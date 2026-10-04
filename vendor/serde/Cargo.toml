@@ -1,0 +1,17 @@
+[package]
+name = "serde"
+version = "1.0.228"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+build = "build.rs"
+[features]
+default = ["std"]
+std = ["serde_core/std"]
+alloc = ["serde_core/alloc"]
+rc = ["serde_core/rc"]
+unstable = ["serde_core/unstable"]
+derive = ["serde_derive"]
+[dependencies]
+serde_core = { path = "../serde_core", default-features = false, features = ["result"] }
+serde_derive = { path = "../serde_derive", optional = true }
+

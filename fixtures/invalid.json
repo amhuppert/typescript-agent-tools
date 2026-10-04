@@ -1,0 +1,218 @@
+[
+  {
+    "name": "missing-initializer",
+    "source": "const x = ;"
+  },
+  {
+    "name": "missing-type",
+    "source": "type X = ;"
+  },
+  {
+    "name": "unclosed-block",
+    "source": "function f() { return 1;"
+  },
+  {
+    "name": "unterminated-string",
+    "source": "const x = 'hello;"
+  },
+  {
+    "name": "unterminated-comment",
+    "source": "/* hello"
+  },
+  {
+    "name": "unterminated-regex",
+    "source": "const x = /abc;"
+  },
+  {
+    "name": "invalid-exponent",
+    "source": "const x = 1e+;"
+  },
+  {
+    "name": "invalid-separator",
+    "source": "const x = 1__2;"
+  },
+  {
+    "name": "separator-after-zero",
+    "source": "const x = 0_1;"
+  },
+  {
+    "name": "fractional-bigint",
+    "source": "const x = 1.2n;"
+  },
+  {
+    "name": "unterminated-template",
+    "source": "const x = `abc ${value;"
+  },
+  {
+    "name": "untagged-invalid-escape",
+    "source": "const x = `\\u{}`;"
+  },
+  {
+    "name": "invalid-string-escape",
+    "source": "const x = '\\xGG';"
+  },
+  {
+    "name": "throw-line-break",
+    "source": "throw\nnew Error();",
+    "nativeDiagnostic": 1142
+  },
+  {
+    "name": "jsx-mismatch",
+    "jsx": true,
+    "source": "const x = <A></B>;"
+  },
+  {
+    "name": "jsx-arrow-ambiguity",
+    "jsx": true,
+    "source": "const f = <T>(x: T) => x;"
+  },
+  {
+    "name": "array-in-for",
+    "source": "for (let x = [a in b]; ; ) {}"
+  },
+  {
+    "name": "binary-assignment",
+    "source": "x + y = z;"
+  },
+  {
+    "name": "unparenthesized-function-union",
+    "source": "type X = number | () => void;"
+  },
+  {
+    "name": "instantiation-property",
+    "source": "const x = new C<T>.member();"
+  },
+  {
+    "name": "await-class-heritage",
+    "source": "class C extends await(foo) {} export {};"
+  },
+  {
+    "name": "jsx-unescaped-close-brace",
+    "source": "const x = <p>}</p>;",
+    "jsx": true
+  },
+  {
+    "name": "jsx-unescaped-greater",
+    "source": "const x = <p>></p>;",
+    "jsx": true
+  },
+  {
+    "name": "reserved-variable",
+    "source": "const for = 1;"
+  },
+  {
+    "name": "reserved-function-name",
+    "source": "function return() {}"
+  },
+  {
+    "name": "reserved-binding-shorthand",
+    "source": "const {default} = value;"
+  },
+  {
+    "name": "removed-module-namespace",
+    "source": "module Old {}",
+    "nativeDiagnostic": 1540
+  },
+  {
+    "name": "removed-import-assert",
+    "source": "import value from \"pkg\" assert {type: \"json\"};"
+  },
+  {
+    "name": "removed-import-type-assert",
+    "source": "type T = import('pkg', {assert: {type: 'json'}});"
+  },
+  {
+    "name": "optional-private-member",
+    "source": "a?.b.#value;"
+  },
+  {
+    "name": "optional-private-member-after-non-null",
+    "source": "a?.b!.#value;"
+  },
+  {
+    "name": "optional-chain-new-target",
+    "source": "new C?.();"
+  },
+  {
+    "name": "jsx-spread-attribute-value",
+    "source": "const x = <C prop={...value} />;",
+    "jsx": true
+  },
+  {
+    "name": "arrow-block-binary-operand",
+    "source": "a = () => {} || b;"
+  },
+  {
+    "name": "bare-super",
+    "source": "super;"
+  },
+  {
+    "name": "unary-exponent-lhs",
+    "source": "const x = -a ** b;"
+  },
+  {
+    "name": "await-exponent-lhs",
+    "source": "async function f() { return await a ** b; }"
+  },
+  {
+    "name": "cast-exponent-lhs",
+    "source": "const x = <T>a ** b;"
+  },
+  {
+    "name": "delegated-yield-without-operand",
+    "source": "function* f() { yield *; }"
+  },
+  {
+    "name": "generator-member-without-parameters",
+    "source": "class C { *value; }"
+  },
+  {
+    "name": "constructor-without-parameters",
+    "source": "class C { constructor; }"
+  },
+  {
+    "name": "optional-constructor",
+    "source": "class C { constructor?() {} }"
+  },
+  {
+    "name": "asserted-method",
+    "source": "class C { method!() {} }"
+  },
+  {
+    "name": "void-qualified-type",
+    "source": "let x: void.Name;"
+  },
+  {
+    "name": "unknown-jsdoc-type",
+    "source": "type T = (?);"
+  },
+  {
+    "name": "legacy-jsdoc-function-type",
+    "source": "type T = function(number): number;"
+  },
+  {
+    "name": "invalid-reference-resolution-mode",
+    "source": "/// <reference types='pkg' resolution-mode='esm' />\nexport {};"
+  },
+  {
+    "name": "invalid-reference-quote",
+    "source": "/// <reference path=\"unclosed />\nexport {};"
+  },
+  {
+    "name": "escaped-jsx-name",
+    "source": "const x = <\\u{41} />;",
+    "jsx": true
+  },
+  {
+    "name": "identifier-newer-than-compiler-unicode",
+    "source": "const \\u{558} = 1;"
+  },
+  {
+    "name": "identifier-part-newer-than-compiler-unicode",
+    "source": "const a\\u{5c8} = 1;"
+  },
+  {
+    "name": "malformed-function-type-in-call",
+    "source": "const result = ([x, ...xs]) << (f<T>());"
+  }
+]

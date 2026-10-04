@@ -1,0 +1,962 @@
+use super::*;
+
+impl<'src> Parser<'src> {
+    pub(super) fn expression(&mut self) -> Result<NodeId> {
+        let context = self.context;
+        self.context &= !32768;
+        let result = (|| {
+            let mut left = self.assignment_expression()?;
+            while self.at(",") {
+                let operator = self.token_node()?;
+                let right = self.assignment_expression()?;
+                left = self.finish(
+                    "BinaryExpression",
+                    self.start(left),
+                    fields![
+                        ("left", left.into()),
+                        ("operatorToken", operator.into()),
+                        ("right", right.into()),
+                    ],
+                );
+            }
+            Ok(left)
+        })();
+        self.context = context;
+        result
+    }
+    pub(super) fn assignment_expression(&mut self) -> Result<NodeId> {
+        self.expression_bp(2, true)
+    }
+    fn expression_bp(&mut self, minimum: u8, allow_arrow_return: bool) -> Result<NodeId> {
+        self.nest(|p| {
+            let mut left = p.unary_expression(minimum <= 2, allow_arrow_return)?;
+            if p.nodes[left.0].kind == "ArrowFunction" {
+                return Ok(left);
+            }
+            loop {
+                if p.at("?") && minimum <= 3 {
+                    let question = p.token_node()?;
+                    let saved = p.allow_in;
+                    p.allow_in = true;
+                    let when_true = p.expression_bp(2, false)?;
+                    p.allow_in = saved;
+                    if !p.at(":") {
+                        return Err(p.error("Expected ':' in conditional expression"));
+                    }
+                    let colon = p.token_node()?;
+                    let when_false = p.expression_bp(2, allow_arrow_return)?;
+                    left = p.finish(
+                        "ConditionalExpression",
+                        p.start(left),
+                        fields![
+                            ("condition", left.into()),
+                            ("questionToken", question.into()),
+                            ("whenTrue", when_true.into()),
+                            ("colonToken", colon.into()),
+                            ("whenFalse", when_false.into()),
+                        ],
+                    );
+                    return Ok(left);
+                }
+                let Some((precedence, right_associative)) = binary_precedence(p.current.raw) else {
+                    break;
+                };
+                if precedence < minimum || (p.at("in") && !p.allow_in) {
+                    break;
+                }
+                if p.at("**")
+                    && (matches!(
+                        p.nodes[left.0].kind,
+                        "DeleteExpression"
+                            | "VoidExpression"
+                            | "TypeOfExpression"
+                            | "AwaitExpression"
+                            | "TypeAssertionExpression"
+                    ) || p.nodes[left.0].kind == "PrefixUnaryExpression"
+                        && !matches!(
+                            p.nodes[left.0].field("operator"),
+                            Some(Value::Number(46 | 47))
+                        ))
+                {
+                    return Err(p.error("A unary expression before '**' must be parenthesized"));
+                }
+                if precedence == 2
+                    && matches!(
+                        p.nodes[left.0].kind,
+                        "BinaryExpression"
+                            | "ConditionalExpression"
+                            | "AsExpression"
+                            | "SatisfiesExpression"
+                            | "TypeAssertionExpression"
+                            | "PrefixUnaryExpression"
+                            | "PostfixUnaryExpression"
+                            | "AwaitExpression"
+                            | "YieldExpression"
+                            | "DeleteExpression"
+                            | "VoidExpression"
+                            | "TypeOfExpression"
+                            | "ArrowFunction"
+                    )
+                {
+                    return Err(p.error("Expected a left-hand-side expression before assignment"));
+                }
+                if p.at("as") || p.at("satisfies") {
+                    if p.current.newline {
+                        break;
+                    }
+                    let kind = if p.at("as") {
+                        "AsExpression"
+                    } else {
+                        "SatisfiesExpression"
+                    };
+                    p.bump()?;
+                    let type_node = p.type_node()?;
+                    left = p.finish(
+                        kind,
+                        p.start(left),
+                        fields![("expression", left.into()), ("type", type_node.into())],
+                    );
+                    continue;
+                }
+                let operator = p.token_node()?;
+                let right = p.expression_bp(
+                    precedence + u8::from(!right_associative),
+                    allow_arrow_return,
+                )?;
+                left = p.finish(
+                    "BinaryExpression",
+                    p.start(left),
+                    fields![
+                        ("left", left.into()),
+                        ("operatorToken", operator.into()),
+                        ("right", right.into()),
+                    ],
+                );
+                if precedence == 2 {
+                    return Ok(left);
+                }
+            }
+            Ok(left)
+        })
+    }
+    fn unary_expression(
+        &mut self,
+        allow_assignment: bool,
+        allow_arrow_return: bool,
+    ) -> Result<NodeId> {
+        let start = self.pos();
+        let potential_arrow = self.at("(")
+            || self.at("<")
+            || self.at("async")
+            || (self.current.kind == Kind::Word && self.peek_at("=>"));
+        if allow_assignment && potential_arrow {
+            if let Some(arrow) = self.attempt(|p| {
+                let (start, fields, modifiers) = p.arrow_head()?;
+                let has_return_type = fields.iter().any(|(key, _)| *key == "type");
+                let ambiguous = !fields.iter().any(|(key, _)| *key == "typeParameters")
+                    && matches!(fields.iter().find(|(key, _)| *key == "parameters"), Some((_, Value::Nodes(parameters))) if !parameters.is_empty() && parameters.iter().all(|id| !p.nodes[id.0].fields.iter().any(|(key, _)| matches!(*key, "type" | "questionToken" | "dotDotDotToken" | "modifiers"))));
+                let saved = p.allow_in;
+                let saved_context = p.context;
+                let async_function = modifiers
+                    .iter()
+                    .any(|id| p.nodes[id.0].kind == "AsyncKeyword");
+                p.context = p.function_context(async_function, false);
+                let body = if p.at("{") {
+                    p.block("Block")?
+                } else {
+                    p.expression_bp(2, allow_arrow_return)?
+                };
+                p.allow_in = saved;
+                p.context = saved_context;
+                if !allow_arrow_return && has_return_type && ambiguous && !p.at(":") {
+                    return Err(p.error("Conditional expression boundary"));
+                }
+                let id = p.finish("ArrowFunction", start, fields);
+                p.field(id, "body", body);
+                p.attach_modifiers(id, modifiers);
+                Ok(id)
+            }) {
+                return Ok(arrow);
+            }
+        }
+        let next = if self.at("await") || self.at("yield") {
+            Some(self.peek())
+        } else {
+            None
+        };
+        let keyword_operand = next.is_some_and(|next| {
+            !next.newline && matches!(next.kind, Kind::Word | Kind::Number | Kind::String)
+        });
+        if allow_assignment && self.at("yield") && (self.context & 16384 != 0 || keyword_operand) {
+            self.bump()?;
+            let mut fields: Fields<'src> = Fields::new();
+            if !self.current.newline {
+                let delegated = self.optional_token("*", "asteriskToken", &mut fields)?;
+                if !matches!(self.current.raw, ";" | "}" | ")" | "]" | "," | ":")
+                    && self.current.kind != Kind::Eof
+                {
+                    fields.push(("expression", self.assignment_expression()?.into()));
+                } else if delegated {
+                    return Err(self.error("Expected an expression after 'yield *'"));
+                }
+            }
+            return Ok(self.finish("YieldExpression", start, fields));
+        }
+        if matches!(
+            self.current.raw,
+            "delete" | "typeof" | "void" | "+" | "-" | "!" | "~" | "++" | "--"
+        ) || (self.at("await") && (self.context & 65536 != 0 || keyword_operand))
+        {
+            let operator = self.bump()?;
+            let operand = if matches!(operator.raw, "++" | "--") {
+                self.nest(|p| p.postfix_expression(false))?
+            } else {
+                self.nest(|p| p.unary_expression(false, allow_arrow_return))?
+            };
+            let (kind, fields) = match operator.raw {
+                "delete" => ("DeleteExpression", fields![("expression", operand.into())]),
+                "typeof" => ("TypeOfExpression", fields![("expression", operand.into())]),
+                "void" => ("VoidExpression", fields![("expression", operand.into())]),
+                "await" => ("AwaitExpression", fields![("expression", operand.into())]),
+                _ => (
+                    "PrefixUnaryExpression",
+                    fields![
+                        (
+                            "operator",
+                            Value::Number(crate::syntax_kind::number(token_kind(
+                                operator.raw,
+                                operator.kind,
+                            )) as u32),
+                        ),
+                        ("operand", operand.into()),
+                    ],
+                ),
+            };
+            return Ok(self.finish(kind, start, fields));
+        }
+        if self.at("<") && !self.options.jsx {
+            self.bump()?;
+            let type_node = self.type_node()?;
+            self.expect_type_close()?;
+            let expression = self.nest(|p| p.unary_expression(false, allow_arrow_return))?;
+            return Ok(self.finish(
+                "TypeAssertionExpression",
+                start,
+                fields![
+                    ("type", type_node.into()),
+                    ("expression", expression.into()),
+                ],
+            ));
+        }
+        let operand = self.postfix_expression(false)?;
+        if !self.current.newline && matches!(self.current.raw, "++" | "--") {
+            let operator = self.bump()?;
+            return Ok(self.finish(
+                "PostfixUnaryExpression",
+                self.start(operand),
+                fields![
+                    ("operand", operand.into()),
+                    (
+                        "operator",
+                        Value::Number(crate::syntax_kind::number(token_kind(
+                            operator.raw,
+                            operator.kind,
+                        )) as u32),
+                    ),
+                ],
+            ));
+        }
+        Ok(operand)
+    }
+    fn arrow_head(&mut self) -> Result<(usize, Fields<'src>, Vec<NodeId>)> {
+        let start = self.pos();
+        let mut fields: Fields<'src> = Fields::new();
+        let mut modifiers = vec![];
+        if self.at("async") && !self.peek_at("=>") {
+            modifiers.push(self.token_node()?);
+            if self.current.newline {
+                return Err(self.error("Line break after async"));
+            }
+        }
+        if self.at("<") {
+            let generic_start = self.current.start;
+            let type_parameters = self.type_parameters()?;
+            if self.options.jsx
+                && type_parameters.len() == 1
+                && !self.lexer.src[generic_start..self.end].contains(',')
+                && self.nodes[type_parameters[0].0]
+                    .field("constraint")
+                    .is_none()
+                && self.nodes[type_parameters[0].0].field("default").is_none()
+            {
+                return Err(
+                    self.error("Ambiguous JSX generic arrow; add a trailing comma or constraint")
+                );
+            }
+            fields.push(("typeParameters", type_parameters.into()));
+        }
+        let saved_context = self.context;
+        let saved_in = self.allow_in;
+        let simple_parameter = !self.at("(");
+        let parameters = if self.at("(") {
+            let async_function = modifiers
+                .iter()
+                .any(|id| self.nodes[id.0].kind == "AsyncKeyword");
+            self.parameters_with_context(async_function, false)?
+        } else {
+            let pos = self.pos();
+            if self.at("await") && self.context & 65536 != 0
+                || self.at("yield") && self.context & 16384 != 0
+            {
+                return Err(self.error("Expected an arrow parameter identifier"));
+            }
+            let name = self.binding_identifier()?;
+            vec![self.finish("Parameter", pos, fields![("name", name.into())])]
+        };
+        fields.push(("parameters", parameters.into()));
+        if self.eat(":")? {
+            fields.push(("type", self.return_type()?.into()));
+        }
+        self.context = saved_context;
+        self.allow_in = saved_in;
+        if !self.at("=>") || self.current.newline && simple_parameter && !modifiers.is_empty() {
+            return Err(self.error("Expected arrow"));
+        }
+        fields.push(("equalsGreaterThanToken", self.token_node()?.into()));
+        Ok((start, fields, modifiers))
+    }
+    pub(super) fn postfix_expression(&mut self, no_call: bool) -> Result<NodeId> {
+        let expression = self.primary_expression()?;
+        self.postfix_rest(expression, no_call)
+    }
+    fn postfix_rest(&mut self, mut expression: NodeId, no_call: bool) -> Result<NodeId> {
+        loop {
+            let start = self.start(expression);
+            let optional_chain = self.nodes[expression.0].flags & 64 != 0;
+            if self.at(".") || self.at("?.") {
+                if no_call && self.at("?.") {
+                    return Err(self.error("An optional chain cannot be the target of 'new'"));
+                }
+                let question = if self.at("?.") {
+                    Some(self.token_node()?)
+                } else {
+                    self.bump()?;
+                    None
+                };
+                let chain = question.is_some() || self.try_optional_chain(expression);
+                let mut fields = fields![("expression", expression.into())];
+                if let Some(question) = question {
+                    fields.push(("questionDotToken", question.into()));
+                }
+                let kind = if question.is_some() && self.eat("[")? {
+                    let saved = self.allow_in;
+                    self.allow_in = true;
+                    fields.push(("argumentExpression", self.expression()?.into()));
+                    self.allow_in = saved;
+                    self.expect("]")?;
+                    "ElementAccessExpression"
+                } else if question.is_some() && !no_call && (self.at("(") || self.type_open()) {
+                    if self.type_open() {
+                        fields.push(("typeArguments", self.type_arguments()?.into()));
+                    }
+                    if matches!(
+                        self.current.kind,
+                        Kind::TemplateHead | Kind::NoSubstitutionTemplate
+                    ) {
+                        fields[0].0 = "tag";
+                        fields.push(("template", self.tagged_template()?.into()));
+                        "TaggedTemplateExpression"
+                    } else {
+                        fields.push(("arguments", self.arguments()?.into()));
+                        "CallExpression"
+                    }
+                } else if question.is_some()
+                    && matches!(
+                        self.current.kind,
+                        Kind::TemplateHead | Kind::NoSubstitutionTemplate
+                    )
+                {
+                    fields[0].0 = "tag";
+                    fields.push(("template", self.tagged_template()?.into()));
+                    "TaggedTemplateExpression"
+                } else {
+                    if self.nodes[expression.0].kind == "ExpressionWithTypeArguments" {
+                        return Err(self.error(
+                            "An instantiation expression cannot be followed by a property access",
+                        ));
+                    }
+                    if chain && self.current.kind == Kind::Private {
+                        return Err(
+                            self.error("An optional chain cannot contain private identifiers")
+                        );
+                    }
+                    fields.push(("name", self.identifier()?.into()));
+                    "PropertyAccessExpression"
+                };
+                expression = self.finish(kind, start, fields);
+                if chain {
+                    self.nodes[expression.0].flags |= 64;
+                }
+            } else if self.context & 32768 == 0 && self.eat("[")? {
+                let chain = self.try_optional_chain(expression);
+                let saved = self.allow_in;
+                self.allow_in = true;
+                let argument = self.expression()?;
+                self.allow_in = saved;
+                self.expect("]")?;
+                expression = self.finish(
+                    "ElementAccessExpression",
+                    start,
+                    fields![
+                        ("expression", expression.into()),
+                        ("argumentExpression", argument.into()),
+                    ],
+                );
+                if chain {
+                    self.nodes[expression.0].flags |= 64;
+                }
+            } else if !no_call && self.at("(") {
+                let chain = self.try_optional_chain(expression);
+                let arguments = self.arguments()?;
+                expression = self.finish(
+                    "CallExpression",
+                    start,
+                    fields![
+                        ("expression", expression.into()),
+                        ("arguments", arguments.into()),
+                    ],
+                );
+                if chain {
+                    self.nodes[expression.0].flags |= 64;
+                }
+            } else if self.type_open() {
+                let arguments = self.expression_type_arguments(no_call)?;
+                let Some(type_arguments) = arguments else {
+                    break;
+                };
+                let mut fields = fields![
+                    ("expression", expression.into()),
+                    ("typeArguments", type_arguments.into()),
+                ];
+                let chain = !no_call && self.at("(") && self.try_optional_chain(expression);
+                let kind = if !no_call && self.at("(") {
+                    fields.push(("arguments", self.arguments()?.into()));
+                    "CallExpression"
+                } else if !no_call
+                    && matches!(
+                        self.current.kind,
+                        Kind::TemplateHead | Kind::NoSubstitutionTemplate
+                    )
+                {
+                    fields.push(("template", self.tagged_template()?.into()));
+                    fields[0].0 = "tag";
+                    "TaggedTemplateExpression"
+                } else {
+                    "ExpressionWithTypeArguments"
+                };
+                expression = self.finish(kind, start, fields);
+                if kind == "CallExpression" && chain
+                    || kind == "TaggedTemplateExpression" && optional_chain
+                {
+                    self.nodes[expression.0].flags |= 64;
+                }
+            } else if matches!(
+                self.current.kind,
+                Kind::TemplateHead | Kind::NoSubstitutionTemplate
+            ) {
+                let template = self.tagged_template()?;
+                expression = self.finish(
+                    "TaggedTemplateExpression",
+                    start,
+                    fields![("tag", expression.into()), ("template", template.into())],
+                );
+                if optional_chain {
+                    self.nodes[expression.0].flags |= 64;
+                }
+            } else if self.at("!") && !self.current.newline {
+                self.bump()?;
+                expression = self.finish(
+                    "NonNullExpression",
+                    start,
+                    fields![("expression", expression.into())],
+                );
+            } else {
+                break;
+            }
+        }
+        Ok(expression)
+    }
+    fn can_follow_type_arguments(&self, no_call: bool) -> bool {
+        no_call
+            || self.at("(")
+            || matches!(
+                self.current.kind,
+                Kind::TemplateHead | Kind::NoSubstitutionTemplate
+            )
+            || !matches!(self.current.raw, "<" | ">" | ">>" | ">>>" | "+" | "-")
+                && (self.current.newline
+                    || binary_precedence(self.current.raw).is_some()
+                    || !matches!(
+                        self.current.kind,
+                        Kind::Word | Kind::Private | Kind::Number | Kind::String
+                    ) && !matches!(self.current.raw, "[" | "{" | "!" | "~" | "++" | "--"))
+    }
+    fn expression_type_arguments(&mut self, no_call: bool) -> Result<Option<Vec<NodeId>>> {
+        let parsed = self.attempt_result(|p| {
+            let arguments = p.type_arguments()?;
+            if p.can_follow_type_arguments(no_call) {
+                Ok(arguments)
+            } else {
+                Err(p.error("Relational expression"))
+            }
+        });
+        match parsed {
+            Ok(arguments) => Ok(Some(arguments)),
+            Err(error) if error.message == "Relational expression" || self.type_probe => Ok(None),
+            Err(_) => {
+                // The compiler commits a type argument list when recovery reaches its real
+                // closing '>' and the following token disambiguates it. Keep its syntax error
+                // instead of silently treating the original '<<' as a shift operator.
+                let mut committed_error = None;
+                let _: Result<()> = self.attempt_result(|p| {
+                    p.type_probe = true;
+                    p.type_probe_error = None;
+                    p.type_arguments()?;
+                    if p.can_follow_type_arguments(no_call) {
+                        committed_error = p.type_probe_error.take();
+                    }
+                    Err(p.error("End of type argument probe"))
+                });
+                match committed_error {
+                    Some(error) => Err(error),
+                    None => Ok(None),
+                }
+            }
+        }
+    }
+    fn try_optional_chain(&mut self, expression: NodeId) -> bool {
+        let mut id = expression;
+        while self.nodes[id.0].flags & 64 == 0 && self.nodes[id.0].kind == "NonNullExpression" {
+            let Some(Value::Node(inner)) = self.nodes[id.0].field("expression") else {
+                return false;
+            };
+            id = *inner;
+        }
+        if self.nodes[id.0].flags & 64 == 0 {
+            return false;
+        }
+        let mut id = expression;
+        while self.nodes[id.0].kind == "NonNullExpression" {
+            self.nodes[id.0].flags |= 64;
+            let Some(Value::Node(inner)) = self.nodes[id.0].field("expression") else {
+                break;
+            };
+            id = *inner;
+        }
+        true
+    }
+    fn primary_expression(&mut self) -> Result<NodeId> {
+        self.check_token()?;
+        let start = self.pos();
+        match self.current.kind {
+            Kind::Number | Kind::String => return self.literal(),
+            Kind::TemplateHead | Kind::NoSubstitutionTemplate => return self.template(false),
+            Kind::Eof => return Err(self.error("Expected expression, found end of input")),
+            _ => {}
+        }
+        match self.current.raw {
+            "(" => {
+                self.bump()?;
+                let saved = self.allow_in;
+                self.allow_in = true;
+                let expression = self.expression()?;
+                self.allow_in = saved;
+                self.expect(")")?;
+                Ok(self.finish(
+                    "ParenthesizedExpression",
+                    start,
+                    fields![("expression", expression.into())],
+                ))
+            }
+            "[" => {
+                self.bump()?;
+                let mut elements = vec![];
+                while !self.at("]") {
+                    let pos = self.pos();
+                    if self.at(",") {
+                        self.bump()?;
+                        elements.push(self.make("OmittedExpression", pos, pos, vec![]));
+                        continue;
+                    }
+                    if self.eat("...")? {
+                        let expression = self.assignment_expression()?;
+                        elements.push(self.finish(
+                            "SpreadElement",
+                            pos,
+                            fields![("expression", expression.into())],
+                        ));
+                    } else {
+                        elements.push(self.assignment_expression()?);
+                    }
+                    if !self.eat(",")? {
+                        break;
+                    }
+                }
+                self.expect("]")?;
+                Ok(self.finish(
+                    "ArrayLiteralExpression",
+                    start,
+                    fields![("elements", elements.into())],
+                ))
+            }
+            "{" => self.object_literal(),
+            "function" => self.function(start, "FunctionExpression", vec![]),
+            "async" if self.peek_at("function") && !self.peek().newline => {
+                let modifier = self.token_node()?;
+                self.function(start, "FunctionExpression", vec![modifier])
+            }
+            "class" => self.class(start, "ClassExpression", vec![]),
+            "@" => {
+                let modifiers = self.modifiers(false)?;
+                if !self.at("class") {
+                    return Err(self.error("Expected a class expression after decorators"));
+                }
+                self.class(start, "ClassExpression", modifiers)
+            }
+            "new" => self.new_expression(),
+            "import" if self.peek_at(".") => {
+                self.bump()?;
+                self.expect(".")?;
+                let name = self.identifier()?;
+                if matches!(self.nodes[name.0].field("escapedText"), Some(Value::Text(text)) if text == "defer")
+                {
+                    if self.at("(") || self.at("<") {
+                        self.source_flags |= 4194304;
+                    }
+                } else {
+                    self.source_flags |= 8388608;
+                }
+                Ok(self.finish(
+                    "MetaProperty",
+                    start,
+                    fields![("keywordToken", Value::Number(102)), ("name", name.into())],
+                ))
+            }
+            "super" => {
+                if !matches!(self.peek().raw, "(" | "." | "[") {
+                    return Err(self.error("'super' must be followed by a call or member access"));
+                }
+                self.token_node()
+            }
+            "null" | "true" | "false" | "this" => self.token_node(),
+            "/" | "/=" => {
+                let token = self.lexer.regex(self.current.start);
+                if let Some(error) = token.error {
+                    return Err(Diagnostic {
+                        message: error.into(),
+                        span: Span {
+                            start: token.start,
+                            end: token.end,
+                        },
+                    });
+                }
+                self.end = token.end;
+                self.current = self.lexer.next();
+                Ok(self.make(
+                    "RegularExpressionLiteral",
+                    start,
+                    token.end,
+                    fields![("text", token.raw.into())],
+                ))
+            }
+            "<" if self.options.jsx => self.jsx_element(),
+            "await" if self.context & 65536 != 0 => {
+                Err(self.error("Expected a left-hand-side expression before await"))
+            }
+            "yield" if self.context & 16384 != 0 => {
+                Err(self.error("Expected a left-hand-side expression before yield"))
+            }
+            "import" => {
+                if matches!(self.peek().raw, "(" | "<" | "<<") {
+                    self.source_flags |= 4194304;
+                    return self.token_node();
+                }
+                Err(self.error("Expected '(' or '.' after import"))
+            }
+            _ if self.current.kind == Kind::Word || self.current.kind == Kind::Private => {
+                if matches!(
+                    self.current.raw,
+                    "else"
+                        | "return"
+                        | "throw"
+                        | "for"
+                        | "while"
+                        | "if"
+                        | "switch"
+                        | "case"
+                        | "default"
+                        | "try"
+                        | "catch"
+                        | "finally"
+                        | "const"
+                        | "var"
+                        | "export"
+                        | "extends"
+                        | "implements"
+                        | "break"
+                        | "continue"
+                        | "debugger"
+                        | "do"
+                        | "with"
+                        | "enum"
+                ) {
+                    return Err(self.error("Unexpected keyword in expression"));
+                }
+                if self.current.kind == Kind::Private {
+                    self.identifier()
+                } else {
+                    self.binding_identifier()
+                }
+            }
+            _ => Err(self.error(format!("Expected expression, found '{}'", self.current.raw))),
+        }
+    }
+    fn arguments(&mut self) -> Result<Vec<NodeId>> {
+        self.expect("(")?;
+        let mut arguments = vec![];
+        let saved = self.allow_in;
+        self.allow_in = true;
+        let saved_context = self.context;
+        self.context &= !32768;
+        while !self.at(")") {
+            let start = self.pos();
+            if self.eat("...")? {
+                let expression = self.assignment_expression()?;
+                arguments.push(self.finish(
+                    "SpreadElement",
+                    start,
+                    fields![("expression", expression.into())],
+                ));
+            } else {
+                arguments.push(self.assignment_expression()?);
+            }
+            if !self.eat(",")? {
+                break;
+            }
+        }
+        self.expect(")")?;
+        self.allow_in = saved;
+        self.context = saved_context;
+        Ok(arguments)
+    }
+    fn new_expression(&mut self) -> Result<NodeId> {
+        self.nest(|p| {
+            let start = p.pos();
+            p.expect("new")?;
+            if p.eat(".")? {
+                let name = p.identifier()?;
+                return Ok(p.finish(
+                    "MetaProperty",
+                    start,
+                    fields![("keywordToken", Value::Number(105)), ("name", name.into())],
+                ));
+            }
+            let expression = p.postfix_expression(true)?;
+            let mut fields = if p.nodes[expression.0].kind == "ExpressionWithTypeArguments" {
+                p.nodes[expression.0].fields.clone()
+            } else {
+                fields![("expression", expression.into())]
+            };
+            if p.at("(") {
+                fields.push(("arguments", p.arguments()?.into()));
+            }
+            Ok(p.finish("NewExpression", start, fields))
+        })
+    }
+    fn object_literal(&mut self) -> Result<NodeId> {
+        let start = self.pos();
+        self.expect("{")?;
+        let mut properties = vec![];
+        while !self.at("}") {
+            let pos = self.pos();
+            if self.eat("...")? {
+                let expression = self.assignment_expression()?;
+                properties.push(self.finish(
+                    "SpreadAssignment",
+                    pos,
+                    fields![("expression", expression.into())],
+                ));
+            } else {
+                let modifiers = self.modifiers(true)?;
+                let accessor = if matches!(self.current.raw, "get" | "set")
+                    && (matches!(
+                        self.peek().kind,
+                        Kind::Word | Kind::Private | Kind::String | Kind::Number
+                    ) || self.peek_at("["))
+                {
+                    Some(self.bump()?.raw)
+                } else {
+                    None
+                };
+                let mut fields: Fields<'src> = Fields::new();
+                let generator = self.optional_token("*", "asteriskToken", &mut fields)?;
+                let name = self.property_name()?;
+                fields.push(("name", name.into()));
+                self.optional_token("?", "questionToken", &mut fields)?;
+                self.optional_token("!", "exclamationToken", &mut fields)?;
+                let saved_context = self.context;
+                let kind = if !generator && accessor.is_none() && self.eat(":")? {
+                    fields.push(("initializer", self.assignment_allow_in()?.into()));
+                    "PropertyAssignment"
+                } else if generator || accessor.is_some() || self.at("(") || self.at("<") {
+                    if self.at("<") {
+                        fields.push(("typeParameters", self.type_parameters()?.into()));
+                    }
+                    let async_function = accessor.is_none()
+                        && modifiers
+                            .iter()
+                            .any(|id| self.nodes[id.0].kind == "AsyncKeyword");
+                    let generator = generator && accessor.is_none();
+                    fields.push((
+                        "parameters",
+                        self.parameters_with_context(async_function, generator)?
+                            .into(),
+                    ));
+                    if self.eat(":")? {
+                        fields.push(("type", self.return_type()?.into()));
+                    }
+                    self.context = self.function_context(async_function, generator);
+                    if self.at("{") {
+                        fields.push(("body", self.block("Block")?.into()));
+                    } else {
+                        self.semi()?;
+                    }
+                    match accessor {
+                        Some("get") => "GetAccessor",
+                        Some("set") => "SetAccessor",
+                        _ => "MethodDeclaration",
+                    }
+                } else {
+                    if self.nodes[name.0].kind != "Identifier" {
+                        return Err(self.error("Expected ':' after property name"));
+                    }
+                    if matches!(self.nodes[name.0].field("escapedText"), Some(Value::Text(text)) if reserved_word(text))
+                    {
+                        return Err(self.error("Expected ':' after reserved property name"));
+                    }
+                    if matches!(self.nodes[name.0].field("escapedText"), Some(Value::Text(text)) if text == "await" && self.context & 65536 != 0 || text == "yield" && self.context & 16384 != 0)
+                    {
+                        return Err(self.error("Expected ':' after a contextual property name"));
+                    }
+                    if self.at("=") {
+                        fields.push(("equalsToken", self.token_node()?.into()));
+                        fields.push((
+                            "objectAssignmentInitializer",
+                            self.assignment_allow_in()?.into(),
+                        ));
+                    }
+                    "ShorthandPropertyAssignment"
+                };
+                self.context = saved_context;
+                let id = self.finish(kind, pos, fields);
+                self.attach_modifiers(id, modifiers);
+                properties.push(id);
+            }
+            if !self.eat(",")? {
+                break;
+            }
+        }
+        self.expect("}")?;
+        Ok(self.finish(
+            "ObjectLiteralExpression",
+            start,
+            fields![("properties", properties.into())],
+        ))
+    }
+    pub(super) fn template(&mut self, type_context: bool) -> Result<NodeId> {
+        self.template_inner(type_context, false)
+    }
+    fn tagged_template(&mut self) -> Result<NodeId> {
+        self.template_inner(false, true)
+    }
+    fn template_inner(&mut self, type_context: bool, tagged: bool) -> Result<NodeId> {
+        let start = self.pos();
+        if self.current.kind == Kind::NoSubstitutionTemplate {
+            let literal = self.literal_mode(tagged)?;
+            return if type_context {
+                Ok(self.finish("LiteralType", start, fields![("literal", literal.into())]))
+            } else {
+                Ok(literal)
+            };
+        }
+        let head = self.literal_mode(tagged)?;
+        let mut spans = vec![];
+        loop {
+            let pos = self.pos();
+            let saved = self.allow_in;
+            self.allow_in = true;
+            let value = if type_context {
+                self.type_node()?
+            } else {
+                self.expression()?
+            };
+            self.allow_in = saved;
+            if !self.at("}") {
+                return Err(self.error("Expected '}' in template substitution"));
+            }
+            let full_start = self.current.full_start;
+            self.current = self.lexer.template(self.current.start, true, false);
+            self.current.full_start = full_start;
+            self.check_token()?;
+            let tail = self.current.kind == Kind::TemplateTail;
+            let literal = self.literal_mode(tagged)?;
+            spans.push(self.finish(
+                if type_context {
+                    "TemplateLiteralTypeSpan"
+                } else {
+                    "TemplateSpan"
+                },
+                pos,
+                fields![
+                    (
+                        if type_context { "type" } else { "expression" },
+                        value.into(),
+                    ),
+                    ("literal", literal.into()),
+                ],
+            ));
+            if tail {
+                break;
+            }
+        }
+        Ok(self.finish(
+            if type_context {
+                "TemplateLiteralType"
+            } else {
+                "TemplateExpression"
+            },
+            start,
+            fields![("head", head.into()), ("templateSpans", spans.into())],
+        ))
+    }
+}
+
+fn binary_precedence(operator: &str) -> Option<(u8, bool)> {
+    Some(match operator {
+        "," => (1, false),
+        "=" | "+=" | "-=" | "*=" | "/=" | "%=" | "**=" | "<<=" | ">>=" | ">>>=" | "&=" | "|="
+        | "^=" | "&&=" | "||=" | "??=" => (2, true),
+        "??" | "||" => (4, false),
+        "&&" => (5, false),
+        "|" => (6, false),
+        "^" => (7, false),
+        "&" => (8, false),
+        "==" | "!=" | "===" | "!==" => (9, false),
+        "<" | ">" | "<=" | ">=" | "instanceof" | "in" | "as" | "satisfies" => (10, false),
+        "<<" | ">>" | ">>>" => (11, false),
+        "+" | "-" => (12, false),
+        "*" | "/" | "%" => (13, false),
+        "**" => (14, true),
+        _ => return None,
+    })
+}

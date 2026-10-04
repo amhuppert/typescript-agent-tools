@@ -1,0 +1,10 @@
+[package]
+name = "ryu"
+version = "1.0.20"
+edition = "2018"
+license = "Apache-2.0 OR BSL-1.0"
+[features]
+small = []
+[lints.rust]
+unexpected_cfgs = "allow"
+unused_assignments = "allow"

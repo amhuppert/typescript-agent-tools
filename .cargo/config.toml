@@ -1,0 +1,15 @@
+[patch.crates-io]
+proc-macro2 = { path = "vendor/proc-macro2" }
+quote = { path = "vendor/quote" }
+syn = { path = "vendor/syn" }
+unicode-ident = { path = "vendor/unicode-ident" }
+itoa = { path = "vendor/itoa" }
+nom = { path = "vendor/nom" }
+serde = { path = "vendor/serde" }
+serde_core = { path = "vendor/serde_core" }
+serde_derive = { path = "vendor/serde_derive" }
+serde_json = { path = "vendor/serde_json" }
+memchr = { path = "vendor/memchr" }
+ryu = { path = "vendor/ryu" }
+unicode-id-start = { path = "vendor/unicode-id-start" }
+smallvec = { path = "vendor/smallvec" }

@@ -1,0 +1,2084 @@
+{
+  "format": 1,
+  "files": [
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "LICENSE",
+      "local": "vendor/nom/LICENSE",
+      "mode": "100644",
+      "sha": "88557e44e34e2469f83d9c87701821c14386ba6b"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "README.md",
+      "local": "vendor/nom/README.md",
+      "mode": "100644",
+      "sha": "3a834eba03f4b72a1d3f8dc16f706c811c7a8e6e"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "doc/nom_recipes.md",
+      "local": "vendor/nom/doc/nom_recipes.md",
+      "mode": "100644",
+      "sha": "91616704af6b7b102dea0d0077dfa29762e96349"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/bits/complete.rs",
+      "local": "vendor/nom/src/bits/complete.rs",
+      "mode": "100644",
+      "sha": "a99ad8acc7ae6b745371ee92de63ad1aea55105f"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/bits/mod.rs",
+      "local": "vendor/nom/src/bits/mod.rs",
+      "mode": "100644",
+      "sha": "f120cb3535e2cb43b7f477f758c331417dc10402"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/bits/streaming.rs",
+      "local": "vendor/nom/src/bits/streaming.rs",
+      "mode": "100644",
+      "sha": "c9215956aa88a21f5097140087c7b235195bd830"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/branch/mod.rs",
+      "local": "vendor/nom/src/branch/mod.rs",
+      "mode": "100644",
+      "sha": "20205f5954be758f1f305d3ae8167c2d53ea633e"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/branch/tests.rs",
+      "local": "vendor/nom/src/branch/tests.rs",
+      "mode": "100644",
+      "sha": "0e374a5900b47e6bae760394823734c450942ac0"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/bytes/complete.rs",
+      "local": "vendor/nom/src/bytes/complete.rs",
+      "mode": "100644",
+      "sha": "780483a8790ec3744d344bfca47fd25aac229ada"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/bytes/mod.rs",
+      "local": "vendor/nom/src/bytes/mod.rs",
+      "mode": "100644",
+      "sha": "b720df39486d92713b66b7d7bd045a8d47ba8012"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/bytes/streaming.rs",
+      "local": "vendor/nom/src/bytes/streaming.rs",
+      "mode": "100644",
+      "sha": "d7f97aae6e626b425645abed040e524b2fd9d960"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/bytes/tests.rs",
+      "local": "vendor/nom/src/bytes/tests.rs",
+      "mode": "100644",
+      "sha": "9e8b9d38da4d94b49ee206f5a0a049237c2201c6"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/character/complete.rs",
+      "local": "vendor/nom/src/character/complete.rs",
+      "mode": "100644",
+      "sha": "f794d9d11671d66f8cbafb0297bf8d3cc47c3827"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/character/mod.rs",
+      "local": "vendor/nom/src/character/mod.rs",
+      "mode": "100644",
+      "sha": "8bdae4312984f76bf93b79391189e7f55f6a86e7"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/character/streaming.rs",
+      "local": "vendor/nom/src/character/streaming.rs",
+      "mode": "100644",
+      "sha": "9ee48d49b1578ce3834bbb6b9e08e631da717178"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/character/tests.rs",
+      "local": "vendor/nom/src/character/tests.rs",
+      "mode": "100644",
+      "sha": "ef3b02a0d25bbfbdd437c324a95d52141a1ca28f"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/combinator/mod.rs",
+      "local": "vendor/nom/src/combinator/mod.rs",
+      "mode": "100644",
+      "sha": "fe6655b9877ad7a30ad32588dc3a43f7e5b886bd"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/combinator/tests.rs",
+      "local": "vendor/nom/src/combinator/tests.rs",
+      "mode": "100644",
+      "sha": "d02713f2623a0ed758643663a7e849b999b1e852"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/error.rs",
+      "local": "vendor/nom/src/error.rs",
+      "mode": "100644",
+      "sha": "dac6a40071303279f08d34dd1723ec07e1f7fa9e"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/internal.rs",
+      "local": "vendor/nom/src/internal.rs",
+      "mode": "100644",
+      "sha": "94ed7c8599e372de64442ce957bcea0140cfb25c"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/lib.rs",
+      "local": "vendor/nom/src/lib.rs",
+      "mode": "100644",
+      "sha": "c82715a3b0ff7b6c2ae0c71108196c2f539a584e"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/macros.rs",
+      "local": "vendor/nom/src/macros.rs",
+      "mode": "100644",
+      "sha": "980d2d90ed28a5777aa1cd4f345a642f0ca631ea"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/multi/mod.rs",
+      "local": "vendor/nom/src/multi/mod.rs",
+      "mode": "100644",
+      "sha": "d78611f994557b3f0f86b3a9a657e0a4d4438fcd"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/multi/tests.rs",
+      "local": "vendor/nom/src/multi/tests.rs",
+      "mode": "100644",
+      "sha": "1003552f6cf735d1c9006a92ba0c8ac14f8a462b"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/number/complete.rs",
+      "local": "vendor/nom/src/number/complete.rs",
+      "mode": "100644",
+      "sha": "d8a2a978eb445397efb104f8a858472c75865998"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/number/mod.rs",
+      "local": "vendor/nom/src/number/mod.rs",
+      "mode": "100644",
+      "sha": "9e7e3d7e81a460a51b8addbf21b9d6c185dee563"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/number/streaming.rs",
+      "local": "vendor/nom/src/number/streaming.rs",
+      "mode": "100644",
+      "sha": "cd892d657b0918a10597e7a896374339f678d442"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/sequence/mod.rs",
+      "local": "vendor/nom/src/sequence/mod.rs",
+      "mode": "100644",
+      "sha": "369796964982b2b2f0feec3c1ac19799fb279542"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/sequence/tests.rs",
+      "local": "vendor/nom/src/sequence/tests.rs",
+      "mode": "100644",
+      "sha": "fc082cd0b2668538242f1913ac6cf6cc13a857d4"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/str.rs",
+      "local": "vendor/nom/src/str.rs",
+      "mode": "100644",
+      "sha": "66cb7b8a97268e4e26b4a1b66a19ca3cef107e5c"
+    },
+    {
+      "name": "nom",
+      "repo": "rust-bakery/nom",
+      "ref": "2cec1b3e4c9ccac62c902d60c00de6d1549ccbe1",
+      "path": "src/traits.rs",
+      "local": "vendor/nom/src/traits.rs",
+      "mode": "100644",
+      "sha": "f778c360198b8e9552f7848b2bae9fe7ba3cbde8"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde/LICENSE-APACHE",
+      "local": "vendor/serde/LICENSE-APACHE",
+      "mode": "120000",
+      "sha": "965b606f331b51d566b46025f9ff311a7aad0c12"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde/LICENSE-MIT",
+      "local": "vendor/serde/LICENSE-MIT",
+      "mode": "120000",
+      "sha": "76219eb72e8524f15c21ec93b9b2592da49b5460"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde/README.md",
+      "local": "vendor/serde/README.md",
+      "mode": "120000",
+      "sha": "32d46ee883b58d6a383eed06eb98f33aa6530ded"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde/build.rs",
+      "local": "vendor/serde/build.rs",
+      "mode": "100644",
+      "sha": "fa0fd5a0d931b8b66c362af27930c7f358af1a7b"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde/crates-io.md",
+      "local": "vendor/serde/crates-io.md",
+      "mode": "120000",
+      "sha": "ae66dc9c49cf24ae5d8353b3c97cfc5e9783fb96"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde/src/integer128.rs",
+      "local": "vendor/serde/src/integer128.rs",
+      "mode": "100644",
+      "sha": "c9ff9d64bd197794d671ee474ecd510b07fa6d2c"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde/src/lib.rs",
+      "local": "vendor/serde/src/lib.rs",
+      "mode": "100644",
+      "sha": "ae495282bda35359b07e35fb55d891c8f7dacb82"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde/src/private/de.rs",
+      "local": "vendor/serde/src/private/de.rs",
+      "mode": "100644",
+      "sha": "6f657f50eb3292be32a52c16feb81bd62e56e041"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde/src/private/mod.rs",
+      "local": "vendor/serde/src/private/mod.rs",
+      "mode": "100644",
+      "sha": "20bfa4eb886af71985fafbc5c5d0f8b8b425d382"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde/src/private/ser.rs",
+      "local": "vendor/serde/src/private/ser.rs",
+      "mode": "100644",
+      "sha": "411e2b41ee8c9da262e6fafc1c7532e3c8030fef"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/LICENSE-APACHE",
+      "local": "vendor/serde_core/LICENSE-APACHE",
+      "mode": "120000",
+      "sha": "965b606f331b51d566b46025f9ff311a7aad0c12"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/LICENSE-MIT",
+      "local": "vendor/serde_core/LICENSE-MIT",
+      "mode": "120000",
+      "sha": "76219eb72e8524f15c21ec93b9b2592da49b5460"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/README.md",
+      "local": "vendor/serde_core/README.md",
+      "mode": "100644",
+      "sha": "94a765e2818b800f9aa61b6ce971d7858f4042e7"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/build.rs",
+      "local": "vendor/serde_core/build.rs",
+      "mode": "100644",
+      "sha": "9a33ab30775dfd45586e5be6796f84066ee41590"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/crate_root.rs",
+      "local": "vendor/serde_core/src/crate_root.rs",
+      "mode": "100644",
+      "sha": "2cf75a40196a761e6666bd77358ac11e73be4fc5"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/de/ignored_any.rs",
+      "local": "vendor/serde_core/src/de/ignored_any.rs",
+      "mode": "100644",
+      "sha": "2360a1742362b1e0b31e0fd1f00e5246161851eb"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/de/impls.rs",
+      "local": "vendor/serde_core/src/de/impls.rs",
+      "mode": "100644",
+      "sha": "ab1a893cc4dcde659409c4677a71715cc220e368"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/de/mod.rs",
+      "local": "vendor/serde_core/src/de/mod.rs",
+      "mode": "100644",
+      "sha": "2518ae68274a9888dd1c18e05d62a6191d3c86b0"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/de/value.rs",
+      "local": "vendor/serde_core/src/de/value.rs",
+      "mode": "100644",
+      "sha": "3d5475def127eb1daaeb0a4e991b07a4ee33867d"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/format.rs",
+      "local": "vendor/serde_core/src/format.rs",
+      "mode": "100644",
+      "sha": "9053cc0704fc94bf09e68dbbd625f5e4bb7ffd30"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/lib.rs",
+      "local": "vendor/serde_core/src/lib.rs",
+      "mode": "100644",
+      "sha": "58d143d79f724399ea14fe4e795f9f2c1256e757"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/macros.rs",
+      "local": "vendor/serde_core/src/macros.rs",
+      "mode": "100644",
+      "sha": "b956730500554bfc0c487937433baeecd937e6ce"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/private/content.rs",
+      "local": "vendor/serde_core/src/private/content.rs",
+      "mode": "100644",
+      "sha": "f29a9b527d65a7e7db298327eb5031f5aec5eb5b"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/private/doc.rs",
+      "local": "vendor/serde_core/src/private/doc.rs",
+      "mode": "100644",
+      "sha": "2cc07f0d931ec977ad0812c828187eb73505cfe2"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/private/mod.rs",
+      "local": "vendor/serde_core/src/private/mod.rs",
+      "mode": "100644",
+      "sha": "dd5f93fe963b267b2eada3b6b6d94fec119c34dd"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/private/seed.rs",
+      "local": "vendor/serde_core/src/private/seed.rs",
+      "mode": "100644",
+      "sha": "bcf267cb09b59bba9133630c3bb3be26709b0e5c"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/private/size_hint.rs",
+      "local": "vendor/serde_core/src/private/size_hint.rs",
+      "mode": "100644",
+      "sha": "783281b46c4e0a84b4cb562971b42ab921508d51"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/private/string.rs",
+      "local": "vendor/serde_core/src/private/string.rs",
+      "mode": "100644",
+      "sha": "c8121a0da718908f5ce1011926a7c363ad77c7cc"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/ser/fmt.rs",
+      "local": "vendor/serde_core/src/ser/fmt.rs",
+      "mode": "100644",
+      "sha": "4b1549f0897cffe4e15347f6c8a359ce97ff68bb"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/ser/impls.rs",
+      "local": "vendor/serde_core/src/ser/impls.rs",
+      "mode": "100644",
+      "sha": "a7a175db9465aa6ab4c6931e18448971a4b0b30a"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/ser/impossible.rs",
+      "local": "vendor/serde_core/src/ser/impossible.rs",
+      "mode": "100644",
+      "sha": "fe69ae24e14bacddbd47362ce7ab75f04667cb87"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/ser/mod.rs",
+      "local": "vendor/serde_core/src/ser/mod.rs",
+      "mode": "100644",
+      "sha": "62e59d981d4ae7096876293f13245c0c80d007fb"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/std_error.rs",
+      "local": "vendor/serde_core/src/std_error.rs",
+      "mode": "100644",
+      "sha": "e026ace100f29f98ff3ddf6e163248430c0c9b3c"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/LICENSE-APACHE",
+      "local": "vendor/serde_derive/LICENSE-APACHE",
+      "mode": "120000",
+      "sha": "965b606f331b51d566b46025f9ff311a7aad0c12"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/LICENSE-MIT",
+      "local": "vendor/serde_derive/LICENSE-MIT",
+      "mode": "120000",
+      "sha": "76219eb72e8524f15c21ec93b9b2592da49b5460"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/README.md",
+      "local": "vendor/serde_derive/README.md",
+      "mode": "120000",
+      "sha": "32d46ee883b58d6a383eed06eb98f33aa6530ded"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/build.rs",
+      "local": "vendor/serde_derive/build.rs",
+      "mode": "100644",
+      "sha": "ebaa409a421ac6eb7b6790873103a5375c648262"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/crates-io.md",
+      "local": "vendor/serde_derive/crates-io.md",
+      "mode": "120000",
+      "sha": "ae66dc9c49cf24ae5d8353b3c97cfc5e9783fb96"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/bound.rs",
+      "local": "vendor/serde_derive/src/bound.rs",
+      "mode": "100644",
+      "sha": "2ff6521fe3f1a45b72953380afac3d73e5b8c96c"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/de.rs",
+      "local": "vendor/serde_derive/src/de.rs",
+      "mode": "100644",
+      "sha": "ca19bb6f722cd76c7bd1ee7f3c90604a18d69e19"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/de/enum_.rs",
+      "local": "vendor/serde_derive/src/de/enum_.rs",
+      "mode": "100644",
+      "sha": "6f5094ff4f7d7c01478a4ea97974dfefffbb0181"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/de/enum_adjacently.rs",
+      "local": "vendor/serde_derive/src/de/enum_adjacently.rs",
+      "mode": "100644",
+      "sha": "467cfc0d753caf254dc05f74327573e488af5f78"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/de/enum_externally.rs",
+      "local": "vendor/serde_derive/src/de/enum_externally.rs",
+      "mode": "100644",
+      "sha": "9e5bde3d8b66b7a7b9df6f491779ace5f0ee691b"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/de/enum_internally.rs",
+      "local": "vendor/serde_derive/src/de/enum_internally.rs",
+      "mode": "100644",
+      "sha": "b669eef7e813c597588db348979e82b00ebbbf88"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/de/enum_untagged.rs",
+      "local": "vendor/serde_derive/src/de/enum_untagged.rs",
+      "mode": "100644",
+      "sha": "f66d98de1f867e40d07ff1051785ca4edc1924fa"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/de/identifier.rs",
+      "local": "vendor/serde_derive/src/de/identifier.rs",
+      "mode": "100644",
+      "sha": "8e67b96310ce6c60ffe34f6764b6c704d62cbdef"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/de/struct_.rs",
+      "local": "vendor/serde_derive/src/de/struct_.rs",
+      "mode": "100644",
+      "sha": "6a5da232acda9c961c380fe78f675d94970ce1ce"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/de/tuple.rs",
+      "local": "vendor/serde_derive/src/de/tuple.rs",
+      "mode": "100644",
+      "sha": "a76089fe658ecdaf8388a88a2586a3f8dea7fec9"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/de/unit.rs",
+      "local": "vendor/serde_derive/src/de/unit.rs",
+      "mode": "100644",
+      "sha": "0d15ef4db5cf95337f96d633882602773ad18aaf"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/deprecated.rs",
+      "local": "vendor/serde_derive/src/deprecated.rs",
+      "mode": "100644",
+      "sha": "3abdc1b25e258c5a503a74d6e52b19ef764c5ee0"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/dummy.rs",
+      "local": "vendor/serde_derive/src/dummy.rs",
+      "mode": "100644",
+      "sha": "e0bca647aca0a9879a0356d13e46ce4202a10e19"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/fragment.rs",
+      "local": "vendor/serde_derive/src/fragment.rs",
+      "mode": "100644",
+      "sha": "6627c2669952e6eaa5b1d18145a0d2f35612ca76"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/internals/ast.rs",
+      "local": "vendor/serde_derive/src/internals/ast.rs",
+      "mode": "100644",
+      "sha": "5a760c6573595367b21962d8b2dc990740f4303e"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/internals/attr.rs",
+      "local": "vendor/serde_derive/src/internals/attr.rs",
+      "mode": "100644",
+      "sha": "f982f03a39fdd55f277cf7ffaf0b4fe60d42fd66"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/internals/case.rs",
+      "local": "vendor/serde_derive/src/internals/case.rs",
+      "mode": "100644",
+      "sha": "8c8c02e75780eadfb8944578ddd2196239ca8d44"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/internals/check.rs",
+      "local": "vendor/serde_derive/src/internals/check.rs",
+      "mode": "100644",
+      "sha": "da2a0fbdc8c01f88b9cc2890b771f45102a3c3c3"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/internals/ctxt.rs",
+      "local": "vendor/serde_derive/src/internals/ctxt.rs",
+      "mode": "100644",
+      "sha": "a47bfa410291ec1264c3443523e2f2495e240947"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/internals/mod.rs",
+      "local": "vendor/serde_derive/src/internals/mod.rs",
+      "mode": "100644",
+      "sha": "cd1e8105283a32b7baa529c37037c4b32518f5d7"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/internals/name.rs",
+      "local": "vendor/serde_derive/src/internals/name.rs",
+      "mode": "100644",
+      "sha": "4c59f9636d32ed090e71e5a7a7358e0417a15069"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/internals/receiver.rs",
+      "local": "vendor/serde_derive/src/internals/receiver.rs",
+      "mode": "100644",
+      "sha": "a326f667c1e7e9b4dbf31936db0fa173f3e78d71"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/internals/respan.rs",
+      "local": "vendor/serde_derive/src/internals/respan.rs",
+      "mode": "100644",
+      "sha": "dcec7017b3155b6a8314b342b82010d3c005d914"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/internals/symbol.rs",
+      "local": "vendor/serde_derive/src/internals/symbol.rs",
+      "mode": "100644",
+      "sha": "59ef8de7c48133f14c737839a257ee505f6d9fa7"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/lib.rs",
+      "local": "vendor/serde_derive/src/lib.rs",
+      "mode": "100644",
+      "sha": "8577b308eaaaec635f6263c1499e4a58831fc55a"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/pretend.rs",
+      "local": "vendor/serde_derive/src/pretend.rs",
+      "mode": "100644",
+      "sha": "cfa1a87d1a0506c04c24092385881b470771b88a"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/ser.rs",
+      "local": "vendor/serde_derive/src/ser.rs",
+      "mode": "100644",
+      "sha": "ad1fb174e814451f3b650a344eb940220fc85af4"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_derive/src/this.rs",
+      "local": "vendor/serde_derive/src/this.rs",
+      "mode": "100644",
+      "sha": "941cea40c1e3f1f22d6a08ff4ce4d93fc10e5bb3"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "LICENSE-APACHE",
+      "local": "vendor/serde_json/LICENSE-APACHE",
+      "mode": "100644",
+      "sha": "1b5ec8b78e237b5c3b3d812a7c0a6589d0f7161d"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "LICENSE-MIT",
+      "local": "vendor/serde_json/LICENSE-MIT",
+      "mode": "100644",
+      "sha": "31aa79387f27e730e33d871925e152e35e428031"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "README.md",
+      "local": "vendor/serde_json/README.md",
+      "mode": "100644",
+      "sha": "be70b7b06d8c03059ae7d56988a465830bc57a2a"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "build.rs",
+      "local": "vendor/serde_json/build.rs",
+      "mode": "100644",
+      "sha": "29907eaf7aed5308bb8aa5623ad4b5eae435c710"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/de.rs",
+      "local": "vendor/serde_json/src/de.rs",
+      "mode": "100644",
+      "sha": "4080c54acac1b9d0b23fb5b24e9fe6b5b8ff4d06"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/error.rs",
+      "local": "vendor/serde_json/src/error.rs",
+      "mode": "100644",
+      "sha": "fbf9eb14e593c89cb7e6cf85f16213123a4ca826"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/io/core.rs",
+      "local": "vendor/serde_json/src/io/core.rs",
+      "mode": "100644",
+      "sha": "54c8ddfda40aaab5b8ae29e44cccf97b278a4441"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/io/mod.rs",
+      "local": "vendor/serde_json/src/io/mod.rs",
+      "mode": "100644",
+      "sha": "9dee4a06853c23fe3fa09623d8e6ac5e369e396b"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/iter.rs",
+      "local": "vendor/serde_json/src/iter.rs",
+      "mode": "100644",
+      "sha": "9792916dcc3068b08d67924167b89648af5cfa44"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/algorithm.rs",
+      "local": "vendor/serde_json/src/lexical/algorithm.rs",
+      "mode": "100644",
+      "sha": "eaa5e7ebc21a557b69a9408f42c6bda3dbbd6d39"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/bhcomp.rs",
+      "local": "vendor/serde_json/src/lexical/bhcomp.rs",
+      "mode": "100644",
+      "sha": "e52b1c9b9dbf1f5d7b264e66c412c65ba08c6159"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/bignum.rs",
+      "local": "vendor/serde_json/src/lexical/bignum.rs",
+      "mode": "100644",
+      "sha": "4fa7eed6dda7ef32d8f5014975399561b8cdfdf8"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/cached.rs",
+      "local": "vendor/serde_json/src/lexical/cached.rs",
+      "mode": "100644",
+      "sha": "ef5a9fe54d060dd620a24a8027b3adfedb1037bf"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/cached_float80.rs",
+      "local": "vendor/serde_json/src/lexical/cached_float80.rs",
+      "mode": "100644",
+      "sha": "9beda3ddb1d8dcf2617229916137dca977ad4aa9"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/digit.rs",
+      "local": "vendor/serde_json/src/lexical/digit.rs",
+      "mode": "100644",
+      "sha": "3d150a1afe7ffa76605dc797e0c345c9e9b6324c"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/errors.rs",
+      "local": "vendor/serde_json/src/lexical/errors.rs",
+      "mode": "100644",
+      "sha": "f4f41cdc5ab8613045046dc35c2c476109343dfd"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/exponent.rs",
+      "local": "vendor/serde_json/src/lexical/exponent.rs",
+      "mode": "100644",
+      "sha": "5e27de893f91e116d44945bb8aec7685def9d602"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/float.rs",
+      "local": "vendor/serde_json/src/lexical/float.rs",
+      "mode": "100644",
+      "sha": "2d434a29cb0f0d428d0e7f0069424af5887f15b8"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/large_powers.rs",
+      "local": "vendor/serde_json/src/lexical/large_powers.rs",
+      "mode": "100644",
+      "sha": "af2c8a6a9747225ca20ad496674877721aabe401"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/large_powers32.rs",
+      "local": "vendor/serde_json/src/lexical/large_powers32.rs",
+      "mode": "100644",
+      "sha": "eb8582f5f0f5e472b1add44d51d45e1443e22d55"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/large_powers64.rs",
+      "local": "vendor/serde_json/src/lexical/large_powers64.rs",
+      "mode": "100644",
+      "sha": "96554eac1c37aab55b96ae92bd2703eedca3b665"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/math.rs",
+      "local": "vendor/serde_json/src/lexical/math.rs",
+      "mode": "100644",
+      "sha": "2e900f1a1b245a183d70e13a1a6bfd1f9cd4b49b"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/mod.rs",
+      "local": "vendor/serde_json/src/lexical/mod.rs",
+      "mode": "100644",
+      "sha": "aeed4065e97ca82f186216a40a16b97b8faa7567"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/num.rs",
+      "local": "vendor/serde_json/src/lexical/num.rs",
+      "mode": "100644",
+      "sha": "3f3914021435051543fb9201616733fa78e130be"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/parse.rs",
+      "local": "vendor/serde_json/src/lexical/parse.rs",
+      "mode": "100644",
+      "sha": "e3d7f1e871040bf6e02bb266ec00a99a05569669"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/rounding.rs",
+      "local": "vendor/serde_json/src/lexical/rounding.rs",
+      "mode": "100644",
+      "sha": "63448752271693c605b0da1603bf50c535ebb0b8"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/shift.rs",
+      "local": "vendor/serde_json/src/lexical/shift.rs",
+      "mode": "100644",
+      "sha": "a0bae01e0f44287baea8b05b4c18fa4e2838e097"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lexical/small_powers.rs",
+      "local": "vendor/serde_json/src/lexical/small_powers.rs",
+      "mode": "100644",
+      "sha": "29b83a159c51eba955e104801c9035cda0400037"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/lib.rs",
+      "local": "vendor/serde_json/src/lib.rs",
+      "mode": "100644",
+      "sha": "9669d70b778b02acb4c78bb134588451cc701a7c"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/macros.rs",
+      "local": "vendor/serde_json/src/macros.rs",
+      "mode": "100644",
+      "sha": "c47bdf9298c255c93f69f81e04b6a68ae6ccfbfa"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/map.rs",
+      "local": "vendor/serde_json/src/map.rs",
+      "mode": "100644",
+      "sha": "f91e70b249af9340ea341826de05f7c05b09793e"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/number.rs",
+      "local": "vendor/serde_json/src/number.rs",
+      "mode": "100644",
+      "sha": "8cb0c3b7b085f8b5b46269927d3c1499e389f72e"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/raw.rs",
+      "local": "vendor/serde_json/src/raw.rs",
+      "mode": "100644",
+      "sha": "be4dad44d9c7c700d2f530aec22ca34a3e91437f"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/read.rs",
+      "local": "vendor/serde_json/src/read.rs",
+      "mode": "100644",
+      "sha": "f90d9f74a396254cf8780bdbad5ac500da3eec6b"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/ser.rs",
+      "local": "vendor/serde_json/src/ser.rs",
+      "mode": "100644",
+      "sha": "50c06f938571887696472a66367f54c0c11498cd"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/value/de.rs",
+      "local": "vendor/serde_json/src/value/de.rs",
+      "mode": "100644",
+      "sha": "9c3b35be60bef7d59a49db6f76af1528037efe38"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/value/from.rs",
+      "local": "vendor/serde_json/src/value/from.rs",
+      "mode": "100644",
+      "sha": "df4b2038cd9e3127c7bd2847357bd90fae2aa6c3"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/value/index.rs",
+      "local": "vendor/serde_json/src/value/index.rs",
+      "mode": "100644",
+      "sha": "7b001100460d589d60be8309e294561ed5a4b711"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/value/mod.rs",
+      "local": "vendor/serde_json/src/value/mod.rs",
+      "mode": "100644",
+      "sha": "7c562f82ddbc395a368ed83d1d14d1ff4b4853a2"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/value/partial_eq.rs",
+      "local": "vendor/serde_json/src/value/partial_eq.rs",
+      "mode": "100644",
+      "sha": "8626eed7f1036cf3244ece6cc6f6cf8f8d9e368d"
+    },
+    {
+      "name": "json",
+      "repo": "serde-rs/json",
+      "ref": "efa66e3a1d61459ab2d325f92ebe3acbd6ca18b1",
+      "path": "src/value/ser.rs",
+      "local": "vendor/serde_json/src/value/ser.rs",
+      "mode": "100644",
+      "sha": "1ffe7b7f1dc7150183aa195b78bc99203af6fd64"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "LICENSE-MIT",
+      "local": "vendor/memchr/LICENSE-MIT",
+      "mode": "100644",
+      "sha": "3b0a5dc09c1e16357459ddc9182a50f360f3cdba"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "README.md",
+      "local": "vendor/memchr/README.md",
+      "mode": "100644",
+      "sha": "db00ebbc9356485fe1b2aa471513338259981b49"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "UNLICENSE",
+      "local": "vendor/memchr/UNLICENSE",
+      "mode": "100644",
+      "sha": "68a49daad8ff7e35068f2b7a97d643aab440eaec"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/aarch64/memchr.rs",
+      "local": "vendor/memchr/src/arch/aarch64/memchr.rs",
+      "mode": "100644",
+      "sha": "e0053b2a2205b7e2627f4b84a765a53cc49b81ed"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/aarch64/mod.rs",
+      "local": "vendor/memchr/src/arch/aarch64/mod.rs",
+      "mode": "100644",
+      "sha": "7b3291257b9360521d888332b085b57669d72e83"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/aarch64/neon/memchr.rs",
+      "local": "vendor/memchr/src/arch/aarch64/neon/memchr.rs",
+      "mode": "100644",
+      "sha": "5fcc76237bad136747ea34fcfef41f2048f97085"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/aarch64/neon/mod.rs",
+      "local": "vendor/memchr/src/arch/aarch64/neon/mod.rs",
+      "mode": "100644",
+      "sha": "ccf9cf81f4bf47fb9271075d3ddaf2149fe325fc"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/aarch64/neon/packedpair.rs",
+      "local": "vendor/memchr/src/arch/aarch64/neon/packedpair.rs",
+      "mode": "100644",
+      "sha": "5cc2a029697b886a29a742ad9258cd1dfba74e7d"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/all/memchr.rs",
+      "local": "vendor/memchr/src/arch/all/memchr.rs",
+      "mode": "100644",
+      "sha": "7f327f86f45732e00f170bba0e8122ec64723b0b"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/all/mod.rs",
+      "local": "vendor/memchr/src/arch/all/mod.rs",
+      "mode": "100644",
+      "sha": "559cb75104d03a1d5f88b26f8bc3ce1e90dec766"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/all/packedpair/default_rank.rs",
+      "local": "vendor/memchr/src/arch/all/packedpair/default_rank.rs",
+      "mode": "100644",
+      "sha": "6aa3895e61ef77b287047058349f2fd88d4233e0"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/all/packedpair/mod.rs",
+      "local": "vendor/memchr/src/arch/all/packedpair/mod.rs",
+      "mode": "100644",
+      "sha": "148a985521d817c99708f91c6fb82a9f874fe8da"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/all/rabinkarp.rs",
+      "local": "vendor/memchr/src/arch/all/rabinkarp.rs",
+      "mode": "100644",
+      "sha": "e0bafbac9829509e7ad2786abe981fb5fec254bb"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/all/shiftor.rs",
+      "local": "vendor/memchr/src/arch/all/shiftor.rs",
+      "mode": "100644",
+      "sha": "b690564a642e9d4275a474426951c0385f39905b"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/all/twoway.rs",
+      "local": "vendor/memchr/src/arch/all/twoway.rs",
+      "mode": "100644",
+      "sha": "0df3b4a86e950c8e97e51a29da088ca26b5ca31d"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/generic/memchr.rs",
+      "local": "vendor/memchr/src/arch/generic/memchr.rs",
+      "mode": "100644",
+      "sha": "de61fd81d8b24e40d92168df92e3a57cffe313ab"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/generic/mod.rs",
+      "local": "vendor/memchr/src/arch/generic/mod.rs",
+      "mode": "100644",
+      "sha": "63ee3f0b34ed96a7c935fdaf5730c9a04aeaee8b"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/generic/packedpair.rs",
+      "local": "vendor/memchr/src/arch/generic/packedpair.rs",
+      "mode": "100644",
+      "sha": "8d97cf28fad117c1f468e6feab7717209ac6ca61"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/mod.rs",
+      "local": "vendor/memchr/src/arch/mod.rs",
+      "mode": "100644",
+      "sha": "10332b64cd52908335a994f77ff1385d17eab6bf"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/wasm32/memchr.rs",
+      "local": "vendor/memchr/src/arch/wasm32/memchr.rs",
+      "mode": "100644",
+      "sha": "55c1c1bb472f10571b5944b91233eb14a5cd20b3"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/wasm32/mod.rs",
+      "local": "vendor/memchr/src/arch/wasm32/mod.rs",
+      "mode": "100644",
+      "sha": "209f876cb58376aaa7c077498050d8d6ea429c5c"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/wasm32/simd128/memchr.rs",
+      "local": "vendor/memchr/src/arch/wasm32/simd128/memchr.rs",
+      "mode": "100644",
+      "sha": "fa314c9d18aa6ff8991fc82b22292378eb2e4853"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/wasm32/simd128/mod.rs",
+      "local": "vendor/memchr/src/arch/wasm32/simd128/mod.rs",
+      "mode": "100644",
+      "sha": "b55d1f07b074060395815e4d8865d84006b8c7f5"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/wasm32/simd128/packedpair.rs",
+      "local": "vendor/memchr/src/arch/wasm32/simd128/packedpair.rs",
+      "mode": "100644",
+      "sha": "e8cf745a8feb77e27993b23ce0d7c4d98c30156c"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/x86_64/avx2/memchr.rs",
+      "local": "vendor/memchr/src/arch/x86_64/avx2/memchr.rs",
+      "mode": "100644",
+      "sha": "59f8c7f7382028b9cb155e4034b490a732c71f11"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/x86_64/avx2/mod.rs",
+      "local": "vendor/memchr/src/arch/x86_64/avx2/mod.rs",
+      "mode": "100644",
+      "sha": "ee4097d6f4c34d0939f7f06195e1619aaed6e7f4"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/x86_64/avx2/packedpair.rs",
+      "local": "vendor/memchr/src/arch/x86_64/avx2/packedpair.rs",
+      "mode": "100644",
+      "sha": "efae7b66c72c5b9f0a6115595fbd4ad2bac2bdd8"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/x86_64/memchr.rs",
+      "local": "vendor/memchr/src/arch/x86_64/memchr.rs",
+      "mode": "100644",
+      "sha": "edb6d431d973042a41787da705264ad51ccea0ff"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/x86_64/mod.rs",
+      "local": "vendor/memchr/src/arch/x86_64/mod.rs",
+      "mode": "100644",
+      "sha": "5dad7218216b79a31e3d877e9c7f6669ec8a0338"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/x86_64/sse2/memchr.rs",
+      "local": "vendor/memchr/src/arch/x86_64/sse2/memchr.rs",
+      "mode": "100644",
+      "sha": "79572b82b1c618598d0183e346c1e4db0439f55d"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/x86_64/sse2/mod.rs",
+      "local": "vendor/memchr/src/arch/x86_64/sse2/mod.rs",
+      "mode": "100644",
+      "sha": "bcb830790fbbaaebef528806a2bd00bf8987f6fe"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/arch/x86_64/sse2/packedpair.rs",
+      "local": "vendor/memchr/src/arch/x86_64/sse2/packedpair.rs",
+      "mode": "100644",
+      "sha": "c8b5b9999b63cddf6f4aa66599b4b5eadff647f1"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/cow.rs",
+      "local": "vendor/memchr/src/cow.rs",
+      "mode": "100644",
+      "sha": "f291645728932cd34dbc8bfccc7133293ecdb8c5"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/ext.rs",
+      "local": "vendor/memchr/src/ext.rs",
+      "mode": "100644",
+      "sha": "802697ab34cc0c5b701b9396d9083d6613f4d24a"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/lib.rs",
+      "local": "vendor/memchr/src/lib.rs",
+      "mode": "100644",
+      "sha": "b3105169cc1dd8fb433b1699b723347e9670a8e5"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/macros.rs",
+      "local": "vendor/memchr/src/macros.rs",
+      "mode": "100644",
+      "sha": "31b4ca3816ace287913339ed02eb65ca41b1aa85"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/memchr.rs",
+      "local": "vendor/memchr/src/memchr.rs",
+      "mode": "100644",
+      "sha": "92a18bd5fa9c352319497e813e4376c5077821e9"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/memmem/mod.rs",
+      "local": "vendor/memchr/src/memmem/mod.rs",
+      "mode": "100644",
+      "sha": "4f04943e6497c5da8ee7257db42c81342f532900"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/memmem/searcher.rs",
+      "local": "vendor/memchr/src/memmem/searcher.rs",
+      "mode": "100644",
+      "sha": "2a533e02fcf6d834ee7a6adb169e01cb28b518c2"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/tests/memchr/mod.rs",
+      "local": "vendor/memchr/src/tests/memchr/mod.rs",
+      "mode": "100644",
+      "sha": "0564ad4fbb8a19fd269b1aa658a6e93c6b9c633b"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/tests/memchr/naive.rs",
+      "local": "vendor/memchr/src/tests/memchr/naive.rs",
+      "mode": "100644",
+      "sha": "6ebcdaea72a7fd3c965a63e62809a8dcac3c94d2"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/tests/memchr/prop.rs",
+      "local": "vendor/memchr/src/tests/memchr/prop.rs",
+      "mode": "100644",
+      "sha": "949ef1f15abc566d9222aaee88c79fcc09c481fd"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/tests/mod.rs",
+      "local": "vendor/memchr/src/tests/mod.rs",
+      "mode": "100644",
+      "sha": "259b67827a142276efce7954eda07acb8b03b6ef"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/tests/packedpair.rs",
+      "local": "vendor/memchr/src/tests/packedpair.rs",
+      "mode": "100644",
+      "sha": "204635b83ea9c1485c19a361352ace0480b676c4"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/tests/substring/mod.rs",
+      "local": "vendor/memchr/src/tests/substring/mod.rs",
+      "mode": "100644",
+      "sha": "dd10cbdd4b32c54f5ce91120b07a4eb7d2579249"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/tests/substring/naive.rs",
+      "local": "vendor/memchr/src/tests/substring/naive.rs",
+      "mode": "100644",
+      "sha": "1bc6009849f12d3ce1b696ebcb9ddcbcb171b239"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/tests/substring/prop.rs",
+      "local": "vendor/memchr/src/tests/substring/prop.rs",
+      "mode": "100644",
+      "sha": "a8352ec74c5acc1402bd0c185ff9482716a77d74"
+    },
+    {
+      "name": "memchr",
+      "repo": "BurntSushi/memchr",
+      "ref": "9ba486e4ba7e865c0510305c5dacba73988d9f31",
+      "path": "src/vector.rs",
+      "local": "vendor/memchr/src/vector.rs",
+      "mode": "100644",
+      "sha": "69f2af01b46a44f7c0d3099fdb4e2b017f1193b6"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "LICENSE-APACHE",
+      "local": "vendor/ryu/LICENSE-APACHE",
+      "mode": "100644",
+      "sha": "1b5ec8b78e237b5c3b3d812a7c0a6589d0f7161d"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "LICENSE-BOOST",
+      "local": "vendor/ryu/LICENSE-BOOST",
+      "mode": "100644",
+      "sha": "36b7cd93cdfbac762f5be4c6ce276df2ea6305c2"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "README.md",
+      "local": "vendor/ryu/README.md",
+      "mode": "100644",
+      "sha": "998ea3ef17c698ff8d94e85118b03018098fe260"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "build.rs",
+      "local": "vendor/ryu/build.rs",
+      "mode": "100644",
+      "sha": "ebaa409a421ac6eb7b6790873103a5375c648262"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "src/buffer/mod.rs",
+      "local": "vendor/ryu/src/buffer/mod.rs",
+      "mode": "100644",
+      "sha": "2ee57f14832c7e65995c0a6164e181fc87dd0580"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "src/common.rs",
+      "local": "vendor/ryu/src/common.rs",
+      "mode": "100644",
+      "sha": "9613036a256ff19c0c3011d648a1ff35e3c37743"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "src/d2s.rs",
+      "local": "vendor/ryu/src/d2s.rs",
+      "mode": "100644",
+      "sha": "76a8164cc7b98b11bda722236e0d356b32c6d5b5"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "src/d2s_full_table.rs",
+      "local": "vendor/ryu/src/d2s_full_table.rs",
+      "mode": "100644",
+      "sha": "7534ddd6abca49e68c344cbeef7f737303a861ce"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "src/d2s_intrinsics.rs",
+      "local": "vendor/ryu/src/d2s_intrinsics.rs",
+      "mode": "100644",
+      "sha": "a4e1fb11c142098250f74ef2134e3d1e1494b0ac"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "src/d2s_small_table.rs",
+      "local": "vendor/ryu/src/d2s_small_table.rs",
+      "mode": "100644",
+      "sha": "b6e32233e1809659eaa60e7a1d0c52c1e5ba57fd"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "src/digit_table.rs",
+      "local": "vendor/ryu/src/digit_table.rs",
+      "mode": "100644",
+      "sha": "d871f03f7745d36499dc61446b24aa672fc3b103"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "src/f2s.rs",
+      "local": "vendor/ryu/src/f2s.rs",
+      "mode": "100644",
+      "sha": "987fefb070e31086b69bff7c4f44bb5abaa0054d"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "src/f2s_intrinsics.rs",
+      "local": "vendor/ryu/src/f2s_intrinsics.rs",
+      "mode": "100644",
+      "sha": "1a352189c819c0075215f670b107006ce1d819e4"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "src/lib.rs",
+      "local": "vendor/ryu/src/lib.rs",
+      "mode": "100644",
+      "sha": "1ce368f305af27d3def6c06831b87f170c05db79"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "src/parse.rs",
+      "local": "vendor/ryu/src/parse.rs",
+      "mode": "100644",
+      "sha": "00f7983699262eb52aee7c8d60c42ba669aa120c"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "src/pretty/exponent.rs",
+      "local": "vendor/ryu/src/pretty/exponent.rs",
+      "mode": "100644",
+      "sha": "529d92ba71edfe66a8c2156afc0cb7a3cbb7f63c"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "src/pretty/mantissa.rs",
+      "local": "vendor/ryu/src/pretty/mantissa.rs",
+      "mode": "100644",
+      "sha": "552dfe3586f5005eb3be2039c7af7e0897af6244"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "src/pretty/mod.rs",
+      "local": "vendor/ryu/src/pretty/mod.rs",
+      "mode": "100644",
+      "sha": "c9d5ae60c24e12c9754a8ba835b3a8934a94b9c8"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "src/s2d.rs",
+      "local": "vendor/ryu/src/s2d.rs",
+      "mode": "100644",
+      "sha": "c6b4fa47dac408c241333919d31b0aff80467368"
+    },
+    {
+      "name": "ryu",
+      "repo": "dtolnay/ryu",
+      "ref": "02237f8751db162e9ed0f5bd3e7135d1b256822e",
+      "path": "src/s2f.rs",
+      "local": "vendor/ryu/src/s2f.rs",
+      "mode": "100644",
+      "sha": "52a3235c37174368e94633d50d503bf99e9a8af4"
+    },
+    {
+      "name": "unicode",
+      "repo": "oxc-project/unicode-id-start",
+      "ref": "0647a2771289f39794468def321e51e46ea45273",
+      "path": "LICENSE-APACHE",
+      "local": "vendor/unicode-id-start/LICENSE-APACHE",
+      "mode": "100644",
+      "sha": "1b5ec8b78e237b5c3b3d812a7c0a6589d0f7161d"
+    },
+    {
+      "name": "unicode",
+      "repo": "oxc-project/unicode-id-start",
+      "ref": "0647a2771289f39794468def321e51e46ea45273",
+      "path": "LICENSE-MIT",
+      "local": "vendor/unicode-id-start/LICENSE-MIT",
+      "mode": "100644",
+      "sha": "31aa79387f27e730e33d871925e152e35e428031"
+    },
+    {
+      "name": "unicode",
+      "repo": "oxc-project/unicode-id-start",
+      "ref": "0647a2771289f39794468def321e51e46ea45273",
+      "path": "LICENSE-UNICODE",
+      "local": "vendor/unicode-id-start/LICENSE-UNICODE",
+      "mode": "100644",
+      "sha": "11f2842a303a7935740f7a1d09139b0b9c28c3b6"
+    },
+    {
+      "name": "unicode",
+      "repo": "oxc-project/unicode-id-start",
+      "ref": "0647a2771289f39794468def321e51e46ea45273",
+      "path": "README.md",
+      "local": "vendor/unicode-id-start/README.md",
+      "mode": "100644",
+      "sha": "a8e87271612a36b22fba6e7a785b5bf7711d3fd1"
+    },
+    {
+      "name": "unicode",
+      "repo": "oxc-project/unicode-id-start",
+      "ref": "0647a2771289f39794468def321e51e46ea45273",
+      "path": "src/lib.rs",
+      "local": "vendor/unicode-id-start/src/lib.rs",
+      "mode": "100644",
+      "sha": "c9f061aba8b7b27b34b939eec92fa227abb9798a"
+    },
+    {
+      "name": "unicode",
+      "repo": "oxc-project/unicode-id-start",
+      "ref": "0647a2771289f39794468def321e51e46ea45273",
+      "path": "src/tables.rs",
+      "local": "vendor/unicode-id-start/src/tables.rs",
+      "mode": "100644",
+      "sha": "7f90ce6fb9c9fd2c19e84425d71f24a095de7576"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/crate_root.rs",
+      "local": "vendor/serde/src/core/crate_root.rs",
+      "mode": "100644",
+      "sha": "2cf75a40196a761e6666bd77358ac11e73be4fc5"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/de/ignored_any.rs",
+      "local": "vendor/serde/src/core/de/ignored_any.rs",
+      "mode": "100644",
+      "sha": "2360a1742362b1e0b31e0fd1f00e5246161851eb"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/de/impls.rs",
+      "local": "vendor/serde/src/core/de/impls.rs",
+      "mode": "100644",
+      "sha": "ab1a893cc4dcde659409c4677a71715cc220e368"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/de/mod.rs",
+      "local": "vendor/serde/src/core/de/mod.rs",
+      "mode": "100644",
+      "sha": "2518ae68274a9888dd1c18e05d62a6191d3c86b0"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/de/value.rs",
+      "local": "vendor/serde/src/core/de/value.rs",
+      "mode": "100644",
+      "sha": "3d5475def127eb1daaeb0a4e991b07a4ee33867d"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/format.rs",
+      "local": "vendor/serde/src/core/format.rs",
+      "mode": "100644",
+      "sha": "9053cc0704fc94bf09e68dbbd625f5e4bb7ffd30"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/lib.rs",
+      "local": "vendor/serde/src/core/lib.rs",
+      "mode": "100644",
+      "sha": "58d143d79f724399ea14fe4e795f9f2c1256e757"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/macros.rs",
+      "local": "vendor/serde/src/core/macros.rs",
+      "mode": "100644",
+      "sha": "b956730500554bfc0c487937433baeecd937e6ce"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/private/content.rs",
+      "local": "vendor/serde/src/core/private/content.rs",
+      "mode": "100644",
+      "sha": "f29a9b527d65a7e7db298327eb5031f5aec5eb5b"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/private/doc.rs",
+      "local": "vendor/serde/src/core/private/doc.rs",
+      "mode": "100644",
+      "sha": "2cc07f0d931ec977ad0812c828187eb73505cfe2"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/private/mod.rs",
+      "local": "vendor/serde/src/core/private/mod.rs",
+      "mode": "100644",
+      "sha": "dd5f93fe963b267b2eada3b6b6d94fec119c34dd"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/private/seed.rs",
+      "local": "vendor/serde/src/core/private/seed.rs",
+      "mode": "100644",
+      "sha": "bcf267cb09b59bba9133630c3bb3be26709b0e5c"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/private/size_hint.rs",
+      "local": "vendor/serde/src/core/private/size_hint.rs",
+      "mode": "100644",
+      "sha": "783281b46c4e0a84b4cb562971b42ab921508d51"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/private/string.rs",
+      "local": "vendor/serde/src/core/private/string.rs",
+      "mode": "100644",
+      "sha": "c8121a0da718908f5ce1011926a7c363ad77c7cc"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/ser/fmt.rs",
+      "local": "vendor/serde/src/core/ser/fmt.rs",
+      "mode": "100644",
+      "sha": "4b1549f0897cffe4e15347f6c8a359ce97ff68bb"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/ser/impls.rs",
+      "local": "vendor/serde/src/core/ser/impls.rs",
+      "mode": "100644",
+      "sha": "a7a175db9465aa6ab4c6931e18448971a4b0b30a"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/ser/impossible.rs",
+      "local": "vendor/serde/src/core/ser/impossible.rs",
+      "mode": "100644",
+      "sha": "fe69ae24e14bacddbd47362ce7ab75f04667cb87"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/ser/mod.rs",
+      "local": "vendor/serde/src/core/ser/mod.rs",
+      "mode": "100644",
+      "sha": "62e59d981d4ae7096876293f13245c0c80d007fb"
+    },
+    {
+      "name": "serde",
+      "repo": "serde-rs/serde",
+      "ref": "a866b336f14aa57a07f0d0be9f8762746e64ecb4",
+      "path": "serde_core/src/std_error.rs",
+      "local": "vendor/serde/src/core/std_error.rs",
+      "mode": "100644",
+      "sha": "e026ace100f29f98ff3ddf6e163248430c0c9b3c"
+    }
+  ]
+}

@@ -1,0 +1,350 @@
+[
+  {
+    "name": "variables",
+    "source": "const value: number = 42; let text = 'hello'; var list = [1, , 3, ...more];"
+  },
+  {
+    "name": "operators",
+    "source": "a = b = 1 + 2 * 3 ** 4 ** 5; x < y && y >= z || x === z; (x ?? y) + z; #value in object;"
+  },
+  {
+    "name": "conditional",
+    "source": "const x = condition ? thenValue : elseValue; const y = a?.b?.[c]?.<T>(d)!;"
+  },
+  {
+    "name": "arrows",
+    "source": "const identity = <const T extends string>(x: T): T => x; const f = async x => await x; const predicate = (x: unknown): x is number => typeof x === 'number';"
+  },
+  {
+    "name": "assertions",
+    "source": "const x = <number>value; const y = x as const; const z = y satisfies number;"
+  },
+  {
+    "name": "functions",
+    "source": "async function* f<T>(x: T, ...args: T[]): AsyncGenerator<T> { yield* args; await g(); return x; } const g = function named() {};"
+  },
+  {
+    "name": "bindings",
+    "source": "const {a: renamed = 2, nested: { b }, ...other} = value; const [first, , ...rest] = values;"
+  },
+  {
+    "name": "objects",
+    "source": "const o = {a: 1, b, [key]: 2, ...rest, async *items<T>(x: T) { yield x; }, get length() { return 0; }, set length(x: number) {} };"
+  },
+  {
+    "name": "templates",
+    "source": "const a = `hello ${name}!`; const b = tag`a ${ { nested: `b ${x}` } } c`; type Keys<T> = `${keyof T & string}-${number}`;"
+  },
+  {
+    "name": "regex",
+    "source": "const x = /[a-z\\/]\\w+/giu.test('path') ? a / b / c : /x/.source;"
+  },
+  {
+    "name": "types",
+    "source": "type X<T> = T extends readonly (infer U)[] ? U : never; type A = string | number & {a: boolean}; type B = [first: number, second?: string, ...rest: boolean[]];"
+  },
+  {
+    "name": "mapped",
+    "source": "type Getters<T> = { -readonly [K in keyof T as `get${Capitalize<string & K>}`]+?: T[K] };"
+  },
+  {
+    "name": "signatures",
+    "source": "interface A<T = unknown> extends B<T> { readonly x?: T; (x: T): T; new <U>(x: U): Box<U>; [key: string]: unknown; get value(): T; set value(x: T); } type C = abstract new <T>(x: T) => Box<T>;"
+  },
+  {
+    "name": "classes",
+    "source": "@sealed export abstract class C<T> extends factory<T>() implements B<T> { static { this.count = 0; } #value!: T; constructor(public readonly id: string) {} get value(): T { return this.#value; } set value(x: T) { this.#value = x; } }"
+  },
+  {
+    "name": "new",
+    "source": "const x = new Box<Map<string, number>>(value); const y = new new C()(); const z = fn<number>; const meta = import.meta; function f() { return new.target; }"
+  },
+  {
+    "name": "imports",
+    "source": "import type { A as B, type C } from 'pkg'; import data from 'data' with { type: 'json' }; import legacy = require('legacy'); export type { B }; export * as ns from 'pkg'; export as namespace Library;"
+  },
+  {
+    "name": "import-types",
+    "source": "type X = typeof import('pkg', { with: { type: 'json' } }).default;"
+  },
+  {
+    "name": "namespaces",
+    "source": "namespace A.B.C { export const enum E { A, B = 1 << 2 } } declare module 'pkg' { export interface Thing { name: string; } } declare global { interface Window { custom: boolean } }"
+  },
+  {
+    "name": "loops",
+    "source": "async function f() { await using resource = acquire(); for await (const x of xs) { if (x) continue; else break; } for (let i = 0; i < 4; i++) { do { i--; } while (i > 3); } for (const k in o) {} }"
+  },
+  {
+    "name": "statements",
+    "source": "label: while (ok) { switch (x) { case 1: break label; default: debugger; } } try { throw new Error('x'); } catch ({message}: any) { log(message); } finally { cleanup(); }"
+  },
+  {
+    "name": "asi",
+    "source": "function f() { return\n1 } let x = 1\nx\n++x;"
+  },
+  {
+    "name": "unicode",
+    "source": "const café = '😀'; const \\u{61} = '\\uD83D\\uDE00'; café;"
+  },
+  {
+    "name": "numbers",
+    "source": "const a = 0xff, b = 0o17, c = 0b11, d = 1_000, e = 1.0e+2, f = 0xFFn, g = 1_000n;"
+  },
+  {
+    "name": "jsx",
+    "jsx": true,
+    "source": "const view = <><UI.Button<string> data-id=\"&amp;\" {...props}>hello // text {value}<x:tag /></UI.Button></>;"
+  },
+  {
+    "name": "async-statements",
+    "source": "async x => x; export default async () => 1;"
+  },
+  {
+    "name": "constrained-infer",
+    "source": "type F<T> = T extends infer U extends string ? U : never;"
+  },
+  {
+    "name": "deferred-import",
+    "source": "import defer * as ns from \"pkg\";"
+  },
+  {
+    "name": "empty-strings",
+    "source": "const x = \"\"; type E = \"\";"
+  },
+  {
+    "name": "namespace-import",
+    "source": "import * as ns from \"pkg\";"
+  },
+  {
+    "name": "type-predicates",
+    "source": "function assert(x: unknown): asserts x is string {} function a(): asserts this {}"
+  },
+  {
+    "name": "jsx-arrows",
+    "jsx": true,
+    "source": "const a = <T,>(x: T) => x; const b = <T = unknown>(x: T) => x;"
+  },
+  {
+    "name": "unicode-surrogate",
+    "source": "const x = \"\\uD800\";"
+  },
+  {
+    "name": "tagged-escapes",
+    "source": "tag`\\u{}`; tag`\\xGG ${value} \\u{110000}`;"
+  },
+  {
+    "name": "contextual-identifiers",
+    "source": "const await = f; await(x); const yield = 1; yield + 1;"
+  },
+  {
+    "name": "for-initializers",
+    "source": "for (let x = [(a in b)]; x.length; x = []) {} for (let x = {a: a in b}; ; ) {} for (let x = function () { return a in b; }; ; ) {}"
+  },
+  {
+    "name": "optional-tuples",
+    "source": "type X = [T, U?, name?: V, ...rest: T[]];"
+  },
+  {
+    "name": "contextual-parameters",
+    "source": "const f = (async) => async; const g = async => async;"
+  },
+  {
+    "name": "type-import-from",
+    "source": "import type from from 'pkg'; import type type from 'pkg';"
+  },
+  {
+    "name": "type-specifiers",
+    "source": "import {type, type as t, type as as, type Foo as Bar} from 'pkg'; export {type, type as t, type Foo as Bar};"
+  },
+  {
+    "name": "generic-call-newline",
+    "source": "const call = fn\n<T>(x);"
+  },
+  {
+    "name": "module-await-call",
+    "source": "export {}; await(foo); const f = () => await(foo);"
+  },
+  {
+    "name": "module-await-regex",
+    "source": "await /pattern/; export {};"
+  },
+  {
+    "name": "module-await-newline",
+    "source": "await\nx; export {};"
+  },
+  {
+    "name": "await-property-names",
+    "source": "const x = {await: 1}; const y = obj.await; export {};"
+  },
+  {
+    "name": "loop-bindings",
+    "source": "for (const [a, b] of pairs) {} for (let {x: y = z, a} = value; ; ) {}"
+  },
+  {
+    "name": "nested-conditional-infer",
+    "source": "type F<T> = T extends (x: infer U) => infer R ? [U, R] : never; type X<T> = T extends T[infer K] ? K : never;"
+  },
+  {
+    "name": "export-assignment",
+    "source": "export = import('pkg');"
+  },
+  {
+    "name": "unexported-class",
+    "source": "class C extends B { readonly x = 1; constructor(public y: number) {} method() {} }"
+  },
+  {
+    "name": "using-line-break",
+    "source": "using\nx = acquire();"
+  },
+  {
+    "name": "jsx-whitespace",
+    "source": "const x = <p> <UI . Button />\n  </p>;",
+    "jsx": true
+  },
+  {
+    "name": "jsx-spaced-namespace",
+    "source": "const x = <x : tag a : name=\"value\"></x:tag>;",
+    "jsx": true
+  },
+  {
+    "name": "adjacent-generic-openers",
+    "source": "const x = fn<<T>(x: T) => T>(); type X = Wrapper<<T>() => T>; type Q = typeof fn< <T>() => T>;"
+  },
+  {
+    "name": "parameter-and-return-contexts",
+    "source": "export function accepts(@decorator value: unknown): value is string { return true; } const fn = async function await(value: string): asserts value {};"
+  },
+  {
+    "name": "class-initializer-and-static-contexts",
+    "source": "export class C { value = helper(1); static #count = 0; static { work(); } constructor(@decorator public x: string) {} method(@decorator value: unknown): value is string { return true; } }"
+  },
+  {
+    "name": "async-constructor-and-accessor-contexts",
+    "source": "async class C { async constructor() {} async get value() { return 1; } async set value(v: number) {} async method() {} } async enum E { A } async interface I {} async namespace N {}"
+  },
+  {
+    "name": "ambient-member-context-restoration",
+    "source": "class C { declare x: string; y = 1; @decorator declare z: number; method() {} }"
+  },
+  {
+    "name": "quoted-constructor",
+    "source": "class C { '\\u0063onstructor'(public value: string) {} 'constructor': () => void; }"
+  },
+  {
+    "name": "decorator-computed-members",
+    "source": "@(value => value) class C { @factory<string>() [key]() {} @(() => 1) get [other]() { return 1; } }"
+  },
+  {
+    "name": "type-predicates-in-type-positions",
+    "source": "let condition: (this is C); type A = asserts this is C; type P = asserts value is boolean; type T = asserts;"
+  },
+  {
+    "name": "module-export-names",
+    "source": "export const value = 1; export { value as 'value 1', type value as 'value 2' }; export * as 'space name' from 'pkg'; import { 'value 1' as first, type 'value 2' as second, type as, type as as, type as as alias } from 'pkg';"
+  },
+  {
+    "name": "arrow-line-break-parsing",
+    "source": "const a = x\n=> x; const b = ()\n=> 1; const c = async ()\n=> 1;"
+  },
+  {
+    "name": "empty-type-argument-lists",
+    "source": "const value = import<>('pkg'); const result = fn<>(); type Empty = Array<>; function f<>() {}"
+  },
+  {
+    "name": "const-and-static-member-modifiers",
+    "source": "class C { const #value = 1; static #count = 0; async static { work(); } @decorator static { work(); } }"
+  },
+  {
+    "name": "await-binding-name-contexts",
+    "source": "export {}; var await = 1; let {await: name} = value; const [await] = values; class await {} import await from 'pkg'; import {await as await} from 'other';"
+  },
+  {
+    "name": "module-await-tagged-template-reparse",
+    "source": "await ``; await <string> `hello`; export {};"
+  },
+  {
+    "name": "non-null-optional-chain-contexts",
+    "source": "a?.b!; a?.b!!.c; a?.[x]!.f<T>(); a?.(x)!.y; a?.b!`text`; a?.b<T>?.();"
+  },
+  {
+    "name": "optional-tagged-templates",
+    "source": "a?.`text`; a?.`text${x}`; a?.<T>`text`; a?.b`text`;"
+  },
+  {
+    "name": "import-expression-and-attribute-values",
+    "source": "import value from getPackage(); export * from true; import data from 'pkg' with {type: name, mode: {value: true}}; type I = import(T).Name;"
+  },
+  {
+    "name": "import-phase-contextual-from",
+    "source": "import type from = require('pkg'); import defer from from 'pkg'; import defer from 'pkg';"
+  },
+  {
+    "name": "dynamic-import-defer-flags",
+    "source": "const a = import.defer('pkg'); const b = import.defer<T>('pkg'); const c = import.defer;"
+  },
+  {
+    "name": "conditional-arrow-return-colons",
+    "source": "a ? (b) : c => (d) : e => f; a ? b => (c) : d => e; a ? (b): T => b : null; a ? (b: T): T => b : null;"
+  },
+  {
+    "name": "heritage-list-boundaries",
+    "source": "class C extends {} class D extends B, {} class E extends {} {} interface I extends {} class F extends implements B {}"
+  },
+  {
+    "name": "object-rest-property-bindings",
+    "source": "const {...x: y} = value; const {...x: {a = 1}} = other; function f({...x: {a}}) {}"
+  },
+  {
+    "name": "index-signature-parameter-forms",
+    "source": "interface I { [readonly x?: string, y: number]: object; [...keys: string[]]: T; []: T; } class C { [public key: string]: number; }"
+  },
+  {
+    "name": "jsdoc-type-grammar",
+    "source": "type A = *; type C = ?number; type D = !string; type E = number!; type F = number?; let xs: Array.<number>; type H = [number?, ...string?];"
+  },
+  {
+    "name": "decorated-class-expressions",
+    "source": "const C = @dec class {}; const D = @factory<T>() class extends Base {};"
+  },
+  {
+    "name": "for-expression-context-flags",
+    "source": "for (var a = ['a', () => 1];;) {} for (var of values) {} for await (await using of values); export {};"
+  },
+  {
+    "name": "template-raw-line-endings",
+    "source": "const a = `first\r\nsecond\rthird`; const b = tag`first\r\n${value}\rlast`;"
+  },
+  {
+    "name": "escaped-private-and-template-hints",
+    "source": "class C { #\\u{76} = 1; } const a = `\\u{41}`; const b = `\\\\u{41}`; const c = tag`\\u{}`;"
+  },
+  {
+    "name": "intrinsic-type-alias-context",
+    "source": "let x: intrinsic; type A = intrinsic; type B<intrinsic> = intrinsic; type C = (intrinsic); type D = intrinsic.Name;"
+  },
+  {
+    "name": "compiler-whitespace-extensions",
+    "source": "consta = 1; const​b = 2; function f() { returna; }"
+  },
+  {
+    "name": "parameter-deprecated-flags",
+    "source": "/** @deprecated */ function f(/** @deprecated */ value: string) {} class C { /** @deprecated */ x: string; }"
+  },
+  {
+    "name": "leading-reference-directives",
+    "source": "/// <reference types='pkg' resolution-mode='require' />\n/// <reference lib='esnext' />\n/// <amd-module name='entry' />\nexport {};"
+  },
+  {
+    "name": "ignored-amd-module-directives",
+    "source": "/// <amd-module name='first' />\n/// <amd-module name='second' />\nexport {};"
+  },
+  {
+    "name": "multiline-using-binding-lists",
+    "source": "{ await using a = null,\n[b] = null,\n{c} = null; } { using a = null,\n[b] = null,\n{c} = null; }"
+  },
+  {
+    "name": "enum-deprecated-flags",
+    "source": "enum E { /** @deprecated */ Inline,\n/** @deprecated */ Old = 1,\n/** @deprecated */ Alias = Old,\nCurrent }"
+  }
+]

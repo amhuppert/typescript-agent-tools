@@ -1,0 +1,13 @@
+[package]
+name = "nom"
+version = "8.0.0"
+edition = "2021"
+license = "MIT"
+[features]
+default = ["std"]
+std = ["alloc", "memchr/std"]
+alloc = []
+docsrs = []
+[dependencies]
+memchr = { path = "../memchr", default-features = false }
+

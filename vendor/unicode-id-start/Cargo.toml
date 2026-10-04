@@ -1,0 +1,6 @@
+[package]
+name = "unicode-id-start"
+version = "1.5.0"
+edition = "2018"
+license = "(MIT OR Apache-2.0) AND Unicode-3.0"
+

@@ -1,0 +1,14 @@
+[package]
+name = "memchr"
+version = "2.7.6"
+edition = "2021"
+license = "Unlicense OR MIT"
+[features]
+default = ["std"]
+std = ["alloc"]
+alloc = []
+use_std = ["std"]
+libc = []
+[lints.rust]
+unexpected_cfgs = "allow"
+

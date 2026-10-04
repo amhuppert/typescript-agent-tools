@@ -1,0 +1,25 @@
+# Local production subset; original registry manifest is Cargo.toml.orig.
+[package]
+name = "smallvec"
+version = "1.15.1"
+edition = "2018"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/servo/rust-smallvec"
+[lib]
+path = "src/lib.rs"
+[features]
+union = []
+const_generics = []
+const_new = ["const_generics"]
+debugger_visualizer = []
+drain_filter = []
+drain_keep_rest = ["drain_filter"]
+impl_bincode = []
+may_dangle = []
+specialization = []
+write = []
+arbitrary = []
+bincode = []
+malloc_size_of = []
+serde = []
+unty = []

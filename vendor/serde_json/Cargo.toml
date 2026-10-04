@@ -1,0 +1,21 @@
+[package]
+name = "serde_json"
+version = "1.0.145"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+[features]
+default = ["std"]
+std = ["memchr/std", "serde_core/std"]
+alloc = ["serde_core/alloc"]
+float_roundtrip = []
+arbitrary_precision = []
+raw_value = []
+unbounded_depth = []
+[lints.rust]
+unexpected_cfgs = "allow"
+[dependencies]
+itoa = { path = "../itoa" }
+memchr = { path = "../memchr", default-features = false }
+ryu = { path = "../ryu" }
+serde_core = { path = "../serde_core", default-features = false }
+

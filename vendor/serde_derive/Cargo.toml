@@ -1,0 +1,15 @@
+[package]
+name = "serde_derive"
+version = "1.0.228"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+[lib]
+proc-macro = true
+[features]
+default = []
+deserialize_in_place = []
+[dependencies]
+proc-macro2 = { path = "../proc-macro2" }
+quote = { path = "../quote" }
+syn = { path = "../syn", features = ["clone-impls", "derive", "parsing", "printing", "proc-macro"] }
+
