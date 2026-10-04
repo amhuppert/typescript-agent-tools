@@ -2,10 +2,8 @@ use super::*;
 
 impl<'src> Parser<'src> {
     pub(super) fn statement(&mut self) -> Result<NodeId> {
-        let saved = self.context;
         let deprecated = self.deprecated_trivia(false);
-        let result = self.nest(Self::statement_inner);
-        self.context = saved;
+        let result = self.in_context(self.context, |p| p.nest(Self::statement_inner));
         if deprecated {
             if let Ok(id) = result {
                 self.nodes[id.0].flags |= 536870912;
@@ -43,12 +41,12 @@ impl<'src> Parser<'src> {
                 };
                 self.bump()?;
                 let expression = self.parenthesized_expression()?;
-                let context = self.context;
-                if kind == "WithStatement" {
-                    self.context |= 67108864;
-                }
-                let statement = self.statement()?;
-                self.context = context;
+                let context = if kind == "WithStatement" {
+                    self.context.with(IN_WITH)
+                } else {
+                    self.context
+                };
+                let statement = self.in_context(context, Self::statement)?;
                 return Ok(self.finish(
                     kind,
                     start,
@@ -270,10 +268,7 @@ impl<'src> Parser<'src> {
     }
     fn parenthesized_expression(&mut self) -> Result<NodeId> {
         self.expect("(")?;
-        let saved = self.allow_in;
-        self.allow_in = true;
-        let expression = self.expression()?;
-        self.allow_in = saved;
+        let expression = self.expression_allow_in()?;
         self.expect(")")?;
         Ok(expression)
     }
@@ -283,20 +278,20 @@ impl<'src> Parser<'src> {
         let mut fields: Fields<'src> = Fields::new();
         self.optional_token("await", "awaitModifier", &mut fields)?;
         self.expect("(")?;
-        let saved = self.allow_in;
-        self.allow_in = false;
-        if !self.at(";") {
-            let initializer = if matches!(self.current.raw, "var" | "let" | "const")
-                || self.at("using") && self.using_declaration(true)
-                || self.at("await") && self.using_declaration(false)
-            {
-                self.variable_list()?
-            } else {
-                self.expression()?
-            };
-            fields.push(("initializer", initializer.into()));
-        }
-        self.allow_in = saved;
+        self.in_context(self.context.with_in(false), |p| {
+            if !p.at(";") {
+                let initializer = if matches!(p.current.raw, "var" | "let" | "const")
+                    || p.at("using") && p.using_declaration(true)
+                    || p.at("await") && p.using_declaration(false)
+                {
+                    p.variable_list()?
+                } else {
+                    p.expression()?
+                };
+                fields.push(("initializer", initializer.into()));
+            }
+            Ok(())
+        })?;
         let kind = if self.at("of") || self.at("in") {
             let keyword = self.bump()?.raw;
             if keyword == "in" && fields.iter().any(|(key, _)| *key == "awaitModifier") {
@@ -423,7 +418,7 @@ impl<'src> Parser<'src> {
             && (self.current.kind == Kind::Eof
                 || matches!(self.current.raw, ";" | "}")
                 || self.current.newline
-                || !self.allow_in && matches!(self.current.raw, "in" | ")"))
+                || !self.context.allow_in && matches!(self.current.raw, "in" | ")"))
             || self.at("of")
                 && self.peek().kind == Kind::Word
                 && !reserved_word(self.peek().raw)
@@ -448,7 +443,7 @@ impl<'src> Parser<'src> {
             start,
             fields![("declarations", declarations.into())],
         );
-        self.nodes[id.0].flags = (self.nodes[id.0].flags & !8192) | flags;
+        self.nodes[id.0].flags = (self.nodes[id.0].flags & !DISALLOW_IN) | flags;
         Ok(id)
     }
     fn variable_declaration(&mut self) -> Result<NodeId> {
@@ -472,49 +467,49 @@ impl<'src> Parser<'src> {
                 return p.binding_identifier();
             }
             p.bump()?;
-            let saved_in = p.allow_in;
-            p.allow_in = true;
-            let close = if object { "}" } else { "]" };
-            let mut elements = vec![];
-            while !p.at(close) {
-                let element_start = p.pos();
-                if !object && p.at(",") {
-                    elements.push(p.make(
-                        "OmittedExpression",
-                        element_start,
-                        element_start,
-                        vec![],
-                    ));
-                    p.bump()?;
-                    continue;
-                }
-                let mut fields: Fields<'src> = Fields::new();
-                p.optional_token("...", "dotDotDotToken", &mut fields)?;
-                let name = if object {
-                    let property = p.property_name()?;
-                    if p.eat(":")? {
-                        fields.push(("propertyName", property.into()));
-                        p.binding_name()?
-                    } else {
-                        if p.nodes[property.0].kind != "Identifier"
-                            || matches!(p.nodes[property.0].field("escapedText"), Some(Value::Text(text)) if reserved_word(text))
-                        { return Err(p.error("Expected ':' and a binding name after property name")); }
-                        property
+            let elements = p.in_context(p.context.with_in(true), |p| {
+                let close = if object { "}" } else { "]" };
+                let mut elements = vec![];
+                while !p.at(close) {
+                    let element_start = p.pos();
+                    if !object && p.at(",") {
+                        elements.push(p.make(
+                            "OmittedExpression",
+                            element_start,
+                            element_start,
+                            vec![],
+                        ));
+                        p.bump()?;
+                        continue;
                     }
-                } else {
-                    p.binding_name()?
-                };
-                fields.push(("name", name.into()));
-                if p.eat("=")? {
-                    fields.push(("initializer", p.assignment_expression()?.into()));
+                    let mut fields: Fields<'src> = Fields::new();
+                    p.optional_token("...", "dotDotDotToken", &mut fields)?;
+                    let name = if object {
+                        let property = p.property_name()?;
+                        if p.eat(":")? {
+                            fields.push(("propertyName", property.into()));
+                            p.binding_name()?
+                        } else {
+                            if p.nodes[property.0].kind != "Identifier"
+                                || matches!(p.nodes[property.0].field("escapedText"), Some(Value::Text(text)) if reserved_word(text))
+                            { return Err(p.error("Expected ':' and a binding name after property name")); }
+                            property
+                        }
+                    } else {
+                        p.binding_name()?
+                    };
+                    fields.push(("name", name.into()));
+                    if p.eat("=")? {
+                        fields.push(("initializer", p.assignment_expression()?.into()));
+                    }
+                    elements.push(p.finish("BindingElement", element_start, fields));
+                    if !p.eat(",")? {
+                        break;
+                    }
                 }
-                elements.push(p.finish("BindingElement", element_start, fields));
-                if !p.eat(",")? {
-                    break;
-                }
-            }
-            p.expect(close)?;
-            p.allow_in = saved_in;
+                p.expect(close)?;
+                Ok(elements)
+            })?;
             Ok(p.finish(
                 if object {
                     "ObjectBindingPattern"
@@ -534,13 +529,10 @@ impl<'src> Parser<'src> {
         async_function: bool,
         generator: bool,
     ) -> Result<Vec<NodeId>> {
-        let context = self.context;
-        self.context = (context & !81920)
-            | if async_function { 65536 } else { 0 }
-            | if generator { 16384 } else { 0 };
-        let result = self.parameter_list("(", ")", context & 65536 != 0);
-        self.context = context;
-        result
+        let outer_await = self.context.contains(AWAIT);
+        self.in_context(self.context.parameters(async_function, generator), |p| {
+            p.parameter_list("(", ")", outer_await)
+        })
     }
     pub(super) fn parameter_list(
         &mut self,
@@ -568,10 +560,12 @@ impl<'src> Parser<'src> {
             }
             let start = self.pos();
             let deprecated = self.deprecated_trivia(true);
-            let context = self.context;
-            self.context = (context & !65536) | if outer_await { 65536 } else { 0 };
-            let modifiers = self.modifiers(true)?;
-            self.context = context;
+            let modifiers = self.in_context(
+                self.context
+                    .without(AWAIT)
+                    .with(if outer_await { AWAIT } else { 0 }),
+                |p| p.modifiers(true),
+            )?;
             let mut fields: Fields<'src> = Fields::new();
             self.optional_token("...", "dotDotDotToken", &mut fields)?;
             let name = if self.at("this") {
@@ -618,61 +612,64 @@ impl<'src> Parser<'src> {
         kind: &'static str,
         modifiers: Vec<NodeId>,
     ) -> Result<NodeId> {
-        let saved_context = self.context;
-        if kind == "FunctionExpression" {
-            self.context &= !32768;
-        }
-        self.expect("function")?;
-        let mut fields: Fields<'src> = Fields::new();
-        let generator = self.optional_token("*", "asteriskToken", &mut fields)?;
-        let async_function = modifiers
-            .iter()
-            .any(|id| self.nodes[id.0].kind == "AsyncKeyword");
-        if self.current.kind == Kind::Word {
-            let context = self.context;
-            if kind == "FunctionExpression" {
-                self.context |=
-                    if async_function { 65536 } else { 0 } | if generator { 16384 } else { 0 };
-            }
-            fields.push(("name", self.binding_identifier()?.into()));
-            self.context = context;
-        } else if kind == "FunctionDeclaration"
-            && !modifiers
-                .iter()
-                .any(|id| self.nodes[id.0].kind == "DefaultKeyword")
-        {
-            return Err(self.error("Expected function name"));
-        }
-        if self.at("<") {
-            fields.push(("typeParameters", self.type_parameters()?.into()));
-        }
-        let saved_in = self.allow_in;
-        if kind == "FunctionDeclaration"
-            && modifiers
-                .iter()
-                .any(|id| self.nodes[id.0].kind == "ExportKeyword")
-        {
-            self.context |= 65536;
-        }
-        fields.push((
-            "parameters",
-            self.parameters_with_context(async_function, generator)?
-                .into(),
-        ));
-        self.allow_in = saved_in;
-        if self.eat(":")? {
-            fields.push(("type", self.return_type()?.into()));
-        }
-        if self.at("{") {
-            self.context = self.function_context(async_function, generator);
-            fields.push(("body", self.block("Block")?.into()));
-        } else if kind == "FunctionExpression" {
-            return Err(self.error("Expected function body"));
+        let context = if kind == "FunctionExpression" {
+            self.context.without(DECORATOR)
         } else {
-            self.semi()?;
-        }
-        self.context = saved_context;
-        self.allow_in = saved_in;
+            self.context
+        };
+        let fields = self.in_context(context, |p| {
+            p.expect("function")?;
+            let mut fields: Fields<'src> = Fields::new();
+            let generator = p.optional_token("*", "asteriskToken", &mut fields)?;
+            let async_function = modifiers
+                .iter()
+                .any(|id| p.nodes[id.0].kind == "AsyncKeyword");
+            if p.current.kind == Kind::Word {
+                let context = if kind == "FunctionExpression" {
+                    p.context.with(
+                        if async_function { AWAIT } else { 0 } | if generator { YIELD } else { 0 },
+                    )
+                } else {
+                    p.context
+                };
+                let name = p.in_context(context, Self::binding_identifier)?;
+                fields.push(("name", name.into()));
+            } else if kind == "FunctionDeclaration"
+                && !modifiers
+                    .iter()
+                    .any(|id| p.nodes[id.0].kind == "DefaultKeyword")
+            {
+                return Err(p.error("Expected function name"));
+            }
+            if p.at("<") {
+                fields.push(("typeParameters", p.type_parameters()?.into()));
+            }
+            if kind == "FunctionDeclaration"
+                && modifiers
+                    .iter()
+                    .any(|id| p.nodes[id.0].kind == "ExportKeyword")
+            {
+                p.context = p.context.with(AWAIT);
+            }
+            fields.push((
+                "parameters",
+                p.parameters_with_context(async_function, generator)?.into(),
+            ));
+            if p.eat(":")? {
+                fields.push(("type", p.return_type()?.into()));
+            }
+            if p.at("{") {
+                let body = p.in_context(p.context.function(async_function, generator), |p| {
+                    p.block("Block")
+                })?;
+                fields.push(("body", body.into()));
+            } else if kind == "FunctionExpression" {
+                return Err(p.error("Expected function body"));
+            } else {
+                p.semi()?;
+            }
+            Ok(fields)
+        })?;
         let id = self.finish(kind, start, fields);
         self.attach_modifiers(id, modifiers);
         Ok(id)
@@ -694,36 +691,37 @@ impl<'src> Parser<'src> {
         if self.at("<") {
             fields.push(("typeParameters", self.type_parameters()?.into()));
         }
-        let saved_context = self.context;
-        if modifiers
+        let context = if modifiers
             .iter()
             .any(|id| self.nodes[id.0].kind == "ExportKeyword")
         {
-            self.context |= 65536;
-        }
-        let saved_in = self.allow_in;
-        let heritage = self.heritage()?;
-        if !heritage.is_empty() {
-            fields.push(("heritageClauses", heritage.into()));
-        }
-        self.expect("{")?;
-        let mut members = vec![];
-        while !self.at("}") {
-            if self.current.kind == Kind::Eof {
-                return Err(self.error("Unterminated class"));
+            self.context.with(AWAIT)
+        } else {
+            self.context
+        };
+        self.in_context(context, |p| {
+            let heritage = p.heritage()?;
+            if !heritage.is_empty() {
+                fields.push(("heritageClauses", heritage.into()));
             }
-            if self.at(";") {
-                let pos = self.pos();
-                self.bump()?;
-                members.push(self.finish("SemicolonClassElement", pos, vec![]));
-                continue;
+            p.expect("{")?;
+            let mut members = vec![];
+            while !p.at("}") {
+                if p.current.kind == Kind::Eof {
+                    return Err(p.error("Unterminated class"));
+                }
+                if p.at(";") {
+                    let pos = p.pos();
+                    p.bump()?;
+                    members.push(p.finish("SemicolonClassElement", pos, vec![]));
+                    continue;
+                }
+                members.push(p.member(false)?);
             }
-            members.push(self.member(false)?);
-        }
-        self.expect("}")?;
-        fields.push(("members", members.into()));
-        self.context = saved_context;
-        self.allow_in = saved_in;
+            p.expect("}")?;
+            fields.push(("members", members.into()));
+            Ok(())
+        })?;
         let id = self.finish(kind, start, fields);
         self.attach_modifiers(id, modifiers);
         Ok(id)
@@ -816,28 +814,28 @@ impl<'src> Parser<'src> {
         self.expect("enum")?;
         let name = self.binding_identifier()?;
         self.expect("{")?;
-        let context = self.context;
-        self.context &= !81920;
-        let mut members = vec![];
-        while !self.at("}") {
-            let member_start = self.pos();
-            let deprecated = self.deprecated_trivia(false);
-            let name = self.property_name()?;
-            let mut fields = fields![("name", name.into())];
-            if self.eat("=")? {
-                fields.push(("initializer", self.assignment_expression()?.into()));
+        let members = self.in_context(self.context.without(AWAIT | YIELD), |p| {
+            let mut members = vec![];
+            while !p.at("}") {
+                let member_start = p.pos();
+                let deprecated = p.deprecated_trivia(false);
+                let name = p.property_name()?;
+                let mut fields = fields![("name", name.into())];
+                if p.eat("=")? {
+                    fields.push(("initializer", p.assignment_expression()?.into()));
+                }
+                let member = p.finish("EnumMember", member_start, fields);
+                if deprecated {
+                    p.nodes[member.0].flags |= 536870912;
+                }
+                members.push(member);
+                if !p.eat(",")? {
+                    break;
+                }
             }
-            let member = self.finish("EnumMember", member_start, fields);
-            if deprecated {
-                self.nodes[member.0].flags |= 536870912;
-            }
-            members.push(member);
-            if !self.eat(",")? {
-                break;
-            }
-        }
-        self.expect("}")?;
-        self.context = context;
+            p.expect("}")?;
+            Ok(members)
+        })?;
         let id = self.finish(
             "EnumDeclaration",
             start,
@@ -1011,10 +1009,8 @@ impl<'src> Parser<'src> {
         let start = self.pos();
         let export = self.token_node()?;
         if self.eat("=")? {
-            let saved_context = self.context;
-            self.context |= 65536;
-            let expression = self.assignment_expression()?;
-            self.context = saved_context;
+            let expression =
+                self.in_context(self.context.with(AWAIT), Self::assignment_expression)?;
             self.semi()?;
             return Ok(self.finish(
                 "ExportAssignment",
@@ -1041,43 +1037,43 @@ impl<'src> Parser<'src> {
             self.bump()?;
         }
         if self.at("{") || self.at("*") {
-            let saved_context = self.context;
-            self.context |= 65536;
-            let mut fields = fields![("isTypeOnly", type_only.into())];
-            if self.at("{") {
-                let pos = self.pos();
-                let elements = self.specifiers(true)?;
-                fields.push((
-                    "exportClause",
-                    self.finish("NamedExports", pos, fields![("elements", elements.into())])
-                        .into(),
-                ));
-            } else {
-                let clause_start = self.pos();
-                self.bump()?;
-                if self.eat("as")? {
-                    let name = self.module_export_name()?;
+            let fields = self.in_context(self.context.with(AWAIT), |p| {
+                let mut fields = fields![("isTypeOnly", type_only.into())];
+                if p.at("{") {
+                    let pos = p.pos();
+                    let elements = p.specifiers(true)?;
                     fields.push((
                         "exportClause",
-                        self.finish(
-                            "NamespaceExport",
-                            clause_start,
-                            fields![("name", name.into())],
-                        )
-                        .into(),
+                        p.finish("NamedExports", pos, fields![("elements", elements.into())])
+                            .into(),
                     ));
+                } else {
+                    let clause_start = p.pos();
+                    p.bump()?;
+                    if p.eat("as")? {
+                        let name = p.module_export_name()?;
+                        fields.push((
+                            "exportClause",
+                            p.finish(
+                                "NamespaceExport",
+                                clause_start,
+                                fields![("name", name.into())],
+                            )
+                            .into(),
+                        ));
+                    }
                 }
-            }
-            if self.eat("from")? {
-                fields.push(("moduleSpecifier", self.module_specifier()?.into()));
-            }
-            if self.at("with") {
-                let attributes = self.import_attributes()?;
-                fields.push(("attributes", attributes.into()));
-                fields.push(("assertClause", attributes.into()));
-            }
-            self.semi()?;
-            self.context = saved_context;
+                if p.eat("from")? {
+                    fields.push(("moduleSpecifier", p.module_specifier()?.into()));
+                }
+                if p.at("with") {
+                    let attributes = p.import_attributes()?;
+                    fields.push(("attributes", attributes.into()));
+                    fields.push(("assertClause", attributes.into()));
+                }
+                p.semi()?;
+                Ok(fields)
+            })?;
             return Ok(self.finish("ExportDeclaration", start, fields));
         }
         let mut modifiers = vec![export];
@@ -1088,11 +1084,9 @@ impl<'src> Parser<'src> {
                 || (self.at("async") && self.peek_at("function"))
                 || self.at("@");
             if !declaration {
-                let saved_context = self.context;
-                self.context |= 65536;
-                let expression = self.assignment_expression()?;
+                let expression =
+                    self.in_context(self.context.with(AWAIT), Self::assignment_expression)?;
                 self.semi()?;
-                self.context = saved_context;
                 return Ok(self.finish(
                     "ExportAssignment",
                     start,
@@ -1208,8 +1202,8 @@ impl<'src> Parser<'src> {
     }
     fn import_name_is_keyword(&self) -> bool {
         reserved_word(self.current.raw)
-            || self.at("await") && self.context & 65536 != 0
-            || self.at("yield") && self.context & 16384 != 0
+            || self.at("await") && self.context.contains(AWAIT)
+            || self.at("yield") && self.context.contains(YIELD)
     }
     pub(super) fn import_attributes(&mut self) -> Result<NodeId> {
         let start = self.pos();

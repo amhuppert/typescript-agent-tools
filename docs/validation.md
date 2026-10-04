@@ -4,7 +4,7 @@ Validation uses TypeScript compiler API 6.0.3 for the JSON syntax projection and
 
 | Check | Result and scope |
 | --- | --- |
-| Rust tests | 28 tests pass on Rust 1.96 and the minimum supported Rust 1.85: one exhaustive identifier test, 22 parser integration tests, four CLI tests, and one doc test. Coverage includes UTF-16 offsets, contextual grammar, first-error behavior, the nesting guard, unpaired surrogate strings, and iterative serialization of a 10,000-operator chain. |
+| Rust tests | 30 tests pass on Rust 1.96 and the minimum supported Rust 1.85: one exhaustive identifier test, 24 parser integration tests, four CLI tests, and one doc test. Coverage includes UTF-16 offsets, nested grammar contexts, ambiguous expressions in loop initializers, first-error behavior, the nesting guard, unpaired surrogate strings, and iterative serialization of a 10,000-operator chain. |
 | Formatting and lint | `cargo fmt --all -- --check` and Clippy with `--all-targets --no-deps -- -D warnings` pass. |
 | Authored AST comparisons | 86/86 cases match the compiler API projection, including positions, context flags, and scanner hints. |
 | Authored native checks | 138/138 positive and negative cases match TypeScript 7.0.2. |
@@ -15,6 +15,7 @@ Validation uses TypeScript compiler API 6.0.3 for the JSON syntax projection and
 | Compiler/application/declaration AST sweep | 212/212 files match positions, flags, and scanner hints; 13,451,990 bytes. This includes 77 compiler source files, 108 standard declarations, and 27 application files. |
 | Identifier classification | All 1,114,112 Unicode code points were checked for identifier-start and identifier-part acceptance against the native compiler. The checked-in regression fixture also tests every code point against the Rust scanner. |
 | Robustness | 3,227 deterministic truncation, mutation, and adversarial cases return successfully or produce a syntax diagnostic, with no crashes or timeouts. |
+| Refactor compatibility | All 14,935 cached upstream cases and 138 authored fixtures produce identical JSON, diagnostics, and exit codes to a release build of baseline commit `da77304`. The comparison includes 14,143 accepted and 792 rejected upstream inputs. |
 
 The upstream corpus is `tests/cases/conformance` and `tests/cases/compiler` at TypeScript 7.0.2 commit `1e4744d68260a7cb91b62b12edc3f6a2187faaf1`. The compiler-source corpus is from TypeScript 6.0.3 commit `050880ce59e30b356b686bd3144efe24f875ebc8`.
 

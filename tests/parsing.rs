@@ -49,6 +49,58 @@ fn class_member_contexts_are_isolated() {
 }
 
 #[test]
+fn nested_grammar_scopes_preserve_the_enclosing_async_context() {
+    let value = json(
+        r#"export async function outer() {
+            type Result<T> = T extends infer U extends string ? U : never;
+            const object = {
+                async run() { return await task; },
+                plain() { return await; },
+                value: await task
+            };
+            const comparison = (left < Type) + (right >> count);
+            return await task;
+        }"#,
+    );
+    let statements = &value["statements"][0]["body"]["statements"];
+    assert_eq!(statements[0]["type"]["flags"], 0);
+    let properties =
+        &statements[1]["declarationList"]["declarations"][0]["initializer"]["properties"];
+    assert_eq!(properties[0]["body"]["flags"], 65536);
+    assert_eq!(properties[1]["body"]["flags"], 0);
+    assert_eq!(
+        properties[1]["body"]["statements"][0]["expression"]["escapedText"],
+        "await"
+    );
+    assert_eq!(properties[2]["initializer"]["flags"], 65536);
+    assert_eq!(
+        statements[2]["declarationList"]["declarations"][0]["initializer"]["flags"],
+        65536
+    );
+    assert_eq!(statements[3]["expression"]["kind"], 224);
+    assert_eq!(statements[3]["expression"]["flags"], 65536);
+}
+
+#[test]
+fn for_initializer_restrictions_survive_nested_and_ambiguous_expressions() {
+    let value = json(
+        r#"for (let value = probe((left < Type), `${left in right}`); value; value--) {}
+        after();"#,
+    );
+    let statement = &value["statements"][0];
+    let initializer = &statement["initializer"]["declarations"][0]["initializer"];
+    assert_eq!(initializer["flags"], 8192);
+    let comparison = &initializer["arguments"][0]["expression"];
+    assert_eq!(comparison["operatorToken"]["kind"], 30);
+    assert_eq!(comparison["flags"], 0);
+    let substitution = &initializer["arguments"][1]["templateSpans"][0]["expression"];
+    assert_eq!(substitution["operatorToken"]["kind"], 103);
+    assert_eq!(substitution["flags"], 0);
+    assert_eq!(statement["condition"]["flags"], 0);
+    assert_eq!(value["statements"][1]["expression"]["flags"], 0);
+}
+
+#[test]
 fn contextual_syntax_errors_are_rejected() {
     for source in [
         "async function f(value = await => await) {}",

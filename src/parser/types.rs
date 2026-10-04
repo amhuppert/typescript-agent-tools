@@ -2,11 +2,9 @@ use super::*;
 
 impl<'src> Parser<'src> {
     pub(super) fn type_node(&mut self) -> Result<NodeId> {
-        let saved = self.context;
-        self.context &= !81920;
-        let result = self.nest(|p| p.conditional_type(p.context & 131072 == 0));
-        self.context = saved;
-        result
+        self.in_context(self.context.without(AWAIT | YIELD), |p| {
+            p.nest(|p| p.conditional_type(!p.context.contains(DISALLOW_CONDITIONAL_TYPES)))
+        })
     }
     fn conditional_type(&mut self, conditional: bool) -> Result<NodeId> {
         if self.function_type_ahead() {
@@ -14,15 +12,12 @@ impl<'src> Parser<'src> {
                 return Ok(node);
             }
         }
-        let saved = self.allow_conditional;
-        self.allow_conditional = conditional;
-        let check = self.union_type()?;
-        self.allow_conditional = saved;
+        let check =
+            self.in_context(self.context.with_conditional(conditional), Self::union_type)?;
         if conditional && !self.current.newline && self.eat("extends")? {
-            let context = self.context;
-            self.context |= 131072;
-            let extends = self.nest(|p| p.conditional_type(false))?;
-            self.context = context;
+            let extends = self.in_context(self.context.with(DISALLOW_CONDITIONAL_TYPES), |p| {
+                p.nest(|p| p.conditional_type(false))
+            })?;
             self.expect("?")?;
             let yes = self.type_node()?;
             self.expect(":")?;
@@ -111,13 +106,15 @@ impl<'src> Parser<'src> {
             let name = self.identifier()?;
             let mut fields = fields![("name", name.into())];
             if self.at("extends") {
-                let disallowed = !self.allow_conditional;
+                let disallowed = !self.context.allow_conditional;
                 if let Some(constraint) = self.attempt(|p| {
                     p.bump()?;
-                    let saved = p.context;
-                    p.context = (p.context & !81920) | 131072;
-                    let node = p.nest(|p| p.conditional_type(false))?;
-                    p.context = saved;
+                    let node = p.in_context(
+                        p.context
+                            .without(AWAIT | YIELD)
+                            .with(DISALLOW_CONDITIONAL_TYPES),
+                        |p| p.nest(|p| p.conditional_type(false)),
+                    )?;
                     if p.at("?") && !disallowed {
                         Err(p.error("Conditional type boundary"))
                     } else {
@@ -134,11 +131,10 @@ impl<'src> Parser<'src> {
                 fields![("typeParameter", parameter.into())],
             ));
         }
-        let context = self.context;
-        self.context &= !131072;
-        let result = self.postfix_type();
-        self.context = context;
-        result
+        self.in_context(
+            self.context.without(DISALLOW_CONDITIONAL_TYPES),
+            Self::postfix_type,
+        )
     }
     fn postfix_type(&mut self) -> Result<NodeId> {
         let mut node = self.primary_type()?;
@@ -167,7 +163,7 @@ impl<'src> Parser<'src> {
                     self.start(node),
                     fields![("elementType", node.into())],
                 );
-                self.nodes[node.0].flags &= !131072;
+                self.nodes[node.0].flags &= !DISALLOW_CONDITIONAL_TYPES;
             } else {
                 let index = self.type_node()?;
                 self.expect("]")?;
@@ -176,7 +172,7 @@ impl<'src> Parser<'src> {
                     self.start(node),
                     fields![("objectType", node.into()), ("indexType", index.into())],
                 );
-                self.nodes[node.0].flags &= !131072;
+                self.nodes[node.0].flags &= !DISALLOW_CONDITIONAL_TYPES;
             }
         }
         Ok(node)
@@ -213,11 +209,9 @@ impl<'src> Parser<'src> {
                 return Ok(node);
             }
         }
-        let context = self.context;
-        self.context &= !131072;
-        let result = self.primary_type_inner(start);
-        self.context = context;
-        result
+        self.in_context(self.context.without(DISALLOW_CONDITIONAL_TYPES), |p| {
+            p.primary_type_inner(start)
+        })
     }
     fn function_type_ahead(&self) -> bool {
         if self.at("<") || self.at("new") || self.at("abstract") && self.peek_at("new") {
@@ -345,7 +339,7 @@ impl<'src> Parser<'src> {
                 start,
                 fields![("type", type_node.into())],
             );
-            self.nodes[id.0].flags &= !131072;
+            self.nodes[id.0].flags &= !DISALLOW_CONDITIONAL_TYPES;
             return Ok(id);
         }
         if self.at("{") {
@@ -520,11 +514,10 @@ impl<'src> Parser<'src> {
         })
     }
     pub(super) fn return_type(&mut self) -> Result<NodeId> {
-        let saved = self.context;
-        self.context &= !131072;
-        let result = self.return_type_inner();
-        self.context = saved;
-        result
+        self.in_context(
+            self.context.without(DISALLOW_CONDITIONAL_TYPES),
+            Self::return_type_inner,
+        )
     }
     fn return_type_inner(&mut self) -> Result<NodeId> {
         let start = self.pos();
@@ -533,8 +526,8 @@ impl<'src> Parser<'src> {
             && self.peek_at("is")
             && !self.peek().newline
             && !reserved_word(self.current.raw)
-            && !(self.at("await") && self.context & 65536 != 0
-                || self.at("yield") && self.context & 16384 != 0)
+            && !(self.at("await") && self.context.contains(AWAIT)
+                || self.at("yield") && self.context.contains(YIELD))
         {
             let name = self.identifier()?;
             fields.push(("parameterName", name.into()));
@@ -730,151 +723,167 @@ impl<'src> Parser<'src> {
         Ok(members)
     }
     pub(super) fn member(&mut self, signature: bool) -> Result<NodeId> {
-        let context = self.context;
         let deprecated = self.deprecated_trivia(false);
-        let result = self.nest(|p| {
-            let start = p.pos();
-            let modifiers = p.modifiers_inner(true, !signature)?;
-            if !signature && p.at("static") && p.peek_at("{") {
-                p.bump()?;
-                let context = p.context;
-                p.context = (context & !16384) | 65536;
-                let body = p.block("Block")?;
-                p.context = context;
-                let id = p.finish(
-                    "ClassStaticBlockDeclaration",
-                    start,
-                    fields![("body", body.into())],
-                );
-                p.attach_modifiers(id, modifiers);
-                return Ok(id);
-            }
-            if p.index_signature_ahead() {
-                    let parameters = p.parameter_list("[", "]", false)?;
-                    let mut fields = fields![("parameters", parameters.into())];
-                    if p.eat(":")? {
-                        fields.push(("type", p.type_node()?.into()));
-                    }
-                    p.member_semi()?;
-                    let id = p.finish("IndexSignature", start, fields);
-                    p.attach_modifiers(id, modifiers);
-                    return Ok(id);
-            }
-            if signature
-                && (p.at("(") || p.at("<") || (p.at("new") && matches!(p.peek().raw, "(" | "<")))
-            {
-                let construct = p.eat("new")?;
-                let mut fields: Fields<'src> = Fields::new();
-                if p.at("<") {
-                    fields.push(("typeParameters", p.type_parameters()?.into()));
-                }
-                fields.push(("parameters", p.parameters()?.into()));
-                if p.eat(":")? {
-                    fields.push(("type", p.return_type()?.into()));
-                }
-                p.member_semi()?;
-                let id = p.finish(
-                    if construct {
-                        "ConstructSignature"
-                    } else {
-                        "CallSignature"
-                    },
-                    start,
-                    fields,
-                );
-                p.attach_modifiers(id, modifiers);
-                return Ok(id);
-            }
-            let accessor = if matches!(p.current.raw, "get" | "set")
-                && (matches!(p.peek().kind, Kind::Word | Kind::Private | Kind::String | Kind::Number)
-                    || p.peek_at("[")) {
-                Some(p.bump()?.raw)
-            } else {
-                None
-            };
-            let generator = p.at("*");
-            let constructor_keyword = !signature && accessor.is_none() && !generator && p.at("constructor");
-            let quoted_constructor = !signature && accessor.is_none() && !generator
-                && p.current.kind == Kind::String && p.peek_at("(")
-                && matches!(decode_string(&p.current.raw[1..p.current.raw.len() - 1]), Ok(Value::Text(text)) if text == "constructor");
-            let constructor = constructor_keyword || quoted_constructor;
-            if accessor.is_none() && !constructor {
-                p.ambient_modifiers(&modifiers);
-            }
-            let mut fields: Fields<'src> = Fields::new();
-            p.optional_token("*", "asteriskToken", &mut fields)?;
-            let name = p.property_name()?;
-            if !constructor {
-                fields.push(("name", name.into()));
-            }
-            if (constructor || accessor.is_some()) && matches!(p.current.raw, "?" | "!") {
-                return Err(p.error("Expected constructor or accessor parameters"));
-            }
-            let optional = p.optional_token("?", "questionToken", &mut fields)?;
-            let asserted = !signature && !optional && !p.current.newline
-                && p.optional_token("!", "exclamationToken", &mut fields)?;
-            let method = generator || constructor || accessor.is_some() || p.at("(") || p.at("<");
-            if asserted && method {
-                return Err(p.error("Expected a property declaration after '!'"));
-            }
-            let saved_context = p.context;
-            let kind = if method {
-                if p.at("<") {
-                    fields.push(("typeParameters", p.type_parameters()?.into()));
-                }
-                let async_function = accessor.is_none() && !constructor && modifiers
-                    .iter()
-                    .any(|id| p.nodes[id.0].kind == "AsyncKeyword");
-                let generator = generator && accessor.is_none() && !constructor;
-                let parameters = p.parameters_with_context(async_function, generator)?;
-                fields.push(("parameters", parameters.into()));
-                if p.eat(":")? {
-                    fields.push(("type", p.return_type()?.into()));
-                }
-                if (!signature || accessor.is_some()) && p.at("{") {
-                    p.context = p.function_context(async_function, generator);
-                    fields.push(("body", p.block("Block")?.into()));
-                } else {
-                    p.member_semi()?;
-                }
-                match accessor {
-                    Some("get") => "GetAccessor",
-                    Some("set") => "SetAccessor",
-                    _ if constructor => "Constructor",
-                    _ if signature => "MethodSignature",
-                    _ => "MethodDeclaration",
-                }
-            } else {
-                if accessor.is_some() {
-                    return Err(p.error("Expected accessor parameters"));
-                }
-                if p.eat(":")? {
-                    fields.push(("type", p.type_node()?.into()));
-                }
-                if p.eat("=")? {
-                    p.context &= !(81920 | 8192);
-                    fields.push(("initializer", p.assignment_allow_in()?.into()));
-                    p.context = saved_context;
-                }
-                p.member_semi()?;
-                if signature {
-                    "PropertySignature"
-                } else {
-                    "PropertyDeclaration"
-                }
-            };
-            p.context = saved_context;
-            let id = p.finish(kind, start, fields);
-            p.attach_modifiers(id, modifiers);
-            Ok(id)
-        });
-        self.context = context;
+        let result = self.in_context(self.context, |p| p.nest(|p| p.member_inner(signature)));
         if deprecated {
             if let Ok(id) = result {
                 self.nodes[id.0].flags |= 536870912;
             }
         }
         result
+    }
+    fn member_inner(&mut self, signature: bool) -> Result<NodeId> {
+        let start = self.pos();
+        let modifiers = self.modifiers_inner(true, !signature)?;
+        if !signature && self.at("static") && self.peek_at("{") {
+            self.bump()?;
+            let body = self.in_context(self.context.without(YIELD).with(AWAIT), |parser| {
+                parser.block("Block")
+            })?;
+            let id = self.finish(
+                "ClassStaticBlockDeclaration",
+                start,
+                fields![("body", body.into())],
+            );
+            self.attach_modifiers(id, modifiers);
+            return Ok(id);
+        }
+        if self.index_signature_ahead() {
+            let parameters = self.parameter_list("[", "]", false)?;
+            let mut fields = fields![("parameters", parameters.into())];
+            if self.eat(":")? {
+                fields.push(("type", self.type_node()?.into()));
+            }
+            self.member_semi()?;
+            let id = self.finish("IndexSignature", start, fields);
+            self.attach_modifiers(id, modifiers);
+            return Ok(id);
+        }
+        if signature
+            && (self.at("(")
+                || self.at("<")
+                || (self.at("new") && matches!(self.peek().raw, "(" | "<")))
+        {
+            let construct = self.eat("new")?;
+            let mut fields: Fields<'src> = Fields::new();
+            if self.at("<") {
+                fields.push(("typeParameters", self.type_parameters()?.into()));
+            }
+            fields.push(("parameters", self.parameters()?.into()));
+            if self.eat(":")? {
+                fields.push(("type", self.return_type()?.into()));
+            }
+            self.member_semi()?;
+            let id = self.finish(
+                if construct {
+                    "ConstructSignature"
+                } else {
+                    "CallSignature"
+                },
+                start,
+                fields,
+            );
+            self.attach_modifiers(id, modifiers);
+            return Ok(id);
+        }
+        let accessor = if matches!(self.current.raw, "get" | "set")
+            && (matches!(
+                self.peek().kind,
+                Kind::Word | Kind::Private | Kind::String | Kind::Number
+            ) || self.peek_at("["))
+        {
+            Some(self.bump()?.raw)
+        } else {
+            None
+        };
+        let generator = self.at("*");
+        let constructor_keyword =
+            !signature && accessor.is_none() && !generator && self.at("constructor");
+        let quoted_constructor = !signature
+            && accessor.is_none()
+            && !generator
+            && self.current.kind == Kind::String
+            && self.peek_at("(")
+            && matches!(decode_string(&self.current.raw[1..self.current.raw.len() - 1]), Ok(Value::Text(text)) if text == "constructor");
+        let constructor = constructor_keyword || quoted_constructor;
+        if accessor.is_none() && !constructor {
+            self.ambient_modifiers(&modifiers);
+        }
+        let mut fields: Fields<'src> = Fields::new();
+        self.optional_token("*", "asteriskToken", &mut fields)?;
+        let name = self.property_name()?;
+        if !constructor {
+            fields.push(("name", name.into()));
+        }
+        if (constructor || accessor.is_some()) && matches!(self.current.raw, "?" | "!") {
+            return Err(self.error("Expected constructor or accessor parameters"));
+        }
+        let optional = self.optional_token("?", "questionToken", &mut fields)?;
+        let asserted = !signature
+            && !optional
+            && !self.current.newline
+            && self.optional_token("!", "exclamationToken", &mut fields)?;
+        let method = generator || constructor || accessor.is_some() || self.at("(") || self.at("<");
+        if asserted && method {
+            return Err(self.error("Expected a property declaration after '!'"));
+        }
+        let kind = if method {
+            if self.at("<") {
+                fields.push(("typeParameters", self.type_parameters()?.into()));
+            }
+            let async_function = accessor.is_none()
+                && !constructor
+                && modifiers
+                    .iter()
+                    .any(|id| self.nodes[id.0].kind == "AsyncKeyword");
+            let generator = generator && accessor.is_none() && !constructor;
+            let parameters = self.parameters_with_context(async_function, generator)?;
+            fields.push(("parameters", parameters.into()));
+            if self.eat(":")? {
+                fields.push(("type", self.return_type()?.into()));
+            }
+            if (!signature || accessor.is_some()) && self.at("{") {
+                let body = self
+                    .in_context(self.context.function(async_function, generator), |parser| {
+                        parser.block("Block")
+                    })?;
+                fields.push(("body", body.into()));
+            } else {
+                self.member_semi()?;
+            }
+            match accessor {
+                Some("get") => "GetAccessor",
+                Some("set") => "SetAccessor",
+                _ if constructor => "Constructor",
+                _ if signature => "MethodSignature",
+                _ => "MethodDeclaration",
+            }
+        } else {
+            if accessor.is_some() {
+                return Err(self.error("Expected accessor parameters"));
+            }
+            if self.eat(":")? {
+                fields.push(("type", self.type_node()?.into()));
+            }
+            if self.eat("=")? {
+                let initializer = self.in_context(
+                    self.context
+                        .without(AWAIT | YIELD | DISALLOW_IN)
+                        .with_in(true),
+                    Self::assignment_expression,
+                )?;
+                fields.push(("initializer", initializer.into()));
+            }
+            self.member_semi()?;
+            if signature {
+                "PropertySignature"
+            } else {
+                "PropertyDeclaration"
+            }
+        };
+        let id = self.finish(kind, start, fields);
+        self.attach_modifiers(id, modifiers);
+        Ok(id)
     }
     fn member_semi(&mut self) -> Result<()> {
         if self.eat(",")? { Ok(()) } else { self.semi() }
@@ -912,8 +921,8 @@ impl<'src> Parser<'src> {
             }
         } else if first.kind != Kind::Word
             || reserved_word(first.raw)
-            || first.raw == "await" && self.context & 65536 != 0
-            || first.raw == "yield" && self.context & 16384 != 0
+            || first.raw == "await" && self.context.contains(AWAIT)
+            || first.raw == "yield" && self.context.contains(YIELD)
         {
             return false;
         }

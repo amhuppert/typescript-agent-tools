@@ -2,16 +2,14 @@ use super::*;
 
 impl<'src> Parser<'src> {
     pub(super) fn expression(&mut self) -> Result<NodeId> {
-        let context = self.context;
-        self.context &= !32768;
-        let result = (|| {
-            let mut left = self.assignment_expression()?;
-            while self.at(",") {
-                let operator = self.token_node()?;
-                let right = self.assignment_expression()?;
-                left = self.finish(
+        self.in_context(self.context.without(DECORATOR), |p| {
+            let mut left = p.assignment_expression()?;
+            while p.at(",") {
+                let operator = p.token_node()?;
+                let right = p.assignment_expression()?;
+                left = p.finish(
                     "BinaryExpression",
-                    self.start(left),
+                    p.start(left),
                     fields![
                         ("left", left.into()),
                         ("operatorToken", operator.into()),
@@ -20,9 +18,7 @@ impl<'src> Parser<'src> {
                 );
             }
             Ok(left)
-        })();
-        self.context = context;
-        result
+        })
     }
     pub(super) fn assignment_expression(&mut self) -> Result<NodeId> {
         self.expression_bp(2, true)
@@ -36,10 +32,8 @@ impl<'src> Parser<'src> {
             loop {
                 if p.at("?") && minimum <= 3 {
                     let question = p.token_node()?;
-                    let saved = p.allow_in;
-                    p.allow_in = true;
-                    let when_true = p.expression_bp(2, false)?;
-                    p.allow_in = saved;
+                    let when_true =
+                        p.in_context(p.context.with_in(true), |p| p.expression_bp(2, false))?;
                     if !p.at(":") {
                         return Err(p.error("Expected ':' in conditional expression"));
                     }
@@ -61,7 +55,7 @@ impl<'src> Parser<'src> {
                 let Some((precedence, right_associative)) = binary_precedence(p.current.raw) else {
                     break;
                 };
-                if precedence < minimum || (p.at("in") && !p.allow_in) {
+                if precedence < minimum || (p.at("in") && !p.context.allow_in) {
                     break;
                 }
                 if p.at("**")
@@ -155,19 +149,16 @@ impl<'src> Parser<'src> {
                 let has_return_type = fields.iter().any(|(key, _)| *key == "type");
                 let ambiguous = !fields.iter().any(|(key, _)| *key == "typeParameters")
                     && matches!(fields.iter().find(|(key, _)| *key == "parameters"), Some((_, Value::Nodes(parameters))) if !parameters.is_empty() && parameters.iter().all(|id| !p.nodes[id.0].fields.iter().any(|(key, _)| matches!(*key, "type" | "questionToken" | "dotDotDotToken" | "modifiers"))));
-                let saved = p.allow_in;
-                let saved_context = p.context;
                 let async_function = modifiers
                     .iter()
                     .any(|id| p.nodes[id.0].kind == "AsyncKeyword");
-                p.context = p.function_context(async_function, false);
-                let body = if p.at("{") {
-                    p.block("Block")?
-                } else {
-                    p.expression_bp(2, allow_arrow_return)?
-                };
-                p.allow_in = saved;
-                p.context = saved_context;
+                let body = p.in_context(p.context.function(async_function, false), |p| {
+                    if p.at("{") {
+                        p.block("Block")
+                    } else {
+                        p.expression_bp(2, allow_arrow_return)
+                    }
+                })?;
                 if !allow_arrow_return && has_return_type && ambiguous && !p.at(":") {
                     return Err(p.error("Conditional expression boundary"));
                 }
@@ -187,7 +178,8 @@ impl<'src> Parser<'src> {
         let keyword_operand = next.is_some_and(|next| {
             !next.newline && matches!(next.kind, Kind::Word | Kind::Number | Kind::String)
         });
-        if allow_assignment && self.at("yield") && (self.context & 16384 != 0 || keyword_operand) {
+        if allow_assignment && self.at("yield") && (self.context.contains(YIELD) || keyword_operand)
+        {
             self.bump()?;
             let mut fields: Fields<'src> = Fields::new();
             if !self.current.newline {
@@ -205,7 +197,7 @@ impl<'src> Parser<'src> {
         if matches!(
             self.current.raw,
             "delete" | "typeof" | "void" | "+" | "-" | "!" | "~" | "++" | "--"
-        ) || (self.at("await") && (self.context & 65536 != 0 || keyword_operand))
+        ) || (self.at("await") && (self.context.contains(AWAIT) || keyword_operand))
         {
             let operator = self.bump()?;
             let operand = if matches!(operator.raw, "++" | "--") {
@@ -295,8 +287,6 @@ impl<'src> Parser<'src> {
             }
             fields.push(("typeParameters", type_parameters.into()));
         }
-        let saved_context = self.context;
-        let saved_in = self.allow_in;
         let simple_parameter = !self.at("(");
         let parameters = if self.at("(") {
             let async_function = modifiers
@@ -305,8 +295,8 @@ impl<'src> Parser<'src> {
             self.parameters_with_context(async_function, false)?
         } else {
             let pos = self.pos();
-            if self.at("await") && self.context & 65536 != 0
-                || self.at("yield") && self.context & 16384 != 0
+            if self.at("await") && self.context.contains(AWAIT)
+                || self.at("yield") && self.context.contains(YIELD)
             {
                 return Err(self.error("Expected an arrow parameter identifier"));
             }
@@ -317,8 +307,6 @@ impl<'src> Parser<'src> {
         if self.eat(":")? {
             fields.push(("type", self.return_type()?.into()));
         }
-        self.context = saved_context;
-        self.allow_in = saved_in;
         if !self.at("=>") || self.current.newline && simple_parameter && !modifiers.is_empty() {
             return Err(self.error("Expected arrow"));
         }
@@ -349,10 +337,7 @@ impl<'src> Parser<'src> {
                     fields.push(("questionDotToken", question.into()));
                 }
                 let kind = if question.is_some() && self.eat("[")? {
-                    let saved = self.allow_in;
-                    self.allow_in = true;
-                    fields.push(("argumentExpression", self.expression()?.into()));
-                    self.allow_in = saved;
+                    fields.push(("argumentExpression", self.expression_allow_in()?.into()));
                     self.expect("]")?;
                     "ElementAccessExpression"
                 } else if question.is_some() && !no_call && (self.at("(") || self.type_open()) {
@@ -397,12 +382,9 @@ impl<'src> Parser<'src> {
                 if chain {
                     self.nodes[expression.0].flags |= 64;
                 }
-            } else if self.context & 32768 == 0 && self.eat("[")? {
+            } else if !self.context.contains(DECORATOR) && self.eat("[")? {
                 let chain = self.try_optional_chain(expression);
-                let saved = self.allow_in;
-                self.allow_in = true;
-                let argument = self.expression()?;
-                self.allow_in = saved;
+                let argument = self.expression_allow_in()?;
                 self.expect("]")?;
                 expression = self.finish(
                     "ElementAccessExpression",
@@ -517,16 +499,19 @@ impl<'src> Parser<'src> {
                 // The compiler commits a type argument list when recovery reaches its real
                 // closing '>' and the following token disambiguates it. Keep its syntax error
                 // instead of silently treating the original '<<' as a shift operator.
-                let mut committed_error = None;
-                let _: Result<()> = self.attempt_result(|p| {
-                    p.type_probe = true;
-                    p.type_probe_error = None;
-                    p.type_arguments()?;
-                    if p.can_follow_type_arguments(no_call) {
-                        committed_error = p.type_probe_error.take();
-                    }
-                    Err(p.error("End of type argument probe"))
-                });
+                let committed_error = self
+                    .look_ahead(|p| {
+                        p.type_probe = true;
+                        p.type_probe_error = None;
+                        p.type_arguments()?;
+                        if p.can_follow_type_arguments(no_call) {
+                            Ok(p.type_probe_error.take())
+                        } else {
+                            Ok(None)
+                        }
+                    })
+                    .ok()
+                    .flatten();
                 match committed_error {
                     Some(error) => Err(error),
                     None => Ok(None),
@@ -567,10 +552,7 @@ impl<'src> Parser<'src> {
         match self.current.raw {
             "(" => {
                 self.bump()?;
-                let saved = self.allow_in;
-                self.allow_in = true;
-                let expression = self.expression()?;
-                self.allow_in = saved;
+                let expression = self.expression_allow_in()?;
                 self.expect(")")?;
                 Ok(self.finish(
                     "ParenthesizedExpression",
@@ -670,10 +652,10 @@ impl<'src> Parser<'src> {
                 ))
             }
             "<" if self.options.jsx => self.jsx_element(),
-            "await" if self.context & 65536 != 0 => {
+            "await" if self.context.contains(AWAIT) => {
                 Err(self.error("Expected a left-hand-side expression before await"))
             }
-            "yield" if self.context & 16384 != 0 => {
+            "yield" if self.context.contains(YIELD) => {
                 Err(self.error("Expected a left-hand-side expression before yield"))
             }
             "import" => {
@@ -723,31 +705,27 @@ impl<'src> Parser<'src> {
     }
     fn arguments(&mut self) -> Result<Vec<NodeId>> {
         self.expect("(")?;
-        let mut arguments = vec![];
-        let saved = self.allow_in;
-        self.allow_in = true;
-        let saved_context = self.context;
-        self.context &= !32768;
-        while !self.at(")") {
-            let start = self.pos();
-            if self.eat("...")? {
-                let expression = self.assignment_expression()?;
-                arguments.push(self.finish(
-                    "SpreadElement",
-                    start,
-                    fields![("expression", expression.into())],
-                ));
-            } else {
-                arguments.push(self.assignment_expression()?);
+        self.in_context(self.context.with_in(true).without(DECORATOR), |p| {
+            let mut arguments = vec![];
+            while !p.at(")") {
+                let start = p.pos();
+                if p.eat("...")? {
+                    let expression = p.assignment_expression()?;
+                    arguments.push(p.finish(
+                        "SpreadElement",
+                        start,
+                        fields![("expression", expression.into())],
+                    ));
+                } else {
+                    arguments.push(p.assignment_expression()?);
+                }
+                if !p.eat(",")? {
+                    break;
+                }
             }
-            if !self.eat(",")? {
-                break;
-            }
-        }
-        self.expect(")")?;
-        self.allow_in = saved;
-        self.context = saved_context;
-        Ok(arguments)
+            p.expect(")")?;
+            Ok(arguments)
+        })
     }
     fn new_expression(&mut self) -> Result<NodeId> {
         self.nest(|p| {
@@ -804,7 +782,6 @@ impl<'src> Parser<'src> {
                 fields.push(("name", name.into()));
                 self.optional_token("?", "questionToken", &mut fields)?;
                 self.optional_token("!", "exclamationToken", &mut fields)?;
-                let saved_context = self.context;
                 let kind = if !generator && accessor.is_none() && self.eat(":")? {
                     fields.push(("initializer", self.assignment_allow_in()?.into()));
                     "PropertyAssignment"
@@ -825,12 +802,14 @@ impl<'src> Parser<'src> {
                     if self.eat(":")? {
                         fields.push(("type", self.return_type()?.into()));
                     }
-                    self.context = self.function_context(async_function, generator);
-                    if self.at("{") {
-                        fields.push(("body", self.block("Block")?.into()));
-                    } else {
-                        self.semi()?;
-                    }
+                    self.in_context(self.context.function(async_function, generator), |p| {
+                        if p.at("{") {
+                            fields.push(("body", p.block("Block")?.into()));
+                        } else {
+                            p.semi()?;
+                        }
+                        Ok(())
+                    })?;
                     match accessor {
                         Some("get") => "GetAccessor",
                         Some("set") => "SetAccessor",
@@ -844,7 +823,7 @@ impl<'src> Parser<'src> {
                     {
                         return Err(self.error("Expected ':' after reserved property name"));
                     }
-                    if matches!(self.nodes[name.0].field("escapedText"), Some(Value::Text(text)) if text == "await" && self.context & 65536 != 0 || text == "yield" && self.context & 16384 != 0)
+                    if matches!(self.nodes[name.0].field("escapedText"), Some(Value::Text(text)) if text == "await" && self.context.contains(AWAIT) || text == "yield" && self.context.contains(YIELD))
                     {
                         return Err(self.error("Expected ':' after a contextual property name"));
                     }
@@ -857,7 +836,6 @@ impl<'src> Parser<'src> {
                     }
                     "ShorthandPropertyAssignment"
                 };
-                self.context = saved_context;
                 let id = self.finish(kind, pos, fields);
                 self.attach_modifiers(id, modifiers);
                 properties.push(id);
@@ -893,14 +871,13 @@ impl<'src> Parser<'src> {
         let mut spans = vec![];
         loop {
             let pos = self.pos();
-            let saved = self.allow_in;
-            self.allow_in = true;
-            let value = if type_context {
-                self.type_node()?
-            } else {
-                self.expression()?
-            };
-            self.allow_in = saved;
+            let value = self.in_context(self.context.with_in(true), |p| {
+                if type_context {
+                    p.type_node()
+                } else {
+                    p.expression()
+                }
+            })?;
             if !self.at("}") {
                 return Err(self.error("Expected '}' in template substitution"));
             }

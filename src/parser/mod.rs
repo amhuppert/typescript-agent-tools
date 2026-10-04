@@ -9,10 +9,16 @@ macro_rules! fields {
     }};
 }
 
+mod context;
 mod expressions;
 mod jsx;
 mod statements;
 mod types;
+
+use context::{
+    AMBIENT, AWAIT, DECORATOR, DISALLOW_CONDITIONAL_TYPES, DISALLOW_IN, GrammarContext, IN_WITH,
+    YIELD,
+};
 
 type Result<T> = std::result::Result<T, Diagnostic>;
 pub(crate) struct Parser<'src> {
@@ -22,9 +28,21 @@ pub(crate) struct Parser<'src> {
     nodes: Vec<Node<'src>>,
     options: ParseOptions,
     depth: usize,
-    allow_in: bool,
-    allow_conditional: bool,
-    context: u32,
+    context: GrammarContext,
+    source_flags: u32,
+    type_probe: bool,
+    type_probe_error: Option<Diagnostic>,
+}
+
+/// A speculative parse owns newly appended nodes. Existing nodes are read-only
+/// until it commits; rolling back restores the cursor and every grammar setting.
+struct Checkpoint<'src> {
+    lexer: Lexer<'src>,
+    current: Token<'src>,
+    end: usize,
+    nodes_len: usize,
+    depth: usize,
+    context: GrammarContext,
     source_flags: u32,
     type_probe: bool,
     type_probe_error: Option<Diagnostic>,
@@ -37,11 +55,7 @@ impl<'src> Parser<'src> {
             pos: 0,
         };
         let current = lexer.next();
-        let context = if options.declaration_file() {
-            33554432
-        } else {
-            0
-        };
+        let context = GrammarContext::new(options.declaration_file());
         Self {
             lexer,
             current,
@@ -49,8 +63,6 @@ impl<'src> Parser<'src> {
             nodes: Vec::with_capacity((source.len() / 16).min(16_384)),
             options,
             depth: 0,
-            allow_in: true,
-            allow_conditional: true,
             context,
             source_flags: 0,
             type_probe: false,
@@ -75,11 +87,7 @@ impl<'src> Parser<'src> {
                     if deferred_error.is_none() {
                         deferred_error = Some(error);
                     }
-                    let context = self.context;
-                    self.context |= 65536;
-                    let statement = self.statement()?;
-                    self.context = context;
-                    statement
+                    self.in_context(self.context.with(AWAIT), Self::statement)?
                 }
                 Err(error) => return Err(error),
             };
@@ -261,7 +269,7 @@ impl<'src> Parser<'src> {
                 continue;
             }
             if node.kind == "Identifier"
-                && node.flags & 65536 == 0
+                && node.flags & AWAIT == 0
                 && matches!(node.field("escapedText"), Some(Value::Text(text)) if text == "await")
             {
                 return true;
@@ -303,39 +311,47 @@ impl<'src> Parser<'src> {
     }
 
     fn reparse_top_level_await(&mut self, original: Vec<NodeId>) -> Result<Vec<NodeId>> {
-        let saved = (self.lexer, self.current, self.end, self.context);
-        let mut statements = Vec::with_capacity(original.len());
-        let mut index = 0;
-        while index < original.len() {
-            if !self.possible_top_level_await(original[index]) {
-                statements.push(original[index]);
-                index += 1;
-                continue;
-            }
-            self.lexer.pos = self.start(original[index]);
-            self.current = self.lexer.next();
-            self.end = self.current.full_start;
-            self.context = saved.3 | 65536;
-            let mut limit = self.nodes[original[index].0].span.end;
-            loop {
-                statements.push(self.statement()?);
-                let merged = self.end > limit;
-                while index < original.len() && self.nodes[original[index].0].span.end <= self.end {
+        let lexer = self.lexer;
+        let current = self.current;
+        let end = self.end;
+        // Reparsing commits new nodes and source flags but borrows the cursor and
+        // await context. The EOF cursor is needed to finish the SourceFile.
+        let result = self.in_context(self.context.with(AWAIT), |p| {
+            let mut statements = Vec::with_capacity(original.len());
+            let mut index = 0;
+            while index < original.len() {
+                if !p.possible_top_level_await(original[index]) {
+                    statements.push(original[index]);
                     index += 1;
+                    continue;
                 }
-                if merged && index < original.len() {
-                    limit = self.nodes[original[index].0].span.end;
-                }
-                if index < original.len() && self.start(original[index]) < self.end {
-                    limit = self.nodes[original[index].0].span.end;
-                }
-                if self.end >= limit {
-                    break;
+                p.lexer.pos = p.start(original[index]);
+                p.current = p.lexer.next();
+                p.end = p.current.full_start;
+                let mut limit = p.nodes[original[index].0].span.end;
+                loop {
+                    statements.push(p.statement()?);
+                    let merged = p.end > limit;
+                    while index < original.len() && p.nodes[original[index].0].span.end <= p.end {
+                        index += 1;
+                    }
+                    if merged && index < original.len() {
+                        limit = p.nodes[original[index].0].span.end;
+                    }
+                    if index < original.len() && p.start(original[index]) < p.end {
+                        limit = p.nodes[original[index].0].span.end;
+                    }
+                    if p.end >= limit {
+                        break;
+                    }
                 }
             }
-        }
-        (self.lexer, self.current, self.end, self.context) = saved;
-        Ok(statements)
+            Ok(statements)
+        });
+        self.lexer = lexer;
+        self.current = current;
+        self.end = end;
+        result
     }
 
     fn error(&self, message: impl Into<String>) -> Diagnostic {
@@ -407,7 +423,7 @@ impl<'src> Parser<'src> {
         self.nodes.push(Node {
             kind,
             span: Span { start, end },
-            flags: self.context | if self.allow_in { 0 } else { 8192 },
+            flags: self.context.node_flags(),
             fields: fields.into(),
         });
         id
@@ -424,17 +440,21 @@ impl<'src> Parser<'src> {
         self.nodes[id.0].fields.push((key, value.into()));
     }
     fn expression_allow_in(&mut self) -> Result<NodeId> {
-        let saved = self.allow_in;
-        self.allow_in = true;
-        let result = self.expression();
-        self.allow_in = saved;
-        result
+        self.in_context(self.context.with_in(true), Self::expression)
     }
     fn assignment_allow_in(&mut self) -> Result<NodeId> {
-        let saved = self.allow_in;
-        self.allow_in = true;
-        let result = self.assignment_expression();
-        self.allow_in = saved;
+        self.in_context(self.context.with_in(true), Self::assignment_expression)
+    }
+    /// Restore the enclosing grammar context on both success and syntax error.
+    /// Cursor movement, new nodes, and source-file flags belong to the parse.
+    fn in_context<T>(
+        &mut self,
+        context: GrammarContext,
+        parse: impl FnOnce(&mut Self) -> Result<T>,
+    ) -> Result<T> {
+        let enclosing = std::mem::replace(&mut self.context, context);
+        let result = parse(self);
+        self.context = enclosing;
         result
     }
     fn nest<T>(&mut self, f: impl FnOnce(&mut Self) -> Result<T>) -> Result<T> {
@@ -450,36 +470,43 @@ impl<'src> Parser<'src> {
         self.attempt_result(f).ok()
     }
     fn attempt_result<T>(&mut self, f: impl FnOnce(&mut Self) -> Result<T>) -> Result<T> {
-        let saved = (
-            self.lexer,
-            self.current,
-            self.end,
-            self.nodes.len(),
-            self.depth,
-            self.allow_in,
-            self.allow_conditional,
-            self.context,
-            self.source_flags,
-            self.type_probe,
-            self.type_probe_error.clone(),
-        );
-        match f(self) {
-            Ok(value) => Ok(value),
-            Err(error) => {
-                self.lexer = saved.0;
-                self.current = saved.1;
-                self.end = saved.2;
-                self.nodes.truncate(saved.3);
-                self.depth = saved.4;
-                self.allow_in = saved.5;
-                self.allow_conditional = saved.6;
-                self.context = saved.7;
-                self.source_flags = saved.8;
-                self.type_probe = saved.9;
-                self.type_probe_error = saved.10;
-                Err(error)
-            }
+        let saved = self.checkpoint();
+        let result = f(self);
+        if result.is_err() {
+            self.restore(saved);
         }
+        result
+    }
+    /// Inspect ambiguous syntax without committing cursor, nodes, or diagnostics.
+    fn look_ahead<T>(&mut self, f: impl FnOnce(&mut Self) -> Result<T>) -> Result<T> {
+        let saved = self.checkpoint();
+        let result = f(self);
+        self.restore(saved);
+        result
+    }
+    fn checkpoint(&self) -> Checkpoint<'src> {
+        Checkpoint {
+            lexer: self.lexer,
+            current: self.current,
+            end: self.end,
+            nodes_len: self.nodes.len(),
+            depth: self.depth,
+            context: self.context,
+            source_flags: self.source_flags,
+            type_probe: self.type_probe,
+            type_probe_error: self.type_probe_error.clone(),
+        }
+    }
+    fn restore(&mut self, saved: Checkpoint<'src>) {
+        self.lexer = saved.lexer;
+        self.current = saved.current;
+        self.end = saved.end;
+        self.nodes.truncate(saved.nodes_len);
+        self.depth = saved.depth;
+        self.context = saved.context;
+        self.source_flags = saved.source_flags;
+        self.type_probe = saved.type_probe;
+        self.type_probe_error = saved.type_probe_error;
     }
     fn type_probe_diagnostic(&mut self, message: &str) {
         if self.type_probe_error.is_none() {
@@ -695,10 +722,9 @@ impl<'src> Parser<'src> {
             if self.at("@") {
                 let start = self.pos();
                 self.bump()?;
-                let saved = self.context;
-                self.context |= 32768;
-                let expression = self.postfix_expression(false)?;
-                self.context = saved;
+                let expression = self.in_context(self.context.with(DECORATOR), |p| {
+                    p.postfix_expression(false)
+                })?;
                 modifiers.push(self.finish(
                     "Decorator",
                     start,
@@ -772,16 +798,11 @@ impl<'src> Parser<'src> {
             .iter()
             .any(|id| self.nodes[id.0].kind == "DeclareKeyword")
         {
-            self.context |= 33554432;
+            self.context = self.context.with(AMBIENT);
             for modifier in modifiers {
-                self.nodes[modifier.0].flags |= 33554432;
+                self.nodes[modifier.0].flags |= AMBIENT;
             }
         }
-    }
-    fn function_context(&self, async_function: bool, generator: bool) -> u32 {
-        (self.context & !(81920 | 32768))
-            | if async_function { 65536 } else { 0 }
-            | if generator { 16384 } else { 0 }
     }
     fn deprecated_trivia(&self, include_trailing: bool) -> bool {
         let mut trivia = &self.lexer.src[self.current.full_start..self.current.start];
