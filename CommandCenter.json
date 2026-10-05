@@ -1,0 +1,44 @@
+{
+  "initScriptPath": null,
+  "validation": {
+    "commands": {
+      "format": {
+        "command": {
+          "full": "scripts/validate/format-full.sh",
+          "changed": "scripts/validate/format-changed.sh"
+        },
+        "cost": 1,
+        "description": "Check Rust formatting",
+        "pathArgs": "forbid"
+      },
+      "lint": {
+        "command": {
+          "full": "scripts/validate/lint-full.sh"
+        },
+        "cost": 2,
+        "description": "Run Clippy on all Rust targets",
+        "pathArgs": "forbid"
+      },
+      "test": {
+        "command": {
+          "full": "scripts/validate/test-full.sh"
+        },
+        "cost": 2,
+        "timeoutMs": 900000,
+        "description": "Run Rust tests with two build jobs and two test threads",
+        "pathArgs": "forbid"
+      },
+      "harness-test": {
+        "command": {
+          "full": "scripts/validate/harness-test-full.sh",
+          "changed": "scripts/validate/harness-test-changed.sh"
+        },
+        "cost": 2,
+        "timeoutMs": 900000,
+        "description": "Run Node harness tests with two workers",
+        "pathArgs": "paths"
+      }
+    },
+    "preMerge": ["format", "lint", "test", "harness-test"]
+  }
+}
