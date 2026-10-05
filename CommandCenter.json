@@ -21,12 +21,13 @@
       },
       "test": {
         "command": {
-          "full": "scripts/validate/test-full.sh"
+          "full": "scripts/validate/test-full.sh",
+          "changed": "scripts/validate/test-changed.sh"
         },
         "cost": 2,
         "timeoutMs": 900000,
-        "description": "Run Rust tests with two build jobs and two test threads",
-        "pathArgs": "forbid"
+        "description": "Run Rust tests or explicit integration-test files with two build jobs and two test threads",
+        "pathArgs": "paths"
       },
       "harness-test": {
         "command": {
