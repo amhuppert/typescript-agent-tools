@@ -12,7 +12,11 @@ The root is a `SourceFile` object. Each syntax node has:
 
 For example, a binary expression has `left`, `operatorToken`, and `right`; a variable declaration has `name`, optional `type`, and optional `initializer`. Identifier text is in `escapedText`, including TypeScript's escaping of names starting with two underscores. Numeric and string literal values are in `text`. Templates include cooked `text`, `rawText`, and `templateFlags`.
 
+Strings and untagged templates reject malformed escapes. Tagged templates retain invalid escape text while cooking valid escapes before and after it, matching the compiler's syntax projection. Each segment accumulates its own escape flags; `hasExtendedUnicodeEscape` reflects valid extended Unicode escapes even when the segment also contains an invalid escape.
+
 `SourceFile` includes `statements`, `endOfFileToken`, `text`, `fileName`, `languageVersion`, `languageVariant`, `scriptKind`, `isDeclarationFile`, and an empty `parseDiagnostics` array. Input errors produce a Rust `Diagnostic` or a nonzero CLI exit, not a partial `SourceFile`.
+
+Ambiguous syntax can be reconsidered until an arrow, function type, or mapped type commits to its interpretation. Errors in the committed remainder, including nesting-budget errors, are returned directly rather than replaced by a fallback interpretation's diagnostic.
 
 This is a serializable **syntax projection**, not a dump of an entire bound compiler object. It omits `parent` links, object IDs, transform/modifier caches, symbols, flow nodes, compiler maps, JSDoc trees, comment directives, and reference/pragma metadata. `HasAggregatedChildData` (2097152) is a lazy compiler cache flag and is excluded from differential comparisons. Arrays serialize as ordinary JSON arrays, as compiler `NodeArray` objects do through `JSON.stringify`. Import attributes use both `attributes` and the compiler's `assertClause` compatibility alias; both serialize the same child.
 

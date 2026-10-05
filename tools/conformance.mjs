@@ -3,18 +3,20 @@
 import { runParser, parserFailure } from './parser-process.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
 import { normalizer, firstDifference } from './ast-comparison.mjs';
-const require = createRequire(import.meta.url);
-const ts = require(process.env.TYPE_SCRIPT_API ?? 'typescript');
+import { loadCompilerApi, classifyReference } from './reference-oracle.mjs';
+import { requireComparisons } from './corpus-selection.mjs';
+const ts = loadCompilerApi();
 const binary = process.env.TSPARSE ?? path.resolve('target/debug/tsparse');
 const cases = JSON.parse(fs.readFileSync('fixtures/conformance.json', 'utf8'));
+requireComparisons(cases.length);
 const normalize = normalizer(process.argv);
 let failures = 0;
 for (const { name, source, jsx } of cases) {
   const reference = ts.createSourceFile(jsx ? 'source.tsx' : 'source.ts', source, ts.ScriptTarget.Latest, false, jsx ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
-  if (reference.parseDiagnostics.some(d => d.code !== 2458)) {
-    console.log(`INVALID FIXTURE ${name}: ${reference.parseDiagnostics.map(d=>ts.flattenDiagnosticMessageText(d.messageText, '\n')).join('; ')}`);
+  const classification = classifyReference(ts, reference);
+  if (!classification.eligible || !classification.valid) {
+    console.log(`INVALID FIXTURE ${name}: ${classification.removed || classification.diagnostics.map(d => d.message).join('; ')}`);
     failures++; continue;
   }
   const result = runParser(binary, jsx ? ['--tsx'] : [], { input: source });

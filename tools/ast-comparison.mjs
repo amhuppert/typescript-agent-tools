@@ -41,15 +41,28 @@ export function normalizer(args = []) {
 export function firstDifference(actual, expected, path = '$') {
   const pending = [{ actual, expected, path }];
   while (pending.length) {
-    const { actual, expected, path } = pending.pop();
+    const { actual, expected, path, actualPresent = true, expectedPresent = true } = pending.pop();
+    if (actualPresent !== expectedPresent) {
+      return { path, actual, expected, actualMissing: !actualPresent, expectedMissing: !expectedPresent };
+    }
     if (actual === expected) continue;
     if (!actual || !expected || typeof actual !== 'object' || typeof expected !== 'object') {
       return { path, actual, expected };
     }
-    const keys = [...new Set([...Object.keys(actual), ...Object.keys(expected)])];
+    const array = Array.isArray(actual);
+    if (array !== Array.isArray(expected)) return { path, actual, expected };
+    if (array && actual.length !== expected.length) {
+      return { path: `${path}.length`, actual: actual.length, expected: expected.length };
+    }
+    const keys = array ? Array.from({ length: actual.length }, (_, index) => index)
+      : [...new Set([...Object.keys(actual), ...Object.keys(expected)])].sort();
     for (let i = keys.length - 1; i >= 0; i--) {
       const key = keys[i];
-      pending.push({ actual: actual[key], expected: expected[key], path: `${path}.${key}` });
+      const actualPresent = Object.hasOwn(actual, key);
+      const expectedPresent = Object.hasOwn(expected, key);
+      pending.push({ actual: actualPresent ? actual[key] : undefined,
+        expected: expectedPresent ? expected[key] : undefined, path: `${path}.${key}`,
+        actualPresent, expectedPresent });
     }
   }
 }

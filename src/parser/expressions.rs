@@ -144,12 +144,12 @@ impl<'src> Parser<'src> {
             || self.at("async")
             || (self.current.kind == Kind::Word && self.peek_at("=>"));
         if allow_assignment && potential_arrow {
-            if let Some(arrow) = self.attempt_cached(
+            if let Some(arrow) = self.probe_cached(
                 ProbeKind::Arrow {
                     allow_return_type: allow_arrow_return_type,
                 },
                 |p| p.arrow_function(allow_arrow_return_type),
-            ) {
+            )? {
                 return Ok(arrow);
             }
         }
@@ -239,8 +239,9 @@ impl<'src> Parser<'src> {
     }
     /// The true arm of a conditional owns its ':' unless an unambiguous arrow
     /// signature establishes a return type. Keep this restriction in probe keys.
-    fn arrow_function(&mut self, allow_arrow_return_type: bool) -> Result<NodeId> {
-        self.nest(|p| {
+    fn arrow_function(&mut self, allow_arrow_return_type: bool) -> Result<Option<NodeId>> {
+        let mut committed = false;
+        let result = self.nest(|p| {
             let (start, fields, modifiers) = p.arrow_head()?;
             let has_return_type = fields.iter().any(|(key, _)| *key == "type");
             let ambiguous_return_type = !fields.iter().any(|(key, _)| *key == "typeParameters")
@@ -258,6 +259,12 @@ impl<'src> Parser<'src> {
                     }
                     _ => false,
                 };
+            // In a conditional's true arm, this ':' might belong to the
+            // conditional instead of the arrow return type. Otherwise the
+            // consumed '=>' commits the head, including errors in its body.
+            let conditional_boundary =
+                !allow_arrow_return_type && has_return_type && ambiguous_return_type;
+            committed = !conditional_boundary;
             let async_function = modifiers
                 .iter()
                 .any(|id| p.nodes[id.0].syntax_kind == AsyncKeyword);
@@ -268,14 +275,19 @@ impl<'src> Parser<'src> {
                     p.expression_bp(2, allow_arrow_return_type)
                 }
             })?;
-            if !allow_arrow_return_type && has_return_type && ambiguous_return_type && !p.at(":") {
-                return Err(p.error("Conditional expression boundary"));
+            if conditional_boundary && !p.at(":") {
+                return Ok(None);
             }
             let id = p.finish(ArrowFunction, start, fields);
             p.field(id, "body", body);
             p.attach_modifiers(id, modifiers);
-            Ok(id)
-        })
+            Ok(Some(id))
+        });
+        if committed {
+            result
+        } else {
+            result.or(Ok(None))
+        }
     }
 
     fn arrow_head(&mut self) -> Result<(usize, Fields<'src>, Vec<NodeId>)> {

@@ -15,14 +15,19 @@ fn run() -> Result<(), (u8, String)> {
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "-h" | "--help" => {
-                println!(
+                let mut stdout = io::stdout().lock();
+                return writeln!(
+                    stdout,
                     "tsparse [--pretty] [--tsx] [--check] [-o OUTPUT] [FILE|-]\n\nParse TypeScript into a compiler-style JSON AST. Reads stdin when FILE is omitted.\n--check validates syntax without producing JSON.\nExit codes: 0 success, 1 syntax error, 2 usage or I/O error."
-                );
-                return Ok(());
+                )
+                .and_then(|_| stdout.flush())
+                .map_err(|e| (2, e.to_string()));
             }
             "-V" | "--version" => {
-                println!("tsparse {}", env!("CARGO_PKG_VERSION"));
-                return Ok(());
+                let mut stdout = io::stdout().lock();
+                return writeln!(stdout, "tsparse {}", env!("CARGO_PKG_VERSION"))
+                    .and_then(|_| stdout.flush())
+                    .map_err(|e| (2, e.to_string()));
             }
             "--pretty" => pretty = true,
             "--tsx" => jsx = true,

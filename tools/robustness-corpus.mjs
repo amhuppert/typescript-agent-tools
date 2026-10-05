@@ -3,10 +3,11 @@
 import { runParser, parserFailure } from './parser-process.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
+import { corpusLimit, requireComparisons } from './corpus-selection.mjs';
 
 const binary = process.env.TSPARSE ?? path.resolve('target/release/tsparse');
 const fixtures = JSON.parse(fs.readFileSync('fixtures/conformance.json', 'utf8'));
-const limit = Number(process.argv.find(arg => arg.startsWith('--limit='))?.slice(8) ?? Infinity);
+const limit = corpusLimit(process.argv);
 let state = 0x5eed1234;
 function random(max) {
   state ^= state << 13; state ^= state >>> 17; state ^= state << 5;
@@ -81,6 +82,7 @@ for (const test of cases()) {
     console.log(JSON.stringify(failures.at(-1)));
   }
 }
+requireComparisons(count);
 const report = { seed: '0x5eed1234', count, accepted, rejected, timeoutMs: 3000, failures };
 fs.writeFileSync('.cache/robustness-corpus.json', JSON.stringify(report, null, 2));
 console.log(JSON.stringify({ ...report, failures: failures.length }));

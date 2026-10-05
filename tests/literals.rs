@@ -1,0 +1,85 @@
+use typescript_parser::{Value, parse};
+
+fn json(source: &str) -> serde_json::Value {
+    let ast = parse(source).unwrap();
+    let mut output = Vec::new();
+    ast.write_json(&mut output, false).unwrap();
+    serde_json::from_slice(&output).unwrap()
+}
+
+#[test]
+fn hexadecimal_escapes_require_ascii_hex_digits() {
+    for escape in [
+        r"\u+041",
+        r"\x+1",
+        r"\u{+41}",
+        r"\u12G4",
+        r"\xG1",
+        r"\u{}",
+        r"\u{110000}",
+        r"\u{FFFFFFFFFFFFFFFFFFFFFFFF}",
+    ] {
+        for source in [
+            format!(r#"const value = "{escape}";"#),
+            format!("`{escape}`;"),
+        ] {
+            assert!(parse(&source).is_err(), "accepted invalid escape: {source}");
+        }
+    }
+    let value = json(r#"const value = "\u{000000000000000000000000000041}";"#);
+    assert_eq!(
+        value["statements"][0]["declarationList"]["declarations"][0]["initializer"]["text"],
+        "A"
+    );
+}
+
+#[test]
+fn tagged_literals_preserve_cooking_and_flags_around_invalid_escapes() {
+    for (raw, text, flags, extended) in [
+        (r"\u0041\xGG", r"A\xGG", 3072, false),
+        (r"\xGG\u0041", r"\xGGA", 3072, false),
+        (r"\u{41}\xGG\u0042", r"A\xGGB", 3080, true),
+        (r"\x41\u+041\x42", r"A\u+041B", 6144, false),
+        (r"\u{+41}\u{42}", r"\u{+41}B", 2056, true),
+        (r"\1\u0041", r"\1A", 3072, false),
+        (r"\\u{41}\x41", r"\u{41}A", 4096, false),
+    ] {
+        let source = format!("tag`{raw}`;");
+        let value = json(&source);
+        let template = &value["statements"][0]["expression"]["template"];
+        assert_eq!(template["text"], text, "{source}");
+        assert_eq!(template["rawText"], raw, "{source}");
+        assert_eq!(template["templateFlags"], flags, "{source}");
+        assert_eq!(
+            template.get("hasExtendedUnicodeEscape"),
+            extended.then_some(&serde_json::Value::Bool(true)),
+            "{source}"
+        );
+    }
+}
+
+#[test]
+fn tagged_template_segments_keep_their_own_escape_metadata() {
+    let value = json(r"tag`\u0041\xGG${value}\x42\u+041${value}\u{43}\xGG`;");
+    let template = &value["statements"][0]["expression"]["template"];
+    assert_eq!(template["head"]["text"], r"A\xGG");
+    assert_eq!(template["head"]["templateFlags"], 3072);
+    let middle = &template["templateSpans"][0]["literal"];
+    assert_eq!(middle["text"], r"B\u+041");
+    assert_eq!(middle["templateFlags"], 6144);
+    let tail = &template["templateSpans"][1]["literal"];
+    assert_eq!(tail["text"], r"C\xGG");
+    assert_eq!(tail["templateFlags"], 2056);
+    assert_eq!(tail["hasExtendedUnicodeEscape"], true);
+}
+
+#[test]
+fn tagged_invalid_escapes_preserve_unpaired_utf16_surrogates() {
+    let ast = parse(r"tag`\uD800\xGG`; ").unwrap();
+    assert!(ast.nodes().iter().any(|node| {
+        matches!(node.field("text"), Some(Value::Utf16(units)) if units == &[0xD800, 0x5C, 0x78, 0x47, 0x47])
+    }));
+    let mut output = Vec::new();
+    ast.write_json(&mut output, false).unwrap();
+    assert!(String::from_utf8(output).unwrap().contains("\\ud800"));
+}

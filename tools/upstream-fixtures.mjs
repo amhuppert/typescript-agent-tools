@@ -14,11 +14,16 @@ export function units(file, text) {
     .filter(unit => /\.(?:tsx?|mts|cts)$/.test(unit.name));
 }
 export function* allUnits(root) {
-  for (const category of ['conformance', 'compiler']) {
-    const folder = path.join(root, 'tests/cases', category);
-    if (!fs.existsSync(folder)) continue;
+  for (const folder of corpusFolders(root)) {
     for (const file of walk(folder)) {
       for (const unit of units(file, fs.readFileSync(file, 'utf8'))) yield { fixture: path.relative(root, file), ...unit };
     }
   }
+}
+
+export function corpusFolders(root) {
+  const folders = ['conformance', 'compiler'].map(category => path.join(root, 'tests/cases', category))
+    .filter(folder => fs.existsSync(folder) && fs.statSync(folder).isDirectory());
+  if (!folders.length) throw new Error(`No upstream corpus directories found under ${root}/tests/cases`);
+  return folders;
 }

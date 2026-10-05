@@ -10,7 +10,7 @@ impl<'src> Parser<'src> {
     // would charge twice for the same entry, including conditional false arms.
     fn conditional_type(&mut self, conditional: bool) -> Result<NodeId> {
         if self.function_type_ahead() {
-            if let Some(node) = self.attempt_cached(ProbeKind::FunctionType, Self::function_type) {
+            if let Some(node) = self.probe_cached(ProbeKind::FunctionType, Self::function_type)? {
                 return Ok(node);
             }
         }
@@ -225,7 +225,7 @@ impl<'src> Parser<'src> {
             p.check_token()?;
             let start = p.pos();
             if p.function_type_ahead() {
-                if let Some(node) = p.attempt_cached(ProbeKind::FunctionType, Self::function_type) {
+                if let Some(node) = p.probe_cached(ProbeKind::FunctionType, Self::function_type)? {
                     return Ok(node);
                 }
             }
@@ -365,7 +365,7 @@ impl<'src> Parser<'src> {
             return Ok(id);
         }
         if self.at("{") {
-            if let Some(mapped) = self.attempt(Self::mapped_type) {
+            if let Some(mapped) = self.probe(Self::mapped_type)? {
                 return Ok(mapped);
             }
             let members = self.type_members()?;
@@ -510,8 +510,9 @@ impl<'src> Parser<'src> {
         }
         Ok(id)
     }
-    fn function_type(&mut self) -> Result<NodeId> {
-        self.nest(|p| {
+    fn function_type(&mut self) -> Result<Option<NodeId>> {
+        let mut committed = false;
+        let result = self.nest(|p| {
             let start = p.pos();
             let mut modifiers = vec![];
             if p.at("abstract") {
@@ -523,7 +524,9 @@ impl<'src> Parser<'src> {
                 fields.push(("typeParameters", p.type_parameters()?.into()));
             }
             fields.push(("parameters", p.parameters()?.into()));
-            p.type_delimiter("=>")?;
+            // Recovery can synthesize this delimiter; only a real '=>' rules
+            // out a parenthesized type when the remainder cannot be parsed.
+            committed = p.type_delimiter("=>")?;
             fields.push(("type", p.return_type()?.into()));
             let id = p.finish(
                 if constructor {
@@ -535,8 +538,13 @@ impl<'src> Parser<'src> {
                 fields,
             );
             p.attach_modifiers(id, modifiers);
-            Ok(id)
-        })
+            Ok(Some(id))
+        });
+        if committed {
+            result
+        } else {
+            result.or(Ok(None))
+        }
     }
     pub(super) fn return_type(&mut self) -> Result<NodeId> {
         self.in_context(
@@ -692,8 +700,9 @@ impl<'src> Parser<'src> {
         }
         Ok(self.finish(ImportType, start, fields))
     }
-    fn mapped_type(&mut self) -> Result<NodeId> {
-        self.nest(|p| {
+    fn mapped_type(&mut self) -> Result<Option<NodeId>> {
+        let mut committed = false;
+        let result = self.nest(|p| {
             let start = p.pos();
             p.expect("{")?;
             let mut fields: Fields<'src> = Fields::new();
@@ -707,6 +716,9 @@ impl<'src> Parser<'src> {
             let parameter_start = p.pos();
             let name = p.identifier()?;
             p.expect("in")?;
+            // The mapped key establishes this interpretation before parsing
+            // its constraint, remapping expression, and value type.
+            committed = true;
             let constraint = p.type_node()?;
             let parameter = p.finish(
                 TypeParameter,
@@ -734,8 +746,13 @@ impl<'src> Parser<'src> {
             }
             p.expect("}")?;
             fields.push(("members", members.into()));
-            Ok(p.finish(MappedType, start, fields))
-        })
+            Ok(Some(p.finish(MappedType, start, fields)))
+        });
+        if committed {
+            result
+        } else {
+            result.or(Ok(None))
+        }
     }
 
     pub(super) fn type_members(&mut self) -> Result<Vec<NodeId>> {

@@ -267,26 +267,23 @@ impl<'src> Parser<'src> {
         let mut fields: Fields<'src> = Fields::new();
         self.optional_token("await", "awaitModifier", &mut fields)?;
         self.expect("(")?;
-        self.in_context(self.context.with_in(false), |p| {
-            if !p.at(";") {
-                let initializer = if matches!(p.current.raw, "var" | "let" | "const")
-                    || p.at("using") && p.using_declaration(true)
-                    || p.at("await") && p.using_declaration(false)
-                {
-                    p.variable_list()?
-                } else {
-                    p.expression()?
-                };
-                fields.push(("initializer", initializer.into()));
-            }
-            Ok(())
-        })?;
+        if !self.at(";") {
+            let initializer = if matches!(self.current.raw, "var" | "let" | "const")
+                || self.at("using") && self.using_declaration(true)
+                || self.at("await") && self.using_declaration(false)
+            {
+                self.variable_list(true)?
+            } else {
+                self.in_context(self.context.with_in(false), Self::expression)?
+            };
+            fields.push(("initializer", initializer.into()));
+        }
         let kind = if self.at("of") || self.at("in") {
             let keyword = self.bump()?.raw;
             if keyword == "in" && fields.iter().any(|(key, _)| *key == "awaitModifier") {
                 return Err(self.error("A 'for await' loop requires 'of'"));
             }
-            let expression = self.expression()?;
+            let expression = self.expression_allow_in()?;
             fields.push(("expression", expression.into()));
             if keyword == "of" {
                 ForOfStatement
@@ -296,11 +293,11 @@ impl<'src> Parser<'src> {
         } else {
             self.expect(";")?;
             if !self.at(";") {
-                fields.push(("condition", self.expression()?.into()));
+                fields.push(("condition", self.expression_allow_in()?.into()));
             }
             self.expect(";")?;
             if !self.at(")") {
-                fields.push(("incrementor", self.expression()?.into()));
+                fields.push(("incrementor", self.expression_allow_in()?.into()));
             }
             ForStatement
         };
@@ -374,7 +371,7 @@ impl<'src> Parser<'src> {
         Ok(self.finish(TryStatement, start, fields))
     }
     fn variable_statement(&mut self, start: usize, modifiers: Vec<NodeId>) -> Result<NodeId> {
-        let list = self.variable_list()?;
+        let list = self.variable_list(false)?;
         self.semi()?;
         let id = self.finish(
             VariableStatement,
@@ -384,7 +381,9 @@ impl<'src> Parser<'src> {
         self.attach_modifiers(id, modifiers);
         Ok(id)
     }
-    fn variable_list(&mut self) -> Result<NodeId> {
+    /// Header declarations prohibit `in`; ordinary declarations permit it.
+    /// The list node inherits the enclosing context after declaration parsing.
+    fn variable_list(&mut self, in_for_initializer: bool) -> Result<NodeId> {
         let start = self.pos();
         let keyword = self.bump()?.raw;
         let flags = match keyword {
@@ -397,38 +396,41 @@ impl<'src> Parser<'src> {
             }
             _ => 0,
         };
-        let binding_start = matches!(self.current.raw, "{" | "[")
-            || self.current.kind == Kind::Word && !reserved_word(self.current.raw);
-        let empty = !binding_start
-            && (self.current.kind == Kind::Eof
-                || matches!(self.current.raw, ";" | "}")
-                || self.current.newline
-                || !self.context.allow_in && matches!(self.current.raw, "in" | ")"))
-            || self.at("of")
-                && self.peek().kind == Kind::Word
-                && !reserved_word(self.peek().raw)
-                && self.peek_second().raw == ")";
-        let mut declarations = vec![];
-        if !empty {
-            declarations.push(self.variable_declaration()?);
-        }
-        while self.eat(",")? {
-            if self.current.kind == Kind::Eof
-                || matches!(self.current.raw, ";" | "}" | "in" | "of")
-                || self.current.newline
-                    && !matches!(self.current.raw, "{" | "[")
-                    && (self.current.kind != Kind::Word || reserved_word(self.current.raw))
-            {
-                break;
+        let declarations = self.in_context(self.context.with_in(!in_for_initializer), |p| {
+            let binding_start = matches!(p.current.raw, "{" | "[")
+                || p.current.kind == Kind::Word && !reserved_word(p.current.raw);
+            let empty = !binding_start
+                && (p.current.kind == Kind::Eof
+                    || matches!(p.current.raw, ";" | "}")
+                    || p.current.newline
+                    || !p.context.allow_in && matches!(p.current.raw, "in" | ")"))
+                || p.at("of")
+                    && p.peek().kind == Kind::Word
+                    && !reserved_word(p.peek().raw)
+                    && p.peek_second().raw == ")";
+            let mut declarations = vec![];
+            if !empty {
+                declarations.push(p.variable_declaration()?);
             }
-            declarations.push(self.variable_declaration()?);
-        }
+            while p.eat(",")? {
+                if p.current.kind == Kind::Eof
+                    || matches!(p.current.raw, ";" | "}" | "in" | "of")
+                    || p.current.newline
+                        && !matches!(p.current.raw, "{" | "[")
+                        && (p.current.kind != Kind::Word || reserved_word(p.current.raw))
+                {
+                    break;
+                }
+                declarations.push(p.variable_declaration()?);
+            }
+            Ok(declarations)
+        })?;
         let id = self.finish(
             VariableDeclarationList,
             start,
             fields![("declarations", declarations.into())],
         );
-        self.nodes[id.0].flags = (self.nodes[id.0].flags & !DISALLOW_IN) | flags;
+        self.nodes[id.0].flags |= flags;
         Ok(id)
     }
     fn variable_declaration(&mut self) -> Result<NodeId> {

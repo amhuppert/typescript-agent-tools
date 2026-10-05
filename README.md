@@ -68,7 +68,7 @@ node tools/robustness-corpus.mjs
 TYPE_SCRIPT_API=/path/to/typescript/lib/typescript.js \
   node tools/conformance.mjs --positions --flags --scanner-hints
 TYPE_SCRIPT_API=/path/to/typescript/lib/typescript.js \
-  node --test tools/parser-process.test.mjs
+  node --test tools/*.test.mjs
 TYPE_SCRIPT_API=/path/to/typescript/lib/typescript.js \
   node tools/generate-compiler-schema.mjs --check
 TYPE_SCRIPT_NATIVE=/path/to/typescript-7/tsc \
@@ -85,6 +85,8 @@ TYPE_SCRIPT_API=/path/to/typescript/lib/typescript.js \
   node tools/upstream-native-corpus.mjs /path/to/typescript-checkout
 ```
 
-The API oracle is TypeScript 6.0.3; the native syntax oracle is TypeScript 7.0.2. Optional `TSPARSE` selects another built CLI. The authored fixture, declaration, grammar, and source runners default to `target/debug/tsparse`; upstream and robustness runners default to `target/release/tsparse`. Differential failures and reports are written under ignored `.cache/`. Every Rust parser runner treats only exit 1 as a syntax rejection; usage/I/O errors, launch errors, crashes, and timeouts fail validation. The process tests include invalid fixtures run through failing executables.
+The API oracle must be TypeScript 6.0.3; the recorded native syntax baseline is TypeScript 7.0.2. Native runners verify a working TypeScript 7 executable and record its version. Optional `TSPARSE` selects another built CLI. The authored fixture, declaration, grammar, and source runners default to `target/debug/tsparse`; upstream and robustness runners default to `target/release/tsparse`. Differential failures and reports are written under ignored `.cache/`. Every Rust parser runner treats only exit 1 as a syntax rejection; usage/I/O errors, launch errors, crashes, and timeouts fail validation. The process tests include invalid fixtures run through failing executables.
+
+API runners share the TypeScript 6-to-7 syntax eligibility and diagnostic rules. Source and upstream runners count syntax removed in TypeScript 7 separately; eligible invalid inputs are checked for rejection. Authored positive fixtures must be eligible and valid. Corpus paths must select at least one comparison, and explicit `--limit` values must be positive integers. Missing upstream corpus layouts, empty selections, and failed oracle setup return a nonzero status.
 
 MIT license. Third-party dependencies retain their own licenses; see [vendor provenance](vendor/README.md).

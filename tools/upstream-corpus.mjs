@@ -2,17 +2,17 @@
 import { runParser, parserFailure } from './parser-process.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
 import { spawnSync } from 'node:child_process';
 import { normalizer, firstDifference } from './ast-comparison.mjs';
-import { walk, units } from './upstream-fixtures.mjs';
-const require = createRequire(import.meta.url);
-const ts = require(process.env.TYPE_SCRIPT_API ?? 'typescript');
+import { walk, units, corpusFolders } from './upstream-fixtures.mjs';
+import { loadCompilerApi, classifyReference } from './reference-oracle.mjs';
+import { corpusLimit, requireComparisons } from './corpus-selection.mjs';
+const ts = loadCompilerApi();
 const binary = process.env.TSPARSE ?? path.resolve('target/release/tsparse');
 const args = process.argv.slice(2);
 const root = args.find(arg => !arg.startsWith('--'));
 if (!root) throw new Error('Usage: node tools/upstream-corpus.mjs CHECKOUT [--limit=N] [--match=REGEX] [--check-only] [--positions --flags --scanner-hints]');
-const limit = Number(args.find(arg => arg.startsWith('--limit='))?.slice(8) ?? Infinity);
+const limit = corpusLimit(args);
 const match = new RegExp(args.find(arg => arg.startsWith('--match='))?.slice(8) ?? '');
 const checkOnly = args.includes('--check-only');
 const failuresReport = args.find(arg => arg.startsWith('--failures='))?.slice(11);
@@ -21,30 +21,6 @@ const selectedUnits = failuresReport ? new Set(JSON.parse(fs.readFileSync(failur
 const reportFile = args.find(arg => arg.startsWith('--report='))?.slice(9) ?? '.cache/upstream-corpus.json';
 const normalize = normalizer(args);
 const directory = path.resolve('.cache/upstream-units'); fs.mkdirSync(directory, { recursive: true });
-function removedSyntax(reference) {
-  const pending = [reference];
-  while (pending.length) {
-    const node = pending.pop();
-    if (ts.isModuleDeclaration(node) && !ts.isStringLiteral(node.name)
-      && !(node.flags & (ts.NodeFlags.Namespace | ts.NodeFlags.GlobalAugmentation))
-      && !(node.flags & ts.NodeFlags.NestedNamespace)) return 'unquoted module';
-    if ((ts.isImportDeclaration(node) || ts.isExportDeclaration(node) || ts.isImportTypeNode(node)) && node.attributes?.token === ts.SyntaxKind.AssertKeyword) return 'assert attributes';
-    if (node.kind === ts.SyntaxKind.JSDocUnknownType || node.kind === ts.SyntaxKind.JSDocFunctionType) return 'legacy JSDoc type syntax';
-    ts.forEachChild(node, child => { pending.push(child); });
-  }
-}
-function strictGrammarDiagnostics(reference) {
-  const pending = [reference];
-  while (pending.length) {
-    const node = pending.pop();
-    // The API leaves this ECMAScript grammar error to the checker's TS1142 diagnostic.
-    if (ts.isThrowStatement(node) && ts.isIdentifier(node.expression)
-      && !node.expression.escapedText && node.expression.pos === node.expression.end)
-      return [{ code: 1142, message: 'Line break not permitted after throw.' }];
-    ts.forEachChild(node, child => { pending.push(child); });
-  }
-  return [];
-}
 const failures = [];
 const commit = spawnSync('git', ['-C', root, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim();
 function saveReport(complete) {
@@ -53,9 +29,7 @@ function saveReport(complete) {
   return report;
 }
 let count = 0, valid = 0, invalid = 0, passed = 0, bytes = 0, removed = 0;
-outer: for (const category of ['conformance', 'compiler']) {
-  const folder = path.join(root, 'tests/cases', category);
-  if (!fs.existsSync(folder)) continue;
+outer: for (const folder of corpusFolders(root)) {
   for (const fixture of walk(folder)) {
     if (!match.test(fixture)) continue;
     for (const { name, source } of units(fixture, fs.readFileSync(fixture, 'utf8'))) {
@@ -63,10 +37,10 @@ outer: for (const category of ['conformance', 'compiler']) {
       if (count >= limit) break outer;
       const jsx = name.endsWith('.tsx');
       const reference = ts.createSourceFile(name, source, ts.ScriptTarget.Latest, false, jsx ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
-      if (removedSyntax(reference)) { removed++; continue; }
+      const classification = classifyReference(ts, reference);
+      if (!classification.eligible) { removed++; continue; }
       count++; bytes += Buffer.byteLength(source);
-      const diagnostics = [...reference.parseDiagnostics.filter(d => d.code !== 2458).map(d => ({ code: d.code, message: ts.flattenDiagnosticMessageText(d.messageText, '\n') })), ...strictGrammarDiagnostics(reference)];
-      const referenceValid = !diagnostics.length;
+      const { diagnostics, valid: referenceValid } = classification;
       if (referenceValid) valid++; else invalid++;
       // Keep the extension, including .d.mts/.d.cts, for the Rust ambient context.
       const file = path.join(directory, `${count}-${name.replace(/[^\w.\-]/g, '_')}`);
@@ -88,6 +62,7 @@ outer: for (const category of ['conformance', 'compiler']) {
     }
   }
 }
+requireComparisons(count);
 const report = saveReport(true);
 console.log(JSON.stringify({ ...report, failures: failures.length }));
 process.exitCode = failures.length ? 1 : 0;

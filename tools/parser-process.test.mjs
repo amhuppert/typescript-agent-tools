@@ -28,7 +28,7 @@ test('crashes, timeouts, output overflow, and launch errors are process failures
   }
 });
 
-test('an invalid upstream fixture cannot pass on exit 2 or a launch error', { skip: !process.env.TYPE_SCRIPT_API }, t => {
+test('real compiler API: an invalid upstream fixture cannot pass on exit 2 or a launch error', { skip: !process.env.TYPE_SCRIPT_API }, t => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'tsparse-runner-'));
   t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   const fixture = path.join(directory, 'upstream/tests/cases/compiler');
@@ -51,7 +51,7 @@ test('an invalid upstream fixture cannot pass on exit 2 or a launch error', { sk
   }
 });
 
-test('grammar runner reports exit 2 on compiler-invalid inputs', { skip: !process.env.TYPE_SCRIPT_API }, t => {
+test('real compiler API: grammar runner reports exit 2 on compiler-invalid inputs', { skip: !process.env.TYPE_SCRIPT_API }, t => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'tsparse-grammar-'));
   t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   const binary = path.join(directory, 'parser');

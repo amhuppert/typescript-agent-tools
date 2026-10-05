@@ -222,5 +222,41 @@
   {
     "name": "missing-function-type-arrow-in-call",
     "source": "f<<T>() T>();"
+  },
+  {
+    "name": "unicode-escape-leading-plus",
+    "source": "const value = \"\\u+041\";"
+  },
+  {
+    "name": "hex-escape-leading-plus",
+    "source": "const value = \"\\x+1\";"
+  },
+  {
+    "name": "braced-unicode-escape-leading-plus",
+    "source": "const value = \"\\u{+41}\";"
+  },
+  {
+    "name": "untagged-unicode-escape-leading-plus",
+    "source": "`\\u+041`;"
+  },
+  {
+    "name": "untagged-hex-escape-leading-plus",
+    "source": "`\\x+1`;"
+  },
+  {
+    "name": "untagged-braced-unicode-escape-leading-plus",
+    "source": "`\\u{+41}`;"
+  },
+  {
+    "name": "committed-arrow-body-error",
+    "source": "const f = (x) => { const y = ; };"
+  },
+  {
+    "name": "committed-function-return-type-error",
+    "source": "type T = (x: number) => ;"
+  },
+  {
+    "name": "committed-mapped-type-error",
+    "source": "type T = {[K in keyof T]: };"
   }
 ]

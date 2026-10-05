@@ -43,6 +43,53 @@ fn syntax_and_usage_errors_have_distinct_exit_codes() {
 }
 
 #[test]
+fn help_and_version_emit_documentation() {
+    for arg in ["-h", "--help"] {
+        let output = cli(&[arg], b"");
+        assert!(output.status.success());
+        assert!(output.stderr.is_empty());
+        let text = String::from_utf8(output.stdout).unwrap();
+        assert!(text.starts_with("tsparse [--pretty] [--tsx] [--check]"));
+        assert!(text.ends_with("Exit codes: 0 success, 1 syntax error, 2 usage or I/O error.\n"));
+    }
+    for arg in ["-V", "--version"] {
+        let output = cli(&[arg], b"");
+        assert!(output.status.success());
+        assert!(output.stderr.is_empty());
+        assert_eq!(
+            String::from_utf8(output.stdout).unwrap(),
+            format!("tsparse {}\n", env!("CARGO_PKG_VERSION"))
+        );
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn help_and_version_report_closed_stdout_as_io_errors() {
+    for arg in ["--help", "--version"] {
+        let mut reader = Command::new("sh")
+            .args(["-c", "exit 0"])
+            .stdin(Stdio::piped())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn()
+            .unwrap();
+        let pipe = reader.stdin.take().unwrap();
+        // Wait until the pipe's only reader has exited before launching tsparse.
+        assert!(reader.wait().unwrap().success());
+        let output = Command::new(env!("CARGO_BIN_EXE_tsparse"))
+            .arg(arg)
+            .stdin(Stdio::null())
+            .stdout(pipe)
+            .stderr(Stdio::piped())
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(2), "{arg}: {output:?}");
+        assert!(!output.stderr.is_empty());
+    }
+}
+
+#[test]
 fn jsx_and_check_modes_work() {
     assert!(cli(&["--tsx"], b"const view = <div />;").status.success());
     let output = cli(&["--check"], b"type X = {a: string};");

@@ -1,6 +1,7 @@
 import { runParser, parserFailure } from './parser-process.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
+import { requireComparisons } from './corpus-selection.mjs';
 const directory = process.argv[2];
 if (!directory) throw new Error('Usage: node tools/declaration-corpus.mjs PATH_TO_TYPESCRIPT_LIB');
 const binary = process.env.TSPARSE ?? path.resolve('target/debug/tsparse');
@@ -12,5 +13,6 @@ for (const name of fs.readdirSync(directory).filter(name => name.endsWith('.d.ts
   total++; bytes += fs.statSync(file).size;
   if (result.outcome !== 'accepted') failures.push({ name, ...parserFailure(result) });
 }
+requireComparisons(total);
 console.log(JSON.stringify({ total, bytes, failures }, null, 2));
 process.exitCode = failures.length ? 1 : 0;

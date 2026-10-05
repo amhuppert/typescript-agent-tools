@@ -1,10 +1,9 @@
 // Pin the compiler-facing schema independently of the parser's grammar.
 import fs from 'node:fs';
-import { createRequire } from 'node:module';
 import { spawnSync } from 'node:child_process';
+import { loadCompilerApi } from './reference-oracle.mjs';
 
-const ts = createRequire(import.meta.url)(process.env.TYPE_SCRIPT_API ?? 'typescript');
-if (ts.version !== '6.0.3') throw new Error(`Expected compiler API 6.0.3, received ${ts.version}`);
+const ts = loadCompilerApi();
 const check = process.argv.includes('--check');
 const kinds = Object.fromEntries(Object.entries(ts.SyntaxKind)
   .filter(([name, value]) => typeof value === 'number' && !/^(First|Last)/.test(name) && name !== 'Count'));

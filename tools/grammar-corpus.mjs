@@ -2,10 +2,10 @@
 import { runParser, parserFailure } from './parser-process.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
 import { normalizer, firstDifference } from './ast-comparison.mjs';
-const require = createRequire(import.meta.url);
-const ts = require(process.env.TYPE_SCRIPT_API ?? 'typescript');
+import { loadCompilerApi, classifyReference } from './reference-oracle.mjs';
+import { requireComparisons } from './corpus-selection.mjs';
+const ts = loadCompilerApi();
 const binary = process.env.TSPARSE ?? path.resolve('target/debug/tsparse');
 const normalize = normalizer(process.argv);
 const cases = [];
@@ -78,12 +78,17 @@ let passed = 0, invalid = 0;
 const failures = [];
 for (const { source, jsx } of cases) {
   const reference = ts.createSourceFile(jsx ? 'source.tsx' : 'source.ts', source, ts.ScriptTarget.Latest, false, jsx ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
+  const classification = classifyReference(ts, reference);
+  if (!classification.eligible) {
+    failures.push({ source, jsx, error: `Ineligible authored fixture: ${classification.removed}` });
+    continue;
+  }
   const result = runParser(binary, jsx ? ['--tsx'] : [], { input: source, timeout: 3000 });
   let difference;
   if (result.outcome === 'failed') difference = parserFailure(result);
-  if (reference.parseDiagnostics.length) {
+  if (!classification.valid) {
     invalid++;
-    if (result.outcome === 'accepted') difference = { error: 'Accepted compiler-invalid syntax', diagnostics: reference.parseDiagnostics.map(d => ts.flattenDiagnosticMessageText(d.messageText, '\n')) };
+    if (result.outcome === 'accepted') difference = { error: 'Accepted compiler-invalid syntax', diagnostics: classification.diagnostics };
   } else if (result.outcome !== 'accepted') difference = parserFailure(result);
   else difference = firstDifference(normalize(JSON.parse(result.stdout), true), normalize(reference, true));
   if (difference) {
@@ -91,6 +96,7 @@ for (const { source, jsx } of cases) {
     if (failures.length <= 25) console.log(JSON.stringify(failures.at(-1)));
   } else passed++;
 }
+requireComparisons(cases.length);
 const report = { version: ts.version, cases: cases.length, invalid, passed, failures };
 fs.mkdirSync('.cache', { recursive: true });
 fs.writeFileSync('.cache/grammar-corpus.json', JSON.stringify(report, null, 2));

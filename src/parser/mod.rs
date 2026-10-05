@@ -15,6 +15,7 @@ macro_rules! fields {
 mod context;
 mod expressions;
 mod jsx;
+mod literals;
 mod statements;
 mod types;
 
@@ -546,13 +547,14 @@ impl<'src> Parser<'src> {
     fn attempt<T>(&mut self, f: impl FnOnce(&mut Self) -> Result<T>) -> Option<T> {
         self.attempt_result(f).ok()
     }
-    /// Cache only failed interpretations; successful parses own fresh arena
-    /// nodes. Context and depth distinguish grammar and resource restrictions.
-    fn attempt_cached<T>(
+    /// Remember non-matches, including resource failures before interpretation
+    /// commits. Committed errors remain diagnostics rather than cache entries.
+    /// Context and depth distinguish grammar and resource restrictions.
+    fn probe_cached<T>(
         &mut self,
         kind: ProbeKind,
-        parse: impl FnOnce(&mut Self) -> Result<T>,
-    ) -> Option<T> {
+        parse: impl FnOnce(&mut Self) -> Result<Option<T>>,
+    ) -> Result<Option<T>> {
         let probe = FailedProbe {
             kind,
             offset: self.current.start,
@@ -561,10 +563,10 @@ impl<'src> Parser<'src> {
             recovering_types: self.recovering_types(),
         };
         if self.failed_probes.contains(&probe) {
-            return None;
+            return Ok(None);
         }
-        let result = self.attempt(parse);
-        if result.is_none() {
+        let result = self.probe(parse);
+        if matches!(result, Ok(None)) {
             self.failed_probes.insert(probe);
         }
         result
@@ -751,13 +753,10 @@ impl<'src> Parser<'src> {
             if token.kind != Kind::String {
                 raw_text = Some(Value::from(raw));
             }
-            match decode_string(raw) {
-                Ok(value) => value,
-                Err(_) if allow_invalid_escape => {
-                    template_flags = token_flags::CONTAINS_INVALID_ESCAPE;
-                    raw.into()
-                }
-                Err(message) => {
+            let decoded = literals::decode(raw);
+            template_flags = decoded.flags;
+            if !allow_invalid_escape {
+                if let Some(message) = decoded.error {
                     return Err(Diagnostic {
                         message: message.into(),
                         span: Span {
@@ -767,16 +766,12 @@ impl<'src> Parser<'src> {
                     });
                 }
             }
+            decoded.text
         };
         let mut fields = fields![("text", text)];
-        if token.kind == Kind::String
-            || template_flags & token_flags::CONTAINS_INVALID_ESCAPE == 0
-                && extended_unicode_escape(token.raw)
-        {
-            fields.push((
-                "hasExtendedUnicodeEscape",
-                extended_unicode_escape(token.raw).into(),
-            ));
+        let extended_escape = template_flags & token_flags::EXTENDED_UNICODE_ESCAPE != 0;
+        if token.kind == Kind::String || extended_escape {
+            fields.push(("hasExtendedUnicodeEscape", extended_escape.into()));
         }
         if token.kind == Kind::Number && !token.raw.ends_with('n') {
             let lower = token.raw.to_ascii_lowercase();
@@ -797,26 +792,6 @@ impl<'src> Parser<'src> {
             fields.push(("numericLiteralFlags", Value::Number(flags)));
         }
         if let Some(raw) = raw_text {
-            let mut chars = token.raw.chars();
-            while let Some(c) = chars.next() {
-                if template_flags & token_flags::CONTAINS_INVALID_ESCAPE != 0 {
-                    break;
-                }
-                if c != '\\' {
-                    continue;
-                }
-                match chars.next() {
-                    Some('u') => {
-                        template_flags |= if chars.clone().next() == Some('{') {
-                            token_flags::EXTENDED_UNICODE_ESCAPE
-                        } else {
-                            token_flags::UNICODE_ESCAPE
-                        };
-                    }
-                    Some('x') => template_flags |= token_flags::HEX_ESCAPE,
-                    _ => {}
-                }
-            }
             fields.push(("rawText", raw));
             fields.push(("templateFlags", Value::Number(template_flags)));
         }
@@ -1063,99 +1038,12 @@ fn decode_identifier(raw: &str) -> std::result::Result<std::borrow::Cow<'_, str>
     Ok(text.into())
 }
 
-fn extended_unicode_escape(raw: &str) -> bool {
-    if !raw.contains("\\u{") {
-        return false;
-    }
-    let mut chars = raw.chars();
-    while let Some(c) = chars.next() {
-        if c == '\\' && chars.next() == Some('u') && chars.clone().next() == Some('{') {
-            return true;
-        }
-    }
-    false
-}
-
 fn decode_string(raw: &str) -> std::result::Result<Value<'_>, &'static str> {
-    if !raw.contains('\\') && !raw.contains('\r') {
-        return Ok(raw.into());
+    let decoded = literals::decode(raw);
+    match decoded.error {
+        Some(error) => Err(error),
+        None => Ok(decoded.text),
     }
-    let mut result: Vec<u16> = Vec::with_capacity(raw.len());
-    let mut chars = raw.chars().peekable();
-    fn push(result: &mut Vec<u16>, c: char) {
-        let mut units = [0; 2];
-        result.extend_from_slice(c.encode_utf16(&mut units));
-    }
-    while let Some(c) = chars.next() {
-        if c == '\r' {
-            if chars.peek() == Some(&'\n') {
-                chars.next();
-            }
-            result.push(10);
-            continue;
-        }
-        if c != '\\' {
-            push(&mut result, c);
-            continue;
-        }
-        let Some(c) = chars.next() else {
-            return Err("Incomplete escape sequence");
-        };
-        match c {
-            'n' => result.push(10),
-            'r' => result.push(13),
-            't' => result.push(9),
-            'b' => result.push(8),
-            'f' => result.push(12),
-            'v' => result.push(11),
-            '0' if !chars.peek().is_some_and(char::is_ascii_digit) => result.push(0),
-            '0'..='9' => return Err("Octal and decimal escape sequences are not allowed"),
-            '\n' | '\u{2028}' | '\u{2029}' => {}
-            '\r' => {
-                if chars.peek() == Some(&'\n') {
-                    chars.next();
-                }
-            }
-            'x' | 'u' => {
-                let braced = c == 'u' && chars.peek() == Some(&'{');
-                if braced {
-                    chars.next();
-                }
-                let mut hex = String::new();
-                if braced {
-                    let mut closed = false;
-                    for c in chars.by_ref() {
-                        if c == '}' {
-                            closed = true;
-                            break;
-                        }
-                        hex.push(c);
-                    }
-                    if !closed {
-                        return Err("Unterminated Unicode escape");
-                    }
-                } else {
-                    for _ in 0..if c == 'x' { 2 } else { 4 } {
-                        hex.push(chars.next().ok_or("Incomplete hexadecimal escape")?);
-                    }
-                }
-                let number =
-                    u32::from_str_radix(&hex, 16).map_err(|_| "Invalid hexadecimal escape")?;
-                if number <= 0xFFFF {
-                    result.push(number as u16);
-                } else if let Some(c) = char::from_u32(number) {
-                    push(&mut result, c);
-                } else {
-                    return Err("Unicode escape exceeds maximum code point");
-                }
-            }
-            _ => push(&mut result, c),
-        }
-    }
-    Ok(match String::from_utf16(&result) {
-        Ok(text) => text.into(),
-        Err(_) => Value::Utf16(result),
-    })
 }
 
 fn numeric_text(raw: &str) -> std::borrow::Cow<'_, str> {
