@@ -5,6 +5,7 @@ impl<'src> Parser<'src> {
         self.nest(|p| {
             let start = p.pos();
             p.expect("<")?;
+            p.jsx_greater();
             let fragment = p.at(">");
             let mut opening_fields = vec![];
             let tag_name = if fragment {
@@ -20,7 +21,10 @@ impl<'src> Parser<'src> {
             if !fragment {
                 let attributes_start = p.pos();
                 let mut properties = vec![];
-                while !p.at(">") && !p.at("/") {
+                while {
+                    p.jsx_greater();
+                    !p.at(">") && !p.at("/")
+                } {
                     let attribute_start = p.pos();
                     if p.eat("{")? {
                         p.expect("...")?;
@@ -75,6 +79,7 @@ impl<'src> Parser<'src> {
                 opening_fields.push(("attributes", attributes.into()));
             }
             if p.eat("/")? {
+                p.jsx_greater();
                 p.expect(">")?;
                 return Ok(p.finish(JsxSelfClosingElement, start, opening_fields));
             }
@@ -106,6 +111,7 @@ impl<'src> Parser<'src> {
                 }
                 closing_fields.push(("tagName", closing_tag.into()));
             }
+            p.jsx_greater();
             p.expect(">")?;
             let closing = p.finish(
                 if fragment {
@@ -146,6 +152,14 @@ impl<'src> Parser<'src> {
         self.lexer.pos = offset;
         self.current = self.lexer.next();
     }
+    /// A JSX tag ends at one `>`, which the scanner joins with a following
+    /// `=` or `>` (`</b>=text`), as type arguments split `>>`.
+    fn jsx_greater(&mut self) {
+        if self.current.raw.len() > 1 && self.current.raw.starts_with('>') {
+            self.split_type_token();
+        }
+    }
+
     fn jsx_children(&mut self, mut position: usize) -> Result<Vec<NodeId>> {
         self.nest(|p| {
             let mut children = vec![];

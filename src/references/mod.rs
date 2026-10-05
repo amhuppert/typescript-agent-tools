@@ -1,0 +1,267 @@
+//! Project-wide reference lookup for one configured TypeScript project.
+//!
+//! ```no_run
+//! use std::path::Path;
+//! use typescript_parser::references::{ReferenceProject, ReferenceQuery};
+//!
+//! let project = ReferenceProject::load(Path::new("tsconfig.json"))?;
+//! let result = project.find_references(ReferenceQuery::Name {
+//!     name: "run".into(),
+//!     file: None,
+//! })?;
+//! println!("{}", serde_json::to_string_pretty(&result)?);
+//! # Ok::<(), Box<dyn std::error::Error>>(())
+//! ```
+
+mod binding;
+mod project;
+mod query;
+mod source;
+
+use serde::Serialize;
+use std::collections::HashMap;
+use std::fmt;
+use std::path::{Path, PathBuf};
+
+/// An immutable reference index for one configured project.
+///
+/// Loading reads each participating file once and resolves the supported
+/// declaration and module relationships. Queries perform no filesystem I/O.
+/// Results describe those captured contents, not later edits on disk.
+/// Scope tables, aliases, and internal IDs never escape this object.
+#[derive(Debug)]
+pub struct ReferenceProject {
+    config: PathBuf,
+    sources: source::Sources,
+    /// Searched files by canonical path, by path under the configuration
+    /// directory, and by every path that reached them, so queries identify
+    /// files without filesystem access. Keys follow the file system's case
+    /// policy (see `path_key`).
+    search_paths: HashMap<PathBuf, source::FileId>,
+    case_sensitive: bool,
+    index: binding::Index,
+}
+
+impl ReferenceProject {
+    /// Load the project selected by a `tsconfig.json`-style file. Nothing
+    /// searches ancestor directories for another configuration. Parsing runs
+    /// on a dedicated thread whose stack fits a deeper syntax budget than
+    /// `ParseOptions::default()`, for generated declaration files.
+    pub fn load(config: &Path) -> Result<Self, ProjectError> {
+        std::thread::scope(|scope| {
+            std::thread::Builder::new()
+                .name("tsparse-references-load".into())
+                .stack_size(project::LOAD_STACK_BYTES)
+                .spawn_scoped(scope, || Self::load_here(config))
+                .map_err(|error| ProjectError {
+                    kind: ProjectErrorKind::Io,
+                    message: format!("cannot start the loading thread: {error}"),
+                    path: Some(config.to_path_buf()),
+                    position: None,
+                })?
+                .join()
+                .unwrap_or_else(|panic| std::panic::resume_unwind(panic))
+        })
+    }
+
+    fn load_here(config: &Path) -> Result<Self, ProjectError> {
+        let program = project::load(config)?;
+        let index = binding::bind(&program)?;
+        let directory = program.config.parent().unwrap_or(Path::new("/"));
+        let case_sensitive = program.case_sensitive;
+        let mut search_paths = HashMap::new();
+        for id in program.sources.ids() {
+            let program_file = &program.files[id.index()];
+            if program_file.search {
+                let file = program.sources.get(id);
+                let lexical = source::normalize(&directory.join(&file.display));
+                for path in [&file.path, &lexical]
+                    .into_iter()
+                    .chain(&program_file.paths)
+                {
+                    search_paths.insert(path_key(path, case_sensitive), id);
+                }
+            }
+        }
+        Ok(Self {
+            config: program.config,
+            sources: program.sources,
+            search_paths,
+            case_sensitive,
+            index,
+        })
+    }
+
+    /// Find the reference groups selected by a source position or an exact
+    /// declared name. Relative query paths use the current working directory
+    /// and are matched lexically, without reading the filesystem.
+    pub fn find_references(&self, query: ReferenceQuery) -> Result<ReferenceResult, QueryError> {
+        let groups = query::find(self, query)?;
+        Ok(ReferenceResult {
+            project: self.config.clone(),
+            groups,
+        })
+    }
+}
+
+/// A query-path key: the path itself, lowercased on a file system that
+/// ignores case.
+fn path_key(path: &Path, case_sensitive: bool) -> PathBuf {
+    if case_sensitive {
+        path.to_path_buf()
+    } else {
+        PathBuf::from(path.to_string_lossy().to_lowercase())
+    }
+}
+
+/// Selects reference groups by token position or by exact declared name.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ReferenceQuery {
+    /// The identifier token containing `position` in `file`.
+    At {
+        file: PathBuf,
+        position: SourcePosition,
+    },
+    /// Declarations, local imports, and exported aliases spelled `name`.
+    /// `file` narrows candidates; references still span the project.
+    Name { name: String, file: Option<PathBuf> },
+}
+
+/// One-based line and one-based UTF-16 column.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+pub struct SourcePosition {
+    pub line: usize,
+    pub column: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ReferenceResult {
+    /// The absolute path of the selected configuration file.
+    pub project: PathBuf,
+    /// Separate symbols, ordered by their earliest declaration.
+    pub groups: Vec<ReferenceGroup>,
+}
+
+/// Every searched occurrence of one underlying symbol.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ReferenceGroup {
+    /// The symbol's declarations, including merged declarations outside the
+    /// searched files.
+    pub declarations: Vec<NamedLocation>,
+    /// Declarations, uses, and import/export names in the searched files.
+    pub occurrences: Vec<Occurrence>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct NamedLocation {
+    pub name: String,
+    pub location: Location,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct Occurrence {
+    pub name: String,
+    pub location: Location,
+    pub roles: Vec<Role>,
+}
+
+/// A source range. `file` uses `/` separators relative to the configuration
+/// directory; `end` is exclusive.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+pub struct Location {
+    pub file: String,
+    pub start: SourcePosition,
+    pub end: SourcePosition,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Role {
+    Declaration,
+    Use,
+    Import,
+    Export,
+}
+
+/// A project that could not be constructed. No partial index exists.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProjectError {
+    pub kind: ProjectErrorKind,
+    pub message: String,
+    pub path: Option<PathBuf>,
+    pub position: Option<SourcePosition>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProjectErrorKind {
+    /// A file or configuration could not be read.
+    Io,
+    /// Invalid configuration content or inheritance.
+    Config,
+    /// A program input has a syntax error.
+    Syntax,
+    /// A required input, option, or construct is outside the supported profile.
+    Unsupported,
+    /// Declarations that cannot share a name.
+    Binding,
+    /// A module that no file or ambient declaration provides.
+    UnresolvedImport,
+}
+
+/// A query that could not produce a reference result.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct QueryError {
+    pub kind: QueryErrorKind,
+    pub message: String,
+    pub path: Option<PathBuf>,
+    pub position: Option<SourcePosition>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum QueryErrorKind {
+    /// The working directory needed to make a query path absolute is unavailable.
+    Io,
+    /// The query file is not one of the project's searched files.
+    OutsideProject,
+    /// A line/column outside the file or inside a surrogate pair.
+    InvalidPosition,
+    /// The selected identifier is a member, label, or other unsupported target.
+    UnsupportedTarget,
+    /// The selected identifier, or a name candidate, has no resolvable target.
+    UnresolvedTarget,
+}
+
+impl fmt::Display for ProjectError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write_location(f, self.path.as_deref(), self.position)?;
+        f.write_str(&self.message)
+    }
+}
+
+impl fmt::Display for QueryError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write_location(f, self.path.as_deref(), self.position)?;
+        f.write_str(&self.message)
+    }
+}
+
+fn write_location(
+    f: &mut fmt::Formatter<'_>,
+    path: Option<&Path>,
+    position: Option<SourcePosition>,
+) -> fmt::Result {
+    match (path, position) {
+        (Some(path), Some(position)) => write!(
+            f,
+            "{}:{}:{}: ",
+            path.display(),
+            position.line,
+            position.column
+        ),
+        (Some(path), None) => write!(f, "{}: ", path.display()),
+        _ => Ok(()),
+    }
+}
+
+impl std::error::Error for ProjectError {}
+impl std::error::Error for QueryError {}

@@ -22,6 +22,30 @@ The upstream corpus is `tests/cases/conformance` and `tests/cases/compiler` at T
 
 The upstream native harness uses `--noCheck --noResolve --noEmit` to isolate syntax. Unquoted `module` declarations and missing operands after `throw` also receive strict grammar checks because the compiler can defer these errors to its checker. Authored tests confirm the corresponding native diagnostics. API runners share one classifier for TypeScript 7's removed syntax, deferred grammar errors, and ignored AMD module-name comments. Source and upstream runners count removed syntax separately and compare eligible invalid inputs as rejections; authored positive fixtures fail when ineligible or invalid. Comparisons omit the compiler's binding data, reference/pragma metadata, JSDoc trees, and lazy caches; see [the JSON contract](ast-json.md) and [normalization code](../tools/ast-comparison.mjs).
 
+## Reference semantics
+
+Find references is checked against the TypeScript 7.0.2 language service through its unstable sync API, separately from the syntax oracles above. `tools/semantic-oracle.mjs` classifies every identifier in a project's searched files and normalizes TypeScript's symbols to the tool's documented model (see [find references](references.md#differences-from-typescript-702)). `tools/semantic-conformance.mjs markers` checks that marker comments in fixture projects agree with the oracle, and `compare` queries the Rust tool at every oracle token through `examples/reference_batch.rs` and reports each difference by kind, including repeated occurrences or declarations within a group.
+
+```sh
+export TYPE_SCRIPT_SEMANTIC_API=/path/to/typescript-7.0.2/package
+export TYPE_SCRIPT_NATIVE=/path/to/typescript-7.0.2-native/lib/tsc
+cargo build --offline --example reference_batch
+node tools/semantic-conformance.mjs markers
+node tools/semantic-conformance.mjs compare [PATH ...]
+```
+
+Both the API package and the native binary must report exactly 7.0.2. Reports are written to `.cache/semantic-markers.json` and `.cache/semantic-conformance.json`; differences and setup failures exit 1. The real-oracle Node tests skip unless both variables are set.
+
+| Check | Result and scope |
+| --- | --- |
+| Marker fixtures | 22 projects in `fixtures/references`, with every identifier marked: 719/719 markers agree with the oracle, and `tests/reference_fixtures.rs` checks the same markers, including roles, against the Rust tool. |
+| Tool comparison | 719/719 fixture tokens match. In the 55 marked temporary projects of `tests/binding.rs` and `tests/references.rs`, kept with `TSPARSE_KEEP_FIXTURES=1`, 885 of 891 tokens match; the other six are the documented star re-export diamond with a type-only first route. One further project is a 5,000-level nesting stress file that the tool rejects by design. |
+| Generated combinations | `tools/reference-combinations.mjs` writes deterministic three-file projects that combine declaration kinds and merges, barrel and import forms, type-only imports, shadowing parameters, locals, and type parameters, and value, type, `typeof`, and qualified uses. Merges are generated only in orders TypeScript accepts. With `--count=400`, all 16,864 tokens match. |
+| TypeScript compiler | A copy of the TypeScript 6.0.3 compiler sources (43 files, 9.4 MB of modules), with `noLib`, shorthand ambient declarations for its Node.js imports, and a stub for its build-generated diagnostics file: all 365,899 tokens match. |
+| Local projects | Nine configurations from seven TypeScript and TSX applications and libraries, with installed packages, each loaded through a configuration that extends the original with `noLib` and keeps its `node_modules`: all 62,170 tokens match (24,283; 14,259; 9,675; 4,881; 4,035; 3,663; 1,273; 90; 7). Three other configurations are rejected as documented: a JSON module import, TypeScript 7's removed `baseUrl`, and a package missing from `node_modules`, which TypeScript also reports. |
+| Adversarial inputs | Tests with time limits cover branching and shared package `imports` cycles, chains past the 16,384-redirect limit (reported as unsupported), a 10,000-configuration `extends` chain, 8,000 suppressed imports, and 40,000 occurrences on one non-ASCII line. Each loads or queries within its limit. |
+| Corpus robustness | Each of the 12,444 upstream conformance and compiler cases loads as a one-file project without a panic. Rejections are invalid TypeScript 7 (`with`, misplaced exports), duplicate declarations, or imports of the case's other virtual files. |
+
 ## Performance and memory
 
 Reference throughput measurements below predate the design fixes. They use an Intel Core i9-9880H at 2.30 GHz, macOS 15.7.7, Rust 1.96, thin LTO, and one codegen unit. Corpus results are medians of three runs. Sources are read before timing; measurements include parsing and AST disposal, excluding JSON generation and file I/O.
@@ -48,6 +72,17 @@ cargo bench --offline --bench parse -- --corpus /path/to/application/src
 cargo bench --offline --bench memory
 cargo bench --offline --bench memory -- /path/to/sources
 ```
+
+### Reference indexing
+
+`cargo bench --offline --bench references [-- path/to/tsconfig.json]` measures project construction, position queries, and requested heap separately from the parser benchmarks. Construction includes reading, parsing, binding, and indexing every program input; queries sample identifier starts across the sources. Measured on the same machine as above, release build, after the final review fixes and while another process was running:
+
+| Project | Inputs | Load (median of 5) | Position query | Peak heap during load | Retained after load |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Generated (300 modules through one barrel) | 302 files, about 150 KB | 73 ms | 2.3 µs | 7.4 MB | 2.1 MB |
+| TypeScript 6.0.3 compiler sources | 43 files, 9.4 MB | 756 ms | 132 µs | 142 MB | 47 MB |
+
+Parsing accounts for roughly a third of the compiler's load time at the throughput above. Retained memory is the captured source text plus one record per identifier token, with names interned. Query time grows with the size of the returned groups; the compiler sample includes groups with thousands of occurrences. No parallelism or persistent cache was added; these measurements do not show a need for either.
 
 ## Scope
 

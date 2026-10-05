@@ -12,6 +12,7 @@ mod identifier_exclusions;
 mod json;
 mod lexer;
 mod parser;
+pub mod references;
 mod syntax_kind;
 pub use ast::{Ast, Diagnostic, Fields, Node, NodeId, NodeView, Span, Value};
 

@@ -162,3 +162,27 @@ fn uncommitted_type_interpretations_can_exhaust_depth_before_expression_fallback
     )
     .unwrap();
 }
+
+#[test]
+fn jsx_tags_end_at_a_single_greater_than_before_equals_text() {
+    for source in [
+        "const a = <p><b>x</b>=<i>y</i></p>;",
+        "const b = <p>=</p>;",
+        "const c = <p><br/>=</p>;",
+        "const d = <>=</>;",
+    ] {
+        let ast = parse_with_options(
+            source,
+            ParseOptions {
+                jsx: true,
+                ..Default::default()
+            },
+        )
+        .unwrap_or_else(|error| panic!("{source}: {error}"));
+        let text = ast
+            .nodes()
+            .iter()
+            .find(|node| node.kind == "JsxText" && matches!(node.field("text"), Some(typescript_parser::Value::Text(text)) if text == "="));
+        assert!(text.is_some(), "{source}: no `=` JSX text");
+    }
+}

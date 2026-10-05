@@ -6,9 +6,12 @@ source position or exact name. The implementation owns project loading, binding,
 alias resolution, and result grouping. Callers never coordinate compiler passes
 or inspect scope tables.
 
-This is a proposed design for implementation. The interview established the
+This was the design for implementation. The interview established the
 feature scope; the API, result format, compatibility limits, and failure policy
-below are recommended design decisions, not implemented behavior.
+below were recommended design decisions. The implemented behavior, and the
+places where TypeScript 7.0.2 behavior overrode this design (such as `types`
+defaulting to `[]` and `baseUrl` being removed), are documented in
+[find references](references.md).
 
 ## Scope and operating envelope
 

@@ -20,6 +20,17 @@ Run Cargo from this repository so its dependency overrides apply. If your usual 
 
 The CLI reads UTF-8 from one input file or stdin (`-`, or no file). `.tsx` and `.jsx` filenames enable JSX automatically; `--tsx` enables it for stdin. `--pretty` indents JSON, `-o` writes a file, and `--check` validates without emitting JSON. Exit codes are **0** for success, **1** for a syntax error, and **2** for usage or I/O errors. Diagnostics use one-based lines and UTF-16 columns.
 
+## Find references
+
+`tsparse --references` loads one `tsconfig.json` project and groups the declarations and occurrences of a symbol, following import and export aliases and keeping shadowed bindings separate:
+
+```sh
+./target/release/tsparse --references --project ./tsconfig.json --at 12:8 src/app.ts
+./target/release/tsparse --references --project ./tsconfig.json --name run --pretty
+```
+
+The library exposes the same operation as `typescript_parser::references::ReferenceProject`. Standard libraries are not loaded, project references are not followed, and properties and class members are not reference targets. See [find references](docs/references.md) for the result format, binding model, exit codes, and compatibility limits.
+
 ## Library
 
 ```rust

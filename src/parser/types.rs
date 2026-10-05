@@ -477,7 +477,7 @@ impl<'src> Parser<'src> {
     }
     /// Retain the first character as the current token and return the suffix to
     /// the lexer. The next bump consumes that prefix and scans the remainder.
-    fn split_type_token(&mut self) {
+    pub(super) fn split_type_token(&mut self) {
         self.current.end = self.current.start + 1;
         self.current.raw = &self.lexer.src[self.current.start..self.current.end];
         self.lexer.pos = self.current.end;
