@@ -1,8 +1,8 @@
 // Deterministic grammar combinations, checked against the compiler API.
+import { runParser, parserFailure } from './parser-process.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
-import { spawnSync } from 'node:child_process';
 import { normalizer, firstDifference } from './ast-comparison.mjs';
 const require = createRequire(import.meta.url);
 const ts = require(process.env.TYPE_SCRIPT_API ?? 'typescript');
@@ -78,12 +78,13 @@ let passed = 0, invalid = 0;
 const failures = [];
 for (const { source, jsx } of cases) {
   const reference = ts.createSourceFile(jsx ? 'source.tsx' : 'source.ts', source, ts.ScriptTarget.Latest, false, jsx ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
-  const result = spawnSync(binary, jsx ? ['--tsx'] : [], { input: source, encoding: 'utf8', timeout: 3000 });
+  const result = runParser(binary, jsx ? ['--tsx'] : [], { input: source, timeout: 3000 });
   let difference;
+  if (result.outcome === 'failed') difference = parserFailure(result);
   if (reference.parseDiagnostics.length) {
     invalid++;
-    if (result.status === 0) difference = { error: 'Accepted compiler-invalid syntax', diagnostics: reference.parseDiagnostics.map(d => ts.flattenDiagnosticMessageText(d.messageText, '\n')) };
-  } else if (result.status !== 0) difference = { error: result.stderr.trim(), status: result.status, signal: result.signal };
+    if (result.outcome === 'accepted') difference = { error: 'Accepted compiler-invalid syntax', diagnostics: reference.parseDiagnostics.map(d => ts.flattenDiagnosticMessageText(d.messageText, '\n')) };
+  } else if (result.outcome !== 'accepted') difference = parserFailure(result);
   else difference = firstDifference(normalize(JSON.parse(result.stdout), true), normalize(reference, true));
   if (difference) {
     failures.push({ source, jsx, ...difference });

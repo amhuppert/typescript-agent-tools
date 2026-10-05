@@ -1,4 +1,5 @@
 // Batch native syntax checks while retaining a result for each virtual source file.
+import { runParser, parserFailure } from './parser-process.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
@@ -48,10 +49,10 @@ function check(batch) {
     const valid = !nativeErrors.length && !strictError;
     if (!valid) invalid++;
     if (strictError) strict++;
-    const rust = spawnSync(binary, ['--check', test.file], { encoding: 'utf8', timeout: 10_000 });
-    if (rust.status === null || rust.error || (rust.status === 0) !== valid) {
+    const rust = runParser(binary, ['--check', test.file]);
+    if (rust.outcome === 'failed' || (rust.outcome === 'accepted') !== valid) {
       const { source, ...identity } = test;
-      failures.push({ ...identity, nativeErrors, strictError, rustStatus: rust.status, rustError: rust.stderr?.trim(), signal: rust.signal });
+      failures.push({ ...identity, nativeErrors, strictError, rustStatus: rust.status, ...parserFailure(rust) });
       if (failures.length <= 20) console.log(JSON.stringify(failures.at(-1)));
     } else { passed++; fs.unlinkSync(test.file); }
   }

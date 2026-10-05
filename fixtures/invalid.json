@@ -214,5 +214,13 @@
   {
     "name": "malformed-function-type-in-call",
     "source": "const result = ([x, ...xs]) << (f<T>());"
+  },
+  {
+    "name": "await-member-decorator-call",
+    "source": "class C { @await(foo) method() {} } export {};"
+  },
+  {
+    "name": "missing-function-type-arrow-in-call",
+    "source": "f<<T>() T>();"
   }
 ]

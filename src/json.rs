@@ -20,7 +20,7 @@ impl Ast<'_> {
                     let node = self.node(id);
                     writer.write_all(b"{")?;
                     for (index, (key, value)) in [
-                        ("kind", crate::syntax_kind::number(node.kind) as usize),
+                        ("kind", node.syntax_kind.number() as usize),
                         ("pos", self.utf16_offset(node.span.start)),
                         ("end", self.utf16_offset(node.span.end)),
                         ("flags", node.flags as usize),

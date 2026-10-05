@@ -60,3 +60,19 @@ fn output_file_contains_the_complete_json_ast() {
     assert_eq!(json["text"], "export const x = 1;");
     std::fs::remove_file(file).unwrap();
 }
+
+#[test]
+fn deeply_nested_class_heritage_returns_a_diagnostic() {
+    let source = format!(
+        "class C extends {}class {{}}{}",
+        "class extends ".repeat(9_999),
+        " {}".repeat(10_000)
+    );
+    let output = cli(&["--check"], source.as_bytes());
+    assert_eq!(output.status.code(), Some(1));
+    assert!(
+        String::from_utf8(output.stderr)
+            .unwrap()
+            .contains("Maximum syntax nesting depth exceeded")
+    );
+}

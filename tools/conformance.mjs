@@ -1,9 +1,9 @@
 // Use an installed TypeScript 6 compiler API as the TypeScript 7 syntax oracle.
 // TYPE_SCRIPT_API can point to @typescript/typescript6/lib/typescript.js.
+import { runParser, parserFailure } from './parser-process.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
-import { spawnSync } from 'node:child_process';
 import { normalizer, firstDifference } from './ast-comparison.mjs';
 const require = createRequire(import.meta.url);
 const ts = require(process.env.TYPE_SCRIPT_API ?? 'typescript');
@@ -17,8 +17,8 @@ for (const { name, source, jsx } of cases) {
     console.log(`INVALID FIXTURE ${name}: ${reference.parseDiagnostics.map(d=>ts.flattenDiagnosticMessageText(d.messageText, '\n')).join('; ')}`);
     failures++; continue;
   }
-  const result = spawnSync(binary, jsx ? ['--tsx'] : [], { input: source, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
-  if (result.status !== 0) { console.log(`PARSE FAIL ${name}: ${result.stderr.trim()}`); failures++; continue; }
+  const result = runParser(binary, jsx ? ['--tsx'] : [], { input: source });
+  if (result.outcome !== 'accepted') { console.log(`PARSE FAIL ${name}: ${JSON.stringify(parserFailure(result))}`); failures++; continue; }
   const actual = normalize(JSON.parse(result.stdout), true);
   const expected = normalize(reference, true);
   if (JSON.stringify(actual) !== JSON.stringify(expected)) {

@@ -1,4 +1,5 @@
 // Test an upstream compiler checkout without adding its fixtures to this repo.
+import { runParser, parserFailure } from './parser-process.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
@@ -70,11 +71,11 @@ outer: for (const category of ['conformance', 'compiler']) {
       // Keep the extension, including .d.mts/.d.cts, for the Rust ambient context.
       const file = path.join(directory, `${count}-${name.replace(/[^\w.\-]/g, '_')}`);
       fs.writeFileSync(file, source);
-      const result = spawnSync(binary, checkOnly || !referenceValid ? ['--check', file] : [file], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 10_000 });
+      const result = runParser(binary, checkOnly || !referenceValid ? ['--check', file] : [file]);
       let difference;
-      if (result.status === null) difference = { error: 'Process failed or timed out', signal: result.signal };
-      else if (!referenceValid && result.status === 0) difference = { error: 'Accepted compiler-invalid syntax', diagnostics };
-      else if (referenceValid && result.status !== 0) difference = { error: result.stderr.trim() };
+      if (result.outcome === 'failed') difference = parserFailure(result);
+      else if (!referenceValid && result.outcome === 'accepted') difference = { error: 'Accepted compiler-invalid syntax', diagnostics };
+      else if (referenceValid && result.outcome !== 'accepted') difference = parserFailure(result);
       else if (referenceValid && !checkOnly) difference = firstDifference(normalize(JSON.parse(result.stdout), true), normalize(reference, true));
       if (difference) {
         failures.push({ fixture: path.relative(root, fixture), name, file, ...difference });

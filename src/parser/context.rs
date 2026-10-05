@@ -1,15 +1,13 @@
 //! Grammar restrictions inherited by nested syntax. Compiler node flags are
 //! derived here so grammar code does not need to encode their bit layout.
 
-pub(super) const DISALLOW_IN: u32 = 1 << 13;
-pub(super) const YIELD: u32 = 1 << 14;
-pub(super) const DECORATOR: u32 = 1 << 15;
-pub(super) const AWAIT: u32 = 1 << 16;
-pub(super) const DISALLOW_CONDITIONAL_TYPES: u32 = 1 << 17;
-pub(super) const AMBIENT: u32 = 1 << 25;
-pub(super) const IN_WITH: u32 = 1 << 26;
+pub(super) use crate::compiler::node::{
+    AMBIENT, AWAIT_CONTEXT as AWAIT, DECORATOR_CONTEXT as DECORATOR,
+    DISALLOW_CONDITIONAL_TYPES_CONTEXT as DISALLOW_CONDITIONAL_TYPES,
+    DISALLOW_IN_CONTEXT as DISALLOW_IN, IN_WITH_STATEMENT as IN_WITH, YIELD_CONTEXT as YIELD,
+};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub(super) struct GrammarContext {
     flags: u32,
     pub(super) allow_in: bool,

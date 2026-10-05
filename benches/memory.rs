@@ -72,7 +72,7 @@ fn main() {
         PEAK.store(0, Ordering::Relaxed);
         ENABLED.store(true, Ordering::Relaxed);
         let ast = support::parse(source);
-        let nodes = ast.nodes.len();
+        let nodes = ast.nodes().len();
         let calls = CALLS.load(Ordering::Relaxed);
         let retained = LIVE.load(Ordering::Relaxed);
         let peak = PEAK.load(Ordering::Relaxed);

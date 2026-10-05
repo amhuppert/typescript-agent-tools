@@ -192,7 +192,7 @@ type External = typeof import("pkg", { with: { type: "json" } }).default;
         "ImportType",
     ] {
         assert!(
-            ast.nodes.iter().any(|node| node.kind == kind),
+            ast.nodes().iter().any(|node| node.kind == kind),
             "missing {kind}"
         );
     }
@@ -249,7 +249,7 @@ fn jsx_has_a_separate_text_and_attribute_scanner() {
         },
     )
     .unwrap();
-    assert!(ast.nodes.iter().any(|node| node.kind == "JsxText"
+    assert!(ast.nodes().iter().any(|node| node.kind == "JsxText"
         && matches!(node.field("text"), Some(Value::Text(text)) if text.contains("// text"))));
     assert!(
         parse_with_options(
@@ -317,7 +317,7 @@ fn iterative_json_matches_serde_and_handles_long_chains() {
     assert!(output.len() > source.len());
     assert_eq!(
         output.iter().filter(|c| **c == b'{').count(),
-        ast.nodes.len()
+        ast.nodes().len()
     );
 }
 
@@ -325,7 +325,7 @@ fn iterative_json_matches_serde_and_handles_long_chains() {
 fn javascript_strings_preserve_surrogate_code_units() {
     let ast = parse(r#"const x = "\uD83D\uDE00", y = "\uD800";"#).unwrap();
     assert!(
-        ast.nodes
+        ast.nodes()
             .iter()
             .any(|node| matches!(node.field("text"), Some(Value::Text(text)) if text == "😀"))
     );
@@ -428,7 +428,7 @@ fn declaration_files_and_all_line_breaks_are_recognized() {
         .unwrap();
         assert_eq!(ast.root().flags, 33554432);
         assert!(
-            ast.nodes
+            ast.nodes()
                 .iter()
                 .any(|node| node.kind == "InterfaceDeclaration" && node.flags & 536870912 != 0)
         );
@@ -475,4 +475,270 @@ fn adjacent_type_argument_and_generic_function_openers_are_rescanned() {
         185
     );
     parse("x << y; const value = f<T>();").unwrap();
+}
+
+#[test]
+fn nested_class_heritage_obeys_the_depth_budget() {
+    let source = format!(
+        "class C extends {}class {{}}{}",
+        "class extends ".repeat(31),
+        " {}".repeat(32)
+    );
+    let error = parse_with_options(
+        &source,
+        ParseOptions {
+            max_depth: 4,
+            ..Default::default()
+        },
+    )
+    .unwrap_err();
+    assert_eq!(error.message, "Maximum syntax nesting depth exceeded");
+    parse_with_options(
+        &source,
+        ParseOptions {
+            max_depth: 256,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    // Integration tests run on Rust's ordinary worker-thread stack, which is
+    // smaller than the CLI main stack. The default budget must protect both.
+    let source = format!(
+        "class C extends {}class {{}}{}",
+        "class extends ".repeat(9_999),
+        " {}".repeat(10_000)
+    );
+    let error = parse(&source).unwrap_err();
+    assert_eq!(error.message, "Maximum syntax nesting depth exceeded");
+}
+
+#[test]
+fn nested_assignments_remain_expressions_during_arrow_speculation() {
+    // Before failed probes were remembered, each nesting level parsed its
+    // initializer twice; even 24 levels could time out in a release build.
+    let source = format!("const v = {}x{};", "(x = ".repeat(32), ")".repeat(32));
+    let ast = parse(&source).unwrap();
+    let child = |id, key| match ast.node(id).field(key).unwrap() {
+        Value::Node(id) => *id,
+        _ => panic!("Expected node field {key}"),
+    };
+    let first = |id, key| match ast.node(id).field(key).unwrap() {
+        Value::Nodes(ids) => ids[0],
+        _ => panic!("Expected node list {key}"),
+    };
+    let statement = first(ast.root_id(), "statements");
+    let list = child(statement, "declarationList");
+    let declaration = first(list, "declarations");
+    let mut expression = child(declaration, "initializer");
+    for _ in 0..32 {
+        assert_eq!(ast.node(expression).kind, "ParenthesizedExpression");
+        let assignment = child(expression, "expression");
+        assert_eq!(ast.node(assignment).kind, "BinaryExpression");
+        expression = child(assignment, "right");
+    }
+    assert!(
+        matches!(ast.node(expression).field("escapedText"), Some(Value::Text(text)) if text == "x")
+    );
+    parse("const f = (x = (y: T) => y) => x; export {}; (x = await(foo));").unwrap();
+}
+
+#[test]
+fn deep_valid_types_fit_the_default_budget() {
+    let source = format!("type T = {}string{};", "(".repeat(40), ")".repeat(40));
+    let ast = parse(&source).unwrap();
+    assert_eq!(
+        ast.nodes()
+            .iter()
+            .filter(|node| node.kind == "ParenthesizedType")
+            .count(),
+        40
+    );
+
+    let arms = (0..100)
+        .map(|value| format!("T extends {value} ? '{value}' : "))
+        .collect::<String>();
+    let source = format!("type Foo<T> = {arms}never;");
+    let ast = parse(&source).unwrap();
+    assert_eq!(
+        ast.nodes()
+            .iter()
+            .filter(|node| node.kind == "ConditionalType")
+            .count(),
+        100
+    );
+}
+
+#[test]
+fn default_budget_protects_rust_worker_thread_stacks() {
+    for (name, source, jsx) in [
+        (
+            "arrows",
+            format!("const f = {}x;", "(x) => ".repeat(1_000)),
+            false,
+        ),
+        (
+            "simple arrows",
+            format!("const f = {}x;", "x => ".repeat(1_000)),
+            false,
+        ),
+        (
+            "arrays",
+            format!("{}0{};", "[".repeat(4_096), "]".repeat(4_096)),
+            false,
+        ),
+        ("unary", format!("{}x;", "!".repeat(4_096)), false),
+        ("new", format!("{}C;", "new ".repeat(4_096)), false),
+        (
+            "calls",
+            format!("{}x{};", "f(".repeat(4_096), ")".repeat(4_096)),
+            false,
+        ),
+        (
+            "types",
+            format!(
+                "type T = {}T{};",
+                "Promise<".repeat(4_096),
+                ">".repeat(4_096)
+            ),
+            false,
+        ),
+        (
+            "parenthesized types",
+            format!("type T = {}T{};", "(".repeat(4_096), ")".repeat(4_096)),
+            false,
+        ),
+        (
+            "conditional false types",
+            format!("type T = {}never;", "T extends T ? T : ".repeat(4_096)),
+            false,
+        ),
+        (
+            "conditional true types",
+            format!(
+                "type T = {}T{};",
+                "T extends T ? ".repeat(4_096),
+                " : T".repeat(4_096)
+            ),
+            false,
+        ),
+        (
+            "function types",
+            format!("type T = {}T;", "() => ".repeat(4_096)),
+            false,
+        ),
+        (
+            "blocks",
+            format!("{}{}", "{".repeat(4_096), "}".repeat(4_096)),
+            false,
+        ),
+        (
+            "jsx",
+            format!("const x = {}{};", "<X>".repeat(4_096), "</X>".repeat(4_096)),
+            true,
+        ),
+        (
+            "templates",
+            format!("{}x{};", "`a${".repeat(4_096), "}`".repeat(4_096)),
+            false,
+        ),
+        (
+            "tagged templates",
+            format!("{}x{};", "tag`a${".repeat(4_096), "}`".repeat(4_096)),
+            false,
+        ),
+        (
+            "bindings",
+            format!("const {}x{} = y;", "[".repeat(4_096), "]".repeat(4_096)),
+            false,
+        ),
+        (
+            "namespaces",
+            format!("namespace A{} {{}}", ".A".repeat(4_096)),
+            false,
+        ),
+        (
+            "mapped types",
+            format!(
+                "type T = {}T{};",
+                "{[K in keyof T]: ".repeat(4_096),
+                "}".repeat(4_096)
+            ),
+            false,
+        ),
+        (
+            "template types",
+            format!("type T = {}T{};", "`a${".repeat(4_096), "}`".repeat(4_096)),
+            false,
+        ),
+    ] {
+        assert!(
+            parse_with_options(
+                &source,
+                ParseOptions {
+                    jsx,
+                    ..Default::default()
+                }
+            )
+            .is_err(),
+            "{name}"
+        );
+    }
+}
+
+#[test]
+fn module_await_in_member_names_and_decorators_uses_the_enclosing_scope() {
+    let value = json(
+        "class C { [await(foo)]() { await(bar); } @decorator(await(baz)) method() {} value = await(qux); } export {};",
+    );
+    let class = &value["statements"][0];
+    assert_eq!(class["flags"], 65536);
+    assert_eq!(class["members"][0]["name"]["expression"]["kind"], 224);
+    assert_eq!(
+        class["members"][0]["body"]["statements"][0]["expression"]["kind"],
+        214
+    );
+    assert_eq!(
+        class["members"][1]["modifiers"][0]["expression"]["arguments"][0]["kind"],
+        224
+    );
+    assert_eq!(class["members"][2]["initializer"]["kind"], 214);
+    let value = json("const o = { [await(foo)]() {} }; export {};");
+    assert_eq!(value["statements"][0]["flags"], 65536);
+    assert_eq!(
+        value["statements"][0]["declarationList"]["declarations"][0]["initializer"]["properties"]
+            [0]["name"]["expression"]["kind"],
+        224
+    );
+    let value = json("class C { await() {} value = await(foo); } export {};");
+    assert_eq!(value["statements"][0]["flags"], 65536);
+    assert_eq!(
+        value["statements"][0]["members"][1]["initializer"]["kind"],
+        214
+    );
+    let value = json("const o = { await() {}, await: 1 }; export {};");
+    assert_eq!(value["statements"][0]["flags"], 0);
+    assert!(parse("class C { @await(foo) method() {} } export {};").is_err());
+}
+
+#[test]
+fn type_argument_recovery_commits_only_a_disambiguated_list() {
+    for source in [
+        "x << y; const f = (x: T): U => x;",
+        "f < T > +x; const f = <T>(x: T) => x;",
+        "f<<T>() => T>(); f?.<<T>() => T>();",
+        "type T = Box<Box<X>>; f<Box<X>>();",
+        "const f = async () => { f < T > x; await(y); };",
+    ] {
+        parse(source).unwrap_or_else(|error| panic!("{source}: {error}"));
+    }
+    for source in [
+        "f<<T>() T>();",
+        "f<<T>(x T) => T>();",
+        "f<<T>(x: ) => T>();",
+        "f?.<<T>() T>();",
+    ] {
+        assert!(parse(source).is_err(), "{source}");
+    }
+    let error = parse("f<<T>() T>();").unwrap_err();
+    assert_eq!(error.message, "Expected '=>'");
 }

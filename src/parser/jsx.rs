@@ -27,7 +27,7 @@ impl<'src> Parser<'src> {
                         let expression = p.assignment_expression()?;
                         p.expect("}")?;
                         properties.push(p.finish(
-                            "JsxSpreadAttribute",
+                            JsxSpreadAttribute,
                             attribute_start,
                             fields![("expression", expression.into())],
                         ));
@@ -47,7 +47,7 @@ impl<'src> Parser<'src> {
                                 let text = &p.lexer.src[token.start + 1..end - 1];
                                 p.reset_at(end);
                                 p.make(
-                                    "StringLiteral",
+                                    StringLiteral,
                                     token.full_start,
                                     end,
                                     fields![
@@ -64,11 +64,11 @@ impl<'src> Parser<'src> {
                             };
                             fields.push(("initializer", initializer.into()));
                         }
-                        properties.push(p.finish("JsxAttribute", attribute_start, fields));
+                        properties.push(p.finish(JsxAttribute, attribute_start, fields));
                     }
                 }
                 let attributes = p.finish(
-                    "JsxAttributes",
+                    JsxAttributes,
                     attributes_start,
                     fields![("properties", properties.into())],
                 );
@@ -76,7 +76,7 @@ impl<'src> Parser<'src> {
             }
             if p.eat("/")? {
                 p.expect(">")?;
-                return Ok(p.finish("JsxSelfClosingElement", start, opening_fields));
+                return Ok(p.finish(JsxSelfClosingElement, start, opening_fields));
             }
             if !p.at(">") {
                 return Err(p.error("Expected '>' in JSX opening tag"));
@@ -85,9 +85,9 @@ impl<'src> Parser<'src> {
             p.end = content_start;
             let opening = p.finish(
                 if fragment {
-                    "JsxOpeningFragment"
+                    JsxOpeningFragment
                 } else {
-                    "JsxOpeningElement"
+                    JsxOpeningElement
                 },
                 start,
                 opening_fields,
@@ -109,19 +109,15 @@ impl<'src> Parser<'src> {
             p.expect(">")?;
             let closing = p.finish(
                 if fragment {
-                    "JsxClosingFragment"
+                    JsxClosingFragment
                 } else {
-                    "JsxClosingElement"
+                    JsxClosingElement
                 },
                 closing_start,
                 closing_fields,
             );
             Ok(p.finish(
-                if fragment {
-                    "JsxFragment"
-                } else {
-                    "JsxElement"
-                },
+                if fragment { JsxFragment } else { JsxElement },
                 start,
                 fields![
                     (
@@ -151,27 +147,28 @@ impl<'src> Parser<'src> {
         self.current = self.lexer.next();
     }
     fn jsx_children(&mut self, mut position: usize) -> Result<Vec<NodeId>> {
-        let mut children = vec![];
-        loop {
-            let rest = &self.lexer.src[position..];
-            let length = rest.find(['<', '{']).unwrap_or(rest.len());
-            if length > 0 {
-                let text = &rest[..length];
-                if let Some(offset) = text.find(['>', '}']) {
-                    return Err(Diagnostic {
-                        message: "Escape '>' and '}' in JSX text with an entity or expression"
-                            .into(),
-                        span: Span {
-                            start: position + offset,
-                            end: position + offset + 1,
-                        },
-                    });
-                }
-                children.push(self.make(
-                    "JsxText",
-                    position,
-                    position + length,
-                    fields![
+        self.nest(|p| {
+            let mut children = vec![];
+            loop {
+                let rest = &p.lexer.src[position..];
+                let length = rest.find(['<', '{']).unwrap_or(rest.len());
+                if length > 0 {
+                    let text = &rest[..length];
+                    if let Some(offset) = text.find(['>', '}']) {
+                        return Err(Diagnostic {
+                            message: "Escape '>' and '}' in JSX text with an entity or expression"
+                                .into(),
+                            span: Span {
+                                start: position + offset,
+                                end: position + offset + 1,
+                            },
+                        });
+                    }
+                    children.push(p.make(
+                        JsxText,
+                        position,
+                        position + length,
+                        fields![
                         ("text", text.into()),
                         (
                             "containsOnlyTriviaWhiteSpaces",
@@ -179,25 +176,27 @@ impl<'src> Parser<'src> {
                                 && text.chars().all(crate::lexer::whitespace)).into(),
                         ),
                     ],
-                ));
-                position += length;
+                    ));
+                    position += length;
+                }
+                p.reset_at(position);
+                if p.lexer.src[position..].starts_with("</") {
+                    break;
+                }
+                if p.current.kind == Kind::Eof {
+                    return Err(p.error("Unterminated JSX element"));
+                }
+                if p.at("<") {
+                    children.push(p.jsx_element()?);
+                } else {
+                    children.push(p.jsx_expression(true)?);
+                }
+                position = p.end;
             }
-            self.reset_at(position);
-            if self.lexer.src[position..].starts_with("</") {
-                break;
-            }
-            if self.current.kind == Kind::Eof {
-                return Err(self.error("Unterminated JSX element"));
-            }
-            if self.at("<") {
-                children.push(self.jsx_element()?);
-            } else {
-                children.push(self.jsx_expression(true)?);
-            }
-            position = self.end;
-        }
-        Ok(children)
+            Ok(children)
+        })
     }
+
     fn jsx_expression(&mut self, allow_spread: bool) -> Result<NodeId> {
         let start = self.pos();
         self.expect("{")?;
@@ -209,7 +208,7 @@ impl<'src> Parser<'src> {
             fields.push(("expression", self.expression()?.into()));
         }
         self.expect("}")?;
-        Ok(self.finish("JsxExpression", start, fields))
+        Ok(self.finish(JsxExpression, start, fields))
     }
     fn jsx_tag_text(&self, id: NodeId) -> String {
         let mut id = id;
@@ -217,17 +216,17 @@ impl<'src> Parser<'src> {
         let mut result;
         loop {
             let node = &self.nodes[id.0];
-            if node.kind == "ThisKeyword" {
+            if node.syntax_kind == ThisKeyword {
                 result = "this".into();
                 break;
-            } else if node.kind == "Identifier" {
+            } else if node.syntax_kind == Identifier {
                 let Some(Value::Text(text)) = node.field("escapedText") else {
                     unreachable!()
                 };
                 result = text.to_string();
                 break;
             } else {
-                let left_key = if node.kind == "JsxNamespacedName" {
+                let left_key = if node.syntax_kind == JsxNamespacedName {
                     "namespace"
                 } else {
                     "expression"
@@ -242,7 +241,7 @@ impl<'src> Parser<'src> {
                     unreachable!()
                 };
                 suffixes.push((
-                    if node.kind == "JsxNamespacedName" {
+                    if node.syntax_kind == JsxNamespacedName {
                         ':'
                     } else {
                         '.'
@@ -264,7 +263,7 @@ impl<'src> Parser<'src> {
         if self.eat(":")? {
             let right = self.jsx_identifier()?;
             return Ok(self.finish(
-                "JsxNamespacedName",
+                JsxNamespacedName,
                 start,
                 fields![("namespace", name.into()), ("name", right.into())],
             ));
@@ -272,13 +271,13 @@ impl<'src> Parser<'src> {
         if dotted
             && matches!(self.nodes[name.0].field("escapedText"), Some(Value::Text(text)) if text == "this")
         {
-            self.nodes[name.0].kind = "ThisKeyword";
+            self.set_kind(name, ThisKeyword);
             self.nodes[name.0].fields.clear();
         }
         while dotted && self.eat(".")? {
             let right = self.jsx_identifier()?;
             name = self.finish(
-                "PropertyAccessExpression",
+                PropertyAccessExpression,
                 start,
                 fields![("expression", name.into()), ("name", right.into())],
             );
@@ -309,6 +308,6 @@ impl<'src> Parser<'src> {
         } else {
             text.into()
         };
-        Ok(self.make("Identifier", start, end, fields![("escapedText", escaped)]))
+        Ok(self.make(Identifier, start, end, fields![("escapedText", escaped)]))
     }
 }

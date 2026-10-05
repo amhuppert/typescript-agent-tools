@@ -1,3 +1,4 @@
+import { runParser, parserFailure } from './parser-process.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -12,12 +13,12 @@ let failures = 0;
 for (const { name, source, jsx, valid, nativeDiagnostic } of cases) {
   const file = path.join(directory, `${name}.${jsx ? 'tsx' : 'ts'}`); fs.writeFileSync(file, source);
   const expected = spawnSync(native, ['--noEmit', ...(nativeDiagnostic ? [] : ['--noCheck']), '--ignoreConfig', '--pretty', 'false', '--target', 'esnext', '--module', 'esnext', '--jsx', 'preserve', file], { encoding: 'utf8', timeout: 10_000 });
-  const actual = spawnSync(binary, ['--check', file], { encoding: 'utf8', timeout: 10_000 });
-  if (expected.status === null || actual.status === null) throw new Error(`${name}: process failed or timed out`);
+  const actual = runParser(binary, ['--check', file]);
+  if (expected.status === null || expected.error) throw new Error(`${name}: process failed or timed out`);
   const nativeValid = nativeDiagnostic ? !expected.stdout.includes(`error TS${nativeDiagnostic}:`) : expected.status === 0;
-  if (nativeValid !== valid || (actual.status === 0) !== valid) {
+  if (nativeValid !== valid || actual.outcome === 'failed' || (actual.outcome === 'accepted') !== valid) {
     console.log(`FAIL ${name}: expected ${valid ? 'valid' : 'invalid'}; native exit ${expected.status}; Rust exit ${actual.status}`);
-    console.log(expected.stdout.trim(), actual.stderr.trim()); failures++;
+    console.log(expected.stdout.trim(), actual.outcome === 'accepted' ? '' : JSON.stringify(parserFailure(actual))); failures++;
   }
 }
 const report = { version: version.stdout.trim(), cases: cases.length, passed: cases.length - failures, failures };

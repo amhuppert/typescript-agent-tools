@@ -7,6 +7,7 @@
 //! ```
 
 pub mod ast;
+mod compiler;
 mod identifier_exclusions;
 mod json;
 mod lexer;
@@ -18,7 +19,8 @@ pub use ast::{Ast, Diagnostic, Fields, Node, NodeId, NodeView, Span, Value};
 pub struct ParseOptions {
     pub jsx: bool,
     pub file_name: String,
-    /// Bound recursive grammar nesting for untrusted input.
+    /// Bound recursive grammar entries for untrusted input, rather than AST
+    /// levels. Raising this budget requires a correspondingly larger stack.
     pub max_depth: usize,
 }
 impl Default for ParseOptions {

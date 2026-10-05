@@ -40,9 +40,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-`parse_with_options` accepts `ParseOptions { jsx, file_name, max_depth }`. Declaration filenames `.d.ts`, `.d.mts`, `.d.cts`, and arbitrary extensions such as `.d.css.ts` set the compiler's ambient context. Recursive syntax nesting defaults to a limit of 256 and returns a diagnostic when exceeded. Parsing requires complete input and returns the first error; there is no recovery tree or type checking.
+`parse_with_options` accepts `ParseOptions { jsx, file_name, max_depth }`. Declaration filenames `.d.ts`, `.d.mts`, `.d.cts`, and arbitrary extensions such as `.d.css.ts` set the compiler's ambient context. The recursive grammar budget defaults to 256 and returns a diagnostic when exceeded. It counts grammar entries and scoped context callbacks, rather than AST levels; raising it requires a correspondingly larger stack. Parsing requires complete input and returns the first error; there is no recovery tree or type checking.
 
-`Ast` borrows its input; keep the source alive while using it. Children are `NodeId` links in `Value::Node` or `Value::Nodes`. Rust node kinds are names such as `BinaryExpression`; JSON kinds are numeric `SyntaxKind` values. [The JSON contract](docs/ast-json.md) explains positions, fields, and serialization.
+`Ast` borrows its input; keep the source alive while using it. The arena is immutable: use `source()`, `nodes()`, `root_id()`, `root()`, and `node(id)` to inspect it. Children are `NodeId` links in `Value::Node` or `Value::Nodes` and belong to their originating arena. Rust node kinds are names such as `BinaryExpression`; JSON kinds are numeric `SyntaxKind` values. [The JSON contract](docs/ast-json.md) explains positions, fields, and serialization.
 
 ## Syntax coverage
 
@@ -67,6 +67,10 @@ node tools/robustness-corpus.mjs
 # Supply your installed compiler paths; these tools do not download anything.
 TYPE_SCRIPT_API=/path/to/typescript/lib/typescript.js \
   node tools/conformance.mjs --positions --flags --scanner-hints
+TYPE_SCRIPT_API=/path/to/typescript/lib/typescript.js \
+  node --test tools/parser-process.test.mjs
+TYPE_SCRIPT_API=/path/to/typescript/lib/typescript.js \
+  node tools/generate-compiler-schema.mjs --check
 TYPE_SCRIPT_NATIVE=/path/to/typescript-7/tsc \
   node tools/native-conformance.mjs
 node tools/declaration-corpus.mjs /path/to/typescript-7/lib
@@ -81,6 +85,6 @@ TYPE_SCRIPT_API=/path/to/typescript/lib/typescript.js \
   node tools/upstream-native-corpus.mjs /path/to/typescript-checkout
 ```
 
-The API oracle is TypeScript 6.0.3; the native syntax oracle is TypeScript 7.0.2. Optional `TSPARSE` selects another built CLI. The authored fixture, declaration, grammar, and source runners default to `target/debug/tsparse`; upstream and robustness runners default to `target/release/tsparse`. Differential failures and reports are written under ignored `.cache/`.
+The API oracle is TypeScript 6.0.3; the native syntax oracle is TypeScript 7.0.2. Optional `TSPARSE` selects another built CLI. The authored fixture, declaration, grammar, and source runners default to `target/debug/tsparse`; upstream and robustness runners default to `target/release/tsparse`. Differential failures and reports are written under ignored `.cache/`. Every Rust parser runner treats only exit 1 as a syntax rejection; usage/I/O errors, launch errors, crashes, and timeouts fail validation. The process tests include invalid fixtures run through failing executables.
 
 MIT license. Third-party dependencies retain their own licenses; see [vendor provenance](vendor/README.md).

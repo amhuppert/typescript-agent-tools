@@ -1,5 +1,8 @@
+use crate::compiler::{node as node_flags, script, target, token as token_flags, variant};
 use crate::lexer::{Kind, Lexer, Token};
+use crate::syntax_kind::{SyntaxKind, SyntaxKind::*};
 use crate::{Ast, Diagnostic, Node, NodeId, ParseOptions, Span, Value};
+use std::collections::HashSet;
 
 type Fields<'src> = crate::ast::Fields<'src>;
 macro_rules! fields {
@@ -21,17 +24,48 @@ use context::{
 };
 
 type Result<T> = std::result::Result<T, Diagnostic>;
+
+/// Recovery is used only to decide whether malformed expression type arguments
+/// commit to type syntax. The first diagnostic survives within that probe.
+#[derive(Clone, Default)]
+enum TypeRecovery {
+    #[default]
+    Strict,
+    Recovering(Option<Diagnostic>),
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+enum ProbeKind {
+    Arrow { allow_return_type: bool },
+    FunctionType,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+struct FailedProbe {
+    kind: ProbeKind,
+    offset: usize,
+    context: GrammarContext,
+    depth: usize,
+    recovering_types: bool,
+}
+
 pub(crate) struct Parser<'src> {
     lexer: Lexer<'src>,
     current: Token<'src>,
+    // `end` is the last consumed token's end; lexer.pos includes lookahead.
     end: usize,
     nodes: Vec<Node<'src>>,
     options: ParseOptions,
     depth: usize,
     context: GrammarContext,
     source_flags: u32,
-    type_probe: bool,
-    type_probe_error: Option<Diagnostic>,
+    // Immutable for this input. Declaration files never reparse top-level await;
+    // other files need summaries only when the source may contain that keyword.
+    track_await: bool,
+    type_recovery: TypeRecovery,
+    // Failed interpretations depend on immutable source and these grammar
+    // settings, not arena IDs. Keep them across rollback to bound repeated work.
+    failed_probes: HashSet<FailedProbe>,
 }
 
 /// A speculative parse owns newly appended nodes. Existing nodes are read-only
@@ -44,8 +78,7 @@ struct Checkpoint<'src> {
     depth: usize,
     context: GrammarContext,
     source_flags: u32,
-    type_probe: bool,
-    type_probe_error: Option<Diagnostic>,
+    type_recovery: TypeRecovery,
 }
 
 impl<'src> Parser<'src> {
@@ -56,6 +89,7 @@ impl<'src> Parser<'src> {
         };
         let current = lexer.next();
         let context = GrammarContext::new(options.declaration_file());
+        let track_await = !options.declaration_file() && source.contains("await");
         Self {
             lexer,
             current,
@@ -65,8 +99,9 @@ impl<'src> Parser<'src> {
             depth: 0,
             context,
             source_flags: 0,
-            type_probe: false,
-            type_probe_error: None,
+            track_await,
+            type_recovery: TypeRecovery::Strict,
+            failed_probes: HashSet::new(),
         }
     }
 
@@ -94,7 +129,7 @@ impl<'src> Parser<'src> {
             statements.push(statement);
         }
         self.check_token()?;
-        let external = self.source_flags & 8388608 != 0
+        let external = self.source_flags & node_flags::POSSIBLY_CONTAINS_IMPORT_META != 0
             || statements.iter().any(|id| self.external_statement(*id));
         if let Some(error) = deferred_error.filter(|_| !external) {
             return Err(error);
@@ -104,21 +139,29 @@ impl<'src> Parser<'src> {
         }
         let eof = self.token_node()?;
         let root = self.make(
-            "SourceFile",
+            SourceFile,
             0,
             self.lexer.src.len(),
             fields![
                 ("statements", statements.into()),
                 ("endOfFileToken", eof.into()),
                 ("text", self.lexer.src.into()),
-                ("languageVersion", Value::Number(99)),
+                ("languageVersion", Value::Number(target::LATEST)),
                 (
                     "languageVariant",
-                    Value::Number(u32::from(self.options.jsx)),
+                    Value::Number(if self.options.jsx {
+                        variant::JSX
+                    } else {
+                        variant::STANDARD
+                    }),
                 ),
                 (
                     "scriptKind",
-                    Value::Number(if self.options.jsx { 4 } else { 3 }),
+                    Value::Number(if self.options.jsx {
+                        script::TSX
+                    } else {
+                        script::TS
+                    }),
                 ),
                 ("isDeclarationFile", self.options.declaration_file().into()),
                 ("fileName", self.options.file_name.clone().into()),
@@ -150,13 +193,13 @@ impl<'src> Parser<'src> {
     fn external_statement(&self, id: NodeId) -> bool {
         let node = &self.nodes[id.0];
         matches!(
-            node.kind,
-            "ImportDeclaration"
-                | "ImportEqualsDeclaration"
-                | "ExportDeclaration"
-                | "ExportAssignment"
-                | "NamespaceExportDeclaration"
-        ) || matches!(node.field("modifiers"), Some(Value::Nodes(ids)) if ids.iter().any(|id| self.nodes[id.0].kind == "ExportKeyword"))
+            node.syntax_kind,
+            ImportDeclaration
+                | ImportEqualsDeclaration
+                | ExportDeclaration
+                | ExportAssignment
+                | NamespaceExportDeclaration
+        ) || matches!(node.field("modifiers"), Some(Value::Nodes(ids)) if ids.iter().any(|id| self.nodes[id.0].syntax_kind == ExportKeyword))
     }
     fn validate_pragmas(&self) -> Result<()> {
         let leading = &self.lexer.src[..self.current.start];
@@ -245,69 +288,97 @@ impl<'src> Parser<'src> {
     }
 
     fn possible_top_level_await(&self, id: NodeId) -> bool {
-        let mut pending = vec![id];
-        while let Some(id) = pending.pop() {
-            let node = &self.nodes[id.0];
-            if matches!(
-                node.kind,
-                "FunctionDeclaration"
-                    | "FunctionExpression"
-                    | "ArrowFunction"
-                    | "MethodDeclaration"
-                    | "GetAccessor"
-                    | "SetAccessor"
-                    | "Constructor"
-                    | "TypeAliasDeclaration"
-                    | "InterfaceDeclaration"
-                    | "ModuleDeclaration"
-                    | "ClassStaticBlockDeclaration"
-                    | "EnumDeclaration"
-                    | "ImportDeclaration"
-                    | "ImportEqualsDeclaration"
-                    | "ExportDeclaration"
-            ) {
-                continue;
-            }
-            if node.kind == "Identifier"
-                && node.flags & AWAIT == 0
-                && matches!(node.field("escapedText"), Some(Value::Text(text)) if text == "await")
-            {
-                return true;
-            }
-            for (key, value) in &node.fields {
-                // Type positions and class member bodies do not introduce top-level await.
-                if matches!(*key, "type" | "typeArguments" | "typeParameters")
-                    || *key == "members"
-                        && matches!(node.kind, "ClassDeclaration" | "ClassExpression")
-                    || *key == "name"
-                        && matches!(
-                            node.kind,
-                            "PropertyAccessExpression"
-                                | "PropertyAssignment"
-                                | "JsxAttribute"
-                                | "JsxNamespacedName"
-                        )
-                    || matches!(*key, "name" | "propertyName")
-                        && matches!(
-                            node.kind,
-                            "VariableDeclaration"
-                                | "BindingElement"
-                                | "ClassDeclaration"
-                                | "ClassExpression"
-                                | "PropertyDeclaration"
-                        )
-                        && matches!(value, Value::Node(id) if self.nodes[id.0].kind == "Identifier")
-                {
-                    continue;
-                }
-                match value {
-                    Value::Node(id) => pending.push(*id),
-                    Value::Nodes(ids) => pending.extend(ids),
-                    _ => {}
-                }
-            }
+        let node = &self.nodes[id.0];
+        node.flags & AWAIT == 0 && node.possible_top_level_await
+    }
+
+    /// Compute the expression summary while constructing syntax, rather than
+    /// rediscovering grammar scopes in a separate traversal during module reparse.
+    /// A method's computed name and decorators belong to its enclosing scope;
+    /// its body does not. Property initializers still trigger class reparsing,
+    /// although their grammar context continues to disallow await expressions.
+    fn await_summary(&self, kind: SyntaxKind, fields: &Fields<'src>) -> bool {
+        if !self.track_await {
+            return false;
         }
-        false
+        if kind == Identifier {
+            return matches!(fields.iter().find(|(key, _)| *key == "escapedText"),
+                Some((_, Value::Text(text))) if text == "await");
+        }
+        if (TypePredicate.number()..=ImportType.number()).contains(&kind.number())
+            || matches!(
+                kind,
+                TypeParameter
+                    | PropertySignature
+                    | MethodSignature
+                    | CallSignature
+                    | ConstructSignature
+                    | IndexSignature
+                    | TypeAliasDeclaration
+                    | InterfaceDeclaration
+                    | FunctionDeclaration
+                    | FunctionExpression
+                    | ArrowFunction
+                    | Constructor
+                    | ModuleDeclaration
+                    | EnumDeclaration
+                    | ImportDeclaration
+                    | ImportEqualsDeclaration
+                    | ImportClause
+                    | ImportSpecifier
+                    | NamespaceImport
+                    | NamedImports
+                    | ExportDeclaration
+                    | ExportSpecifier
+                    | NamedExports
+                    | NamespaceExport
+                    | NamespaceExportDeclaration
+            )
+        {
+            return false;
+        }
+        let method = matches!(kind, MethodDeclaration | GetAccessor | SetAccessor);
+        if method && !fields.iter().any(|(key, _)| *key == "body") {
+            return false;
+        }
+        if matches!(kind, ClassDeclaration | ClassExpression)
+            && matches!(fields.iter().find(|(key, _)| *key == "modifiers"),
+                Some((_, Value::Nodes(ids))) if ids.iter().any(|id| self.nodes[id.0].syntax_kind == DeclareKeyword))
+        {
+            return false;
+        }
+        fields.iter().any(|(key, value)| {
+            if matches!(*key, "type" | "typeArguments" | "typeParameters")
+                || method && *key == "body"
+            {
+                return false;
+            }
+            let child = |id: &NodeId| {
+                let node = &self.nodes[id.0];
+                // Identifier names may be spelled `await`; computed names and
+                // binding patterns retain the summaries of their expressions.
+                !(matches!(*key, "name" | "propertyName" | "label")
+                    && node.syntax_kind == Identifier)
+                    && node.possible_top_level_await
+            };
+            match value {
+                Value::Node(id) => child(id),
+                Value::Nodes(ids) => ids.iter().any(child),
+                _ => false,
+            }
+        })
+    }
+
+    fn refresh_await_summary(&mut self, id: NodeId) {
+        let node = &self.nodes[id.0];
+        let summary = self.await_summary(node.syntax_kind, &node.fields);
+        self.nodes[id.0].possible_top_level_await = summary;
+    }
+
+    fn set_kind(&mut self, id: NodeId, kind: SyntaxKind) {
+        self.nodes[id.0].syntax_kind = kind;
+        self.nodes[id.0].kind = kind.name();
+        self.refresh_await_summary(id);
     }
 
     fn reparse_top_level_await(&mut self, original: Vec<NodeId>) -> Result<Vec<NodeId>> {
@@ -414,23 +485,27 @@ impl<'src> Parser<'src> {
     }
     fn make(
         &mut self,
-        kind: &'static str,
+        kind: SyntaxKind,
         start: usize,
         end: usize,
         fields: impl Into<Fields<'src>>,
     ) -> NodeId {
         let id = NodeId(self.nodes.len());
+        let fields = fields.into();
+        let summary = self.await_summary(kind, &fields);
         self.nodes.push(Node {
-            kind,
+            kind: kind.name(),
+            syntax_kind: kind,
+            possible_top_level_await: summary,
             span: Span { start, end },
             flags: self.context.node_flags(),
-            fields: fields.into(),
+            fields,
         });
         id
     }
     fn finish(
         &mut self,
-        kind: &'static str,
+        kind: SyntaxKind,
         start: usize,
         fields: impl Into<Fields<'src>>,
     ) -> NodeId {
@@ -438,6 +513,7 @@ impl<'src> Parser<'src> {
     }
     fn field(&mut self, id: NodeId, key: &'static str, value: impl Into<Value<'src>>) {
         self.nodes[id.0].fields.push((key, value.into()));
+        self.refresh_await_summary(id);
     }
     fn expression_allow_in(&mut self) -> Result<NodeId> {
         self.in_context(self.context.with_in(true), Self::expression)
@@ -445,7 +521,8 @@ impl<'src> Parser<'src> {
     fn assignment_allow_in(&mut self) -> Result<NodeId> {
         self.in_context(self.context.with_in(true), Self::assignment_expression)
     }
-    /// Restore the enclosing grammar context on both success and syntax error.
+    /// Budget the callback frame and restore the enclosing grammar context on
+    /// both success and syntax error. Context callbacks can themselves recurse.
     /// Cursor movement, new nodes, and source-file flags belong to the parse.
     fn in_context<T>(
         &mut self,
@@ -453,7 +530,7 @@ impl<'src> Parser<'src> {
         parse: impl FnOnce(&mut Self) -> Result<T>,
     ) -> Result<T> {
         let enclosing = std::mem::replace(&mut self.context, context);
-        let result = parse(self);
+        let result = self.nest(parse);
         self.context = enclosing;
         result
     }
@@ -469,10 +546,43 @@ impl<'src> Parser<'src> {
     fn attempt<T>(&mut self, f: impl FnOnce(&mut Self) -> Result<T>) -> Option<T> {
         self.attempt_result(f).ok()
     }
+    /// Cache only failed interpretations; successful parses own fresh arena
+    /// nodes. Context and depth distinguish grammar and resource restrictions.
+    fn attempt_cached<T>(
+        &mut self,
+        kind: ProbeKind,
+        parse: impl FnOnce(&mut Self) -> Result<T>,
+    ) -> Option<T> {
+        let probe = FailedProbe {
+            kind,
+            offset: self.current.start,
+            context: self.context,
+            depth: self.depth,
+            recovering_types: self.recovering_types(),
+        };
+        if self.failed_probes.contains(&probe) {
+            return None;
+        }
+        let result = self.attempt(parse);
+        if result.is_none() {
+            self.failed_probes.insert(probe);
+        }
+        result
+    }
     fn attempt_result<T>(&mut self, f: impl FnOnce(&mut Self) -> Result<T>) -> Result<T> {
         let saved = self.checkpoint();
         let result = f(self);
         if result.is_err() {
+            self.restore(saved);
+        }
+        result
+    }
+    /// Commit only a recognized interpretation. Both ordinary non-matches and
+    /// syntax errors restore cursor, nodes, context, and recovery diagnostics.
+    fn probe<T>(&mut self, f: impl FnOnce(&mut Self) -> Result<Option<T>>) -> Result<Option<T>> {
+        let saved = self.checkpoint();
+        let result = f(self);
+        if !matches!(result, Ok(Some(_))) {
             self.restore(saved);
         }
         result
@@ -493,8 +603,7 @@ impl<'src> Parser<'src> {
             depth: self.depth,
             context: self.context,
             source_flags: self.source_flags,
-            type_probe: self.type_probe,
-            type_probe_error: self.type_probe_error.clone(),
+            type_recovery: self.type_recovery.clone(),
         }
     }
     fn restore(&mut self, saved: Checkpoint<'src>) {
@@ -505,22 +614,44 @@ impl<'src> Parser<'src> {
         self.depth = saved.depth;
         self.context = saved.context;
         self.source_flags = saved.source_flags;
-        self.type_probe = saved.type_probe;
-        self.type_probe_error = saved.type_probe_error;
+        self.type_recovery = saved.type_recovery;
     }
-    fn type_probe_diagnostic(&mut self, message: &str) {
-        if self.type_probe_error.is_none() {
-            self.type_probe_error = Some(self.error(message));
+    fn recovering_types(&self) -> bool {
+        matches!(self.type_recovery, TypeRecovery::Recovering(_))
+    }
+    fn record_type_error(&mut self, error: Diagnostic) {
+        if let TypeRecovery::Recovering(first @ None) = &mut self.type_recovery {
+            *first = Some(error);
         }
     }
-    fn type_delimiter(&mut self, raw: &str) -> Result<()> {
-        if self.type_probe && !self.at(raw) {
-            self.type_probe_diagnostic(&format!("Expected '{raw}'"));
-            Ok(())
+    fn type_recovery_diagnostic(&mut self, message: &str) {
+        self.record_type_error(self.error(message));
+    }
+    /// Recover missing type syntax inside a probe, returning its first diagnostic
+    /// and restoring the enclosing recovery mode on both success and error.
+    fn recover_types<T>(
+        &mut self,
+        f: impl FnOnce(&mut Self) -> Result<T>,
+    ) -> Result<(T, Option<Diagnostic>)> {
+        let enclosing = std::mem::replace(&mut self.type_recovery, TypeRecovery::Recovering(None));
+        let result = f(self);
+        let recovered = std::mem::replace(&mut self.type_recovery, enclosing);
+        let TypeRecovery::Recovering(error) = recovered else {
+            unreachable!()
+        };
+        result.map(|value| (value, error))
+    }
+    /// Consume an existing delimiter. In recovery mode a missing delimiter is
+    /// diagnosed and returns `false` without advancing the cursor.
+    fn type_delimiter(&mut self, raw: &str) -> Result<bool> {
+        if self.recovering_types() && !self.at(raw) {
+            self.type_recovery_diagnostic(&format!("Expected '{raw}'"));
+            Ok(false)
         } else {
-            self.expect(raw).map(|_| ())
+            self.expect(raw).map(|_| true)
         }
     }
+
     fn semi(&mut self) -> Result<()> {
         if self.eat(";")? || self.at("}") || self.current.kind == Kind::Eof || self.current.newline
         {
@@ -566,16 +697,16 @@ impl<'src> Parser<'src> {
         };
         let id = self.make(
             if token.kind == Kind::Private {
-                "PrivateIdentifier"
+                PrivateIdentifier
             } else {
-                "Identifier"
+                Identifier
             },
             token.full_start,
             token.end,
             fields![("escapedText", Value::Text(escaped))],
         );
         if token.kind == Kind::Word && token.raw.contains("\\u{") {
-            self.nodes[id.0].flags |= 256;
+            self.nodes[id.0].flags |= node_flags::IDENTIFIER_HAS_EXTENDED_UNICODE_ESCAPE;
         }
         Ok(id)
     }
@@ -597,13 +728,13 @@ impl<'src> Parser<'src> {
     fn literal_mode(&mut self, allow_invalid_escape: bool) -> Result<NodeId> {
         let token = self.bump()?;
         let kind = match token.kind {
-            Kind::Number if token.raw.ends_with('n') => "BigIntLiteral",
-            Kind::Number => "NumericLiteral",
-            Kind::String => "StringLiteral",
-            Kind::NoSubstitutionTemplate => "NoSubstitutionTemplateLiteral",
-            Kind::TemplateHead => "TemplateHead",
-            Kind::TemplateMiddle => "TemplateMiddle",
-            Kind::TemplateTail => "TemplateTail",
+            Kind::Number if token.raw.ends_with('n') => BigIntLiteral,
+            Kind::Number => NumericLiteral,
+            Kind::String => StringLiteral,
+            Kind::NoSubstitutionTemplate => NoSubstitutionTemplateLiteral,
+            Kind::TemplateHead => TemplateHead,
+            Kind::TemplateMiddle => TemplateMiddle,
+            Kind::TemplateTail => TemplateTail,
             _ => return Err(self.error("Expected literal")),
         };
         let mut template_flags = 0;
@@ -623,7 +754,7 @@ impl<'src> Parser<'src> {
             match decode_string(raw) {
                 Ok(value) => value,
                 Err(_) if allow_invalid_escape => {
-                    template_flags = 2048;
+                    template_flags = token_flags::CONTAINS_INVALID_ESCAPE;
                     raw.into()
                 }
                 Err(message) => {
@@ -639,7 +770,8 @@ impl<'src> Parser<'src> {
         };
         let mut fields = fields![("text", text)];
         if token.kind == Kind::String
-            || template_flags & 2048 == 0 && extended_unicode_escape(token.raw)
+            || template_flags & token_flags::CONTAINS_INVALID_ESCAPE == 0
+                && extended_unicode_escape(token.raw)
         {
             fields.push((
                 "hasExtendedUnicodeEscape",
@@ -649,25 +781,25 @@ impl<'src> Parser<'src> {
         if token.kind == Kind::Number && !token.raw.ends_with('n') {
             let lower = token.raw.to_ascii_lowercase();
             let mut flags = if lower.starts_with("0x") {
-                64
+                token_flags::HEX_SPECIFIER
             } else if lower.starts_with("0b") {
-                128
+                token_flags::BINARY_SPECIFIER
             } else if lower.starts_with("0o") {
-                256
+                token_flags::OCTAL_SPECIFIER
             } else if lower.contains('e') {
-                16
+                token_flags::SCIENTIFIC
             } else {
                 0
             };
             if token.raw.contains('_') {
-                flags |= 512;
+                flags |= token_flags::CONTAINS_SEPARATOR;
             }
             fields.push(("numericLiteralFlags", Value::Number(flags)));
         }
         if let Some(raw) = raw_text {
             let mut chars = token.raw.chars();
             while let Some(c) = chars.next() {
-                if template_flags & 2048 != 0 {
+                if template_flags & token_flags::CONTAINS_INVALID_ESCAPE != 0 {
                     break;
                 }
                 if c != '\\' {
@@ -676,12 +808,12 @@ impl<'src> Parser<'src> {
                 match chars.next() {
                     Some('u') => {
                         template_flags |= if chars.clone().next() == Some('{') {
-                            8
+                            token_flags::EXTENDED_UNICODE_ESCAPE
                         } else {
-                            1024
+                            token_flags::UNICODE_ESCAPE
                         };
                     }
-                    Some('x') => template_flags |= 4096,
+                    Some('x') => template_flags |= token_flags::HEX_ESCAPE,
                     _ => {}
                 }
             }
@@ -696,7 +828,7 @@ impl<'src> Parser<'src> {
             let expression = self.expression_allow_in()?;
             self.expect("]")?;
             Ok(self.finish(
-                "ComputedPropertyName",
+                ComputedPropertyName,
                 start,
                 fields![("expression", expression.into())],
             ))
@@ -726,7 +858,7 @@ impl<'src> Parser<'src> {
                     p.postfix_expression(false)
                 })?;
                 modifiers.push(self.finish(
-                    "Decorator",
+                    Decorator,
                     start,
                     fields![("expression", expression.into())],
                 ));
@@ -780,7 +912,7 @@ impl<'src> Parser<'src> {
                 || self.at("static")
                     && modifiers
                         .iter()
-                        .any(|id| self.nodes[id.0].kind == "StaticKeyword")
+                        .any(|id| self.nodes[id.0].syntax_kind == StaticKeyword)
             {
                 break;
             }
@@ -793,10 +925,23 @@ impl<'src> Parser<'src> {
             self.field(id, "modifiers", modifiers);
         }
     }
+    fn prepend_modifiers(&mut self, id: NodeId, mut modifiers: Vec<NodeId>) {
+        if let Some((_, Value::Nodes(existing))) = self.nodes[id.0]
+            .fields
+            .iter_mut()
+            .find(|(key, _)| *key == "modifiers")
+        {
+            modifiers.append(existing);
+            *existing = modifiers;
+            self.refresh_await_summary(id);
+        } else {
+            self.attach_modifiers(id, modifiers);
+        }
+    }
     fn ambient_modifiers(&mut self, modifiers: &[NodeId]) {
         if modifiers
             .iter()
-            .any(|id| self.nodes[id.0].kind == "DeclareKeyword")
+            .any(|id| self.nodes[id.0].syntax_kind == DeclareKeyword)
         {
             self.context = self.context.with(AMBIENT);
             for modifier in modifiers {
@@ -1099,98 +1244,98 @@ fn radix_number(digits: &str, bits_per_digit: usize) -> f64 {
     (top as f64) * 2.0f64.powi(significant_bits as i32 - 53)
 }
 
-fn token_kind(raw: &str, kind: Kind) -> &'static str {
+fn token_kind(raw: &str, kind: Kind) -> SyntaxKind {
     match raw {
-        "" if kind == Kind::Eof => "EndOfFileToken",
-        "{" => "OpenBraceToken",
-        "}" => "CloseBraceToken",
-        "(" => "OpenParenToken",
-        ")" => "CloseParenToken",
-        "[" => "OpenBracketToken",
-        "]" => "CloseBracketToken",
-        "." => "DotToken",
-        "..." => "DotDotDotToken",
-        ";" => "SemicolonToken",
-        "," => "CommaToken",
-        "?." => "QuestionDotToken",
-        "<" => "LessThanToken",
-        ">" => "GreaterThanToken",
-        "<=" => "LessThanEqualsToken",
-        ">=" => "GreaterThanEqualsToken",
-        "==" => "EqualsEqualsToken",
-        "!=" => "ExclamationEqualsToken",
-        "===" => "EqualsEqualsEqualsToken",
-        "!==" => "ExclamationEqualsEqualsToken",
-        "=>" => "EqualsGreaterThanToken",
-        "+" => "PlusToken",
-        "-" => "MinusToken",
-        "*" => "AsteriskToken",
-        "**" => "AsteriskAsteriskToken",
-        "/" => "SlashToken",
-        "%" => "PercentToken",
-        "++" => "PlusPlusToken",
-        "--" => "MinusMinusToken",
-        "<<" => "LessThanLessThanToken",
-        ">>" => "GreaterThanGreaterThanToken",
-        ">>>" => "GreaterThanGreaterThanGreaterThanToken",
-        "&" => "AmpersandToken",
-        "|" => "BarToken",
-        "^" => "CaretToken",
-        "!" => "ExclamationToken",
-        "~" => "TildeToken",
-        "&&" => "AmpersandAmpersandToken",
-        "||" => "BarBarToken",
-        "?" => "QuestionToken",
-        ":" => "ColonToken",
-        "@" => "AtToken",
-        "??" => "QuestionQuestionToken",
-        "=" => "EqualsToken",
-        "+=" => "PlusEqualsToken",
-        "-=" => "MinusEqualsToken",
-        "*=" => "AsteriskEqualsToken",
-        "**=" => "AsteriskAsteriskEqualsToken",
-        "/=" => "SlashEqualsToken",
-        "%=" => "PercentEqualsToken",
-        "<<=" => "LessThanLessThanEqualsToken",
-        ">>=" => "GreaterThanGreaterThanEqualsToken",
-        ">>>=" => "GreaterThanGreaterThanGreaterThanEqualsToken",
-        "&=" => "AmpersandEqualsToken",
-        "|=" => "BarEqualsToken",
-        "^=" => "CaretEqualsToken",
-        "||=" => "BarBarEqualsToken",
-        "&&=" => "AmpersandAmpersandEqualsToken",
-        "??=" => "QuestionQuestionEqualsToken",
-        "abstract" => "AbstractKeyword",
-        "accessor" => "AccessorKeyword",
-        "as" => "AsKeyword",
-        "asserts" => "AssertsKeyword",
-        "async" => "AsyncKeyword",
-        "await" => "AwaitKeyword",
-        "const" => "ConstKeyword",
-        "declare" => "DeclareKeyword",
-        "default" => "DefaultKeyword",
-        "export" => "ExportKeyword",
-        "extends" => "ExtendsKeyword",
-        "implements" => "ImplementsKeyword",
-        "import" => "ImportKeyword",
-        "intrinsic" => "IntrinsicKeyword",
-        "in" => "InKeyword",
-        "out" => "OutKeyword",
-        "instanceof" => "InstanceOfKeyword",
-        "new" => "NewKeyword",
-        "override" => "OverrideKeyword",
-        "private" => "PrivateKeyword",
-        "protected" => "ProtectedKeyword",
-        "public" => "PublicKeyword",
-        "readonly" => "ReadonlyKeyword",
-        "static" => "StaticKeyword",
-        "this" => "ThisKeyword",
-        "super" => "SuperKeyword",
-        "null" => "NullKeyword",
-        "true" => "TrueKeyword",
-        "false" => "FalseKeyword",
-        "satisfies" => "SatisfiesKeyword",
-        _ => "Identifier",
+        "" if kind == Kind::Eof => EndOfFileToken,
+        "{" => OpenBraceToken,
+        "}" => CloseBraceToken,
+        "(" => OpenParenToken,
+        ")" => CloseParenToken,
+        "[" => OpenBracketToken,
+        "]" => CloseBracketToken,
+        "." => DotToken,
+        "..." => DotDotDotToken,
+        ";" => SemicolonToken,
+        "," => CommaToken,
+        "?." => QuestionDotToken,
+        "<" => LessThanToken,
+        ">" => GreaterThanToken,
+        "<=" => LessThanEqualsToken,
+        ">=" => GreaterThanEqualsToken,
+        "==" => EqualsEqualsToken,
+        "!=" => ExclamationEqualsToken,
+        "===" => EqualsEqualsEqualsToken,
+        "!==" => ExclamationEqualsEqualsToken,
+        "=>" => EqualsGreaterThanToken,
+        "+" => PlusToken,
+        "-" => MinusToken,
+        "*" => AsteriskToken,
+        "**" => AsteriskAsteriskToken,
+        "/" => SlashToken,
+        "%" => PercentToken,
+        "++" => PlusPlusToken,
+        "--" => MinusMinusToken,
+        "<<" => LessThanLessThanToken,
+        ">>" => GreaterThanGreaterThanToken,
+        ">>>" => GreaterThanGreaterThanGreaterThanToken,
+        "&" => AmpersandToken,
+        "|" => BarToken,
+        "^" => CaretToken,
+        "!" => ExclamationToken,
+        "~" => TildeToken,
+        "&&" => AmpersandAmpersandToken,
+        "||" => BarBarToken,
+        "?" => QuestionToken,
+        ":" => ColonToken,
+        "@" => AtToken,
+        "??" => QuestionQuestionToken,
+        "=" => EqualsToken,
+        "+=" => PlusEqualsToken,
+        "-=" => MinusEqualsToken,
+        "*=" => AsteriskEqualsToken,
+        "**=" => AsteriskAsteriskEqualsToken,
+        "/=" => SlashEqualsToken,
+        "%=" => PercentEqualsToken,
+        "<<=" => LessThanLessThanEqualsToken,
+        ">>=" => GreaterThanGreaterThanEqualsToken,
+        ">>>=" => GreaterThanGreaterThanGreaterThanEqualsToken,
+        "&=" => AmpersandEqualsToken,
+        "|=" => BarEqualsToken,
+        "^=" => CaretEqualsToken,
+        "||=" => BarBarEqualsToken,
+        "&&=" => AmpersandAmpersandEqualsToken,
+        "??=" => QuestionQuestionEqualsToken,
+        "abstract" => AbstractKeyword,
+        "accessor" => AccessorKeyword,
+        "as" => AsKeyword,
+        "asserts" => AssertsKeyword,
+        "async" => AsyncKeyword,
+        "await" => AwaitKeyword,
+        "const" => ConstKeyword,
+        "declare" => DeclareKeyword,
+        "default" => DefaultKeyword,
+        "export" => ExportKeyword,
+        "extends" => ExtendsKeyword,
+        "implements" => ImplementsKeyword,
+        "import" => ImportKeyword,
+        "intrinsic" => IntrinsicKeyword,
+        "in" => InKeyword,
+        "out" => OutKeyword,
+        "instanceof" => InstanceOfKeyword,
+        "new" => NewKeyword,
+        "override" => OverrideKeyword,
+        "private" => PrivateKeyword,
+        "protected" => ProtectedKeyword,
+        "public" => PublicKeyword,
+        "readonly" => ReadonlyKeyword,
+        "static" => StaticKeyword,
+        "this" => ThisKeyword,
+        "super" => SuperKeyword,
+        "null" => NullKeyword,
+        "true" => TrueKeyword,
+        "false" => FalseKeyword,
+        "satisfies" => SatisfiesKeyword,
+        _ => Identifier,
     }
 }
 

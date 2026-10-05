@@ -16,10 +16,23 @@ For example, a binary expression has `left`, `operatorToken`, and `right`; a var
 
 This is a serializable **syntax projection**, not a dump of an entire bound compiler object. It omits `parent` links, object IDs, transform/modifier caches, symbols, flow nodes, compiler maps, JSDoc trees, comment directives, and reference/pragma metadata. `HasAggregatedChildData` (2097152) is a lazy compiler cache flag and is excluded from differential comparisons. Arrays serialize as ordinary JSON arrays, as compiler `NodeArray` objects do through `JSON.stringify`. Import attributes use both `attributes` and the compiler's `assertClause` compatibility alias; both serialize the same child.
 
-In Rust, `Node.kind` is the readable syntax name. `Node.span` and `Diagnostic.span` are **UTF-8 byte** ranges; use `Ast::utf16_offset` to convert a byte offset to the JSON convention. `Ast::text` includes the node's preceding trivia. `Diagnostic::line_column` converts an error to one-based line and UTF-16 column, treating CRLF as one line break and recognizing CR, LF, U+2028, and U+2029.
+In Rust, `Node.kind` is the readable syntax name. `Node.span` and `Diagnostic.span` are **UTF-8 byte** ranges; use `Ast::utf16_offset` to convert a byte boundary within the original source to the JSON convention. Offsets outside the source or inside a UTF-8 character panic. `Ast::text` includes the node's preceding trivia. `Diagnostic::line_column` takes the source that produced the diagnostic and converts an error to one-based line and UTF-16 column, treating CRLF as one line break and recognizing CR, LF, U+2028, and U+2029.
 
-`Node.fields` uses the public `Fields` alias, a small vector with one entry stored inline. Iterate over `(name, Value)` pairs or use `Node::field(name)` for lookup. Child links are arena `NodeId` values; `Ast::node(id)` returns the child and `Ast::view(id)` provides its nested serde view.
+`Ast` is immutable after parsing, preserving its child links, source spans, and cached position index. Read its source with `source()`, its allocated nodes with `nodes()`, and its root link with `root_id()`. These accessors replace the formerly mutable public `source`, `nodes`, and `root` fields.
+
+`Node.fields` uses the public `Fields` alias, a small vector with one entry stored inline. Iterate over `(name, Value)` pairs or use `Node::field(name)` for lookup. Child links are arena `NodeId` values; `Ast::node(id)` returns the child and `Ast::view(id)` provides its nested serde view. An ID must come from the same arena; its numeric index alone does not establish ownership. Out-of-bounds lookups panic.
 
 `Ast::write_json(writer, pretty)` is the recommended writer. It traverses the arena iteratively and preserves JavaScript strings containing unpaired UTF-16 surrogates as `\uXXXX` escapes. Those strings are `Value::Utf16` in Rust. `serde::Serialize` is also supported for normal-sized trees whose strings are valid Unicode; a serde serializer may recurse deeply or reject unpaired surrogates. The arena itself can be dropped without recursively traversing child nodes.
 
 Arena nodes can include nodes made while disambiguating or reparsing syntax that are not reachable from the final root. Traverse from `Ast::root` using child fields when inspecting the parsed tree. JSON always traverses the final root.
+
+## Compiler schema
+
+Node construction uses a private typed `SyntaxKind`; serializers obtain its numeric value directly. Syntax kinds, node flags, scanner flags, and source-file metadata constants are generated together from the pinned TypeScript 6.0.3 API. The same generator writes [syntax-kinds.json](syntax-kinds.json), including compiler aliases. It refuses a different compiler version and supports a read-only drift check:
+
+```sh
+TYPE_SCRIPT_API=/path/to/typescript/lib/typescript.js \
+  node tools/generate-compiler-schema.mjs
+TYPE_SCRIPT_API=/path/to/typescript/lib/typescript.js \
+  node tools/generate-compiler-schema.mjs --check
+```

@@ -6,9 +6,11 @@ impl<'src> Parser<'src> {
             p.nest(|p| p.conditional_type(!p.context.contains(DISALLOW_CONDITIONAL_TYPES)))
         })
     }
+    // Each caller budgets its recursive type entry. An additional guard here
+    // would charge twice for the same entry, including conditional false arms.
     fn conditional_type(&mut self, conditional: bool) -> Result<NodeId> {
         if self.function_type_ahead() {
-            if let Some(node) = self.attempt(Self::function_type) {
+            if let Some(node) = self.attempt_cached(ProbeKind::FunctionType, Self::function_type) {
                 return Ok(node);
             }
         }
@@ -23,7 +25,7 @@ impl<'src> Parser<'src> {
             self.expect(":")?;
             let no = self.type_node()?;
             Ok(self.finish(
-                "ConditionalType",
+                ConditionalType,
                 self.start(check),
                 fields![
                     ("checkType", check.into()),
@@ -36,6 +38,7 @@ impl<'src> Parser<'src> {
             Ok(check)
         }
     }
+
     fn union_type(&mut self) -> Result<NodeId> {
         let start = self.pos();
         let leading = self.eat("|")?;
@@ -44,19 +47,27 @@ impl<'src> Parser<'src> {
             return Ok(first);
         }
         let mut types = vec![first];
-        if leading && matches!(self.nodes[first.0].kind, "FunctionType" | "ConstructorType") {
+        if leading
+            && matches!(
+                self.nodes[first.0].syntax_kind,
+                FunctionType | ConstructorType
+            )
+        {
             return Err(self.error("Function or constructor type in a union must be parenthesized"));
         }
         while self.eat("|")? {
             let node = self.intersection_type()?;
-            if matches!(self.nodes[node.0].kind, "FunctionType" | "ConstructorType") {
+            if matches!(
+                self.nodes[node.0].syntax_kind,
+                FunctionType | ConstructorType
+            ) {
                 return Err(
                     self.error("Function or constructor type in a union must be parenthesized")
                 );
             }
             types.push(node);
         }
-        Ok(self.finish("UnionType", start, fields![("types", types.into())]))
+        Ok(self.finish(UnionType, start, fields![("types", types.into())]))
     }
     fn intersection_type(&mut self) -> Result<NodeId> {
         let start = self.pos();
@@ -66,21 +77,29 @@ impl<'src> Parser<'src> {
             return Ok(first);
         }
         let mut types = vec![first];
-        if leading && matches!(self.nodes[first.0].kind, "FunctionType" | "ConstructorType") {
+        if leading
+            && matches!(
+                self.nodes[first.0].syntax_kind,
+                FunctionType | ConstructorType
+            )
+        {
             return Err(
                 self.error("Function or constructor type in an intersection must be parenthesized")
             );
         }
         while self.eat("&")? {
             let node = self.type_operator()?;
-            if matches!(self.nodes[node.0].kind, "FunctionType" | "ConstructorType") {
+            if matches!(
+                self.nodes[node.0].syntax_kind,
+                FunctionType | ConstructorType
+            ) {
                 return Err(self.error(
                     "Function or constructor type in an intersection must be parenthesized",
                 ));
             }
             types.push(node);
         }
-        Ok(self.finish("IntersectionType", start, fields![("types", types.into())]))
+        Ok(self.finish(IntersectionType, start, fields![("types", types.into())]))
     }
     fn type_operator(&mut self) -> Result<NodeId> {
         let start = self.pos();
@@ -88,12 +107,12 @@ impl<'src> Parser<'src> {
             let operator = self.bump()?;
             let type_node = self.nest(Self::type_operator)?;
             let number = match operator.raw {
-                "keyof" => 143,
-                "unique" => 158,
-                _ => 148,
+                "keyof" => KeyOfKeyword.number(),
+                "unique" => UniqueKeyword.number(),
+                _ => ReadonlyKeyword.number(),
             };
             return Ok(self.finish(
-                "TypeOperator",
+                TypeOperator,
                 start,
                 fields![
                     ("operator", Value::Number(number)),
@@ -124,9 +143,9 @@ impl<'src> Parser<'src> {
                     fields.push(("constraint", constraint.into()));
                 }
             }
-            let parameter = self.finish("TypeParameter", parameter_start, fields);
+            let parameter = self.finish(TypeParameter, parameter_start, fields);
             return Ok(self.finish(
-                "InferType",
+                InferType,
                 start,
                 fields![("typeParameter", parameter.into())],
             ));
@@ -141,9 +160,9 @@ impl<'src> Parser<'src> {
         while !self.current.newline {
             if self.at("!") || self.at("?") && !self.type_start(self.peek()) {
                 let kind = if self.at("!") {
-                    "JSDocNonNullableType"
+                    JSDocNonNullableType
                 } else {
-                    "JSDocNullableType"
+                    JSDocNullableType
                 };
                 self.bump()?;
                 node = self.finish(
@@ -159,7 +178,7 @@ impl<'src> Parser<'src> {
             self.bump()?;
             if self.eat("]")? {
                 node = self.finish(
-                    "ArrayType",
+                    ArrayType,
                     self.start(node),
                     fields![("elementType", node.into())],
                 );
@@ -168,7 +187,7 @@ impl<'src> Parser<'src> {
                 let index = self.type_node()?;
                 self.expect("]")?;
                 node = self.finish(
-                    "IndexedAccessType",
+                    IndexedAccessType,
                     self.start(node),
                     fields![("objectType", node.into()), ("indexType", index.into())],
                 );
@@ -202,17 +221,20 @@ impl<'src> Parser<'src> {
             || token.raw == "-" && self.peek_second().kind == Kind::Number
     }
     fn primary_type(&mut self) -> Result<NodeId> {
-        self.check_token()?;
-        let start = self.pos();
-        if self.function_type_ahead() {
-            if let Some(node) = self.attempt(Self::function_type) {
-                return Ok(node);
+        self.nest(|p| {
+            p.check_token()?;
+            let start = p.pos();
+            if p.function_type_ahead() {
+                if let Some(node) = p.attempt_cached(ProbeKind::FunctionType, Self::function_type) {
+                    return Ok(node);
+                }
             }
-        }
-        self.in_context(self.context.without(DISALLOW_CONDITIONAL_TYPES), |p| {
-            p.primary_type_inner(start)
+            p.in_context(p.context.without(DISALLOW_CONDITIONAL_TYPES), |p| {
+                p.primary_type_inner(start)
+            })
         })
     }
+
     fn function_type_ahead(&self) -> bool {
         if self.at("<") || self.at("new") || self.at("abstract") && self.peek_at("new") {
             return true;
@@ -274,13 +296,13 @@ impl<'src> Parser<'src> {
                 self.split_type_token();
             }
             self.bump()?;
-            return Ok(self.finish("JSDocAllType", start, vec![]));
+            return Ok(self.finish(JSDocAllType, start, vec![]));
         }
         if self.at("!") {
             self.bump()?;
             let type_node = self.nest(Self::primary_type)?;
             return Ok(self.finish(
-                "JSDocNonNullableType",
+                JSDocNonNullableType,
                 start,
                 fields![("type", type_node.into()), ("postfix", false.into())],
             ));
@@ -295,7 +317,7 @@ impl<'src> Parser<'src> {
             }
             let type_node = self.type_node()?;
             return Ok(self.finish(
-                "JSDocNullableType",
+                JSDocNullableType,
                 start,
                 fields![("type", type_node.into()), ("postfix", false.into())],
             ));
@@ -305,11 +327,11 @@ impl<'src> Parser<'src> {
         }
         if self.at("this") {
             self.bump()?;
-            let name = self.finish("ThisType", start, vec![]);
+            let name = self.finish(ThisType, start, vec![]);
             if !self.current.newline && self.eat("is")? {
                 let type_node = self.type_node()?;
                 return Ok(self.finish(
-                    "TypePredicate",
+                    TypePredicate,
                     start,
                     fields![("parameterName", name.into()), ("type", type_node.into())],
                 ));
@@ -321,7 +343,7 @@ impl<'src> Parser<'src> {
             let name = if self.at("this") {
                 let start = self.pos();
                 self.bump()?;
-                self.finish("ThisType", start, vec![])
+                self.finish(ThisType, start, vec![])
             } else {
                 self.identifier()?
             };
@@ -329,13 +351,13 @@ impl<'src> Parser<'src> {
             if self.eat("is")? {
                 fields.push(("type", self.type_node()?.into()));
             }
-            return Ok(self.finish("TypePredicate", start, fields));
+            return Ok(self.finish(TypePredicate, start, fields));
         }
         if self.eat("(")? {
             let type_node = self.type_node()?;
             self.expect(")")?;
             let id = self.finish(
-                "ParenthesizedType",
+                ParenthesizedType,
                 start,
                 fields![("type", type_node.into())],
             );
@@ -347,7 +369,7 @@ impl<'src> Parser<'src> {
                 return Ok(mapped);
             }
             let members = self.type_members()?;
-            return Ok(self.finish("TypeLiteral", start, fields![("members", members.into())]));
+            return Ok(self.finish(TypeLiteral, start, fields![("members", members.into())]));
         }
         if self.eat("[")? {
             let mut elements = vec![];
@@ -361,7 +383,7 @@ impl<'src> Parser<'src> {
                     self.optional_token("?", "questionToken", &mut fields)?;
                     self.expect(":")?;
                     fields.push(("type", self.tuple_element_type()?.into()));
-                    self.finish("NamedTupleMember", pos, fields)
+                    self.finish(NamedTupleMember, pos, fields)
                 } else {
                     self.tuple_element_type()?
                 };
@@ -371,7 +393,7 @@ impl<'src> Parser<'src> {
                 }
             }
             self.expect("]")?;
-            return Ok(self.finish("TupleType", start, fields![("elements", elements.into())]));
+            return Ok(self.finish(TupleType, start, fields![("elements", elements.into())]));
         }
         if self.at("typeof") {
             self.bump()?;
@@ -383,7 +405,7 @@ impl<'src> Parser<'src> {
             if !self.current.newline && self.at("<") {
                 fields.push(("typeArguments", self.type_arguments()?.into()));
             }
-            return Ok(self.finish("TypeQuery", start, fields));
+            return Ok(self.finish(TypeQuery, start, fields));
         }
         if self.at("import") {
             return self.import_type(start, false);
@@ -400,45 +422,46 @@ impl<'src> Parser<'src> {
             let literal = if self.eat("-")? {
                 let operand = self.literal()?;
                 self.finish(
-                    "PrefixUnaryExpression",
+                    PrefixUnaryExpression,
                     start,
-                    fields![("operator", Value::Number(41)), ("operand", operand.into())],
+                    fields![
+                        ("operator", Value::Number(MinusToken.number())),
+                        ("operand", operand.into())
+                    ],
                 )
             } else if matches!(self.current.raw, "true" | "false" | "null") {
                 self.token_node()?
             } else {
                 self.literal()?
             };
-            return Ok(self.finish("LiteralType", start, fields![("literal", literal.into())]));
+            return Ok(self.finish(LiteralType, start, fields![("literal", literal.into())]));
         }
         let keyword = match self.current.raw {
-            "any" => Some("AnyKeyword"),
-            "unknown" => Some("UnknownKeyword"),
-            "number" => Some("NumberKeyword"),
-            "object" => Some("ObjectKeyword"),
-            "boolean" => Some("BooleanKeyword"),
-            "bigint" => Some("BigIntKeyword"),
-            "string" => Some("StringKeyword"),
-            "symbol" => Some("SymbolKeyword"),
-            "void" => Some("VoidKeyword"),
-            "undefined" => Some("UndefinedKeyword"),
-            "never" => Some("NeverKeyword"),
+            "any" => Some(AnyKeyword),
+            "unknown" => Some(UnknownKeyword),
+            "number" => Some(NumberKeyword),
+            "object" => Some(ObjectKeyword),
+            "boolean" => Some(BooleanKeyword),
+            "bigint" => Some(BigIntKeyword),
+            "string" => Some(StringKeyword),
+            "symbol" => Some(SymbolKeyword),
+            "void" => Some(VoidKeyword),
+            "undefined" => Some(UndefinedKeyword),
+            "never" => Some(NeverKeyword),
             _ => None,
         };
         if let Some(kind) = keyword {
-            if kind == "VoidKeyword" || !self.peek_at(".") {
+            if kind == VoidKeyword || !self.peek_at(".") {
                 self.bump()?;
                 return Ok(self.finish(kind, start, vec![]));
             }
         }
         let name = match self.entity_name() {
             Ok(name) => name,
-            Err(error) if self.type_probe => {
-                if self.type_probe_error.is_none() {
-                    self.type_probe_error = Some(error);
-                }
+            Err(error) if self.recovering_types() => {
+                self.record_type_error(error);
                 self.make(
-                    "Identifier",
+                    Identifier,
                     self.pos(),
                     self.pos(),
                     fields![("escapedText", "".into())],
@@ -450,8 +473,10 @@ impl<'src> Parser<'src> {
         if !self.current.newline && self.type_open() {
             fields.push(("typeArguments", self.type_arguments()?.into()));
         }
-        Ok(self.finish("TypeReference", start, fields))
+        Ok(self.finish(TypeReference, start, fields))
     }
+    /// Retain the first character as the current token and return the suffix to
+    /// the lexer. The next bump consumes that prefix and scans the remainder.
     fn split_type_token(&mut self) {
         self.current.end = self.current.start + 1;
         self.current.raw = &self.lexer.src[self.current.start..self.current.end];
@@ -474,13 +499,13 @@ impl<'src> Parser<'src> {
         let start = self.pos();
         if self.eat("...")? {
             let type_node = self.type_node()?;
-            return Ok(self.finish("RestType", start, fields![("type", type_node.into())]));
+            return Ok(self.finish(RestType, start, fields![("type", type_node.into())]));
         }
         let id = self.type_node()?;
-        if self.nodes[id.0].kind == "JSDocNullableType"
+        if self.nodes[id.0].syntax_kind == JSDocNullableType
             && matches!(self.nodes[id.0].field("postfix"), Some(Value::Bool(true)))
         {
-            self.nodes[id.0].kind = "OptionalType";
+            self.set_kind(id, OptionalType);
             self.nodes[id.0].fields.retain(|(key, _)| *key != "postfix");
         }
         Ok(id)
@@ -502,9 +527,9 @@ impl<'src> Parser<'src> {
             fields.push(("type", p.return_type()?.into()));
             let id = p.finish(
                 if constructor {
-                    "ConstructorType"
+                    ConstructorType
                 } else {
-                    "FunctionType"
+                    FunctionType
                 },
                 start,
                 fields,
@@ -534,7 +559,7 @@ impl<'src> Parser<'src> {
             if self.eat("is")? {
                 fields.push(("type", self.type_node()?.into()));
             }
-            return Ok(self.finish("TypePredicate", start, fields));
+            return Ok(self.finish(TypePredicate, start, fields));
         }
         self.type_node()
     }
@@ -552,7 +577,7 @@ impl<'src> Parser<'src> {
             }
             let right = self.identifier()?;
             name = self.finish(
-                "QualifiedName",
+                QualifiedName,
                 self.start(name),
                 fields![("left", name.into()), ("right", right.into())],
             );
@@ -560,28 +585,29 @@ impl<'src> Parser<'src> {
         Ok(name)
     }
     pub(super) fn type_arguments(&mut self) -> Result<Vec<NodeId>> {
-        if self.at("<<") {
-            self.current.end = self.current.start + 1;
-            self.current.raw = &self.lexer.src[self.current.start..self.current.end];
-            self.lexer.pos = self.current.end;
-        }
-        self.expect("<")?;
-        let mut arguments = vec![];
-        if !self.type_close() {
-            arguments.push(self.type_node()?);
-        }
-        while self.eat(",")? {
-            if self.type_close() {
-                break;
+        self.nest(|p| {
+            if p.at("<<") {
+                p.split_type_token();
             }
-            arguments.push(self.type_node()?);
-        }
-        if self.type_probe && !self.type_close() {
-            return Err(self.error("Expected '>'"));
-        }
-        self.expect_type_close()?;
-        Ok(arguments)
+            p.expect("<")?;
+            let mut arguments = vec![];
+            if !p.type_close() {
+                arguments.push(p.type_node()?);
+            }
+            while p.eat(",")? {
+                if p.type_close() {
+                    break;
+                }
+                arguments.push(p.type_node()?);
+            }
+            if p.recovering_types() && !p.type_close() {
+                return Err(p.error("Expected '>'"));
+            }
+            p.expect_type_close()?;
+            Ok(arguments)
+        })
     }
+
     pub(super) fn type_open(&self) -> bool {
         self.at("<") || self.at("<<")
     }
@@ -589,7 +615,7 @@ impl<'src> Parser<'src> {
         self.expect("<")?;
         let mut parameters = vec![];
         while !self.type_close() {
-            if self.type_probe
+            if self.recovering_types()
                 && (self.current.kind == Kind::Eof
                     || matches!(self.current.raw, "(" | "{" | "extends" | "implements"))
             {
@@ -605,7 +631,7 @@ impl<'src> Parser<'src> {
             if self.eat("=")? {
                 fields.push(("default", self.type_node()?.into()));
             }
-            let id = self.finish("TypeParameter", start, fields);
+            let id = self.finish(TypeParameter, start, fields);
             self.attach_modifiers(id, modifiers);
             parameters.push(id);
             if !self.eat(",")? || self.type_close() {
@@ -618,10 +644,12 @@ impl<'src> Parser<'src> {
     fn type_close(&self) -> bool {
         self.current.raw.starts_with('>')
     }
-    pub(super) fn expect_type_close(&mut self) -> Result<()> {
+    /// Consume one '>' even from a compound token. Missing recovery delimiters
+    /// return false without advancing; strict parsing returns a diagnostic.
+    pub(super) fn expect_type_close(&mut self) -> Result<bool> {
         if self.at(">") {
             self.bump()?;
-            return Ok(());
+            return Ok(true);
         }
         if self.type_close() {
             self.end = self.current.start + 1;
@@ -629,18 +657,18 @@ impl<'src> Parser<'src> {
             self.current.full_start = self.current.start;
             self.current.raw = &self.current.raw[1..];
             self.current.newline = false;
-            Ok(())
+            Ok(true)
         } else {
-            if self.type_probe {
-                self.type_probe_diagnostic("Expected '>'");
-                Ok(())
+            if self.recovering_types() {
+                self.type_recovery_diagnostic("Expected '>'");
+                Ok(false)
             } else {
                 Err(self.error("Expected '>'"))
             }
         }
     }
     fn import_type(&mut self, start: usize, query: bool) -> Result<NodeId> {
-        self.source_flags |= 4194304;
+        self.source_flags |= node_flags::POSSIBLY_CONTAINS_DYNAMIC_IMPORT;
         self.expect("import")?;
         self.expect("(")?;
         let argument = self.type_node()?;
@@ -662,51 +690,54 @@ impl<'src> Parser<'src> {
         if self.type_open() {
             fields.push(("typeArguments", self.type_arguments()?.into()));
         }
-        Ok(self.finish("ImportType", start, fields))
+        Ok(self.finish(ImportType, start, fields))
     }
     fn mapped_type(&mut self) -> Result<NodeId> {
-        let start = self.pos();
-        self.expect("{")?;
-        let mut fields: Fields<'src> = Fields::new();
-        if self.at("+") || self.at("-") {
-            fields.push(("readonlyToken", self.token_node()?.into()));
-            self.expect("readonly")?;
-        } else {
-            self.optional_token("readonly", "readonlyToken", &mut fields)?;
-        }
-        self.expect("[")?;
-        let parameter_start = self.pos();
-        let name = self.identifier()?;
-        self.expect("in")?;
-        let constraint = self.type_node()?;
-        let parameter = self.finish(
-            "TypeParameter",
-            parameter_start,
-            fields![("name", name.into()), ("constraint", constraint.into())],
-        );
-        fields.push(("typeParameter", parameter.into()));
-        if self.eat("as")? {
-            fields.push(("nameType", self.type_node()?.into()));
-        }
-        self.expect("]")?;
-        if self.at("+") || self.at("-") {
-            fields.push(("questionToken", self.token_node()?.into()));
-            self.expect("?")?;
-        } else {
-            self.optional_token("?", "questionToken", &mut fields)?;
-        }
-        if self.eat(":")? {
-            fields.push(("type", self.type_node()?.into()));
-        }
-        self.eat(";")?;
-        let mut members = vec![];
-        while !self.at("}") {
-            members.push(self.member(true)?);
-        }
-        self.expect("}")?;
-        fields.push(("members", members.into()));
-        Ok(self.finish("MappedType", start, fields))
+        self.nest(|p| {
+            let start = p.pos();
+            p.expect("{")?;
+            let mut fields: Fields<'src> = Fields::new();
+            if p.at("+") || p.at("-") {
+                fields.push(("readonlyToken", p.token_node()?.into()));
+                p.expect("readonly")?;
+            } else {
+                p.optional_token("readonly", "readonlyToken", &mut fields)?;
+            }
+            p.expect("[")?;
+            let parameter_start = p.pos();
+            let name = p.identifier()?;
+            p.expect("in")?;
+            let constraint = p.type_node()?;
+            let parameter = p.finish(
+                TypeParameter,
+                parameter_start,
+                fields![("name", name.into()), ("constraint", constraint.into())],
+            );
+            fields.push(("typeParameter", parameter.into()));
+            if p.eat("as")? {
+                fields.push(("nameType", p.type_node()?.into()));
+            }
+            p.expect("]")?;
+            if p.at("+") || p.at("-") {
+                fields.push(("questionToken", p.token_node()?.into()));
+                p.expect("?")?;
+            } else {
+                p.optional_token("?", "questionToken", &mut fields)?;
+            }
+            if p.eat(":")? {
+                fields.push(("type", p.type_node()?.into()));
+            }
+            p.eat(";")?;
+            let mut members = vec![];
+            while !p.at("}") {
+                members.push(p.member(true)?);
+            }
+            p.expect("}")?;
+            fields.push(("members", members.into()));
+            Ok(p.finish(MappedType, start, fields))
+        })
     }
+
     pub(super) fn type_members(&mut self) -> Result<Vec<NodeId>> {
         self.expect("{")?;
         let mut members = vec![];
@@ -722,12 +753,13 @@ impl<'src> Parser<'src> {
         self.expect("}")?;
         Ok(members)
     }
+
     pub(super) fn member(&mut self, signature: bool) -> Result<NodeId> {
         let deprecated = self.deprecated_trivia(false);
         let result = self.in_context(self.context, |p| p.nest(|p| p.member_inner(signature)));
         if deprecated {
             if let Ok(id) = result {
-                self.nodes[id.0].flags |= 536870912;
+                self.nodes[id.0].flags |= node_flags::DEPRECATED;
             }
         }
         result
@@ -738,10 +770,10 @@ impl<'src> Parser<'src> {
         if !signature && self.at("static") && self.peek_at("{") {
             self.bump()?;
             let body = self.in_context(self.context.without(YIELD).with(AWAIT), |parser| {
-                parser.block("Block")
+                parser.block(Block)
             })?;
             let id = self.finish(
-                "ClassStaticBlockDeclaration",
+                ClassStaticBlockDeclaration,
                 start,
                 fields![("body", body.into())],
             );
@@ -755,7 +787,7 @@ impl<'src> Parser<'src> {
                 fields.push(("type", self.type_node()?.into()));
             }
             self.member_semi()?;
-            let id = self.finish("IndexSignature", start, fields);
+            let id = self.finish(IndexSignature, start, fields);
             self.attach_modifiers(id, modifiers);
             return Ok(id);
         }
@@ -776,9 +808,9 @@ impl<'src> Parser<'src> {
             self.member_semi()?;
             let id = self.finish(
                 if construct {
-                    "ConstructSignature"
+                    ConstructSignature
                 } else {
-                    "CallSignature"
+                    CallSignature
                 },
                 start,
                 fields,
@@ -835,7 +867,7 @@ impl<'src> Parser<'src> {
                 && !constructor
                 && modifiers
                     .iter()
-                    .any(|id| self.nodes[id.0].kind == "AsyncKeyword");
+                    .any(|id| self.nodes[id.0].syntax_kind == AsyncKeyword);
             let generator = generator && accessor.is_none() && !constructor;
             let parameters = self.parameters_with_context(async_function, generator)?;
             fields.push(("parameters", parameters.into()));
@@ -845,18 +877,18 @@ impl<'src> Parser<'src> {
             if (!signature || accessor.is_some()) && self.at("{") {
                 let body = self
                     .in_context(self.context.function(async_function, generator), |parser| {
-                        parser.block("Block")
+                        parser.block(Block)
                     })?;
                 fields.push(("body", body.into()));
             } else {
                 self.member_semi()?;
             }
             match accessor {
-                Some("get") => "GetAccessor",
-                Some("set") => "SetAccessor",
-                _ if constructor => "Constructor",
-                _ if signature => "MethodSignature",
-                _ => "MethodDeclaration",
+                Some("get") => GetAccessor,
+                Some("set") => SetAccessor,
+                _ if constructor => Constructor,
+                _ if signature => MethodSignature,
+                _ => MethodDeclaration,
             }
         } else {
             if accessor.is_some() {
@@ -876,9 +908,9 @@ impl<'src> Parser<'src> {
             }
             self.member_semi()?;
             if signature {
-                "PropertySignature"
+                PropertySignature
             } else {
-                "PropertyDeclaration"
+                PropertyDeclaration
             }
         };
         let id = self.finish(kind, start, fields);

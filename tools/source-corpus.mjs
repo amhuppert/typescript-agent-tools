@@ -1,8 +1,8 @@
 // Validate existing source trees without changing or copying their files.
+import { runParser, parserFailure } from './parser-process.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
-import { spawnSync } from 'node:child_process';
 import { normalizer, firstDifference } from './ast-comparison.mjs';
 const require = createRequire(import.meta.url);
 const ts = require(process.env.TYPE_SCRIPT_API ?? 'typescript');
@@ -26,8 +26,8 @@ for (const root of roots) for (const file of files(root)) {
   const reference = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, false, jsx ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
   if (reference.parseDiagnostics.length) { invalid++; continue; }
   total++; bytes += Buffer.byteLength(source);
-  const result = spawnSync(binary, [file], { encoding: 'utf8', maxBuffer: 128 * 1024 * 1024, timeout: 10_000 });
-  const difference = result.status === 0 ? firstDifference(normalize(JSON.parse(result.stdout), true), normalize(reference, true)) : { error: result.stderr.trim(), status: result.status, signal: result.signal };
+  const result = runParser(binary, [file], { maxBuffer: 128 * 1024 * 1024 });
+  const difference = result.outcome === 'accepted' ? firstDifference(normalize(JSON.parse(result.stdout), true), normalize(reference, true)) : parserFailure(result);
   if (difference) {
     failures.push({ file, ...difference });
     if (failures.length <= 20) console.log(JSON.stringify(failures.at(-1)));
