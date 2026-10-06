@@ -1,4 +1,4 @@
-use typescript_parser::{ParseOptions, parse, parse_with_options};
+use typescript_parser::{ParseOptions, Value, parse, parse_with_options};
 
 #[test]
 fn ordinary_declarations_permit_in_inside_for_initializer_functions() {
@@ -11,8 +11,8 @@ fn ordinary_declarations_permit_in_inside_for_initializer_functions() {
     ] {
         let ast = parse(source).unwrap_or_else(|error| panic!("{source}: {error}"));
         let declaration_list = ast
-            .nodes()
-            .iter()
+            .walk()
+            .map(|id| ast.node(id))
             .find(|node| {
                 node.kind == "VariableDeclarationList"
                     && node.span.start > source.find('{').unwrap()
@@ -22,8 +22,8 @@ fn ordinary_declarations_permit_in_inside_for_initializer_functions() {
         // DisallowIn flag, while its ordinary declarations permit `in`.
         assert_eq!(declaration_list.flags, 8194, "{source}");
         let initializer = ast
-            .nodes()
-            .iter()
+            .walk()
+            .map(|id| ast.node(id))
             .find(|node| {
                 node.kind == "BinaryExpression" && node.span.end <= source.find(';').unwrap()
             })
@@ -56,8 +56,8 @@ fn nested_loop_headers_restore_each_expression_context() {
             "let y"
         };
         let declaration_list = ast
-            .nodes()
-            .iter()
+            .walk()
+            .map(|id| ast.node(id))
             .find(|node| {
                 node.kind == "VariableDeclarationList"
                     && source[node.span.start..node.span.end]
@@ -71,8 +71,8 @@ fn nested_loop_headers_restore_each_expression_context() {
             "{source}"
         );
         for expression in ast
-            .nodes()
-            .iter()
+            .walk()
+            .map(|id| ast.node(id))
             .filter(|node| node.kind == "BinaryExpression")
         {
             assert_eq!(expression.flags, 0, "{source}");
@@ -129,6 +129,156 @@ fn committed_syntax_preserves_depth_diagnostics() {
 }
 
 #[test]
+fn speculative_depth_exhaustion_is_reported_instead_of_a_fallback() {
+    // Past these depths, parsing the type arguments exceeds the default budget.
+    // The comparison reading `f < (...) > (x)` still fits within it, but must
+    // not replace the generic call.
+    let parentheses = |depth| format!("f<{}B{}>(x);", "(".repeat(depth), ")".repeat(depth));
+    let generics = |depth| format!("f<{}B{}(x);", "A<".repeat(depth), ">".repeat(depth + 1));
+    for source in [parentheses(40), generics(34)] {
+        let ast = parse(&source).unwrap_or_else(|error| panic!("{source}: {error}"));
+        let Some(Value::Nodes(statements)) = ast.node(ast.root_id()).field("statements") else {
+            panic!("{source}: no statements");
+        };
+        let Some(Value::Node(expression)) = ast.node(statements[0]).field("expression") else {
+            panic!("{source}: no expression");
+        };
+        let expression = ast.node(*expression);
+        assert_eq!(expression.kind, "CallExpression", "{source}");
+        assert!(expression.field("typeArguments").is_some(), "{source}");
+    }
+    for source in [
+        parentheses(41),
+        parentheses(45),
+        parentheses(50),
+        generics(35),
+        generics(40),
+    ] {
+        let Err(error) = parse(&source) else {
+            panic!("{source}: accepted another interpretation");
+        };
+        assert_eq!(
+            error.message, "Maximum syntax nesting depth exceeded",
+            "{source}"
+        );
+    }
+}
+
+fn first_expression<'a, 's>(
+    ast: &'a typescript_parser::Ast<'s>,
+) -> &'a typescript_parser::Node<'s> {
+    let Some(Value::Nodes(statements)) = ast.root().field("statements") else {
+        panic!("no statements");
+    };
+    let Some(Value::Node(expression)) = ast.node(statements[0]).field("expression") else {
+        panic!("no expression statement");
+    };
+    ast.node(*expression)
+}
+
+#[test]
+fn flat_comparison_lists_stay_within_the_depth_budget() {
+    // Each `<` could open type arguments, but none of these lists has a `>`
+    // that could close one. Reading every later item as a nested type argument
+    // once rejected 36-item lists although the final trees are shallow.
+    let list = |count: usize, item: &dyn Fn(usize) -> String| {
+        (0..count).map(item).collect::<Vec<_>>().join(", ")
+    };
+    for count in [35, 36, 400] {
+        for (source, kind, items) in [
+            (
+                format!("f({});", list(count, &|i| format!("x < {i}"))),
+                "CallExpression",
+                "arguments",
+            ),
+            (
+                format!("[{}];", list(count, &|i| format!("a{i} < b{i}"))),
+                "ArrayLiteralExpression",
+                "elements",
+            ),
+            (
+                format!("f({}, y > 1);", list(count, &|i| format!("x < {i}"))),
+                "CallExpression",
+                "arguments",
+            ),
+            (
+                format!("f({});", list(count, &|i| format!("x < {i}, y > {i}"))),
+                "CallExpression",
+                "arguments",
+            ),
+        ] {
+            let ast = parse(&source).unwrap_or_else(|error| panic!("{count}: {error}"));
+            let expression = first_expression(&ast);
+            assert_eq!(expression.kind, kind, "{count}");
+            let Some(Value::Nodes(elements)) = expression.field(items) else {
+                panic!("{count}: no {items}");
+            };
+            assert!(elements.len() >= count, "{count}: {}", elements.len());
+            for &element in elements {
+                assert_eq!(ast.node(element).kind, "BinaryExpression", "{count}");
+            }
+        }
+        let chain = format!(
+            "x = {};",
+            (0..count)
+                .map(|i| format!("a{i}"))
+                .collect::<Vec<_>>()
+                .join(" < ")
+        );
+        parse(&chain).unwrap_or_else(|error| panic!("chain {count}: {error}"));
+    }
+
+    // One forward scan resolves every `<` in a list, so work grows linearly.
+    let source = format!("f({});", list(40_000, &|i| format!("x < {i}, y > {i}")));
+    let start = std::time::Instant::now();
+    parse(&source).unwrap();
+    assert!(
+        start.elapsed() < std::time::Duration::from_secs(10),
+        "{:?}",
+        start.elapsed()
+    );
+}
+
+#[test]
+fn expression_type_arguments_close_at_a_lone_greater_than() {
+    // TypeScript rescans the closing `>`: joined to `=` or `>`, it is an
+    // operator, and a following `>` of any length cannot follow a list.
+    let ast = parse("f(a < b, c >= d);").unwrap();
+    let Some(Value::Nodes(arguments)) = first_expression(&ast).field("arguments") else {
+        panic!("no arguments");
+    };
+    assert_eq!(arguments.len(), 2);
+    let ast = parse("a < b >= c;").unwrap();
+    let Some(Value::Node(left)) = first_expression(&ast).field("left") else {
+        panic!("no left operand");
+    };
+    assert_eq!(ast.text(*left).trim(), "a < b");
+    let ast = parse("a < b >> c;").unwrap();
+    assert!(
+        ast.walk()
+            .all(|id| ast.node(id).field("typeArguments").is_none())
+    );
+    assert!(parse("x = f<T> >= y;").is_err());
+
+    // Lists that do close still parse as type arguments, including ones whose
+    // members contain semicolons, template literal types, or joined `>>`.
+    for source in [
+        "f<{a: string; b: number}>();",
+        "f<`a${B}c${D}e`>();",
+        "f<A<B<C>>>();",
+        "f<<T>(x: T) => T>();",
+        "f<(a: Array<string>) => void>();",
+        "f<{ [K in keyof T]: T[K] }>();",
+        "a < b > (c);",
+    ] {
+        let ast = parse(source).unwrap_or_else(|error| panic!("{source}: {error}"));
+        let expression = first_expression(&ast);
+        assert_eq!(expression.kind, "CallExpression", "{source}");
+        assert!(expression.field("typeArguments").is_some(), "{source}");
+    }
+}
+
+#[test]
 fn conditional_arrows_keep_their_colon_interpretations() {
     for source in [
         "a ? (b) : c => (d) : e => f;",
@@ -148,19 +298,39 @@ fn conditional_arrows_keep_their_colon_interpretations() {
 }
 
 #[test]
-fn uncommitted_type_interpretations_can_exhaust_depth_before_expression_fallback() {
+fn speculative_interpretations_count_against_the_depth_budget() {
     // Speculating that the true arm has an arrow return type parses the false
-    // arm as a function type. That interpretation uses more grammar frames
-    // than the actual arrow expression and must remain eligible for rollback.
+    // arm as a function type, which takes more grammar frames than the actual
+    // arrow expression. Exhausting the budget there ends the parse rather than
+    // falling back; a budget of 30 suffices for the final interpretation alone.
     let source = "const f = test ? (x) : (y) => ((((z))));";
-    parse_with_options(
-        source,
-        ParseOptions {
-            max_depth: 40,
-            ..Default::default()
-        },
-    )
-    .unwrap();
+    let parse_within = |max_depth| {
+        parse_with_options(
+            source,
+            ParseOptions {
+                max_depth,
+                ..Default::default()
+            },
+        )
+    };
+    for max_depth in [30, 41] {
+        let Err(error) = parse_within(max_depth) else {
+            panic!("{max_depth}: accepted within the budget");
+        };
+        assert_eq!(error.message, "Maximum syntax nesting depth exceeded");
+    }
+    let ast = parse_within(42).unwrap_or_else(|error| panic!("{source}: {error}"));
+    let conditional = ast
+        .walk()
+        .map(|id| ast.node(id))
+        .find(|node| node.kind == "ConditionalExpression")
+        .unwrap();
+    let branch = |key| match conditional.field(key) {
+        Some(Value::Node(id)) => ast.node(*id).kind,
+        _ => panic!("Expected node field {key}"),
+    };
+    assert_eq!(branch("whenTrue"), "ParenthesizedExpression");
+    assert_eq!(branch("whenFalse"), "ArrowFunction");
 }
 
 #[test]
@@ -180,9 +350,97 @@ fn jsx_tags_end_at_a_single_greater_than_before_equals_text() {
         )
         .unwrap_or_else(|error| panic!("{source}: {error}"));
         let text = ast
-            .nodes()
-            .iter()
+            .walk()
+            .map(|id| ast.node(id))
             .find(|node| node.kind == "JsxText" && matches!(node.field("text"), Some(typescript_parser::Value::Text(text)) if text == "="));
         assert!(text.is_some(), "{source}: no `=` JSX text");
+    }
+}
+
+#[test]
+fn deprecated_jsdoc_is_collected_where_typescript_collects_comments() {
+    const DEPRECATED: u32 = 536_870_912;
+    let deprecated = |source: &str| {
+        let ast = parse(source).unwrap_or_else(|error| panic!("{source:?}: {error}"));
+        let function = ast
+            .walk()
+            .map(|id| ast.node(id))
+            .find(|node| node.kind == "FunctionDeclaration")
+            .unwrap();
+        function.flags & DEPRECATED != 0
+    };
+    // At the start of a file, collection begins after a `#!` line, which a
+    // byte order mark may precede.
+    for prefix in ["", "\u{feff}"] {
+        let source =
+            format!("{prefix}#!/usr/bin/env node\n/** @deprecated */\nexport function f() {{}}");
+        assert!(deprecated(&source), "{prefix:?}");
+    }
+    // Elsewhere TypeScript's `iterateCommentRanges` starts collecting after a
+    // CR or LF only, not after U+2028 or U+2029.
+    for (separator, expected) in [
+        ("\n", true),
+        ("\r", true),
+        ("\r\n", true),
+        ("\u{2028}", false),
+        ("\u{2029}", false),
+        (" ", false),
+    ] {
+        let source = format!("let a = 1;{separator}/** @deprecated */ function f() {{}}");
+        assert_eq!(deprecated(&source), expected, "{separator:?}");
+    }
+}
+
+#[test]
+fn only_typescripts_module_indicators_reparse_top_level_await() {
+    // In a script, `await (x)` calls a function named `await`; in a module it
+    // awaits. `import x = N.y` and `export as namespace` leave a file a
+    // script, as in TypeScript's `isAnExternalModuleIndicatorNode`.
+    for (header, module) in [
+        (
+            "namespace N { export const y = 1; }\nimport x = N.y;",
+            false,
+        ),
+        ("export as namespace X;", false),
+        ("declare module \"m\" {}", false),
+        ("import x = require(\"m\");", true),
+        ("export const a = 1;", true),
+        ("import.meta;", true),
+    ] {
+        let source = format!("{header}\nawait (x);");
+        let ast = parse(&source).unwrap_or_else(|error| panic!("{header}: {error}"));
+        let Some(Value::Nodes(statements)) = ast.root().field("statements") else {
+            panic!("{header}: no statements");
+        };
+        let Some(Value::Node(expression)) =
+            ast.node(*statements.last().unwrap()).field("expression")
+        else {
+            panic!("{header}: no expression");
+        };
+        let expected = if module {
+            "AwaitExpression"
+        } else {
+            "CallExpression"
+        };
+        assert_eq!(ast.node(*expression).kind, expected, "{header}");
+    }
+}
+
+#[test]
+fn type_lookaheads_skip_every_modifier_typescript_skips() {
+    // TypeScript's `isModifierKind` includes `export` and `default`, so a
+    // parenthesized parameter list with one is a function type; its checker,
+    // not its parser, rejects the modifier (TS1090).
+    for source in [
+        "type F = (export x: number) => void;",
+        "type F = (public x: number) => void;",
+        "type G = { [readonly x: string]: number };",
+    ] {
+        let ast = parse(source).unwrap_or_else(|error| panic!("{source}: {error}"));
+        assert!(
+            ast.walk()
+                .any(|id| matches!(ast.node(id).kind, "FunctionType" | "IndexSignature")),
+            "{source}"
+        );
     }
 }

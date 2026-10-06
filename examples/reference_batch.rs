@@ -7,19 +7,21 @@
 //! Each stdin line is `{"at":{"file":"…","line":L,"column":C}}` or
 //! `{"name":"…","file":null|"…"}`; relative paths resolve against the working
 //! directory. Each query prints one line: `{"result": ReferenceResult}`,
-//! `{"error": {"kind": "<QueryErrorKind>", "message": "…"}}`, or
-//! `{"panic": "…"}` when the implementation panics. A project that fails to
-//! load prints `{"projectError": {...}}` and exits 1. Usage errors and
-//! malformed query lines exit 2.
+//! `{"error": {"kind": "<QueryErrorKind>", "message": "…", "path": …,
+//! "position": …}}`, or `{"panic": "…"}` when the implementation panics. A
+//! project that fails to load prints `{"projectError": {...}}` with a
+//! `ProjectErrorKind` and exits 1. Kinds are the variant names. Usage errors
+//! and malformed query lines exit 2.
 
 use serde::{Deserialize, Serialize};
 use std::io::{BufRead, Write};
 use std::panic::AssertUnwindSafe;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::sync::Mutex;
 use typescript_parser::references::{
-    ReferenceProject, ReferenceQuery, ReferenceResult, SourcePosition,
+    ProjectErrorKind, QueryErrorKind, ReferenceProject, ReferenceQuery, ReferenceResult,
+    SourcePosition,
 };
 
 #[derive(Deserialize)]
@@ -41,16 +43,22 @@ struct At {
 enum Response<'a> {
     Result(&'a ReferenceResult),
     Error {
-        kind: String,
-        message: String,
-    },
-    Panic(String),
-    ProjectError {
-        kind: String,
+        kind: QueryErrorKind,
         message: String,
         path: Option<String>,
         position: Option<SourcePosition>,
     },
+    Panic(String),
+    ProjectError {
+        kind: ProjectErrorKind,
+        message: String,
+        path: Option<String>,
+        position: Option<SourcePosition>,
+    },
+}
+
+fn display(path: Option<&Path>) -> Option<String> {
+    path.map(|path| path.display().to_string())
 }
 
 /// The message and location of the most recent panic, captured quietly so a
@@ -82,9 +90,9 @@ fn run(config: &std::path::Path) -> Result<ExitCode, Box<dyn std::error::Error>>
         Ok(project) => project,
         Err(error) => {
             let response = Response::ProjectError {
-                kind: format!("{:?}", error.kind),
+                kind: error.kind,
                 message: error.to_string(),
-                path: error.path.as_ref().map(|path| path.display().to_string()),
+                path: display(error.path.as_deref()),
                 position: error.position,
             };
             write_line(&mut out, &response)?;
@@ -125,8 +133,10 @@ fn run(config: &std::path::Path) -> Result<ExitCode, Box<dyn std::error::Error>>
             Ok(Err(error)) => write_line(
                 &mut out,
                 &Response::Error {
-                    kind: format!("{:?}", error.kind),
+                    kind: error.kind,
                     message: error.to_string(),
+                    path: display(error.path.as_deref()),
+                    position: error.position,
                 },
             )?,
             Err(_) => {

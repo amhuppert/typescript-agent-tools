@@ -2,7 +2,6 @@ use std::{fs, path::Path};
 pub struct Source {
     pub name: String,
     pub text: String,
-    pub jsx: bool,
 }
 pub fn sources(paths: &[String]) -> Vec<Source> {
     let mut files = Vec::new();
@@ -13,7 +12,6 @@ pub fn sources(paths: &[String]) -> Vec<Source> {
     files
         .into_iter()
         .map(|file| Source {
-            jsx: file.extension().is_some_and(|ext| ext == "tsx"),
             name: file.to_string_lossy().into_owned(),
             text: fs::read_to_string(file).unwrap(),
         })
@@ -42,11 +40,7 @@ fn collect(path: &Path, files: &mut Vec<std::path::PathBuf>) {
 pub fn parse(source: &Source) -> typescript_parser::Ast<'_> {
     typescript_parser::parse_with_options(
         &source.text,
-        typescript_parser::ParseOptions {
-            jsx: source.jsx,
-            file_name: source.name.clone(),
-            ..Default::default()
-        },
+        typescript_parser::ParseOptions::for_file(source.name.as_str()),
     )
     .unwrap_or_else(|error| panic!("{}: {error}", source.name))
 }

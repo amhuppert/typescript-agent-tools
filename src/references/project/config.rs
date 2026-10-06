@@ -5,7 +5,7 @@
 use super::jsonc::{self, Kind, Value};
 use super::paths;
 use super::resolve;
-use super::{Origin, io_error};
+use super::{Origin, disk, io_error};
 use crate::references::source::SourceText;
 use crate::references::{ProjectError, ProjectErrorKind};
 use std::collections::{HashMap, HashSet};
@@ -18,6 +18,8 @@ pub(super) struct Config {
     pub(super) path: PathBuf,
     /// Canonical directory of the selected configuration.
     pub(super) dir: String,
+    /// The selected configuration in its canonical directory.
+    pub(super) file: String,
     pub(super) files: Option<Specs>,
     pub(super) include: Option<Specs>,
     pub(super) exclude: Option<Specs>,
@@ -67,6 +69,9 @@ pub(super) enum Detection {
 }
 
 /// The settings that affect program inputs, module edges, or file binding.
+/// Directory-valued settings (`rootDirs`, `typeRoots`, `outDir`,
+/// `declarationDir`, `rootDir`) are absolute and normalized, without a
+/// trailing separator except at a root.
 #[derive(Debug)]
 pub(super) struct Options {
     pub(super) module: Module,
@@ -100,9 +105,10 @@ pub(super) struct Options {
     pub(super) declaration_dir: Option<String>,
     pub(super) root_dir: Option<String>,
     pub(super) composite: bool,
-    /// Canonical directory and path of the selected configuration.
-    pub(super) config_dir: String,
-    pub(super) config_file: String,
+    /// TypeScript's `shouldPreserveConstEnums`: `preserveConstEnums`,
+    /// `isolatedModules`, or `verbatimModuleSyntax`. A namespace of only
+    /// const enums then counts as instantiated in merge-order checks.
+    pub(super) preserve_const_enums: bool,
 }
 
 /// `paths` patterns and their substitutions, relative to `base`: the
@@ -113,9 +119,10 @@ pub(super) struct Paths {
     pub(super) patterns: Vec<(String, Vec<String>)>,
 }
 
-impl Default for Options {
-    /// The settings TypeScript uses to resolve package-name `extends`.
-    fn default() -> Self {
+impl Options {
+    /// The settings TypeScript uses to resolve package-name `extends`, not
+    /// the compiler defaults, which `convert` applies.
+    pub(super) fn for_extends_lookup() -> Self {
         Self {
             module: Module::Node,
             resolution: Resolution::NodeNext,
@@ -141,8 +148,7 @@ impl Default for Options {
             declaration_dir: None,
             root_dir: None,
             composite: false,
-            config_dir: String::new(),
-            config_file: String::new(),
+            preserve_const_enums: false,
         }
     }
 }
@@ -171,11 +177,16 @@ impl File {
             .map(|name| name.to_string_lossy())
             .unwrap_or_default();
         let text = SourceText::new(text);
-        let root = jsonc::parse(text.as_str()).map_err(|error| ProjectError {
-            kind: ProjectErrorKind::Config,
-            message: error.message,
-            path: Some(path.to_path_buf()),
-            position: Some(text.position(error.offset)),
+        let root = jsonc::parse(text.as_str(), jsonc::Dialect::Tsconfig).map_err(|error| {
+            ProjectError {
+                kind: match error.failure {
+                    jsonc::Failure::Malformed => ProjectErrorKind::Config,
+                    jsonc::Failure::TooDeep => ProjectErrorKind::Unsupported,
+                },
+                message: error.message,
+                path: Some(path.to_path_buf()),
+                position: Some(text.position(error.offset)),
+            }
         })?;
         let file = File {
             path: paths::combine(&dir, &name),
@@ -207,6 +218,18 @@ impl File {
     fn unsupported(&self, value: &Value, message: impl Into<String>) -> ProjectError {
         self.origin(value)
             .error(ProjectErrorKind::Unsupported, message)
+    }
+
+    /// `message` for a value that is not the string expected, unless it is a
+    /// string this tool cannot represent exactly (`Kind::Utf16`).
+    fn not_string(&self, value: &Value, message: impl Into<String>) -> ProjectError {
+        match value.kind {
+            Kind::Utf16(_) => self.unsupported(
+                value,
+                "This string has an unpaired UTF-16 surrogate, which cannot name a file, module, or option value",
+            ),
+            _ => self.error(value, message),
+        }
     }
 }
 
@@ -269,6 +292,7 @@ pub(super) fn load(path: &Path) -> Result<Config, ProjectError> {
     Ok(Config {
         path: path.to_path_buf(),
         dir: leaf_dir.clone(),
+        file: leaf.path.clone(),
         report_no_inputs: files.is_none()
             && leaf.root.get("files").is_none()
             && leaf.root.get("references").is_none(),
@@ -312,7 +336,14 @@ fn inheritance(leaf: &Rc<File>) -> Result<Vec<Rc<File>>, ProjectError> {
         let parent = match files.get(&target) {
             Some(parent) => parent.clone(),
             None => {
-                let parent = File::read(Path::new(&target))?;
+                // Report an unreadable parent where the chain names it.
+                let parent = File::read(Path::new(&target)).map_err(|error| match error.kind {
+                    ProjectErrorKind::Io => file.origin(&value).error(
+                        ProjectErrorKind::Io,
+                        format!("Cannot read file '{target}': {}", error.message),
+                    ),
+                    _ => error,
+                })?;
                 files.insert(target, parent.clone());
                 parent
             }
@@ -359,13 +390,15 @@ fn extends_of(file: &File) -> Result<Vec<(String, Value)>, ProjectError> {
     let names: Vec<&Value> = match &value.kind {
         Kind::String(_) => vec![value],
         Kind::Array(items) => items.iter().collect(),
-        _ => return Err(file.error(value, "'extends' must be a string or an array of strings")),
+        _ => {
+            return Err(file.not_string(value, "'extends' must be a string or an array of strings"));
+        }
     };
     names
         .into_iter()
         .map(|name| {
             let Some(text) = name.as_str() else {
-                return Err(file.error(name, "'extends' entries must be strings"));
+                return Err(file.not_string(name, "'extends' entries must be strings"));
             };
             Ok((extends_path(file, name, text)?, name.clone()))
         })
@@ -376,35 +409,43 @@ fn extends_of(file: &File) -> Result<Vec<(String, Value)>, ProjectError> {
 /// when the file does not exist, or else a package resolved like a NodeNext
 /// `require` of a JSON configuration.
 fn extends_path(file: &File, value: &Value, name: &str) -> Result<String, ProjectError> {
-    let name = name.replace('\\', "/");
+    let name = paths::separators(name);
     if name.is_empty() {
         return Err(file.error(value, "'extends' cannot be an empty string"));
     }
     if paths::is_rooted(&name) || name.starts_with("./") || name.starts_with("../") {
         let path = paths::resolve(&file.dir, &name);
-        if Path::new(&path).is_file() || path.ends_with(".json") {
+        let is_file =
+            |path: &str| disk::is_file(path).map_err(|error| io_error(Path::new(path), &error));
+        if path.ends_with(".json") || is_file(&path)? {
             return Ok(path);
         }
         let with_json = format!("{path}.json");
-        if Path::new(&with_json).is_file() {
+        if is_file(&with_json)? {
             return Ok(with_json);
         }
-    } else if let Some(path) = resolve::config_package(&name, &file.dir) {
+    } else if let Some(path) = resolve::config_package(&name, &file.dir)? {
         return Ok(path);
     }
     Err(file.error(value, format!("File '{name}' not found")))
 }
 
-/// Replaces a leading `${configDir}` with the selected configuration's
-/// directory, or resolves relative to the declaring file.
+/// A path written in a configuration: a leading `${configDir}` names the
+/// selected configuration's directory; otherwise it is relative to the
+/// declaring file.
 fn config_path(file: &File, text: &str, leaf_dir: &str) -> String {
-    const TEMPLATE: &str = "${configDir}";
-    match text.get(..TEMPLATE.len()) {
-        Some(prefix) if prefix.eq_ignore_ascii_case(TEMPLATE) => {
-            paths::resolve(leaf_dir, &format!(".{}", &text[TEMPLATE.len()..]))
-        }
-        _ => paths::resolve(&file.dir, text),
+    match config_dir_tail(text) {
+        Some(tail) => paths::resolve(leaf_dir, &format!(".{tail}")),
+        None => paths::resolve(&file.dir, text),
     }
+}
+
+/// The rest of `text` after a leading `${configDir}`, matched without case.
+fn config_dir_tail(text: &str) -> Option<&str> {
+    const TEMPLATE: &str = "${configDir}";
+    text.get(..TEMPLATE.len())
+        .filter(|prefix| prefix.eq_ignore_ascii_case(TEMPLATE))
+        .map(|_| &text[TEMPLATE.len()..])
 }
 
 fn specs_of(
@@ -420,10 +461,10 @@ fn specs_of(
     let mut entries = Vec::new();
     for item in items {
         let Some(text) = item.as_str() else {
-            return Err(file.error(item, format!("'{name}' entries must be strings")));
+            return Err(file.not_string(item, format!("'{name}' entries must be strings")));
         };
         if name != "files" {
-            let normalized = text.replace('\\', "/");
+            let normalized = paths::separators(text);
             let trailing_recursion =
                 normalized == "**" || normalized.ends_with("/**") || normalized.ends_with("/**/");
             if include && trailing_recursion {
@@ -444,7 +485,7 @@ fn specs_of(
         }
         entries.push(Spec {
             text: text.to_owned(),
-            path: config_path(file, &text.replace('\\', "/"), leaf_dir),
+            path: config_path(file, text, leaf_dir),
             origin: file.origin(item),
         });
     }
@@ -504,26 +545,25 @@ impl<'a> Reader<'a, '_> {
                 item.as_str().map(|text| (text, item)).ok_or_else(|| {
                     declared
                         .file
-                        .error(item, format!("'{name}' entries must be strings"))
+                        .not_string(item, format!("'{name}' entries must be strings"))
                 })
             })
             .collect::<Result<_, _>>()?;
         Ok(Some((strings, declared)))
     }
 
-    fn path(&self, name: &str) -> Result<Option<String>, ProjectError> {
+    /// A directory-valued option, in the form `Options` documents.
+    fn directory(&self, name: &str) -> Result<Option<String>, ProjectError> {
         Ok(self.string(name)?.map(|(text, declared)| {
-            config_path(declared.file, &text.replace('\\', "/"), self.leaf_dir)
+            paths::directory(config_path(declared.file, text, self.leaf_dir))
         }))
     }
 
-    fn path_list(&self, name: &str) -> Result<Option<Vec<String>>, ProjectError> {
+    fn directory_list(&self, name: &str) -> Result<Option<Vec<String>>, ProjectError> {
         Ok(self.strings(name)?.map(|(items, declared)| {
             items
                 .into_iter()
-                .map(|(text, _)| {
-                    config_path(declared.file, &text.replace('\\', "/"), self.leaf_dir)
-                })
+                .map(|(text, _)| paths::directory(config_path(declared.file, text, self.leaf_dir)))
                 .collect()
         }))
     }
@@ -537,7 +577,7 @@ impl<'a> Reader<'a, '_> {
 }
 
 fn type_error(declared: Declared, name: &str, kind: &str) -> ProjectError {
-    declared.file.error(
+    declared.file.not_string(
         declared.value,
         format!("Compiler option '{name}' requires a value of type {kind}"),
     )
@@ -571,13 +611,14 @@ fn convert(options: &HashMap<&str, Declared>, leaf: &File) -> Result<Options, Pr
         }
     }
 
-    let module = match read.choice("module")? {
-        None => Module::Es,
+    let (module, node_next_module) = match read.choice("module")? {
+        None => (Module::Es, false),
         Some((value, declared)) => match value.as_str() {
-            "commonjs" => Module::CommonJs,
-            "es6" | "es2015" | "es2020" | "es2022" | "esnext" => Module::Es,
-            "node16" | "node18" | "node20" | "nodenext" => Module::Node,
-            "preserve" => Module::Preserve,
+            "commonjs" => (Module::CommonJs, false),
+            "es6" | "es2015" | "es2020" | "es2022" | "esnext" => (Module::Es, false),
+            "node16" | "node18" | "node20" => (Module::Node, false),
+            "nodenext" => (Module::Node, true),
+            "preserve" => (Module::Preserve, false),
             "amd" | "umd" | "system" => {
                 return Err(declared.file.unsupported(
                     declared.value,
@@ -593,9 +634,6 @@ fn convert(options: &HashMap<&str, Declared>, leaf: &File) -> Result<Options, Pr
             }
         },
     };
-    let node_next_module = read
-        .choice("module")?
-        .is_some_and(|(value, _)| value == "nodenext");
     let resolution = match read.choice("moduleResolution")? {
         None => match module {
             Module::Node if node_next_module => Resolution::NodeNext,
@@ -713,8 +751,8 @@ fn convert(options: &HashMap<&str, Declared>, leaf: &File) -> Result<Options, Pr
             .get("paths")
             .map(|d| paths_option(d, &leaf.dir))
             .transpose()?,
-        root_dirs: read.path_list("rootDirs")?.unwrap_or_default(),
-        type_roots: read.path_list("typeRoots")?,
+        root_dirs: read.directory_list("rootDirs")?.unwrap_or_default(),
+        type_roots: read.directory_list("typeRoots")?,
         types,
         custom_conditions: strings("customConditions")?,
         module_suffixes: strings("moduleSuffixes")?,
@@ -726,12 +764,13 @@ fn convert(options: &HashMap<&str, Declared>, leaf: &File) -> Result<Options, Pr
         package_exports: read.bool("resolvePackageJsonExports")?.unwrap_or(true),
         package_imports: read.bool("resolvePackageJsonImports")?.unwrap_or(true),
         no_lib,
-        out_dir: read.path("outDir")?,
-        declaration_dir: read.path("declarationDir")?,
-        root_dir: read.path("rootDir")?,
+        out_dir: read.directory("outDir")?,
+        declaration_dir: read.directory("declarationDir")?,
+        root_dir: read.directory("rootDir")?,
         composite: read.bool("composite")?.unwrap_or(false),
-        config_dir: leaf.dir.clone(),
-        config_file: leaf.path.clone(),
+        preserve_const_enums: read.bool("preserveConstEnums")?.unwrap_or(false)
+            || read.bool("isolatedModules")?.unwrap_or(false)
+            || read.bool("verbatimModuleSyntax")?.unwrap_or(false),
     })
 }
 
@@ -763,7 +802,7 @@ fn paths_option(declared: Declared, leaf_dir: &str) -> Result<Paths, ProjectErro
         let mut substitutions = Vec::new();
         for item in items {
             let Some(text) = item.as_str() else {
-                return Err(file.error(
+                return Err(file.not_string(
                     item,
                     format!("Substitution for pattern '{pattern}' must be a string"),
                 ));
@@ -774,10 +813,8 @@ fn paths_option(declared: Declared, leaf_dir: &str) -> Result<Paths, ProjectErro
                     format!("Substitution '{text}' in pattern '{pattern}' can have at most one '*' character"),
                 ));
             }
-            let text = text.replace('\\', "/");
-            let template = text
-                .get(.."${configDir}".len())
-                .is_some_and(|prefix| prefix.eq_ignore_ascii_case("${configDir}"));
+            let text = text.to_owned();
+            let template = config_dir_tail(&text).is_some();
             if !template && !paths::is_relative(&text) && !paths::is_rooted(&text) {
                 return Err(file.error(
                     item,

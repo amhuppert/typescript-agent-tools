@@ -12,9 +12,37 @@ use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use typescript_parser::references::{
-    Location, QueryErrorKind, ReferenceGroup, ReferenceProject, ReferenceQuery, Role,
+    Location, ProjectError, QueryErrorKind, ReferenceGroup, ReferenceProject, ReferenceQuery, Role,
     SourcePosition,
 };
+
+/// The configuration of most test projects: no standard library.
+pub const CONFIG: &str = r#"{ "compilerOptions": { "noLib": true } }"#;
+
+/// A temporary `CONFIG` project with `files`.
+pub fn project(files: &[(&str, &str)]) -> Fixture {
+    let mut all = vec![("tsconfig.json", CONFIG)];
+    all.extend_from_slice(files);
+    Fixture::new(&all)
+}
+
+/// Query every marked token of a temporary `CONFIG` project with `files`.
+pub fn check(files: &[(&str, &str)]) {
+    let fixture = project(files);
+    fixture.check_markers(&fixture.load());
+}
+
+/// The error from loading a temporary `CONFIG` project with `files`.
+pub fn load_error(files: &[(&str, &str)]) -> ProjectError {
+    let fixture = project(files);
+    ReferenceProject::load(&fixture.path("tsconfig.json"))
+        .expect_err("the project should fail to load")
+}
+
+/// The directory of the checked-in marker fixtures.
+pub fn fixtures_root() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/references")
+}
 
 pub struct Fixture {
     pub root: PathBuf,
@@ -25,24 +53,18 @@ pub struct Fixture {
 impl Fixture {
     /// Write `(relative path, contents)` pairs into a new temporary directory.
     pub fn new(files: &[(&str, &str)]) -> Self {
-        static NEXT: AtomicUsize = AtomicUsize::new(0);
-        let root = std::env::temp_dir().join(format!(
-            "tsparse-references-{}-{}",
-            std::process::id(),
-            NEXT.fetch_add(1, Ordering::Relaxed)
-        ));
-        let _ = std::fs::remove_dir_all(&root);
+        let root = temporary_directory();
         for (path, contents) in files {
             let path = root.join(path);
             std::fs::create_dir_all(path.parent().unwrap()).unwrap();
             std::fs::write(path, contents).unwrap();
         }
-        // Results are relative to the canonical configuration directory.
-        let root = std::fs::canonicalize(&root).unwrap();
-        Self {
-            root,
-            temporary: true,
-        }
+        Self::temporary(root)
+    }
+
+    /// A checked-in fixture under `fixtures/references`, which is never modified.
+    pub fn checked_in(name: &str) -> Self {
+        Self::existing(&fixtures_root().join(name))
     }
 
     /// A checked-in fixture directory, which is never modified.
@@ -50,6 +72,33 @@ impl Fixture {
         Self {
             root: std::fs::canonicalize(root).unwrap(),
             temporary: false,
+        }
+    }
+
+    /// A temporary copy of a checked-in fixture, for tests that change files.
+    pub fn copy_of(name: &str) -> Self {
+        fn copy(from: &Path, to: &Path) {
+            std::fs::create_dir_all(to).unwrap();
+            for entry in std::fs::read_dir(from).unwrap() {
+                let entry = entry.unwrap();
+                let target = to.join(entry.file_name());
+                if entry.file_type().unwrap().is_dir() {
+                    copy(&entry.path(), &target);
+                } else {
+                    std::fs::copy(entry.path(), target).unwrap();
+                }
+            }
+        }
+        let root = temporary_directory();
+        copy(&fixtures_root().join(name), &root);
+        Self::temporary(root)
+    }
+
+    fn temporary(root: PathBuf) -> Self {
+        // Results are relative to the canonical configuration directory.
+        Self {
+            root: std::fs::canonicalize(&root).unwrap(),
+            temporary: true,
         }
     }
 
@@ -305,6 +354,18 @@ pub fn render(groups: &[ReferenceGroup]) -> String {
     out
 }
 
+fn temporary_directory() -> PathBuf {
+    static NEXT: AtomicUsize = AtomicUsize::new(0);
+    let root = std::env::temp_dir().join(format!(
+        "tsparse-references-{}-{}",
+        std::process::id(),
+        NEXT.fetch_add(1, Ordering::Relaxed)
+    ));
+    let _ = std::fs::remove_dir_all(&root);
+    std::fs::create_dir_all(&root).unwrap();
+    root
+}
+
 fn collect_markers(root: &Path, directory: &Path, markers: &mut Vec<Marker>) {
     let mut entries: Vec<_> = std::fs::read_dir(directory)
         .unwrap()
@@ -328,46 +389,62 @@ fn collect_markers(root: &Path, directory: &Path, markers: &mut Vec<Marker>) {
             .unwrap()
             .to_string_lossy()
             .replace('\\', "/");
-        let mut search = 0;
-        while let Some(found) = text[search..].find("/*@") {
-            let open = search + found;
-            let close = open + text[open..].find("*/").expect("closed marker");
-            let spec = &text[open + 3..close];
-            let start = close + 2;
-            let end = start + identifier_length(&text[start..]);
-            assert!(
-                end > start,
-                "marker at {file} byte {open} precedes no identifier"
-            );
-            let expect = match spec {
-                "!" => Expect::Unsupported,
-                "?" => Expect::Unresolved,
-                _ => {
-                    let (labels, roles) = match spec.split_once(':') {
-                        Some((labels, roles)) => (labels, Some(parse_roles(roles))),
-                        None => (spec, None),
-                    };
-                    Expect::Groups {
-                        labels: labels.split(',').map(str::to_string).collect(),
-                        roles,
-                    }
-                }
-            };
-            markers.push(Marker {
-                location: Location {
-                    file: file.clone(),
-                    start: position(&text, start),
-                    end: position(&text, end),
-                },
-                name: decode(&text[start..end]),
-                expect,
-            });
-            search = start;
-        }
+        markers.extend(parse_markers(&text, &file));
     }
 }
 
-fn parse_roles(roles: &str) -> BTreeSet<Role> {
+/// The markers of one source file, in source order. The grammar is the one
+/// documented at the top of this module; tools/semantic-conformance.mjs
+/// parses it identically. Malformed markers panic.
+pub fn parse_markers(text: &str, file: &str) -> Vec<Marker> {
+    let mut markers = Vec::new();
+    let mut search = 0;
+    while let Some(found) = text[search..].find("/*@") {
+        let open = search + found;
+        let at = || {
+            let position = position(text, open);
+            format!("{file}:{}:{}", position.line, position.column)
+        };
+        let close = open
+            + text[open..]
+                .find("*/")
+                .unwrap_or_else(|| panic!("unclosed marker at {}", at()));
+        let spec = &text[open + 3..close];
+        let start = close + 2;
+        let end = start + identifier_length(&text[start..]);
+        assert!(end > start, "marker at {} precedes no identifier", at());
+        let expect = match spec {
+            "!" => Expect::Unsupported,
+            "?" => Expect::Unresolved,
+            _ => {
+                let (labels, roles) = match spec.split_once(':') {
+                    Some((labels, roles)) => (labels, Some(parse_roles(roles, &at))),
+                    None => (spec, None),
+                };
+                let labels: Vec<String> = labels.split(',').map(str::to_string).collect();
+                assert!(
+                    labels.iter().all(|label| !label.is_empty()),
+                    "empty marker label at {}",
+                    at()
+                );
+                Expect::Groups { labels, roles }
+            }
+        };
+        markers.push(Marker {
+            location: Location {
+                file: file.to_string(),
+                start: position(text, start),
+                end: position(text, end),
+            },
+            name: decode(&text[start..end]),
+            expect,
+        });
+        search = start;
+    }
+    markers
+}
+
+fn parse_roles(roles: &str, at: &dyn Fn() -> String) -> BTreeSet<Role> {
     roles
         .chars()
         .map(|role| match role {
@@ -375,7 +452,7 @@ fn parse_roles(roles: &str) -> BTreeSet<Role> {
             'u' => Role::Use,
             'i' => Role::Import,
             'e' => Role::Export,
-            _ => panic!("unknown role {role}"),
+            _ => panic!("unknown role {role} at {}", at()),
         })
         .collect()
 }

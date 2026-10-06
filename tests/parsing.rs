@@ -192,7 +192,9 @@ type External = typeof import("pkg", { with: { type: "json" } }).default;
         "ImportType",
     ] {
         assert!(
-            ast.nodes().iter().any(|node| node.kind == kind),
+            ast.walk()
+                .map(|id| ast.node(id))
+                .any(|node| node.kind == kind),
             "missing {kind}"
         );
     }
@@ -249,7 +251,7 @@ fn jsx_has_a_separate_text_and_attribute_scanner() {
         },
     )
     .unwrap();
-    assert!(ast.nodes().iter().any(|node| node.kind == "JsxText"
+    assert!(ast.walk().map(|id| ast.node(id)).any(|node| node.kind == "JsxText"
         && matches!(node.field("text"), Some(Value::Text(text)) if text.contains("// text"))));
     assert!(
         parse_with_options(
@@ -325,8 +327,8 @@ fn iterative_json_matches_serde_and_handles_long_chains() {
 fn javascript_strings_preserve_surrogate_code_units() {
     let ast = parse(r#"const x = "\uD83D\uDE00", y = "\uD800";"#).unwrap();
     assert!(
-        ast.nodes()
-            .iter()
+        ast.walk()
+            .map(|id| ast.node(id))
             .any(|node| matches!(node.field("text"), Some(Value::Text(text)) if text == "😀"))
     );
     let mut output = Vec::new();
@@ -428,8 +430,8 @@ fn declaration_files_and_all_line_breaks_are_recognized() {
         .unwrap();
         assert_eq!(ast.root().flags, 33554432);
         assert!(
-            ast.nodes()
-                .iter()
+            ast.walk()
+                .map(|id| ast.node(id))
                 .any(|node| node.kind == "InterfaceDeclaration" && node.flags & 536870912 != 0)
         );
     }
@@ -547,8 +549,8 @@ fn deep_valid_types_fit_the_default_budget() {
     let source = format!("type T = {}string{};", "(".repeat(40), ")".repeat(40));
     let ast = parse(&source).unwrap();
     assert_eq!(
-        ast.nodes()
-            .iter()
+        ast.walk()
+            .map(|id| ast.node(id))
             .filter(|node| node.kind == "ParenthesizedType")
             .count(),
         40
@@ -560,17 +562,18 @@ fn deep_valid_types_fit_the_default_budget() {
     let source = format!("type Foo<T> = {arms}never;");
     let ast = parse(&source).unwrap();
     assert_eq!(
-        ast.nodes()
-            .iter()
+        ast.walk()
+            .map(|id| ast.node(id))
             .filter(|node| node.kind == "ConditionalType")
             .count(),
         100
     );
 }
 
-#[test]
-fn default_budget_protects_rust_worker_thread_stacks() {
-    for (name, source, jsx) in [
+/// Inputs nested 4,096 levels deep along every recursive grammar path, each
+/// with whether it needs JSX. Each exceeds both depth budgets.
+fn deep_inputs() -> Vec<(&'static str, String, bool)> {
+    vec![
         (
             "arrows",
             format!("const f = {}x;", "(x) => ".repeat(1_000)),
@@ -670,19 +673,63 @@ fn default_budget_protects_rust_worker_thread_stacks() {
             format!("type T = {}T{};", "`a${".repeat(4_096), "}`".repeat(4_096)),
             false,
         ),
-    ] {
-        assert!(
-            parse_with_options(
-                &source,
-                ParseOptions {
-                    jsx,
-                    ..Default::default()
-                }
-            )
-            .is_err(),
+    ]
+}
+
+#[test]
+fn default_budget_protects_rust_worker_thread_stacks() {
+    for (name, source, jsx) in deep_inputs() {
+        let error = parse_with_options(
+            &source,
+            ParseOptions {
+                jsx,
+                ..Default::default()
+            },
+        )
+        .unwrap_err();
+        assert_eq!(
+            error.message, "Maximum syntax nesting depth exceeded",
             "{name}"
         );
     }
+}
+
+#[test]
+fn the_deep_budget_fits_its_documented_stack() {
+    // A parse that exhausts the budget has recursed as deeply as it can.
+    std::thread::Builder::new()
+        .stack_size(typescript_parser::DEEP_PARSE_STACK_BYTES)
+        .spawn(|| {
+            for (name, source, jsx) in deep_inputs() {
+                let error = parse_with_options(
+                    &source,
+                    ParseOptions {
+                        jsx,
+                        max_depth: ParseOptions::DEEP_MAX_DEPTH,
+                        ..Default::default()
+                    },
+                )
+                .unwrap_err();
+                assert_eq!(
+                    error.message, "Maximum syntax nesting depth exceeded",
+                    "{name}"
+                );
+            }
+            // The deep budget admits what the default rejects.
+            let source = format!("{}x{};", "f(".repeat(200), ")".repeat(200));
+            assert!(parse(&source).is_err());
+            parse_with_options(
+                &source,
+                ParseOptions {
+                    max_depth: ParseOptions::DEEP_MAX_DEPTH,
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+        })
+        .unwrap()
+        .join()
+        .unwrap();
 }
 
 #[test]
@@ -741,4 +788,110 @@ fn type_argument_recovery_commits_only_a_disambiguated_list() {
     }
     let error = parse("f<<T>() T>();").unwrap_err();
     assert_eq!(error.message, "Expected '=>'");
+}
+
+#[test]
+fn walking_visits_each_node_of_the_final_tree_once() {
+    // Module reparsing replaces the script reading of `await(foo)`, a call,
+    // which stays allocated but is not part of the tree.
+    let ast = parse("export {}; await(foo);").unwrap();
+    assert!(ast.nodes().iter().any(|node| node.kind == "CallExpression"));
+    let walked: Vec<_> = ast.walk().collect();
+    assert_eq!(walked[0], ast.root_id());
+    assert!(
+        walked
+            .iter()
+            .all(|&id| ast.node(id).kind != "CallExpression")
+    );
+    assert!(
+        walked
+            .iter()
+            .any(|&id| ast.node(id).kind == "AwaitExpression")
+    );
+    let mut unique = walked.clone();
+    unique.sort_by_key(|id| id.index());
+    unique.dedup();
+    assert_eq!(unique.len(), walked.len());
+
+    // `assertClause` repeats `attributes`; their shared child is one child.
+    let ast = parse("import x from \"m\" with { type: \"json\" };").unwrap();
+    let attributes: Vec<_> = ast
+        .walk()
+        .filter(|&id| ast.node(id).kind == "ImportAttributes")
+        .collect();
+    assert_eq!(attributes.len(), 1);
+    let import = ast
+        .walk()
+        .find(|&id| ast.node(id).kind == "ImportDeclaration")
+        .unwrap();
+    assert_eq!(
+        ast.children(import)
+            .filter(|&id| id == attributes[0])
+            .count(),
+        1
+    );
+}
+
+#[test]
+fn token_spans_and_identifier_names_undo_the_json_projection() {
+    let source = "/* c */ let __x = 1; const y = <a>// text</a>;";
+    let ast = parse_with_options(
+        source,
+        ParseOptions {
+            jsx: true,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let find = |kind: &str| ast.walk().find(|&id| ast.node(id).kind == kind).unwrap();
+    let name = find("Identifier");
+    assert_eq!(ast.text(name), " __x");
+    let span = ast.token_span(name);
+    assert_eq!(&source[span.start..span.end], "__x");
+    assert!(
+        matches!(ast.node(name).field("escapedText"), Some(Value::Text(text)) if text == "___x")
+    );
+    assert_eq!(ast.identifier_name(name), Some("__x"));
+    let statement = find("VariableStatement");
+    let span = ast.token_span(statement);
+    assert_eq!(&source[span.start..span.end], "let __x = 1;");
+    // JSX text has no trivia, so its `//` is text.
+    let text = find("JsxText");
+    let span = ast.token_span(text);
+    assert_eq!(&source[span.start..span.end], "// text");
+    assert_eq!(ast.identifier_name(text), None);
+}
+
+#[test]
+fn parse_options_for_a_file_follow_typescripts_name_rules() {
+    // JSX follows the extension without case, as TypeScript's
+    // `getScriptKindFromFileName`; declaration context needs the exact name.
+    for (name, jsx, declaration) in [
+        ("view.tsx", true, false),
+        ("VIEW.TSX", true, false),
+        ("view.jsx", true, false),
+        ("view.ts", false, false),
+        ("dir.tsx/view.ts", false, false),
+        ("types.d.ts", false, true),
+        ("styles.d.css.ts", false, true),
+        ("G.D.TS", false, false),
+    ] {
+        let options = ParseOptions::for_file(name);
+        assert_eq!(options.jsx, jsx, "{name}");
+        let source = if jsx {
+            "const a = <div />;"
+        } else {
+            "declare const a: number;"
+        };
+        let ast =
+            parse_with_options(source, options).unwrap_or_else(|error| panic!("{name}: {error}"));
+        assert_eq!(
+            matches!(
+                ast.root().field("isDeclarationFile"),
+                Some(Value::Bool(true))
+            ),
+            declaration,
+            "{name}"
+        );
+    }
 }

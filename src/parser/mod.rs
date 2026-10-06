@@ -12,6 +12,7 @@ macro_rules! fields {
     }};
 }
 
+mod angles;
 mod context;
 mod expressions;
 mod jsx;
@@ -67,10 +68,20 @@ pub(crate) struct Parser<'src> {
     // Failed interpretations depend on immutable source and these grammar
     // settings, not arena IDs. Keep them across rollback to bound repeated work.
     failed_probes: HashSet<FailedProbe>,
+    // Which type-argument attempts can close; also a property of the source.
+    angles: angles::Angles,
+    // During a type-argument attempt in an expression: the offset its parse
+    // cannot pass, and how many type-argument lists it has open.
+    speculation: Option<usize>,
+    type_argument_frames: usize,
+    // The first depth-budget diagnostic, including one raised by a speculative
+    // interpretation. Rollback keeps it, so exhaustion always ends the parse.
+    exhausted: Option<Diagnostic>,
 }
 
 /// A speculative parse owns newly appended nodes. Existing nodes are read-only
-/// until it commits; rolling back restores the cursor and every grammar setting.
+/// until it commits; rolling back restores the cursor and every grammar setting,
+/// but never clears budget exhaustion.
 struct Checkpoint<'src> {
     lexer: Lexer<'src>,
     current: Token<'src>,
@@ -103,6 +114,10 @@ impl<'src> Parser<'src> {
             track_await,
             type_recovery: TypeRecovery::Strict,
             failed_probes: HashSet::new(),
+            angles: angles::Angles::default(),
+            speculation: None,
+            type_argument_frames: 0,
+            exhausted: None,
         }
     }
 
@@ -130,14 +145,15 @@ impl<'src> Parser<'src> {
             statements.push(statement);
         }
         self.check_token()?;
-        let external = self.source_flags & node_flags::POSSIBLY_CONTAINS_IMPORT_META != 0
-            || statements.iter().any(|id| self.external_statement(*id));
+        let external = crate::ast::external_module(&self.nodes, &statements, self.source_flags);
         if let Some(error) = deferred_error.filter(|_| !external) {
             return Err(error);
         }
         if !self.options.declaration_file() && has_await && external {
             statements = self.reparse_top_level_await(statements)?;
         }
+        // Exhaustion in a discarded interpretation still fails the parse.
+        self.check_budget()?;
         let eof = self.token_node()?;
         let root = self.make(
             SourceFile,
@@ -191,80 +207,30 @@ impl<'src> Parser<'src> {
         })
     }
 
-    fn external_statement(&self, id: NodeId) -> bool {
-        let node = &self.nodes[id.0];
-        matches!(
-            node.syntax_kind,
-            ImportDeclaration
-                | ImportEqualsDeclaration
-                | ExportDeclaration
-                | ExportAssignment
-                | NamespaceExportDeclaration
-        ) || matches!(node.field("modifiers"), Some(Value::Nodes(ids)) if ids.iter().any(|id| self.nodes[id.0].syntax_kind == ExportKeyword))
-    }
     fn validate_pragmas(&self) -> Result<()> {
         let leading = &self.lexer.src[..self.current.start];
-        let mut pos = 0;
-        while pos < leading.len() {
-            let rest = &leading[pos..];
-            let trimmed = rest.trim_start_matches(crate::lexer::whitespace);
-            pos += rest.len() - trimmed.len();
-            let rest = &leading[pos..];
-            if rest.starts_with("/*") {
-                let Some(end) = rest.find("*/") else { break };
-                pos += end + 2;
-                continue;
-            }
-            if rest.starts_with("#!") {
-                pos += rest.find(crate::lexer::line_break).unwrap_or(rest.len());
-                continue;
-            }
-            if !rest.starts_with("//") {
-                break;
-            }
-            let length = rest.find(crate::lexer::line_break).unwrap_or(rest.len());
-            let comment = &rest[..length];
-            if let Some(xml) = comment
-                .strip_prefix("///")
-                .map(|text| text.trim_start_matches(char::is_whitespace))
-                .and_then(|text| text.strip_prefix('<'))
-                .filter(|text| text.contains("/>"))
-            {
-                let name_end = xml.find(char::is_whitespace).unwrap_or(xml.len());
-                let name = &xml[..name_end];
-                let attributes = &xml[name_end..];
-                let error = if name.eq_ignore_ascii_case("reference") {
-                    let types = pragma_attribute(attributes, "types");
-                    if pragma_attribute(attributes, "no-default-lib") == Some("true") {
-                        None
-                    } else if types.is_some() {
-                        match pragma_attribute(attributes, "resolution-mode") {
-                            Some(mode) if mode != "require" && mode != "import" => {
-                                Some("'resolution-mode' must be 'require' or 'import'")
-                            }
-                            _ => None,
-                        }
-                    } else if pragma_attribute(attributes, "lib").is_some()
-                        || pragma_attribute(attributes, "path").is_some()
-                    {
-                        None
-                    } else {
-                        Some("Invalid 'reference' directive syntax")
+        for reference in crate::pragmas::references(leading) {
+            let attribute = |name| reference.attribute(name).map(|(value, _)| value);
+            let error = if attribute("no-default-lib") == Some("true") {
+                None
+            } else if attribute("types").is_some() {
+                match attribute("resolution-mode") {
+                    Some(mode) if mode != "require" && mode != "import" => {
+                        Some("'resolution-mode' must be 'require' or 'import'")
                     }
-                } else {
-                    None
-                };
-                if let Some(message) = error {
-                    return Err(Diagnostic {
-                        message: message.into(),
-                        span: Span {
-                            start: pos,
-                            end: pos + length,
-                        },
-                    });
+                    _ => None,
                 }
+            } else if attribute("lib").is_some() || attribute("path").is_some() {
+                None
+            } else {
+                Some("Invalid 'reference' directive syntax")
+            };
+            if let Some(message) = error {
+                return Err(Diagnostic {
+                    message: message.into(),
+                    span: reference.span(),
+                });
             }
-            pos += length;
         }
         Ok(())
     }
@@ -535,21 +501,38 @@ impl<'src> Parser<'src> {
         self.context = enclosing;
         result
     }
+    /// Charge one grammar entry against the depth budget, including entries made
+    /// while speculating. Exceeding it is sticky: later entries and speculation
+    /// helpers fail with the same diagnostic, and `parse` returns it.
     fn nest<T>(&mut self, f: impl FnOnce(&mut Self) -> Result<T>) -> Result<T> {
-        if self.depth >= self.options.max_depth {
-            return Err(self.error("Maximum syntax nesting depth exceeded"));
+        if self.exhausted.is_none() && self.depth >= self.options.max_depth {
+            self.exhausted = Some(self.error("Maximum syntax nesting depth exceeded"));
         }
+        self.check_budget()?;
         self.depth += 1;
         let result = f(self);
         self.depth -= 1;
         result
     }
-    fn attempt<T>(&mut self, f: impl FnOnce(&mut Self) -> Result<T>) -> Option<T> {
-        self.attempt_result(f).ok()
+    fn check_budget(&self) -> Result<()> {
+        match &self.exhausted {
+            Some(error) => Err(error.clone()),
+            None => Ok(()),
+        }
     }
-    /// Remember non-matches, including resource failures before interpretation
-    /// commits. Committed errors remain diagnostics rather than cache entries.
-    /// Context and depth distinguish grammar and resource restrictions.
+    /// Classify a speculative result: a syntax error is a grammar mismatch
+    /// (`None`), but budget exhaustion is a failure and propagates.
+    fn matched<T>(&self, result: Result<T>) -> Result<Option<T>> {
+        self.check_budget()?;
+        Ok(result.ok())
+    }
+    fn attempt<T>(&mut self, f: impl FnOnce(&mut Self) -> Result<T>) -> Result<Option<T>> {
+        let result = self.attempt_result(f);
+        self.matched(result)
+    }
+    /// Remember grammar non-matches. Committed errors remain diagnostics, and
+    /// exhaustion is never a non-match. Depth stays in the key so a cached
+    /// non-match answers only probes with the same remaining budget.
     fn probe_cached<T>(
         &mut self,
         kind: ProbeKind,
@@ -571,12 +554,15 @@ impl<'src> Parser<'src> {
         }
         result
     }
+    // Each speculation helper returns the exhaustion diagnostic even when the
+    // callback converted it into a non-match or an alternative result.
     fn attempt_result<T>(&mut self, f: impl FnOnce(&mut Self) -> Result<T>) -> Result<T> {
         let saved = self.checkpoint();
         let result = f(self);
         if result.is_err() {
             self.restore(saved);
         }
+        self.check_budget()?;
         result
     }
     /// Commit only a recognized interpretation. Both ordinary non-matches and
@@ -587,6 +573,7 @@ impl<'src> Parser<'src> {
         if !matches!(result, Ok(Some(_))) {
             self.restore(saved);
         }
+        self.check_budget()?;
         result
     }
     /// Inspect ambiguous syntax without committing cursor, nodes, or diagnostics.
@@ -594,6 +581,7 @@ impl<'src> Parser<'src> {
         let saved = self.checkpoint();
         let result = f(self);
         self.restore(saved);
+        self.check_budget()?;
         result
     }
     fn checkpoint(&self) -> Checkpoint<'src> {
@@ -924,70 +912,41 @@ impl<'src> Parser<'src> {
             }
         }
     }
+    /// Whether a JSDoc comment in the current token's leading trivia carries
+    /// `@deprecated`. TypeScript collects a leading comment only at the start
+    /// of the file (after a `#!` line), for trailing trivia, or after a CR or
+    /// LF in the trivia: `iterateCommentRanges` switches collection on for
+    /// those characters alone, so U+2028 and U+2029 do not, unlike every other
+    /// line-break rule (`lexer::line_break`).
     fn deprecated_trivia(&self, include_trailing: bool) -> bool {
-        let mut trivia = &self.lexer.src[self.current.full_start..self.current.start];
-        let mut collecting = self.current.full_start == 0 || include_trailing;
-        if !trivia.contains("/**") {
+        let src = self.lexer.src;
+        let trivia = &src[..self.current.start];
+        let from = self.current.full_start.max(crate::lexer::shebang_end(src));
+        if from >= trivia.len() || !trivia[from..].contains("/**") {
             return false;
         }
-        while !trivia.is_empty() {
-            let trimmed = trivia.trim_start_matches(crate::lexer::whitespace);
-            collecting |= trivia[..trivia.len() - trimmed.len()].contains(['\r', '\n']);
-            trivia = trimmed;
-            if trivia.starts_with("//") {
-                trivia = &trivia[trivia
-                    .find(crate::lexer::line_break)
-                    .unwrap_or(trivia.len())..];
-            } else if let Some(comment) = trivia.strip_prefix("/*") {
-                let Some(end) = comment.find("*/") else {
-                    return false;
-                };
-                let text = &comment[..end];
-                if collecting
-                    && text.starts_with('*')
-                    && text
-                        .split("@deprecated")
-                        .skip(1)
-                        .any(|tail| !tail.starts_with(crate::lexer::id_continue))
-                {
-                    return true;
-                }
-                trivia = &comment[end + 2..];
-            } else {
-                break;
+        let mut collecting = self.current.full_start == 0 || include_trailing;
+        for comment in crate::lexer::comments(trivia, from) {
+            collecting |= comment.space_before.contains(['\r', '\n']);
+            let Some(body) = comment
+                .text
+                .strip_prefix("/*")
+                .and_then(|text| text.strip_suffix("*/"))
+            else {
+                continue;
+            };
+            if collecting
+                && body.starts_with('*')
+                && body
+                    .split("@deprecated")
+                    .skip(1)
+                    .any(|tail| !tail.starts_with(crate::lexer::id_continue))
+            {
+                return true;
             }
         }
         false
     }
-}
-
-fn pragma_attribute<'src>(text: &'src str, name: &str) -> Option<&'src str> {
-    for (pos, character) in text.char_indices() {
-        if !character.is_whitespace() {
-            continue;
-        }
-        let tail = text[pos..].trim_start_matches(char::is_whitespace);
-        let Some(prefix) = tail.get(..name.len()) else {
-            continue;
-        };
-        if !prefix.eq_ignore_ascii_case(name) {
-            continue;
-        }
-        let tail = tail[name.len()..].trim_start_matches(char::is_whitespace);
-        let Some(tail) = tail.strip_prefix('=') else {
-            continue;
-        };
-        let tail = tail.trim_start_matches(char::is_whitespace);
-        let quote = tail.chars().next()?;
-        if !matches!(quote, '\'' | '"') {
-            continue;
-        }
-        let tail = &tail[1..];
-        if let Some(end) = tail.find(quote) {
-            return Some(&tail[..end]);
-        }
-    }
-    None
 }
 
 fn decode_identifier(raw: &str) -> std::result::Result<std::borrow::Cow<'_, str>, String> {

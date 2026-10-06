@@ -1,13 +1,13 @@
 // Module and global augmentations merge with their targets.
-import { /*@Options*/Options, /*@configure*/configure } from "./api";
+import { /*@Options:i*/Options, /*@configure:i*/configure } from "./api";
 
 declare module "./api" {
-  interface /*@Options*/Options { /*@!*/extra: number }
+  interface /*@Options:d*/Options { /*@!*/extra: number }
 }
 
 declare /*@!*/global {
-  interface /*@GlobalExtra*/GlobalExtra { /*@!*/flag: boolean }
+  interface /*@GlobalExtra:d*/GlobalExtra { /*@!*/flag: boolean }
 }
 
-let /*@merged*/merged: /*@Options*/Options = { /*@!*/base: 1, /*@!*/extra: 2 };
-/*@configure*/configure(/*@merged*/merged);
+let /*@merged:d*/merged: /*@Options:u*/Options = { /*@!*/base: 1, /*@!*/extra: 2 };
+/*@configure:u*/configure(/*@merged:u*/merged);

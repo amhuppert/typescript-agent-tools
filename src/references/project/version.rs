@@ -16,19 +16,18 @@ fn typescript() -> Version {
     Version::new(7, 0, 2)
 }
 
-/// Whether `range` admits the reference compiler's version; `None` when the
-/// range does not parse, which TypeScript treats as not matching.
-pub(super) fn matches_typescript(range: &str) -> Option<bool> {
+/// Whether `range` admits the reference compiler's version. TypeScript
+/// treats a range that does not parse as not matching.
+pub(super) fn matches_typescript(range: &str) -> bool {
     let version = typescript();
-    let alternatives = parse_range(range)?;
-    Some(
+    parse_range(range).is_some_and(|alternatives| {
         alternatives.is_empty()
             || alternatives.iter().any(|comparators| {
                 comparators
                     .iter()
                     .all(|(operator, operand)| operator.test(version.compare(operand)))
-            }),
-    )
+            })
+    })
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -327,29 +326,29 @@ mod tests {
     #[test]
     fn evaluates_ranges_against_the_reference_compiler() {
         for (range, expected) in [
-            ("*", Some(true)),
-            ("", Some(true)),
-            (">=4.0", Some(true)),
-            (">=7.1", Some(false)),
-            ("<7", Some(false)),
-            ("<7.1", Some(true)),
-            ("<=7.0", Some(true)),
-            (">7.0", Some(false)),
-            (">7.0.1", Some(true)),
-            ("7", Some(true)),
-            ("7.x", Some(true)),
-            ("6.x || 7.0.x", Some(true)),
-            ("~7.0.1", Some(true)),
-            ("^6.5", Some(false)),
-            ("^7.0.0-beta", Some(true)),
-            ("4.0 - 7.0.1", Some(false)),
-            ("4.0 - 7", Some(true)),
-            (">=3.1 <8", Some(true)),
-            (">= 3.1", None),
-            ("=7.0.2", Some(true)),
-            ("<7.0.2-0", Some(false)),
-            ("not a range", None),
-            ("01.2", None),
+            ("*", true),
+            ("", true),
+            (">=4.0", true),
+            (">=7.1", false),
+            ("<7", false),
+            ("<7.1", true),
+            ("<=7.0", true),
+            (">7.0", false),
+            (">7.0.1", true),
+            ("7", true),
+            ("7.x", true),
+            ("6.x || 7.0.x", true),
+            ("~7.0.1", true),
+            ("^6.5", false),
+            ("^7.0.0-beta", true),
+            ("4.0 - 7.0.1", false),
+            ("4.0 - 7", true),
+            (">=3.1 <8", true),
+            (">= 3.1", false),
+            ("=7.0.2", true),
+            ("<7.0.2-0", false),
+            ("not a range", false),
+            ("01.2", false),
         ] {
             assert_eq!(matches_typescript(range), expected, "{range}");
         }

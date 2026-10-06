@@ -5,22 +5,28 @@
 //! and occurrence resolution, then freezes the index served to queries.
 
 mod collect;
+mod ids;
 mod index;
+mod instances;
 mod link;
 mod syntax;
+mod targets;
 
-use super::source::{FileId, SourceText, token_span};
+use super::source::{FileId, SourceText};
 use super::{ProjectError, project::Program};
-use crate::{Ast, Node, NodeId, Span};
+use crate::syntax_kind::SyntaxKind;
+use crate::{Ast, Node, Span};
 
-/// A module specifier written in one file.
+/// A module one file requests: a specifier written in it, or the automatic
+/// JSX runtime that the project adds for its configuration.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct ModuleRequest {
     pub(super) specifier: String,
     pub(super) kind: RequestKind,
     /// An explicit `resolution-mode` import attribute.
     pub(super) mode: Option<ResolutionMode>,
-    /// The specifier string literal, for diagnostics.
+    /// Where diagnostics report the request: the specifier's string literal
+    /// token, or the start of the first JSX tag for the JSX runtime.
     pub(super) span: Span,
 }
 
@@ -65,6 +71,8 @@ pub(super) struct FileFacts {
     /// The start of the first JSX element or fragment in source order.
     pub(super) jsx: Option<usize>,
     pub(super) requests: Vec<ModuleRequest>,
+    /// End offsets of `@ts-ignore` and `@ts-expect-error` comments.
+    directives: Vec<u32>,
     facts: collect::Facts,
 }
 
@@ -81,7 +89,8 @@ pub(super) enum ModuleResolution {
     Unsupported(String),
 }
 
-pub(super) use index::{Index, SymbolId, Target};
+pub(super) use ids::SymbolId;
+pub(super) use index::{Index, Occurrence, Target};
 
 /// Occurrence role bits.
 pub(super) mod roles {
@@ -96,22 +105,21 @@ pub(super) mod meaning {
     pub(crate) const ALL: u8 = VALUE | TYPE | NAMESPACE;
 }
 
-/// Capture one file's semantic facts. Errors carry a position but no path.
+/// Capture one file's semantic facts from `ast`, parsed from `source`.
+/// Errors carry a position but no path.
 pub(super) fn collect(
-    _file: FileId,
     ast: &Ast<'_>,
+    source: &SourceText,
     options: FileOptions,
 ) -> Result<FileFacts, ProjectError> {
     let module = is_module(ast, options);
-    let (facts, requests) = collect::Collector::new(ast, module).run()?;
+    let (facts, requests) = collect::Collector::new(ast, source, module).run()?;
     Ok(FileFacts {
         module,
-        declaration: ast
-            .root()
-            .field("isDeclarationFile")
-            .is_some_and(|value| matches!(value, crate::Value::Bool(true))),
+        declaration: syntax::flag(ast.root(), "isDeclarationFile"),
         jsx: first_jsx(ast),
         requests,
+        directives: comment_directives(ast),
         facts,
     })
 }
@@ -121,90 +129,103 @@ pub(super) fn bind(program: &Program) -> Result<Index, ProjectError> {
     link::link(program)
 }
 
-/// TypeScript's external-module indicators, plus configuration and format
-/// rules supplied by the project.
+/// TypeScript's external-module indicators (`crate::ast::external_module`),
+/// plus configuration and format rules supplied by the project.
 fn is_module(ast: &Ast<'_>, options: FileOptions) -> bool {
     let root = ast.root();
     options.force_module
-        || root.flags & crate::compiler::node::POSSIBLY_CONTAINS_IMPORT_META != 0
-        || syntax::ids(root, "statements")
-            .iter()
-            .any(|&id| module_indicator(ast, ast.node(id)))
+        || crate::ast::external_module(ast.nodes(), syntax::ids(root, "statements"), root.flags)
         || options.jsx_module && first_jsx(ast).is_some()
 }
 
-fn module_indicator<'s>(ast: &Ast<'s>, node: &Node<'s>) -> bool {
-    match node.kind {
-        "ImportDeclaration" | "ExportDeclaration" | "ExportAssignment" => true,
-        "ImportEqualsDeclaration" => syntax::child(ast, node, "moduleReference")
-            .is_some_and(|reference| reference.kind == "ExternalModuleReference"),
-        _ => has_modifier(ast, node, "ExportKeyword"),
-    }
-}
-
-pub(super) fn has_modifier<'s>(ast: &Ast<'s>, node: &Node<'s>, kind: &str) -> bool {
+pub(super) fn has_modifier<'s>(ast: &Ast<'s>, node: &Node<'s>, kind: SyntaxKind) -> bool {
     syntax::ids(node, "modifiers")
         .iter()
-        .any(|&id| ast.node(id).kind == kind)
+        .any(|&id| ast.node(id).syntax_kind == kind)
 }
 
 fn first_jsx(ast: &Ast<'_>) -> Option<usize> {
-    reachable(ast)
-        .map(|id| ast.node(id))
-        .find(|node| {
+    ast.walk()
+        .find(|&id| {
             matches!(
-                node.kind,
-                "JsxElement" | "JsxSelfClosingElement" | "JsxFragment"
+                ast.node(id).syntax_kind,
+                SyntaxKind::JsxElement
+                    | SyntaxKind::JsxSelfClosingElement
+                    | SyntaxKind::JsxFragment
             )
         })
-        .map(|node| token_span(ast.source(), node.span).start)
+        .map(|id| ast.token_span(id).start)
 }
 
-/// The lines whose errors `@ts-ignore` and `@ts-expect-error` comments
-/// suppress, by TypeScript's rule: a directive comment ends on a preceding
-/// line, and only blank or line-comment lines lie between.
-#[derive(Debug, Default)]
-pub(super) struct Suppressions {
-    /// Indexed by zero-based line; empty without directives.
-    covered: Vec<bool>,
-}
-
-impl Suppressions {
-    pub(super) fn new(source: &SourceText, facts: &FileFacts) -> Self {
-        let directives = &facts.facts.directives;
-        if directives.is_empty() {
-            return Self::default();
-        }
-        let mut directive = vec![false; source.line_count()];
-        for &end in directives {
-            directive[source.line_index(end as usize)] = true;
-        }
-        let mut covered = vec![false; directive.len()];
-        for line in 1..covered.len() {
-            let above = line - 1;
-            covered[line] = directive[above]
-                || covered[above] && {
-                    let text = source.line(line).unwrap_or("").trim();
-                    text.is_empty() || text.starts_with("//")
-                };
-        }
-        Self { covered }
-    }
-
-    /// Whether errors at `offset` are suppressed.
-    pub(super) fn covers(&self, source: &SourceText, offset: usize) -> bool {
-        !self.covered.is_empty() && self.covered[source.line_index(offset)]
+impl FileFacts {
+    /// End offsets of real comment directives.
+    pub(super) fn comment_directives(&self) -> &[u32] {
+        &self.directives
     }
 }
 
-/// Nodes reachable from the root, visited with an explicit stack.
-fn reachable<'a>(ast: &'a Ast<'_>) -> impl Iterator<Item = NodeId> + 'a {
-    let mut stack = vec![ast.root_id()];
-    std::iter::from_fn(move || {
-        let id = stack.pop()?;
-        let start = stack.len();
-        stack.extend(syntax::children(ast.node(id)));
-        stack[start..].reverse();
-        Some(id)
-    })
+/// End offsets of `@ts-ignore` and `@ts-expect-error` comments anywhere in
+/// the file, as TypeScript's scanner records them. Outside string, template,
+/// regular expression, and JSX text tokens, `//` and `/*` always begin a
+/// comment, so the source is scanned around those tokens.
+fn comment_directives(ast: &Ast<'_>) -> Vec<u32> {
+    let text = ast.source();
+    let mut literals: Vec<Span> = ast
+        .walk()
+        .filter(|&id| {
+            matches!(
+                ast.node(id).syntax_kind,
+                SyntaxKind::StringLiteral
+                    | SyntaxKind::NoSubstitutionTemplateLiteral
+                    | SyntaxKind::TemplateHead
+                    | SyntaxKind::TemplateMiddle
+                    | SyntaxKind::TemplateTail
+                    | SyntaxKind::RegularExpressionLiteral
+                    | SyntaxKind::JsxText
+            )
+        })
+        .map(|id| ast.token_span(id))
+        .collect();
+    literals.sort_by_key(|span| span.start);
+    let mut literals = literals.into_iter().peekable();
+    let mut directives = Vec::new();
+    // A `#!` line is not a comment.
+    let mut at = crate::lexer::shebang_end(text);
+    while at < text.len() {
+        if let Some(literal) = literals.next_if(|literal| literal.start <= at) {
+            at = at.max(literal.end);
+            continue;
+        }
+        let limit = literals.peek().map_or(text.len(), |literal| literal.start);
+        let Some(slash) = text[at..limit].find('/') else {
+            at = limit;
+            continue;
+        };
+        let start = at + slash;
+        let Some(end) = crate::lexer::comment_end(text, start) else {
+            if text[start..].starts_with("/*") {
+                break;
+            }
+            at = start + 1;
+            continue;
+        };
+        let comment = &text[start..end];
+        let body = if comment.starts_with("//") {
+            comment.trim_start_matches('/')
+        } else {
+            // As in TypeScript, a block comment's directive is on its last line.
+            let comment = &comment[..comment.len() - 2];
+            let last_line = comment
+                .rfind(crate::lexer::line_break)
+                .map_or(comment, |at| &comment[at..]);
+            last_line.trim_start().trim_start_matches(['/', '*'])
+        };
+        // TypeScript 7's directive pattern allows only ASCII whitespace here.
+        let body = body.trim_start_matches([' ', '\t', '\x0c']);
+        if body.starts_with("@ts-ignore") || body.starts_with("@ts-expect-error") {
+            directives.push(end as u32);
+        }
+        at = end;
+    }
+    directives
 }

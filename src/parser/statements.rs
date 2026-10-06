@@ -121,7 +121,7 @@ impl<'src> Parser<'src> {
                 } else {
                     Err(p.error("Expected declaration after modifiers"))
                 }
-            })
+            })?
             .unwrap_or_default();
         self.ambient_modifiers(&modifiers);
         if modifiers

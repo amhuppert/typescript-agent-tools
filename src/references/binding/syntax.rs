@@ -1,8 +1,18 @@
-//! Field access over the final syntax tree. Only nodes reachable from the root
-//! are visited, and the `assertClause` compatibility alias of `attributes` is
-//! never treated as a second child.
+//! Typed field access over syntax nodes. `Ast::walk` and `Ast::children`
+//! traverse the final tree.
 
+use crate::syntax_kind::SyntaxKind;
 use crate::{Ast, Node, NodeId, Value};
+
+/// A punctuation or keyword token: TypeScript's `FirstPunctuation` through
+/// `LastPunctuation` and `FirstKeyword` through `LastKeyword`. Such a leaf
+/// names nothing, whatever syntax it appears in.
+pub(super) fn is_token(kind: SyntaxKind) -> bool {
+    let kind = kind.number();
+    let range = |first: SyntaxKind, last: SyntaxKind| first.number()..=last.number();
+    range(SyntaxKind::OpenBraceToken, SyntaxKind::CaretEqualsToken).contains(&kind)
+        || range(SyntaxKind::BreakKeyword, SyntaxKind::DeferKeyword).contains(&kind)
+}
 
 pub(super) fn child<'a, 'src>(
     ast: &'a Ast<'src>,
@@ -37,25 +47,25 @@ pub(super) fn number(node: &Node<'_>, field: &str) -> Option<u32> {
     }
 }
 
-/// Text of an identifier's `escapedText` or a literal's `text`. Unpaired
-/// surrogates in string literals are replaced.
-pub(super) fn text(node: &Node<'_>) -> String {
+/// The exact text of an identifier's `escapedText` or a literal's `text`, or
+/// empty for a node with neither. A string literal with an unpaired UTF-16
+/// surrogate has no exact Rust form, and replacing the surrogate would make
+/// distinct names equal, so it is an error holding display text for messages,
+/// with each unpaired surrogate written as a `\uXXXX` escape.
+pub(super) fn exact_text<'n>(node: &'n Node<'_>) -> Result<&'n str, String> {
     match node.field("escapedText").or_else(|| node.field("text")) {
-        Some(Value::Text(text)) => text.to_string(),
-        Some(Value::Utf16(units)) => String::from_utf16_lossy(units),
-        _ => String::new(),
+        Some(Value::Text(text)) => Ok(text),
+        Some(Value::Utf16(units)) => Err(char::decode_utf16(units.iter().copied())
+            .map(|unit| match unit {
+                Ok(c) => c.to_string(),
+                Err(error) => format!("\\u{:04X}", error.unpaired_surrogate()),
+            })
+            .collect()),
+        _ => Ok(""),
     }
 }
 
-/// Every child link of a node, in field order, excluding compatibility aliases.
-pub(super) fn children<'a, 's>(node: &'a Node<'s>) -> impl Iterator<Item = NodeId> + use<'a, 's> {
-    node.fields
-        .iter()
-        .filter(|(key, _)| *key != "assertClause")
-        .flat_map(|(_, value)| match value {
-            Value::Node(id) => std::slice::from_ref(id),
-            Value::Nodes(ids) => ids.as_slice(),
-            _ => &[],
-        })
-        .copied()
+/// Whether a node's exact text is `expected`.
+pub(super) fn is_text(node: &Node<'_>, expected: &str) -> bool {
+    exact_text(node) == Ok(expected)
 }

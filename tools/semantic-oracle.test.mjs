@@ -9,9 +9,13 @@ import {
   normalizeOracle, clusterDeclarations, classifySymbol, merges, lineStarts, position, loadSemanticApi, semanticCompilerVersion,
   SemanticSession, resultGroups,
 } from './semantic-oracle.mjs';
-import { parseMarkers, collectMarkers, checkMarkers, compareResponse, compareGroups, runBatch } from './semantic-conformance.mjs';
+import {
+  parseMarkers, collectMarkers, checkMarkers, compareResponse, compareGroups, runBatch, nameQueries, compareNameResponse,
+} from './semantic-conformance.mjs';
 
-const realOracle = !process.env.TYPE_SCRIPT_SEMANTIC_API || !process.env.TYPE_SCRIPT_NATIVE;
+// Real-oracle tests are skipped, with this reason, unless both compilers are configured.
+const oracleUnavailable = (!process.env.TYPE_SCRIPT_SEMANTIC_API || !process.env.TYPE_SCRIPT_NATIVE)
+  && 'TYPE_SCRIPT_SEMANTIC_API and TYPE_SCRIPT_NATIVE are not both set';
 const conformance = fileURLToPath(new URL('./semantic-conformance.mjs', import.meta.url));
 const fixtures = fileURLToPath(new URL('../fixtures/references/', import.meta.url));
 
@@ -95,7 +99,8 @@ test('normalization routes each token to the clusters its meaning selects', () =
   assert.deepEqual(oracle.groups.map(g => [g.meaning, g.declarations.map(d => d.location.start.line), g.occurrences.length]),
     [[['type'], [1], 3], [['value'], [2], 3]]);
   assert.deepEqual(resultGroups(oracle, [1]), [{ declarations: [{ name: 'Box', location: at('a.ts', 2, 13, 3) }],
-    occurrences: [at('a.ts', 2, 13, 3), at('a.ts', 3, 20, 3), at('a.ts', 4, 10, 3)].map(location => ({ name: 'Box', location })) }]);
+    occurrences: [[at('a.ts', 2, 13, 3), ['declaration']], [at('a.ts', 3, 20, 3), ['use']], [at('a.ts', 4, 10, 3), ['export']]]
+      .map(([location, roles]) => ({ name: 'Box', location, roles })) }]);
   assert.equal(oracle.anomalies.length, 0);
 });
 
@@ -126,6 +131,7 @@ test('a declaration name keeps its own cluster even when TypeScript returns anot
   assert.deepEqual(oracle.tokens.map(t => [t.classification, t.groups, t.outcome]),
     [['symbol', [0], 'groups'], ['symbol', [0], 'groups'], ['member', [], 'unsupported']]);
   assert.equal(oracle.tokens[0].note, 'declaration outside the TypeScript target symbol');
+  assert.deepEqual(oracle.tokens.map(t => t.normalization), ['declarationOutsideTarget', undefined, undefined]);
 });
 
 test('unmatched meanings become anomalies instead of silently dropped occurrences', () => {
@@ -160,6 +166,9 @@ test('non-reference syntax expects UnsupportedTarget; other unresolved tokens ex
   assert.match(oracle.tokens[7].note, /non-reference name to `process`/);
   assert.deepEqual(oracle.groups.map(g => g.occurrences.map(o => o.name)), [['process']]);
   assert.deepEqual(oracle.anomalies, []);
+  // Only departures from what TypeScript resolves are normalizations.
+  assert.deepEqual(oracle.tokens.map(t => t.normalization), [undefined, undefined, 'unresolvedProperty', undefined, undefined,
+    'libraryOnly', 'nonReference:globalAugmentation', 'nonReference:propertyName', undefined]);
 });
 
 test('missing namespace exports and value uses of type-only aliases expect UnresolvedTarget', () => {
@@ -172,6 +181,25 @@ test('missing namespace exports and value uses of type-only aliases expect Unres
     token('Shape', 'a.ts', 4, 1, 0, ['type']),
   ]));
   assert.deepEqual(oracle.tokens.map(t => t.outcome), ['unresolved', 'unsupported', 'unresolved', 'groups']);
+  assert.deepEqual(oracle.tokens.map(t => t.normalization), ['missingNamespaceExport', 'unresolvedProperty', 'typeOnlyValue', undefined]);
+});
+
+test('built-in targets and receiver-dependent properties carry normalization codes', () => {
+  const value = { name: 'box', flags: ['BlockScopedVariable'], declarations: [declaration('box', 'const', 'a.ts', 1, 7)] };
+  const size = { name: 'size', flags: ['BlockScopedVariable'], declarations: [declaration('size', 'const', 'a.ts', 2, 7)] };
+  const undefinedSymbol = { name: 'undefined', flags: ['Property', 'Transient'], declarations: [], special: 'undefined' };
+  const globalThisSymbol = { name: 'globalThis', flags: ['ValueModule'], declarations: [] };
+  const oracle = normalizeOracle(raw([value, size, undefinedSymbol, globalThisSymbol], [
+    token('undefined', 'a.ts', 3, 1, 2, ['value']),
+    token('globalThis', 'a.ts', 4, 1, 3, ['value']),
+    // `box.size` resolves through the type of `box`; `gone.size` has no receiver.
+    token('box', 'a.ts', 5, 1, 0, ['value']),
+    token('size', 'a.ts', 5, 5, 1, ['value'], { syntax: 'property', receiver: at('a.ts', 5, 1, 3) }),
+    token('gone', 'a.ts', 6, 1, null, ['value']),
+    token('size', 'a.ts', 6, 6, 1, ['value'], { syntax: 'property', receiver: at('a.ts', 6, 1, 4) }),
+  ]));
+  assert.deepEqual(oracle.tokens.map(t => [t.outcome, t.normalization]), [['unsupported', 'builtin'], ['unsupported', 'builtin'],
+    ['groups', undefined], ['unsupported', 'receiverType'], ['unresolved', undefined], ['unsupported', 'unresolvedReceiver']]);
 });
 
 test('groups are ordered by their earliest declaration and occurrences by location', () => {
@@ -196,7 +224,7 @@ test('locations use one-based lines and UTF-16 columns for every TypeScript line
 });
 
 test('markers follow the Rust harness syntax, including escapes, astral names, and roles', () => {
-  const text = 'const /*@a:de*/x = 1;\r\n/*@a,b:u*/x; /*@!*/\\u0061b; /*@?*/\\u{1D465}y; /*@c*/\u{1D465}_$ + 1;';
+  const text = 'const /*@a:de*/x = 1;\r\n/*@a,b:u*/x; /*@!*/\\u0061b; /*@?*/\\u{1D465}y;\u2028/*@c*/\u{1D465}_$ + 1;';
   const markers = parseMarkers(text, 'f.ts');
   assert.deepEqual(markers.map(m => [m.name, m.location.start, m.location.end]), [
     ['x', { line: 1, column: 16 }, { line: 1, column: 17 }],
@@ -235,8 +263,8 @@ function sampleOracle() {
   const run = { name: 'run', flags: ['Function'], declarations: [declaration('run', 'function', 'a.ts', 1, 13)] };
   const param = { name: 's', flags: ['FunctionScopedVariable'], declarations: [declaration('s', 'parameter', 'a.ts', 2, 13)] };
   return normalizeOracle(raw([run, param], [
-    token('run', 'a.ts', 1, 13, 0, ['value', 'type', 'namespace'], { declares: run.declarations[0], roles: ['declaration'] }),
-    token('s', 'a.ts', 2, 13, 1, ['value', 'type', 'namespace'], { declares: param.declarations[0], roles: ['declaration'] }),
+    token('run', 'a.ts', 1, 13, 0, ['value', 'type', 'namespace'], { declares: run.declarations[0], roles: ['declaration'], candidate: true }),
+    token('s', 'a.ts', 2, 13, 1, ['value', 'type', 'namespace'], { declares: param.declarations[0], roles: ['declaration'], candidate: true }),
     token('run', 'a.ts', 3, 13, 0, ['value']),
     token('lbl', 'a.ts', 4, 13, null, [], { syntax: 'label', roles: [] }),
   ]));
@@ -286,6 +314,14 @@ test('tool comparison classifies every difference without discarding locations',
   assert.deepEqual(kinds(0, result([moved])), ['extra-declaration', 'missing-declaration']);
   const renamed = { ...group(0), occurrences: group(0).occurrences.map(o => ({ ...o, name: 'other' })) };
   assert.deepEqual(kinds(0, result([renamed])), ['occurrence-name']);
+  // Roles are compared as sets on every matched occurrence.
+  const withRoles = roles => ({ ...group(0), occurrences: group(0).occurrences.map((o, index) => ({ ...o, roles: roles(o.roles, index) })) });
+  assert.deepEqual(kinds(0, result([withRoles(roles => [...roles].reverse())])), []);
+  assert.deepEqual(kinds(0, result([withRoles(() => ['use'])])), ['occurrence-roles']);
+  assert.deepEqual(kinds(0, result([withRoles((roles, index) => (index ? roles : [...roles, 'export']))])), ['occurrence-roles']);
+  assert.deepEqual(kinds(0, result([withRoles(() => undefined)])), ['occurrence-roles']);
+  const [reroled] = compareResponse(oracle, oracle.tokens[0], result([withRoles(() => ['use'])]));
+  assert.deepEqual([reroled.count, reroled.locations], [1, ['a.ts:1:13 declaration -> use']]);
   assert.deepEqual(kinds(0, result([group(0), group(1)])), ['extra-group']);
   // `export { Box }` belongs to both the type and the value group; sharing it
   // does not make the groups split or merged.
@@ -314,6 +350,50 @@ test('group comparison reports repeated occurrences and declarations', () => {
   actual[0].declarations.push(structuredClone(actual[0].declarations[0]));
   assert.deepEqual(compareGroups(expected, actual).map(difference => difference.kind), ['duplicate-occurrence', 'duplicate-declaration']);
   assert.deepEqual(compareGroups(expected, structuredClone(expected)), []);
+});
+
+test('name queries expect the union of their candidates groups or a failing candidate error', () => {
+  const result = groups => ({ result: { project: '/p/tsconfig.json', groups } });
+  const error = (kind, line, column) => ({ error: { kind, message: kind, path: '/p/a.ts', position: { line, column } } });
+  const sample = sampleOracle();
+  // Uses and labels are not candidates; one query per distinct spelling.
+  assert.deepEqual(nameQueries(sample).map(query => [query.name, query.candidates.map(t => t.location.start.line)]), [['run', [1]], ['s', [2]]]);
+  assert.deepEqual(nameQueries(sample, sample.tokens.slice(1)).map(query => query.name), ['s']);
+  const [run] = nameQueries(sample);
+  const kinds = (oracle, query, response) => compareNameResponse(oracle, query, response).map(d => d.kind).sort();
+  assert.deepEqual(kinds(sample, run, result(resultGroups(sample, [0]))), []);
+  assert.deepEqual(kinds(sample, run, result([])), ['missing-group']);
+  assert.deepEqual(kinds(sample, run, error('UnresolvedTarget', 1, 13)), ['classification']);
+  assert.deepEqual(kinds(sample, run, { panic: 'boom' }), ['panic']);
+
+  // `x` is declared twice (two groups) and imported from a missing module
+  // (unresolved); `y` is imported both from a missing module and as a member
+  // of an `export =` namespace (unsupported).
+  const first = { name: 'x', flags: ['BlockScopedVariable'], declarations: [declaration('x', 'const', 'b.ts', 1, 7)] };
+  const second = { name: 'x', flags: ['FunctionScopedVariable'], declarations: [declaration('x', 'parameter', 'c.ts', 1, 12)] };
+  const member = { name: 'y', flags: ['Method'], declarations: [declaration('y', 'member', 'd.d.ts', 1, 30)] };
+  const all = ['value', 'type', 'namespace'];
+  const oracle = normalizeOracle(raw([first, second, member], [
+    token('x', 'a.ts', 1, 10, null, all, { roles: ['import'], candidate: true }),
+    token('x', 'b.ts', 1, 7, 0, all, { declares: first.declarations[0], roles: ['declaration'], candidate: true }),
+    token('x', 'c.ts', 1, 12, 1, all, { declares: second.declarations[0], roles: ['declaration'], candidate: true }),
+    token('y', 'a.ts', 2, 10, null, all, { roles: ['import'], candidate: true }),
+    token('y', 'a.ts', 3, 10, 2, all, { roles: ['import'], candidate: true }),
+  ]));
+  const [x, y] = nameQueries(oracle);
+  assert.deepEqual(kinds(oracle, x, error('UnresolvedTarget', 1, 10)), []);
+  assert.deepEqual(kinds(oracle, x, result(resultGroups(oracle))), ['classification']);
+  assert.deepEqual(kinds(oracle, x, error('UnsupportedTarget', 1, 10)), ['classification']);
+  assert.deepEqual(kinds(oracle, x, error('UnresolvedTarget', 1, 11)), ['error-location']);
+  assert.deepEqual(kinds(oracle, x, { error: { kind: 'UnresolvedTarget', message: 'no location' } }), ['error-location']);
+  // Either failing candidate may be reported, but only with its own kind.
+  assert.deepEqual(kinds(oracle, y, error('UnresolvedTarget', 2, 10)), []);
+  assert.deepEqual(kinds(oracle, y, error('UnsupportedTarget', 3, 10)), []);
+  assert.deepEqual(kinds(oracle, y, error('UnsupportedTarget', 2, 10)), ['error-location']);
+  // Without the unresolved import, the query unites both declarations' groups.
+  const resolved = { ...x, candidates: x.candidates.slice(1) };
+  assert.deepEqual(kinds(oracle, resolved, result(resultGroups(oracle))), []);
+  assert.deepEqual(kinds(oracle, resolved, result(resultGroups(oracle, [1]))), ['missing-group']);
 });
 
 test('batch runs stream answers and treat crashes, short answers, and project errors as setup failures', async t => {
@@ -368,7 +448,7 @@ test('conformance CLI rejects bad usage and setup before comparing anything', t 
   assert.match(result.stderr, /package\.json/);
 });
 
-test('real oracle: positions, aliases, shadowing, and markers agree on a fixture', { skip: realOracle }, async t => {
+test('real oracle: positions, aliases, shadowing, and markers agree on a fixture', { skip: oracleUnavailable }, async t => {
   const semantic = await loadSemanticApi();
   const session = new SemanticSession(semantic);
   t.after(() => session.close());
@@ -384,9 +464,39 @@ test('real oracle: positions, aliases, shadowing, and markers agree on a fixture
   assert.deepEqual(checkMarkers(aliases, collectMarkers(fixture)), []);
   assert.deepEqual(aliases.groups.map(g => [g.declarations.map(d => `${d.name}@${d.location.file}`).join(), g.occurrences.length]),
     [['run@api.ts', 7], ['copy@api.ts', 2], ['local@app.ts', 1], ['start@app.ts', 2]]);
+  // Name candidates: declarations, the local name of an import, and the
+  // exported name of a re-export, but not the names they rename.
+  assert.deepEqual(aliases.tokens.filter(t => t.candidate).map(t => `${t.location.file}:${t.location.start.line}:${t.name}`).sort(),
+    ['api.ts:2:run', 'api.ts:3:copy', 'app.ts:2:start', 'app.ts:4:local', 'app.ts:4:start', 'barrel.ts:1:execute']);
 });
 
-test('real oracle: preserved symlinks keep distinct program files apart', { skip: realOracle }, async t => {
+test('real oracle: mixed aliases retain independent type and value declarations', { skip: oracleUnavailable }, async t => {
+  const session = new SemanticSession(await loadSemanticApi());
+  t.after(() => session.close());
+  const fixture = path.join(fixtures, 'mixed-alias-meanings');
+  const oracle = normalizeOracle(session.collect(path.join(fixture, 'tsconfig.json')));
+  assert.deepEqual(oracle.anomalies, []);
+  assert.deepEqual(checkMarkers(oracle, collectMarkers(fixture)), []);
+});
+
+test('real oracle: ambiguous star exports are unresolved where TypeScript keeps the first target', { skip: oracleUnavailable }, async t => {
+  const session = new SemanticSession(await loadSemanticApi());
+  t.after(() => session.close());
+  const fixture = path.join(fixtures, 'star-exports');
+  const oracle = normalizeOracle(session.collect(path.join(fixture, 'tsconfig.json')));
+  assert.deepEqual(oracle.anomalies, []);
+  assert.deepEqual(checkMarkers(oracle, collectMarkers(fixture)), []);
+  // TypeScript reports TS2308 at the second `export *` and resolves these
+  // tokens to left.ts: through an import, its uses, a namespace member, and
+  // both names of a re-export.
+  assert.ok(oracle.diagnostics.some(diagnostic => diagnostic.code === 2308 && diagnostic.file === 'both.ts'));
+  assert.deepEqual(oracle.tokens.filter(t => t.normalization === 'ambiguousStarExport')
+    .map(t => `${t.location.file}:${t.location.start.line}:${t.name}:${t.outcome}`).sort(),
+  ['app.ts:10:shared:unresolved', 'app.ts:11:shared:unresolved', 'app.ts:13:forwarded:unresolved', 'app.ts:13:shared:unresolved',
+    'app.ts:3:shared:unresolved']);
+});
+
+test('real oracle: preserved symlinks keep distinct program files apart', { skip: oracleUnavailable }, async t => {
   const semantic = await loadSemanticApi();
   const session = new SemanticSession(semantic);
   t.after(() => session.close());
@@ -401,7 +511,7 @@ test('real oracle: preserved symlinks keep distinct program files apart', { skip
     [['alias.ts', 'alias.ts'], ['app.ts', 'app.ts']]);
 });
 
-test('real oracle: compare mode passes on exact answers and reports differences otherwise', { skip: realOracle }, async t => {
+test('real oracle: compare mode passes on exact answers and reports differences otherwise', { skip: oracleUnavailable }, async t => {
   const directory = temporary(t);
   const project = path.join(directory, 'project');
   fs.mkdirSync(project);
@@ -415,6 +525,9 @@ test('real oracle: compare mode passes on exact answers and reports differences 
   const exact = oracle.tokens.map(token => token.outcome === 'groups'
     ? { result: { project: oracle.project, groups: resultGroups(oracle, token.groups) } }
     : { error: { kind: kinds[token.outcome], message: token.outcome } });
+  // Name queries follow the position queries: here only `value` is a candidate.
+  assert.deepEqual(nameQueries(oracle).map(query => query.name), ['value']);
+  exact.push({ result: { project: oracle.project, groups: resultGroups(oracle, nameQueries(oracle)[0].candidates[0].groups) } });
   fs.writeFileSync(path.join(directory, 'answers.json'), JSON.stringify(exact));
   const batch = executable(directory, 'batch', `
     const fs = require('node:fs');
@@ -427,8 +540,14 @@ test('real oracle: compare mode passes on exact answers and reports differences 
   assert.equal(passed.status, 0, passed.stdout + passed.stderr);
   const report = JSON.parse(fs.readFileSync(path.join(directory, '.cache/semantic-conformance.json'), 'utf8'));
   assert.deepEqual([report.queried, report.passed, report.failed], [oracle.tokens.length, oracle.tokens.length, 0]);
+  assert.deepEqual(report.names, { queried: 1, passed: 1, failed: 0, byKind: {} });
+  // `value` twice, the label twice, and `missing`.
+  assert.deepEqual(report.outcomes, { groups: 2, unresolved: 1, unsupported: 2 });
+  assert.deepEqual(report.normalizations, {});
   const failed = run({ EMPTY: '1' });
   assert.equal(failed.status, 1, failed.stdout + failed.stderr);
   const failures = JSON.parse(fs.readFileSync(path.join(directory, '.cache/semantic-conformance.json'), 'utf8'));
   assert.deepEqual(failures.byKind, { 'missing-group': 2, classification: 3 });
+  assert.deepEqual(failures.names, { queried: 1, passed: 0, failed: 1, byKind: { 'missing-group': 1 } });
+  assert.match(failed.stdout, /^FAIL .*project: name `value` \(1 candidates\): missing-group$/m);
 });

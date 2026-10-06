@@ -1,6 +1,7 @@
 //! An arena of syntax nodes. Child links are indices, so dropping an AST never
 //! recursively walks the tree. Source text is borrowed rather than copied.
 
+use crate::syntax_kind::SyntaxKind;
 use serde::{
     Serialize, Serializer,
     ser::{SerializeMap, SerializeSeq},
@@ -118,7 +119,7 @@ impl Diagnostic {
         for c in source[..self.span.start].chars() {
             match c {
                 '\n' if previous_cr => {}
-                '\n' | '\r' | '\u{2028}' | '\u{2029}' => {
+                c if crate::lexer::line_break(c) => {
                     line += 1;
                     column = 1;
                 }
@@ -128,6 +129,30 @@ impl Diagnostic {
         }
         (line, column)
     }
+}
+
+/// TypeScript's `isFileProbablyExternalModule`: whether `import.meta`, in
+/// the root's `flags`, or a top-level statement makes a file a module. As in
+/// `isAnExternalModuleIndicatorNode`, an `import =` counts only with
+/// `require(...)`, and `export as namespace` does not count.
+pub(crate) fn external_module(nodes: &[Node<'_>], statements: &[NodeId], flags: u32) -> bool {
+    use SyntaxKind::*;
+    let has_kind = |value: Option<&Value<'_>>, kind| match value {
+        Some(Value::Node(id)) => nodes[id.0].syntax_kind == kind,
+        Some(Value::Nodes(ids)) => ids.iter().any(|id| nodes[id.0].syntax_kind == kind),
+        _ => false,
+    };
+    flags & crate::compiler::node::POSSIBLY_CONTAINS_IMPORT_META != 0
+        || statements.iter().any(|&id| {
+            let node = &nodes[id.0];
+            match node.syntax_kind {
+                ImportDeclaration | ExportDeclaration | ExportAssignment => true,
+                ImportEqualsDeclaration => {
+                    has_kind(node.field("moduleReference"), ExternalModuleReference)
+                }
+                _ => has_kind(node.field("modifiers"), ExportKeyword),
+            }
+        })
 }
 
 /// An immutable syntax arena borrowing its original source. Child IDs and the
@@ -145,7 +170,7 @@ impl<'src> Ast<'src> {
         self.source
     }
     /// All allocated nodes, including nodes superseded by module reparsing.
-    /// Traverse child fields from `root()` to visit only the final syntax tree.
+    /// Use `walk()` to visit only the final syntax tree.
     pub fn nodes(&self) -> &[Node<'src>] {
         &self.nodes
     }
@@ -168,6 +193,66 @@ impl<'src> Ast<'src> {
     pub fn text(&self, id: NodeId) -> &'src str {
         let span = self.node(id).span;
         &self.source[span.start..span.end]
+    }
+    /// A node's span without its preceding trivia: from the start of its first
+    /// token to its end. For an identifier or literal, this is the exact token.
+    pub fn token_span(&self, id: NodeId) -> Span {
+        self.token_span_of(self.node(id))
+    }
+    /// `token_span` for a node of this arena already in hand.
+    pub(crate) fn token_span_of(&self, node: &Node<'src>) -> Span {
+        // JSX text has no trivia; text such as `// x` in it is not a comment.
+        if matches!(
+            node.syntax_kind,
+            SyntaxKind::JsxText | SyntaxKind::JsxTextAllWhiteSpaces
+        ) {
+            return node.span;
+        }
+        let mut lexer = crate::lexer::Lexer {
+            src: self.source,
+            pos: node.span.start,
+        };
+        Span {
+            start: lexer.next().start.min(node.span.end),
+            end: node.span.end,
+        }
+    }
+    /// An identifier's name. The compiler's `escapedText` field writes a name
+    /// that begins with two underscores with a third; this undoes that.
+    /// `None` for a node without `escapedText`.
+    pub fn identifier_name(&self, id: NodeId) -> Option<&str> {
+        match self.node(id).field("escapedText") {
+            Some(Value::Text(text)) if text.starts_with("___") => Some(&text[1..]),
+            Some(Value::Text(text)) => Some(text),
+            _ => None,
+        }
+    }
+    /// Child links in field order, without the `assertClause` compatibility
+    /// alias, which repeats `attributes`.
+    pub fn children(&self, id: NodeId) -> impl Iterator<Item = NodeId> + '_ {
+        self.node(id)
+            .fields
+            .iter()
+            .filter(|(key, _)| *key != "assertClause")
+            .flat_map(|(_, value)| match value {
+                Value::Node(id) => std::slice::from_ref(id),
+                Value::Nodes(ids) => ids.as_slice(),
+                _ => &[],
+            })
+            .copied()
+    }
+    /// The final syntax tree in pre-order: each node before its children, and
+    /// children in field order, each visited once. Nodes superseded by
+    /// reparsing are not visited. An explicit stack bounds native recursion.
+    pub fn walk(&self) -> impl Iterator<Item = NodeId> + '_ {
+        let mut stack = vec![self.root];
+        std::iter::from_fn(move || {
+            let id = stack.pop()?;
+            let start = stack.len();
+            stack.extend(self.children(id));
+            stack[start..].reverse();
+            Some(id)
+        })
     }
     /// A JSON view of a link from this arena; see `node()` for ID preconditions.
     pub fn view(&self, id: NodeId) -> NodeView<'_, 'src> {

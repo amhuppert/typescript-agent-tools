@@ -31,10 +31,11 @@ calls.push({
 fs.writeFileSync(log, JSON.stringify(calls));
 console.log('cargo stdout diagnostic');
 console.error('cargo stderr diagnostic');
+if (process.env.TSPARSE_WRAPPER_SKIP) console.log(process.env.TSPARSE_WRAPPER_SKIP);
 process.exit(Number(process.env.TSPARSE_WRAPPER_EXIT ?? 0));
 `, { mode: 0o755 });
 
-  return (args, exit = 0) => {
+  return (args, exit = 0, skip = '') => {
     fs.writeFileSync(log, '[]');
     const result = spawnSync(wrapper, args, {
       cwd: directory,
@@ -43,6 +44,7 @@ process.exit(Number(process.env.TSPARSE_WRAPPER_EXIT ?? 0));
         PATH: `${bin}${path.delimiter}${process.env.PATH}`,
         TSPARSE_WRAPPER_LOG: log,
         TSPARSE_WRAPPER_EXIT: String(exit),
+        TSPARSE_WRAPPER_SKIP: skip,
         RUST_TEST_THREADS: '99',
         NODE_OPTIONS: '--max-old-space-size=8192',
         FORCE_COLOR: '1',
@@ -60,11 +62,11 @@ test('an explicit integration-test file selects only its Cargo target and pins r
   const result = fixture(t)(['tests/cli.rs']);
   assert.equal(result.status, 0, result.stderr);
   assert.deepEqual(result.calls, [{
-    args: ['test', '--offline', '--jobs', '2', '--test', 'cli', '--', '--test-threads=2'],
+    args: ['test', '--offline', '--jobs', '2', '--test', 'cli', '--', '--test-threads=2', '--show-output'],
     cwd: result.directory,
     threads: '2', nodeOptions: '--max-old-space-size=2048', forceColor: '0', noColor: '1',
   }]);
-  assert.equal(result.stdout, '');
+  assert.equal(result.stdout, 'rust tests: passed, 0 skipped\n');
   assert.equal(result.stderr, '');
 });
 
@@ -73,7 +75,7 @@ test('multiple explicit files select exactly their integration-test targets', t 
   assert.equal(result.status, 0, result.stderr);
   assert.equal(result.calls.length, 1);
   assert.deepEqual(result.calls[0].args,
-    ['test', '--offline', '--jobs', '2', '--test', 'cli', '--test', 'literals', '--', '--test-threads=2']);
+    ['test', '--offline', '--jobs', '2', '--test', 'cli', '--test', 'literals', '--', '--test-threads=2', '--show-output']);
 });
 
 test('without explicit paths the changed wrapper uses the safe full-suite fallback', t => {
@@ -81,9 +83,16 @@ test('without explicit paths the changed wrapper uses the safe full-suite fallba
   assert.equal(result.status, 0, result.stderr);
   assert.equal(result.calls.length, 1);
   assert.deepEqual(result.calls[0].args,
-    ['test', '--offline', '--jobs', '2', '--', '--test-threads=2']);
-  assert.equal(result.stdout, '');
+    ['test', '--offline', '--jobs', '2', '--', '--test-threads=2', '--show-output']);
+  assert.equal(result.stdout, 'rust tests: passed, 0 skipped\n');
   assert.equal(result.stderr, '');
+});
+
+test('a test that cannot run on this platform is reported as a skip', t => {
+  const skip = 'SKIP case_policy: case-sensitive file system';
+  const result = fixture(t)(['tests/cli.rs'], 0, skip);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stdout, `rust tests: passed, 1 skipped on this platform:\n${skip}\n`);
 });
 
 test('invalid or unsupported paths fail before Cargo runs instead of widening scope', t => {

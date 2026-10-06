@@ -1,15 +1,15 @@
 // Component tags and expression containers are lexical uses; intrinsic tag
 // names and attribute names are not, even when a variable shares the name.
-function /*@Button*/Button(/*@props*/props: { /*@!*/label: string }) {
-  return < /*@!*/div /*@!*/className={/*@props*/props./*@!*/label}>{/*@props*/props./*@!*/label}</ /*@!*/div>;
+function /*@Button:d*/Button(/*@props:d*/props: { /*@!*/label: string }) {
+  return < /*@!*/div /*@!*/className={/*@props:u*/props./*@!*/label}>{/*@props:u*/props./*@!*/label}</ /*@!*/div>;
 }
 
-const /*@className*/className = "x";
-const /*@div*/div = 1;
+const /*@className:d*/className = "x";
+const /*@div:d*/div = 1;
 
-export const /*@App*/App = () => (
+export const /*@App:de*/App = () => (
   < /*@!*/span>
-    < /*@Button*/Button /*@!*/label={/*@className*/className} />
-    < /*@Button*/Button /*@!*/label="text">{/*@div*/div}</ /*@Button*/Button>
+    < /*@Button:u*/Button /*@!*/label={/*@className:u*/className} />
+    < /*@Button:u*/Button /*@!*/label="text">{/*@div:u*/div}</ /*@Button:u*/Button>
   </ /*@!*/span>
 );

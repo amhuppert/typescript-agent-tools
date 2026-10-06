@@ -501,14 +501,24 @@ impl<'src> Parser<'src> {
         }
         Ok(expression)
     }
+    /// TypeScript's `parseTypeArgumentsInExpression` and
+    /// `canFollowTypeArgumentsInExpression`. The closing `>` must stand alone,
+    /// as `reScanGreaterToken` requires: one joined to a following `>` or `=`
+    /// (`f(a < b, c >= d)`) is an operator, not a closer.
     fn can_follow_type_arguments(&self, no_call: bool) -> bool {
+        let joined = self.current.start == self.end && self.current.raw.starts_with(['>', '=']);
+        !joined && self.can_follow_closed_type_arguments(no_call)
+    }
+    fn can_follow_closed_type_arguments(&self, no_call: bool) -> bool {
         no_call
             || self.at("(")
             || matches!(
                 self.current.kind,
                 Kind::TemplateHead | Kind::NoSubstitutionTemplate
             )
-            || !matches!(self.current.raw, "<" | ">" | ">>" | ">>>" | "+" | "-")
+            // TypeScript scans `>` alone here, so `>=` and `>>` also begin
+            // with a rejected `>`.
+            || !(self.current.raw.starts_with('>') || matches!(self.current.raw, "<" | "+" | "-"))
                 && (self.current.newline
                     || binary_precedence(self.current.raw).is_some()
                     || !matches!(
@@ -517,30 +527,47 @@ impl<'src> Parser<'src> {
                     ) && !matches!(self.current.raw, "[" | "{" | "!" | "~" | "++" | "--"))
     }
     fn expression_type_arguments(&mut self, no_call: bool) -> Result<Option<Vec<NodeId>>> {
-        match self.probe(|p| {
-            let arguments = p.type_arguments()?;
-            Ok(p.can_follow_type_arguments(no_call).then_some(arguments))
-        }) {
-            Ok(arguments) => Ok(arguments),
-            Err(_) if self.recovering_types() => Ok(None),
-            Err(_) => {
-                // Recovery commits only when it reaches the real closing '>'
-                // and the following token establishes expression type arguments.
-                let committed_error = self
-                    .look_ahead(|p| {
-                        let (_, error) = p.recover_types(Self::type_arguments)?;
-                        Ok(p.can_follow_type_arguments(no_call)
-                            .then_some(error)
-                            .flatten())
-                    })
-                    .ok()
-                    .flatten();
-                match committed_error {
-                    Some(error) => Err(error),
-                    None => Ok(None),
-                }
+        // Attempts that `angles` rules out could only fail, so skipping them
+        // changes no result.
+        let angle = self.angles.at(self.lexer.src, self.current.start);
+        if angle.strict {
+            let strict = self.speculate(angle.stop, |p| {
+                p.probe(|p| {
+                    let arguments = p.type_arguments()?;
+                    Ok(p.can_follow_type_arguments(no_call).then_some(arguments))
+                })
+            });
+            if let Some(arguments) = self.matched(strict)? {
+                return Ok(arguments);
             }
         }
+        if self.recovering_types() || self.angles.closers(self.current.start, angle.stop) == 0 {
+            return Ok(None);
+        }
+        // Recovery commits only when it reaches the real closing '>'
+        // and the following token establishes expression type arguments.
+        let recovered = self.speculate(angle.stop, |p| {
+            p.look_ahead(|p| {
+                let (_, error) = p.recover_types(Self::type_arguments)?;
+                Ok(p.can_follow_type_arguments(no_call)
+                    .then_some(error)
+                    .flatten())
+            })
+        });
+        match self.matched(recovered)?.flatten() {
+            Some(error) => Err(error),
+            None => Ok(None),
+        }
+    }
+
+    /// Run a type-argument attempt whose parse cannot pass `stop`, counting
+    /// the type-argument lists it opens from zero.
+    fn speculate<T>(&mut self, stop: usize, attempt: impl FnOnce(&mut Self) -> T) -> T {
+        let enclosing = (self.speculation.replace(stop), self.type_argument_frames);
+        self.type_argument_frames = 0;
+        let result = attempt(self);
+        (self.speculation, self.type_argument_frames) = enclosing;
+        result
     }
 
     fn try_optional_chain(&mut self, expression: NodeId) -> bool {

@@ -1,2 +1,2 @@
-export default class /*@Named*/NamedClass {}
-/*@Named*/NamedClass;
+export default class /*@Named:de*/NamedClass {}
+/*@Named:u*/NamedClass;

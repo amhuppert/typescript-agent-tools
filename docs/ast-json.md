@@ -16,7 +16,7 @@ Strings and untagged templates reject malformed escapes. Tagged templates retain
 
 `SourceFile` includes `statements`, `endOfFileToken`, `text`, `fileName`, `languageVersion`, `languageVariant`, `scriptKind`, `isDeclarationFile`, and an empty `parseDiagnostics` array. Input errors produce a Rust `Diagnostic` or a nonzero CLI exit, not a partial `SourceFile`.
 
-Ambiguous syntax can be reconsidered until an arrow, function type, or mapped type commits to its interpretation. Errors in the committed remainder, including nesting-budget errors, are returned directly rather than replaced by a fallback interpretation's diagnostic.
+Ambiguous syntax can be reconsidered until an arrow, function type, or mapped type commits to its interpretation. Errors in the committed remainder are returned directly rather than replaced by a fallback interpretation's diagnostic. Nesting-budget errors are returned even from an interpretation that has not committed: speculative attempts count toward the budget, and exceeding it never yields a different tree.
 
 This is a serializable **syntax projection**, not a dump of an entire bound compiler object. It omits `parent` links, object IDs, transform/modifier caches, symbols, flow nodes, compiler maps, JSDoc trees, comment directives, and reference/pragma metadata. `HasAggregatedChildData` (2097152) is a lazy compiler cache flag and is excluded from differential comparisons. Arrays serialize as ordinary JSON arrays, as compiler `NodeArray` objects do through `JSON.stringify`. Import attributes use both `attributes` and the compiler's `assertClause` compatibility alias; both serialize the same child.
 

@@ -1,14 +1,14 @@
 //! Symbol selection by position or name, and result grouping. Both entry
 //! points select symbols and share one grouping operation.
 
-use super::binding::{Index, SymbolId, Target, roles};
-use super::source::{FileId, PositionError, normalize};
+use super::binding::{self, Index, SymbolId, Target, roles};
+use super::source::{FileId, PositionError};
 use super::{
     Location, NamedLocation, Occurrence, QueryError, QueryErrorKind, ReferenceGroup,
-    ReferenceProject, ReferenceQuery, Role,
+    ReferenceProject, ReferenceQuery, Role, SourcePosition,
 };
 use std::collections::BTreeMap;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub(super) fn find(
     project: &ReferenceProject,
@@ -34,30 +34,8 @@ pub(super) fn find(
             let Some(occurrence) = index.occurrence_at(id, offset) else {
                 return Ok(Vec::new());
             };
-            let error = |kind, message: String| QueryError {
-                kind,
-                message,
-                path: Some(file.clone()),
-                position: Some(position),
-            };
-            match &occurrence.target {
-                Target::Symbols(found) => symbols.extend(found.iter().copied()),
-                Target::NotReference(why) => {
-                    return Err(error(
-                        QueryErrorKind::UnsupportedTarget,
-                        format!(
-                            "`{}` is a {why}, not a supported reference target",
-                            index.text(occurrence.name)
-                        ),
-                    ));
-                }
-                Target::Unresolved(why) => {
-                    return Err(error(
-                        QueryErrorKind::UnresolvedTarget,
-                        index.text(*why).to_string(),
-                    ));
-                }
-            }
+            let path = &project.sources.get(id).path;
+            symbols.extend_from_slice(selected(index, occurrence, || (path.clone(), position))?);
         }
         ReferenceQuery::Name { name, file } => {
             let only = file
@@ -69,19 +47,13 @@ pub(super) fn find(
                     continue;
                 }
                 let occurrence = index.occurrence(candidate);
-                match &occurrence.target {
-                    Target::Symbols(found) => symbols.extend(found.iter().copied()),
-                    Target::NotReference(_) => {}
-                    Target::Unresolved(why) => {
-                        let source = project.sources.get(candidate.file);
-                        return Err(QueryError {
-                            kind: QueryErrorKind::UnresolvedTarget,
-                            message: format!("`{name}`: {}", index.text(*why)),
-                            path: Some(source.path.clone()),
-                            position: Some(source.text.position(occurrence.span.start)),
-                        });
-                    }
-                }
+                let source = project.sources.get(candidate.file);
+                symbols.extend_from_slice(selected(index, occurrence, || {
+                    (
+                        source.path.clone(),
+                        source.text.position(occurrence.span.start),
+                    )
+                })?);
             }
         }
     }
@@ -102,6 +74,37 @@ pub(super) fn find(
         first(a).cmp(&first(b))
     });
     Ok(groups)
+}
+
+/// The symbols a selected token denotes. Both entry points fail on a token
+/// that is not a supported target or does not resolve, rather than letting
+/// it vanish from an otherwise successful result.
+fn selected<'a>(
+    index: &Index,
+    occurrence: &'a binding::Occurrence,
+    at: impl FnOnce() -> (PathBuf, SourcePosition),
+) -> Result<&'a [SymbolId], QueryError> {
+    let (kind, message) = match &occurrence.target {
+        Target::Symbols(found) => return Ok(found),
+        Target::NotReference(why) => (
+            QueryErrorKind::UnsupportedTarget,
+            format!(
+                "`{}` is not a supported reference target ({why})",
+                index.text(occurrence.name)
+            ),
+        ),
+        Target::Unresolved(why) => (
+            QueryErrorKind::UnresolvedTarget,
+            format!("`{}`: {}", index.text(occurrence.name), index.text(*why)),
+        ),
+    };
+    let (path, position) = at();
+    Err(QueryError {
+        kind,
+        message,
+        path: Some(path),
+        position: Some(position),
+    })
 }
 
 fn group(project: &ReferenceProject, index: &Index, symbol: SymbolId) -> ReferenceGroup {
@@ -165,23 +168,10 @@ fn location(project: &ReferenceProject, file: FileId, span: crate::Span) -> Loca
 
 /// The searched file a query names, matched lexically without file access.
 fn search_file(project: &ReferenceProject, file: &Path) -> Result<FileId, QueryError> {
-    let absolute = std::path::absolute(file).map_err(|error| QueryError {
-        kind: QueryErrorKind::Io,
-        message: error.to_string(),
+    project.files.find(file).ok_or_else(|| QueryError {
+        kind: QueryErrorKind::OutsideProject,
+        message: "not one of the project's searched files".into(),
         path: Some(file.to_path_buf()),
         position: None,
-    })?;
-    project
-        .search_paths
-        .get(&super::path_key(
-            &normalize(&absolute),
-            project.case_sensitive,
-        ))
-        .copied()
-        .ok_or_else(|| QueryError {
-            kind: QueryErrorKind::OutsideProject,
-            message: "not one of the project's searched files".into(),
-            path: Some(file.to_path_buf()),
-            position: None,
-        })
+    })
 }

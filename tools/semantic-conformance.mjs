@@ -16,9 +16,14 @@
 // compare: queries the Rust tool at every oracle token through one
 // `reference_batch` process per project and reports per-token differences:
 // classification (expected groups, UnsupportedTarget, or UnresolvedTarget),
-// missing/extra groups and occurrences, declaration sets, merged and split
-// groups, panics, and oracle anomalies (recorded, never filtered). --limit
-// bounds the number of queried tokens across all projects.
+// missing/extra groups and occurrences, occurrence names and roles,
+// declaration sets, merged and split groups, panics, and oracle anomalies
+// (recorded, never filtered). It also issues one name query per distinct
+// spelling among the queried tokens' name candidates and compares it with the
+// union of the candidates' groups, or with the error a failing candidate
+// implies. --limit bounds the number of queried tokens across all projects.
+// The summary counts queried tokens by expected outcome and by normalization
+// code (see semantic-oracle.mjs), and name queries separately.
 //
 // Environment: TYPE_SCRIPT_SEMANTIC_API and TYPE_SCRIPT_NATIVE select the
 // pinned compiler (see semantic-oracle.mjs). REFERENCE_BATCH names the example
@@ -32,7 +37,7 @@ import path from 'node:path';
 import readline from 'node:readline';
 import { spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
-import { corpusLimit, requireComparisons } from './corpus-selection.mjs';
+import { runnerArguments, corpusLimit, requireComparisons } from './corpus-selection.mjs';
 import {
   SemanticSession, loadSemanticApi, normalizeOracle, lineStarts, position, locationKey, describeLocation, compareLocations,
 } from './semantic-oracle.mjs';
@@ -221,6 +226,51 @@ export function compareResponse(oracle, token, response) {
   return compareGroups(token.groups.map(index => ({ index, ...oracle.groups[index] })), response.result.groups);
 }
 
+// One name query per distinct spelling among `tokens`' name candidates. Its
+// candidates are every candidate token of that spelling in the project.
+export function nameQueries(oracle, tokens = oracle.tokens) {
+  const names = [...new Set(tokens.filter(token => token.candidate).map(token => token.name))].sort();
+  return names.map(name => ({ name, candidates: oracle.tokens.filter(token => token.candidate && token.name === name) }));
+}
+
+// Differences between the expectation for a name query and one response. A
+// name query returns the union of its candidates' groups, or fails as a
+// position query on its first unsupported or unresolved candidate would. The
+// tool's candidate order is not part of the contract, so the error may name
+// any failing candidate whose outcome matches its kind.
+export function compareNameResponse(oracle, query, response) {
+  const anomalous = query.candidates.find(token => token.outcome === 'anomaly');
+  if (anomalous) return [{ kind: 'oracle-anomaly', message: `candidate ${describeLocation(anomalous.location)} has no expected outcome` }];
+  if (!response || typeof response !== 'object') return [{ kind: 'invalid-response', message: JSON.stringify(response) }];
+  if (typeof response.panic === 'string') return [{ kind: 'panic', message: response.panic }];
+  const actual = response.error && typeof response.error.kind === 'string' ? response.error.kind
+    : response.result && Array.isArray(response.result.groups) ? 'groups' : undefined;
+  if (actual === undefined) return [{ kind: 'invalid-response', message: JSON.stringify(response).slice(0, 500) }];
+  const failing = query.candidates.filter(token => token.outcome !== 'groups');
+  const describe = tokens => tokens.slice(0, SAMPLE).map(token => `${locationKey(token.location)} ${token.outcome}`);
+  if (failing.length) {
+    const expected = [...new Set(failing.map(token => EXPECTED_RESPONSE[token.outcome]))].sort();
+    if (!expected.includes(actual))
+      return [{ kind: 'classification', expected: expected.join('|'), actual, candidates: describe(failing), ...(response.error ? { message: response.error.message } : {}) }];
+    const at = errorLocation(path.dirname(oracle.project), response.error);
+    if (!failing.some(token => EXPECTED_RESPONSE[token.outcome] === actual && locationKey(token.location) === at))
+      return [{ kind: 'error-location', expected: describe(failing), actual: at ?? 'none', message: response.error.message }];
+    return [];
+  }
+  if (actual !== 'groups') return [{ kind: 'classification', expected: 'groups', actual, message: response.error.message }];
+  const indices = [...new Set(query.candidates.flatMap(token => token.groups))].sort((a, b) => a - b);
+  return compareGroups(indices.map(index => ({ index, ...oracle.groups[index] })), response.result.groups);
+}
+
+// The `file:line:column` key of a query error's location relative to the
+// project directory, or undefined when the error has none.
+function errorLocation(root, error) {
+  if (typeof error.path !== 'string' || !error.position) return undefined;
+  let file = path.resolve(root, error.path);
+  try { file = fs.realpathSync(file); } catch { /* keep the reported spelling */ }
+  return `${path.relative(root, file).split(path.sep).join('/')}:${error.position.line}:${error.position.column}`;
+}
+
 export function compareGroups(expected, actual) {
   const differences = [];
   // Each group lists a location once; set-based matching below would hide a
@@ -238,10 +288,13 @@ export function compareGroups(expected, actual) {
     }
   }
   const occurrenceKeys = group => new Map(group.occurrences.map(occurrence => [locationKey(occurrence.location), occurrence.name]));
+  // Sorted roles joined by `+`, or null when an occurrence has no role list.
+  const roleKeys = group => new Map(group.occurrences.map(occurrence =>
+    [locationKey(occurrence.location), Array.isArray(occurrence.roles) ? [...occurrence.roles].sort().join('+') : null]));
   const declarationKeys = group => new Set(group.declarations.map(declaration => `${declaration.name}@${locationKey(declaration.location)}`));
   const declarationPlaces = group => new Set(group.declarations.map(declaration => locationKey(declaration.location)));
   const summarize = groups => {
-    const sides = groups.map(group => ({ occurrences: occurrenceKeys(group), declarations: declarationKeys(group), places: declarationPlaces(group) }));
+    const sides = groups.map(group => ({ occurrences: occurrenceKeys(group), roles: roleKeys(group), declarations: declarationKeys(group), places: declarationPlaces(group) }));
     // A token in several groups (such as `export { Name }` for a type and a
     // value) says nothing about which groups correspond; match on the others.
     const counts = new Map();
@@ -271,6 +324,11 @@ export function compareGroups(expected, actual) {
     if (missing.length) differences.push({ kind: 'missing-occurrence', ...label, ...sample(missing) });
     const renamed = [...group.occurrences].filter(([key, name]) => present.has(key) && present.get(key) !== name);
     if (renamed.length) differences.push({ kind: 'occurrence-name', ...label, ...sample(renamed.map(([key, name]) => `${key} ${name} -> ${present.get(key)}`)) });
+    // Roles are syntactic, so a token has the same roles in every group.
+    const presentRoles = new Map(matches[index].flatMap(other => [...found[other].roles]));
+    const reroled = [...group.roles].filter(([key, roles]) => roles !== null && presentRoles.has(key) && presentRoles.get(key) !== roles);
+    const spell = roles => (roles === null ? 'missing' : roles || 'none');
+    if (reroled.length) differences.push({ kind: 'occurrence-roles', ...label, ...sample(reroled.map(([key, roles]) => `${key} ${spell(roles)} -> ${spell(presentRoles.get(key))}`)) });
     const declarations = new Set(matches[index].flatMap(other => [...found[other].declarations]));
     const missingDeclarations = [...group.declarations].filter(key => !declarations.has(key));
     const extraDeclarations = [...declarations].filter(key => !group.declarations.has(key));
@@ -397,6 +455,11 @@ async function compareMode(args, semantic) {
   if (!fs.existsSync(binary)) throw new Error(`No reference_batch binary at ${binary}; run \`cargo build --offline --example reference_batch\` or set REFERENCE_BATCH`);
   const session = new SemanticSession(semantic);
   const projects = [], failures = [], byKind = {};
+  const names = { queried: 0, passed: 0, failed: 0, byKind: {} };
+  // Expected outcomes of the queried tokens, and how many of them the oracle
+  // moved away from TypeScript's resolution (see normalizationCode).
+  const outcomes = {}, normalizations = {};
+  const count = (counts, key) => { counts[key] = (counts[key] ?? 0) + 1; };
   let queried = 0, passed = 0;
   try {
     for (const config of configs) {
@@ -409,18 +472,40 @@ async function compareMode(args, semantic) {
       const root = path.dirname(oracle.project);
       const tokens = oracle.tokens.slice(0, remaining);
       remaining -= tokens.length;
-      Object.assign(entry, { tokens: oracle.tokens.length, queried: tokens.length, groups: oracle.groups.length, anomalies: oracle.anomalies.length, passed: 0, failed: 0 });
-      const queries = tokens.map(token => ({ at: { file: path.join(root, token.location.file), line: token.location.start.line, column: token.location.start.column } }));
+      const nameList = nameQueries(oracle, tokens);
+      Object.assign(entry, { tokens: oracle.tokens.length, queried: tokens.length, groups: oracle.groups.length, anomalies: oracle.anomalies.length,
+        passed: 0, failed: 0, names: nameList.length, namesPassed: 0, namesFailed: 0 });
+      for (const token of tokens) {
+        count(outcomes, token.outcome);
+        if (token.normalization) count(normalizations, token.normalization);
+      }
+      const queries = [
+        ...tokens.map(token => ({ at: { file: path.join(root, token.location.file), line: token.location.start.line, column: token.location.start.column } })),
+        ...nameList.map(({ name }) => ({ name, file: null })),
+      ];
       const run = await runBatch(binary, oracle.project, queries, (index, response) => {
+        if (index >= tokens.length) {
+          const query = nameList[index - tokens.length];
+          names.queried++;
+          const differences = compareNameResponse(oracle, query, response);
+          if (!differences.length) { names.passed++; entry.namesPassed++; return; }
+          names.failed++;
+          entry.namesFailed++;
+          for (const kind of new Set(differences.map(difference => difference.kind))) count(names.byKind, kind);
+          failures.push({ project: config, query: 'name', name: query.name,
+            candidates: query.candidates.map(token => `${describeLocation(token.location)} ${token.outcome}`).slice(0, SAMPLE), differences });
+          return;
+        }
+        queried++;
         const token = tokens[index];
         const differences = compareResponse(oracle, token, response);
         if (!differences.length) { entry.passed++; return; }
         entry.failed++;
-        for (const kind of new Set(differences.map(difference => difference.kind))) byKind[kind] = (byKind[kind] ?? 0) + 1;
-        failures.push({ project: config, location: describeLocation(token.location), name: token.name, typescript: token.classification,
-          expected: token.outcome, ...(token.syntax ? { syntax: token.syntax } : {}), differences });
+        for (const kind of new Set(differences.map(difference => difference.kind))) count(byKind, kind);
+        failures.push({ project: config, query: 'at', location: describeLocation(token.location), name: token.name, typescript: token.classification,
+          expected: token.outcome, ...(token.syntax ? { syntax: token.syntax } : {}),
+          ...(token.normalization ? { normalization: token.normalization } : {}), differences });
       });
-      queried += run.responses;
       passed += entry.passed;
       if (run.projectError) entry.setupError = `reference_batch project error ${run.projectError.kind}: ${run.projectError.message}`;
       else if (run.error) entry.setupError = `reference_batch: ${run.error}`;
@@ -432,17 +517,22 @@ async function compareMode(args, semantic) {
   for (const project of setupFailures) console.log(`SETUP ${project.project}: ${project.setupError}`);
   for (const failure of failures.slice(0, 50)) {
     const directory = path.relative(process.cwd(), path.dirname(failure.project)) || '.';
-    console.log(`FAIL ${directory}: ${failure.location} \`${failure.name}\` (${failure.expected}): ${failure.differences.map(d => d.kind).join(', ')}`);
+    const subject = failure.query === 'name' ? `name \`${failure.name}\` (${failure.candidates.length} candidates)`
+      : `${failure.location} \`${failure.name}\` (${failure.expected})`;
+    console.log(`FAIL ${directory}: ${subject}: ${failure.differences.map(d => d.kind).join(', ')}`);
   }
   if (failures.length > 50) console.log(`... ${failures.length - 50} more failures in the report`);
   if (!setupFailures.length) requireComparisons(queried);
   const report = { compiler: semantic.version, mode: 'compare', binary, projects, tokens: projects.reduce((sum, p) => sum + (p.tokens ?? 0), 0),
-    queried, passed, failed: failures.length, setupFailures: setupFailures.length, byKind, failures };
+    queried, passed, failed: queried - passed, setupFailures: setupFailures.length, byKind, names,
+    outcomes: sortedCounts(outcomes), normalizations: sortedCounts(normalizations), failures };
   writeReport(reportPath(args, '.cache/semantic-conformance.json'), report);
   const { failures: _, projects: __, ...summary } = report;
   console.log(JSON.stringify(summary));
   return failures.length || setupFailures.length ? 1 : 0;
 }
+
+const sortedCounts = counts => Object.fromEntries(Object.entries(counts).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
 
 function reportPath(args, fallback) {
   const option = args.find(arg => arg.startsWith('--report='));
@@ -453,8 +543,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   try {
     const [mode, ...args] = process.argv.slice(2);
     if (mode !== 'markers' && mode !== 'compare') throw new Error('Usage: node tools/semantic-conformance.mjs markers|compare [--limit=N] [--report=FILE] [PATH ...]');
-    const unknown = args.find(arg => arg.startsWith('--') && !/^--(limit|report)=/.test(arg));
-    if (unknown) throw new Error(`Unknown option ${unknown}`);
+    runnerArguments(args, { options: ['--limit=', '--report='], positional: Infinity });
     corpusLimit(args);
     const semantic = await loadSemanticApi();
     process.exitCode = mode === 'markers' ? await markersMode(args, semantic) : await compareMode(args, semantic);

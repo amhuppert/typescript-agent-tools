@@ -8,11 +8,12 @@
 //! A final component without `.`, `*`, or `?` names a directory and gains
 //! `/**/*`. An `exclude` match also excludes everything beneath it.
 
-use super::config::{Config, Spec};
-use super::{Origin, io_error, paths};
+use super::config::{Config, Spec, Specs};
+use super::paths::{self, Case, InputKind};
+use super::{Origin, disk, io_error};
 use crate::references::{ProjectError, ProjectErrorKind};
 use std::collections::{HashMap, HashSet};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 /// One root input: an absolute path and, for `files` entries, where it was
 /// listed.
@@ -24,7 +25,64 @@ pub(super) struct Root {
 
 const PACKAGE_FOLDERS: [&str; 3] = ["node_modules", "bower_components", "jspm_packages"];
 
-pub(super) fn roots(config: &Config, case_sensitive: bool) -> Result<Vec<Root>, ProjectError> {
+/// The include pattern of a configuration without `files` or `include`.
+const DEFAULT_INCLUDE: &str = "**/*";
+
+/// The root inputs a configuration selects. JavaScript and JSON files take
+/// part in extension priority, then are rejected as unsupported inputs.
+pub(super) fn roots(config: &Config, case: Case) -> Result<Vec<Root>, ProjectError> {
+    let roots = select(config, case)?;
+    if roots.is_empty() && config.report_no_inputs {
+        return Err(no_inputs(config));
+    }
+    for root in &roots {
+        let kind = InputKind::of(&root.path, case);
+        if !matches!(kind, InputKind::JavaScript | InputKind::Json) {
+            continue;
+        }
+        let message = format!("{} inputs are not supported", kind.label());
+        return Err(match &root.origin {
+            Some(origin) => origin.error(ProjectErrorKind::Unsupported, message),
+            None => ProjectError {
+                kind: ProjectErrorKind::Unsupported,
+                message,
+                path: Some(PathBuf::from(&root.path)),
+                position: None,
+            },
+        });
+    }
+    Ok(roots)
+}
+
+/// TypeScript's TS18003 message.
+fn no_inputs(config: &Config) -> ProjectError {
+    let specs = |specs: &Option<Specs>| {
+        let entries: Vec<String> = specs
+            .iter()
+            .flat_map(|specs| &specs.entries)
+            .map(|spec| format!("{:?}", spec.text))
+            .collect();
+        format!("[{}]", entries.join(","))
+    };
+    let include = if config.include.is_none() && config.files.is_none() {
+        format!("[{DEFAULT_INCLUDE:?}]")
+    } else {
+        specs(&config.include)
+    };
+    ProjectError {
+        kind: ProjectErrorKind::Config,
+        message: format!(
+            "No inputs were found in config file '{}'. Specified 'include' paths were '{include}' and 'exclude' paths were '{}'",
+            config.path.display(),
+            specs(&config.exclude)
+        ),
+        path: Some(config.path.clone()),
+        position: None,
+    }
+}
+
+/// Literal `files`, then `include` matches not removed by `exclude`.
+fn select(config: &Config, case: Case) -> Result<Vec<Root>, ProjectError> {
     let options = &config.options;
     // Extension groups in priority order; within a group, earlier wins.
     let mut groups: Vec<Vec<&str>> = if options.allow_js {
@@ -41,16 +99,10 @@ pub(super) fn roots(config: &Config, case_sensitive: bool) -> Result<Vec<Root>, 
         ]
     };
     let mut roots = Vec::new();
-    let key = |path: &str| {
-        if case_sensitive {
-            path.to_owned()
-        } else {
-            path.to_lowercase()
-        }
-    };
+    let key = |path: &str| case.fold(path).into_owned();
     let mut literal: HashSet<String> = HashSet::new();
     for spec in config.files.iter().flat_map(|specs| &specs.entries) {
-        let path = literal_file(spec, case_sensitive)?;
+        let path = literal_file(spec, case)?;
         if literal.insert(key(&path)) {
             roots.push(Root {
                 path,
@@ -65,8 +117,8 @@ pub(super) fn roots(config: &Config, case_sensitive: bool) -> Result<Vec<Root>, 
         (None, Some(_)) => Vec::new(),
         (None, None) => {
             default_include = Spec {
-                text: "**/*".into(),
-                path: paths::combine(&config.dir, "**/*"),
+                text: DEFAULT_INCLUDE.into(),
+                path: paths::combine(&config.dir, DEFAULT_INCLUDE),
                 origin: Origin {
                     path: config.path.clone(),
                     position: None,
@@ -93,7 +145,7 @@ pub(super) fn roots(config: &Config, case_sensitive: bool) -> Result<Vec<Root>, 
     let matcher = Matcher {
         include: include.iter().map(|spec| pattern(&spec.path)).collect(),
         exclude: exclude.iter().map(|path| pattern(path)).collect(),
-        case_sensitive,
+        case,
     };
     let mut wildcard: Vec<String> = Vec::new();
     let mut wildcard_keys: HashMap<String, usize> = HashMap::new();
@@ -153,41 +205,62 @@ pub(super) fn roots(config: &Config, case_sensitive: bool) -> Result<Vec<Root>, 
     Ok(roots)
 }
 
-/// A listed file must exist; a name without an extension may omit `.ts`,
-/// `.tsx`, or `.d.ts`.
-fn literal_file(spec: &Spec, case_sensitive: bool) -> Result<String, ProjectError> {
-    let path = &spec.path;
-    // Extensions follow the file system's case policy, as file names do.
-    let spelled = if case_sensitive {
-        path.clone()
-    } else {
-        path.to_lowercase()
-    };
-    if !paths::basename(path).contains('.') {
-        if let Some(found) = [".ts", ".tsx", ".d.ts"]
-            .iter()
-            .map(|extension| format!("{path}{extension}"))
-            .find(|candidate| Path::new(candidate).is_file())
-        {
-            return Ok(found);
-        }
-    } else if paths::is_typescript(&spelled)
-        || paths::is_javascript(&spelled)
-        || spelled.ends_with(".json")
-    {
-        if Path::new(path).is_file() {
-            return Ok(path.clone());
-        }
-    } else {
-        return Err(spec.origin.error(
+/// A listed file must exist. JavaScript and JSON entries, present or not,
+/// are selected here, for extension priority, and rejected with the other
+/// roots.
+fn literal_file(spec: &Spec, case: Case) -> Result<String, ProjectError> {
+    match literal_input(&spec.path, case)? {
+        Literal::Found(path) => Ok(path),
+        Literal::Unsupported(_) => Ok(spec.path.clone()),
+        Literal::Missing => Err(spec.origin.error(
+            ProjectErrorKind::Io,
+            format!("File '{}' not found", spec.text),
+        )),
+        Literal::UnsupportedExtension => Err(spec.origin.error(
             ProjectErrorKind::Config,
             format!("File '{}' has an unsupported extension", spec.text),
-        ));
+        )),
     }
-    Err(spec.origin.error(
-        ProjectErrorKind::Io,
-        format!("File '{}' not found", spec.text),
-    ))
+}
+
+/// What a file name written literally, as a `files` entry or a
+/// `/// <reference path>`, selects.
+pub(super) enum Literal {
+    /// An existing file, which may still be outside the supported profile.
+    Found(String),
+    /// No such file, under any default extension of a name without one.
+    Missing,
+    /// An extension that never names a program input, such as `.css`.
+    UnsupportedExtension,
+    /// A JavaScript or JSON input, which this tool does not read, whether
+    /// or not it exists; TypeScript rejects both forms of literal name alike.
+    Unsupported(InputKind),
+}
+
+/// TypeScript's literal file rule: a name with a program-input extension
+/// must exist as written, and a name without an extension may omit `.ts`,
+/// `.tsx`, or `.d.ts`. Each caller decides how to report the outcome.
+pub(super) fn literal_input(path: &str, case: Case) -> Result<Literal, ProjectError> {
+    let kind = InputKind::of(path, case);
+    if matches!(kind, InputKind::JavaScript | InputKind::Json) {
+        return Ok(Literal::Unsupported(kind));
+    }
+    let candidates: Vec<String> = if kind != InputKind::Other {
+        vec![path.to_owned()]
+    } else if paths::basename(path).contains('.') {
+        return Ok(Literal::UnsupportedExtension);
+    } else {
+        [".ts", ".tsx", ".d.ts"]
+            .iter()
+            .map(|extension| format!("{path}{extension}"))
+            .collect()
+    };
+    for candidate in candidates {
+        if disk::is_file(&candidate).map_err(|error| io_error(Path::new(&candidate), &error))? {
+            return Ok(Literal::Found(candidate));
+        }
+    }
+    Ok(Literal::Missing)
 }
 
 /// Whether a file with the same name and a higher-priority extension in its
@@ -268,7 +341,7 @@ enum Usage {
 struct Matcher {
     include: Vec<Vec<Segment>>,
     exclude: Vec<Vec<Segment>>,
-    case_sensitive: bool,
+    case: Case,
 }
 
 impl Matcher {
@@ -287,14 +360,24 @@ impl Matcher {
         for base in self.base_paths(config_dir, include) {
             let mut stack = vec![base];
             while let Some(directory) = stack.pop() {
-                let Ok(real) = std::fs::canonicalize(&directory) else {
-                    continue;
+                // An include base may name no directory, as `entries` allows.
+                let real = match std::fs::canonicalize(&directory) {
+                    Ok(real) => real,
+                    Err(error) if disk::is_absence(&error) => continue,
+                    Err(error) => return Err(io_error(Path::new(&directory), &error)),
                 };
                 if !visited.insert(real) {
                     continue;
                 }
                 let (files, directories) = entries(&directory)?;
                 for name in files {
+                    let name = match name {
+                        Ok(name) => name,
+                        Err(lossy) if paths::has_extension(&lossy, extensions) => {
+                            return Err(paths::inexact_name(&directory, &lossy));
+                        }
+                        Err(_) => continue,
+                    };
                     let path = paths::combine(&directory, &name);
                     if !paths::has_extension(&path, extensions) {
                         continue;
@@ -312,7 +395,8 @@ impl Matcher {
                     }
                 }
                 for name in directories.into_iter().rev() {
-                    let path = paths::combine(&directory, &name);
+                    let (Ok(text) | Err(text)) = &name;
+                    let path = paths::combine(&directory, text);
                     let components: Vec<&str> = path.split('/').collect();
                     if self
                         .include
@@ -320,6 +404,10 @@ impl Matcher {
                         .any(|pattern| self.prefix_match(pattern, &components))
                         && !self.excluded(&components)
                     {
+                        // A directory the walk would enter must be named exactly.
+                        if name.is_err() {
+                            return Err(paths::inexact_name(&directory, text));
+                        }
                         stack.push(path);
                     }
                 }
@@ -345,16 +433,12 @@ impl Matcher {
                 }
             })
             .collect();
-        if self.case_sensitive {
-            bases.sort();
-        } else {
-            bases.sort_by_key(|base| base.to_lowercase());
-        }
+        bases.sort_by(|a, b| self.case.fold(a).cmp(&self.case.fold(b)));
         let mut result = vec![config_dir.to_owned()];
         for base in bases {
             if !result
                 .iter()
-                .any(|existing| paths::contains(existing, &base, self.case_sensitive))
+                .any(|existing| self.case.contains(existing, &base))
             {
                 result.push(base);
             }
@@ -419,7 +503,7 @@ impl Matcher {
                             || !name.starts_with('.') && !self.package_folder(name);
                         allowed.then_some(state)
                     }
-                    Segment::Literal(literal) => self.same(literal, name).then_some(state + 1),
+                    Segment::Literal(literal) => self.case.same(literal, name).then_some(state + 1),
                     Segment::Wildcard(tokens) => self
                         .wildcard(tokens, name, usage, last)
                         .then_some(state + 1),
@@ -442,16 +526,10 @@ impl Matcher {
         states
     }
 
-    fn same(&self, a: &str, b: &str) -> bool {
-        if self.case_sensitive {
-            a == b
-        } else {
-            a.to_lowercase() == b.to_lowercase()
-        }
-    }
-
     fn package_folder(&self, name: &str) -> bool {
-        PACKAGE_FOLDERS.iter().any(|folder| self.same(folder, name))
+        PACKAGE_FOLDERS
+            .iter()
+            .any(|folder| self.case.same(folder, name))
     }
 
     fn wildcard(&self, tokens: &[Token], name: &str, usage: Usage, last: bool) -> bool {
@@ -469,13 +547,7 @@ impl Matcher {
                 _ => {}
             }
         }
-        let lower = |c: char| {
-            if self.case_sensitive {
-                c
-            } else {
-                c.to_lowercase().next().unwrap_or(c)
-            }
-        };
+        let lower = |c: char| self.case.fold_char(c);
         // In file names, `*` does not consume the `.` of a final `.min.js`.
         let min_js = usage == Usage::Files && last;
         let consumable = |index: usize| {
@@ -508,32 +580,36 @@ impl Matcher {
     }
 }
 
+/// A directory entry's exact name, or the lossy form of one that is not
+/// Unicode (`paths::exact_name`).
+type Name = Result<String, String>;
+
 /// Sorted file and directory names, following symbolic links and skipping
-/// broken ones. A missing directory has no entries.
-fn entries(directory: &str) -> Result<(Vec<String>, Vec<String>), ProjectError> {
+/// broken ones. A missing directory, or a file named as one, has no entries.
+fn entries(directory: &str) -> Result<(Vec<Name>, Vec<Name>), ProjectError> {
     let mut files = Vec::new();
     let mut directories = Vec::new();
     let reader = match std::fs::read_dir(directory) {
         Ok(reader) => reader,
-        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
-            return Ok((files, directories));
-        }
+        Err(error) if disk::is_absence(&error) => return Ok((files, directories)),
         Err(error) => return Err(io_error(Path::new(directory), &error)),
     };
     for entry in reader {
         let entry = entry.map_err(|error| io_error(Path::new(directory), &error))?;
-        let name = entry.file_name().to_string_lossy().into_owned();
-        let Ok(metadata) = std::fs::metadata(entry.path()) else {
-            continue;
-        };
-        if metadata.is_dir() {
-            directories.push(name);
-        } else if metadata.is_file() {
-            files.push(name);
+        let name = paths::exact_name(entry.file_name());
+        let path = entry.path();
+        match disk::entry(&path).map_err(|error| io_error(&path, &error))? {
+            Some(disk::Entry::Directory) => directories.push(name),
+            Some(disk::Entry::File) => files.push(name),
+            Some(disk::Entry::Other) | None => {}
         }
     }
-    files.sort();
-    directories.sort();
+    let key = |name: &Name| -> String {
+        let (Ok(text) | Err(text)) = name;
+        text.clone()
+    };
+    files.sort_by_key(key);
+    directories.sort_by_key(key);
     Ok((files, directories))
 }
 
@@ -545,7 +621,11 @@ mod tests {
         Matcher {
             include: include.iter().map(|path| pattern(path)).collect(),
             exclude: exclude.iter().map(|path| pattern(path)).collect(),
-            case_sensitive,
+            case: if case_sensitive {
+                Case::Sensitive
+            } else {
+                Case::Insensitive
+            },
         }
     }
 

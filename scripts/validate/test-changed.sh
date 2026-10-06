@@ -9,7 +9,7 @@ export RUST_TEST_THREADS="$TEST_WORKERS"
 
 # Without explicit targets, source changes can affect the entire suite.
 if (( $# == 0 )); then
-  run_quiet cargo test --offline --jobs "$TEST_WORKERS" -- --test-threads="$TEST_WORKERS"
+  run_rust_tests "$TEST_WORKERS"
   exit 0
 fi
 
@@ -23,4 +23,4 @@ for file in "$@"; do
   fi
 done
 
-run_quiet cargo test --offline --jobs "$TEST_WORKERS" "${test_targets[@]}" -- --test-threads="$TEST_WORKERS"
+run_rust_tests "$TEST_WORKERS" "${test_targets[@]}"

@@ -139,7 +139,7 @@ impl<'src> Parser<'src> {
                     } else {
                         Ok(node)
                     }
-                }) {
+                })? {
                     fields.push(("constraint", constraint.into()));
                 }
             }
@@ -247,22 +247,7 @@ impl<'src> Parser<'src> {
         if matches!(token.raw, ")" | "...") {
             return true;
         }
-        while matches!(
-            token.raw,
-            "public"
-                | "private"
-                | "protected"
-                | "readonly"
-                | "static"
-                | "abstract"
-                | "declare"
-                | "async"
-                | "override"
-                | "in"
-                | "out"
-                | "const"
-                | "accessor"
-        ) {
+        while modifier_keyword(token.raw) {
             let next = lexer.next();
             if matches!(next.raw, ":" | "," | "?" | "=" | ")") {
                 token = next;
@@ -593,6 +578,22 @@ impl<'src> Parser<'src> {
         Ok(name)
     }
     pub(super) fn type_arguments(&mut self) -> Result<Vec<NodeId>> {
+        // Inside an expression's type-argument attempt, give up on a list that
+        // `angles` shows cannot close: one a strict parse cannot match, or one
+        // left without a `>` for it and each enclosing list.
+        if let Some(stop) = self.speculation {
+            let at = self.current.start;
+            let unmatched = !self.recovering_types() && !self.angles.at(self.lexer.src, at).strict;
+            if unmatched || self.angles.closers(at, stop) <= self.type_argument_frames {
+                return Err(self.error("Expected '>'"));
+            }
+        }
+        self.type_argument_frames += 1;
+        let arguments = self.type_argument_list();
+        self.type_argument_frames -= 1;
+        arguments
+    }
+    fn type_argument_list(&mut self) -> Result<Vec<NodeId>> {
         self.nest(|p| {
             if p.at("<<") {
                 p.split_type_token();
@@ -947,24 +948,7 @@ impl<'src> Parser<'src> {
             return true;
         }
         let mut next = lexer.next();
-        if matches!(
-            first.raw,
-            "public"
-                | "private"
-                | "protected"
-                | "readonly"
-                | "static"
-                | "abstract"
-                | "async"
-                | "declare"
-                | "export"
-                | "default"
-                | "const"
-                | "in"
-                | "out"
-                | "override"
-                | "accessor"
-        ) {
+        if modifier_keyword(first.raw) {
             if next.kind == Kind::Word && !reserved_word(next.raw) {
                 return true;
             }
@@ -984,4 +968,29 @@ impl<'src> Parser<'src> {
         next = lexer.next();
         matches!(next.raw, ":" | "," | "]")
     }
+}
+
+/// TypeScript's `isModifierKind`, which the function-type and
+/// index-signature lookaheads use to skip a parameter's modifiers. Which
+/// modifiers a declaration accepts is a separate, contextual rule
+/// (`Parser::modifiers_inner`).
+fn modifier_keyword(raw: &str) -> bool {
+    matches!(
+        raw,
+        "abstract"
+            | "accessor"
+            | "async"
+            | "const"
+            | "declare"
+            | "default"
+            | "export"
+            | "in"
+            | "out"
+            | "override"
+            | "private"
+            | "protected"
+            | "public"
+            | "readonly"
+            | "static"
+    )
 }

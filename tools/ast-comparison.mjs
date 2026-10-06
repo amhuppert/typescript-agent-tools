@@ -1,5 +1,18 @@
+// The syntax runners' optional comparison settings: each option restores fields
+// the structural comparison otherwise omits.
+const SETTINGS = {
+  '--positions': ['pos', 'end'],
+  '--flags': ['flags'],
+  '--scanner-hints': ['hasExtendedUnicodeEscape', 'numericLiteralFlags', 'rawText', 'templateFlags'],
+};
+export const COMPARISON_OPTIONS = Object.keys(SETTINGS);
+
 // Compare serializable syntax, leaving compiler caches and binding data out.
-export function normalizer(args = []) {
+// `flags` is the set of flags parsed by runnerArguments (corpus-selection.mjs);
+// only comparison options are read. The returned function's `compared` lists
+// the active settings by name, in COMPARISON_OPTIONS order.
+export function normalizer(flags = new Set()) {
+  if (!(flags instanceof Set)) throw new TypeError('normalizer takes the flag set parsed by runnerArguments');
   const omit = new Set(['id', 'flags', 'modifierFlagsCache', 'transformFlags', 'parent',
     'original', 'emitNode', 'symbol', 'localSymbol', 'locals', 'nextContainer', 'flowNode',
     'hasExtendedUnicodeEscape', 'numericLiteralFlags', 'multiLine', 'jsDoc', 'pos', 'end',
@@ -9,11 +22,8 @@ export function normalizer(args = []) {
     'typeReferenceDirectives', 'libReferenceDirectives', 'amdDependencies', 'identifiers',
     'jsDocParsingMode', 'externalModuleIndicator', 'endOfFileToken', 'textSourceNode',
     'internalFlags', 'rawText', 'templateFlags', 'commentDirectives', 'checkJsDirective', 'moduleName']);
-  if (args.includes('--positions')) { omit.delete('pos'); omit.delete('end'); }
-  if (args.includes('--flags')) omit.delete('flags');
-  if (args.includes('--scanner-hints')) {
-    for (const key of ['hasExtendedUnicodeEscape', 'numericLiteralFlags', 'rawText', 'templateFlags']) omit.delete(key);
-  }
+  const active = COMPARISON_OPTIONS.filter(option => flags.has(option));
+  for (const option of active) for (const key of SETTINGS[option]) omit.delete(key);
   function normalize(value, root = false) {
     if (!value || typeof value !== 'object') return value;
     const result = Array.isArray(value) ? [] : {};
@@ -35,7 +45,16 @@ export function normalizer(args = []) {
     }
     return result;
   }
+  normalize.compared = active.map(option => option.slice(2));
   return normalize;
+}
+
+// What runners record as `compared`: the active settings, 'structure only'
+// without any, or 'acceptance only' when no trees are compared (upstream
+// --check-only).
+export function describeComparison(compared, { trees = true } = {}) {
+  if (!trees) return 'acceptance only';
+  return compared.length ? compared.join(', ') : 'structure only';
 }
 
 export function firstDifference(actual, expected, path = '$') {

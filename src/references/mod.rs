@@ -14,12 +14,12 @@
 //! ```
 
 mod binding;
+mod pattern;
 mod project;
 mod query;
 mod source;
 
 use serde::Serialize;
-use std::collections::HashMap;
 use std::fmt;
 use std::path::{Path, PathBuf};
 
@@ -33,12 +33,7 @@ use std::path::{Path, PathBuf};
 pub struct ReferenceProject {
     config: PathBuf,
     sources: source::Sources,
-    /// Searched files by canonical path, by path under the configuration
-    /// directory, and by every path that reached them, so queries identify
-    /// files without filesystem access. Keys follow the file system's case
-    /// policy (see `path_key`).
-    search_paths: HashMap<PathBuf, source::FileId>,
-    case_sensitive: bool,
+    files: project::FileLookup,
     index: binding::Index,
 }
 
@@ -67,27 +62,11 @@ impl ReferenceProject {
     fn load_here(config: &Path) -> Result<Self, ProjectError> {
         let program = project::load(config)?;
         let index = binding::bind(&program)?;
-        let directory = program.config.parent().unwrap_or(Path::new("/"));
-        let case_sensitive = program.case_sensitive;
-        let mut search_paths = HashMap::new();
-        for id in program.sources.ids() {
-            let program_file = &program.files[id.index()];
-            if program_file.search {
-                let file = program.sources.get(id);
-                let lexical = source::normalize(&directory.join(&file.display));
-                for path in [&file.path, &lexical]
-                    .into_iter()
-                    .chain(&program_file.paths)
-                {
-                    search_paths.insert(path_key(path, case_sensitive), id);
-                }
-            }
-        }
+        let files = program.file_lookup();
         Ok(Self {
             config: program.config,
             sources: program.sources,
-            search_paths,
-            case_sensitive,
+            files,
             index,
         })
     }
@@ -101,16 +80,6 @@ impl ReferenceProject {
             project: self.config.clone(),
             groups,
         })
-    }
-}
-
-/// A query-path key: the path itself, lowercased on a file system that
-/// ignores case.
-fn path_key(path: &Path, case_sensitive: bool) -> PathBuf {
-    if case_sensitive {
-        path.to_path_buf()
-    } else {
-        PathBuf::from(path.to_string_lossy().to_lowercase())
     }
 }
 
@@ -136,7 +105,8 @@ pub struct SourcePosition {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ReferenceResult {
-    /// The absolute path of the selected configuration file.
+    /// The selected configuration file, in the canonical form of its
+    /// directory, which every `Location::file` is relative to.
     pub project: PathBuf,
     /// Separate symbols, ordered by their earliest declaration.
     pub groups: Vec<ReferenceGroup>,
@@ -192,9 +162,11 @@ pub struct ProjectError {
     pub position: Option<SourcePosition>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Serialized as the variant name, the stable spelling tools compare.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 pub enum ProjectErrorKind {
-    /// A file or configuration could not be read.
+    /// A file or configuration could not be read, or the system refused a
+    /// resource loading needs, such as its thread.
     Io,
     /// Invalid configuration content or inheritance.
     Config,
@@ -213,15 +185,19 @@ pub enum ProjectErrorKind {
 pub struct QueryError {
     pub kind: QueryErrorKind,
     pub message: String,
+    /// The file as the query spelled it for `OutsideProject` and
+    /// `InvalidPosition`, which concern the query itself; otherwise the
+    /// selected token's file as a canonical absolute path, whichever entry
+    /// point selected it.
     pub path: Option<PathBuf>,
     pub position: Option<SourcePosition>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Serialized as the variant name, the stable spelling tools compare.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 pub enum QueryErrorKind {
-    /// The working directory needed to make a query path absolute is unavailable.
-    Io,
-    /// The query file is not one of the project's searched files.
+    /// The query file is not one of the project's searched files, including a
+    /// path that cannot be made absolute against the working directory.
     OutsideProject,
     /// A line/column outside the file or inside a surrogate pair.
     InvalidPosition,

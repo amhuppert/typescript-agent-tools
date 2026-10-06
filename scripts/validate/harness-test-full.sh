@@ -6,4 +6,4 @@ readonly TEST_WORKERS=2
 readonly TEST_HEAP_MB=2048
 export NODE_OPTIONS="--max-old-space-size=${TEST_HEAP_MB}"
 
-run_quiet node --test --test-concurrency="$TEST_WORKERS" tools/*.test.mjs
+run_harness_tests "$TEST_WORKERS" tools/*.test.mjs

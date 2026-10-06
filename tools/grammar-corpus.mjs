@@ -1,13 +1,13 @@
 // Deterministic grammar combinations, checked against the compiler API.
-import { runParser, parserFailure } from './parser-process.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
-import { normalizer, firstDifference } from './ast-comparison.mjs';
-import { loadCompilerApi, classifyReference } from './reference-oracle.mjs';
-import { requireComparisons } from './corpus-selection.mjs';
+import { COMPARISON_OPTIONS, normalizer, describeComparison } from './ast-comparison.mjs';
+import { loadCompilerApi, compareSource } from './reference-oracle.mjs';
+import { runnerArguments, requireComparisons } from './corpus-selection.mjs';
+const { flags } = runnerArguments(process.argv.slice(2), { options: COMPARISON_OPTIONS });
+const normalize = normalizer(flags);
 const ts = loadCompilerApi();
 const binary = process.env.TSPARSE ?? path.resolve('target/debug/tsparse');
-const normalize = normalizer(process.argv);
 const cases = [];
 const add = (source, jsx = false) => cases.push({ source, jsx });
 const atoms = ['x', '1', '"a"', 'true', 'f<T>()', '(x)', '[x, ...xs]', '{x: 1}', 'x?.y', '`a${x}`'];
@@ -77,27 +77,21 @@ for (const source of [
 let passed = 0, invalid = 0;
 const failures = [];
 for (const { source, jsx } of cases) {
-  const reference = ts.createSourceFile(jsx ? 'source.tsx' : 'source.ts', source, ts.ScriptTarget.Latest, false, jsx ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
-  const classification = classifyReference(ts, reference);
-  if (!classification.eligible) {
-    failures.push({ source, jsx, error: `Ineligible authored fixture: ${classification.removed}` });
+  const facts = compareSource(ts, binary, { name: jsx ? 'source.tsx' : 'source.ts', source, normalize, options: { timeout: 3000 } });
+  // Authored combinations must use syntax TypeScript 7 still has; an invalid
+  // combination passes when the parser rejects it.
+  if (!facts.eligible) {
+    failures.push({ source, jsx, error: `Ineligible authored fixture: ${facts.removed}` });
     continue;
   }
-  const result = runParser(binary, jsx ? ['--tsx'] : [], { input: source, timeout: 3000 });
-  let difference;
-  if (result.outcome === 'failed') difference = parserFailure(result);
-  if (!classification.valid) {
-    invalid++;
-    if (result.outcome === 'accepted') difference = { error: 'Accepted compiler-invalid syntax', diagnostics: classification.diagnostics };
-  } else if (result.outcome !== 'accepted') difference = parserFailure(result);
-  else difference = firstDifference(normalize(JSON.parse(result.stdout), true), normalize(reference, true));
-  if (difference) {
-    failures.push({ source, jsx, ...difference });
+  if (!facts.valid) invalid++;
+  if (facts.difference) {
+    failures.push({ source, jsx, ...facts.difference });
     if (failures.length <= 25) console.log(JSON.stringify(failures.at(-1)));
   } else passed++;
 }
 requireComparisons(cases.length);
-const report = { version: ts.version, cases: cases.length, invalid, passed, failures };
+const report = { version: ts.version, compared: describeComparison(normalize.compared), cases: cases.length, invalid, passed, failures };
 fs.mkdirSync('.cache', { recursive: true });
 fs.writeFileSync('.cache/grammar-corpus.json', JSON.stringify(report, null, 2));
 console.log(JSON.stringify({ ...report, failures: failures.length }));

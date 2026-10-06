@@ -1,6 +1,8 @@
 import { createRequire } from 'node:module';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
+import { runParser, parserFailure } from './parser-process.mjs';
+import { firstDifference } from './ast-comparison.mjs';
 
 const require = createRequire(import.meta.url);
 
@@ -47,6 +49,43 @@ export function classifyReference(ts, reference) {
     .map(d => ({ code: d.code, message: ts.flattenDiagnosticMessageText(d.messageText, '\n') }));
   diagnostics.push(...strictDiagnostics);
   return { eligible: !removed, removed, valid: !diagnostics.length, diagnostics, strictDiagnostics };
+}
+
+// Compare one source text with the compiler API oracle. `name` is the oracle's
+// file name; its extension selects TSX and declaration context. When TypeScript
+// 7 still has the syntax (eligible), the Rust CLI parses `file`, which must
+// keep that extension, or else the source on stdin. Invalid inputs, and every
+// input under `checkOnly`, run with --check; otherwise `normalize` prepares both
+// trees for firstDifference.
+//
+// Returns classifyReference's facts plus `outcome`, the CLI's accepted,
+// rejected, or failed (absent when ineligible), and `difference`, the first
+// disagreement with the oracle, if any: a process failure, acceptance of
+// invalid syntax, rejection of valid syntax, or the first differing tree path.
+// Differing trees are also returned as `actual` and `expected`. Runners own the
+// policy: which facts pass, and what an ineligible or invalid input means.
+export function compareSource(ts, binary, { name, source, file, normalize, checkOnly = false, options = {} }) {
+  // As TypeScript's getScriptKindFromFileName and ParseOptions::for_file: the
+  // extension without case.
+  const tsx = /\.tsx$/i.test(name);
+  const reference = ts.createSourceFile(name, source, ts.ScriptTarget.Latest, false, tsx ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
+  const facts = classifyReference(ts, reference);
+  if (!facts.eligible) return facts;
+  const check = checkOnly || !facts.valid;
+  const args = [...(check ? ['--check'] : []), ...(file ? [file] : tsx ? ['--tsx'] : [])];
+  const result = runParser(binary, args, file ? options : { ...options, input: source });
+  facts.outcome = result.outcome;
+  if (result.outcome === 'failed') facts.difference = parserFailure(result);
+  else if (!facts.valid) {
+    if (result.outcome === 'accepted') facts.difference = { error: 'Accepted compiler-invalid syntax', diagnostics: facts.diagnostics };
+  } else if (result.outcome === 'rejected') facts.difference = parserFailure(result);
+  else if (!check) {
+    const actual = normalize(JSON.parse(result.stdout), true);
+    const expected = normalize(reference, true);
+    facts.difference = firstDifference(actual, expected);
+    if (facts.difference) Object.assign(facts, { actual, expected });
+  }
+  return facts;
 }
 
 // Native exits do not use the Rust CLI's 0/1/2 contract. A nonzero normal exit

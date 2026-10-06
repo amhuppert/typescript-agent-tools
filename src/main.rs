@@ -21,7 +21,8 @@ the identifier at LINE:COLUMN in FILE (one-based line, UTF-16 column), or by
 every declaration, local import, or exported alias spelled exactly NAME; FILE
 then narrows the candidates. Import and export aliases join their underlying
 symbol; shadowed bindings form separate groups. Argument paths are relative to
-the working directory; result paths are relative to the TSCONFIG directory.
+the working directory; result paths are relative to the directory of the
+reported project, the TSCONFIG directory's real path.
 Supported: one configuration and its inherited settings; .ts, .tsx, .mts, and
 .cts sources and declarations; node16, nodenext, and bundler resolution; and
 installed packages with declarations. Project references are not followed:
@@ -96,7 +97,7 @@ fn print(text: &str) -> Result<(), (u8, String)> {
 
 fn parse(options: Options) -> Result<(), (u8, String)> {
     let name = options.files.first().map_or("-", String::as_str);
-    let jsx = options.jsx || name.ends_with(".tsx") || name.ends_with(".jsx");
+    let file = ParseOptions::for_file(if name == "-" { "source.ts" } else { name });
     let source = if name == "-" {
         let mut source = String::new();
         io::stdin()
@@ -109,9 +110,8 @@ fn parse(options: Options) -> Result<(), (u8, String)> {
     let ast = parse_with_options(
         &source,
         ParseOptions {
-            jsx,
-            file_name: if name == "-" { "source.ts" } else { name }.into(),
-            ..Default::default()
+            jsx: options.jsx || file.jsx,
+            ..file
         },
     )
     .map_err(|e| {
@@ -158,18 +158,23 @@ fn references(options: Options) -> Result<(), (u8, String)> {
             ));
         }
     };
+    // Exit 2 for what the invocation got wrong or could not read; exit 1 for
+    // what analysis found.
     let project = ReferenceProject::load(project.as_ref()).map_err(|error| {
-        let code = if error.kind == ProjectErrorKind::Io {
-            2
-        } else {
-            1
+        let code = match error.kind {
+            ProjectErrorKind::Io => 2,
+            ProjectErrorKind::Config
+            | ProjectErrorKind::Syntax
+            | ProjectErrorKind::Unsupported
+            | ProjectErrorKind::Binding
+            | ProjectErrorKind::UnresolvedImport => 1,
         };
         (code, error.to_string())
     })?;
     let result = project.find_references(query).map_err(|error| {
         let code = match error.kind {
+            QueryErrorKind::OutsideProject | QueryErrorKind::InvalidPosition => 2,
             QueryErrorKind::UnsupportedTarget | QueryErrorKind::UnresolvedTarget => 1,
-            _ => 2,
         };
         (code, error.to_string())
     })?;

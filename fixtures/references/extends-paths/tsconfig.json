@@ -1,0 +1,3 @@
+// The project inherits `include` from config/app and `paths` from config,
+// each relative to the configuration that declares it.
+{ "extends": "./config/app/tsconfig.json" }

@@ -51,7 +51,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-`parse_with_options` accepts `ParseOptions { jsx, file_name, max_depth }`. Declaration filenames `.d.ts`, `.d.mts`, `.d.cts`, and arbitrary extensions such as `.d.css.ts` set the compiler's ambient context. The recursive grammar budget defaults to 256 and returns a diagnostic when exceeded. It counts grammar entries and scoped context callbacks, rather than AST levels; raising it requires a correspondingly larger stack. Parsing requires complete input and returns the first error; there is no recovery tree or type checking.
+`parse_with_options` accepts `ParseOptions { jsx, file_name, max_depth }`; `ParseOptions::for_file(name)` derives them as TypeScript does, with JSX for a `.tsx` or `.jsx` extension in any case. Declaration filenames `.d.ts`, `.d.mts`, `.d.cts`, and arbitrary extensions such as `.d.css.ts`, matched exactly, set the compiler's ambient context. The recursive grammar budget defaults to 256. It counts grammar entries and scoped context callbacks rather than AST levels, including entries made while trying an interpretation that is later discarded, so an input whose final tree would fit can still be rejected. A `<` after an expression is tried as type arguments only when enough `>` tokens remain to close every list the attempt would open, so long flat lists of comparisons such as `f(x < 0, x < 1, …)` stay shallow; one statement that holds dozens of `<` comparisons and as many later `>` tokens can still exceed it, because TypeScript's own attempt nests that deep. Exceeding the budget anywhere returns the `Maximum syntax nesting depth exceeded` diagnostic; the parser never substitutes another interpretation that fits. Raising the budget requires a correspondingly larger stack: `ParseOptions::DEEP_MAX_DEPTH` (1024) is measured to fit a thread of `DEEP_PARSE_STACK_BYTES` (256 MiB), as find references uses for generated declaration files. Parsing requires complete input and returns the first error; there is no recovery tree or type checking.
 
 `Ast` borrows its input; keep the source alive while using it. The arena is immutable: use `source()`, `nodes()`, `root_id()`, `root()`, and `node(id)` to inspect it. Children are `NodeId` links in `Value::Node` or `Value::Nodes` and belong to their originating arena. Rust node kinds are names such as `BinaryExpression`; JSON kinds are numeric `SyntaxKind` values. [The JSON contract](docs/ast-json.md) explains positions, fields, and serialization.
 
@@ -96,8 +96,25 @@ TYPE_SCRIPT_API=/path/to/typescript/lib/typescript.js \
   node tools/upstream-native-corpus.mjs /path/to/typescript-checkout
 ```
 
+Find references is checked against TypeScript 7.0.2's language service, its semantic oracle, and benchmarked separately:
+
+```sh
+export TYPE_SCRIPT_SEMANTIC_API=/path/to/typescript-7.0.2/package
+export TYPE_SCRIPT_NATIVE=/path/to/typescript-<platform>-7.0.2/package/lib/tsc
+cargo build --offline --example reference_batch
+node tools/semantic-conformance.mjs markers               # fixtures/references markers
+node tools/semantic-conformance.mjs compare [PATH ...]    # positions, names, and roles
+node tools/reference-combinations.mjs --count=400 --out=.cache/reference-combinations
+node tools/semantic-conformance.mjs compare .cache/reference-combinations/*
+cargo bench --offline --bench references [-- path/to/tsconfig.json]
+```
+
+`scripts/validate/semantic-full.sh` runs the build, `markers`, and fixture `compare` as the `semantic` validation command, finding the compilers in the canonical checkout's `.cache/compiler-oracles` when the variables are unset; see [validation](docs/validation.md#reference-semantics).
+
+`scripts/validate/harness-test-full.sh` runs the Node tests as the `harness-test` validation command. It fills unset compiler variables from the same cache and prints one line with the total, executed, passed, and skipped counts. `scripts/validate/harness-test-changed.sh` runs only the existing `tools/*.test.mjs` files it is given and exits 2 for any other path. With `HARNESS_REQUIRE_COMPILERS=1`, a missing compiler or any skipped test fails the run; see [validation](docs/validation.md#harness-tests).
+
 The API oracle must be TypeScript 6.0.3; the recorded native syntax baseline is TypeScript 7.0.2. Native runners verify a working TypeScript 7 executable and record its version. Optional `TSPARSE` selects another built CLI. The authored fixture, declaration, grammar, and source runners default to `target/debug/tsparse`; upstream and robustness runners default to `target/release/tsparse`. Differential failures and reports are written under ignored `.cache/`. Every Rust parser runner treats only exit 1 as a syntax rejection; usage/I/O errors, launch errors, crashes, and timeouts fail validation. The process tests include invalid fixtures run through failing executables.
 
-API runners share the TypeScript 6-to-7 syntax eligibility and diagnostic rules. Source and upstream runners count syntax removed in TypeScript 7 separately; eligible invalid inputs are checked for rejection. Authored positive fixtures must be eligible and valid. Corpus paths must select at least one comparison, and explicit `--limit` values must be positive integers. Missing upstream corpus layouts, empty selections, and failed oracle setup return a nonzero status.
+API runners share the TypeScript 6-to-7 syntax eligibility and diagnostic rules and one source comparison, which reports facts; each runner decides what they mean. Source and upstream runners count syntax removed in TypeScript 7 separately; eligible invalid inputs are checked for rejection. Authored positive fixtures must be eligible and valid. Corpus paths must select at least one comparison, and explicit `--limit` values must be positive integers. Missing upstream corpus layouts, empty selections, and failed oracle setup return a nonzero status.
 
 MIT license. Third-party dependencies retain their own licenses; see [vendor provenance](vendor/README.md).

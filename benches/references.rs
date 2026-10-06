@@ -1,5 +1,7 @@
 //! Whole-project reference indexing costs, measured separately from parsing:
 //! construction time, query time, and requested heap during and after load.
+//! Queries are counted by outcome, and group-returning queries are timed
+//! separately from the total, so failed queries cannot pass for fast answers.
 //!
 //! cargo bench --offline --bench references [-- path/to/tsconfig.json]
 use std::{
@@ -8,7 +10,9 @@ use std::{
     sync::atomic::{AtomicBool, AtomicUsize, Ordering},
     time::{Duration, Instant},
 };
-use typescript_parser::references::{ReferenceProject, ReferenceQuery, SourcePosition};
+use typescript_parser::references::{
+    QueryErrorKind, ReferenceProject, ReferenceQuery, SourcePosition,
+};
 
 struct Allocator;
 static ENABLED: AtomicBool = AtomicBool::new(false);
@@ -95,7 +99,10 @@ fn synthetic_project(modules: usize) -> PathBuf {
     root.join("tsconfig.json")
 }
 
-/// Positions at the start of each word in the project's sources.
+/// Positions at the start of each word in the project's sources, in the
+/// public `SourcePosition` form: one-based lines, broken at CR, LF, CRLF,
+/// U+2028, and U+2029 as the crate's source index does, and one-based UTF-16
+/// columns.
 fn positions(config: &Path, limit: usize) -> Vec<(PathBuf, SourcePosition)> {
     let mut files = Vec::new();
     let mut stack = vec![config.parent().unwrap().to_path_buf()];
@@ -118,24 +125,43 @@ fn positions(config: &Path, limit: usize) -> Vec<(PathBuf, SourcePosition)> {
     let mut positions = Vec::new();
     for file in files {
         let text = std::fs::read_to_string(&file).unwrap();
-        for (line, content) in text.lines().enumerate() {
-            let mut previous = ' ';
-            for (column, c) in content.chars().enumerate() {
-                if c.is_alphabetic() && !(previous.is_alphanumeric() || previous == '_') {
-                    positions.push((
-                        file.clone(),
-                        SourcePosition {
-                            line: line + 1,
-                            column: column + 1,
-                        },
-                    ));
+        let (mut line, mut column) = (1, 1);
+        let mut previous = '\n';
+        for c in text.chars() {
+            if matches!(c, '\n' | '\r' | '\u{2028}' | '\u{2029}') {
+                // CRLF is one break.
+                if !(c == '\n' && previous == '\r') {
+                    line += 1;
                 }
-                previous = c;
+                column = 1;
+            } else {
+                if c.is_alphabetic() && !(previous.is_alphanumeric() || previous == '_') {
+                    positions.push((file.clone(), SourcePosition { line, column }));
+                }
+                column += c.len_utf16();
             }
+            previous = c;
         }
     }
     let step = (positions.len() / limit).max(1);
     positions.into_iter().step_by(step).take(limit).collect()
+}
+
+/// Query outcomes by kind. Every query lands in exactly one count.
+#[derive(Default)]
+struct Outcomes {
+    answered: usize,
+    groups: usize,
+    answered_time: Duration,
+    empty: usize,
+    outside_project: usize,
+    invalid_position: usize,
+    unsupported_target: usize,
+    unresolved_target: usize,
+}
+
+fn micros_each(time: Duration, count: usize) -> f64 {
+    time.as_secs_f64() * 1e6 / count.max(1) as f64
 }
 
 fn median(mut samples: Vec<Duration>) -> Duration {
@@ -163,17 +189,32 @@ fn main() {
         .collect();
     let project = ReferenceProject::load(&config).unwrap();
     let queries = positions(&config, 2_000);
-    let start = Instant::now();
-    let mut groups = 0;
+    let mut outcomes = Outcomes::default();
+    let mut query_time = Duration::ZERO;
     for (file, position) in &queries {
-        if let Ok(result) = project.find_references(ReferenceQuery::At {
+        let query = ReferenceQuery::At {
             file: file.clone(),
             position: *position,
-        }) {
-            groups += result.groups.len();
+        };
+        let start = Instant::now();
+        let result = project.find_references(query);
+        let elapsed = start.elapsed();
+        query_time += elapsed;
+        match result {
+            Ok(result) if result.groups.is_empty() => outcomes.empty += 1,
+            Ok(result) => {
+                outcomes.answered += 1;
+                outcomes.groups += result.groups.len();
+                outcomes.answered_time += elapsed;
+            }
+            Err(error) => match error.kind {
+                QueryErrorKind::OutsideProject => outcomes.outside_project += 1,
+                QueryErrorKind::InvalidPosition => outcomes.invalid_position += 1,
+                QueryErrorKind::UnsupportedTarget => outcomes.unsupported_target += 1,
+                QueryErrorKind::UnresolvedTarget => outcomes.unresolved_target += 1,
+            },
         }
     }
-    let query_time = start.elapsed();
     drop(project);
 
     LIVE.store(0, Ordering::Relaxed);
@@ -191,9 +232,20 @@ fn main() {
         median(loads).as_secs_f64() * 1e3
     );
     println!(
-        "queries: {} positions, {groups} groups, {:.1} µs each",
+        "queries: {} positions, {:.1} µs each",
         queries.len(),
-        query_time.as_secs_f64() * 1e6 / queries.len().max(1) as f64
+        micros_each(query_time, queries.len())
     );
+    println!(
+        "  groups returned: {} queries, {} groups, {:.1} µs each",
+        outcomes.answered,
+        outcomes.groups,
+        micros_each(outcomes.answered_time, outcomes.answered)
+    );
+    println!("  empty result: {}", outcomes.empty);
+    println!("  OutsideProject: {}", outcomes.outside_project);
+    println!("  InvalidPosition: {}", outcomes.invalid_position);
+    println!("  UnsupportedTarget: {}", outcomes.unsupported_target);
+    println!("  UnresolvedTarget: {}", outcomes.unresolved_target);
     println!("load peak requested heap: {peak} bytes; retained after load: {retained} bytes");
 }

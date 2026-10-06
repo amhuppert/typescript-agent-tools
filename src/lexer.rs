@@ -58,6 +58,63 @@ pub(crate) fn whitespace(c: char) -> bool {
             | '\u{2000}'..='\u{200B}' | '\u{202F}' | '\u{205F}' | '\u{3000}'
     ) || line_break(c)
 }
+
+/// Where a leading `#!` line ends, or 0 without one. A byte order mark may
+/// precede it: TypeScript removes the mark when it reads a file, so its
+/// `getShebang` sees the `#!` at the start.
+pub(crate) fn shebang_end(text: &str) -> usize {
+    let start = if text.starts_with('\u{FEFF}') { 3 } else { 0 };
+    if !text[start..].starts_with("#!") {
+        return 0;
+    }
+    text[start..]
+        .find(line_break)
+        .map_or(text.len(), |length| start + length)
+}
+
+/// Where a comment starting at `pos` ends: a `//` comment before its line
+/// break, a `/* */` comment after its `*/`. `None` when no comment starts at
+/// `pos` or a block comment is unterminated.
+pub(crate) fn comment_end(text: &str, pos: usize) -> Option<usize> {
+    let rest = &text[pos..];
+    if rest.starts_with("//") {
+        Some(pos + rest.find(line_break).unwrap_or(rest.len()))
+    } else if let Some(body) = rest.strip_prefix("/*") {
+        Some(pos + body.find("*/")? + 4)
+    } else {
+        None
+    }
+}
+
+/// One comment in trivia.
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct Comment<'s> {
+    /// The comment, including its delimiters.
+    pub(crate) text: &'s str,
+    pub(crate) start: usize,
+    /// The whitespace between the previous comment, or the scan's start, and
+    /// this one.
+    pub(crate) space_before: &'s str,
+}
+
+/// The comments in the trivia from `pos` until the next token, as
+/// TypeScript's `iterateCommentRanges` finds them. Consumers apply their own
+/// selection: which comments count, and which whitespace may separate them.
+pub(crate) fn comments(text: &str, mut pos: usize) -> impl Iterator<Item = Comment<'_>> {
+    std::iter::from_fn(move || {
+        let rest = &text[pos..];
+        let start = pos + rest.len() - rest.trim_start_matches(whitespace).len();
+        let end = comment_end(text, start)?;
+        let comment = Comment {
+            text: &text[start..end],
+            start,
+            space_before: &text[pos..start],
+        };
+        pos = end;
+        Some(comment)
+    })
+}
+
 pub(crate) fn id_start(c: char) -> bool {
     if c.is_ascii() {
         c.is_ascii_alphabetic() || c == '$' || c == '_'
@@ -151,15 +208,12 @@ impl<'src> Lexer<'src> {
                 .unwrap();
             newline |= space.chars().any(line_break);
             self.pos = self.src.len() - tail.len();
-            if tail.starts_with("//")
-                || ((self.pos == 0 || (self.pos == 3 && self.src.starts_with('\u{FEFF}')))
-                    && tail.starts_with("#!"))
-            {
-                self.pos += tail.find(line_break).unwrap_or(tail.len());
-            } else if let Some(comment) = tail.strip_prefix("/*") {
-                if let Some(end) = comment.find("*/") {
-                    newline |= comment[..end].chars().any(line_break);
-                    self.pos += end + 4;
+            if self.pos <= 3 && tail.starts_with("#!") && shebang_end(self.src) > self.pos {
+                self.pos = shebang_end(self.src);
+            } else if tail.starts_with("//") || tail.starts_with("/*") {
+                if let Some(end) = comment_end(self.src, self.pos) {
+                    newline |= self.src[self.pos..end].chars().any(line_break);
+                    self.pos = end;
                 } else {
                     let start = self.pos;
                     return self.token(

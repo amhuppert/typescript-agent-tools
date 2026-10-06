@@ -33,11 +33,16 @@
 // missing export of a pure namespace, module, or globalThis qualifier, which
 // is unresolved. A value use through a type-only import or export (outside
 // `typeof`) is unresolved: the Rust tool keeps the type-only restriction where
-// TypeScript reports an error but resolves. Other none and library tokens
-// expect UnresolvedTarget; symbols expect their groups.
+// TypeScript reports an error but resolves. A name that
+// `export *` declarations supply with different targets is unresolved: the
+// tool treats it as ambiguous, as ECMAScript does, where TypeScript reports
+// TS2308 and keeps the first. Other none and library tokens expect
+// UnresolvedTarget; symbols expect their groups.
 // `roles` are syntactic: declaration (a lexical declaration's name), import,
 // export (specifiers, `export =`/`export default` identifiers, and names of
-// declarations with an `export` modifier), or use.
+// declarations with an `export` modifier), or use. `candidate` marks the
+// tokens a name query selects (see references.md, Selection): declaration
+// names, local import names, and exported alias names.
 //
 // Normalization. TypeScript merges every same-named declaration of one symbol
 // table into one symbol. The Rust tool keeps one symbol per meaning unless the
@@ -72,7 +77,9 @@
 // `export=` and the `=` token. Clusters with identical declaration sets are
 // one group, even when TypeScript returns distinct (transient) symbols.
 // Normalization never drops an occurrence: tokens with no matching cluster are
-// reported as anomalies.
+// reported as anomalies. Each token whose expected outcome departs from what
+// TypeScript resolves, under a documented difference, carries a stable
+// `normalization` code (see NORMALIZATIONS) so reports can count them.
 import { createRequire } from 'node:module';
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -100,7 +107,7 @@ const MEMBER_FLAGS = ['Property', 'EnumMember', 'Method', 'GetAccessor', 'SetAcc
 // Names that never enter lexical lookup, whatever TypeScript resolves them to.
 const NON_REFERENCE_SYNTAX = new Set(['label', 'jsxIntrinsic', 'jsxAttribute', 'jsxNamespacedName', 'memberName',
   'privateName', 'propertyName', 'metaProperty', 'importAttribute', 'globalAugmentation', 'constAssertion',
-  'thisParameter', 'tupleLabel']);
+  'thisParameter', 'thisTypeQuery', 'tupleLabel']);
 
 export function semanticCompilerVersion(binary) {
   const result = spawnSync(binary, ['--version'], { encoding: 'utf8', timeout: 10_000 });
@@ -278,7 +285,7 @@ class Collector {
     // An import or export clause name denotes only what it aliases.
     const clause = context.roles.includes('import') || context.roles.includes('export');
     const token = { location: this.location(sourceFile, identifier.getStart(sourceFile), identifier.end), name: identifier.text,
-      symbol: !target ? null : clause ? this.record(target) : this.recordWithLocals(symbol, target),
+      symbol: !target ? null : this.recordWithLocals(symbol, target, !clause),
       meaning: meaningNames(context.meaning ?? 0), roles: context.roles };
     if (context.syntax) token.syntax = context.syntax;
     if (target?.escapedName === '__global') token.syntax = 'globalAugmentation';
@@ -295,9 +302,29 @@ class Collector {
     }
     if (symbol && symbol.flags & this.flags.Alias && meaningBits(token.meaning) === VALUE
       && !this.inTypeQuery(identifier) && this.typeOnlyChain(symbol)) token.typeOnlyValue = true;
+    if (target && !this.checker.isUnknownSymbol(target) && this.ambiguousStar(identifier, symbol)) token.ambiguousStar = true;
     const declares = this.declaredBy(identifier);
     if (declares) token.declares = this.declaration(declares);
+    if (this.candidate(identifier, context)) token.candidate = true;
     return token;
+  }
+
+  // Whether a name query selects this token: a declaration name, a local
+  // import name, or an exported alias name, but not the imported or
+  // re-exported name before `as`.
+  candidate(identifier, context) {
+    const { k } = this;
+    const parent = identifier.parent;
+    if (context.syntax) return false;
+    if (context.roles.includes('declaration')) return true;
+    switch (parent.kind) {
+      case k.ImportSpecifier: case k.ExportSpecifier: case k.ImportEqualsDeclaration:
+        return parent.name === identifier;
+      case k.ImportClause: case k.NamespaceImport: case k.NamespaceExport: case k.NamespaceExportDeclaration:
+        return true;
+      default:
+        return false;
+    }
   }
 
   target(symbol) {
@@ -326,25 +353,103 @@ class Collector {
     return index;
   }
 
-  // TypeScript keeps an import and same-named local declarations of other
-  // meanings in one table symbol. Following the alias would drop the local
-  // declarations, so the token's record combines both.
-  recordWithLocals(symbol, target) {
-    const { flags } = this;
-    const local = symbol !== target && symbol.flags & flags.Alias
-      && symbol.flags & ~flags.Alias & (flags.Value | flags.Type | flags.Namespace);
-    if (!local) return this.record(target);
-    const key = `${symbol.id}+${target.id}`;
+  // Each immediate alias can also declare independent local meanings.
+  // getAliasedSymbol may stop at such a mixed symbol, so capture the whole
+  // chain. Import/export clause names skip their own local declarations.
+  recordWithLocals(symbol, target, includeOwn = true) {
+    if (!(symbol.flags & this.flags.Alias)) return this.record(target);
     this.combined ??= new Map();
-    let index = this.combined.get(key);
-    if (index === undefined) {
-      const aliased = this.symbols[this.record(target)];
-      const own = this.symbols[this.record(symbol)];
-      const declarations = [...aliased.declarations, ...own.declarations.filter(d => d.category !== 'alias')];
-      index = this.symbols.push({ name: aliased.name, flags: [...new Set([...aliased.flags, ...own.flags])], declarations }) - 1;
-      this.combined.set(key, index);
+    const key = `${symbol.id}:${includeOwn}`;
+    if (this.combined.has(key)) return this.combined.get(key);
+    const records = [], seen = new Set();
+    let current = symbol;
+    while (current && !seen.has(current.id)) {
+      seen.add(current.id);
+      if (!(current.flags & this.flags.Alias)) {
+        records.push(this.symbols[this.record(current)]);
+        break;
+      }
+      const local = current.flags & (this.flags.Value | this.flags.Type | this.flags.Namespace);
+      if (local && (current !== symbol || includeOwn)) {
+        const record = this.symbols[this.record(current)];
+        const declarations = record.declarations.filter(d => d.category !== 'alias');
+        if (declarations.length) records.push({ ...record, declarations });
+      }
+      const next = this.checker.getImmediateAliasedSymbol(current);
+      if (!next || seen.has(next.id)) {
+        records.push(this.symbols[this.record(this.target(current))]);
+        break;
+      }
+      current = next;
     }
+    const declarations = [...new Map(records.flatMap(r => r.declarations)
+      .map(d => [declarationKey(d), d])).values()];
+    const combined = { name: target.name,
+      flags: [...new Set(records.flatMap(r => r.flags))], declarations };
+    if (!declarations.length && records.at(-1)?.special) combined.special = records.at(-1).special;
+    const index = this.symbols.push(combined) - 1;
+    this.combined.set(key, index);
     return index;
+  }
+
+  // Whether the token reaches its target through `export *` declarations that
+  // supply different targets for its name, at an import or re-export along
+  // its alias chain or as a member of a module receiver. ECMAScript makes such
+  // a name ambiguous, as the tool does; TypeScript reports TS2308 at the
+  // conflicting `export *` and keeps the first target.
+  ambiguousStar(identifier, symbol) {
+    const { k } = this;
+    const parent = identifier.parent;
+    if ((parent.kind === k.PropertyAccessExpression && parent.name === identifier)
+      || (parent.kind === k.QualifiedName && parent.right === identifier)) {
+      const qualifier = this.checker.getSymbolAtLocation(parent.kind === k.QualifiedName ? parent.left : parent.expression);
+      const module = qualifier && this.target(qualifier);
+      return !!module && !this.checker.isUnknownSymbol(module)
+        && this.symbols[this.record(module)].declarations.some(d => d.category === 'module')
+        && this.starConflict(module, identifier.text);
+    }
+    const conflicts = node => {
+      if (node?.kind !== k.ImportSpecifier && node?.kind !== k.ExportSpecifier) return false;
+      const declaration = node.kind === k.ImportSpecifier ? node.parent.parent.parent : node.parent.parent;
+      const module = declaration.moduleSpecifier && this.checker.getSymbolAtLocation(declaration.moduleSpecifier);
+      return !!module && this.starConflict(module, (node.propertyName ?? node.name).text);
+    };
+    // The imported or re-exported name before `as` denotes the module's export.
+    if (parent.propertyName === identifier && conflicts(parent)) return true;
+    const seen = new Set();
+    for (let current = symbol; current && current.flags & this.flags.Alias && !seen.has(current.id);
+      current = this.checker.getImmediateAliasedSymbol(current)) {
+      seen.add(current.id);
+      if ((current.declarations ?? []).some(handle => conflicts(handle.resolve(this.project)))) return true;
+    }
+    return false;
+  }
+
+  starConflict(module, name) {
+    this.conflicts ??= new Map();
+    const key = `${module.id}:${name}`;
+    if (!this.conflicts.has(key)) this.conflicts.set(key, this.findStarConflict(module, name, new Set()));
+    return this.conflicts.get(key);
+  }
+
+  // A name that a module does not export itself is looked up through its
+  // `export *` declarations (TypeScript's `__export` entry); it conflicts when
+  // they resolve it to different targets or a nested lookup conflicts.
+  findStarConflict(module, name, visiting) {
+    if (visiting.has(module.id)) return false;
+    visiting.add(module.id);
+    const exports = module.getExports();
+    if (exports.has(name.startsWith('__') ? `_${name}` : name) || exports.has('export=')) return false;
+    const targets = new Set();
+    for (const handle of exports.get('__export')?.declarations ?? []) {
+      const node = handle.resolve(this.project);
+      const next = node?.moduleSpecifier && this.checker.getSymbolAtLocation(node.moduleSpecifier);
+      if (!next) continue;
+      if (this.findStarConflict(next, name, visiting)) return true;
+      const member = this.checker.getMemberInModuleExports(next, name);
+      if (member) targets.add(this.target(member).id);
+    }
+    return targets.size > 1;
   }
 
   // A namespace or module that is not also a class, function, variable, or
@@ -363,7 +468,8 @@ class Collector {
     return node?.kind === k.TypeQuery;
   }
 
-  // Whether an alias chain passes through a type-only import or export.
+  // Whether the value target is reached only through a type-only edge.
+  // A same-named local value ends the lookup before that symbol's type alias.
   typeOnlyChain(symbol) {
     const { k, flags } = this;
     this.typeOnly ??= new Map();
@@ -373,6 +479,10 @@ class Collector {
     for (let current = symbol; current && current.flags & flags.Alias && !seen.has(current.id);
       current = this.checker.getImmediateAliasedSymbol(current)) {
       seen.add(current.id);
+      if (current.flags & flags.Value) {
+        const own = this.symbols[this.record(current)];
+        if (clusterDeclarations(own).some(cluster => cluster.meaning & VALUE)) break;
+      }
       for (const handle of current.declarations ?? []) {
         const node = handle.resolve(this.project);
         if (!node) continue;
@@ -491,6 +601,15 @@ class Collector {
       case k.MetaProperty: return { syntax: 'metaProperty', roles: [] };
       case k.NamedTupleMember: if (parent.name === identifier) return { syntax: 'tupleLabel', roles: [] }; break;
       case k.Parameter: if (parent.name === identifier && identifier.text === 'this') return { syntax: 'thisParameter', roles: [] }; break;
+      // `typeof this` and `typeof this.x` name the enclosing class's instance.
+      case k.TypeQuery: if (identifier.text === 'this') return { syntax: 'thisTypeQuery', roles: [] }; break;
+      case k.QualifiedName:
+        if (parent.left === identifier && identifier.text === 'this') {
+          let up = parent;
+          while (up.kind === k.QualifiedName) up = up.parent;
+          if (up.kind === k.TypeQuery) return { syntax: 'thisTypeQuery', roles: [] };
+        }
+        break;
       case k.ImportAttribute: return { syntax: 'importAttribute', roles: [] };
       case k.JsxOpeningElement: case k.JsxSelfClosingElement: case k.JsxClosingElement:
         if (/^[a-z]|-/.test(identifier.text)) return { syntax: 'jsxIntrinsic', roles: [] };
@@ -609,9 +728,37 @@ export function clusterDeclarations(symbol) {
   });
 }
 
+// Codes for tokens whose expected outcome departs from TypeScript's
+// resolution under a difference documented in references.md ("Differences
+// from TypeScript 7.0.2" and "Compatibility limits"):
+//   nonReference:<syntax> - TypeScript resolves a non-reference name (a `this`
+//                           parameter, tuple label, binding key, ...): unsupported.
+//   typeOnlyValue         - a value use through a type-only alias: unresolved.
+//   ambiguousStarExport   - a name that `export *` declarations supply with
+//                           different targets, where TypeScript keeps the
+//                           first (TS2308): unresolved.
+//   builtin               - `undefined`, `arguments`, `globalThis`: unsupported.
+//   libraryOnly           - declared only by a standard library: unresolved.
+//   missingNamespaceExport - a missing export of a namespace qualifier: unresolved.
+//   unresolvedProperty    - any other unresolved `a.b` name: unsupported.
+//   unresolvedReceiver    - a property of an unresolved receiver: unsupported.
+//   receiverType          - resolved through a receiver's type: unsupported.
+//   declarationOutsideTarget - a declaration name TypeScript resolves to
+//                           another symbol (a parameter property): own group.
+export function normalizationCode(token) {
+  if (NON_REFERENCE_SYNTAX.has(token.syntax)) return token.classification === 'symbol' ? `nonReference:${token.syntax}` : undefined;
+  if (token.typeOnlyValue && token.classification === 'symbol') return 'typeOnlyValue';
+  if (token.ambiguousStar && token.classification === 'symbol') return 'ambiguousStarExport';
+  if (token.builtin) return 'builtin';
+  if (token.classification === 'library') return 'libraryOnly';
+  if (token.classification === 'none' && token.syntax === 'property') return token.namespaceQualifier ? 'missingNamespaceExport' : 'unresolvedProperty';
+  if (token.outsideTarget) return 'declarationOutsideTarget';
+  return undefined;
+}
+
 export function expectedOutcome(token) {
   if (NON_REFERENCE_SYNTAX.has(token.syntax)) return 'unsupported';
-  if (token.typeOnlyValue) return 'unresolved';
+  if (token.typeOnlyValue || token.ambiguousStar) return 'unresolved';
   if (token.classification === 'symbol') return token.groups.length ? 'groups' : 'anomaly';
   if (token.classification === 'member') return 'unsupported';
   // An unresolved `a.b` name is a member access on an unknown receiver,
@@ -637,13 +784,18 @@ export function normalizeOracle(raw) {
     const symbol = token.symbol === null ? null : raw.symbols[token.symbol];
     const classification = classifySymbol(symbol);
     const result = { ...token, classification, groups: [] };
+    if (classification === 'member' && (symbol.special === 'undefined' || symbol.special === 'arguments'
+      || (symbol.name === 'globalThis' && !symbol.declarations.length))) result.builtin = true;
     if (NON_REFERENCE_SYNTAX.has(token.syntax)) {
       if (classification === 'symbol') result.note = `TypeScript resolves this non-reference name to \`${symbol.name}\``;
     } else if (token.declares && CATEGORY_MEANING[token.declares.category] !== undefined && classification !== 'none') {
       // A declaration name denotes its own declaration's cluster.
       const clusters = classification === 'symbol' ? clusterOf(symbol) : [];
       const own = clusters.find(cluster => cluster.declarations.some(d => declarationKey(d) === declarationKey(token.declares)));
-      if (!own) result.note = 'declaration outside the TypeScript target symbol';
+      if (!own) {
+        result.note = 'declaration outside the TypeScript target symbol';
+        result.outsideTarget = true;
+      }
       result.classification = 'symbol';
       result.groups = [group(own ?? clusterDeclarations({ declarations: [token.declares], flags: [] })[0])];
     } else if (classification === 'symbol') {
@@ -653,6 +805,8 @@ export function normalizeOracle(raw) {
         reason: `no declaration cluster of \`${symbol.name}\` has the token's meaning (${token.meaning.join('+') || 'none'})` });
     }
     result.outcome = expectedOutcome(result);
+    const code = normalizationCode(result);
+    if (code) result.normalization = code;
     return result;
 
     function clusterOf(target) {
@@ -673,15 +827,18 @@ export function normalizeOracle(raw) {
     if (receiver.outcome === 'unresolved') {
       token.outcome = 'unsupported';
       token.note = 'property of an unresolved receiver';
+      token.normalization = 'unresolvedReceiver';
     } else if (receiver.outcome === 'groups' && !namespace) {
       token.outcome = 'unsupported';
       token.note = "resolved through the receiver's type";
+      token.normalization = 'receiverType';
     }
   }
   for (const token of tokens) {
     // A token expected to be unresolved or unsupported belongs to no group.
     if (token.outcome !== 'groups') token.groups = [];
-    for (const index of token.groups) groups[index].occurrences.push({ name: token.name, location: token.location });
+    const roles = [...token.roles].sort();
+    for (const index of token.groups) groups[index].occurrences.push({ name: token.name, location: token.location, roles });
   }
   // Groups are ordered by their earliest declaration; renumber the tokens.
   const order = groups.map((_, index) => index).sort((a, b) =>
@@ -701,7 +858,8 @@ export async function semanticOracle(config, semantic) {
   try { return normalizeOracle(session.collect(config)); } finally { session.close(); }
 }
 
-// The Rust result shape: groups without roles and without internal fields.
+// The Rust result shape: groups without internal fields. Occurrence roles are
+// sorted by name; compare them as sets.
 export function resultGroups(oracle, indices = oracle.groups.map((_, index) => index)) {
   return indices.map(index => ({ declarations: oracle.groups[index].declarations, occurrences: oracle.groups[index].occurrences }));
 }

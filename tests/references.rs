@@ -1,42 +1,20 @@
 mod support;
 
-use support::Fixture;
+use support::{CONFIG, Fixture, load_error, project};
 use typescript_parser::references::{
-    ProjectError, ProjectErrorKind, QueryErrorKind, ReferenceProject, ReferenceQuery,
-    SourcePosition,
+    ProjectErrorKind, QueryErrorKind, ReferenceProject, ReferenceQuery, SourcePosition,
 };
 
-const CONFIG: &str = r#"{ "compilerOptions": { "noLib": true } }"#;
 /// TypeScript reports no errors in declaration files under this setting.
 const SKIP_LIB_CHECK: &str = r#"{ "compilerOptions": { "noLib": true, "skipLibCheck": true } }"#;
 
-fn aliases_and_shadowing() -> Fixture {
-    Fixture::new(&[
-        ("tsconfig.json", CONFIG),
-        (
-            "api.ts",
-            "export function /*@run:de*/run() {}\nconst /*@copy:d*/copy = /*@run:u*/run;\n/*@copy:u*/copy();\n",
-        ),
-        (
-            "barrel.ts",
-            "export { /*@run:e*/run as /*@run:e*/execute } from \"./api\";\n",
-        ),
-        (
-            "app.ts",
-            "import { /*@run:i*/execute as /*@run:i*/start } from \"./barrel\";\n/*@run:u*/start();\nfunction /*@local:d*/local(/*@param:d*/start: () => void) { /*@param:u*/start(); }\n",
-        ),
-    ])
-}
-
-#[test]
-fn positions_select_the_symbol_behind_aliases_but_not_shadowed_bindings() {
-    let fixture = aliases_and_shadowing();
-    fixture.check_markers(&fixture.load());
-}
+/// Cross-file aliases and a shadowing parameter; tests/reference_fixtures.rs
+/// checks its position queries.
+const ALIASES: &str = "aliases-shadowing";
 
 #[test]
 fn names_select_every_matching_declaration_and_alias() {
-    let fixture = aliases_and_shadowing();
+    let fixture = Fixture::checked_in(ALIASES);
     let project = fixture.load();
     fixture.check_name(&project, "start", None, &["run", "param"]);
     fixture.check_name(&project, "start", Some("app.ts"), &["run", "param"]);
@@ -135,7 +113,7 @@ fn at(line: usize, column: usize) -> SourcePosition {
 
 #[test]
 fn positions_select_tokens_start_inclusive_end_exclusive() {
-    let fixture = aliases_and_shadowing();
+    let fixture = Fixture::checked_in(ALIASES);
     let project = fixture.load();
     let groups = |line, column| {
         project
@@ -145,18 +123,17 @@ fn positions_select_tokens_start_inclusive_end_exclusive() {
             })
             .map(|result| result.groups.len())
     };
-    // `start();` is at line 2 after an 11-column marker comment.
-    assert_eq!(groups(2, 11), Ok(1));
-    assert_eq!(groups(2, 15), Ok(1));
-    assert_eq!(groups(2, 16), Ok(0));
-    assert_eq!(groups(2, 10), Ok(0));
+    // `start();` is at line 3 after a 10-column marker comment.
+    assert_eq!(groups(3, 11), Ok(1));
+    assert_eq!(groups(3, 15), Ok(1));
+    assert_eq!(groups(3, 16), Ok(0));
+    assert_eq!(groups(3, 10), Ok(0));
 }
 
 #[test]
 fn invalid_queries_have_typed_errors() {
-    let fixture = aliases_and_shadowing();
-    std::fs::write(fixture.path("outside.ts"), "let outside = 1;").unwrap();
-    let project = fixture.load_config("tsconfig.json");
+    let fixture = Fixture::checked_in(ALIASES);
+    let project = fixture.load();
     let error = |query| project.find_references(query).unwrap_err().kind;
     let position = |file: &str, line, column| ReferenceQuery::At {
         file: fixture.path(file),
@@ -204,13 +181,6 @@ fn columns_inside_surrogate_pairs_are_invalid() {
     assert_eq!(query(14).unwrap().groups.len(), 1);
     assert_eq!(query(15).unwrap_err().kind, QueryErrorKind::InvalidPosition);
     assert_eq!(query(16).unwrap().groups.len(), 0);
-}
-
-fn load_error(files: &[(&str, &str)]) -> ProjectError {
-    let mut all = vec![("tsconfig.json", CONFIG)];
-    all.extend_from_slice(files);
-    let fixture = Fixture::new(&all);
-    ReferenceProject::load(&fixture.path("tsconfig.json")).unwrap_err()
 }
 
 #[test]
@@ -295,7 +265,8 @@ let /*@p:d*/p: /*@Props:u*/Props | /*@React:u*/React./*@Props:u*/Props;
 
 #[test]
 fn query_paths_match_lexically_after_loading() {
-    let fixture = aliases_and_shadowing();
+    // A copy, because the test deletes a file.
+    let fixture = Fixture::copy_of(ALIASES);
     let project = fixture.load();
     let query = |file: std::path::PathBuf| {
         project
@@ -309,6 +280,21 @@ fn query_paths_match_lexically_after_loading() {
     // The captured index answers even after the file disappears from disk.
     std::fs::remove_file(fixture.path("app.ts")).unwrap();
     assert_eq!(query(fixture.path("app.ts")), Ok(2));
+}
+
+#[test]
+#[cfg(unix)]
+fn query_paths_clamp_parent_traversal_at_the_root() {
+    let fixture = Fixture::checked_in(ALIASES);
+    let project = fixture.load();
+    let file = std::path::Path::new("/../").join(fixture.path("app.ts").strip_prefix("/").unwrap());
+    let result = project
+        .find_references(ReferenceQuery::Name {
+            name: "start".into(),
+            file: Some(file),
+        })
+        .unwrap();
+    assert_eq!(result.groups.len(), 2);
 }
 
 #[test]
@@ -358,12 +344,6 @@ fn type_only_restrictions_apply_at_value_uses_not_to_re_exports() {
     fixture.check_markers(&fixture.load());
 }
 
-fn project(files: &[(&str, &str)]) -> Fixture {
-    let mut all = vec![("tsconfig.json", CONFIG)];
-    all.extend_from_slice(files);
-    Fixture::new(&all)
-}
-
 #[test]
 fn star_exports_prefer_accessible_routes_to_one_declaration() {
     for barrel in [
@@ -394,6 +374,137 @@ fn star_exports_prefer_accessible_routes_to_one_declaration() {
         ),
     ]);
     fixture.check_markers(&fixture.load());
+}
+
+#[test]
+fn alias_cycles_resolve_through_local_declarations_whichever_file_loads_first() {
+    // TypeScript resolves a name with local declarations to those locals
+    // without following a same-named import, so an import that comes back
+    // through `b` reaches `a`'s own `const Foo`. That conflict is TS2440, a
+    // binding error in a checked file; a dependency tolerates it.
+    let a = "import { Foo } from \"./b\";\nconst Foo = 1;\nexport { Foo };\n";
+    let b = "export { Foo } from \"./a\";\n";
+    for order in [r#"["a.ts", "b.ts"]"#, r#"["b.ts", "a.ts"]"#] {
+        let config = format!(r#"{{ "compilerOptions": {{ "noLib": true }}, "files": {order} }}"#);
+        let fixture = Fixture::new(&[("tsconfig.json", &config), ("a.ts", a), ("b.ts", b)]);
+        let error = ReferenceProject::load(&fixture.path("tsconfig.json")).unwrap_err();
+        assert_eq!(error.kind, ProjectErrorKind::Binding, "{order}: {error}");
+        assert!(error.path.unwrap().ends_with("a.ts"));
+        assert_eq!(error.position, Some(at(1, 10)), "{order}");
+    }
+    let package = [
+        (
+            "node_modules/pkg/package.json",
+            r#"{ "name": "pkg", "types": "a.d.ts" }"#,
+        ),
+        (
+            "node_modules/pkg/a.d.ts",
+            "import { Foo } from \"./b\";\ndeclare const Foo: number;\nexport { Foo };\n",
+        ),
+        ("node_modules/pkg/b.d.ts", b),
+        (
+            "via-a.ts",
+            "import { /*@foo:i*/Foo } from \"pkg/a\";\n/*@foo:u*/Foo;\n",
+        ),
+        (
+            "via-b.ts",
+            "import { /*@foo:i*/Foo } from \"pkg/b\";\n/*@foo:u*/Foo;\n",
+        ),
+    ];
+    for order in [r#"["via-a.ts", "via-b.ts"]"#, r#"["via-b.ts", "via-a.ts"]"#] {
+        let config = format!(
+            r#"{{ "compilerOptions": {{ "noLib": true, "skipLibCheck": true }}, "files": {order} }}"#
+        );
+        let mut files = vec![("tsconfig.json", config.as_str())];
+        files.extend_from_slice(&package);
+        let fixture = Fixture::new(&files);
+        let project = fixture.load();
+        fixture.check_markers(&project);
+        let result = project
+            .find_references(ReferenceQuery::Name {
+                name: "Foo".into(),
+                file: Some(fixture.path("via-b.ts")),
+            })
+            .unwrap();
+        assert_eq!(
+            result.groups[0].declarations[0].location.file, "node_modules/pkg/a.d.ts",
+            "{order}"
+        );
+    }
+}
+
+#[test]
+fn exporting_a_merged_local_declaration_is_not_a_conflict() {
+    // tsc 7.0.2 accepts both; an export specifier of a local names the local
+    // itself.
+    for source in [
+        "export interface B { a: number }\nconst B = 1;\nexport { B };\n",
+        "export type T = number;\nnamespace T { export const q = 1; }\nexport { T };\n",
+    ] {
+        project(&[("a.ts", source)]).load();
+    }
+    // An import that resolves back to its own module's local is TS2440.
+    let error = load_error(&[("a.ts", "import { x } from \"./a\";\nexport const x = 1;\n")]);
+    assert_eq!(error.kind, ProjectErrorKind::Binding, "{error}");
+    assert_eq!(error.position, Some(at(1, 10)));
+}
+
+#[test]
+fn cut_alias_cycles_do_not_leak_into_other_lookups() {
+    // `m` and `n` each declare one meaning of `x` and re-export the other's,
+    // a cycle of fill edges. Whichever lookup reaches it first, `c`'s value
+    // use resolves to `n`'s constant.
+    let sources = [
+        (
+            "node_modules/m/index.d.ts",
+            "export interface x {}\nexport { x } from \"n\";\n",
+        ),
+        (
+            "node_modules/n/index.d.ts",
+            "export declare const x: number;\nexport { x } from \"m\";\n",
+        ),
+        ("c.ts", "import { x } from \"m\";\nx;\n"),
+        ("b.ts", "export { x } from \"n\";\n"),
+    ];
+    for order in [r#"["c.ts", "b.ts"]"#, r#"["b.ts", "c.ts"]"#] {
+        let config = format!(
+            r#"{{ "compilerOptions": {{ "noLib": true, "skipLibCheck": true }}, "files": {order} }}"#
+        );
+        let mut files = vec![("tsconfig.json", config.as_str())];
+        files.extend_from_slice(&sources);
+        let fixture = Fixture::new(&files);
+        let result = fixture
+            .load()
+            .find_references(ReferenceQuery::At {
+                file: fixture.path("c.ts"),
+                position: at(2, 1),
+            })
+            .unwrap_or_else(|error| panic!("{order}: {error}"));
+        let declarations: Vec<_> = result.groups[0]
+            .declarations
+            .iter()
+            .map(|declaration| declaration.location.file.as_str())
+            .collect();
+        assert_eq!(declarations, ["node_modules/n/index.d.ts"], "{order}");
+    }
+}
+
+#[test]
+fn alias_cycles_without_declarations_are_unresolved() {
+    // TypeScript's TS2303: every alias in the cycle is unresolved, whichever
+    // file resolution reaches first.
+    let sources = [
+        ("d.ts", "export { /*@?*/Bar } from \"./e\";\n"),
+        ("e.ts", "export { /*@?*/Bar } from \"./d\";\n"),
+        ("f.ts", "import { /*@?*/Bar } from \"./e\";\n/*@?*/Bar;\n"),
+    ];
+    for order in [r#"["d.ts", "e.ts", "f.ts"]"#, r#"["f.ts", "e.ts", "d.ts"]"#] {
+        let config = format!(r#"{{ "compilerOptions": {{ "noLib": true }}, "files": {order} }}"#);
+        let mut files = vec![("tsconfig.json", config.as_str())];
+        files.extend_from_slice(&sources);
+        let fixture = Fixture::new(&files);
+        fixture.check_markers(&fixture.load());
+    }
 }
 
 #[test]
@@ -473,6 +584,35 @@ fn package_declarations_may_import_missing_peer_modules() {
 }
 
 #[test]
+fn mixed_export_declarations_are_binding_errors_only_in_checked_files() {
+    // Declarations of one name in one container must be all exported or all
+    // local (TypeScript's TS2395 and TS2383). `export {}` stops an ambient
+    // module from exporting every declaration.
+    let mixed =
+        "export declare function f(): void;\ndeclare function f(x: number): void;\nexport {};\n";
+    let error = load_error(&[("mixed.ts", mixed)]);
+    assert_eq!(error.kind, ProjectErrorKind::Binding);
+    assert!(error.path.unwrap().ends_with("mixed.ts"));
+    assert_eq!(error.position, Some(at(2, 18)));
+    // Dependency-only declarations are lenient regardless of skipLibCheck.
+    for config in [CONFIG, SKIP_LIB_CHECK] {
+        let fixture = Fixture::new(&[
+            ("tsconfig.json", config),
+            (
+                "node_modules/pkg/package.json",
+                r#"{ "name": "pkg", "types": "index.d.ts" }"#,
+            ),
+            ("node_modules/pkg/index.d.ts", mixed),
+            (
+                "app.ts",
+                "import { /*@f:i*/f } from \"pkg\";\n/*@f:u*/f();\n",
+            ),
+        ]);
+        fixture.check_markers(&fixture.load());
+    }
+}
+
+#[test]
 fn package_augmentations_of_absent_modules_bind_nothing() {
     let fixture = Fixture::new(&[
         ("tsconfig.json", SKIP_LIB_CHECK),
@@ -499,6 +639,22 @@ fn suppressed_unresolved_imports_leave_names_unresolved() {
         "// @ts-expect-error The package does not export this path.\nexport type /*@T:de*/T = import(\"pkg/hidden\")./*@?*/Brand;\n  /* @ts-ignore */\nimport { /*@?*/gone } from \"./absent\";\n/*@?*/gone;\n",
     )]);
     fixture.check_markers(&fixture.load());
+}
+
+#[test]
+fn comment_directives_count_between_any_tokens_but_not_inside_literals() {
+    let fixture = project(&[(
+        "app.ts",
+        "import {\n  /*@?*/a,\n  // @ts-expect-error The module is generated later.\n} from \"./generated\";\nexport const /*@x:de*/x = /*@?*/a;\n",
+    )]);
+    fixture.check_markers(&fixture.load());
+
+    let error = load_error(&[(
+        "literal.ts",
+        "export const t = `\n// @ts-ignore`;\nimport { b } from \"./absent\";\n",
+    )]);
+    assert_eq!(error.kind, ProjectErrorKind::UnresolvedImport);
+    assert_eq!(error.position, Some(at(3, 19)));
 }
 
 #[test]
@@ -564,6 +720,34 @@ fn members_beside_a_value_are_properties_and_type_exports_do_not_instantiate() {
         ),
     ]);
     fixture.check_markers(&fixture.load());
+}
+
+#[test]
+fn name_candidates_that_are_not_reference_targets_fail_the_query() {
+    let fixture = project(&[
+        (
+            "path.d.ts",
+            "declare namespace path { interface PlatformPath { resolve(): string } }\ndeclare const path: path.PlatformPath;\nexport = path;\n",
+        ),
+        (
+            "app.ts",
+            "import { resolve } from \"./path\";\nexport { globalThis as g };\n",
+        ),
+    ]);
+    let project = fixture.load();
+    let error = |name: &str| {
+        project
+            .find_references(ReferenceQuery::Name {
+                name: name.into(),
+                file: None,
+            })
+            .unwrap_err()
+    };
+    let resolve = error("resolve");
+    assert_eq!(resolve.kind, QueryErrorKind::UnsupportedTarget);
+    assert!(resolve.path.unwrap().ends_with("app.ts"));
+    assert_eq!(resolve.position, Some(at(1, 10)));
+    assert_eq!(error("g").kind, QueryErrorKind::UnsupportedTarget);
 }
 
 #[test]
@@ -669,6 +853,48 @@ fn automatic_jsx_runtimes_enter_the_program() {
 
 #[cfg(unix)]
 #[test]
+fn a_symlinked_configuration_directory_does_not_redirect_parent_paths() {
+    // `L/x` links to `real/deep/x`. Configuration paths resolve from the real
+    // directory, where `../z.ts` is `real/deep/z.ts`; from the link, the same
+    // spelling would lexically name `L/z.ts`.
+    let fixture = Fixture::new(&[
+        (
+            "real/deep/x/tsconfig.json",
+            r#"{ "compilerOptions": { "noLib": true }, "files": ["../../../L/z.ts", "../z.ts", "in.ts"] }"#,
+        ),
+        ("real/deep/x/in.ts", "export const inside = 1;\n"),
+        ("L/z.ts", "export const near = 1;\n"),
+        ("real/deep/z.ts", "export const far = 1;\n"),
+    ]);
+    std::os::unix::fs::symlink(fixture.path("real/deep/x"), fixture.path("L/x")).unwrap();
+    let project = ReferenceProject::load(&fixture.path("L/x/tsconfig.json")).unwrap();
+    let query = |file| {
+        project
+            .find_references(ReferenceQuery::At {
+                file,
+                position: at(1, 14),
+            })
+            .unwrap()
+    };
+    let name = |result: &typescript_parser::references::ReferenceResult| {
+        result.groups[0].declarations[0].name.clone()
+    };
+    assert_eq!(name(&query(fixture.path("L/z.ts"))), "near");
+    assert_eq!(name(&query(fixture.path("real/deep/z.ts"))), "far");
+    // A file under the configuration directory can be named through the link.
+    assert_eq!(name(&query(fixture.path("L/x/in.ts"))), "inside");
+    // Result files are relative to the reported configuration's directory.
+    let result = query(fixture.path("real/deep/z.ts"));
+    assert_eq!(result.project, fixture.path("real/deep/x/tsconfig.json"));
+    let file = &result.groups[0].declarations[0].location.file;
+    assert_eq!(
+        std::fs::canonicalize(result.project.parent().unwrap().join(file)).unwrap(),
+        fixture.path("real/deep/z.ts")
+    );
+}
+
+#[cfg(unix)]
+#[test]
 fn files_selected_through_symlinks_or_other_cases_can_be_queried() {
     let fixture = project(&[("app.ts", "export const x = 1;\nx;\n")]);
     std::os::unix::fs::symlink(fixture.path("app.ts"), fixture.path("alias.ts")).unwrap();
@@ -703,6 +929,251 @@ fn files_selected_through_symlinks_or_other_cases_can_be_queried() {
         });
         assert_eq!(result.unwrap().groups.len(), 1);
     }
+}
+
+#[test]
+fn input_extensions_follow_the_file_system_case_policy() {
+    let fixture = project(&[
+        ("script.js", "export const s = 1;\n"),
+        ("types.ts", "declare const t: number;\n"),
+        (
+            "app.ts",
+            "/// <reference path=\"./TYPES.TS\" />\nexport const a = t;\n",
+        ),
+    ]);
+    // Only a case-insensitive file system has other spellings of a name.
+    if !fixture.path("SCRIPT.JS").exists() {
+        eprintln!(
+            "SKIP input_extensions_follow_the_file_system_case_policy: case-sensitive file system"
+        );
+        return;
+    }
+    let configure = |files: &str| {
+        let config = format!(r#"{{ "compilerOptions": {{ "noLib": true }}, "files": {files} }}"#);
+        std::fs::write(fixture.path("tsconfig.json"), config).unwrap();
+        ReferenceProject::load(&fixture.path("tsconfig.json"))
+    };
+    let error = configure(r#"["SCRIPT.JS"]"#).unwrap_err();
+    assert_eq!(error.kind, ProjectErrorKind::Unsupported, "{error}");
+    let project = configure(r#"["app.ts"]"#).unwrap_or_else(|error| panic!("{error}"));
+    let result = project
+        .find_references(ReferenceQuery::Name {
+            name: "t".into(),
+            file: None,
+        })
+        .unwrap();
+    assert_eq!(result.groups[0].occurrences.len(), 2);
+}
+
+#[test]
+fn declaration_files_are_named_by_their_exact_spelling() {
+    // tsc 7.0.2 reports TS2304 for `g`: `G.D.TS` is an ordinary module under
+    // `nodenext`, not a declaration file, though the file system ignores case.
+    let fixture = Fixture::new(&[
+        (
+            "tsconfig.json",
+            r#"{ "compilerOptions": { "noLib": true, "module": "nodenext" }, "files": ["main.ts", "G.D.TS"] }"#,
+        ),
+        (
+            "main.ts",
+            "export {};
+g;
+",
+        ),
+        (
+            "G.D.TS",
+            "declare const g: number;
+",
+        ),
+    ]);
+    if !fixture.path("g.d.ts").exists() {
+        eprintln!(
+            "SKIP declaration_files_are_named_by_their_exact_spelling: case-sensitive file system"
+        );
+        return;
+    }
+    let error = fixture
+        .load()
+        .find_references(ReferenceQuery::At {
+            file: fixture.path("main.ts"),
+            position: SourcePosition { line: 2, column: 1 },
+        })
+        .unwrap_err();
+    assert_eq!(error.kind, QueryErrorKind::UnresolvedTarget, "{error}");
+}
+
+#[test]
+fn equally_specific_pattern_ambient_modules_resolve_to_the_first() {
+    // As in tsc 7.0.2 (`findBestPatternMatch`): both patterns have an empty
+    // prefix, so the first declared wins; a name with two `*` is no pattern.
+    let client = "declare module '*.module.css' { export const onlyModule: number; }\n\
+                  declare module '*.css' { export const onlyPlain: number; }\n\
+                  declare module 'a*b*c' { export const twoStars: number; }\n";
+    let resolve = |import: &str| {
+        let fixture = project(&[
+            ("client.d.ts", client),
+            (
+                "app.ts",
+                &format!("import {{ {import} }} from \"./x.module.css\";\n{import};\n"),
+            ),
+        ]);
+        fixture.load().find_references(ReferenceQuery::At {
+            file: fixture.path("app.ts"),
+            position: SourcePosition {
+                line: 1,
+                column: 10,
+            },
+        })
+    };
+    let result = resolve("onlyModule").unwrap();
+    assert_eq!(
+        result.groups[0].declarations[0].location.file,
+        "client.d.ts"
+    );
+    assert_eq!(result.groups[0].declarations[0].location.start.line, 1);
+    let error = resolve("onlyPlain").unwrap_err();
+    assert_eq!(error.kind, QueryErrorKind::UnresolvedTarget, "{error}");
+
+    let fixture = project(&[
+        ("client.d.ts", client),
+        ("app.ts", "import { twoStars } from \"aZb*c\";\ntwoStars;\n"),
+    ]);
+    let error = ReferenceProject::load(&fixture.path("tsconfig.json")).unwrap_err();
+    assert_eq!(error.kind, ProjectErrorKind::UnresolvedImport, "{error}");
+}
+
+#[test]
+fn a_star_export_route_that_fails_still_exports_its_name() {
+    // `b.ts` re-exports a missing `x`. tsc 7.0.2 reports TS2305 there and,
+    // beside `c.ts`, TS2308 at the second `export *`: the failing route still
+    // exports `x`, so the name is ambiguous rather than `c.ts`'s.
+    let query = |barrel: &str| {
+        let fixture = project(&[
+            ("a.ts", barrel),
+            ("b.ts", "export { x } from \"./c2.js\";\n"),
+            ("c.ts", "export const x = 1;\n"),
+            ("c2.ts", "export const y = 1;\n"),
+            ("main.ts", "import { x } from \"./a.js\";\nx;\n"),
+        ]);
+        fixture
+            .load()
+            .find_references(ReferenceQuery::At {
+                file: fixture.path("main.ts"),
+                position: SourcePosition {
+                    line: 1,
+                    column: 10,
+                },
+            })
+            .unwrap_err()
+    };
+    let error = query("export * from \"./b.js\";\nexport * from \"./c.js\";\n");
+    assert_eq!(error.kind, QueryErrorKind::UnresolvedTarget, "{error}");
+    assert!(error.message.contains("ambiguous"), "{error}");
+    let error = query("export * from \"./b.js\";\n");
+    assert_eq!(error.kind, QueryErrorKind::UnresolvedTarget, "{error}");
+    assert!(error.message.contains("not exported"), "{error}");
+}
+
+#[test]
+fn exported_and_local_declarations_conflict_by_declaration_space() {
+    // TypeScript's `getDeclarationSpaces` (TS2395): an enum occupies the
+    // value and type spaces only, so it merges with a local type-only
+    // namespace but not with a local instantiated one.
+    let load = |source: &str| {
+        let fixture = project(&[("a.ts", source)]);
+        ReferenceProject::load(&fixture.path("tsconfig.json"))
+    };
+    for source in [
+        "export enum Color { Red }\nnamespace Color { export type Name = keyof typeof Color; }\n",
+        "enum Color { Red }\nexport namespace Color { export type Name = string; }\n",
+    ] {
+        load(source).unwrap_or_else(|error| panic!("{source}: {error}"));
+    }
+    for source in [
+        "export enum Color { Red }\nnamespace Color { export const x = 1; }\n",
+        "export class C {}\nnamespace C { export const x = 1; }\n",
+        "export class C {}\ninterface C { x: number }\n",
+    ] {
+        let error = load(source).unwrap_err();
+        assert_eq!(error.kind, ProjectErrorKind::Binding, "{source}: {error}");
+    }
+}
+
+#[test]
+fn a_const_enum_namespace_precedes_a_function_unless_const_enums_are_kept() {
+    // TypeScript's `isInstantiatedModule` counts a namespace of const enums
+    // only under `shouldPreserveConstEnums` (TS2434 otherwise).
+    let source = "namespace f { export const enum E { A } }\nfunction f() {}\nexport {};\n";
+    let load = |options: &str| {
+        let config = format!(r#"{{ "compilerOptions": {{ "noLib": true{options} }} }}"#);
+        let fixture = Fixture::new(&[("tsconfig.json", config.as_str()), ("a.ts", source)]);
+        ReferenceProject::load(&fixture.path("tsconfig.json"))
+    };
+    load("").unwrap_or_else(|error| panic!("{error}"));
+    for option in [
+        "isolatedModules",
+        "preserveConstEnums",
+        "verbatimModuleSyntax",
+    ] {
+        let error = load(&format!(r#", "{option}": true"#)).unwrap_err();
+        assert_eq!(error.kind, ProjectErrorKind::Binding, "{option}: {error}");
+    }
+    let instantiated = "namespace f { export const x = 1; }\nfunction f() {}\nexport {};\n";
+    let fixture = project(&[("a.ts", instantiated)]);
+    let error = ReferenceProject::load(&fixture.path("tsconfig.json")).unwrap_err();
+    assert_eq!(error.kind, ProjectErrorKind::Binding, "{error}");
+}
+
+#[test]
+fn relative_specifiers_accept_backslash_separators() {
+    // tsc 7.0.2 resolves each of these to `sub/a.ts`: `pathIsRelative` and
+    // `combinePaths` read `\\` as a separator.
+    for specifier in [".\\\\sub\\\\a", "./sub\\\\a", ".\\\\sub/a"] {
+        let fixture = project(&[
+            ("sub/a.ts", "export const value = 1;\n"),
+            (
+                "main.ts",
+                &format!("import {{ value }} from \"{specifier}\";\nvalue;\n"),
+            ),
+        ]);
+        let result = fixture
+            .load()
+            .find_references(ReferenceQuery::Name {
+                name: "value".into(),
+                file: None,
+            })
+            .unwrap_or_else(|error| panic!("{specifier}: {error}"));
+        assert_eq!(result.groups.len(), 1, "{specifier}");
+        assert_eq!(result.groups[0].occurrences.len(), 3, "{specifier}");
+    }
+}
+
+#[test]
+fn both_entry_points_report_a_failing_token_at_the_same_path() {
+    let fixture = project(&[
+        ("src/m.ts", "export const a = 1;\n"),
+        ("src/c.ts", "import { b } from \"./m\";\nb;\n"),
+    ]);
+    let project = fixture.load();
+    let at = project
+        .find_references(ReferenceQuery::At {
+            file: fixture.root.join("src/../src/c.ts"),
+            position: SourcePosition {
+                line: 1,
+                column: 10,
+            },
+        })
+        .unwrap_err();
+    let named = project
+        .find_references(ReferenceQuery::Name {
+            name: "b".into(),
+            file: None,
+        })
+        .unwrap_err();
+    assert_eq!(at.kind, QueryErrorKind::UnresolvedTarget, "{at}");
+    assert_eq!(named.kind, QueryErrorKind::UnresolvedTarget, "{named}");
+    assert_eq!(at.path, named.path);
+    assert!(at.path.as_ref().unwrap().is_absolute());
 }
 
 #[test]
@@ -951,4 +1422,210 @@ fn suppression_directives_are_real_comments_on_preceding_lines() {
         "// @ts-ignore\nexport const z = 1;\nimport { x } from \"./missing\";\n",
     )]);
     assert_eq!(error.kind, ProjectErrorKind::UnresolvedImport);
+}
+
+#[test]
+fn alias_errors_are_reported_at_the_alias_name_or_its_keyword() {
+    let duplicate = |file: &str, source: &str| {
+        let error = load_error(&[("lib.ts", "export const x = 1;\n"), (file, source)]);
+        assert_eq!(error.kind, ProjectErrorKind::Binding, "{source}: {error}");
+        assert!(error.message.contains("duplicate"), "{source}: {error}");
+        error.position
+    };
+    // Nameless entity aliases are anchored at `default` or `=`.
+    let entity = "declare namespace a { const b: number; }\n";
+    assert_eq!(
+        duplicate(
+            "app.ts",
+            &format!("{entity}export default a.b;\nexport default a.b;\n")
+        ),
+        Some(at(3, 8))
+    );
+    assert_eq!(
+        duplicate("app.ts", &format!("{entity}export = a.b;\nexport = a.b;\n")),
+        Some(at(3, 8))
+    );
+    assert_eq!(
+        duplicate(
+            "app.d.ts",
+            "export declare const x: number;\nexport as namespace X;\nexport as namespace X;\n"
+        ),
+        Some(at(3, 21))
+    );
+    // A string-literal export name anchors its alias.
+    assert_eq!(
+        duplicate(
+            "app.ts",
+            "export * as \"s\" from \"./lib\";\nexport * as \"s\" from \"./lib\";\n"
+        ),
+        Some(at(2, 13))
+    );
+}
+
+#[test]
+fn identifiers_without_a_binding_rule_name_their_construct() {
+    // Only the coverage pass sees a decorator on an object literal member.
+    let error = load_error(&[(
+        "app.ts",
+        "declare function dec(t: any): any;\nexport const o = { @dec a: 1 };\n",
+    )]);
+    assert_eq!(error.kind, ProjectErrorKind::Unsupported, "{error}");
+    assert!(error.message.contains("Decorator"), "{error}");
+    assert_eq!(error.position, Some(at(2, 21)));
+}
+
+#[test]
+fn augmentations_of_scripts_fail_only_where_bindings_are_checked() {
+    // TypeScript reports TS2306 at the augmented name.
+    let error = load_error(&[
+        ("globals.ts", "var pluginGlobal = 1;\n"),
+        (
+            "app.ts",
+            "export {};\ndeclare module \"./globals\" { export interface Options { extra: string } }\n",
+        ),
+    ]);
+    assert_eq!(error.kind, ProjectErrorKind::UnresolvedImport);
+    assert_eq!(error.position, Some(at(2, 16)));
+
+    // A package's augmentation of a script binds nothing.
+    let fixture = Fixture::new(&[
+        ("tsconfig.json", SKIP_LIB_CHECK),
+        (
+            "node_modules/plugin/package.json",
+            r#"{ "name": "plugin", "types": "index.d.ts" }"#,
+        ),
+        (
+            "node_modules/plugin/index.d.ts",
+            "/// <reference path=\"./globals.d.ts\" />\nexport declare const plugin: number;\ndeclare module \"./globals\" { export interface Options { extra: string } }\n",
+        ),
+        (
+            "node_modules/plugin/globals.d.ts",
+            "interface Options { base: string }\n",
+        ),
+        (
+            "app.ts",
+            "import { /*@plugin:i*/plugin } from \"plugin\";\n/*@plugin:u*/plugin;\ndeclare let /*@o:d*/o: /*@Options:u*/Options;\n/*@o:u*/o;\n",
+        ),
+    ]);
+    fixture.check_markers(&fixture.load());
+}
+
+#[test]
+fn qualified_aliases_keep_type_only_values_for_type_queries() {
+    // TypeScript reports TS1379 at the alias but resolves `typeof x` to `C`.
+    let fixture = project(&[
+        ("m.ts", "class /*@C:d*/C {}\nexport type { /*@C:e*/C };\n"),
+        (
+            "app.ts",
+            "import * as /*@m:i*/ns from \"./m\";\nimport /*@C:i*/x = /*@m:u*/ns./*@C:u*/C;\ntype /*@T:d*/T = typeof /*@C:u*/x;\n",
+        ),
+    ]);
+    fixture.check_markers(&fixture.load());
+}
+
+/// TypeScript 7.0.2 accepts this project: a module object is a value and a
+/// namespace, and so is an `import =` alias of one. The fixture
+/// `module-aliases` checks more forms against the semantic oracle.
+#[test]
+fn import_equals_aliases_of_module_objects_are_values() {
+    let fixture = Fixture::new(&[
+        (
+            "tsconfig.json",
+            r#"{ "compilerOptions": { "noLib": true, "module": "nodenext" } }"#,
+        ),
+        ("m.ts", "export function foo() {}\n"),
+        (
+            "a.ts",
+            "import * as ns from \"./m.js\";\nimport x = ns;\nx.foo();\n",
+        ),
+    ]);
+    let result = fixture
+        .load()
+        .find_references(ReferenceQuery::At {
+            file: fixture.path("a.ts"),
+            position: at(3, 1),
+        })
+        .unwrap();
+    assert_eq!(result.groups.len(), 1);
+    let group = &result.groups[0];
+    assert_eq!(group.declarations.len(), 1);
+    assert_eq!(group.declarations[0].name, "m.ts");
+    let occurrences: Vec<_> = group
+        .occurrences
+        .iter()
+        .map(|occurrence| (occurrence.name.as_str(), occurrence.location.start))
+        .collect();
+    assert_eq!(
+        occurrences,
+        [
+            ("ns", at(1, 13)),
+            ("x", at(2, 8)),
+            ("ns", at(2, 12)),
+            ("x", at(3, 1))
+        ]
+    );
+}
+
+#[test]
+fn module_alias_meanings_keep_shorthand_members_and_type_only_routes() {
+    // An export of a shorthand ambient module has every meaning a use asks
+    // for, so the named import is also a type. The module object, which an
+    // `import =` alias expands, is only a value and a namespace; TypeScript
+    // reports TS2709 at `let u: y`.
+    let shorthand = project(&[
+        ("shorty.d.ts", "declare module \"shorty\";\n"),
+        (
+            "app.ts",
+            "import { /*@m:i*/thing } from \"shorty\";\nimport * as /*@m:i*/ns from \"shorty\";\nimport /*@m:i*/y = /*@m:u*/thing;\nimport /*@m:i*/z = /*@m:u*/ns;\nlet /*@t:d*/t: /*@m:u*/thing;\nlet /*@u:d*/u: /*@?*/y;\n/*@m:u*/y(); /*@m:u*/z(); /*@m:u*/z./*@?*/member;\n/*@t:u*/t; /*@u:u*/u;\nexport {};\n",
+        ),
+    ]);
+    shorthand.check_markers(&shorthand.load());
+
+    // An alias of a type-only module route keeps that route's restriction on
+    // the value meaning it adds. TypeScript reports TS1380 and TS1379 at the
+    // aliases and TS1361 and TS1362 at the value uses.
+    let type_only = project(&[
+        (
+            "m.ts",
+            "export function /*@foo:de*/foo() {}\nexport interface /*@I:de*/I {}\n",
+        ),
+        (
+            "re.ts",
+            "import * as /*@m:i*/ns from \"./m\";\nexport type { /*@m:e*/ns };\n",
+        ),
+        (
+            "app.ts",
+            "import type * as /*@m:i*/ns from \"./m\";\nimport { /*@m:i*/ns as /*@m:i*/exported } from \"./re\";\nimport /*@m:i*/x = /*@m:u*/ns;\nimport /*@m:i*/y = /*@m:u*/exported;\n/*@?*/x./*@!*/foo(); /*@?*/y./*@!*/foo();\nlet /*@a:d*/a: typeof /*@m:u*/x./*@foo:u*/foo;\nlet /*@b:d*/b: typeof /*@m:u*/y./*@foo:u*/foo;\nlet /*@c:d*/c: /*@m:u*/x./*@I:u*/I = /*@a:u*/a;\nlet /*@d:d*/d: /*@m:u*/y./*@I:u*/I = /*@b:u*/b;\n/*@c:u*/c; /*@d:u*/d;\n",
+        ),
+    ]);
+    type_only.check_markers(&type_only.load());
+}
+
+/// A dependency's declarations merge leniently where they conflict, so a
+/// namespace wrongly counted as a value would silently join the constant.
+#[test]
+fn uninstantiated_namespaces_in_dependencies_stay_beside_values() {
+    let fixture = Fixture::new(&[
+        ("tsconfig.json", SKIP_LIB_CHECK),
+        (
+            "node_modules/pkg/package.json",
+            r#"{ "name": "pkg", "types": "index.d.ts" }"#,
+        ),
+        (
+            "node_modules/pkg/index.d.ts",
+            "export declare namespace A { namespace B { type T = 1; } export { B }; }\nexport declare const A: number;\n",
+        ),
+        ("app.ts", "import { A } from \"pkg\";\nA;\n"),
+    ]);
+    let result = fixture
+        .load()
+        .find_references(ReferenceQuery::At {
+            file: fixture.path("app.ts"),
+            position: at(2, 1),
+        })
+        .unwrap();
+    assert_eq!(result.groups.len(), 1);
+    let declarations = &result.groups[0].declarations;
+    assert_eq!(declarations.len(), 1, "{declarations:?}");
+    assert_eq!(declarations[0].location.start, at(2, 22));
 }

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { firstDifference, normalizer } from './ast-comparison.mjs';
+import { COMPARISON_OPTIONS, describeComparison, firstDifference, normalizer } from './ast-comparison.mjs';
 
 test('equal JSON trees compare equally regardless of object property order', () => {
   const actual = { kind: 308, statements: [{ text: 'x', kind: 80 }], empty: [], optional: null };
@@ -63,11 +63,42 @@ test('normalization keeps syntax array shape and selected metadata while omittin
   const actual = { kind: 308, text: 'another source', statements: [
     { kind: 11, flags: 0, pos: 0, end: 2, text: 'x', rawText: 'raw' },
   ] };
-  const normalize = normalizer(['--positions', '--flags', '--scanner-hints']);
+  const normalize = normalizer(new Set(['--positions', '--flags', '--scanner-hints']));
   assert.equal(firstDifference(normalize(actual, true), normalize(expected, true)), undefined);
   assert.deepEqual(normalizer()(expected, true), { kind: 308, statements: [{ kind: 11, text: 'x' }] });
   assert.equal(firstDifference(normalize({ statements: [] }), normalize({ statements: {} })).path,
     '$.statements');
+});
+
+test('each comparison option restores only its own fields and is reported as active', () => {
+  const node = { kind: 11, pos: 1, end: 2, flags: 2097152 | 16, rawText: 'r', templateFlags: 1,
+    hasExtendedUnicodeEscape: true, numericLiteralFlags: 8, text: 'x' };
+  const restored = {
+    '--positions': { pos: 1, end: 2 },
+    '--flags': { flags: 16 },
+    '--scanner-hints': { rawText: 'r', templateFlags: 1, hasExtendedUnicodeEscape: true, numericLiteralFlags: 8 },
+  };
+  assert.deepEqual(COMPARISON_OPTIONS, Object.keys(restored));
+  const structure = normalizer();
+  assert.deepEqual(structure(node), { kind: 11, text: 'x' });
+  assert.deepEqual(structure.compared, []);
+  assert.equal(describeComparison(structure.compared), 'structure only');
+  for (const option of COMPARISON_OPTIONS) {
+    // Flags that are not comparison options, such as a runner's own, are ignored.
+    const normalize = normalizer(new Set([option, '--check-only']));
+    assert.deepEqual(normalize(node), { kind: 11, text: 'x', ...restored[option] }, option);
+    assert.deepEqual(normalize.compared, [option.slice(2)]);
+    assert.equal(describeComparison(normalize.compared), option.slice(2));
+  }
+  const all = normalizer(new Set([...COMPARISON_OPTIONS].reverse()));
+  assert.deepEqual(all.compared, ['positions', 'flags', 'scanner-hints']);
+  assert.equal(describeComparison(all.compared), 'positions, flags, scanner-hints');
+  assert.equal(describeComparison(all.compared, { trees: false }), 'acceptance only');
+});
+
+test('normalization takes parsed runner flags, not raw arguments', () => {
+  for (const raw of [['--positions'], process.argv, '--positions'])
+    assert.throws(() => normalizer(raw), /flag set parsed by runnerArguments/);
 });
 
 test('normalization and comparison handle deep trees without a recursive traversal stack', () => {

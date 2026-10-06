@@ -1,14 +1,13 @@
-//! Captured source text and the only conversions between UTF-8 byte spans and
-//! one-based line/UTF-16 column positions.
+//! Captured source text, and the reference subsystem's conversions between
+//! UTF-8 byte spans and one-based line/UTF-16 column positions.
 
 use super::SourcePosition;
-use crate::Span;
-use std::path::{Component, Path, PathBuf};
+use std::path::PathBuf;
 
 /// A project-local file identity. It indexes `Sources` and never escapes the
-/// project.
+/// project; only `Sources` creates one.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub(super) struct FileId(pub(super) u32);
+pub(super) struct FileId(u32);
 
 impl FileId {
     pub(super) fn index(self) -> usize {
@@ -29,40 +28,37 @@ pub(super) struct SourceFile {
 #[derive(Debug, Default)]
 pub(super) struct Sources {
     files: Vec<SourceFile>,
+    reserved: u32,
 }
 
 impl Sources {
-    pub(super) fn add(&mut self, file: SourceFile) -> FileId {
-        let id = FileId(u32::try_from(self.files.len()).expect("file count fits in u32"));
-        self.files.push(file);
+    /// The id of an input discovered before it is captured.
+    pub(super) fn reserve(&mut self) -> FileId {
+        let id = FileId(self.reserved);
+        self.reserved = self
+            .reserved
+            .checked_add(1)
+            .expect("file count fits in u32");
         id
     }
+
+    /// Capture a reserved input. Inputs are captured in reservation order,
+    /// so every table indexed by `FileId` lines up with `Sources`.
+    pub(super) fn capture(&mut self, id: FileId, file: SourceFile) {
+        assert_eq!(
+            id.index(),
+            self.files.len(),
+            "inputs are captured in reservation order"
+        );
+        self.files.push(file);
+    }
+
     pub(super) fn get(&self, id: FileId) -> &SourceFile {
         &self.files[id.index()]
-    }
-    pub(super) fn len(&self) -> usize {
-        self.files.len()
     }
     pub(super) fn ids(&self) -> impl Iterator<Item = FileId> + '_ {
         (0..self.files.len()).map(|index| FileId(index as u32))
     }
-}
-
-/// A path with `.` and `..` components removed lexically.
-pub(super) fn normalize(path: &Path) -> PathBuf {
-    let mut normalized = PathBuf::new();
-    for component in path.components() {
-        match component {
-            Component::CurDir => {}
-            Component::ParentDir => {
-                if !normalized.pop() {
-                    normalized.push(component);
-                }
-            }
-            other => normalized.push(other),
-        }
-    }
-    normalized
 }
 
 /// Source text with an index of ECMAScript line starts. CRLF is one break;
@@ -100,7 +96,7 @@ impl SourceText {
                         line_starts.push(index + 1);
                     }
                 }
-                '\n' | '\u{2028}' | '\u{2029}' => line_starts.push(index + c.len_utf8()),
+                c if crate::lexer::line_break(c) => line_starts.push(index + c.len_utf8()),
                 _ => {}
             }
         }
@@ -217,30 +213,6 @@ impl SourceText {
     }
 }
 
-/// The exact token of a syntax node whose span begins at its leading trivia,
-/// such as an identifier.
-pub(super) fn token_span(text: &str, span: Span) -> Span {
-    let mut lexer = crate::lexer::Lexer {
-        src: text,
-        pos: span.start,
-    };
-    let start = lexer.next().start.min(span.end);
-    Span {
-        start,
-        end: span.end,
-    }
-}
-
-/// Decoded identifier text from compiler `escapedText`, which prefixes names
-/// beginning with two underscores with a third.
-pub(super) fn decoded_name(escaped: &str) -> &str {
-    if escaped.starts_with("___") {
-        &escaped[1..]
-    } else {
-        escaped
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -286,12 +258,5 @@ mod tests {
             let column = source[line_start..byte].encode_utf16().count() + 1;
             assert_eq!(text.position(byte), at(line, column), "byte {byte}");
         }
-    }
-
-    #[test]
-    fn token_spans_exclude_comments_and_whitespace() {
-        let text = " /* c */\n// d\n  name";
-        let span = token_span(text, Span { start: 0, end: 20 });
-        assert_eq!(&text[span.start..span.end], "name");
     }
 }

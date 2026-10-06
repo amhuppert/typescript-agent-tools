@@ -1,13 +1,13 @@
-import /*@function*/fn from "./anonymous-function";
-import /*@class*/Cls from "./anonymous-class";
-import /*@expression*/expression from "./expression";
-import /*@named*/value from "./named";
-import /*@Named*/Model, { /*@Named*/default as /*@Named*/Same } from "./named-class";
+import /*@function:i*/fn from "./anonymous-function";
+import /*@class:i*/Cls from "./anonymous-class";
+import /*@expression:i*/expression from "./expression";
+import /*@named:i*/value from "./named";
+import /*@Named:i*/Model, { /*@Named:i*/default as /*@Named:i*/Same } from "./named-class";
 
-/*@function*/fn();
-new /*@class*/Cls();
-/*@expression*/expression;
-/*@named*/value;
-let /*@instance*/instance: /*@Named*/Model = new /*@Named*/Same();
-/*@instance*/instance;
-export { /*@expression*/expression as /*@expression*/default };
+/*@function:u*/fn();
+new /*@class:u*/Cls();
+/*@expression:u*/expression;
+/*@named:u*/value;
+let /*@instance:d*/instance: /*@Named:u*/Model = new /*@Named:u*/Same();
+/*@instance:u*/instance;
+export { /*@expression:e*/expression as /*@expression:e*/default };

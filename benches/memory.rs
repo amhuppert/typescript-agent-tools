@@ -56,7 +56,6 @@ fn main() {
     let sources = if args.is_empty() {
         vec![support::Source {
             name: "functions.ts".into(),
-            jsx: false,
             text: "export function sum<T extends number>(x: T, y: T): number { return x + y; }\n"
                 .repeat(1_000),
         }]

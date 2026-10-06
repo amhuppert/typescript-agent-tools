@@ -1,31 +1,31 @@
 // Nested shadowing, sibling scopes with equal names, and a use in the
 // temporal dead zone (which still denotes the inner binding).
-const /*@top*/shadowed = 1;
+const /*@top:d*/shadowed = 1;
 
-function /*@outer*/outer(/*@param*/shadowed: number) {
-  /*@param*/shadowed;
+function /*@outer:d*/outer(/*@param:d*/shadowed: number) {
+  /*@param:u*/shadowed;
   {
-    const /*@block*/shadowed = 2;
-    /*@block*/shadowed;
+    const /*@block:d*/shadowed = 2;
+    /*@block:u*/shadowed;
     {
-      /*@block*/shadowed;
+      /*@block:u*/shadowed;
     }
   }
-  const /*@arrow*/arrow = (/*@arrowParam*/shadowed: number) => /*@arrowParam*/shadowed;
-  /*@arrow*/arrow(/*@param*/shadowed);
+  const /*@arrow:d*/arrow = (/*@arrowParam:d*/shadowed: number) => /*@arrowParam:u*/shadowed;
+  /*@arrow:u*/arrow(/*@param:u*/shadowed);
 }
 
-function /*@tdz*/tdz() {
-  /*@tdzInner*/shadowed;
-  let /*@tdzInner*/shadowed = 3;
+function /*@tdz:d*/tdz() {
+  /*@tdzInner:u*/shadowed;
+  let /*@tdzInner:d*/shadowed = 3;
 }
 
-function /*@first*/first() { let /*@firstLocal*/local = 1; /*@firstLocal*/local; }
-function /*@second*/second() { let /*@secondLocal*/local = 2; /*@secondLocal*/local; }
+function /*@first:d*/first() { let /*@firstLocal:d*/local = 1; /*@firstLocal:u*/local; }
+function /*@second:d*/second() { let /*@secondLocal:d*/local = 2; /*@secondLocal:u*/local; }
 
-/*@top*/shadowed;
-/*@outer*/outer(/*@top*/shadowed);
-/*@tdz*/tdz();
-/*@first*/first();
-/*@second*/second();
+/*@top:u*/shadowed;
+/*@outer:u*/outer(/*@top:u*/shadowed);
+/*@tdz:u*/tdz();
+/*@first:u*/first();
+/*@second:u*/second();
 export {};

@@ -1,6 +1,6 @@
 // `import x = require()` aliases the `export =` target.
-import /*@factory*/make = require("./factory");
-/*@factory*/make();
-/*@factory*/make./*@version*/version;
-let /*@typed*/typed: typeof /*@factory*/make = /*@factory*/make;
-/*@typed*/typed;
+import /*@factory:i*/make = require("./factory");
+/*@factory:u*/make();
+/*@factory:u*/make./*@version:u*/version;
+let /*@typed:d*/typed: typeof /*@factory:u*/make = /*@factory:u*/make;
+/*@typed:u*/typed;

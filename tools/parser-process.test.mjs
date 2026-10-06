@@ -7,6 +7,9 @@ import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { runParser, parserFailure } from './parser-process.mjs';
 
+// Real-compiler tests are skipped, with this reason, unless the API is configured.
+const apiUnavailable = !process.env.TYPE_SCRIPT_API && 'TYPE_SCRIPT_API is not set';
+
 test('only a normal exit 1 is a syntax rejection', () => {
   for (const [code, outcome] of [[0, 'accepted'], [1, 'rejected'], [2, 'failed'], [3, 'failed']]) {
     const result = runParser(process.execPath, ['-e', `process.exit(${code})`]);
@@ -28,7 +31,7 @@ test('crashes, timeouts, output overflow, and launch errors are process failures
   }
 });
 
-test('real compiler API: an invalid upstream fixture cannot pass on exit 2 or a launch error', { skip: !process.env.TYPE_SCRIPT_API }, t => {
+test('real compiler API: an invalid upstream fixture cannot pass on exit 2 or a launch error', { skip: apiUnavailable }, t => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'tsparse-runner-'));
   t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   const fixture = path.join(directory, 'upstream/tests/cases/compiler');
@@ -51,7 +54,7 @@ test('real compiler API: an invalid upstream fixture cannot pass on exit 2 or a 
   }
 });
 
-test('real compiler API: grammar runner reports exit 2 on compiler-invalid inputs', { skip: !process.env.TYPE_SCRIPT_API }, t => {
+test('real compiler API: grammar runner reports exit 2 on compiler-invalid inputs', { skip: apiUnavailable }, t => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'tsparse-grammar-'));
   t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   const binary = path.join(directory, 'parser');

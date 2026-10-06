@@ -123,3 +123,21 @@ fn deeply_nested_class_heritage_returns_a_diagnostic() {
             .contains("Maximum syntax nesting depth exceeded")
     );
 }
+
+#[test]
+fn file_extensions_select_jsx_without_case() {
+    let dir = std::env::temp_dir().join(format!("tsparse-cli-jsx-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    for name in ["view.tsx", "VIEW.TSX", "view.jsx"] {
+        let file = dir.join(name);
+        std::fs::write(&file, "const a = <div />;").unwrap();
+        let output = cli(&["--check", file.to_str().unwrap()], b"");
+        assert!(
+            output.status.success(),
+            "{name}: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        std::fs::remove_file(file).unwrap();
+    }
+    std::fs::remove_dir(dir).unwrap();
+}

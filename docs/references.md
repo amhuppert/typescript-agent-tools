@@ -24,8 +24,8 @@ directory. `--pretty` and `-o OUTPUT` keep their parse-mode meanings; stdin,
 | Exit | Meaning |
 | --- | --- |
 | 0 | A result, including `groups: []` for a token-free position or an unmatched name. |
-| 1 | A syntax error, unsupported required input, invalid binding, unresolved import, or an unsupported or unresolved selected target. |
-| 2 | Invalid flags or position, a missing or unreadable configuration, or a query file that is not one of the project's searched files (including a missing file). |
+| 1 | Invalid configuration content or inheritance, a syntax error, unsupported required input, invalid binding, a name that resolution looks up and does not find (an import, a `types` entry, or a `/// <reference>` target), or an unsupported or unresolved selected target. |
+| 2 | Invalid flags or position; a file the invocation or configuration names to be read, the `--project` file, an `extends` target, or a `files` entry, that does not exist; any file or directory that exists but cannot be read; or a query file that is not one of the project's searched files (including a missing file). |
 
 Diagnostics on stderr have the form `path:line:column: message` when a location
 is known.
@@ -51,13 +51,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 `load` reads each program input once and returns either a complete immutable
 index or a `ProjectError` (`Io`, `Config`, `Syntax`, `Unsupported`, `Binding`,
-or `UnresolvedImport`) with a path and position where available. Queries read
+or `UnresolvedImport`) with a path and position where available. Only a path
+that does not exist, or that runs through a file, is absent. Any other failure
+to inspect or read a file or directory, such as a package manifest, a type
+root, or a directory entry, is an `Io` error. Queries read
 no files: a query path is made absolute against the working directory and
-matched lexically against each searched file's canonical path and its path
-under the configuration directory, so results reflect the captured contents
+matched lexically against each searched file's canonical path, the paths
+through which loading reached it, and, for a file under the configuration
+directory, its path under that directory as `--project` spelled it (such as a
+symlink). Results reflect the captured contents
 even if files change afterwards. Queries return `QueryError`
-(`OutsideProject`, `InvalidPosition`, `UnsupportedTarget`, `UnresolvedTarget`,
-or `Io` when the working directory is unavailable). Results own their data and
+(`OutsideProject`, including a path that cannot be made absolute,
+`InvalidPosition`, `UnsupportedTarget`, or `UnresolvedTarget`). Its `path` is
+the file as the query spelled it for `OutsideProject` and `InvalidPosition`, and
+otherwise the selected token's file as a canonical absolute path, whichever
+entry point selected it. Both error kinds serialize as their variant names. Loading and querying share
+normalization and the captured filesystem case policy; parent traversal is
+clamped at an absolute path's root. Results own their data and
 can outlive the project.
 
 ## Result
@@ -81,8 +91,10 @@ export clauses (`import`, `export`). A token can carry several roles, such as
 one symbol, such as `export { Shape }` naming both an interface and a constant,
 appears in each group.
 
-File paths use `/` and are relative to the configuration's directory, with
-`../` where needed. Ranges are exact identifier tokens without trivia; `end` is
+File paths use `/` and are relative to the configuration's canonical
+directory, with `../` where needed; `project` names the configuration in that
+directory, so joining the two locates the file even when `--project` is
+spelled through a symlink. Ranges are exact identifier tokens without trivia; `end` is
 exclusive. Occurrences are ordered by file and position, groups by their
 earliest declaration.
 
@@ -97,17 +109,19 @@ ambient module (`declare module "x"`) is named `x` at its string literal.
 A position must fall inside an identifier token, start inclusive and end
 exclusive. Whitespace, punctuation, and keywords give an empty result. Member,
 property, enum member, label, JSX attribute, intrinsic element, tuple label,
-import attribute, `import.meta`, `new.target`, `arguments`, `undefined`, and
-`globalThis` tokens are `UnsupportedTarget`. A name with no declaration among the
+import attribute, `import.meta`, `new.target`, `arguments`, `undefined`,
+`globalThis`, and `this` in a type query are `UnsupportedTarget`. A name with no declaration among the
 program inputs is `UnresolvedTarget`.
 
 A name query is exact and case-sensitive on decoded identifier text, so
-`abc` and `abc` are the same name. Candidates are declaration names, local
+`\u0061bc` and `abc` are the same name. Candidates are declaration names, local
 import names, and exported alias names in the searched files; FILE restricts
 candidates, not results. Every matching candidate's symbols are grouped, so two
 shadowed declarations give two groups and two aliases of one symbol give one.
-An unresolved candidate makes the query fail with `UnresolvedTarget` rather than
-silently omitting it.
+A candidate that is not a supported target, such as an import of a member or an
+export of `globalThis`, makes the query fail with `UnsupportedTarget`, and an
+unresolved candidate with `UnresolvedTarget`, exactly as a position query on
+that token would, rather than silently omitting it.
 
 ## Binding model
 
@@ -117,10 +131,21 @@ meaning its syntax requires and searches outward, so a type alias and a constant
 with the same spelling remain separate groups and a type does not shadow a
 value. Declarations that TypeScript merges become one symbol: function
 overloads, interfaces, class and interface, namespace with namespace, class,
-function, or enum, enums, and redeclared `var` and parameters. Conflicting
-declarations, such as two `let x`, fail with a `Binding` error. Conflicts only
-among installed-package declarations are merged, as TypeScript's binder does
-when library checking is skipped.
+function, or enum, enums, and redeclared `var` and parameters. A namespace is
+also a value only when TypeScript counts it as instantiated: when its body
+holds anything other than interfaces, type aliases, uninstantiated namespaces,
+non-exported imports, and `export { ... }` of such declarations. A re-exported
+name declared by an `import =`, or by no enclosing block, counts as a value. So
+a namespace of types shares its name with a value instead of conflicting with
+it. A module object, which a namespace import, `import = require`, or `export
+as namespace` names, is a value and a namespace; an `import =` alias of an
+entity name takes every meaning its target has.
+Conflicting declarations, such as two `let x`, fail with a `Binding` error.
+Conflicts only
+among dependency-only declarations are merged under the tool's lenient binding
+profile, independently of `skipLibCheck`. Explicitly selected roots retain
+project binding checks even inside `node_modules`. Diagnostic tolerance is a
+separate policy from whether a file's occurrences appear in results.
 
 Scopes follow TypeScript: function-scoped `var` and block-scoped `let`, `const`,
 `using`, classes, and strict-mode functions; separate parameter and body scopes,
@@ -136,17 +161,35 @@ alias, `export as namespace` global, or `export * as` name resolves to the
 underlying symbol, following star re-exports (local exports shadow them, and
 different targets for one name are ambiguous) and `export =` targets. A
 type-only alias does not supply a value outside type positions, so
-`import type { C }` followed by `new C()` leaves `C` unresolved. `ns.name` and
+`import type { C }` followed by `new C()` leaves `C` unresolved. Restrictions
+belong to each resolved meaning: a same-named local value beside an imported
+type remains usable through ordinary re-exports, while an explicit type-only
+re-export restricts that value too. `ns.name` and
 `N.Type` resolve through module and namespace exports; other property accesses
 are not reference targets. Ordinary value flow, such as `const copy = run`,
 creates no alias.
 
-Aliases and qualified references resolve on demand with an explicit task stack;
-a circular alias is unresolved rather than an error.
+Aliases and qualified references resolve during loading in dependency order,
+with an explicit task stack. As in TypeScript, a name with local declarations
+resolves to them without following a same-named import for meanings they lack,
+so an alias cycle that returns through such a name resolves to its locals; in a
+checked file the import then conflicts with the local declaration (TS2440), a
+`Binding` error. Every alias in a cycle of aliases alone (TS2303) is unresolved
+rather than an error. Either way the result does not depend on which file
+resolution reaches first.
 
 ## Project configuration
 
-The configuration is JSONC (comments and trailing commas). `extends` accepts a
+`tsconfig.json` is read as TypeScript reads it, with its scanner: comments
+ending at any ECMAScript line terminator, trailing commas, and JavaScript
+string escapes such as `\x41` and `\u{41}`. A string with an unpaired UTF-16
+surrogate keeps it, so it equals no other name; one that must name a file,
+module, or option value is `Unsupported`. `package.json` is read as strict
+JSON, as TypeScript 7 reads it: a manifest with a comment, trailing comma,
+single quote, other escape, raw control character, non-ASCII whitespace, or
+unpaired surrogate is unparsable, so its fields are ignored while it still
+marks a package scope. Either file nested more than 128 levels deep is
+`Unsupported`: that is this tool's limit, not an unparsable file. `extends` accepts a
 string or an ordered array of relative, rooted, or package configurations
 (through `node_modules`, a manifest `tsconfig` field, `exports`, or a package's
 `tsconfig.json`), with `${configDir}` and inheritance cycles reported as
@@ -170,12 +213,27 @@ substitution, directory and extensionless rules, `paths`, `rootDirs`,
 `moduleSuffixes`, `node_modules` and `@types` lookup, package `exports`,
 `imports`, `typesVersions`, `types`/`typings`/`main`, self-name imports,
 `customConditions`, and `resolution-mode` on type-only imports and import
-types. A cyclic package `imports` chain is unresolved, and one longer than
-16,384 redirects is unsupported. A file's identity is its real path unless `preserveSymlinks` is set, so
+types. Relative specifiers, paths, and directives accept `\` as a separator.
+A cyclic package `imports` chain is unresolved, and one longer than 1,024
+redirects fails loading as `Unsupported` wherever it appears, since that is
+this tool's limit rather than an input TypeScript rejects. A name with a NUL
+character names no file, so it is not looked up on disk. A file's identity is its real path unless `preserveSymlinks` is set, so
 a file reached through a symlinked directory is one input where TypeScript can
 create two. Exact ambient modules (`declare module "x"`) win over files for
 non-relative names, and pattern ambient modules (`"*.css"`) satisfy any
-otherwise unresolved name.
+otherwise unresolved name: the one with the longest text before its `*`, the
+first declared on a tie, as in TypeScript's `findBestPatternMatch`. Patterns
+from different files are ordered by this tool's file order, which may differ
+from TypeScript's program order. A name with more than one `*` is no pattern.
+An `export *` route whose export of a name fails to resolve still exports it:
+alone, its failure is the result; beside another route, the name is
+ambiguous, as TypeScript reports TS2308.
+
+A file's triple-slash `<reference ...>` directives and JSX pragmas follow
+TypeScript 7: only spaces and tabs separate their parts, a `<reference` tag
+needs no closing `/>`, the last of a repeated attribute wins, and a present
+`types`, `lib`, or `path` attribute, even an empty one, decides the directive
+in that order. A `#!` line may follow a byte order mark.
 
 `types` defaults to `[]`; list packages, or use `"types": ["*"]` for every type
 root. An explicit `typeRoots` turns off the `node_modules` fallback for type
@@ -186,7 +244,12 @@ are ignored.
 Rejected configurations: `baseUrl` (removed in TypeScript 7), `moduleResolution`
 `node`, `node10`, or `classic`, `module` `amd`, `umd`, or `system`, a non-empty
 `lib`, `/// <reference lib>` without `noLib`, `noResolve`, `noDtsResolution`,
-a non-empty `references`, and JavaScript or JSON roots.
+a non-empty `references`, and JavaScript or JSON roots or reference targets,
+whether or not the file exists. As in TypeScript, whether an input has a
+supported extension follows the file system's case policy, so `A.JS` is
+JavaScript on a case-insensitive file system; other name rules use the exact
+spelling, so `G.D.TS` is an ordinary module rather than a declaration file, and
+JSX follows a `.tsx` extension in any case.
 
 ## Compatibility limits
 
@@ -194,12 +257,22 @@ a non-empty `references`, and JavaScript or JSON roots.
   non-empty `references` is rejected.
 - Inputs are `.ts`, `.tsx`, `.mts`, `.cts`, and their declaration files.
   JavaScript, JSDoc binding, JSON modules, and asset modules are unsupported
-  when resolution needs them.
+  when resolution needs them. In a dependency file, an import or
+  `/// <reference path>` that reaches such an input is skipped instead.
 - Standard libraries are not loaded. An explicit non-empty `lib` setting or a
   `/// <reference lib>` directive is rejected, and globals declared only by a
   standard library, such as `Array` or `console`, are unresolved.
 - `with` statements and other syntax without a binding rule are rejected with
   an `Unsupported` error naming the construct.
+- Modules and exports are keyed by their exact names, which must be valid
+  Unicode. A module specifier, ambient module name, or string-literal import or
+  export name with an unpaired UTF-16 surrogate, such as `"\uD800"`, is
+  rejected with an `Unsupported` error at its string literal rather than merged
+  with the other names that a replacement character would make equal.
+  TypeScript keeps such names distinct.
+- File and directory names must be Unicode. On a file system that allows
+  other names, such a name that file selection or `"types": ["*"]` would use
+  is `Unsupported` rather than converted to a different name.
 - Properties, methods, class members, enum members, and inferred receiver types
   are not reference targets.
 
@@ -222,6 +295,16 @@ canonical path, as this tool does, unless `preserveSymlinks` is set:
   error but still resolves it. When star re-exports reach one declaration by
   both a type-only and an ordinary route, the ordinary route makes it a value
   here; TypeScript keeps the first route and may report that error.
+- A name that two `export *` sources supply with different targets is
+  ambiguous and unresolved here; TypeScript reports TS2308 and resolves it to
+  the first source.
+- In a dependency file that declares a name both exported and local (TS2395
+  or TS2383, tolerated there), the declarations merge into one symbol, so its
+  group also lists the local declarations; TypeScript's export symbol has only
+  the exported ones. The same holds for an exported enum, class, or function
+  merged with a local namespace in spaces that do not conflict, such as an
+  exported enum and a local namespace of types: TypeScript gives the export its
+  own symbol, here they form one group.
 - `undefined`, `arguments`, and `globalThis` are built-in non-reference
   targets. A missing export of a namespace, module, or `globalThis` qualifier is
   unresolved; any other unresolved `a.b` name is a property. Receiver types are
@@ -229,7 +312,8 @@ canonical path, as this tool does, unless `preserveSymlinks` is set:
   it through a variable's `typeof namespace` type.
 - A named import from a shorthand ambient module (`declare module "x";`)
   denotes the module, as in TypeScript; a member reached through one is
-  unresolved. A default import of a declaration file or ambient module with
+  unresolved. Such an import resolves in a type position too, where
+  TypeScript reports TS2709. A default import of a declaration file or ambient module with
   neither a default export nor an `__esModule` export denotes the module
   object, as TypeScript's synthetic defaults do; an ordinary module without
   one has no default.
@@ -239,26 +323,35 @@ canonical path, as this tool does, unless `preserveSymlinks` is set:
 - Non-reference syntax is unsupported even where TypeScript resolves it: a
   binding-pattern key such as `default` in `const { default: x } = await
   import("m")`, `const` in `as const`, `global` in `declare global`, a `this`
-  parameter, and a tuple member label.
+  parameter, `this` in a type query such as `typeof this.x` (TypeScript
+  resolves it to the enclosing class), and a tuple member label.
 - A constructor parameter property's name belongs to the parameter's group;
   TypeScript resolves the name itself to the property.
 - Invalid declaration arrangements that TypeScript binds but its checker
   rejects are `Binding` errors here: duplicate implementations (TS2393), a
   function merged with a non-ambient class (TS2813/TS2814), a repeated type
   parameter (TS2300), a hoisted `var` past a block's `let` (TS2481), a name
-  declared both exported and local in one container (TS2395), a namespace
-  before or in another file from the class or function it merges with
-  (TS2434/TS2433), and merged classes or interfaces whose type parameter
+  declared both exported and local in one container in overlapping
+  declaration spaces (TS2395, so an enum and a namespace of types may differ),
+  an instantiated namespace before or in another file from the class or
+  function it merges with (TS2434/TS2433; a namespace of const enums only
+  counts under `preserveConstEnums`, `isolatedModules`, or
+  `verbatimModuleSyntax`), and merged classes or interfaces whose type parameter
   names disagree by position or omit a parameter that no declaration gives a
-  default (TS2428). Constraints and default types are not compared.
+  default (TS2428), and an import whose target shares a meaning with a
+  same-named local declaration, even when it resolves back to that local
+  through its own module (TS2440). Constraints and default types are not
+  compared.
 - An unresolved side-effect import fails the project, as TypeScript reports
   TS2882, unless `noUncheckedSideEffectImports` is false.
 - An unresolved module or reference directive leaves the names that depend
   on it unresolved instead of failing the project where TypeScript reports no
   error: in a declaration file under `skipLibCheck`, or after a
   `@ts-expect-error` or `@ts-ignore` comment that ends on an earlier line with
-  only blank or line-comment lines between. A block comment's directive must
-  be on its last line. A missing automatic JSX runtime is reported once per
+  only blank or line-comment lines between. Such a comment counts anywhere
+  between tokens, including inside an import's braces, but not inside a
+  string, template, regular expression, or JSX text. A block comment's
+  directive must be on its last line. A missing automatic JSX runtime is reported once per
   file, at its first JSX tag in source order; TypeScript uses the first tag it
   checks, which can be later in source when a function expression's body is
   checked late.

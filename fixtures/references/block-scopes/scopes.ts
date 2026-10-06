@@ -1,61 +1,61 @@
 // Function-scoped `var` versus block-scoped `let`/`const`/`using`, loops,
 // switch clauses, catch bindings, and class static blocks.
-declare const /*@source*/source: { /*@!*/one: number };
-declare const /*@list*/list: any;
+declare const /*@source:d*/source: { /*@!*/one: number };
+declare const /*@list:d*/list: any;
 
-function /*@scopes*/scopes() {
-  /*@hoisted*/hoisted;
-  var /*@hoisted*/hoisted = 1;
-  let /*@outer*/value = 1;
+function /*@scopes:d*/scopes() {
+  /*@hoisted:u*/hoisted;
+  var /*@hoisted:d*/hoisted = 1;
+  let /*@outer:d*/value = 1;
   {
-    let /*@inner*/value = 2;
-    const /*@constant*/constant = /*@inner*/value;
-    /*@constant*/constant;
-    var /*@hoisted*/hoisted = 3;
+    let /*@inner:d*/value = 2;
+    const /*@constant:d*/constant = /*@inner:u*/value;
+    /*@constant:u*/constant;
+    var /*@hoisted:d*/hoisted = 3;
   }
-  /*@outer*/value;
-  for (let /*@index*/index = 0; /*@index*/index < 1; /*@index*/index++) { /*@index*/index; }
-  for (const /*@key*/key in /*@source*/source) { /*@key*/key; }
-  for (const /*@item*/item of /*@list*/list) { /*@item*/item; }
-  for (var /*@counter*/counter = 0; /*@counter*/counter < 1; /*@counter*/counter++) {}
-  /*@counter*/counter;
-  while (/*@hoisted*/hoisted) { let /*@loopLocal*/loopLocal = 1; /*@loopLocal*/loopLocal; break; }
-  switch (/*@hoisted*/hoisted) {
+  /*@outer:u*/value;
+  for (let /*@index:d*/index = 0; /*@index:u*/index < 1; /*@index:u*/index++) { /*@index:u*/index; }
+  for (const /*@key:d*/key in /*@source:u*/source) { /*@key:u*/key; }
+  for (const /*@item:d*/item of /*@list:u*/list) { /*@item:u*/item; }
+  for (var /*@counter:d*/counter = 0; /*@counter:u*/counter < 1; /*@counter:u*/counter++) {}
+  /*@counter:u*/counter;
+  while (/*@hoisted:u*/hoisted) { let /*@loopLocal:d*/loopLocal = 1; /*@loopLocal:u*/loopLocal; break; }
+  switch (/*@hoisted:u*/hoisted) {
     case 1:
-      let /*@clause*/clause = 1;
-      /*@clause*/clause;
+      let /*@clause:d*/clause = 1;
+      /*@clause:u*/clause;
       break;
     default:
-      /*@clause*/clause;
+      /*@clause:u*/clause;
   }
   try {
-    /*@hoisted*/hoisted;
-  } catch (/*@caught*/error) {
-    /*@caught*/error;
-    var /*@fromCatch*/fromCatch = 1;
+    /*@hoisted:u*/hoisted;
+  } catch (/*@caught:d*/error) {
+    /*@caught:u*/error;
+    var /*@fromCatch:d*/fromCatch = 1;
   }
-  /*@fromCatch*/fromCatch;
+  /*@fromCatch:u*/fromCatch;
   {
-    using /*@resource*/resource = null;
-    /*@resource*/resource;
+    using /*@resource:d*/resource = null;
+    /*@resource:u*/resource;
   }
 }
 
-async function /*@later*/later() {
-  await using /*@awaited*/awaited = null;
-  /*@awaited*/awaited;
+async function /*@later:d*/later() {
+  await using /*@awaited:d*/awaited = null;
+  /*@awaited:u*/awaited;
 }
 
-class /*@Statics*/Statics {
+class /*@Statics:d*/Statics {
   static {
-    var /*@inStatic*/inStatic = 1;
-    let /*@blockLocal*/blockLocal = /*@inStatic*/inStatic;
-    /*@blockLocal*/blockLocal;
+    var /*@inStatic:d*/inStatic = 1;
+    let /*@blockLocal:d*/blockLocal = /*@inStatic:u*/inStatic;
+    /*@blockLocal:u*/blockLocal;
   }
 }
 
 /*@?*/inStatic;
-/*@scopes*/scopes();
-/*@later*/later();
-new /*@Statics*/Statics();
+/*@scopes:u*/scopes();
+/*@later:u*/later();
+new /*@Statics:u*/Statics();
 export {};

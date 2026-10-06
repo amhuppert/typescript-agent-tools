@@ -13,6 +13,111 @@ places where TypeScript 7.0.2 behavior overrode this design (such as `types`
 defaulting to `[]` and `baseUrl` being removed), are documented in
 [find references](references.md).
 
+## Refinements after implementation
+
+The public operation and immutable snapshot remain the intended boundary.
+The implementation review refined three private contracts:
+
+- Resolved meanings carry their own type-only provenance. Combining a local
+  value with an imported type preserves the local value's accessibility;
+  re-exports and alternative star-export routes retain each target's access.
+  `binding::targets` owns combination, restriction, and meaning selection.
+- The project owns normalized file identity keys and the captured spellings
+  used by queries. `project::paths::FileLookup` uses the same normalization and
+  case policy as loading, including clamping parent traversal at a path root.
+  The public façade and query owner do not reconstruct identity rules.
+- A per-file diagnostic policy owns binding leniency, unsupported dependency
+  tolerance, `skipLibCheck`, and comment suppressions. File provenance informs
+  both that policy and search inclusion during loading; the binder does not
+  infer diagnostic permissions from whether occurrences appear in results.
+
+Semantic links use distinct private IDs for scopes, declarations, references,
+aliases, requests, and index records. Optional type-parameter-list identity is
+an `Option`, rather than an integer sentinel. Built-in `globalThis` resolution
+has a semantic variant whose diagnostic text is chosen at the result boundary.
+
+The semantic oracle follows immediate alias chains to retain independent local
+meanings along a re-export path. A type-only edge affects the value target only
+when that target is actually reached through the edge. The
+`mixed-alias-meanings` fixture protects this contract on both sides of the
+comparison.
+
+A second review kept the design and gave single owners to rules that had been
+reconstructed in several places, each of which had produced a wrong result:
+
+- File identity: loading derives a query spelling under the configuration
+  directory as the caller spelled it only for files inside that directory, and
+  the result's `project` names the configuration in the canonical directory
+  that result paths are relative to. `paths::Case` is the one case policy for
+  identity keys, comparisons, and `InputKind`, which classifies an input by its
+  extension as TypeScript does.
+- Binding errors are reported only through link, after file provenance is
+  known. The collector records the all-exported-or-all-local conflict as a fact
+  rather than failing before the diagnostic policy exists.
+- Comment directives are scanned from the whole source around literal tokens,
+  as TypeScript's scanner records them, rather than from the leading trivia of
+  whichever nodes the collector visits.
+- Leading comments and their reference and JSX pragmas have one owner,
+  `crate::pragmas`, using the lexer's whitespace and line breaks. The parser
+  validates reference directives from it; `project::directives` decides what
+  they ask loading to follow, and the loader settles each outcome by kind
+  (`Followed`) rather than by matching error kinds.
+- Alias cycles resolve the same way whichever file resolution reaches first.
+  A dependency that only fills meanings a name's local declarations lack is a
+  fill edge; as in TypeScript, a cycle through one is cut there and resolves
+  to those locals (so an import that returns to its own local is TS2440). A
+  cycle of aliases alone leaves every member unresolved (TS2303).
+- A name query and a position query classify a selected token through one
+  function, so neither silently drops an unsupported or unresolved candidate.
+
+The same review moved several decisions to the owner that holds their
+knowledge:
+
+- `Sources` alone allocates `FileId`s, reserving one when an input is
+  discovered and asserting that inputs are captured in reservation order.
+  Loading computes the provenance-free part of the diagnostic policy as it
+  captures each file and builds each `ProgramFile` once the dependency graph is
+  complete, so no provisional origin exists; an unsupported reference path is
+  settled then, like an unsupported module target.
+- The resolver interprets file formats: request and type-directive resolution
+  modes, and whether a format forces module semantics. It receives the case
+  policy for output-directory mapping, as TypeScript does.
+- Only `NotFound` and `NotADirectory` mean a path is absent
+  (`project::disk`). Any other failure to inspect or read a file or directory
+  is an `Io` error, never an empty manifest, directory, or skipped entry. Queries have no I/O error: a path that cannot
+  be made absolute names no searched file.
+- In the binder, `targets::Slots` hides the per-meaning slot layout and one
+  selection rule decides when a type-only value is dropped; one member lookup
+  serves qualified names and `export =`; `index::Builder` establishes the
+  frozen index's ordering invariants; one exhaustive match decides where each
+  scope kind stores its names; and an augmentation of a script in a dependency
+  is ignored, so a declaration always has an export host. The collector
+  compares `SyntaxKind`s rather than kind strings, builds alias records with
+  their anchors, and stores exact token spans.
+
+A third review found rules that still had a second owner, owners that
+returned a reduced form of TypeScript's concept, and failures that became
+ordinary results, and fixed each where its owner lives:
+
+- Lexical boundaries have one owner, the lexer: where a `#!` line ends (after
+  a byte order mark), where comments start and end (`iterateCommentRanges`).
+  Pragmas, `@ts-ignore` scanning, and `@deprecated` collection keep their own
+  selection rules over it; `crate::pragmas` follows TypeScript 7's directive
+  grammar, with spaces and tabs as the only separators.
+- `ParseOptions::for_file` decides what a file name means for parsing, with
+  TypeScript's case rules; the module indicator is one function
+  (`ast::external_module`); `paths` itself reads `\` as a separator; one
+  `pattern` module serves `paths` patterns and pattern ambient modules.
+- Binding keeps the three-state namespace instance and asks TypeScript's
+  `getDeclarationSpaces` question for exported and local declarations; a
+  failed `export *` route still exports its name.
+- `project::jsonc` reads `tsconfig.json` and `package.json` as TypeScript 7
+  reads each, and reports its depth limit, like the package `imports` limit,
+  as a failure no file's diagnostic policy tolerates.
+- In expressions, a `<` is tried as type arguments only when enough `>`
+  tokens remain to close it (`parser::angles`), so speculation no longer
+  exhausts the depth budget on long flat lists of comparisons.
+
 ## Scope and operating envelope
 
 The confirmed scope is one configured TypeScript project, inherited settings,
@@ -37,9 +142,9 @@ resolution failures must remain distinguishable from an empty successful search.
 | Current contract | Design consequence |
 | --- | --- |
 | [`Ast` borrows its source](../src/ast.rs), and `NodeId` is arena-local. | Own source text and semantic records in the project; do not build a self-referential collection of sources and borrowed ASTs. |
-| `Ast::nodes()` includes discarded parse nodes. | Visit only nodes reachable from `root_id()`, using an explicit traversal stack. |
-| Syntax fields can share children, such as `attributes` and `assertClause`. | Enumerate semantic children once. A fallback walker deduplicates arena IDs and does not count compatibility aliases twice. |
-| Identifier spans include leading trivia; names use compiler `escapedText`. | Extract exact token spans and decoded identifier names in one place. Do not compare raw source spelling or emit trivia as a reference. |
+| `Ast::nodes()` includes discarded parse nodes. | Visit only the final tree with `Ast::walk`, which uses an explicit traversal stack. |
+| Syntax fields can share children, such as `attributes` and `assertClause`. | Enumerate semantic children once with `Ast::children`, which skips compatibility aliases. |
+| Identifier spans include leading trivia; names use compiler `escapedText`. | `Ast::token_span` and `Ast::identifier_name` own exact token spans and decoded names. Do not compare raw source spelling or emit trivia as a reference. |
 | Rust spans are UTF-8 bytes; JSON offsets and diagnostic columns use UTF-16. | Keep byte ranges internally and centralize validated conversion at the query/result boundary. |
 | [`src/main.rs`](../src/main.rs) currently reads one file or stdin. | Add an explicit reference mode; put project and semantic work below argument parsing. |
 | [`tools/reference-oracle.mjs`](../tools/reference-oracle.mjs) is a TypeScript 6.0.3 syntax oracle. | Add a separate semantic oracle. Existing AST conformance does not establish binding correctness. |
@@ -98,7 +203,7 @@ the following ownership boundaries; file splitting is secondary to the contracts
 | `references::project` | JSONC configuration, inheritance, path provenance, file selection, resolution modes, package metadata, and file identity | Captured files, effective binding settings, resolved module edges, and which files belong in results |
 | `references::binding` | AST field roles, scope creation, declaration compatibility, meaning-aware lookup, namespace exports, and alias relationships | A completed semantic index with symbol identity for supported occurrences |
 | `references::query` | Position selection, exact-name candidate selection, reverse occurrence lookup, deduplication, and stable ordering | Owned reference groups |
-| `references::source` | Source ownership, exact token locations, line breaks, and byte/UTF-16 conversion | Validated locations and source access by private `FileId` |
+| `references::source` | Source ownership, line positions, and byte/UTF-16 conversion | Validated locations and source access by private `FileId` |
 | `references::mod` | Construction order and consistency between these parts | The public operation above |
 | Existing CLI boundary | Flags, printing, output files, and exit codes | The existing command behavior plus reference mode |
 
@@ -299,8 +404,9 @@ The project owner is a substantive part of this feature. It cannot be replaced
 with a directory walk and a string comparison on module specifiers.
 
 Keep path-valued configuration entries associated with the configuration file
-that declared them. Inherited `include`, `exclude`, `baseUrl`, and `paths` must not
-all be reinterpreted relative to the leaf configuration. Handle JSONC comments,
+that declared them. Inherited `include`, `exclude`, and `paths` must not all be
+reinterpreted relative to the leaf configuration. (This design also listed
+`baseUrl`; TypeScript 7 removed it, and the implementation rejects it.) Handle JSONC comments,
 trailing commas, ordered `extends` inheritance, and inheritance-cycle errors.
 Keep JSONC parsing behind this owner; `serde_json` alone does not accept JSONC.
 
@@ -310,7 +416,9 @@ Define these sets explicitly:
   `include`/`exclude` rules, including declaration files and TSX.
 - **Program inputs:** roots plus transitive static imports/re-exports, supported
   reference directives, and ambient type dependencies selected by `types` and
-  `typeRoots`, including automatic package discovery when `types` is absent.
+  `typeRoots`. (This design assumed automatic package discovery when `types` is
+  absent; TypeScript 7.0.2 defaults `types` to `[]`, and the implementation
+  follows the compiler, with `"types": ["*"]` selecting every package.)
   An excluded file can still enter through an import, as in TypeScript.
 - **Search files:** roots and their locally resolved source/declaration
   dependencies. Installed package declarations can establish identity without
@@ -450,36 +558,20 @@ tool's deliberate whole-symbol grouping: an editor may return several alias
 groups. Do not call those output-format differences binding failures, and do not
 discard missing or extra occurrence locations during normalization.
 
-The existing API oracle is pinned to TypeScript 6.0.3, while the parser targets
-TypeScript 7. A 6.0.3 language service can provide interim evidence for explicitly
-compatible cases, but it cannot establish general TypeScript 7 reference parity.
-Before claiming that parity, obtain a pinned TypeScript 7 semantic oracle through
-its available language-service/test interface and record the version and supported
-comparison surface. That interface has not been verified in this design task;
-the configured 6.0.3 API was also unavailable in the current worktree.
+The existing syntax oracle is pinned to TypeScript 6.0.3, while the parser
+targets TypeScript 7, so reference parity needs a TypeScript 7 semantic oracle.
+(This design planned interim 6.0.3 evidence because no TypeScript 7 interface
+had been verified. The implementation uses TypeScript 7.0.2's language service
+through its unstable sync API; [validation](validation.md#reference-semantics)
+records the version, comparison surface, and results.)
 
-The Rust `test` command retains its full wrapper for checkpoints and adds
-[`scripts/validate/test-changed.sh`](../scripts/validate/test-changed.sh) as
-`validation.commands.test.command.changed`, with `pathArgs: "paths"`. Explicit
-paths must name existing top-level integration-test files, `tests/<target>.rs`,
-which map to Cargo's automatically discovered test targets. Directory paths,
-source files, and unsupported test layouts are rejected rather than widening the
-run. Without explicit paths, the changed wrapper safely runs the full suite.
-
-Command Center reads the registration and resolves wrapper executables from the
-canonical project root (the main worktree), then runs them with the session
-worktree as the working directory. Changes made only in this session therefore
-do not take effect through `cctl validate`. Integrate both the `CommandCenter.json`
-registration and the executable wrapper into the canonical project root through
-the normal Command Center integration process before relying on scoped validation.
-
-While developing the wrapper, a direct invocation is permitted only as the narrow
-wrapper-development diagnostic described in the project-setup skill; it is local
-evidence, not a registered validation verdict. After canonical integration, check
-`cctl validate list` for path support, then use
-`cctl validate run test --queue-if-busy --require-match -- tests/references.rs`
-for the TDD loop. Verify that the run selects the intended test target before
-claiming a file-scoped result.
+For the TDD loop, the Rust `test` command's changed wrapper
+([`scripts/validate/test-changed.sh`](../scripts/validate/test-changed.sh),
+`pathArgs: "paths"`) runs explicit top-level integration-test files,
+`tests/<target>.rs`, and rejects directories, source files, and other layouts
+rather than widening the run; without paths it runs the full suite. Command
+Center resolves registered wrappers from the canonical project root, so a
+wrapper change takes effect only after integration.
 
 ## Main implementation risks
 

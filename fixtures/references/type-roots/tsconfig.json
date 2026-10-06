@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "noLib": true,
+    "typeRoots": ["./typings", "./vendor/node_modules/@types"],
+    "types": ["globals", "vendored"]
+  },
+  "include": ["src"]
+}

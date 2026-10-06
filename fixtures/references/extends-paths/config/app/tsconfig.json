@@ -1,0 +1,5 @@
+{
+  // A configuration in the parent directory declares `paths`.
+  "extends": "../tsconfig.paths.json",
+  "include": ["../../src"],
+}

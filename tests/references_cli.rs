@@ -3,14 +3,11 @@ mod support;
 
 use serde_json::{Value, json};
 use std::process::{Command, Output, Stdio};
-use support::Fixture;
-
-const CONFIG: &str = r#"{ "compilerOptions": { "noLib": true } }"#;
+use support::{Fixture, project};
 
 /// Cross-file aliases plus a parameter with the same spelling as an alias.
-fn project() -> Fixture {
-    Fixture::new(&[
-        ("tsconfig.json", CONFIG),
+fn aliases() -> Fixture {
+    project(&[
         ("src/api.ts", "export function run() {}\n"),
         (
             "src/barrel.ts",
@@ -61,7 +58,7 @@ fn occurrence(name: &str, file: &str, line: u32, start: u32, roles: &[&str]) -> 
 
 #[test]
 fn position_query_emits_the_aliased_symbol_group() {
-    let fixture = project();
+    let fixture = aliases();
     let result = success(tsparse(
         &fixture,
         &[
@@ -95,7 +92,7 @@ fn position_query_emits_the_aliased_symbol_group() {
 
 #[test]
 fn name_queries_return_every_group_and_narrow_by_file() {
-    let fixture = project();
+    let fixture = aliases();
     let groups = |args: &[&str]| -> Vec<Value> {
         let mut all = vec!["--references", "--project", "tsconfig.json"];
         all.extend_from_slice(args);
@@ -122,7 +119,7 @@ fn name_queries_return_every_group_and_narrow_by_file() {
 
 #[test]
 fn pretty_and_output_file_keep_their_meanings() {
-    let fixture = project();
+    let fixture = aliases();
     let output = tsparse(
         &fixture,
         &[
@@ -156,7 +153,7 @@ fn pretty_and_output_file_keep_their_meanings() {
 
 #[test]
 fn usage_and_io_errors_exit_2() {
-    let fixture = project();
+    let fixture = aliases();
     for args in [
         &["--references", "--name", "run"][..],
         &["--references", "--project", "tsconfig.json"],
@@ -240,7 +237,7 @@ fn usage_and_io_errors_exit_2() {
 
 #[test]
 fn analysis_failures_exit_1_with_located_diagnostics() {
-    let fixture = project();
+    let fixture = aliases();
     let output = tsparse(
         &fixture,
         &[
@@ -283,7 +280,7 @@ fn analysis_failures_exit_1_with_located_diagnostics() {
 
 #[test]
 fn help_documents_reference_mode_and_its_limits() {
-    let fixture = project();
+    let fixture = aliases();
     let output = tsparse(&fixture, &["--help"]);
     let text = String::from_utf8(output.stdout).unwrap();
     for needle in [
@@ -291,7 +288,7 @@ fn help_documents_reference_mode_and_its_limits() {
         "--at LINE:COLUMN",
         "--name NAME",
         "Project references are not followed",
-        "lib",
+        "an explicit lib setting or lib reference",
         "In reference mode, exit 1",
     ] {
         assert!(text.contains(needle), "help lacks {needle:?}:\n{text}");

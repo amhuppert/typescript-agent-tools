@@ -76,7 +76,7 @@ fn tagged_template_segments_keep_their_own_escape_metadata() {
 #[test]
 fn tagged_invalid_escapes_preserve_unpaired_utf16_surrogates() {
     let ast = parse(r"tag`\uD800\xGG`; ").unwrap();
-    assert!(ast.nodes().iter().any(|node| {
+    assert!(ast.walk().map(|id| ast.node(id)).any(|node| {
         matches!(node.field("text"), Some(Value::Utf16(units)) if units == &[0xD800, 0x5C, 0x78, 0x47, 0x47])
     }));
     let mut output = Vec::new();

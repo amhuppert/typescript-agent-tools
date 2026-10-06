@@ -1,8 +1,8 @@
 // A global JSX namespace, so intrinsic tags and attributes resolve to members.
-declare namespace /*@JSX*/JSX {
-  interface /*@IntrinsicElements*/IntrinsicElements {
+declare namespace /*@JSX:d*/JSX {
+  interface /*@IntrinsicElements:d*/IntrinsicElements {
     /*@!*/div: { /*@!*/className?: string };
     /*@!*/span: {};
   }
-  interface /*@Element*/Element {}
+  interface /*@Element:d*/Element {}
 }

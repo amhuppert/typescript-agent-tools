@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "noLib": true,
+    // Relative to this directory, not to the project or the extending config.
+    "paths": {
+      "#lib/*": ["../generated/*", "../lib/*"],
+      "@shared": ["../shared/index.ts"]
+    }
+  }
+}

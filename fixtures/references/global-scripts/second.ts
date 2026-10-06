@@ -1,8 +1,8 @@
 // `var` and interface declarations merge across global scripts; module-local
 // declarations are not globals.
-var /*@shared*/shared = 2;
-interface /*@GlobalShape*/GlobalShape { /*@!*/b: number }
-/*@globalFn*/globalFn();
-let /*@shape*/shape: /*@GlobalShape*/GlobalShape = { /*@!*/a: 1, /*@!*/b: 2 };
-/*@shape*/shape;
+var /*@shared:d*/shared = 2;
+interface /*@GlobalShape:d*/GlobalShape { /*@!*/b: number }
+/*@globalFn:u*/globalFn();
+let /*@shape:d*/shape: /*@GlobalShape:u*/GlobalShape = { /*@!*/a: 1, /*@!*/b: 2 };
+/*@shape:u*/shape;
 /*@?*/moduleOnly;

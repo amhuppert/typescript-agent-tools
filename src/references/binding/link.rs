@@ -7,22 +7,21 @@
 //! task stack; cycles become unresolved targets rather than recursion.
 
 use super::collect::{AliasBind, AliasKind, DeclKind, Facts, Host, NameTarget, RefBase, ScopeKind};
-use super::index::{Index, Occurrence, OccurrenceRef, Site, Strings, SymbolId, Target};
+use super::ids::{
+    AliasId, DeclId, ModuleId, RefId, RequestId, ScopeId, SymbolId, TableId, TypeParameterListId,
+};
+use super::index::{self, Index, Site, Target, Token};
+use super::instances::Instance;
+use super::targets::{Meanings, Reach, Slots, each};
 use super::{FileFacts, ModuleResolution, RequestKind, meaning};
 use crate::Span;
-use crate::references::project::Program;
-use crate::references::source::{FileId, token_span};
+use crate::references::project::{self, Program};
+use crate::references::source::FileId;
 use crate::references::{ProjectError, ProjectErrorKind};
 use smallvec::SmallVec;
 use std::collections::{HashMap, HashSet};
 
-type Slots = [Option<SymbolId>; 3];
-type TableId = usize;
-type ModuleId = usize;
-const GLOBAL: TableId = 0;
-
-const BITS: [u8; 3] = [meaning::VALUE, meaning::TYPE, meaning::NAMESPACE];
-const GLOBAL_THIS: &str = "built-in globalThis";
+const GLOBAL: TableId = TableId::new_const(0);
 
 /// TypeScript symbol flags that decide which declarations may share a name.
 mod flags {
@@ -39,6 +38,7 @@ mod flags {
     pub(super) const TYPE_PARAMETER: u32 = 1 << 10;
     pub(super) const PARAMETER: u32 = 1 << 11;
     pub(super) const EXPRESSION: u32 = 1 << 12;
+    /// A source file or ambient module, which TypeScript marks `ValueModule`.
     pub(super) const MODULE: u32 = 1 << 13;
     /// A function declaration with a body.
     pub(super) const IMPLEMENTED: u32 = 1 << 14;
@@ -63,12 +63,60 @@ fn symbol_flags(kind: DeclKind) -> u32 {
         DeclKind::TypeAlias => TYPE_ALIAS,
         DeclKind::Enum { constant: true } => CONST_ENUM,
         DeclKind::Enum { constant: false } => REGULAR_ENUM,
-        DeclKind::Namespace { instantiated: true } => VALUE_MODULE,
         DeclKind::Namespace {
-            instantiated: false,
+            instance: Instance::NonInstantiated,
         } => NAMESPACE_MODULE,
+        DeclKind::Namespace { .. } => VALUE_MODULE,
         DeclKind::TypeParameter => TYPE_PARAMETER,
         DeclKind::Expression => EXPRESSION,
+    }
+}
+
+/// The meanings a symbol with `flags` has of its own: the one rule for a
+/// symbol's meanings, which its declarations' kinds and alias expansion use.
+/// A module is a value and a namespace. Contextual meanings stay with their
+/// rule: any export of a shorthand ambient module has every meaning, and a
+/// type-only route restricts the meanings it reaches (see `targets`).
+fn meanings(flags: u32) -> u8 {
+    let mut meanings = 0;
+    if flags & (flags::VALUE | flags::MODULE) != 0 {
+        meanings |= meaning::VALUE;
+    }
+    if flags & flags::TYPE != 0 {
+        meanings |= meaning::TYPE;
+    }
+    if flags & (flags::NAMESPACE | flags::ENUM | flags::MODULE) != 0 {
+        meanings |= meaning::NAMESPACE;
+    }
+    meanings
+}
+
+impl DeclKind {
+    /// The meanings one declaration of this kind gives its symbol.
+    pub(super) fn meanings(self) -> u8 {
+        meanings(symbol_flags(self))
+    }
+
+    /// TypeScript's `getDeclarationSpaces`: the value, type, and namespace
+    /// spaces a declaration occupies, which decide whether exported and local
+    /// declarations of one name conflict (TS2395). Unlike its lookup
+    /// meanings, an enum occupies no namespace space, so an exported enum and
+    /// a local type-only namespace merge.
+    pub(super) fn declaration_spaces(self) -> u8 {
+        use meaning::{NAMESPACE, TYPE, VALUE};
+        match self {
+            DeclKind::Var
+            | DeclKind::Parameter
+            | DeclKind::Let
+            | DeclKind::Function
+            | DeclKind::Expression => VALUE,
+            DeclKind::Class | DeclKind::Enum { .. } => VALUE | TYPE,
+            DeclKind::Interface | DeclKind::TypeAlias | DeclKind::TypeParameter => TYPE,
+            DeclKind::Namespace {
+                instance: Instance::NonInstantiated,
+            } => NAMESPACE,
+            DeclKind::Namespace { .. } => NAMESPACE | VALUE,
+        }
     }
 }
 
@@ -84,12 +132,10 @@ fn excludes(kind: DeclKind) -> u32 {
         DeclKind::Interface => TYPE & !(INTERFACE | CLASS),
         DeclKind::Enum { constant: false } => (VALUE | TYPE) & !(REGULAR_ENUM | VALUE_MODULE),
         DeclKind::Enum { constant: true } => (VALUE | TYPE) & !CONST_ENUM,
-        DeclKind::Namespace { instantiated: true } => {
-            VALUE & !(FUNCTION | CLASS | REGULAR_ENUM | VALUE_MODULE)
-        }
         DeclKind::Namespace {
-            instantiated: false,
+            instance: Instance::NonInstantiated,
         } => 0,
+        DeclKind::Namespace { .. } => VALUE & !(FUNCTION | CLASS | REGULAR_ENUM | VALUE_MODULE),
         DeclKind::TypeAlias => TYPE,
         DeclKind::TypeParameter => TYPE & !TYPE_PARAMETER,
     }
@@ -113,6 +159,9 @@ fn merges(existing: u32, kind: DeclKind) -> bool {
     }
 }
 
+/// One name in a table: at most one declared symbol per meaning, plus an
+/// optional import or export alias. A stored symbol may since have merged
+/// into another, so readers canonicalize it with `find`.
 #[derive(Debug, Default)]
 struct Entry {
     slots: Slots,
@@ -122,24 +171,41 @@ struct Entry {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 struct AliasRef {
     file: FileId,
-    index: u32,
+    id: AliasId,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 struct RefRef {
     file: FileId,
-    index: u32,
+    id: RefId,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum Task {
     Alias(AliasRef),
     Ref(RefRef),
 }
 
+/// A task that another task waits for. `fill` marks an alias consulted only
+/// for meanings that same-named local declarations lack: TypeScript resolves
+/// such a name to its locals without following the alias, so a cycle through
+/// that edge is cut there rather than leaving every member unresolved.
+#[derive(Debug, Clone, Copy)]
+struct Need {
+    task: Task,
+    fill: bool,
+}
+
+impl Need {
+    fn required(task: Task) -> Self {
+        Self { task, fill: false }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum Resolution {
-    Found { slots: Slots, type_only: bool },
+    Found(Meanings),
+    GlobalThis,
     NotReference(&'static str),
     Unresolved(String),
 }
@@ -154,22 +220,22 @@ enum State {
 
 enum Step<T> {
     Done(T),
-    Need(Task),
+    Need(Need),
 }
 
-/// The result of checking one table for a name.
-enum Check {
+/// The result of probing one table for a name.
+enum Probe {
     Found(Resolution),
-    Need(Task),
+    Need(Need),
     Missing,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 struct Symbol {
     flags: u32,
     sites: Vec<Site>,
     /// Type parameter lists that declare this type parameter.
-    lists: Vec<(FileId, u32)>,
+    lists: Vec<(FileId, TypeParameterListId)>,
     exports: Option<TableId>,
     members: Option<TableId>,
     module: Option<ModuleId>,
@@ -187,11 +253,25 @@ struct Module {
     declaration: bool,
 }
 
+/// What a module request denotes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum RequestTarget {
     Module(ModuleId),
     Script,
+    /// A tolerated failure: names imported through the request are
+    /// unresolved, and an augmentation of it binds nothing.
     Ignored,
+}
+
+/// Where a scope's names are stored.
+#[derive(Debug, Clone, Copy)]
+enum Storage {
+    /// The global table: a script's root, or `declare global`.
+    Global,
+    /// The member table shared by a class or interface's declarations.
+    Members(DeclId),
+    /// The scope's own table, which also sees the exports of a host.
+    Own(Option<Host>),
 }
 
 struct Linker<'p> {
@@ -199,23 +279,35 @@ struct Linker<'p> {
     tables: Vec<HashMap<String, Entry>>,
     scope_tables: Vec<Vec<Option<TableId>>>,
     symbols: Vec<Symbol>,
-    parents: Vec<u32>,
+    parents: Vec<SymbolId>,
+    /// The symbol each declaration created or merged into. It may since have
+    /// merged into another, so readers canonicalize it with `find`.
     decl_symbols: Vec<Vec<Option<SymbolId>>>,
     modules: Vec<Module>,
     file_modules: Vec<Option<ModuleId>>,
     ambient: HashMap<String, ModuleId>,
-    patterns: Vec<(String, String, ModuleId)>,
-    targets: Vec<Vec<RequestTarget>>,
+    /// Pattern ambient modules, by name, in the order they were declared.
+    patterns: Vec<(String, ModuleId)>,
+    /// Parallel to each file's requests.
+    request_modules: Vec<Vec<RequestTarget>>,
     alias_states: Vec<Vec<State>>,
     ref_states: Vec<Vec<State>>,
     export_memo: HashMap<(ModuleId, String), Resolution>,
     conflicts: Vec<(TableId, String, FileId, Span)>,
+    /// The task `force` is running, for `probe_entry` to consult `cuts`.
+    running: Option<Task>,
+    /// Fill edges that close a cycle: the waiting task resolves to its local
+    /// declarations without the alias.
+    cuts: HashSet<(Task, Task)>,
+    /// The waiting tasks of `cuts`, whose lookups are specific to them.
+    cut_tasks: HashSet<Task>,
 }
 
 type Result<T> = std::result::Result<T, ProjectError>;
 
 pub(super) fn link(program: &Program) -> Result<Index> {
     let mut linker = Linker::new(program);
+    linker.check_mixed_exports()?;
     linker.create_modules();
     linker.resolve_requests()?;
     linker.collect_stars();
@@ -248,7 +340,7 @@ impl<'p> Linker<'p> {
             file_modules: vec![None; files.len()],
             ambient: HashMap::new(),
             patterns: Vec::new(),
-            targets: Vec::new(),
+            request_modules: Vec::new(),
             alias_states: files
                 .iter()
                 .map(|f| vec![State::Unvisited; f.facts.facts.aliases.len()])
@@ -259,11 +351,14 @@ impl<'p> Linker<'p> {
                 .collect(),
             export_memo: HashMap::new(),
             conflicts: Vec::new(),
+            running: None,
+            cuts: HashSet::new(),
+            cut_tasks: HashSet::new(),
         }
     }
 
-    fn file_ids(&self) -> impl Iterator<Item = FileId> + use<> {
-        (0..self.program.files.len() as u32).map(FileId)
+    fn file_ids(&self) -> impl Iterator<Item = FileId> + use<'p> {
+        self.program.sources.ids()
     }
     fn file(&self, file: FileId) -> &'p FileFacts {
         &self.program.files[file.index()].facts
@@ -274,10 +369,11 @@ impl<'p> Linker<'p> {
     fn search(&self, file: FileId) -> bool {
         self.program.files[file.index()].search
     }
-    fn text(&self, file: FileId) -> &'p str {
-        self.program.sources.get(file).text.as_str()
+    fn checks_bindings(&self, file: FileId) -> bool {
+        self.program.files[file.index()]
+            .diagnostics
+            .checks_bindings()
     }
-
     fn error(
         &self,
         kind: ProjectErrorKind,
@@ -296,40 +392,36 @@ impl<'p> Linker<'p> {
 
     fn table(&mut self) -> TableId {
         self.tables.push(HashMap::new());
-        self.tables.len() - 1
+        TableId::new(self.tables.len() - 1)
     }
 
     fn new_symbol(&mut self, flags: u32, site: Option<Site>) -> SymbolId {
-        let id = SymbolId(self.symbols.len() as u32);
+        let id = SymbolId::new(self.symbols.len());
         self.symbols.push(Symbol {
             flags,
             sites: site.into_iter().collect(),
-            lists: Vec::new(),
-            exports: None,
-            members: None,
-            module: None,
-            enum_members: Vec::new(),
+            ..Symbol::default()
         });
-        self.parents.push(id.0);
+        self.parents.push(id);
         id
     }
 
     /// The canonical symbol after declaration merges.
     fn find(&self, mut id: SymbolId) -> SymbolId {
-        while self.parents[id.0 as usize] != id.0 {
-            id = SymbolId(self.parents[id.0 as usize]);
+        while self.parents[id.index()] != id {
+            id = self.parents[id.index()];
         }
         id
     }
     fn symbol(&self, id: SymbolId) -> &Symbol {
-        &self.symbols[self.find(id).0 as usize]
+        &self.symbols[self.find(id).index()]
     }
 
     fn new_module(&mut self, site: Site, shorthand: bool, declaration: bool) -> ModuleId {
         let exports = self.table();
         let symbol = self.new_symbol(flags::MODULE, Some(site));
-        let id = self.modules.len();
-        self.symbols[symbol.0 as usize].module = Some(id);
+        let id = ModuleId::new(self.modules.len());
+        self.symbols[symbol.index()].module = Some(id);
         self.modules.push(Module {
             exports,
             stars: Vec::new(),
@@ -354,20 +446,20 @@ impl<'p> Linker<'p> {
             for ambient in &self.facts(file).ambient_modules {
                 let site = Site {
                     file,
-                    span: token_span(self.text(file), ambient.span),
+                    span: ambient.span,
                     name: ambient.name.clone(),
                 };
                 match self.ambient.get(&ambient.name) {
                     Some(&module) => {
-                        let symbol = self.modules[module].symbol;
-                        self.symbols[symbol.0 as usize].sites.push(site);
-                        self.modules[module].shorthand &= ambient.shorthand;
+                        let symbol = self.modules[module.index()].symbol;
+                        self.symbols[symbol.index()].sites.push(site);
+                        self.modules[module.index()].shorthand &= ambient.shorthand;
                     }
                     None => {
                         let module = self.new_module(site, ambient.shorthand, true);
                         self.ambient.insert(ambient.name.clone(), module);
-                        if let Some((prefix, suffix)) = ambient.name.split_once('*') {
-                            self.patterns.push((prefix.into(), suffix.into(), module));
+                        if super::super::pattern::parse(&ambient.name).is_some() {
+                            self.patterns.push((ambient.name.clone(), module));
                         }
                     }
                 }
@@ -378,19 +470,15 @@ impl<'p> Linker<'p> {
     fn resolve_requests(&mut self) -> Result<()> {
         for file in self.file_ids() {
             let program_file = &self.program.files[file.index()];
-            let mut targets = Vec::with_capacity(program_file.facts.requests.len());
+            let mut modules = Vec::with_capacity(program_file.facts.requests.len());
             for (index, request) in program_file.facts.requests.iter().enumerate() {
-                let resolution = program_file
-                    .modules
-                    .get(index)
-                    .cloned()
-                    .unwrap_or(ModuleResolution::Missing);
-                let relative = is_relative(&request.specifier);
+                let resolution = &program_file.modules[index];
+                let relative = project::is_relative_name(&request.specifier);
                 let ambient = (!relative)
                     .then(|| self.ambient.get(&request.specifier).copied())
                     .flatten();
-                let span = token_span(self.text(file), request.span);
-                let target = match (ambient, resolution) {
+                let span = request.span;
+                let mut target = match (ambient, resolution) {
                     (Some(module), _) => RequestTarget::Module(module),
                     (None, ModuleResolution::File(target)) => {
                         match self.file_modules[target.index()] {
@@ -407,10 +495,10 @@ impl<'p> Linker<'p> {
                             // files under skipLibCheck, and a comment
                             // directive may suppress one; only names imported
                             // through the request stay unresolved.
-                            None if program_file.unchecked
-                                || program_file
-                                    .suppressions
-                                    .covers(&self.program.sources.get(file).text, span.start) =>
+                            None if program_file.diagnostics.tolerates_missing_input(
+                                &self.program.sources.get(file).text,
+                                span.start,
+                            ) =>
                             {
                                 RequestTarget::Ignored
                             }
@@ -424,7 +512,9 @@ impl<'p> Linker<'p> {
                             }
                         }
                     }
-                    (None, ModuleResolution::Unsupported(_)) if !self.search(file) => {
+                    (None, ModuleResolution::Unsupported(_))
+                        if program_file.diagnostics.tolerates_unsupported_input() =>
+                    {
                         RequestTarget::Ignored
                     }
                     (None, ModuleResolution::Unsupported(reason)) => {
@@ -437,65 +527,75 @@ impl<'p> Linker<'p> {
                     }
                 };
                 if request.kind == RequestKind::Augmentation {
-                    if let RequestTarget::Module(module) = target {
-                        let symbol = self.modules[module].symbol;
-                        let site = Site {
-                            file,
-                            span,
-                            name: request.specifier.clone(),
-                        };
-                        self.symbols[symbol.0 as usize].sites.push(site);
-                    } else if self.search(file) && target != RequestTarget::Ignored {
-                        return Err(self.error(
-                            ProjectErrorKind::UnresolvedImport,
-                            file,
-                            span,
-                            format!(
-                                "cannot augment \"{}\", which is not a module",
-                                request.specifier
-                            ),
-                        ));
+                    match target {
+                        RequestTarget::Module(module) => {
+                            let symbol = self.modules[module.index()].symbol;
+                            let site = Site {
+                                file,
+                                span,
+                                name: request.specifier.clone(),
+                            };
+                            self.symbols[symbol.index()].sites.push(site);
+                        }
+                        // Like an augmentation of a tolerated missing module,
+                        // a dependency's augmentation of a script binds
+                        // nothing.
+                        RequestTarget::Script if !self.checks_bindings(file) => {
+                            target = RequestTarget::Ignored;
+                        }
+                        RequestTarget::Script => {
+                            return Err(self.error(
+                                ProjectErrorKind::UnresolvedImport,
+                                file,
+                                span,
+                                format!(
+                                    "cannot augment \"{}\", which is not a module",
+                                    request.specifier
+                                ),
+                            ));
+                        }
+                        RequestTarget::Ignored => {}
                     }
                 }
-                targets.push(target);
+                modules.push(target);
             }
-            self.targets.push(targets);
+            self.request_modules.push(modules);
         }
         Ok(())
     }
 
-    /// Whether declarations or aliases may lack their export host: a package
-    /// file, or a module augmentation whose missing target is tolerated.
-    fn tolerated(&self, file: FileId, host: Host) -> bool {
-        !self.search(file)
-            || matches!(host, Host::Augmentation(request)
-                if self.targets[file.index()][request as usize] == RequestTarget::Ignored)
+    /// The module a request names, or why names imported through it are
+    /// unresolved.
+    fn request_module(
+        &self,
+        file: FileId,
+        request: RequestId,
+    ) -> std::result::Result<ModuleId, &'static str> {
+        match self.request_modules[file.index()][request.index()] {
+            RequestTarget::Module(module) => Ok(module),
+            RequestTarget::Script => Err("imported file is not a module"),
+            RequestTarget::Ignored => Err("module is not resolved"),
+        }
     }
 
-    /// The pattern ambient module with the longest matching prefix.
+    /// The best-matching pattern ambient module, as TypeScript's
+    /// `resolveExternalModule` chooses it.
     fn pattern(&self, specifier: &str) -> Option<ModuleId> {
-        self.patterns
+        let patterns = self
+            .patterns
             .iter()
-            .filter(|(prefix, suffix, _)| {
-                specifier.len() >= prefix.len() + suffix.len()
-                    && specifier.starts_with(prefix.as_str())
-                    && specifier.ends_with(suffix.as_str())
-            })
-            .max_by_key(|(prefix, _, _)| prefix.len())
-            .map(|(_, _, module)| *module)
+            .map(|(name, module)| (name.as_str(), *module));
+        super::super::pattern::best_match(patterns, specifier).map(|(module, _)| module)
     }
 
     fn host_module(&self, file: FileId, host: Host) -> Option<ModuleId> {
         match host {
             Host::File => self.file_modules[file.index()],
             Host::AmbientModule(index) => {
-                let name = &self.facts(file).ambient_modules[index as usize].name;
+                let name = &self.facts(file).ambient_modules[index.index()].name;
                 self.ambient.get(name).copied()
             }
-            Host::Augmentation(request) => match self.targets[file.index()][request as usize] {
-                RequestTarget::Module(module) => Some(module),
-                _ => None,
-            },
+            Host::Augmentation(request) => self.request_module(file, request).ok(),
             Host::Namespace(_) => None,
         }
     }
@@ -503,70 +603,117 @@ impl<'p> Linker<'p> {
     fn collect_stars(&mut self) {
         for file in self.file_ids() {
             for star in &self.facts(file).stars {
-                let (Some(host), RequestTarget::Module(target)) = (
+                let (Some(host), Ok(target)) = (
                     self.host_module(file, star.host),
-                    self.targets[file.index()][star.request as usize],
+                    self.request_module(file, star.request),
                 ) else {
                     continue;
                 };
-                self.modules[host].stars.push((target, star.type_only));
+                self.modules[host.index()]
+                    .stars
+                    .push((target, star.type_only));
             }
         }
     }
 
-    /// The table of a scope, created on first use.
-    fn scope_table(&mut self, file: FileId, scope: u32) -> TableId {
-        let facts = self.facts(file);
-        match facts.scopes[scope as usize].kind {
-            ScopeKind::Root if !self.file(file).module => return GLOBAL,
-            ScopeKind::Global => return GLOBAL,
-            ScopeKind::Members { decl } => {
+    /// Where a scope stores its names. Every scope kind is decided here, for
+    /// both declaration and lookup.
+    fn storage(&self, file: FileId, scope: ScopeId) -> Storage {
+        match self.facts(file).scopes[scope.index()].kind {
+            ScopeKind::Root if !self.file(file).module => Storage::Global,
+            ScopeKind::Global => Storage::Global,
+            ScopeKind::Members { decl } => Storage::Members(decl),
+            ScopeKind::Namespace { decl } => Storage::Own(Some(Host::Namespace(decl))),
+            ScopeKind::AmbientModule { module } => Storage::Own(Some(Host::AmbientModule(module))),
+            ScopeKind::Augmentation { request } => Storage::Own(Some(Host::Augmentation(request))),
+            ScopeKind::Root
+            | ScopeKind::Block
+            | ScopeKind::Catch
+            | ScopeKind::Signature { .. }
+            | ScopeKind::Body
+            | ScopeKind::ExpressionName
+            | ScopeKind::TypeParameters
+            | ScopeKind::Infer
+            | ScopeKind::InferConstraint { .. }
+            | ScopeKind::Enum { .. } => Storage::Own(None),
+        }
+    }
+
+    /// The table a scope declares into, created on first use.
+    fn scope_table(&mut self, file: FileId, scope: ScopeId) -> TableId {
+        match self.storage(file, scope) {
+            Storage::Global => GLOBAL,
+            Storage::Members(decl) => {
                 let symbol = self.decl_symbol(file, decl);
-                return self.member_table(symbol);
+                self.member_table(symbol)
             }
-            _ => {}
+            Storage::Own(_) => {
+                if let Some(table) = self.scope_tables[file.index()][scope.index()] {
+                    return table;
+                }
+                let table = self.table();
+                self.scope_tables[file.index()][scope.index()] = Some(table);
+                table
+            }
         }
-        if let Some(table) = self.scope_tables[file.index()][scope as usize] {
-            return table;
-        }
-        let table = self.table();
-        self.scope_tables[file.index()][scope as usize] = Some(table);
-        table
     }
 
-    fn decl_symbol(&self, file: FileId, decl: u32) -> SymbolId {
-        self.find(self.decl_symbols[file.index()][decl as usize].expect("declared before use"))
+    fn decl_symbol(&self, file: FileId, decl: DeclId) -> SymbolId {
+        self.find(self.decl_symbols[file.index()][decl.index()].expect("declared before use"))
     }
 
     fn member_table(&mut self, symbol: SymbolId) -> TableId {
         let symbol = self.find(symbol);
-        if let Some(table) = self.symbols[symbol.0 as usize].members {
+        if let Some(table) = self.symbols[symbol.index()].members {
             return table;
         }
         let table = self.table();
-        self.symbols[symbol.0 as usize].members = Some(table);
+        self.symbols[symbol.index()].members = Some(table);
         table
     }
 
     fn export_table(&mut self, symbol: SymbolId) -> TableId {
         let symbol = self.find(symbol);
-        if let Some(table) = self.symbols[symbol.0 as usize].exports {
+        if let Some(table) = self.symbols[symbol.index()].exports {
             return table;
         }
         let table = self.table();
-        self.symbols[symbol.0 as usize].exports = Some(table);
+        self.symbols[symbol.index()].exports = Some(table);
         table
     }
 
+    /// The export table of a host, created on first use. Only an ignored
+    /// module augmentation has none, and its declarations bind nothing:
+    /// exporting files and ambient modules always have modules, and
+    /// `resolve_requests` either rejects an augmentation of anything else or
+    /// ignores it.
     fn host_table(&mut self, file: FileId, host: Host) -> Option<TableId> {
-        match host {
+        let table = match host {
             Host::Namespace(decl) => {
                 let symbol = self.decl_symbol(file, decl);
                 Some(self.export_table(symbol))
             }
             _ => self
                 .host_module(file, host)
-                .map(|module| self.modules[module].exports),
+                .map(|module| self.modules[module.index()].exports),
+        };
+        debug_assert!(
+            table.is_some()
+                || matches!(host, Host::Augmentation(request)
+                    if self.request_modules[file.index()][request.index()] == RequestTarget::Ignored),
+            "only an ignored augmentation lacks an export table"
+        );
+        table
+    }
+
+    /// The export table of a host whose members a scope sees, if it exists.
+    fn visible_exports(&self, file: FileId, host: Host) -> Option<TableId> {
+        match host {
+            Host::Namespace(decl) => self.decl_symbols[file.index()][decl.index()]
+                .and_then(|symbol| self.symbol(symbol).exports),
+            _ => self
+                .host_module(file, host)
+                .map(|module| self.modules[module.index()].exports),
         }
     }
 
@@ -575,20 +722,20 @@ impl<'p> Linker<'p> {
             let facts = self.facts(file);
             for (index, decl) in facts.decls.iter().enumerate() {
                 if decl.deferred == deferred {
-                    self.declare(file, index as u32)?;
+                    self.declare(file, DeclId::new(index))?;
                 }
             }
             for (index, alias) in facts.aliases.iter().enumerate() {
                 if alias.deferred == deferred {
-                    self.bind_alias(file, index as u32)?;
+                    self.bind_alias(file, AliasId::new(index))?;
                 }
             }
         }
         Ok(())
     }
 
-    fn declare(&mut self, file: FileId, index: u32) -> Result<()> {
-        let decl = &self.facts(file).decls[index as usize];
+    fn declare(&mut self, file: FileId, index: DeclId) -> Result<()> {
+        let decl = &self.facts(file).decls[index.index()];
         let site = Site {
             file,
             span: decl.anchor,
@@ -608,7 +755,7 @@ impl<'p> Linker<'p> {
         let declaring = Declaring {
             kind: decl.kind,
             flags,
-            list: (decl.list != u32::MAX).then_some((file, decl.list)),
+            list: decl.list.map(|list| (file, list)),
             site,
         };
         let symbol = match (decl.lexical, &decl.export) {
@@ -619,50 +766,43 @@ impl<'p> Linker<'p> {
             }
             (None, Some((host, name))) => match self.host_table(file, *host) {
                 Some(table) => self.declare_in(table, None, name, declaring)?,
-                // A tolerated augmentation of an absent module binds nothing.
-                None if self.tolerated(file, *host) => {
-                    self.new_symbol(declaring.flags, Some(declaring.site))
-                }
-                None => {
-                    return Err(self.error(
-                        ProjectErrorKind::Binding,
-                        file,
-                        decl.anchor,
-                        format!("no module to export `{}` from", decl.name),
-                    ));
-                }
+                // An ignored augmentation binds nothing.
+                None => self.new_symbol(declaring.flags, Some(declaring.site)),
             },
-            (None, None) => self.new_symbol(declaring.flags, Some(declaring.site)),
+            (None, None) => unreachable!("collect binds a declaration lexically or as an export"),
         };
-        self.decl_symbols[file.index()][index as usize] = Some(symbol);
+        self.decl_symbols[file.index()][index.index()] = Some(symbol);
         if !decl.members.is_empty() {
             let canonical = self.find(symbol);
-            self.symbols[canonical.0 as usize]
+            self.symbols[canonical.index()]
                 .enum_members
                 .extend(decl.members.iter().cloned());
         }
         if let (Some(_), Some((host, name))) = (decl.lexical, &decl.export) {
-            let table = self.host_table(file, *host);
-            if table.is_none() && self.tolerated(file, *host) {
-                return Ok(());
+            if let Some(table) = self.host_table(file, *host) {
+                self.export_symbol(table, name, symbol, decl.kind.meanings(), file, decl.anchor)?;
             }
-            let table = table.ok_or_else(|| {
-                self.error(
+        }
+        Ok(())
+    }
+
+    /// Declarations of one name in one container must be all exported or
+    /// all local (TypeScript's TS2395), where bindings are checked.
+    fn check_mixed_exports(&self) -> Result<()> {
+        for file in self.file_ids().filter(|&file| self.checks_bindings(file)) {
+            let facts = self.facts(file);
+            if let Some(&name) = facts.mixed_exports.first() {
+                let name = &facts.names[name.index()];
+                return Err(self.error(
                     ProjectErrorKind::Binding,
                     file,
-                    decl.anchor,
-                    format!("no module to export `{}` from", decl.name),
-                )
-            })?;
-            let name = name.clone();
-            self.export_symbol(
-                table,
-                &name,
-                symbol,
-                decl.kind.meanings(),
-                file,
-                decl.anchor,
-            )?;
+                    name.span,
+                    format!(
+                        "declarations of one name must be all exported or all local: `{}`",
+                        name.text
+                    ),
+                ));
+            }
         }
         Ok(())
     }
@@ -674,14 +814,14 @@ impl<'p> Linker<'p> {
             let facts = self.facts(file);
             for decl in facts.decls.iter().filter(|decl| !decl.hoisted.is_empty()) {
                 for &scope in &decl.hoisted {
-                    if facts.scopes[scope as usize].kind == ScopeKind::Catch {
+                    if facts.scopes[scope.index()].kind == ScopeKind::Catch {
                         continue;
                     }
-                    let blocked = self.scope_tables[file.index()][scope as usize]
-                        .and_then(|table| self.tables[table].get(&decl.name))
-                        .and_then(|entry| entry.slots[0])
+                    let blocked = self.scope_tables[file.index()][scope.index()]
+                        .and_then(|table| self.tables[table.index()].get(&decl.name))
+                        .and_then(|entry| entry.slots.value())
                         .is_some_and(|symbol| self.symbol(symbol).flags & flags::BLOCK_SCOPED != 0);
-                    if blocked && self.search(file) {
+                    if blocked && self.checks_bindings(file) {
                         return Err(self.error(
                             ProjectErrorKind::Binding,
                             file,
@@ -701,20 +841,20 @@ impl<'p> Linker<'p> {
     /// Merged declarations TypeScript's checker rejects: an instantiated
     /// namespace before, or in another file from, the class or function it
     /// merges with (TS2433, TS2434), and classes and interfaces whose type
-    /// parameters differ (TS2428). Only searched declarations are checked.
+    /// parameters differ (TS2428). Only declarations covered by the binding diagnostic policy are checked.
     fn check_merges(&self) -> Result<()> {
-        let mut declarations: HashMap<SymbolId, Vec<(FileId, u32)>> = HashMap::new();
+        let mut declarations: HashMap<SymbolId, Vec<(FileId, DeclId)>> = HashMap::new();
         for file in self.file_ids() {
             for (index, symbol) in self.decl_symbols[file.index()].iter().enumerate() {
                 if let Some(symbol) = symbol {
                     declarations
                         .entry(self.find(*symbol))
                         .or_default()
-                        .push((file, index as u32));
+                        .push((file, DeclId::new(index)));
                 }
             }
         }
-        let decl = |(file, index): (FileId, u32)| &self.facts(file).decls[index as usize];
+        let decl = |(file, index): (FileId, DeclId)| &self.facts(file).decls[index.index()];
         for list in declarations.values().filter(|list| list.len() > 1) {
             let anchor = list.iter().copied().find(|&(file, index)| {
                 let decl = decl((file, index));
@@ -722,8 +862,18 @@ impl<'p> Linker<'p> {
             });
             for &(file, index) in list {
                 let namespace = decl((file, index));
-                let instantiated = namespace.kind == (DeclKind::Namespace { instantiated: true });
-                if !instantiated || namespace.ambient || !self.search(file) {
+                // TypeScript's `isInstantiatedModule` with
+                // `shouldPreserveConstEnums`: a namespace of const enums only
+                // counts when the configuration keeps const enums.
+                let instantiated = match namespace.kind {
+                    DeclKind::Namespace { instance } => {
+                        instance == Instance::Instantiated
+                            || instance == Instance::ConstEnumOnly
+                                && self.program.preserve_const_enums
+                    }
+                    _ => false,
+                };
+                if !instantiated || namespace.ambient || !self.checks_bindings(file) {
                     continue;
                 }
                 let Some((anchor_file, anchor_index)) = anchor else {
@@ -751,8 +901,9 @@ impl<'p> Linker<'p> {
                 .collect();
             if !identical_type_parameters(generic.iter().map(|&(_, list)| list)) {
                 // TypeScript reports every declaration.
-                if let Some(&((file, index), _)) =
-                    generic.iter().find(|((file, _), _)| self.search(*file))
+                if let Some(&((file, index), _)) = generic
+                    .iter()
+                    .find(|((file, _), _)| self.checks_bindings(*file))
                 {
                     let declaration = decl((file, index));
                     return Err(self.error(
@@ -770,18 +921,20 @@ impl<'p> Linker<'p> {
         Ok(())
     }
 
-    /// The parameter table a body-level `var` may redeclare into.
-    fn signature_table(&self, file: FileId, scope: u32, kind: DeclKind) -> Option<TableId> {
+    /// The parameter table a body-level `var` may redeclare into. Collect
+    /// records a function's parameters before its body's declarations, so
+    /// the table exists by the time a body declaration asks for it.
+    fn signature_table(&self, file: FileId, scope: ScopeId, kind: DeclKind) -> Option<TableId> {
         if kind.meanings() & meaning::VALUE == 0 {
             return None;
         }
         let scopes = &self.facts(file).scopes;
-        let ScopeKind::Body = scopes[scope as usize].kind else {
+        let ScopeKind::Body = scopes[scope.index()].kind else {
             return None;
         };
-        let parent = scopes[scope as usize].parent?;
-        matches!(scopes[parent as usize].kind, ScopeKind::Signature { .. })
-            .then(|| self.scope_tables[file.index()][parent as usize])
+        let parent = scopes[scope.index()].parent?;
+        matches!(scopes[parent.index()].kind, ScopeKind::Signature { .. })
+            .then(|| self.scope_tables[file.index()][parent.index()])
             .flatten()
     }
 
@@ -799,17 +952,19 @@ impl<'p> Linker<'p> {
             list,
             site,
         } = declaring;
-        let mut existing: SmallVec<[SymbolId; 3]> = SmallVec::new();
-        let entry = self.tables[table].get(name);
-        let mut slots = entry.map(|entry| entry.slots).unwrap_or_default();
-        if let Some(parameter) = parameters
-            .and_then(|parameters| self.tables[parameters].get(name))
-            .and_then(|entry| entry.slots[0])
-        {
-            slots[0] = slots[0].or(Some(parameter));
-        }
+        let entry = self.tables[table.index()].get(name);
         let has_alias = entry.is_some_and(|entry| entry.alias.is_some());
-        for symbol in slots.into_iter().flatten() {
+        let mut slots = entry.map(|entry| entry.slots).unwrap_or_default();
+        if slots.value().is_none() {
+            if let Some(parameter) = parameters
+                .and_then(|parameters| self.tables[parameters.index()].get(name))
+                .and_then(|entry| entry.slots.value())
+            {
+                slots.set(meaning::VALUE, parameter);
+            }
+        }
+        let mut existing: SmallVec<[SymbolId; 3]> = SmallVec::new();
+        for symbol in slots.symbols() {
             let symbol = self.find(symbol);
             if !existing.contains(&symbol) {
                 existing.push(symbol);
@@ -817,9 +972,9 @@ impl<'p> Linker<'p> {
         }
         let mut merge_with: SmallVec<[SymbolId; 3]> = SmallVec::new();
         for &symbol in &existing {
-            let flags = self.symbols[symbol.0 as usize].flags;
+            let flags = self.symbols[symbol.index()].flags;
             let repeated =
-                list.is_some_and(|list| self.symbols[symbol.0 as usize].lists.contains(&list));
+                list.is_some_and(|list| self.symbols[symbol.index()].lists.contains(&list));
             if flags & excludes(kind) != 0 || invalid_merge(flags, declared, repeated) {
                 if !self.lenient(symbol, site.file) {
                     return Err(self.error(
@@ -838,27 +993,29 @@ impl<'p> Linker<'p> {
             None => self.new_symbol(declared, Some(site.clone())),
             Some((&first, rest)) => {
                 for &other in rest {
-                    self.merge_symbols(first, other, &site)?;
+                    self.merge_symbols(first, other)?;
                 }
-                let target = &mut self.symbols[first.0 as usize];
+                let first = self.find(first);
+                let target = &mut self.symbols[first.index()];
                 target.flags |= declared;
                 target.sites.push(site.clone());
                 first
             }
         };
-        self.symbols[symbol.0 as usize].lists.extend(list);
-        let meanings = kind.meanings() | self.meanings_of(symbol);
-        let entry = self.tables[table].entry(name.to_string()).or_default();
-        for (index, bit) in BITS.iter().enumerate() {
-            if meanings & bit != 0 {
-                let occupied = entry.slots[index].map(|s| s.0);
-                let replace = match occupied {
-                    None => true,
-                    Some(other) => merge_with.iter().any(|m| m.0 == other) || other == symbol.0,
-                };
-                if replace {
-                    entry.slots[index] = Some(symbol);
-                }
+        self.symbols[symbol.index()].lists.extend(list);
+        let meanings = self.meanings_of(symbol);
+        // The symbol takes each of its meanings that is free or held by a
+        // symbol now merged into it.
+        let held = self.tables[table.index()]
+            .get(name)
+            .map(|entry| entry.slots.map(|other| self.find(other)))
+            .unwrap_or_default();
+        let entry = self.tables[table.index()]
+            .entry(name.to_string())
+            .or_default();
+        for meaning in each(meanings) {
+            if held.get(meaning).is_none_or(|other| other == symbol) {
+                entry.slots.set(meaning, symbol);
             }
         }
         if has_alias {
@@ -871,85 +1028,85 @@ impl<'p> Linker<'p> {
     /// Declarations reached only through packages are merged as TypeScript's
     /// binder does when library checking is skipped.
     fn lenient(&self, symbol: SymbolId, file: FileId) -> bool {
-        !self.search(file)
+        !self.checks_bindings(file)
             && self
                 .symbol(symbol)
                 .sites
                 .iter()
-                .all(|site| !self.search(site.file))
+                .all(|site| !self.checks_bindings(site.file))
     }
 
+    /// The meanings of a symbol and every declaration merged into it.
     fn meanings_of(&self, symbol: SymbolId) -> u8 {
-        let flags = self.symbol(symbol).flags;
-        let mut meanings = 0;
-        if flags & flags::VALUE != 0 {
-            meanings |= meaning::VALUE;
-        }
-        if flags & flags::TYPE != 0 {
-            meanings |= meaning::TYPE;
-        }
-        if flags & (flags::NAMESPACE | flags::ENUM | flags::MODULE) != 0 {
-            meanings |= meaning::NAMESPACE;
-        }
-        meanings
+        meanings(self.symbol(symbol).flags)
     }
 
     /// Merge `other` into `target`, combining namespace exports and shared
     /// type parameters.
-    fn merge_symbols(&mut self, target: SymbolId, other: SymbolId, site: &Site) -> Result<()> {
+    fn merge_symbols(&mut self, target: SymbolId, other: SymbolId) -> Result<()> {
         let mut work = vec![(target, other)];
         while let Some((target, other)) = work.pop() {
             let (target, other) = (self.find(target), self.find(other));
             if target == other {
                 continue;
             }
-            self.parents[other.0 as usize] = target.0;
-            let moved = std::mem::replace(
-                &mut self.symbols[other.0 as usize],
-                Symbol {
-                    flags: 0,
-                    sites: Vec::new(),
-                    lists: Vec::new(),
-                    exports: None,
-                    members: None,
-                    module: None,
-                    enum_members: Vec::new(),
-                },
-            );
-            let symbol = &mut self.symbols[target.0 as usize];
+            self.parents[other.index()] = target;
+            let moved = std::mem::take(&mut self.symbols[other.index()]);
+            let symbol = &mut self.symbols[target.index()];
             symbol.flags |= moved.flags;
             symbol.sites.extend(moved.sites);
             symbol.lists.extend(moved.lists);
             symbol.enum_members.extend(moved.enum_members);
-            for (from, slot) in [(moved.exports, 0), (moved.members, 1)] {
-                let Some(from) = from else { continue };
-                let into = if slot == 0 {
-                    self.export_table(target)
-                } else {
-                    self.member_table(target)
-                };
-                let entries: Vec<(String, Entry)> = self.tables[from].drain().collect();
-                for (name, entry) in entries {
-                    let destination = self.tables[into].entry(name.clone()).or_default();
-                    for index in 0..3 {
-                        match (destination.slots[index], entry.slots[index]) {
-                            (Some(a), Some(b)) => work.push((a, b)),
-                            (None, Some(b)) => destination.slots[index] = Some(b),
-                            _ => {}
-                        }
-                    }
-                    if entry.alias.is_some() {
-                        if destination.alias.is_some() {
-                            return Err(self.error(
-                                ProjectErrorKind::Binding,
-                                site.file,
-                                site.span,
-                                format!("merged declarations both export `{name}`"),
-                            ));
-                        }
-                        destination.alias = entry.alias;
-                    }
+            if let Some(from) = moved.exports {
+                let into = self.export_table(target);
+                self.merge_tables(from, into, &mut work)?;
+            }
+            if let Some(from) = moved.members {
+                let into = self.member_table(target);
+                self.merge_tables(from, into, &mut work)?;
+            }
+        }
+        Ok(())
+    }
+
+    /// Move the entries of `from` into `into`. Symbols that meet in one
+    /// meaning are queued to merge in turn.
+    fn merge_tables(
+        &mut self,
+        from: TableId,
+        into: TableId,
+        work: &mut Vec<(SymbolId, SymbolId)>,
+    ) -> Result<()> {
+        let entries: Vec<(String, Entry)> = self.tables[from.index()].drain().collect();
+        for (name, entry) in entries {
+            let destination = self.tables[into.index()].entry(name.clone()).or_default();
+            for meaning in each(meaning::ALL) {
+                match (destination.slots.get(meaning), entry.slots.get(meaning)) {
+                    (Some(a), Some(b)) => work.push((a, b)),
+                    (None, Some(b)) => destination.slots.set(meaning, b),
+                    _ => {}
                 }
+            }
+            let Some(alias) = entry.alias else {
+                continue;
+            };
+            let Some(kept) = destination.alias else {
+                destination.alias = Some(alias);
+                continue;
+            };
+            // TypeScript reports both declarations; the first export stays
+            // where neither file's bindings are checked.
+            if let Some(checked) = [kept, alias]
+                .into_iter()
+                .find(|alias| self.checks_bindings(alias.file))
+            {
+                let span = self.facts(checked.file).aliases[checked.id.index()].span;
+                return Err(self.error(
+                    ProjectErrorKind::Binding,
+                    checked.file,
+                    span,
+                    format!("merged declarations both export `{name}`"),
+                ));
             }
         }
         Ok(())
@@ -967,13 +1124,12 @@ impl<'p> Linker<'p> {
     ) -> Result<()> {
         let symbol = self.find(symbol);
         let mut merge = Vec::new();
-        let entry = self.tables[table].entry(name.to_string()).or_default();
-        for (index, bit) in BITS.iter().enumerate() {
-            if meanings & bit == 0 {
-                continue;
-            }
-            match entry.slots[index] {
-                None => entry.slots[index] = Some(symbol),
+        let entry = self.tables[table.index()]
+            .entry(name.to_string())
+            .or_default();
+        for meaning in each(meanings) {
+            match entry.slots.get(meaning) {
+                None => entry.slots.set(meaning, symbol),
                 Some(other) => merge.push(other),
             }
         }
@@ -995,30 +1151,20 @@ impl<'p> Linker<'p> {
         Ok(())
     }
 
-    fn bind_alias(&mut self, file: FileId, index: u32) -> Result<()> {
-        let alias = &self.facts(file).aliases[index as usize];
-        let reference = AliasRef { file, index };
+    fn bind_alias(&mut self, file: FileId, index: AliasId) -> Result<()> {
+        let alias = &self.facts(file).aliases[index.index()];
+        let reference = AliasRef { file, id: index };
         let span = alias.span;
-        let host = match &alias.bind {
-            AliasBind::Export { host, .. } | AliasBind::Both { host, .. } => Some(*host),
-            _ => None,
-        };
-        let tolerated = host.is_some_and(|host| self.tolerated(file, host));
         let bind = |linker: &mut Self, table: Option<TableId>, name: &str| -> Result<()> {
-            if table.is_none() && tolerated {
+            // An ignored augmentation binds nothing.
+            let Some(table) = table else {
                 return Ok(());
-            }
-            let table = table.ok_or_else(|| {
-                linker.error(
-                    ProjectErrorKind::Binding,
-                    file,
-                    span,
-                    format!("no module to export `{name}` from"),
-                )
-            })?;
-            let entry = linker.tables[table].entry(name.to_string()).or_default();
+            };
+            let entry = linker.tables[table.index()]
+                .entry(name.to_string())
+                .or_default();
             if entry.alias.is_some() {
-                if linker.search(file) {
+                if linker.checks_bindings(file) {
                     return Err(linker.error(
                         ProjectErrorKind::Binding,
                         file,
@@ -1029,7 +1175,7 @@ impl<'p> Linker<'p> {
                 return Ok(());
             }
             entry.alias = Some(reference);
-            if entry.slots.iter().any(Option::is_some) {
+            if !entry.slots.is_empty() {
                 linker.conflicts.push((table, name.to_string(), file, span));
             }
             Ok(())
@@ -1057,47 +1203,76 @@ impl<'p> Linker<'p> {
 
     fn state(&self, task: Task) -> &State {
         match task {
-            Task::Alias(a) => &self.alias_states[a.file.index()][a.index as usize],
-            Task::Ref(r) => &self.ref_states[r.file.index()][r.index as usize],
+            Task::Alias(a) => &self.alias_states[a.file.index()][a.id.index()],
+            Task::Ref(r) => &self.ref_states[r.file.index()][r.id.index()],
         }
     }
     fn set_state(&mut self, task: Task, state: State) {
         match task {
-            Task::Alias(a) => self.alias_states[a.file.index()][a.index as usize] = state,
-            Task::Ref(r) => self.ref_states[r.file.index()][r.index as usize] = state,
+            Task::Alias(a) => self.alias_states[a.file.index()][a.id.index()] = state,
+            Task::Ref(r) => self.ref_states[r.file.index()][r.id.index()] = state,
         }
     }
 
-    /// Resolve `task` and everything it needs with an explicit stack. A task
-    /// that needs one of its own dependents is circular and unresolved.
+    /// Resolve `task` and everything it needs with an explicit stack. Each
+    /// task on the stack needs the one above it, so a task that needs one
+    /// still in progress closes a cycle through every task between them. All
+    /// of them are unresolved, whichever task resolution happened to start
+    /// from; deciding only the task that detects the cycle would let the
+    /// others' results depend on file order.
     fn force(&mut self, task: Task) -> Resolution {
-        let mut stack = vec![task];
-        while let Some(&top) = stack.last() {
+        // Each frame records whether a fill edge from the frame below pushed it.
+        let mut stack = vec![(task, false)];
+        while let Some(&(top, _)) = stack.last() {
             if let State::Done(_) = self.state(top) {
                 stack.pop();
                 continue;
             }
             self.set_state(top, State::InProgress);
+            self.running = Some(top);
             let step = match top {
                 Task::Alias(alias) => self.try_alias(alias),
                 Task::Ref(reference) => self.try_ref(reference),
             };
+            self.running = None;
             match step {
                 Step::Done(resolution) => {
                     self.set_state(top, State::Done(resolution));
                     stack.pop();
                 }
-                Step::Need(dependency) => {
-                    if let State::InProgress = self.state(dependency) {
-                        self.set_state(
-                            top,
-                            State::Done(Resolution::Unresolved("circular alias".into())),
-                        );
-                        stack.pop();
-                    } else {
-                        stack.push(dependency);
+                Step::Need(need) if matches!(self.state(need.task), State::InProgress) => {
+                    let start = stack
+                        .iter()
+                        .position(|&(task, _)| task == need.task)
+                        .expect("a task in progress is on the stack");
+                    // The cycle's edges: frame to frame, then `top` back to `start`.
+                    let mut fills = (start + 1..stack.len())
+                        .filter(|&index| stack[index].1)
+                        .map(|index| (index - 1, stack[index].0))
+                        .collect::<Vec<_>>();
+                    if need.fill {
+                        fills.push((stack.len() - 1, need.task));
+                    }
+                    let Some(&(lowest, _)) = fills.first() else {
+                        for (member, _) in stack.drain(start..) {
+                            self.set_state(
+                                member,
+                                State::Done(Resolution::Unresolved("circular alias".into())),
+                            );
+                        }
+                        continue;
+                    };
+                    for &(tail, head) in &fills {
+                        self.cuts.insert((stack[tail].0, head));
+                        self.cut_tasks.insert(stack[tail].0);
+                    }
+                    // Rerun from the lowest cut tail; tasks above it resume
+                    // when it needs them again.
+                    for (member, _) in stack.drain(lowest + 1..) {
+                        self.set_state(member, State::Unvisited);
                     }
                 }
+                Step::Need(need) => stack.push((need.task, need.fill)),
             }
         }
         match self.state(task) {
@@ -1113,109 +1288,78 @@ impl<'p> Linker<'p> {
         }
     }
 
-    /// Check one table for `name` in `mask`. A mask of every meaning returns
+    /// Probe one table for `name` in `mask`. A mask of every meaning returns
     /// the first entry's meanings, as for export specifiers.
-    fn check(&self, table: TableId, name: &str, mask: u8, type_context: bool) -> Check {
-        self.check_entry(table, name, mask, type_context, false)
+    fn probe(&self, table: TableId, name: &str, mask: u8, type_context: bool) -> Probe {
+        self.probe_entry(table, name, mask, type_context, false)
     }
 
-    /// `check` for a lexical lookup, to which export specifiers are invisible
+    /// `probe` for a lexical lookup, to which export specifiers are invisible
     /// even in the export table of an enclosing namespace.
-    fn check_lexical(&self, table: TableId, name: &str, mask: u8, type_context: bool) -> Check {
-        self.check_entry(table, name, mask, type_context, true)
+    fn probe_lexical(&self, table: TableId, name: &str, mask: u8, type_context: bool) -> Probe {
+        self.probe_entry(table, name, mask, type_context, true)
     }
 
-    fn check_entry(
+    fn probe_entry(
         &self,
         table: TableId,
         name: &str,
         mask: u8,
         type_context: bool,
         lexical: bool,
-    ) -> Check {
-        let Some(entry) = self.tables[table].get(name) else {
-            return Check::Missing;
+    ) -> Probe {
+        let Some(entry) = self.tables[table.index()].get(name) else {
+            return Probe::Missing;
         };
-        let mut slots: Slots = [None; 3];
-        for (index, bit) in BITS.iter().enumerate() {
-            if mask & bit != 0 {
-                slots[index] = entry.slots[index].map(|symbol| self.find(symbol));
-            }
-        }
-        let mut type_only = false;
+        let mut found =
+            Meanings::new(entry.slots.map(|symbol| self.find(symbol))).select(mask, type_context);
         let alias = entry.alias.filter(|alias| {
-            !lexical || !self.facts(alias.file).aliases[alias.index as usize].export_only
+            !lexical || !self.facts(alias.file).aliases[alias.id.index()].export_only
         });
         if let Some(alias) = alias {
-            let needed = BITS
-                .iter()
-                .enumerate()
-                .any(|(index, bit)| mask & bit != 0 && slots[index].is_none());
-            if needed {
-                match self.done(Task::Alias(alias)) {
-                    None => return Check::Need(Task::Alias(alias)),
-                    Some(Resolution::Found {
-                        slots: targets,
-                        type_only: restricted,
-                    }) => {
-                        for (index, bit) in BITS.iter().enumerate() {
-                            // Only a value lookup is blocked; an all-meaning
-                            // alias keeps the restriction for its own uses.
-                            let value_blocked =
-                                *restricted && mask == meaning::VALUE && !type_context;
-                            if mask & bit != 0 && slots[index].is_none() && !value_blocked {
-                                slots[index] = targets[index].map(|symbol| self.find(symbol));
-                                type_only |= *restricted && slots[index].is_some();
-                            }
-                        }
+            let task = Task::Alias(alias);
+            let cut = !found.is_empty()
+                && self
+                    .running
+                    .is_some_and(|running| self.cuts.contains(&(running, task)));
+            if found.needs(mask) && !cut {
+                match self.done(task) {
+                    None => {
+                        return Probe::Need(Need {
+                            task,
+                            fill: !found.is_empty(),
+                        });
                     }
-                    Some(other) => {
-                        if slots.iter().all(Option::is_none) {
-                            return Check::Found(other.clone());
-                        }
+                    Some(Resolution::Found(targets)) => {
+                        found.fill_missing(*targets, mask, type_context)
                     }
+                    Some(other) if found.is_empty() => return Probe::Found(other.clone()),
+                    Some(_) => {}
                 }
             }
         }
-        if slots.iter().any(Option::is_some) {
-            Check::Found(Resolution::Found { slots, type_only })
+        if found.is_empty() {
+            Probe::Missing
         } else {
-            Check::Missing
+            Probe::Found(Resolution::Found(found))
         }
     }
 
     /// Tables consulted for a scope: its locals, then any export table whose
     /// members are visible inside it.
-    fn lookup_tables(&self, file: FileId, scope: u32) -> SmallVec<[TableId; 2]> {
-        let facts = self.facts(file);
-        let own = self.scope_tables[file.index()][scope as usize];
+    fn lookup_tables(&self, file: FileId, scope: ScopeId) -> SmallVec<[TableId; 2]> {
         let mut tables = SmallVec::new();
-        match facts.scopes[scope as usize].kind {
-            ScopeKind::Root if !self.file(file).module => tables.push(GLOBAL),
-            ScopeKind::Global => tables.push(GLOBAL),
-            ScopeKind::Members { decl } => {
-                if let Some(symbol) = self.decl_symbols[file.index()][decl as usize] {
+        match self.storage(file, scope) {
+            Storage::Global => tables.push(GLOBAL),
+            Storage::Members(decl) => {
+                if let Some(symbol) = self.decl_symbols[file.index()][decl.index()] {
                     tables.extend(self.symbol(symbol).members);
                 }
             }
-            ScopeKind::Namespace { decl } => {
-                tables.extend(own);
-                if let Some(symbol) = self.decl_symbols[file.index()][decl as usize] {
-                    tables.extend(self.symbol(symbol).exports);
-                }
+            Storage::Own(host) => {
+                tables.extend(self.scope_tables[file.index()][scope.index()]);
+                tables.extend(host.and_then(|host| self.visible_exports(file, host)));
             }
-            ScopeKind::AmbientModule { .. } | ScopeKind::Augmentation { .. } => {
-                tables.extend(own);
-                let host = match facts.scopes[scope as usize].kind {
-                    ScopeKind::AmbientModule { module } => Host::AmbientModule(module),
-                    ScopeKind::Augmentation { request } => Host::Augmentation(request),
-                    _ => unreachable!(),
-                };
-                if let Some(module) = self.host_module(file, host) {
-                    tables.push(self.modules[module].exports);
-                }
-            }
-            _ => tables.extend(own),
         }
         tables
     }
@@ -1224,7 +1368,7 @@ impl<'p> Linker<'p> {
     fn lookup(
         &self,
         file: FileId,
-        scope: u32,
+        scope: ScopeId,
         name: &str,
         mask: u8,
         type_context: bool,
@@ -1233,22 +1377,22 @@ impl<'p> Linker<'p> {
         let mut current = Some(scope);
         let mut global = false;
         while let Some(index) = current {
-            let scope = &facts.scopes[index as usize];
+            let scope = &facts.scopes[index.index()];
             // An infer constraint sees only its own declaration's name.
             if let ScopeKind::InferConstraint { decl } = scope.kind {
-                let own = &facts.decls[decl as usize];
+                let own = &facts.decls[decl.index()];
                 if own.name == name && mask & meaning::TYPE != 0 {
-                    if let Some(symbol) = self.decl_symbols[file.index()][decl as usize] {
-                        return Step::Done(Resolution::Found {
-                            slots: [None, Some(self.find(symbol)), None],
-                            type_only: false,
-                        });
+                    if let Some(symbol) = self.decl_symbols[file.index()][decl.index()] {
+                        return Step::Done(Resolution::Found(Meanings::new(Slots::only(
+                            meaning::TYPE,
+                            self.find(symbol),
+                        ))));
                     }
                 }
             }
             // Enum initializers see the enum's members, which are not targets.
             if let ScopeKind::Enum { decl } = scope.kind {
-                let member = self.decl_symbols[file.index()][decl as usize].is_some_and(|symbol| {
+                let member = self.decl_symbols[file.index()][decl.index()].is_some_and(|symbol| {
                     self.symbol(symbol).enum_members.iter().any(|m| m == name)
                 });
                 if member {
@@ -1257,10 +1401,10 @@ impl<'p> Linker<'p> {
             }
             for table in self.lookup_tables(file, index) {
                 global |= table == GLOBAL;
-                match self.check_lexical(table, name, mask, type_context) {
-                    Check::Found(resolution) => return Step::Done(resolution),
-                    Check::Need(task) => return Step::Need(task),
-                    Check::Missing => {}
+                match self.probe_lexical(table, name, mask, type_context) {
+                    Probe::Found(resolution) => return Step::Done(resolution),
+                    Probe::Need(task) => return Step::Need(task),
+                    Probe::Missing => {}
                 }
             }
             // A non-arrow function binds `arguments` around its parameters
@@ -1274,27 +1418,29 @@ impl<'p> Linker<'p> {
             current = scope.parent;
         }
         if !global {
-            match self.check_lexical(GLOBAL, name, mask, type_context) {
-                Check::Found(resolution) => return Step::Done(resolution),
-                Check::Need(task) => return Step::Need(task),
-                Check::Missing => {}
+            match self.probe_lexical(GLOBAL, name, mask, type_context) {
+                Probe::Found(resolution) => return Step::Done(resolution),
+                Probe::Need(task) => return Step::Need(task),
+                Probe::Missing => {}
             }
         }
         Step::Done(match name {
-            "globalThis" => Resolution::NotReference(GLOBAL_THIS),
+            "globalThis" => Resolution::GlobalThis,
             "undefined" => Resolution::NotReference("built-in value"),
             _ => Resolution::Unresolved(format!("cannot find `{name}`")),
         })
     }
 
-    fn module_slots(&self, module: ModuleId) -> Slots {
-        let symbol = Some(self.modules[module].symbol);
-        [symbol, None, symbol]
-    }
-
     /// An export of a module, following `export =`, local exports, and star
     /// re-exports. Conflicting star exports are ambiguous.
     fn resolve_export(&mut self, module: ModuleId, name: &str) -> Step<Resolution> {
+        // A task with cuts sees a lookup no other task shares.
+        let shared = !self
+            .running
+            .is_some_and(|task| self.cut_tasks.contains(&task));
+        if !shared {
+            return self.resolve_export_uncached(module, name);
+        }
         if let Some(resolution) = self.export_memo.get(&(module, name.to_string())) {
             return Step::Done(resolution.clone());
         }
@@ -1306,42 +1452,44 @@ impl<'p> Linker<'p> {
         step
     }
 
-    fn resolve_export_uncached(&self, module: ModuleId, name: &str) -> Step<Resolution> {
+    fn resolve_export_uncached(&mut self, module: ModuleId, name: &str) -> Step<Resolution> {
         let mut current = module;
         let mut type_only = false;
         let mut seen = HashSet::from([module]);
         loop {
-            if self.modules[current].shorthand {
-                return Step::Done(Resolution::Found {
-                    slots: [Some(self.modules[current].symbol); 3],
-                    type_only,
-                });
+            // A shorthand module lists no exports, so each has whatever
+            // meaning its use asks for, unlike the module's own meanings.
+            if self.modules[current.index()].shorthand {
+                let symbol = self.modules[current.index()].symbol;
+                return Step::Done(Resolution::Found(
+                    Meanings::new(Slots::only(meaning::ALL, symbol)).restrict(type_only),
+                ));
             }
-            let exports = self.modules[current].exports;
+            let exports = self.modules[current.index()].exports;
             // Explicit exports, including type exports beside `export =`.
             if name != "export=" {
-                match self.check(exports, name, meaning::ALL, true) {
-                    Check::Found(resolution) => return Step::Done(restrict(resolution, type_only)),
-                    Check::Need(task) => return Step::Need(task),
-                    Check::Missing => {}
+                match self.probe(exports, name, meaning::ALL, true) {
+                    Probe::Found(resolution) => return Step::Done(restrict(resolution, type_only)),
+                    Probe::Need(task) => return Step::Need(task),
+                    Probe::Missing => {}
                 }
             }
-            if !self.tables[exports].contains_key("export=") || name == "export=" {
+            if !self.tables[exports.index()].contains_key("export=") || name == "export=" {
                 break;
             }
-            let (slots, restricted) = match self.check(exports, "export=", meaning::ALL, true) {
-                Check::Need(task) => return Step::Need(task),
-                Check::Found(Resolution::Found { slots, type_only }) => (slots, type_only),
-                Check::Found(other) => return Step::Done(other),
-                Check::Missing => unreachable!("entry exists"),
+            let found = match self.probe(exports, "export=", meaning::ALL, true) {
+                Probe::Need(task) => return Step::Need(task),
+                Probe::Found(Resolution::Found(found)) => found,
+                Probe::Found(other) => return Step::Done(other),
+                Probe::Missing => unreachable!("entry exists"),
             };
-            type_only |= restricted;
             if name == "default" {
-                return Step::Done(Resolution::Found { slots, type_only });
+                return Step::Done(Resolution::Found(found.restrict(type_only)));
             }
+            type_only |= found.members_type_only(Reach::ExportAssignment);
             // An `export =` of another module object exposes its exports.
-            let target = slots[2]
-                .or(slots[0])
+            let target = found
+                .container()
                 .and_then(|container| self.symbol(container).module);
             if let Some(target) = target {
                 if !seen.insert(target) {
@@ -1350,13 +1498,10 @@ impl<'p> Linker<'p> {
                 current = target;
                 continue;
             }
-            return Step::Done(
-                match self.namespace_member(slots, name, meaning::ALL, true) {
-                    Check::Need(task) => return Step::Need(task),
-                    Check::Found(resolution) => restrict(resolution, type_only),
-                    Check::Missing => Resolution::Unresolved(format!("`{name}` is not exported")),
-                },
-            );
+            return match self.member(found, name, meaning::ALL, true) {
+                Step::Done(resolution) => Step::Done(restrict(resolution, type_only)),
+                need => need,
+            };
         }
         if name == "default" {
             return Step::Done(Resolution::Unresolved("no default export".into()));
@@ -1369,13 +1514,17 @@ impl<'p> Linker<'p> {
     /// different declarations make the name ambiguous.
     fn star_export(&self, module: ModuleId, name: &str, type_only: bool) -> Step<Resolution> {
         let mut best: HashMap<ModuleId, bool> = HashMap::from([(module, type_only)]);
-        let mut stack: Vec<(ModuleId, bool)> = self.modules[module]
+        let mut stack: Vec<(ModuleId, bool)> = self.modules[module.index()]
             .stars
             .iter()
             .rev()
             .map(|&(star, star_type_only)| (star, type_only || star_type_only))
             .collect();
-        let mut found: Vec<(Slots, bool)> = Vec::new();
+        let mut found: Vec<Meanings> = Vec::new();
+        // Routes whose export of `name` does not resolve. They still export
+        // the name, as TypeScript counts them: alone, the failure is the
+        // result; beside another route, the name is ambiguous (TS2308).
+        let mut failed: Vec<(ModuleId, Resolution)> = Vec::new();
         while let Some((star, route_type_only)) = stack.pop() {
             match best.get(&star) {
                 Some(&previous) if previous <= route_type_only => continue,
@@ -1383,142 +1532,152 @@ impl<'p> Linker<'p> {
                     best.insert(star, route_type_only);
                 }
             }
-            if self.modules[star].shorthand {
+            if self.modules[star.index()].shorthand {
                 continue;
             }
-            match self.check(self.modules[star].exports, name, meaning::ALL, true) {
-                Check::Need(task) => return Step::Need(task),
-                Check::Found(Resolution::Found { slots, type_only }) => {
-                    let restricted = type_only || route_type_only;
-                    match found.iter_mut().find(|(other, _)| *other == slots) {
-                        Some((_, existing)) => *existing &= restricted,
-                        None => found.push((slots, restricted)),
+            match self.probe(self.modules[star.index()].exports, name, meaning::ALL, true) {
+                Probe::Need(task) => return Step::Need(task),
+                Probe::Found(Resolution::Found(targets)) => {
+                    let targets = targets.restrict(route_type_only);
+                    match found
+                        .iter_mut()
+                        .find(|other| other.targets() == targets.targets())
+                    {
+                        Some(existing) => existing.merge_routes(targets),
+                        None => found.push(targets),
                     }
                 }
-                Check::Found(_) => {}
-                Check::Missing => {
-                    for &(next, next_type_only) in self.modules[star].stars.iter().rev() {
+                Probe::Found(resolution) => {
+                    if !failed.iter().any(|(module, _)| *module == star) {
+                        failed.push((star, resolution));
+                    }
+                }
+                Probe::Missing => {
+                    for &(next, next_type_only) in self.modules[star.index()].stars.iter().rev() {
                         stack.push((next, next_type_only || route_type_only));
                     }
                 }
             }
         }
-        Step::Done(match found.as_slice() {
-            [] => Resolution::Unresolved(format!("`{name}` is not exported")),
-            [(slots, type_only)] => Resolution::Found {
-                slots: *slots,
-                type_only: *type_only,
-            },
+        Step::Done(match (found.as_slice(), failed.len()) {
+            ([], 0) => Resolution::Unresolved(format!("`{name}` is not exported")),
+            ([targets], 0) => Resolution::Found(*targets),
+            ([], 1) => failed.pop().unwrap().1,
             _ => Resolution::Unresolved(format!("`{name}` is ambiguous among star exports")),
         })
     }
 
-    /// A member of the namespace-like target among `slots`: a namespace's
-    /// exports or a module's exports. Other targets have properties or
-    /// members, which are not reference targets.
-    fn namespace_member(&self, slots: Slots, name: &str, mask: u8, type_context: bool) -> Check {
-        let Some(container) = slots[2].or(slots[0]) else {
-            return Check::Found(Resolution::NotReference("property"));
+    /// A member of the namespace-like target of `qualifier`: an export of a
+    /// module or a namespace. Other targets have properties or members, which
+    /// are not reference targets.
+    fn member(
+        &mut self,
+        qualifier: Meanings,
+        name: &str,
+        mask: u8,
+        type_context: bool,
+    ) -> Step<Resolution> {
+        let Some(container) = qualifier.container() else {
+            return Step::Done(Resolution::NotReference("property"));
         };
-        // A same-named value beside a namespace has properties of its own.
-        let value = slots[0].filter(|&value| self.find(value) != self.find(container));
-        let symbol = self.symbol(container);
-        if symbol.module.is_some() {
-            // Modules are resolved through `resolve_export`, which needs `&mut`.
-            return Check::Missing;
+        if let Some(module) = self.symbol(container).module {
+            return self.module_member(module, name);
         }
+        // A same-named value beside a namespace has properties of its own.
+        let value = qualifier
+            .targets()
+            .value()
+            .filter(|&value| self.find(value) != self.find(container));
+        let symbol = self.symbol(container);
         if let Some(exports) = symbol.exports {
-            match self.check(exports, name, mask, type_context) {
-                Check::Missing => {}
-                other => return other,
+            match self.probe(exports, name, mask, type_context) {
+                Probe::Found(resolution) => return Step::Done(resolution),
+                Probe::Need(task) => return Step::Need(task),
+                Probe::Missing => {}
             }
         }
         let member_kinds =
             flags::CLASS | flags::FUNCTION | flags::FUNCTION_SCOPED | flags::BLOCK_SCOPED;
-        Check::Found(if symbol.flags & flags::ENUM != 0 {
+        Step::Done(if symbol.flags & flags::ENUM != 0 {
             Resolution::NotReference("enum member")
-        } else if symbol.flags & member_kinds != 0 || symbol.exports.is_none() || value.is_some() {
+        } else if symbol.flags & member_kinds != 0
+            || value.is_some()
+            // A namespace that exports nothing has no export table either.
+            || symbol.exports.is_none() && symbol.flags & flags::NAMESPACE == 0
+        {
             Resolution::NotReference("property")
         } else {
             Resolution::Unresolved(format!("namespace has no exported member `{name}`"))
         })
     }
 
+    /// An export of a module named by a qualifier. A shorthand ambient
+    /// module does not list its exports.
+    fn module_member(&mut self, module: ModuleId, name: &str) -> Step<Resolution> {
+        if self.modules[module.index()].shorthand {
+            return Step::Done(Resolution::Unresolved(format!(
+                "`{name}` is a member of a shorthand ambient module"
+            )));
+        }
+        self.resolve_export(module, name)
+    }
+
     /// A member of `globalThis`: a global type, or a global value other than
     /// a block-scoped variable.
     fn global_member(&self, name: &str, mask: u8, type_context: bool) -> Step<Resolution> {
-        let mut slots = match self.check(GLOBAL, name, mask, type_context) {
-            Check::Need(task) => return Step::Need(task),
-            Check::Found(Resolution::Found { slots, .. }) => slots,
-            _ => [None; 3],
+        let found = match self.probe(GLOBAL, name, mask, type_context) {
+            Probe::Need(task) => return Step::Need(task),
+            Probe::Found(Resolution::Found(found)) => Some(found),
+            _ => None,
         };
-        if slots[0].is_some_and(|value| self.symbol(value).flags & flags::BLOCK_SCOPED != 0) {
-            slots[0] = None;
-        }
-        Step::Done(if slots.iter().any(Option::is_some) {
-            Resolution::Found {
-                slots,
-                type_only: false,
-            }
-        } else {
-            Resolution::Unresolved(format!("`{name}` is not a global property"))
-        })
-    }
-
-    /// Every meaning of the symbols found for some meanings, as when
-    /// `import M = N` finds `N` as a namespace and aliases all of it.
-    fn all_meanings(&self, slots: Slots) -> Slots {
-        let mut all = slots;
-        for symbol in slots.into_iter().flatten() {
-            let meanings = self.meanings_of(symbol);
-            for (index, bit) in BITS.iter().enumerate() {
-                if meanings & bit != 0 && all[index].is_none() {
-                    all[index] = Some(symbol);
+        let found = found
+            .map(|found| match found.targets().value() {
+                Some(value) if self.symbol(value).flags & flags::BLOCK_SCOPED != 0 => {
+                    found.without_value()
                 }
-            }
-        }
-        all
+                _ => found,
+            })
+            .filter(|found| !found.is_empty());
+        Step::Done(match found {
+            Some(found) => Resolution::Found(found),
+            None => Resolution::Unresolved(format!("`{name}` is not a global property")),
+        })
     }
 
     /// What a namespace import, `import = require`, or UMD global denotes:
     /// the module's `export =` target, or the module itself.
     fn module_object(&self, module: ModuleId) -> Step<Resolution> {
-        let exports = self.modules[module].exports;
-        if !self.tables[exports].contains_key("export=") {
-            return Step::Done(Resolution::Found {
-                slots: self.module_slots(module),
-                type_only: false,
-            });
+        let exports = self.modules[module.index()].exports;
+        if !self.tables[exports.index()].contains_key("export=") {
+            let symbol = self.modules[module.index()].symbol;
+            return Step::Done(Resolution::Found(Meanings::new(Slots::only(
+                self.meanings_of(symbol),
+                symbol,
+            ))));
         }
-        match self.check(exports, "export=", meaning::ALL, true) {
-            Check::Need(task) => Step::Need(task),
-            Check::Found(resolution) => Step::Done(resolution),
-            Check::Missing => unreachable!("entry exists"),
+        match self.probe(exports, "export=", meaning::ALL, true) {
+            Probe::Need(task) => Step::Need(task),
+            Probe::Found(resolution) => Step::Done(resolution),
+            Probe::Missing => unreachable!("entry exists"),
         }
     }
 
     fn try_alias(&mut self, alias: AliasRef) -> Step<Resolution> {
         let facts = self.facts(alias.file);
-        let data = &facts.aliases[alias.index as usize];
-        let restrict = |resolution: Resolution| match resolution {
-            Resolution::Found { slots, type_only } => Resolution::Found {
-                slots,
-                type_only: type_only || data.type_only,
-            },
-            other => other,
-        };
+        let data = &facts.aliases[alias.id.index()];
         let step = match &data.kind {
             AliasKind::Import { request, name } => {
-                match self.targets[alias.file.index()][*request as usize] {
-                    RequestTarget::Module(module) => match self.resolve_export(module, name) {
-                        // A default import of a declaration module without
-                        // a default export or an `__esModule` marker is its
-                        // module object (synthetic default).
+                match self.request_module(alias.file, *request) {
+                    Ok(module) => match self.resolve_export(module, name) {
+                        // A default import of a declaration module without a
+                        // default export or an `__esModule` marker is its module
+                        // object (synthetic default).
                         Step::Done(Resolution::Unresolved(_))
                             if name == "default"
-                                && self.modules[module].declaration
+                                && self.modules[module.index()].declaration
                                 && !["default", "__esModule"].iter().any(|name| {
-                                    self.tables[self.modules[module].exports].contains_key(*name)
+                                    self.tables[self.modules[module.index()].exports.index()]
+                                        .contains_key(*name)
                                 })
                                 && matches!(data.bind, AliasBind::Lexical { .. }) =>
                         {
@@ -1526,25 +1685,13 @@ impl<'p> Linker<'p> {
                         }
                         step => step,
                     },
-                    RequestTarget::Script => Step::Done(Resolution::Unresolved(
-                        "imported file is not a module".into(),
-                    )),
-                    RequestTarget::Ignored => {
-                        Step::Done(Resolution::Unresolved("module is not resolved".into()))
-                    }
+                    Err(why) => Step::Done(Resolution::Unresolved(why.into())),
                 }
             }
-            AliasKind::Namespace { request } => {
-                match self.targets[alias.file.index()][*request as usize] {
-                    RequestTarget::Module(module) => self.module_object(module),
-                    RequestTarget::Script => Step::Done(Resolution::Unresolved(
-                        "imported file is not a module".into(),
-                    )),
-                    RequestTarget::Ignored => {
-                        Step::Done(Resolution::Unresolved("module is not resolved".into()))
-                    }
-                }
-            }
+            AliasKind::Namespace { request } => match self.request_module(alias.file, *request) {
+                Ok(module) => self.module_object(module),
+                Err(why) => Step::Done(Resolution::Unresolved(why.into())),
+            },
             AliasKind::SelfModule => match self.file_modules[alias.file.index()] {
                 Some(module) => self.module_object(module),
                 None => Step::Done(Resolution::Unresolved("file is not a module".into())),
@@ -1555,43 +1702,42 @@ impl<'p> Linker<'p> {
             AliasKind::Entity { reference, expand } => {
                 let task = Task::Ref(RefRef {
                     file: alias.file,
-                    index: *reference,
+                    id: *reference,
                 });
                 match self.done(task) {
-                    Some(Resolution::Found { slots, type_only }) if *expand => {
-                        Step::Done(Resolution::Found {
-                            slots: self.all_meanings(*slots),
-                            type_only: *type_only,
-                        })
-                    }
+                    Some(Resolution::Found(found)) if *expand => Step::Done(Resolution::Found(
+                        found.expanded(|symbol| self.meanings_of(symbol)),
+                    )),
                     Some(resolution) => Step::Done(resolution.clone()),
-                    None => Step::Need(task),
+                    None => Step::Need(Need::required(task)),
                 }
             }
         };
         match step {
-            Step::Done(resolution) => Step::Done(restrict(resolution)),
+            Step::Done(resolution) => Step::Done(restrict(resolution, data.type_only)),
             need => need,
         }
     }
 
     fn try_ref(&mut self, reference: RefRef) -> Step<Resolution> {
         let facts = self.facts(reference.file);
-        let data = &facts.refs[reference.index as usize];
-        let name = facts.names[data.token as usize].text.as_str();
-        let found = match data.base {
+        let data = &facts.refs[reference.id.index()];
+        let name = facts.names[data.token.index()].text.as_str();
+        let step = match data.base {
+            // Lookup already selects the meanings the reference needs from
+            // each table it probes, by the same rule as `mask_resolution`.
             RefBase::Lexical(scope) => {
                 return self.lookup(reference.file, scope, name, data.meaning, data.type_context);
             }
             RefBase::Member(base) => {
                 let base = Task::Ref(RefRef {
                     file: reference.file,
-                    index: base,
+                    id: base,
                 });
-                let slots = match self.done(base) {
-                    None => return Step::Need(base),
-                    Some(Resolution::Found { slots, .. }) => *slots,
-                    Some(Resolution::NotReference(GLOBAL_THIS)) => {
+                let qualifier = match self.done(base) {
+                    None => return Step::Need(Need::required(base)),
+                    Some(Resolution::Found(found)) => *found,
+                    Some(Resolution::GlobalThis) => {
                         return self.global_member(name, data.meaning, data.type_context);
                     }
                     Some(Resolution::NotReference(_)) => {
@@ -1608,134 +1754,75 @@ impl<'p> Linker<'p> {
                         )));
                     }
                 };
-                let module = slots[2]
-                    .or(slots[0])
-                    .and_then(|container| self.symbol(container).module);
-                match module {
-                    Some(module) if self.modules[module].shorthand => Resolution::Unresolved(
-                        format!("`{name}` is a member of a shorthand ambient module"),
-                    ),
-                    Some(module) => match self.resolve_export(module, name) {
-                        Step::Need(task) => return Step::Need(task),
-                        Step::Done(resolution) => resolution,
-                    },
-                    None => {
-                        match self.namespace_member(slots, name, data.meaning, data.type_context) {
-                            Check::Need(task) => return Step::Need(task),
-                            Check::Found(resolution) => resolution,
-                            Check::Missing => {
-                                Resolution::Unresolved(format!("`{name}` is not exported"))
-                            }
-                        }
-                    }
+                match self.member(qualifier, name, data.meaning, data.type_context) {
+                    Step::Done(resolution) => Step::Done(restrict(
+                        resolution,
+                        qualifier.members_type_only(Reach::Qualified),
+                    )),
+                    need => need,
                 }
             }
-            RefBase::Module(request) => {
-                match self.targets[reference.file.index()][request as usize] {
-                    RequestTarget::Module(module) if self.modules[module].shorthand => {
-                        Resolution::Unresolved(format!(
-                            "`{name}` is a member of a shorthand ambient module"
-                        ))
-                    }
-                    RequestTarget::Module(module) => match self.resolve_export(module, name) {
-                        Step::Need(task) => return Step::Need(task),
-                        Step::Done(resolution) => resolution,
-                    },
-                    _ => Resolution::Unresolved("module is not resolved".into()),
-                }
-            }
+            RefBase::Module(request) => match self.request_module(reference.file, request) {
+                Ok(module) => self.module_member(module, name),
+                Err(why) => Step::Done(Resolution::Unresolved(why.into())),
+            },
         };
-        Step::Done(mask_resolution(
-            found,
-            data.meaning,
-            data.type_context,
-            name,
-        ))
+        match step {
+            Step::Done(found) => Step::Done(mask_resolution(
+                found,
+                data.meaning,
+                data.type_context,
+                name,
+            )),
+            need => need,
+        }
     }
 
     /// Resolve every searched occurrence and freeze the index.
     fn resolve_and_index(&mut self) -> Index {
-        let mut index = Index {
-            files: Vec::with_capacity(self.program.files.len()),
-            ..Index::default()
-        };
-        let mut strings = Strings::default();
+        let mut index = index::Builder::default();
         for file in self.file_ids() {
-            if !self.search(file) {
-                index.files.push(Vec::new());
-                continue;
-            }
-            let facts = self.facts(file);
-            let mut occurrences = Vec::with_capacity(facts.names.len());
-            for name in &facts.names {
-                let target = match name.target {
-                    NameTarget::Decl(decl) => {
-                        Target::Symbols(SmallVec::from_elem(self.decl_symbol(file, decl), 1))
-                    }
-                    NameTarget::Ref(reference) => {
-                        let resolution = self.force(Task::Ref(RefRef {
-                            file,
-                            index: reference,
-                        }));
-                        self.target(resolution, &mut strings)
-                    }
-                    NameTarget::Alias(alias) => {
-                        let resolution = self.force(Task::Alias(AliasRef { file, index: alias }));
-                        self.target(resolution, &mut strings)
-                    }
-                    NameTarget::NotReference(why) => Target::NotReference(why),
-                };
-                occurrences.push((name, target));
-            }
-            occurrences.sort_by_key(|(name, _)| name.span.start);
-            let mut records = Vec::with_capacity(occurrences.len());
-            for (position, (name, target)) in occurrences.into_iter().enumerate() {
-                let reference = OccurrenceRef {
-                    file,
-                    index: position as u32,
-                };
-                if let Target::Symbols(symbols) = &target {
-                    for symbol in symbols {
-                        index.by_symbol.entry(*symbol).or_default().push(reference);
-                    }
-                    if name.candidate {
-                        index
-                            .by_name
-                            .entry(name.text.clone())
-                            .or_default()
-                            .push(reference);
-                    }
-                } else if name.candidate {
-                    index
-                        .by_name
-                        .entry(name.text.clone())
-                        .or_default()
-                        .push(reference);
+            let mut tokens = Vec::new();
+            if self.search(file) {
+                let names = &self.facts(file).names;
+                tokens.reserve(names.len());
+                for name in names {
+                    let target = match name.target {
+                        NameTarget::Decl(decl) => {
+                            Target::Symbols(SmallVec::from_elem(self.decl_symbol(file, decl), 1))
+                        }
+                        NameTarget::Ref(reference) => {
+                            let resolution = self.force(Task::Ref(RefRef {
+                                file,
+                                id: reference,
+                            }));
+                            self.target(resolution, &mut index)
+                        }
+                        NameTarget::Alias(alias) => {
+                            let resolution = self.force(Task::Alias(AliasRef { file, id: alias }));
+                            self.target(resolution, &mut index)
+                        }
+                        NameTarget::NotReference(why) => Target::NotReference(why),
+                    };
+                    tokens.push(Token {
+                        span: name.span,
+                        name: &name.text,
+                        roles: name.roles,
+                        candidate: name.candidate,
+                        target,
+                    });
                 }
-                records.push(Occurrence {
-                    span: name.span,
-                    name: strings.intern(&name.text),
-                    roles: name.roles,
-                    target,
-                });
             }
-            index.files.push(records);
+            index.add_file(file, tokens);
         }
-        let symbols: Vec<SymbolId> = index.by_symbol.keys().copied().collect();
-        for symbol in symbols {
-            index
-                .sites
-                .insert(symbol, self.symbol(symbol).sites.clone());
-        }
-        index.strings = strings.finish();
-        index
+        index.finish(|symbol| self.symbol(symbol).sites.clone())
     }
 
-    fn target(&self, resolution: Resolution, strings: &mut Strings) -> Target {
+    fn target(&self, resolution: Resolution, index: &mut index::Builder) -> Target {
         match resolution {
-            Resolution::Found { slots, .. } => {
+            Resolution::Found(found) => {
                 let mut symbols: SmallVec<[SymbolId; 2]> = SmallVec::new();
-                for symbol in slots.into_iter().flatten() {
+                for symbol in found.targets().symbols() {
                     let symbol = self.find(symbol);
                     if !symbols.contains(&symbol) {
                         symbols.push(symbol);
@@ -1743,25 +1830,38 @@ impl<'p> Linker<'p> {
                 }
                 Target::Symbols(symbols)
             }
+            Resolution::GlobalThis => Target::NotReference("built-in globalThis"),
             Resolution::NotReference(why) => Target::NotReference(why),
-            Resolution::Unresolved(why) => Target::Unresolved(strings.intern(&why)),
+            Resolution::Unresolved(why) => Target::Unresolved(index.intern(&why)),
         }
     }
 
     /// An import alias may not share a meaning with a local declaration.
     fn check_conflicts(&mut self) -> Result<()> {
         for (table, name, file, span) in std::mem::take(&mut self.conflicts) {
-            let Some(entry) = self.tables[table].get(&name) else {
+            let Some(entry) = self.tables[table.index()].get(&name) else {
                 continue;
             };
             let (Some(alias), slots) = (entry.alias, entry.slots) else {
                 continue;
             };
-            if let Resolution::Found { slots: targets, .. } = self.force(Task::Alias(alias)) {
-                let overlap = (0..3).any(|index| {
-                    matches!((slots[index], targets[index]), (Some(a), Some(b)) if self.find(a) != self.find(b))
+            if let Resolution::Found(found) = self.force(Task::Alias(alias)) {
+                let targets = found.targets();
+                // An export specifier of a local names that local; any other
+                // alias conflicts on a shared meaning even when it resolves
+                // back to the local itself, as an import cycling through its
+                // own module does (TypeScript's TS2440).
+                let local = matches!(
+                    self.facts(alias.file).aliases[alias.id.index()].kind,
+                    AliasKind::Lexical { .. }
+                );
+                let overlap = each(meaning::ALL).any(|meaning| {
+                    match (slots.get(meaning), targets.get(meaning)) {
+                        (Some(a), Some(b)) => !local || self.find(a) != self.find(b),
+                        _ => false,
+                    }
                 });
-                if overlap && self.search(file) {
+                if overlap && self.checks_bindings(file) {
                     return Err(self.error(
                         ProjectErrorKind::Binding,
                         file,
@@ -1780,7 +1880,7 @@ struct Declaring {
     kind: DeclKind,
     /// `symbol_flags` plus implementation and ambient-class facts.
     flags: u32,
-    list: Option<(FileId, u32)>,
+    list: Option<(FileId, TypeParameterListId)>,
     site: Site,
 }
 
@@ -1828,44 +1928,22 @@ fn identical_type_parameters<'a>(
 /// Mark a resolution reached through a type-only route.
 fn restrict(resolution: Resolution, type_only: bool) -> Resolution {
     match resolution {
-        Resolution::Found {
-            slots,
-            type_only: inner,
-        } => Resolution::Found {
-            slots,
-            type_only: inner || type_only,
-        },
+        Resolution::Found(found) => Resolution::Found(found.restrict(type_only)),
         other => other,
     }
 }
 
-/// Restrict a resolution to the meaning a reference needs.
+/// Select the meanings a reference needs, retaining each target's own access.
 fn mask_resolution(resolution: Resolution, mask: u8, type_context: bool, name: &str) -> Resolution {
     match resolution {
-        Resolution::Found { slots, type_only } => {
-            let mut masked = [None; 3];
-            for (index, bit) in BITS.iter().enumerate() {
-                if mask & bit != 0 && !(type_only && *bit == meaning::VALUE && !type_context) {
-                    masked[index] = slots[index];
-                }
-            }
-            if masked.iter().any(Option::is_some) {
-                Resolution::Found {
-                    slots: masked,
-                    type_only,
-                }
-            } else {
+        Resolution::Found(found) => {
+            let selected = found.select(mask, type_context);
+            if selected.is_empty() {
                 Resolution::Unresolved(format!("`{name}` has no matching meaning"))
+            } else {
+                Resolution::Found(selected)
             }
         }
         other => other,
     }
-}
-
-fn is_relative(specifier: &str) -> bool {
-    specifier.starts_with("./")
-        || specifier.starts_with("../")
-        || specifier == "."
-        || specifier == ".."
-        || specifier.starts_with('/')
 }

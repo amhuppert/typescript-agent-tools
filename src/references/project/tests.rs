@@ -10,16 +10,19 @@
 //!   `references` must be absent or empty.
 //! - `module` (`commonjs`, `es2015`…`esnext`, `node16`, `node18`, `node20`,
 //!   `nodenext`, `preserve`), `moduleResolution` (`node16`, `nodenext`,
-//!   `bundler`), `moduleDetection`, `jsx`, `paths`, `rootDirs`, `typeRoots`,
-//!   `types` (including `"*"`), `customConditions`, `moduleSuffixes`,
-//!   `preserveSymlinks`, `allowJs`, `resolveJsonModule`,
+//!   `bundler`), `moduleDetection`, `jsx`, `jsxImportSource`, `paths`,
+//!   `rootDirs`, `typeRoots`, `types` (including `"*"`), `customConditions`,
+//!   `moduleSuffixes`, `preserveSymlinks`, `allowJs`, `resolveJsonModule`,
 //!   `resolvePackageJsonExports`, `resolvePackageJsonImports`, `noLib`,
-//!   `outDir`, `declarationDir`, `rootDir`, `composite`.
+//!   `outDir`, `declarationDir`, `rootDir`, `composite`, `skipLibCheck`, and
+//!   `noUncheckedSideEffectImports`.
 //! - Rejected as unsupported: `baseUrl`, `moduleResolution` `node`/`node10`/
 //!   `classic`, `module` `amd`/`umd`/`system`, a non-empty `lib`,
 //!   `noResolve`, `noDtsResolution`, non-empty `references`, JavaScript or
 //!   JSON inputs, and `/// <reference lib>` without `noLib`.
-//! - Every other option is ignored; none affects the program graph.
+//! - Every other option is ignored: none affects the program graph, binding,
+//!   or which failures loading tolerates. A new option is read in
+//!   `config::convert`, listed here, and documented in docs/references.md.
 
 use super::*;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -163,7 +166,9 @@ fn extends_resolves_paths_against_the_declaring_configuration() {
         ("proj/ignored.ts", "export {}"),
     ]);
     let program = project.load("proj/tsconfig.json");
-    assert_eq!(program.config, project.root.join("proj/tsconfig.json"));
+    // Reported in the canonical directory that result paths are relative to.
+    let directory = std::fs::canonicalize(project.root.join("proj")).unwrap();
+    assert_eq!(program.config, directory.join("tsconfig.json"));
     assert_eq!(inputs(&program), ["../src/a.ts", "../lib/l.ts"]);
     assert_eq!(resolved(&program, "../src/a.ts", "@lib/l"), "../lib/l.ts");
     assert_eq!(searched(&program), ["../lib/l.ts", "../src/a.ts"]);
@@ -266,11 +271,20 @@ fn extends_errors_are_located() {
         (missing.kind, missing.position),
         (ProjectErrorKind::Config, position(1, 14))
     );
+    // A read failure is located at the `extends` value that named the file.
     let unreadable = project.error("unreadable.json");
-    assert_eq!(unreadable.kind, ProjectErrorKind::Io);
+    assert_eq!(
+        (unreadable.kind, unreadable.position),
+        (ProjectErrorKind::Io, position(1, 14))
+    );
     assert_eq!(
         project.display(unreadable.path.as_ref().unwrap()),
-        "nope.json"
+        "unreadable.json"
+    );
+    assert!(
+        unreadable.message.contains("nope.json"),
+        "{}",
+        unreadable.message
     );
     assert_eq!(project.error("package.json").kind, ProjectErrorKind::Config);
     let invalid = project.error("invalid.json");
@@ -1179,6 +1193,27 @@ fn paths_root_dirs_suffixes_and_type_roots() {
 }
 
 #[test]
+fn directory_options_take_one_form_and_match_whole_components() {
+    // Trailing separators in the configuration change nothing, and `src`
+    // does not contain `src-other`.
+    let project = Project::new(&[
+        (
+            "tsconfig.json",
+            r#"{ "compilerOptions": { "noLib": true, "rootDirs": ["src/", "./gen//"], "typeRoots": ["./types/"] }, "files": ["src/a.ts", "src-other/b.ts"] }"#,
+        ),
+        ("src/a.ts", "import \"./x\";\nimport \"t\";\n"),
+        ("src-other/b.ts", "import \"./y\";\n"),
+        ("gen/x.ts", ""),
+        ("gen/y.ts", ""),
+        ("types/t/index.d.ts", ""),
+    ]);
+    let program = project.load("tsconfig.json");
+    assert_eq!(resolved(&program, "src/a.ts", "./x"), "gen/x.ts");
+    assert_eq!(resolved(&program, "src/a.ts", "t"), "types/t/index.d.ts");
+    assert_eq!(resolved(&program, "src-other/b.ts", "./y"), "missing");
+}
+
+#[test]
 fn output_paths_in_exports_map_to_sources_only_with_a_fixed_root() {
     let project = Project::new(&[
         (
@@ -1820,10 +1855,12 @@ fn package_targets_fall_back_past_missing_candidates_but_not_null() {
 
 #[test]
 fn long_imports_chains_resolve_and_cycles_end() {
-    let mut imports: Vec<String> = (0..2000)
+    // The longest chain within the limit.
+    let length = resolve::MAX_IMPORTS_CHAIN - 1;
+    let mut imports: Vec<String> = (0..length)
         .map(|i| format!(r##""#a{i}": "#a{}""##, i + 1))
         .collect();
-    imports.push(r##""#a2000": "./lib.ts""##.into());
+    imports.push(format!(r##""#a{length}": "./lib.ts""##));
     imports.push(r##""#c0": "#c1", "#c1": "#c0""##.into());
     let manifest = format!("{{ \"imports\": {{ {} }} }}", imports.join(", "));
     let project = Project::new(&[
@@ -1841,7 +1878,7 @@ fn long_imports_chains_resolve_and_cycles_end() {
 }
 
 #[test]
-fn imports_chains_beyond_the_limit_are_unsupported() {
+fn imports_chains_beyond_the_limit_fail_the_load() {
     let limit = resolve::MAX_IMPORTS_CHAIN;
     let mut imports: Vec<String> = (0..=limit)
         .map(|i| format!(r##""#a{i}": "#a{}""##, i + 1))
@@ -1860,16 +1897,14 @@ fn imports_chains_beyond_the_limit_are_unsupported() {
     ]);
     let config = project.root.join("tsconfig.json");
     // Loading runs on a stack of this size.
-    let results = std::thread::Builder::new()
+    let error = std::thread::Builder::new()
         .stack_size(LOAD_STACK_BYTES)
-        .spawn(move || {
-            let program = load(&config).unwrap();
-            ["#a0", "#b"].map(|name| resolved(&program, "app.ts", name))
-        })
+        .spawn(move || load(&config).unwrap_err())
         .unwrap()
         .join()
         .unwrap();
-    assert_eq!(results, ["unsupported", "lib.ts"]);
+    assert_eq!(error.kind, ProjectErrorKind::Unsupported, "{error}");
+    assert_eq!(error.position, Some(SourcePosition { line: 1, column: 8 }));
 }
 
 #[test]
