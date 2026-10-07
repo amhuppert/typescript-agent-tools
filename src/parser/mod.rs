@@ -715,6 +715,9 @@ impl<'src> Parser<'src> {
     fn literal(&mut self) -> Result<NodeId> {
         self.literal_mode(false)
     }
+    /// TypeScript's `parseLiteralLikeNode`: preserve the token's cooked text
+    /// and scanner flags in the final literal node. Numeric flags follow
+    /// `scanNumber` and the scanner's radix-prefixed number branches.
     fn literal_mode(&mut self, allow_invalid_escape: bool) -> Result<NodeId> {
         let token = self.bump()?;
         let kind = match token.kind {
@@ -762,17 +765,12 @@ impl<'src> Parser<'src> {
             fields.push(("hasExtendedUnicodeEscape", extended_escape.into()));
         }
         if token.kind == Kind::Number && !token.raw.ends_with('n') {
-            let lower = token.raw.to_ascii_lowercase();
-            let mut flags = if lower.starts_with("0x") {
-                token_flags::HEX_SPECIFIER
-            } else if lower.starts_with("0b") {
-                token_flags::BINARY_SPECIFIER
-            } else if lower.starts_with("0o") {
-                token_flags::OCTAL_SPECIFIER
-            } else if lower.contains('e') {
-                token_flags::SCIENTIFIC
-            } else {
-                0
+            let mut flags = match token.raw.as_bytes() {
+                [b'0', b'x' | b'X', ..] => token_flags::HEX_SPECIFIER,
+                [b'0', b'b' | b'B', ..] => token_flags::BINARY_SPECIFIER,
+                [b'0', b'o' | b'O', ..] => token_flags::OCTAL_SPECIFIER,
+                _ if token.raw.contains(['e', 'E']) => token_flags::SCIENTIFIC,
+                _ => 0,
             };
             if token.raw.contains('_') {
                 flags |= token_flags::CONTAINS_SEPARATOR;

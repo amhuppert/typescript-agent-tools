@@ -90,7 +90,7 @@ pub(super) enum ModuleResolution {
 }
 
 pub(super) use ids::SymbolId;
-pub(super) use index::{Index, Occurrence, Target};
+pub(super) use index::{Index, IndexedLocation, Occurrence, Target};
 
 /// Occurrence role bits.
 pub(super) mod roles {

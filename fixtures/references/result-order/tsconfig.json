@@ -1,0 +1,4 @@
+{
+  "compilerOptions": { "noLib": true },
+  "files": ["z.ts", "a.ts"]
+}

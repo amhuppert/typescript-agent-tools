@@ -7,7 +7,6 @@ use super::{
     Location, NamedLocation, Occurrence, QueryError, QueryErrorKind, ReferenceGroup,
     ReferenceProject, ReferenceQuery, Role, SourcePosition,
 };
-use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 pub(super) fn find(
@@ -63,17 +62,16 @@ pub(super) fn find(
         .into_iter()
         .map(|symbol| group(project, index, symbol))
         .collect();
-    groups.sort_by(|a, b| {
-        let first = |group: &ReferenceGroup| {
-            group
-                .declarations
-                .first()
-                .map(|declaration| declaration.location.clone())
-                .or_else(|| group.occurrences.first().map(|o| o.location.clone()))
-        };
-        first(a).cmp(&first(b))
-    });
+    groups.sort_by(|a, b| first_location(a).cmp(&first_location(b)));
     Ok(groups)
+}
+
+fn first_location(group: &ReferenceGroup) -> Option<&Location> {
+    group
+        .declarations
+        .first()
+        .map(|declaration| &declaration.location)
+        .or_else(|| group.occurrences.first().map(|o| &o.location))
 }
 
 /// The symbols a selected token denotes. Both entry points fail on a token
@@ -108,37 +106,23 @@ fn selected<'a>(
 }
 
 fn group(project: &ReferenceProject, index: &Index, symbol: SymbolId) -> ReferenceGroup {
-    let mut declarations: Vec<NamedLocation> = index
+    let declarations: Vec<NamedLocation> = index
         .sites(symbol)
         .iter()
         .map(|site| NamedLocation {
             name: site.name.clone(),
-            location: location(project, site.file, site.span),
+            location: location(project, site.location),
         })
         .collect();
-    declarations.sort_by(|a, b| a.location.cmp(&b.location));
-    declarations.dedup();
-    let mut occurrences: BTreeMap<Location, Occurrence> = BTreeMap::new();
-    for &reference in index.occurrences_of(symbol) {
-        let occurrence = index.occurrence(reference);
-        let location = location(project, reference.file, occurrence.span);
-        let entry = occurrences
-            .entry(location.clone())
-            .or_insert_with(|| Occurrence {
-                name: index.text(occurrence.name).to_string(),
-                location,
-                roles: Vec::new(),
-            });
-        for role in role_list(occurrence.roles) {
-            if !entry.roles.contains(&role) {
-                entry.roles.push(role);
-            }
-        }
-    }
-    let mut occurrences: Vec<Occurrence> = occurrences.into_values().collect();
-    for occurrence in &mut occurrences {
-        occurrence.roles.sort();
-    }
+    let occurrences = index
+        .occurrences_of(symbol)
+        .iter()
+        .map(|occurrence| Occurrence {
+            name: index.text(occurrence.name).to_string(),
+            location: location(project, occurrence.location),
+            roles: role_list(occurrence.roles).collect(),
+        })
+        .collect();
     ReferenceGroup {
         declarations,
         occurrences,
@@ -157,12 +141,12 @@ fn role_list(bits: u8) -> impl Iterator<Item = Role> {
     .map(|(_, role)| role)
 }
 
-fn location(project: &ReferenceProject, file: FileId, span: crate::Span) -> Location {
-    let source = project.sources.get(file);
+fn location(project: &ReferenceProject, location: binding::IndexedLocation) -> Location {
+    let source = project.sources.get(location.file);
     Location {
         file: source.display.clone(),
-        start: source.text.position(span.start),
-        end: source.text.position(span.end),
+        start: location.start,
+        end: location.end,
     }
 }
 

@@ -2,7 +2,8 @@
 
 use super::ids::{OccurrenceId, StringId, SymbolId};
 use crate::Span;
-use crate::references::source::FileId;
+use crate::references::SourcePosition;
+use crate::references::source::{FileId, Sources};
 use smallvec::SmallVec;
 use std::collections::HashMap;
 
@@ -13,6 +14,44 @@ pub(crate) struct Site {
     pub(crate) file: FileId,
     pub(crate) span: Span,
     pub(crate) name: String,
+}
+
+/// A result location captured once, without an owned copy of its filename.
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct IndexedLocation {
+    pub(crate) file: FileId,
+    pub(crate) start: SourcePosition,
+    pub(crate) end: SourcePosition,
+}
+
+impl IndexedLocation {
+    fn new(sources: &Sources, file: FileId, span: Span) -> Self {
+        let text = &sources.get(file).text;
+        Self {
+            file,
+            start: text.position(span.start),
+            end: text.position(span.end),
+        }
+    }
+
+    /// The public `Location` order, using its display name rather than the
+    /// file's discovery order. No filenames are allocated for comparisons.
+    fn key(self, sources: &Sources) -> (&str, SourcePosition, SourcePosition) {
+        (&sources.get(self.file).display, self.start, self.end)
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct IndexedSite {
+    pub(crate) name: String,
+    pub(crate) location: IndexedLocation,
+}
+
+#[derive(Debug)]
+pub(crate) struct IndexedOccurrence {
+    pub(crate) name: StringId,
+    pub(crate) location: IndexedLocation,
+    pub(crate) roles: u8,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -42,10 +81,12 @@ pub(crate) struct OccurrenceRef {
 
 #[derive(Debug, Default)]
 pub(crate) struct Index {
-    sites: HashMap<SymbolId, Vec<Site>>,
+    sites: HashMap<SymbolId, Vec<IndexedSite>>,
     /// Occurrences of each file, indexed by `FileId` and ordered by start.
     files: Vec<Vec<Occurrence>>,
-    by_symbol: HashMap<SymbolId, Vec<OccurrenceRef>>,
+    /// Public result order, with duplicate locations' roles combined. This
+    /// immutable work is shared by position and name queries.
+    by_symbol: HashMap<SymbolId, Vec<IndexedOccurrence>>,
     by_name: HashMap<String, Vec<OccurrenceRef>>,
     /// Names and reasons shared by many occurrences.
     strings: Vec<Box<str>>,
@@ -69,7 +110,7 @@ impl Index {
         self.by_name.get(name).map_or(&[], Vec::as_slice)
     }
 
-    pub(crate) fn occurrences_of(&self, symbol: SymbolId) -> &[OccurrenceRef] {
+    pub(crate) fn occurrences_of(&self, symbol: SymbolId) -> &[IndexedOccurrence] {
         self.by_symbol.get(&symbol).map_or(&[], Vec::as_slice)
     }
 
@@ -77,7 +118,7 @@ impl Index {
         &self.strings[id.index()]
     }
 
-    pub(crate) fn sites(&self, symbol: SymbolId) -> &[Site] {
+    pub(crate) fn sites(&self, symbol: SymbolId) -> &[IndexedSite] {
         self.sites.get(&symbol).map_or(&[], Vec::as_slice)
     }
 }
@@ -99,6 +140,7 @@ pub(crate) struct Token<'a> {
 pub(crate) struct Builder {
     index: Index,
     string_ids: HashMap<Box<str>, StringId>,
+    by_symbol: HashMap<SymbolId, Vec<OccurrenceRef>>,
 }
 
 impl Builder {
@@ -130,11 +172,7 @@ impl Builder {
             };
             if let Target::Symbols(symbols) = &token.target {
                 for &symbol in symbols {
-                    self.index
-                        .by_symbol
-                        .entry(symbol)
-                        .or_default()
-                        .push(reference);
+                    self.by_symbol.entry(symbol).or_default().push(reference);
                 }
             }
             if token.candidate {
@@ -156,13 +194,48 @@ impl Builder {
 
     /// Freeze the index with the declarations of every symbol that an
     /// occurrence denotes.
-    pub(crate) fn finish(mut self, sites: impl Fn(SymbolId) -> Vec<Site>) -> Index {
-        self.index.sites = self
-            .index
-            .by_symbol
-            .keys()
-            .map(|&symbol| (symbol, sites(symbol)))
-            .collect();
+    pub(crate) fn finish(
+        mut self,
+        sources: &Sources,
+        sites: impl Fn(SymbolId) -> Vec<Site>,
+    ) -> Index {
+        for (symbol, references) in self.by_symbol {
+            let mut declarations: Vec<_> = sites(symbol)
+                .into_iter()
+                .map(|site| IndexedSite {
+                    name: site.name,
+                    location: IndexedLocation::new(sources, site.file, site.span),
+                })
+                .collect();
+            declarations.sort_by_key(|site| site.location.key(sources));
+            declarations.dedup_by(|a, b| {
+                a.location.key(sources) == b.location.key(sources) && a.name == b.name
+            });
+            self.index.sites.insert(symbol, declarations);
+
+            let mut occurrences: Vec<_> = references
+                .into_iter()
+                .map(|reference| {
+                    let occurrence = self.index.occurrence(reference);
+                    IndexedOccurrence {
+                        name: occurrence.name,
+                        location: IndexedLocation::new(sources, reference.file, occurrence.span),
+                        roles: occurrence.roles,
+                    }
+                })
+                .collect();
+            // Stable sorting keeps the first token's spelling at a shared
+            // location, as the former query-time map did. Every role survives.
+            occurrences.sort_by_key(|occurrence| occurrence.location.key(sources));
+            occurrences.dedup_by(|later, first| {
+                if later.location.key(sources) != first.location.key(sources) {
+                    return false;
+                }
+                first.roles |= later.roles;
+                true
+            });
+            self.index.by_symbol.insert(symbol, occurrences);
+        }
         self.index
     }
 }

@@ -422,5 +422,9 @@
   {
     "name": "unicode-escape-leading-zeros",
     "source": "const value = \"\\u{000000000000000000000000000041}\";"
+  },
+  {
+    "name": "numeric-flags-case-variants",
+    "source": "const values = [0,123,1.5,.5,1.,1e2,1E+2,1E-2,0xDeAD,0XDEAD,0b101,0B101,0o17,0O17,1_000,1e1_0,1E1_0,0xDE_AD,0XDE_AD,0b10_10,0B10_10,0o1_7,0O1_7,123n,0XDEADn];"
   }
 ]

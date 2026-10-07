@@ -1815,7 +1815,9 @@ impl<'p> Linker<'p> {
             }
             index.add_file(file, tokens);
         }
-        index.finish(|symbol| self.symbol(symbol).sites.clone())
+        index.finish(&self.program.sources, |symbol| {
+            self.symbol(symbol).sites.clone()
+        })
     }
 
     fn target(&self, resolution: Resolution, index: &mut index::Builder) -> Target {

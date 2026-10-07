@@ -2,6 +2,15 @@
   "initScriptPath": null,
   "validation": {
     "commands": {
+      "benchmark-build": {
+        "command": {
+          "full": "scripts/validate/benchmark-build-full.sh"
+        },
+        "cost": 2,
+        "timeoutMs": 900000,
+        "description": "Build release binaries, examples, and benchmarks with two jobs",
+        "pathArgs": "forbid"
+      },
       "format": {
         "command": {
           "full": "scripts/validate/format-full.sh",

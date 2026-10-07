@@ -8,6 +8,53 @@ fn json(source: &str) -> serde_json::Value {
 }
 
 #[test]
+fn numeric_literals_keep_compiler_text_flags_and_spans_for_both_cases() {
+    // Expected node fields from the pinned compiler projection. Hexadecimal
+    // E/e digits are radix digits, not the decimal scientific flag.
+    for (raw, text, flags) in [
+        ("0", "0", 0),
+        ("123", "123", 0),
+        ("1.5", "1.5", 0),
+        (".5", "0.5", 0),
+        ("1.", "1", 0),
+        ("1e2", "100", 16),
+        ("1E+2", "100", 16),
+        ("1E-2", "0.01", 16),
+        ("0xDeAD", "57005", 64),
+        ("0XDEAD", "57005", 64),
+        ("0b101", "5", 128),
+        ("0B101", "5", 128),
+        ("0o17", "15", 256),
+        ("0O17", "15", 256),
+        ("1_000", "1000", 512),
+        ("1e1_0", "10000000000", 528),
+        ("1E1_0", "10000000000", 528),
+        ("0xDE_AD", "57005", 576),
+        ("0XDE_AD", "57005", 576),
+        ("0b10_10", "10", 640),
+        ("0B10_10", "10", 640),
+        ("0o1_7", "15", 768),
+        ("0O1_7", "15", 768),
+    ] {
+        let source = format!("const x = {raw};");
+        let value = json(&source);
+        let literal = &value["statements"][0]["declarationList"]["declarations"][0]["initializer"];
+        assert_eq!(literal["kind"], 9, "{raw}");
+        assert_eq!(literal["text"], text, "{raw}");
+        assert_eq!(literal["numericLiteralFlags"], flags, "{raw}");
+        assert_eq!(literal["pos"], 9, "{raw}");
+        assert_eq!(literal["end"], 10 + raw.len(), "{raw}");
+    }
+    for (raw, text) in [("123n", "123n"), ("0XDEADn", "0xdeadn")] {
+        let value = json(&format!("const x = {raw};"));
+        let literal = &value["statements"][0]["declarationList"]["declarations"][0]["initializer"];
+        assert_eq!(literal["kind"], 10);
+        assert_eq!(literal["text"], text);
+        assert_eq!(literal.get("numericLiteralFlags"), None);
+    }
+}
+
+#[test]
 fn hexadecimal_escapes_require_ascii_hex_digits() {
     for escape in [
         r"\u+041",
