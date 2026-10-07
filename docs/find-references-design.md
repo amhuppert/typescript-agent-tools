@@ -132,6 +132,10 @@ Rust and preserve the existing parser API and AST JSON contract. No latency or
 project-size target was specified; measure full-project indexing before adding
 parallelism or caching.
 
+The [persistent reference service](reference-service-design.md) extends this
+original envelope after the larger-project performance measurements. It owns
+refresh and process lifetime around the immutable project API described here.
+
 The result is source navigation information within the selected project. It is
 not a rename edit set or a promise about runtime uses through reflection, strings,
 or dynamic code. A missed or incorrectly grouped source occurrence matters, so

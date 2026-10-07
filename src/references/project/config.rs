@@ -166,17 +166,23 @@ struct File {
 }
 
 impl File {
-    fn read(path: &Path) -> Result<Rc<File>, ProjectError> {
-        let text = std::fs::read_to_string(path).map_err(|error| io_error(path, &error))?;
-        let identity = std::fs::canonicalize(path).map_err(|error| io_error(path, &error))?;
+    fn read(path: &Path, disk: &disk::Disk) -> Result<Rc<File>, ProjectError> {
+        let text = disk
+            .read_to_string(path)
+            .map_err(|error| io_error(path, &error))?;
+        let identity = disk
+            .canonicalize(path)
+            .map_err(|error| io_error(path, &error))?;
         let parent = path.parent().unwrap_or(Path::new("/"));
-        let dir = std::fs::canonicalize(parent).map_err(|error| io_error(parent, &error))?;
+        let dir = disk
+            .canonicalize(parent)
+            .map_err(|error| io_error(parent, &error))?;
         let dir = paths::from_path(&dir);
         let name = path
             .file_name()
             .map(|name| name.to_string_lossy())
             .unwrap_or_default();
-        let text = SourceText::new(text);
+        let text = SourceText::shared(text);
         let root = jsonc::parse(text.as_str(), jsonc::Dialect::Tsconfig).map_err(|error| {
             ProjectError {
                 kind: match error.failure {
@@ -240,9 +246,9 @@ struct Declared<'a> {
     file: &'a File,
 }
 
-pub(super) fn load(path: &Path) -> Result<Config, ProjectError> {
-    let leaf = File::read(path)?;
-    let chain = inheritance(&leaf)?;
+pub(super) fn load(path: &Path, disk: &disk::Disk) -> Result<Config, ProjectError> {
+    let leaf = File::read(path, disk)?;
+    let chain = inheritance(&leaf, disk)?;
     let mut options: HashMap<&str, Declared> = HashMap::new();
     let mut specs: [Option<Declared>; 3] = [None, None, None];
     for file in &chain {
@@ -314,12 +320,12 @@ pub(super) fn load(path: &Path) -> Result<Config, ProjectError> {
 /// it meets them; the order is then the reverse of a preorder walk that
 /// visits targets from last to first and skips files already visited, which
 /// keeps each file's last position in linear time.
-fn inheritance(leaf: &Rc<File>) -> Result<Vec<Rc<File>>, ProjectError> {
+fn inheritance(leaf: &Rc<File>, disk: &disk::Disk) -> Result<Vec<Rc<File>>, ProjectError> {
     let mut files: HashMap<String, Rc<File>> = HashMap::new();
     let mut targets: HashMap<PathBuf, Vec<Rc<File>>> = HashMap::new();
     let mut active = HashSet::from([leaf.identity.clone()]);
     // Each frame is a file, its resolved `extends` targets, and the next one.
-    let mut stack = vec![(leaf.clone(), extends_of(leaf)?, 0)];
+    let mut stack = vec![(leaf.clone(), extends_of(leaf, disk)?, 0)];
     while let Some((file, pending, next)) = stack.last_mut() {
         let Some((target, value)) = pending.get(*next).cloned() else {
             let parents = pending
@@ -337,13 +343,14 @@ fn inheritance(leaf: &Rc<File>) -> Result<Vec<Rc<File>>, ProjectError> {
             Some(parent) => parent.clone(),
             None => {
                 // Report an unreadable parent where the chain names it.
-                let parent = File::read(Path::new(&target)).map_err(|error| match error.kind {
-                    ProjectErrorKind::Io => file.origin(&value).error(
-                        ProjectErrorKind::Io,
-                        format!("Cannot read file '{target}': {}", error.message),
-                    ),
-                    _ => error,
-                })?;
+                let parent =
+                    File::read(Path::new(&target), disk).map_err(|error| match error.kind {
+                        ProjectErrorKind::Io => file.origin(&value).error(
+                            ProjectErrorKind::Io,
+                            format!("Cannot read file '{target}': {}", error.message),
+                        ),
+                        _ => error,
+                    })?;
                 files.insert(target, parent.clone());
                 parent
             }
@@ -366,7 +373,7 @@ fn inheritance(leaf: &Rc<File>) -> Result<Vec<Rc<File>>, ProjectError> {
             continue;
         }
         active.insert(parent.identity.clone());
-        let pending = extends_of(&parent)?;
+        let pending = extends_of(&parent, disk)?;
         stack.push((parent, pending, 0));
     }
     let mut visited = HashSet::new();
@@ -383,7 +390,7 @@ fn inheritance(leaf: &Rc<File>) -> Result<Vec<Rc<File>>, ProjectError> {
 }
 
 /// The paths named by a file's `extends`, with the values that named them.
-fn extends_of(file: &File) -> Result<Vec<(String, Value)>, ProjectError> {
+fn extends_of(file: &File, disk: &disk::Disk) -> Result<Vec<(String, Value)>, ProjectError> {
     let Some(value) = file.root.field("extends") else {
         return Ok(Vec::new());
     };
@@ -400,7 +407,7 @@ fn extends_of(file: &File) -> Result<Vec<(String, Value)>, ProjectError> {
             let Some(text) = name.as_str() else {
                 return Err(file.not_string(name, "'extends' entries must be strings"));
             };
-            Ok((extends_path(file, name, text)?, name.clone()))
+            Ok((extends_path(file, name, text, disk)?, name.clone()))
         })
         .collect()
 }
@@ -408,15 +415,22 @@ fn extends_of(file: &File) -> Result<Vec<(String, Value)>, ProjectError> {
 /// TypeScript's `extends` lookup: a relative or rooted path, adding `.json`
 /// when the file does not exist, or else a package resolved like a NodeNext
 /// `require` of a JSON configuration.
-fn extends_path(file: &File, value: &Value, name: &str) -> Result<String, ProjectError> {
+fn extends_path(
+    file: &File,
+    value: &Value,
+    name: &str,
+    disk: &disk::Disk,
+) -> Result<String, ProjectError> {
     let name = paths::separators(name);
     if name.is_empty() {
         return Err(file.error(value, "'extends' cannot be an empty string"));
     }
     if paths::is_rooted(&name) || name.starts_with("./") || name.starts_with("../") {
         let path = paths::resolve(&file.dir, &name);
-        let is_file =
-            |path: &str| disk::is_file(path).map_err(|error| io_error(Path::new(path), &error));
+        let is_file = |path: &str| {
+            disk.is_file(path)
+                .map_err(|error| io_error(Path::new(path), &error))
+        };
         if path.ends_with(".json") || is_file(&path)? {
             return Ok(path);
         }
@@ -424,7 +438,7 @@ fn extends_path(file: &File, value: &Value, name: &str) -> Result<String, Projec
         if is_file(&with_json)? {
             return Ok(with_json);
         }
-    } else if let Some(path) = resolve::config_package(&name, &file.dir)? {
+    } else if let Some(path) = resolve::config_package(&name, &file.dir, disk)? {
         return Ok(path);
     }
     Err(file.error(value, format!("File '{name}' not found")))

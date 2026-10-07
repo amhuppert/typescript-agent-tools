@@ -30,7 +30,43 @@ directory. `--pretty` and `-o OUTPUT` keep their parse-mode meanings; stdin,
 Diagnostics on stderr have the form `path:line:column: message` when a location
 is known.
 
+## Persistent CLI service
+
+On macOS and Linux, ordinary CLI queries use a local service. It reuses a complete
+index while its captured filesystem inputs match and rebuilds after changes.
+`--references-status --project CONFIG` reports `running`, `pid`, and `generation`
+(the number of successfully published indexes); status does not check freshness.
+`--references-stop --project CONFIG` stops it, and `--references-direct` performs
+a fresh load in the CLI process. `--references-serve --project CONFIG` runs the
+service in the foreground for a supervisor. Background services use null standard
+streams and a separate process group and expire after ten idle minutes.
+
+The private runtime directory defaults to `/tmp/tsparse-UID`. Override it with
+`TSPARSE_SERVICE_DIR`, naming a directory owned by the current user with mode 0700;
+its parent must exist. Keep paths short enough for Unix sockets. Set
+`TSPARSE_SERVICE_IDLE_SECS` to a positive integer to change the idle timeout.
+Configuration spellings and compiled build identities have separate services.
+Old-build services expire normally. Lock files remain after shutdown so concurrent
+launchers always lock the same inode; do not remove them while services run.
+
+Requests are limited to 1 MiB including their terminating newline. Socket reads
+and writes at the server allow five seconds without progress; clients wait up to
+five minutes for a result. A transport or runtime-directory failure is exit 2.
+Other platforms use direct loading and reject service administration flags.
+See [the design](reference-service-design.md) for ownership and consistency limits.
+
 ## Library
+
+`ReferenceSession::new(config)` creates a lazy refreshable session.
+`session.find_references(query)` validates or rebuilds and returns either the
+usual result or `ReferenceError::Project` / `ReferenceError::Query`. Configuration
+paths are fixed at construction; relative query paths use the caller's current
+directory. `session.generation()` counts successful publications. Failed refreshes
+discard the old generation. An unreadable *previous* input forces a full load:
+current selection decides whether that input is still required. Required input
+failures are reported by the loader, never answered from stale state.
+
+`ReferenceProject` retains its immutable, explicitly captured snapshot semantics:
 
 ```rust
 use std::path::Path;

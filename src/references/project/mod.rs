@@ -9,7 +9,7 @@
 mod config;
 mod diagnostics;
 mod directives;
-mod disk;
+pub(super) mod disk;
 mod files;
 mod jsonc;
 mod paths;
@@ -94,14 +94,15 @@ pub(super) struct ProgramFile {
 /// target that TypeScript would report. A module request that finds no file
 /// is `ModuleResolution::Missing` for the binder to settle against ambient
 /// module declarations.
-pub(super) fn load(config: &Path) -> Result<Program, ProjectError> {
+pub(super) fn load(config: &Path, disk: &disk::Disk) -> Result<Program, ProjectError> {
     let path = std::path::absolute(config).map_err(|error| io_error(config, &error))?;
-    let config = config::load(&path)?;
+    let config = config::load(&path, disk)?;
     let case = Case::detect();
-    let roots = files::roots(&config, case)?;
+    let roots = files::roots(&config, case, disk)?;
     let mut loader = Loader {
         config: &config,
-        resolver: Resolver::new(&config, case),
+        resolver: Resolver::new(&config, case, disk),
+        disk,
         case,
         ids: HashMap::new(),
         queue: VecDeque::new(),
@@ -195,6 +196,7 @@ fn io_error(path: &Path, error: &std::io::Error) -> ProjectError {
 }
 
 struct Loader<'a> {
+    disk: &'a disk::Disk,
     config: &'a Config,
     resolver: Resolver<'a>,
     case: Case,
@@ -259,8 +261,10 @@ impl Loader<'_> {
         let identity = if self.config.options.preserve_symlinks {
             paths::normalize(path)
         } else {
-            let real =
-                std::fs::canonicalize(path).map_err(|error| io_error(Path::new(path), &error))?;
+            let real = self
+                .disk
+                .canonicalize(path)
+                .map_err(|error| io_error(Path::new(path), &error))?;
             paths::from_path(&real)
         };
         let key = self.case.key(&identity);
@@ -316,9 +320,11 @@ impl Loader<'_> {
     /// Parses one input once, captures its facts, and resolves its edges.
     fn load_file(&mut self, path: String, id: FileId) -> Result<(), ProjectError> {
         let file_path = PathBuf::from(&path);
-        let text =
-            std::fs::read_to_string(&file_path).map_err(|error| io_error(&file_path, &error))?;
-        let source = SourceText::new(text);
+        let text = self
+            .disk
+            .read_to_string(&file_path)
+            .map_err(|error| io_error(&file_path, &error))?;
+        let source = SourceText::shared(text);
         let format = self.resolver.file_format(&path);
         // What the name means follows TypeScript, which classifies the exact
         // spelling; the case policy decides only identity and support.
@@ -538,7 +544,7 @@ impl Loader<'_> {
                         format!("Referenced file '{reference}' {reason}"),
                     )))
                 };
-                match files::literal_input(&target, self.case)? {
+                match files::literal_input(&target, self.case, self.disk)? {
                     files::Literal::Unsupported(kind) => unsupported(format!(
                         "is a {} input, which is not supported",
                         kind.label()

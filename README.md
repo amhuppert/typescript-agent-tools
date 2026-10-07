@@ -29,7 +29,28 @@ The CLI reads UTF-8 from one input file or stdin (`-`, or no file). `.tsx` and `
 ./target/release/tsparse --references --project ./tsconfig.json --name run --pretty
 ```
 
-The library exposes the same operation as `typescript_parser::references::ReferenceProject`. Standard libraries are not loaded, project references are not followed, and properties and class members are not reference targets. See [find references](docs/references.md) for the result format, binding model, exit codes, and compatibility limits.
+On macOS and Linux, reference commands automatically start a local service and
+reuse its index across CLI invocations. Every query checks the captured inputs;
+changed sources, configuration, or resolution inputs trigger a rebuild. A failed
+refresh reports its error. Services stop after ten idle minutes.
+
+```sh
+./target/release/tsparse --references-status --project ./tsconfig.json
+./target/release/tsparse --references-stop --project ./tsconfig.json
+./target/release/tsparse --references-direct --project ./tsconfig.json --name run
+```
+
+Use `--references-serve --project CONFIG` for a foreground service managed by a
+supervisor. `TSPARSE_SERVICE_DIR` selects a private runtime directory, and
+`TSPARSE_SERVICE_IDLE_SECS` sets its positive idle timeout in seconds. Other
+platforms use direct loading. The [service design](docs/reference-service-design.md)
+describes freshness, process ownership, and the current full-rebuild limitation.
+
+The library exposes immutable snapshots through `typescript_parser::references::ReferenceProject`
+and refreshable generations through `ReferenceSession`. Standard libraries are not loaded,
+project references are not followed, and properties and class members are not reference
+targets. See [find references](docs/references.md) for the result format, binding model,
+exit codes, and compatibility limits.
 
 ## Library
 

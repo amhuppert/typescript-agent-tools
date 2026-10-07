@@ -190,8 +190,8 @@ impl PackageJson {
 }
 
 /// Cached file system queries.
-#[derive(Default)]
-struct Host {
+struct Host<'a> {
+    disk: &'a disk::Disk,
     files: HashMap<String, bool>,
     directories: HashMap<String, bool>,
     packages: HashMap<String, Option<Rc<PackageJson>>>,
@@ -202,7 +202,7 @@ struct Host {
     failure: Option<ProjectError>,
 }
 
-impl Host {
+impl Host<'_> {
     fn unreadable(&mut self, path: &str, error: std::io::Error) {
         self.fail(io_error(Path::new(path), &error));
     }
@@ -215,7 +215,7 @@ impl Host {
         if let Some(&exists) = self.files.get(path) {
             return exists;
         }
-        let exists = self.probe(path, disk::is_file(path));
+        let exists = self.probe(path, self.disk.is_file(path));
         self.files.insert(path.to_owned(), exists);
         exists
     }
@@ -224,7 +224,7 @@ impl Host {
         if let Some(&exists) = self.directories.get(path) {
             return exists;
         }
-        let exists = self.probe(path, disk::is_dir(path));
+        let exists = self.probe(path, self.disk.is_dir(path));
         self.directories.insert(path.to_owned(), exists);
         exists
     }
@@ -247,9 +247,9 @@ impl Host {
         let package = self.file_exists(&path).then(|| {
             // Content that is not UTF-8 is unparsable, as in TypeScript, not
             // unreadable.
-            let bytes = std::fs::read(&path).unwrap_or_else(|error| {
+            let bytes = self.disk.read(&path).unwrap_or_else(|error| {
                 self.unreadable(&path, error);
-                Vec::new()
+                Vec::new().into()
             });
             let text = std::str::from_utf8(&bytes).unwrap_or("");
             Rc::new(PackageJson::parse(dir, text).unwrap_or_else(|error| {
@@ -332,7 +332,7 @@ pub(super) struct Resolver<'a> {
     config_dir: &'a str,
     config_file: &'a str,
     case: Case,
-    host: Host,
+    host: Host<'a>,
     modules: HashMap<(String, String, bool), Resolved>,
     /// Results of `imports` hops during one module resolution, so branches
     /// that share a lookup evaluate it once.
@@ -343,17 +343,29 @@ pub(super) struct Resolver<'a> {
 }
 
 impl<'a> Resolver<'a> {
-    pub(super) fn new(config: &'a Config, case: Case) -> Self {
-        Self::with(&config.options, &config.dir, &config.file, case)
+    pub(super) fn new(config: &'a Config, case: Case, disk: &'a disk::Disk) -> Self {
+        Self::with(&config.options, &config.dir, &config.file, case, disk)
     }
 
-    fn with(options: &'a Options, config_dir: &'a str, config_file: &'a str, case: Case) -> Self {
+    fn with(
+        options: &'a Options,
+        config_dir: &'a str,
+        config_file: &'a str,
+        case: Case,
+        disk: &'a disk::Disk,
+    ) -> Self {
         Self {
             options,
             config_dir,
             config_file,
             case,
-            host: Host::default(),
+            host: Host {
+                disk,
+                files: HashMap::new(),
+                directories: HashMap::new(),
+                packages: HashMap::new(),
+                failure: None,
+            },
             modules: HashMap::new(),
             hops: HashMap::new(),
             active: HashSet::new(),
@@ -457,7 +469,7 @@ impl<'a> Resolver<'a> {
     pub(super) fn automatic_types(&mut self) -> Vec<String> {
         let mut names: Vec<String> = Vec::new();
         for root in self.type_roots() {
-            let entries = match std::fs::read_dir(&root) {
+            let entries = match self.host.disk.read_dir(&root) {
                 Ok(entries) => entries,
                 Err(error) if disk::is_absence(&error) => continue,
                 Err(error) => {
@@ -467,14 +479,7 @@ impl<'a> Resolver<'a> {
             };
             let mut directories: Vec<String> = Vec::new();
             for entry in entries {
-                let entry = match entry {
-                    Ok(entry) => entry,
-                    Err(error) => {
-                        self.host.unreadable(&root, error);
-                        continue;
-                    }
-                };
-                match disk::entry(&entry.path()) {
+                match self.host.disk.entry(&entry.path()) {
                     Ok(Some(disk::Entry::Directory)) => {
                         match paths::exact_name(entry.file_name()) {
                             Ok(name) => directories.push(name),
@@ -1369,11 +1374,15 @@ impl<'a> Resolver<'a> {
 /// Resolves a package-name `extends` as TypeScript does: a NodeNext
 /// `require` of JSON that honors a manifest's `tsconfig` field and a
 /// package's `tsconfig.json`.
-pub(super) fn config_package(name: &str, directory: &str) -> Result<Option<String>, ProjectError> {
+pub(super) fn config_package(
+    name: &str,
+    directory: &str,
+    disk: &disk::Disk,
+) -> Result<Option<String>, ProjectError> {
     let options = Options::for_extends_lookup();
     // A configuration lookup consults neither the configuration's location
     // nor output directories.
-    let mut resolver = Resolver::with(&options, "", "", Case::Sensitive);
+    let mut resolver = Resolver::with(&options, "", "", Case::Sensitive, disk);
     let mut state = resolver.state(Some(ResolutionMode::Require), JSON);
     state.config_lookup = true;
     let found = resolver

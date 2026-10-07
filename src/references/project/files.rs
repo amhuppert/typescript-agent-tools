@@ -30,8 +30,12 @@ const DEFAULT_INCLUDE: &str = "**/*";
 
 /// The root inputs a configuration selects. JavaScript and JSON files take
 /// part in extension priority, then are rejected as unsupported inputs.
-pub(super) fn roots(config: &Config, case: Case) -> Result<Vec<Root>, ProjectError> {
-    let roots = select(config, case)?;
+pub(super) fn roots(
+    config: &Config,
+    case: Case,
+    disk: &disk::Disk,
+) -> Result<Vec<Root>, ProjectError> {
+    let roots = select(config, case, disk)?;
     if roots.is_empty() && config.report_no_inputs {
         return Err(no_inputs(config));
     }
@@ -82,7 +86,7 @@ fn no_inputs(config: &Config) -> ProjectError {
 }
 
 /// Literal `files`, then `include` matches not removed by `exclude`.
-fn select(config: &Config, case: Case) -> Result<Vec<Root>, ProjectError> {
+fn select(config: &Config, case: Case, disk: &disk::Disk) -> Result<Vec<Root>, ProjectError> {
     let options = &config.options;
     // Extension groups in priority order; within a group, earlier wins.
     let mut groups: Vec<Vec<&str>> = if options.allow_js {
@@ -102,7 +106,7 @@ fn select(config: &Config, case: Case) -> Result<Vec<Root>, ProjectError> {
     let key = |path: &str| case.fold(path).into_owned();
     let mut literal: HashSet<String> = HashSet::new();
     for spec in config.files.iter().flat_map(|specs| &specs.entries) {
-        let path = literal_file(spec, case)?;
+        let path = literal_file(spec, case, disk)?;
         if literal.insert(key(&path)) {
             roots.push(Root {
                 path,
@@ -155,7 +159,7 @@ fn select(config: &Config, case: Case) -> Result<Vec<Root>, ProjectError> {
         .filter(|spec| spec.path.ends_with(".json"))
         .map(|spec| pattern(&spec.path))
         .collect();
-    for file in matcher.walk(&config.dir, &include, &extensions)? {
+    for file in matcher.walk(&config.dir, &include, &extensions, disk)? {
         if file.ends_with(".json") {
             let components: Vec<&str> = file.split('/').collect();
             if json_include
@@ -208,8 +212,8 @@ fn select(config: &Config, case: Case) -> Result<Vec<Root>, ProjectError> {
 /// A listed file must exist. JavaScript and JSON entries, present or not,
 /// are selected here, for extension priority, and rejected with the other
 /// roots.
-fn literal_file(spec: &Spec, case: Case) -> Result<String, ProjectError> {
-    match literal_input(&spec.path, case)? {
+fn literal_file(spec: &Spec, case: Case, disk: &disk::Disk) -> Result<String, ProjectError> {
+    match literal_input(&spec.path, case, disk)? {
         Literal::Found(path) => Ok(path),
         Literal::Unsupported(_) => Ok(spec.path.clone()),
         Literal::Missing => Err(spec.origin.error(
@@ -240,7 +244,11 @@ pub(super) enum Literal {
 /// TypeScript's literal file rule: a name with a program-input extension
 /// must exist as written, and a name without an extension may omit `.ts`,
 /// `.tsx`, or `.d.ts`. Each caller decides how to report the outcome.
-pub(super) fn literal_input(path: &str, case: Case) -> Result<Literal, ProjectError> {
+pub(super) fn literal_input(
+    path: &str,
+    case: Case,
+    disk: &disk::Disk,
+) -> Result<Literal, ProjectError> {
     let kind = InputKind::of(path, case);
     if matches!(kind, InputKind::JavaScript | InputKind::Json) {
         return Ok(Literal::Unsupported(kind));
@@ -256,7 +264,10 @@ pub(super) fn literal_input(path: &str, case: Case) -> Result<Literal, ProjectEr
             .collect()
     };
     for candidate in candidates {
-        if disk::is_file(&candidate).map_err(|error| io_error(Path::new(&candidate), &error))? {
+        if disk
+            .is_file(&candidate)
+            .map_err(|error| io_error(Path::new(&candidate), &error))?
+        {
             return Ok(Literal::Found(candidate));
         }
     }
@@ -354,6 +365,7 @@ impl Matcher {
         config_dir: &str,
         include: &[&Spec],
         extensions: &[&str],
+        disk: &disk::Disk,
     ) -> Result<Vec<String>, ProjectError> {
         let mut results: Vec<Vec<String>> = vec![Vec::new(); self.include.len()];
         let mut visited: HashSet<std::path::PathBuf> = HashSet::new();
@@ -361,7 +373,7 @@ impl Matcher {
             let mut stack = vec![base];
             while let Some(directory) = stack.pop() {
                 // An include base may name no directory, as `entries` allows.
-                let real = match std::fs::canonicalize(&directory) {
+                let real = match disk.canonicalize(&directory) {
                     Ok(real) => real,
                     Err(error) if disk::is_absence(&error) => continue,
                     Err(error) => return Err(io_error(Path::new(&directory), &error)),
@@ -369,7 +381,7 @@ impl Matcher {
                 if !visited.insert(real) {
                     continue;
                 }
-                let (files, directories) = entries(&directory)?;
+                let (files, directories) = entries(&directory, disk)?;
                 for name in files {
                     let name = match name {
                         Ok(name) => name,
@@ -586,19 +598,18 @@ type Name = Result<String, String>;
 
 /// Sorted file and directory names, following symbolic links and skipping
 /// broken ones. A missing directory, or a file named as one, has no entries.
-fn entries(directory: &str) -> Result<(Vec<Name>, Vec<Name>), ProjectError> {
+fn entries(directory: &str, disk: &disk::Disk) -> Result<(Vec<Name>, Vec<Name>), ProjectError> {
     let mut files = Vec::new();
     let mut directories = Vec::new();
-    let reader = match std::fs::read_dir(directory) {
+    let reader = match disk.read_dir(directory) {
         Ok(reader) => reader,
         Err(error) if disk::is_absence(&error) => return Ok((files, directories)),
         Err(error) => return Err(io_error(Path::new(directory), &error)),
     };
     for entry in reader {
-        let entry = entry.map_err(|error| io_error(Path::new(directory), &error))?;
         let name = paths::exact_name(entry.file_name());
         let path = entry.path();
-        match disk::entry(&path).map_err(|error| io_error(&path, &error))? {
+        match disk.entry(&path).map_err(|error| io_error(&path, &error))? {
             Some(disk::Entry::Directory) => directories.push(name),
             Some(disk::Entry::File) => files.push(name),
             Some(disk::Entry::Other) | None => {}

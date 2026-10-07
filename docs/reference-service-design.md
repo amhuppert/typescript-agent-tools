@@ -1,0 +1,190 @@
+# Persistent reference service
+
+## Intent and operating envelope
+
+Repeated `tsparse --references` invocations should reuse a completed reference
+index across agent processes. Callers are local processes of the same user,
+including concurrent agents, over editable files on disk. Each worktree and
+selected configuration must remain isolated. The initial service targets Unix
+(macOS and Linux); other platforms retain direct reference loading. There is no
+network listener, editor buffer protocol, or cross-user service.
+
+The existing Command Center benchmark measures 22–25 seconds to construct an
+index and about 304 MiB retained afterward. Those measurements use the documented
+benchmark shims, not the unchanged Command Center configuration. Persistence
+amortizes construction over unchanged queries; an edit initially requires a
+complete rebuild. Neither IPC latency nor freshness checking is free.
+
+## Alternatives and decision
+
+Saving and restoring the frozen index on every invocation would preserve the
+one-process lifecycle, but repeatedly allocates and reconstructs a large object.
+A resident process can use the existing immutable `ReferenceProject` directly.
+Choose a resident process first; measure restart frequency before adding a disk
+format. A single global multiplexing server would need project eviction,
+multi-project scheduling, and routing. One service per selected configuration
+provides isolation and a simpler lifecycle; idle shutdown bounds residency.
+
+An explicit filesystem observer is preferable to a thread-local recording mode:
+the observer is supplied to project loading and owns all read observations.
+TypeScript configuration, file selection, and resolution rules remain in their
+current owners. The observer knows filesystem operations, not TypeScript rules.
+
+## Public behavior
+
+Ordinary reference commands connect to the service, starting it when necessary.
+Each completed request performs freshness validation before answering. Query
+JSON, diagnostics, output files, and exit classes retain their CLI contracts.
+The client makes query paths absolute against its own working directory.
+
+`--references-status --project CONFIG` reports whether a service is running and,
+when it is, its PID and successful index generation. It does not start or load a
+project. `--references-stop --project CONFIG` stops that project's service and
+succeeds when none is running. `--references-direct` selects fresh in-process
+loading for diagnostics and comparisons. `--references-serve --project CONFIG`
+runs the service in the foreground for a process supervisor.
+
+Service identity includes the selected absolute configuration spelling and the
+running executable's compiled build identifier. Keeping the selected spelling matters:
+the loader captures query aliases through that configuration directory, and a
+symlink can later be retargeted. Distinct spellings may own separate services;
+they must never accidentally reuse each other's captured lookup aliases.
+
+## Owners
+
+* `references::project::disk`: filesystem operations and their observations:
+  exact text/bytes read, directory names, entry kinds (including absence), and
+  canonicalization results (including absence). Share captured source text with
+  `SourceText` rather than retaining another copy. Validation repeats these
+  operations and compares their results; source identity does not depend on size
+  or modification time. I/O failures remain failures.
+* `references::ReferenceSession`: one project's current generation. Its query
+  operation validates, loads when necessary, and answers from a complete
+  immutable `ReferenceProject`. Callers do not orchestrate refresh steps. The
+  existing `ReferenceProject` API retains its explicitly captured-snapshot
+  semantics and does not acquire hidden refresh behavior.
+* Binary-private `service`: rendezvous, exclusive process ownership, private
+  socket protocol, startup, idle shutdown, and administrative operations.
+* `main`: CLI arguments, exit-code policy, diagnostics, and output formatting.
+
+## Freshness and failure contract
+
+Validation checks observations made by the existing loader, including negative
+probes and directory listings. Adding a higher-priority module candidate,
+changing inherited configuration or package metadata, retargeting a symlink,
+adding a wildcard root, or replacing a dependency must invalidate the generation.
+An unchanged metadata timestamp does not establish unchanged contents.
+
+If an old observation is now unreadable, discard the cached generation and do a
+full load. The current configuration/import graph decides whether that old path
+is still required. A failure on a required current input propagates normally;
+an obsolete input must not prevent loading a valid new project. Final validation
+of a newly built generation propagates every I/O failure directly.
+
+A request uses one complete generation. On detected change, invalidate the old
+generation and construct another; if construction fails, return that failure.
+Never answer from the previous generation after a failed refresh. Revalidate a
+new generation before publishing it to detect changes during construction; if
+the inputs keep changing, fail with a located I/O-class diagnostic rather than
+retry indefinitely. As with ordinary filesystem loading, there is no atomic
+filesystem snapshot and no guarantee against a write after its final check.
+
+Serialize requests within a project service. Concurrent cold requests therefore
+share one build, and no reader observes a partially replaced index. This is
+proportionate to measured query costs and avoids concurrent rebuild memory peaks.
+A slow or disconnected client must not terminate the service or monopolize it
+indefinitely; bound protocol input and socket waits. Analysis failures and
+transport failures remain distinct until CLI exit handling.
+
+## Lifecycle
+
+Use a private runtime directory outside the project source tree, with an
+optional `TSPARSE_SERVICE_DIR` override for managed environments and tests.
+Hold an operating-system advisory lock for the lifetime of a server. Only the
+lock holder may remove a stale socket and bind its replacement. Lock files
+remain in place so concurrent processes always lock the same inode; a crash
+releases the lock automatically. Simultaneous launch attempts are harmless.
+
+The client starts the current executable with null standard streams; the service
+owns its own lifetime and exits after an idle period (default ten minutes).
+An inherited shell pipe must not keep CLI output collection open. Foreground
+mode supports external supervisors. Administrative stop and test teardown must
+wait for process ownership to be released. Runtime permission failures and
+unexpected startup failures are reported, not silently converted to direct
+loading. Windows uses direct loading until a native transport is implemented.
+
+## Delivery and adversarial checkpoints
+
+1. Pin public session behavior with failing integration tests: reuse, edits,
+   failed refresh/recovery, negative probes, config/package changes, added roots,
+   exact text despite identical size/time, and symlinks. Implement observation
+   ownership and session refresh; review the actual filesystem call graph.
+2. Pin independent CLI process reuse, concurrency, working-directory handling,
+   startup/stop/restart, stale sockets, and failure propagation. Implement the
+   transport and CLI; review process and socket races adversarially.
+3. Reassess module boundaries against actual callers; remove leaked lifecycle
+   steps and duplicated decisions. Run required formatting, lint, Rust, harness,
+   and pinned semantic checks. Measure cold and repeated full CLI calls,
+   including validation and serialization, and record limitations.
+
+Incremental refresh can later reuse owned `FileFacts`, with configuration and
+parse settings in the reuse contract, while initially relinking the whole
+project. Disk snapshots and watchers are not required for this first complete
+service. Neither should be introduced until measurements justify their lifecycle
+and invalidation costs.
+
+## Implementation review checkpoints
+
+The first review retained the explicit filesystem owner: configuration,
+resolution, root discovery, and source capture now supply one `Disk` instance.
+Reviewing every filesystem call found no input reads outside it; the pre-existing
+platform case detection remains in its owner. Source text is shared with the
+observations using `Arc<str>`. Obsolete generations are released before rebuilding,
+so serialized requests do not retain two large indexes simultaneously.
+
+The transport checkpoint found and corrected two observable failures. On macOS,
+accepted sockets can inherit nonblocking mode, so a client connecting before
+writing was closed prematurely. Accepted streams are now explicitly blocking,
+with socket timeouts; a delayed-write regression covers that gap. Moving query
+paths across the process boundary also changed caller-spelled error paths.
+The client restores the operand spelling for invalid-position/outside-project
+errors while retaining canonical source paths for semantic target errors.
+
+Another adversarial case changed configuration to exclude an input while that
+old file became unreadable. Reporting its validation error rejected a project
+that loaded successfully from scratch. A failing public-session test established
+the issue; the session now delegates current input selection and error reporting
+to a full load when it cannot validate the previous generation.
+
+The lifecycle review replaced runtime executable hashing with a compiled build
+identifier. Reopening an executable path can read a newly installed image rather
+than the image executing the request, and adds file I/O to every CLI call. The
+Cargo build script emits a unique identifier and watches source, vendored
+dependencies, manifests, Cargo configuration, and compiler flags. This is build
+wiring, so a separate test-first cycle was skipped; cross-process reuse tests
+cover its integration. The protocol checks the complete identity even though
+socket names use a compact hash, so a rendezvous collision cannot serve another
+project's results.
+
+The service deliberately serializes requests: tests prove concurrent cold callers
+share one build, crash recovery does not trust a stale socket, stop releases the
+OS lease, and idle shutdown frees the process. The request boundary is checked
+just below, at, and above 1 MiB. In-range requests reach protocol validation;
+oversized requests fail while subsequent queries still use the same generation.
+No transport failure becomes an empty semantic result or a silent direct load.
+
+The final [CLI measurement](reference-service-performance.md) found a 12.338 s
+direct median and a 0.651 s warm median on 4,000 generated files (18.96×). This
+supports retaining the current design. Freshness remains proportional to the
+observed inputs, and post-edit queries still pay for a complete rebuild; these
+are measured limits, not hidden incremental-update promises.
+
+A follow-up [Command Center measurement](reference-service-command-center.md)
+used all 5,316 native-selected roots with the existing benchmark compatibility
+adjustments. Warm CLI medians were 0.709–0.945 s versus direct calls of
+10.011–11.733 s, including a 14.9 MB response. Concurrent requests shared one
+generation; editing a benchmark-only source rebuilt it and matched a fresh load.
+The service retained about 662 MiB RSS. This keeps the lifecycle and observation
+boundaries justified on the real corpus, while exposing the remaining costs of
+full freshness validation and full post-edit rebuilds. The unchanged Command
+Center config still hits the known library, JSON, and TipTap compatibility limits.

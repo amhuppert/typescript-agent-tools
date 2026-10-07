@@ -22,8 +22,14 @@ fn aliases() -> Fixture {
 }
 
 fn tsparse(fixture: &Fixture, args: &[&str]) -> Output {
-    Command::new(env!("CARGO_BIN_EXE_tsparse"))
-        .args(args)
+    let mut command = Command::new(env!("CARGO_BIN_EXE_tsparse"));
+    command.args(args);
+    // These tests own CLI formatting/diagnostics; service lifecycle and
+    // concurrent clients have dedicated teardown in reference_service.rs.
+    if args.contains(&"--references") {
+        command.arg("--references-direct");
+    }
+    command
         .current_dir(&fixture.root)
         .stdin(Stdio::null())
         .output()

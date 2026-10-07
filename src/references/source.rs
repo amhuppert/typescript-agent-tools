@@ -65,7 +65,7 @@ impl Sources {
 /// CR, LF, U+2028, and U+2029 are also breaks.
 #[derive(Debug)]
 pub(super) struct SourceText {
-    text: String,
+    text: std::sync::Arc<str>,
     line_starts: Vec<usize>,
     /// For non-ASCII text, the UTF-16 length of the text before each multiple
     /// of `CHECKPOINT` bytes, rounded down to a character boundary, so a
@@ -84,6 +84,10 @@ pub(super) enum PositionError {
 
 impl SourceText {
     pub(super) fn new(text: String) -> Self {
+        Self::shared(text.into())
+    }
+
+    pub(super) fn shared(text: std::sync::Arc<str>) -> Self {
         let mut line_starts = vec![0];
         let mut chars = text.char_indices().peekable();
         while let Some((index, c)) = chars.next() {

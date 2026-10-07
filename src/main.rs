@@ -5,16 +5,27 @@ use std::{
     process::ExitCode,
 };
 use typescript_parser::references::{
-    ProjectErrorKind, QueryErrorKind, ReferenceProject, ReferenceQuery, SourcePosition,
+    ProjectErrorKind, QueryErrorKind, ReferenceError, ReferenceProject, ReferenceQuery,
+    SourcePosition,
 };
 use typescript_parser::{ParseOptions, parse_with_options};
+
+#[cfg(unix)]
+mod service;
 
 const HELP: &str = "\
 tsparse [--pretty] [--tsx] [--check] [-o OUTPUT] [FILE|-]
 tsparse --references --project TSCONFIG (--at LINE:COLUMN FILE | --name NAME [FILE]) [--pretty] [-o OUTPUT]
+tsparse (--references-status | --references-stop | --references-serve) --project TSCONFIG
 
 Parse TypeScript into a compiler-style JSON AST. Reads stdin when FILE is omitted.
 --check validates syntax without producing JSON.
+
+On Unix, reference commands reuse a local project service, started automatically.
+--references-direct loads a fresh project in this process. --references-status
+reports service state; --references-stop releases it; --references-serve runs it
+in the foreground. Services exit after ten idle minutes. TSPARSE_SERVICE_DIR
+selects a private runtime directory; TSPARSE_SERVICE_IDLE_SECS sets idle seconds.
 
 --references groups the declarations and occurrences of the symbol selected by
 the identifier at LINE:COLUMN in FILE (one-based line, UTF-16 column), or by
@@ -47,6 +58,8 @@ struct Options {
     project: Option<String>,
     at: Option<String>,
     name: Option<String>,
+    service_action: Option<String>,
+    references_direct: bool,
 }
 
 fn run() -> Result<(), (u8, String)> {
@@ -66,6 +79,16 @@ fn run() -> Result<(), (u8, String)> {
             "--tsx" => options.jsx = true,
             "--check" => options.check = true,
             "--references" => options.references = true,
+            "--references-direct" => {
+                options.references = true;
+                options.references_direct = true;
+            }
+            "--references-serve" | "--references-status" | "--references-stop" => {
+                if options.service_action.replace(arg).is_some() {
+                    return Err((2, "Expected one reference service action".into()));
+                }
+                options.references = true;
+            }
             "-o" | "--output" => options.output = Some(value("-o")?),
             "--project" => options.project = Some(value("--project")?),
             "--at" => options.at = Some(value("--at")?),
@@ -133,6 +156,36 @@ fn references(options: Options) -> Result<(), (u8, String)> {
     let project = options
         .project
         .ok_or((2, "--references requires --project TSCONFIG".to_string()))?;
+    if let Some(action) = &options.service_action {
+        if options.at.is_some()
+            || options.name.is_some()
+            || !options.files.is_empty()
+            || options.references_direct
+        {
+            return Err((2, "Service actions do not take a reference query".into()));
+        }
+        #[cfg(unix)]
+        return match action.as_str() {
+            "--references-status" => {
+                let status = service::status(project.as_ref()).map_err(|e| (2, e.to_string()))?;
+                write_output(options.output.as_deref(), |writer| {
+                    if options.pretty {
+                        serde_json::to_writer_pretty(writer, &status)
+                    } else {
+                        serde_json::to_writer(writer, &status)
+                    }
+                    .map_err(io::Error::other)
+                })
+            }
+            "--references-stop" => service::stop(project.as_ref()).map_err(|e| (2, e.to_string())),
+            "--references-serve" => {
+                service::serve(project.as_ref()).map_err(|e| (2, e.to_string()))
+            }
+            _ => unreachable!("argument parsing selects the service action"),
+        };
+        #[cfg(not(unix))]
+        return Err((2, format!("{action} is available only on Unix")));
+    }
     let file = options.files.into_iter().next();
     if file.as_deref() == Some("-") {
         return Err((
@@ -158,26 +211,17 @@ fn references(options: Options) -> Result<(), (u8, String)> {
             ));
         }
     };
-    // Exit 2 for what the invocation got wrong or could not read; exit 1 for
-    // what analysis found.
-    let project = ReferenceProject::load(project.as_ref()).map_err(|error| {
-        let code = match error.kind {
-            ProjectErrorKind::Io => 2,
-            ProjectErrorKind::Config
-            | ProjectErrorKind::Syntax
-            | ProjectErrorKind::Unsupported
-            | ProjectErrorKind::Binding
-            | ProjectErrorKind::UnresolvedImport => 1,
-        };
-        (code, error.to_string())
-    })?;
-    let result = project.find_references(query).map_err(|error| {
-        let code = match error.kind {
-            QueryErrorKind::OutsideProject | QueryErrorKind::InvalidPosition => 2,
-            QueryErrorKind::UnsupportedTarget | QueryErrorKind::UnresolvedTarget => 1,
-        };
-        (code, error.to_string())
-    })?;
+    #[cfg(unix)]
+    let result = if !options.references_direct {
+        service::query(project.as_ref(), query).map_err(|error| match error {
+            service::Error::Reference(error) => reference_error(error),
+            service::Error::Transport(error) => (2, error.to_string()),
+        })?
+    } else {
+        direct_references(project.as_ref(), query)?
+    };
+    #[cfg(not(unix))]
+    let result = direct_references(project.as_ref(), query)?;
     write_output(options.output.as_deref(), |writer| {
         if options.pretty {
             serde_json::to_writer_pretty(&mut *writer, &result)
@@ -186,6 +230,37 @@ fn references(options: Options) -> Result<(), (u8, String)> {
         }
         .map_err(io::Error::other)
     })
+}
+
+fn direct_references(
+    project: &std::path::Path,
+    query: ReferenceQuery,
+) -> Result<typescript_parser::references::ReferenceResult, (u8, String)> {
+    let project = ReferenceProject::load(project)
+        .map_err(|error| reference_error(ReferenceError::Project(error)))?;
+    project
+        .find_references(query)
+        .map_err(|error| reference_error(ReferenceError::Query(error)))
+}
+
+/// Exit policy is shared by direct loading and service responses. Transport
+/// errors are handled separately; they never become successful empty searches.
+fn reference_error(error: ReferenceError) -> (u8, String) {
+    let code = match &error {
+        ReferenceError::Project(error) => match error.kind {
+            ProjectErrorKind::Io => 2,
+            ProjectErrorKind::Config
+            | ProjectErrorKind::Syntax
+            | ProjectErrorKind::Unsupported
+            | ProjectErrorKind::Binding
+            | ProjectErrorKind::UnresolvedImport => 1,
+        },
+        ReferenceError::Query(error) => match error.kind {
+            QueryErrorKind::OutsideProject | QueryErrorKind::InvalidPosition => 2,
+            QueryErrorKind::UnsupportedTarget | QueryErrorKind::UnresolvedTarget => 1,
+        },
+    };
+    (code, error.to_string())
 }
 
 fn position(text: &str) -> Result<SourcePosition, (u8, String)> {

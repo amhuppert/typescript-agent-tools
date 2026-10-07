@@ -17,9 +17,12 @@ mod binding;
 mod pattern;
 mod project;
 mod query;
+mod session;
 mod source;
 
-use serde::Serialize;
+pub use session::{ReferenceError, ReferenceSession};
+
+use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::path::{Path, PathBuf};
 
@@ -43,11 +46,20 @@ impl ReferenceProject {
     /// on a dedicated thread whose stack fits a deeper syntax budget than
     /// `ParseOptions::default()`, for generated declaration files.
     pub fn load(config: &Path) -> Result<Self, ProjectError> {
+        Self::on_loading_thread(config, || {
+            Self::load_here(config, &project::disk::Disk::default())
+        })
+    }
+
+    fn on_loading_thread<T: Send>(
+        config: &Path,
+        load: impl FnOnce() -> Result<T, ProjectError> + Send,
+    ) -> Result<T, ProjectError> {
         std::thread::scope(|scope| {
             std::thread::Builder::new()
                 .name("tsparse-references-load".into())
                 .stack_size(project::LOAD_STACK_BYTES)
-                .spawn_scoped(scope, || Self::load_here(config))
+                .spawn_scoped(scope, load)
                 .map_err(|error| ProjectError {
                     kind: ProjectErrorKind::Io,
                     message: format!("cannot start the loading thread: {error}"),
@@ -59,8 +71,8 @@ impl ReferenceProject {
         })
     }
 
-    fn load_here(config: &Path) -> Result<Self, ProjectError> {
-        let program = project::load(config)?;
+    fn load_here(config: &Path, disk: &project::disk::Disk) -> Result<Self, ProjectError> {
+        let program = project::load(config, disk)?;
         let index = binding::bind(&program)?;
         let files = program.file_lookup();
         Ok(Self {
@@ -84,7 +96,7 @@ impl ReferenceProject {
 }
 
 /// Selects reference groups by token position or by exact declared name.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ReferenceQuery {
     /// The identifier token containing `position` in `file`.
     At {
@@ -97,13 +109,13 @@ pub enum ReferenceQuery {
 }
 
 /// One-based line and one-based UTF-16 column.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct SourcePosition {
     pub line: usize,
     pub column: usize,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ReferenceResult {
     /// The selected configuration file, in the canonical form of its
     /// directory, which every `Location::file` is relative to.
@@ -113,7 +125,7 @@ pub struct ReferenceResult {
 }
 
 /// Every searched occurrence of one underlying symbol.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ReferenceGroup {
     /// The symbol's declarations, including merged declarations outside the
     /// searched files.
@@ -122,13 +134,13 @@ pub struct ReferenceGroup {
     pub occurrences: Vec<Occurrence>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NamedLocation {
     pub name: String,
     pub location: Location,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Occurrence {
     pub name: String,
     pub location: Location,
@@ -137,14 +149,14 @@ pub struct Occurrence {
 
 /// A source range. `file` uses `/` separators relative to the configuration
 /// directory; `end` is exclusive.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct Location {
     pub file: String,
     pub start: SourcePosition,
     pub end: SourcePosition,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Role {
     Declaration,
@@ -154,7 +166,7 @@ pub enum Role {
 }
 
 /// A project that could not be constructed. No partial index exists.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ProjectError {
     pub kind: ProjectErrorKind,
     pub message: String,
@@ -163,7 +175,7 @@ pub struct ProjectError {
 }
 
 /// Serialized as the variant name, the stable spelling tools compare.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ProjectErrorKind {
     /// A file or configuration could not be read, or the system refused a
     /// resource loading needs, such as its thread.
@@ -181,7 +193,7 @@ pub enum ProjectErrorKind {
 }
 
 /// A query that could not produce a reference result.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct QueryError {
     pub kind: QueryErrorKind,
     pub message: String,
@@ -194,7 +206,7 @@ pub struct QueryError {
 }
 
 /// Serialized as the variant name, the stable spelling tools compare.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum QueryErrorKind {
     /// The query file is not one of the project's searched files, including a
     /// path that cannot be made absolute against the working directory.

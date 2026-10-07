@@ -62,7 +62,7 @@ impl Project {
     }
 
     fn try_load(&self, config: &str) -> Result<Program, ProjectError> {
-        load(&self.root.join(config))
+        load(&self.root.join(config), &super::disk::Disk::default())
     }
 
     fn load(&self, config: &str) -> Program {
@@ -1899,7 +1899,7 @@ fn imports_chains_beyond_the_limit_fail_the_load() {
     // Loading runs on a stack of this size.
     let error = std::thread::Builder::new()
         .stack_size(LOAD_STACK_BYTES)
-        .spawn(move || load(&config).unwrap_err())
+        .spawn(move || load(&config, &super::disk::Disk::default()).unwrap_err())
         .unwrap()
         .join()
         .unwrap();
@@ -1935,7 +1935,7 @@ fn long_extends_chains_load_in_linear_time() {
     let config = project.root.join("tsconfig.json");
     let (send, receive) = std::sync::mpsc::channel();
     std::thread::spawn(move || {
-        let program = load(&config).unwrap();
+        let program = load(&config, &super::disk::Disk::default()).unwrap();
         let inputs: Vec<String> = inputs(&program).into_iter().map(str::to_owned).collect();
         send.send(inputs).unwrap();
     });
@@ -1973,7 +1973,7 @@ fn branching_imports_cycles_and_shared_failures_end_quickly() {
     let config = project.root.join("tsconfig.json");
     let (send, receive) = std::sync::mpsc::channel();
     std::thread::spawn(move || {
-        let program = load(&config).unwrap();
+        let program = load(&config, &super::disk::Disk::default()).unwrap();
         let results = ["#x", "#p", "#d0", "#ok"].map(|name| resolved(&program, "app.ts", name));
         send.send(results).unwrap();
     });
