@@ -3,71 +3,8 @@
 mod support;
 
 use serde_json::Value;
-use std::process::{Command, Output};
-use support::{Fixture, project};
-
-struct Service {
-    fixture: Fixture,
-    runtime: std::path::PathBuf,
-}
-
-impl Service {
-    fn new(files: &[(&str, &str)]) -> Self {
-        let fixture = project(files);
-        let runtime = std::path::Path::new("/tmp").join(format!(
-            "tsps-{}-{}",
-            std::process::id(),
-            fixture.root.file_name().unwrap().to_str().unwrap()
-        ));
-        Self { fixture, runtime }
-    }
-
-    fn command(&self) -> Command {
-        let mut command = Command::new(env!("CARGO_BIN_EXE_tsparse"));
-        command
-            .current_dir(&self.fixture.root)
-            .env("TSPARSE_SERVICE_DIR", &self.runtime)
-            .env("TSPARSE_SERVICE_IDLE_SECS", "10");
-        command
-    }
-
-    fn run(&self, args: &[&str]) -> Output {
-        self.command()
-            .args(args)
-            .args(["--project", "tsconfig.json"])
-            .output()
-            .unwrap()
-    }
-
-    fn query(&self, name: &str) -> Value {
-        json(self.run(&["--references", "--name", name]))
-    }
-
-    fn status(&self) -> Value {
-        json(self.run(&["--references-status"]))
-    }
-}
-
-impl Drop for Service {
-    fn drop(&mut self) {
-        let _ = self.run(&["--references-stop"]);
-        let _ = std::fs::remove_dir_all(&self.runtime);
-    }
-}
-
-fn json(output: Output) -> Value {
-    assert!(
-        output.status.success(),
-        "{}",
-        String::from_utf8_lossy(&output.stderr)
-    );
-    assert!(
-        output.stderr.is_empty(),
-        "{}",
-        String::from_utf8_lossy(&output.stderr)
-    );
-    serde_json::from_slice(&output.stdout).unwrap()
-}
+use std::process::Command;
+use support::service::{Service, json};
 
 #[test]
 fn independent_invocations_reuse_the_service_and_stop_releases_it() {
@@ -318,7 +255,7 @@ fn protocol_request_limit_accepts_under_and_at_limit_and_rejects_over_it() {
     for size in [(1 << 20) - 1, 1 << 20, (1 << 20) + 1] {
         let mut request = serde_json::to_vec(&serde_json::json!({
             "identity": {"config": service.fixture.path("tsconfig.json"), "build": env!("TSPARSE_SERVICE_BUILD")},
-            "action": {"Query": {"Name": {"name": "value", "file": null}}}
+            "action": {"Query": {"References": {"Name": {"name": "value", "file": null}}}}
         })).unwrap();
         request.resize(size - 1, b' ');
         request.push(b'\n');
@@ -333,7 +270,7 @@ fn protocol_request_limit_accepts_under_and_at_limit_and_rejects_over_it() {
             assert!(write.is_ok(), "size {size}: {write:?}");
             read.unwrap();
             let response: Value = serde_json::from_str(&response).unwrap();
-            assert_eq!(response["Query"]["Ok"], expected);
+            assert_eq!(response["Query"]["Ok"]["References"], expected);
         } else {
             // A peer may reset on close with an unread suffix. Either outcome is
             // a failed request, and must not kill or rebuild the project service.
@@ -345,4 +282,57 @@ fn protocol_request_limit_accepts_under_and_at_limit_and_rejects_over_it() {
         assert_eq!(service.query("value"), expected);
         assert_eq!(service.status()["generation"], 1);
     }
+}
+
+#[test]
+fn a_service_never_holds_a_descriptor_its_launcher_inherited() {
+    // A launcher can inherit a descriptor its parent never meant to pass:
+    // on macOS, std creates a pipe and marks it close-on-exec in two steps,
+    // so a concurrent spawn can inherit it. The service that launcher
+    // starts outlives it and must not hold that descriptor, or whoever
+    // waits for the pipe's end of file, such as `Command::output` waiting
+    // for another client, waits until the service exits.
+    use std::io::Read;
+    use std::os::fd::FromRawFd;
+    use std::process::Stdio;
+    unsafe extern "C" {
+        fn pipe(descriptors: *mut std::ffi::c_int) -> std::ffi::c_int;
+    }
+    let service = Service::new(&[("a.ts", "export const value = 1;")]);
+    let mut descriptors = [0; 2];
+    // SAFETY: `pipe` writes two new descriptors, neither close-on-exec.
+    assert_eq!(unsafe { pipe(descriptors.as_mut_ptr()) }, 0);
+    // SAFETY: each descriptor is new and owned once.
+    let (mut reader, writer) = unsafe {
+        (
+            std::fs::File::from_raw_fd(descriptors[0]),
+            std::fs::File::from_raw_fd(descriptors[1]),
+        )
+    };
+    let client = service
+        .command()
+        .args([
+            "--references",
+            "--project",
+            "tsconfig.json",
+            "--name",
+            "value",
+        ])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    drop(writer);
+    let output = client.wait_with_output().unwrap();
+    assert_eq!(json(output)["groups"].as_array().unwrap().len(), 1);
+    let (send, receive) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        let mut bytes = Vec::new();
+        let _ = send.send(reader.read_to_end(&mut bytes).map(|_| bytes));
+    });
+    let read = receive
+        .recv_timeout(std::time::Duration::from_secs(30))
+        .expect("the service still holds the pipe its launcher inherited");
+    assert!(read.unwrap().is_empty());
+    assert_eq!(service.status()["running"], true);
 }

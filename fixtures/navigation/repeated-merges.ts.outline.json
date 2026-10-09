@@ -1,0 +1,39 @@
+{
+  "entries": [
+    {"anchor":{"column":16,"line":6},"key":"pkg","kind":"module","label":"\"pkg\"","range":{"end":{"column":2,"line":10},"start":{"column":1,"line":6}},"selector":"pkg","signature":"declare module \"pkg\"", "children": [
+      {"anchor":{"column":13,"line":7},"key":"Commands","kind":"interface","label":"Commands","range":{"end":{"column":4,"line":9},"start":{"column":3,"line":7}},"selector":"pkg.Commands","signature":"interface Commands<ReturnType>", "children": [
+        {"anchor":{"column":5,"line":8},"key":"first","kind":"property","label":"first","range":{"end":{"column":29,"line":8},"start":{"column":5,"line":8}},"selector":"pkg.Commands.first","signature":"first: () => ReturnType", "children": []}
+      ]}
+    ]},
+    {"anchor":{"column":16,"line":12},"key":"pkg","kind":"module","label":"\"pkg\"","range":{"end":{"column":2,"line":16},"start":{"column":1,"line":12}},"selector":"pkg","signature":"declare module \"pkg\"", "children": [
+      {"anchor":{"column":13,"line":13},"key":"Commands","kind":"interface","label":"Commands","range":{"end":{"column":4,"line":15},"start":{"column":3,"line":13}},"selector":"pkg.Commands","signature":"interface Commands<ReturnType>", "children": [
+        {"anchor":{"column":5,"line":14},"key":"second","kind":"property","label":"second","range":{"end":{"column":30,"line":14},"start":{"column":5,"line":14}},"selector":"pkg.Commands.second","signature":"second: () => ReturnType", "children": []}
+      ]}
+    ]},
+    {"anchor":{"column":9,"line":18},"key":"global","kind":"module","label":"global","range":{"end":{"column":2,"line":22},"start":{"column":1,"line":18}},"selector":"global","signature":"declare global", "children": [
+      {"anchor":{"column":13,"line":19},"key":"Window","kind":"interface","label":"Window","range":{"end":{"column":4,"line":21},"start":{"column":3,"line":19}},"selector":"global.Window","signature":"interface Window", "children": [
+        {"anchor":{"column":5,"line":20},"key":"first","kind":"property","label":"first","range":{"end":{"column":19,"line":20},"start":{"column":5,"line":20}},"selector":"global.Window.first","signature":"first: string", "children": []}
+      ]}
+    ]},
+    {"anchor":{"column":9,"line":24},"key":"global","kind":"module","label":"global","range":{"end":{"column":2,"line":28},"start":{"column":1,"line":24}},"selector":"global","signature":"declare global", "children": [
+      {"anchor":{"column":13,"line":25},"key":"Window","kind":"interface","label":"Window","range":{"end":{"column":4,"line":27},"start":{"column":3,"line":25}},"selector":"global.Window","signature":"interface Window", "children": [
+        {"anchor":{"column":5,"line":26},"key":"second","kind":"property","label":"second","range":{"end":{"column":20,"line":26},"start":{"column":5,"line":26}},"selector":"global.Window.second","signature":"second: string", "children": []}
+      ]}
+    ]},
+    {"anchor":{"column":17,"line":30},"key":"publish","kind":"function","label":"publish","range":{"end":{"column":2,"line":40},"start":{"column":1,"line":30}},"selector":"publish","signature":"export function publish(kind: string, evidence: { records: { body: string }[] })", "children": [
+      {"anchor":{"column":7,"line":31},"key":"result","kind":"variable","label":"result","range":{"end":{"column":23,"line":31},"start":{"column":3,"line":31}},"selector":"publish.result","signature":"let result: unknown", "children": []},
+      {"anchor":{"column":13,"line":33},"key":"records","kind":"variable","label":"records","range":{"end":{"column":34,"line":33},"start":{"column":5,"line":33}},"selector":"publish.records", "children": []},
+      {"anchor":{"column":16,"line":34},"key":"records","kind":"property","label":"records","range":{"end":{"column":75,"line":34},"start":{"column":16,"line":34}},"selector":"publish.records","signature":"records: records.map(({ body }) => ({ size: body.length }))", "children": [
+        {"anchor":{"column":37,"line":34},"kind":"function","label":"records.map() callback","range":{"end":{"column":74,"line":34},"start":{"column":37,"line":34}}, "children": [
+          {"anchor":{"column":54,"line":34},"key":"size","kind":"property","label":"size","range":{"end":{"column":71,"line":34},"start":{"column":54,"line":34}},"selector":"publish.records.size","signature":"size: body.length", "children": []}
+        ]}
+      ]},
+      {"anchor":{"column":13,"line":36},"key":"records","kind":"variable","label":"records","range":{"end":{"column":34,"line":36},"start":{"column":5,"line":36}},"selector":"publish.records", "children": []},
+      {"anchor":{"column":16,"line":37},"key":"records","kind":"property","label":"records","range":{"end":{"column":75,"line":37},"start":{"column":16,"line":37}},"selector":"publish.records","signature":"records: records.map(({ body }) => ({ size: body.length }))", "children": [
+        {"anchor":{"column":37,"line":37},"kind":"function","label":"records.map() callback","range":{"end":{"column":74,"line":37},"start":{"column":37,"line":37}}, "children": [
+          {"anchor":{"column":54,"line":37},"key":"size","kind":"property","label":"size","range":{"end":{"column":71,"line":37},"start":{"column":54,"line":37}},"selector":"publish.records.size","signature":"size: body.length", "children": []}
+        ]}
+      ]}
+    ]}
+  ]
+}

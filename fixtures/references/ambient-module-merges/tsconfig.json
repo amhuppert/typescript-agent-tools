@@ -1,0 +1,1 @@
+{ "compilerOptions": { "noLib": true }, "files": ["first.d.ts", "second.d.ts", "use.ts"] }

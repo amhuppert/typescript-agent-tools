@@ -1,0 +1,25 @@
+{
+  "compiler": "7.0.2",
+  "symbols": [
+    {"name": "\"pkg\"", "kind": 3, "range": "2:1-11:2", "selection": "2:16-2:21", "children": [
+      {"name": "Options", "kind": 11, "range": "3:3-5:4", "selection": "3:20-3:27", "children": [
+        {"name": "verbose", "kind": 7, "range": "4:5-4:23", "selection": "4:5-4:12", "children": []}
+      ]},
+      {"name": "run", "kind": 12, "range": "6:3-6:47", "selection": "6:19-6:22", "children": []},
+      {"name": "run", "kind": 12, "range": "7:3-7:62", "selection": "7:19-7:22", "children": []},
+      {"name": "global", "kind": 3, "range": "8:3-10:4", "selection": "8:3-8:9", "children": [
+        {"name": "pkgVersion", "kind": 13, "range": "9:9-9:27", "selection": "9:9-9:19", "children": []}
+      ]}
+    ]},
+    {"name": "\"pkg/*\"", "kind": 3, "range": "13:1-13:24", "selection": "13:16-13:23", "children": []},
+    {"name": "Lib.Nested", "kind": 3, "range": "15:1-18:2", "selection": "15:19-15:29", "children": [
+      {"name": "nestedCall", "kind": 12, "range": "16:3-16:31", "selection": "16:12-16:22", "children": []},
+      {"name": "counter", "kind": 13, "range": "17:7-17:22", "selection": "17:7-17:14", "children": []}
+    ]},
+    {"name": "global", "kind": 3, "range": "20:1-24:2", "selection": "20:9-20:15", "children": [
+      {"name": "Array", "kind": 11, "range": "21:3-23:4", "selection": "21:13-21:18", "children": [
+        {"name": "customFind", "kind": 6, "range": "22:5-22:65", "selection": "22:5-22:15", "children": []}
+      ]}
+    ]}
+  ]
+}

@@ -1,0 +1,1550 @@
+{
+  "description": "What a comment directive is (processCommentDirective): after `//` and any further slashes, or at the start of a block comment's last line after any slashes and asterisks, only spaces and tabs may precede `@ts-ignore` or `@ts-expect-error`, matched as a case-sensitive prefix. Each space class after `//` and at the start of a block comment's last line, after each line break, before a missing module (TS2307), and controls: other slash and asterisk runs, a directive on the first line of a block comment or on the line of the error, and directive text inside a template, string, or regular expression.",
+  "config": "{\"compilerOptions\": {\"noLib\": true, \"types\": []}, \"files\": [\"main.ts\"]}",
+  "cases": [
+    {
+      "name": "line-lf-space",
+      "files": {
+        "main.ts": "// @ts-ignore\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-lf-space",
+      "files": {
+        "main.ts": "/* x\n @ts-ignore */\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-star-lf-space",
+      "files": {
+        "main.ts": "/* x\n * @ts-ignore */\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "line-lf-tab",
+      "files": {
+        "main.ts": "//\t@ts-ignore\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-lf-tab",
+      "files": {
+        "main.ts": "/* x\n\t@ts-ignore */\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-star-lf-tab",
+      "files": {
+        "main.ts": "/* x\n\t* @ts-ignore */\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "line-lf-nbsp",
+      "files": {
+        "main.ts": "// @ts-ignore\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:2:19"
+        ]
+      }
+    },
+    {
+      "name": "block-lf-nbsp",
+      "files": {
+        "main.ts": "/* x\n @ts-ignore */\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "block-star-lf-nbsp",
+      "files": {
+        "main.ts": "/* x\n * @ts-ignore */\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "line-lf-vt",
+      "files": {
+        "main.ts": "//\u000b@ts-ignore\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:2:19"
+        ]
+      }
+    },
+    {
+      "name": "block-lf-vt",
+      "files": {
+        "main.ts": "/* x\n\u000b@ts-ignore */\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "block-star-lf-vt",
+      "files": {
+        "main.ts": "/* x\n\u000b* @ts-ignore */\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "line-lf-ff",
+      "files": {
+        "main.ts": "//\f@ts-ignore\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:2:19"
+        ]
+      }
+    },
+    {
+      "name": "block-lf-ff",
+      "files": {
+        "main.ts": "/* x\n\f@ts-ignore */\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "block-star-lf-ff",
+      "files": {
+        "main.ts": "/* x\n\f* @ts-ignore */\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "line-cr-space",
+      "files": {
+        "main.ts": "// @ts-ignore\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-cr-space",
+      "files": {
+        "main.ts": "/* x\r @ts-ignore */\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-star-cr-space",
+      "files": {
+        "main.ts": "/* x\r * @ts-ignore */\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "line-cr-tab",
+      "files": {
+        "main.ts": "//\t@ts-ignore\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-cr-tab",
+      "files": {
+        "main.ts": "/* x\r\t@ts-ignore */\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-star-cr-tab",
+      "files": {
+        "main.ts": "/* x\r\t* @ts-ignore */\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "line-cr-nbsp",
+      "files": {
+        "main.ts": "// @ts-ignore\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:2:19"
+        ]
+      }
+    },
+    {
+      "name": "block-cr-nbsp",
+      "files": {
+        "main.ts": "/* x\r @ts-ignore */\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "block-star-cr-nbsp",
+      "files": {
+        "main.ts": "/* x\r * @ts-ignore */\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "line-cr-vt",
+      "files": {
+        "main.ts": "//\u000b@ts-ignore\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:2:19"
+        ]
+      }
+    },
+    {
+      "name": "block-cr-vt",
+      "files": {
+        "main.ts": "/* x\r\u000b@ts-ignore */\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "block-star-cr-vt",
+      "files": {
+        "main.ts": "/* x\r\u000b* @ts-ignore */\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "line-cr-ff",
+      "files": {
+        "main.ts": "//\f@ts-ignore\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:2:19"
+        ]
+      }
+    },
+    {
+      "name": "block-cr-ff",
+      "files": {
+        "main.ts": "/* x\r\f@ts-ignore */\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "block-star-cr-ff",
+      "files": {
+        "main.ts": "/* x\r\f* @ts-ignore */\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "line-crlf-space",
+      "files": {
+        "main.ts": "// @ts-ignore\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-crlf-space",
+      "files": {
+        "main.ts": "/* x\r\n @ts-ignore */\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-star-crlf-space",
+      "files": {
+        "main.ts": "/* x\r\n * @ts-ignore */\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "line-crlf-tab",
+      "files": {
+        "main.ts": "//\t@ts-ignore\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-crlf-tab",
+      "files": {
+        "main.ts": "/* x\r\n\t@ts-ignore */\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-star-crlf-tab",
+      "files": {
+        "main.ts": "/* x\r\n\t* @ts-ignore */\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "line-crlf-nbsp",
+      "files": {
+        "main.ts": "// @ts-ignore\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:2:19"
+        ]
+      }
+    },
+    {
+      "name": "block-crlf-nbsp",
+      "files": {
+        "main.ts": "/* x\r\n @ts-ignore */\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "block-star-crlf-nbsp",
+      "files": {
+        "main.ts": "/* x\r\n * @ts-ignore */\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "line-crlf-vt",
+      "files": {
+        "main.ts": "//\u000b@ts-ignore\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:2:19"
+        ]
+      }
+    },
+    {
+      "name": "block-crlf-vt",
+      "files": {
+        "main.ts": "/* x\r\n\u000b@ts-ignore */\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "block-star-crlf-vt",
+      "files": {
+        "main.ts": "/* x\r\n\u000b* @ts-ignore */\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "line-crlf-ff",
+      "files": {
+        "main.ts": "//\f@ts-ignore\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:2:19"
+        ]
+      }
+    },
+    {
+      "name": "block-crlf-ff",
+      "files": {
+        "main.ts": "/* x\r\n\f@ts-ignore */\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "block-star-crlf-ff",
+      "files": {
+        "main.ts": "/* x\r\n\f* @ts-ignore */\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "line-ls-space",
+      "files": {
+        "main.ts": "// @ts-ignore import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-ls-space",
+      "files": {
+        "main.ts": "/* x  @ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-star-ls-space",
+      "files": {
+        "main.ts": "/* x  * @ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "line-ls-tab",
+      "files": {
+        "main.ts": "//\t@ts-ignore import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-ls-tab",
+      "files": {
+        "main.ts": "/* x \t@ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-star-ls-tab",
+      "files": {
+        "main.ts": "/* x \t* @ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "line-ls-nbsp",
+      "files": {
+        "main.ts": "// @ts-ignore import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:2:19"
+        ]
+      }
+    },
+    {
+      "name": "block-ls-nbsp",
+      "files": {
+        "main.ts": "/* x  @ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "block-star-ls-nbsp",
+      "files": {
+        "main.ts": "/* x  * @ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "line-ls-vt",
+      "files": {
+        "main.ts": "//\u000b@ts-ignore import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:2:19"
+        ]
+      }
+    },
+    {
+      "name": "block-ls-vt",
+      "files": {
+        "main.ts": "/* x \u000b@ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "block-star-ls-vt",
+      "files": {
+        "main.ts": "/* x \u000b* @ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "line-ls-ff",
+      "files": {
+        "main.ts": "//\f@ts-ignore import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:2:19"
+        ]
+      }
+    },
+    {
+      "name": "block-ls-ff",
+      "files": {
+        "main.ts": "/* x \f@ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "block-star-ls-ff",
+      "files": {
+        "main.ts": "/* x \f* @ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "line-ps-space",
+      "files": {
+        "main.ts": "// @ts-ignore import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-ps-space",
+      "files": {
+        "main.ts": "/* x  @ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-star-ps-space",
+      "files": {
+        "main.ts": "/* x  * @ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "line-ps-tab",
+      "files": {
+        "main.ts": "//\t@ts-ignore import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-ps-tab",
+      "files": {
+        "main.ts": "/* x \t@ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-star-ps-tab",
+      "files": {
+        "main.ts": "/* x \t* @ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "line-ps-nbsp",
+      "files": {
+        "main.ts": "// @ts-ignore import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:2:19"
+        ]
+      }
+    },
+    {
+      "name": "block-ps-nbsp",
+      "files": {
+        "main.ts": "/* x  @ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "block-star-ps-nbsp",
+      "files": {
+        "main.ts": "/* x  * @ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "line-ps-vt",
+      "files": {
+        "main.ts": "//\u000b@ts-ignore import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:2:19"
+        ]
+      }
+    },
+    {
+      "name": "block-ps-vt",
+      "files": {
+        "main.ts": "/* x \u000b@ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "block-star-ps-vt",
+      "files": {
+        "main.ts": "/* x \u000b* @ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "line-ps-ff",
+      "files": {
+        "main.ts": "//\f@ts-ignore import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:2:19"
+        ]
+      }
+    },
+    {
+      "name": "block-ps-ff",
+      "files": {
+        "main.ts": "/* x \f@ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "block-star-ps-ff",
+      "files": {
+        "main.ts": "/* x \f* @ts-ignore */ import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "line-none",
+      "files": {
+        "main.ts": "//@ts-ignore\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "line-spaces-and-tabs",
+      "files": {
+        "main.ts": "// \t \t@ts-ignore\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "line-three-slashes",
+      "files": {
+        "main.ts": "/// @ts-ignore\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "line-four-slashes",
+      "files": {
+        "main.ts": "////@ts-ignore\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "line-longer-name",
+      "files": {
+        "main.ts": "// @ts-ignored\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "line-upper-case",
+      "files": {
+        "main.ts": "// @TS-IGNORE\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:2:19"
+        ]
+      }
+    },
+    {
+      "name": "line-reason",
+      "files": {
+        "main.ts": "// @ts-expect-error: the module is generated\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "line-after-code",
+      "files": {
+        "main.ts": "export {};// @ts-ignore\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-none",
+      "files": {
+        "main.ts": "/*@ts-ignore*/\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-jsdoc",
+      "files": {
+        "main.ts": "/** @ts-ignore */\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-slash",
+      "files": {
+        "main.ts": "/*/ @ts-ignore */\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-stars",
+      "files": {
+        "main.ts": "/*** @ts-ignore */\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-first-line",
+      "files": {
+        "main.ts": "/* @ts-ignore\n x */\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "block-jsdoc-lines",
+      "files": {
+        "main.ts": "/**\n * @ts-expect-error\n */\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:4:19"
+        ]
+      }
+    },
+    {
+      "name": "block-last-line",
+      "files": {
+        "main.ts": "/**\n * x\n * @ts-expect-error */\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "block-same-line",
+      "files": {
+        "main.ts": "/* @ts-ignore */ import { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:1:36"
+        ]
+      }
+    },
+    {
+      "name": "template-line",
+      "files": {
+        "main.ts": "export const s = `\n// @ts-ignore\n`; import { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:22"
+        ]
+      }
+    },
+    {
+      "name": "string-line",
+      "files": {
+        "main.ts": "export const s = \"\\\n// @ts-ignore\\\n\"; import { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:22"
+        ]
+      }
+    },
+    {
+      "name": "regex-line",
+      "files": {
+        "main.ts": "export const s = /\\/\\/ @ts-ignore/;\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:2:19"
+        ]
+      }
+    }
+  ]
+}

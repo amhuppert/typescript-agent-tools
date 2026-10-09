@@ -1,0 +1,10 @@
+{
+  "compiler": "7.0.2",
+  "symbols": [
+    {"name": "first", "kind": 13, "range": "1:14-1:23", "selection": "1:14-1:19", "children": []},
+    {"name": "second", "kind": 12, "range": "1:25-1:70", "selection": "1:41-1:47", "children": [
+      {"name": "inner", "kind": 13, "range": "1:58-1:67", "selection": "1:58-1:63", "children": []}
+    ]},
+    {"name": "Third", "kind": 5, "range": "4:1-4:22", "selection": "4:14-4:19", "children": []}
+  ]
+}

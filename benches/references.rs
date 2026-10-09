@@ -10,9 +10,10 @@ use std::{
     sync::atomic::{AtomicBool, AtomicUsize, Ordering},
     time::{Duration, Instant},
 };
-use typescript_parser::references::{
-    QueryErrorKind, ReferenceProject, ReferenceQuery, SourcePosition,
-};
+use typescript_parser::analysis::{AnalysisError, QueryErrorKind};
+use typescript_parser::project::Project;
+use typescript_parser::references::ReferenceQuery;
+use typescript_parser::source::SourcePosition;
 
 struct Allocator;
 static ENABLED: AtomicBool = AtomicBool::new(false);
@@ -181,13 +182,13 @@ fn main() {
     let loads: Vec<Duration> = (0..5)
         .map(|_| {
             let start = Instant::now();
-            let project = ReferenceProject::load(&config).unwrap();
+            let project = Project::load(&config).unwrap();
             let elapsed = start.elapsed();
             drop(project);
             elapsed
         })
         .collect();
-    let project = ReferenceProject::load(&config).unwrap();
+    let project = Project::load(&config).unwrap();
     let queries = positions(&config, 2_000);
     let mut outcomes = Outcomes::default();
     let mut query_time = Duration::ZERO;
@@ -207,12 +208,14 @@ fn main() {
                 outcomes.groups += result.groups.len();
                 outcomes.answered_time += elapsed;
             }
-            Err(error) => match error.kind {
+            Err(AnalysisError::Query(error)) => match error.kind {
                 QueryErrorKind::OutsideProject => outcomes.outside_project += 1,
                 QueryErrorKind::InvalidPosition => outcomes.invalid_position += 1,
                 QueryErrorKind::UnsupportedTarget => outcomes.unsupported_target += 1,
                 QueryErrorKind::UnresolvedTarget => outcomes.unresolved_target += 1,
             },
+            // Queries name the captured files exactly.
+            Err(AnalysisError::Input(error)) => panic!("{error}"),
         }
     }
     drop(project);
@@ -220,7 +223,7 @@ fn main() {
     LIVE.store(0, Ordering::Relaxed);
     PEAK.store(0, Ordering::Relaxed);
     ENABLED.store(true, Ordering::Relaxed);
-    let project = ReferenceProject::load(&config).unwrap();
+    let project = Project::load(&config).unwrap();
     let retained = LIVE.load(Ordering::Relaxed);
     let peak = PEAK.load(Ordering::Relaxed);
     drop(project);

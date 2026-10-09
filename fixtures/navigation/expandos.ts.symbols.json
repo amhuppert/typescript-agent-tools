@@ -1,0 +1,44 @@
+{
+  "compiler": "7.0.2",
+  "symbols": [
+    {"name": "target", "kind": 12, "range": "2:1-2:21", "selection": "2:10-2:16", "children": [
+      {"name": "extra", "kind": 13, "range": "3:1-3:13", "selection": "3:8-3:13", "children": []},
+      {"name": "callback", "kind": 13, "range": "4:1-4:16", "selection": "4:8-4:16", "children": [
+        {"name": "callback", "kind": 12, "range": "4:19-6:2", "selection": "4:19-4:19", "children": [
+          {"name": "inCallback", "kind": 13, "range": "5:9-5:23", "selection": "5:9-5:19", "children": []}
+        ]}
+      ]},
+      {"name": "method", "kind": 13, "range": "29:1-29:14", "selection": "29:8-29:14", "children": [
+        {"name": "method", "kind": 12, "range": "29:17-31:2", "selection": "29:17-29:17", "children": [
+          {"name": "keepMe", "kind": 12, "range": "30:3-30:23", "selection": "30:12-30:18", "children": []}
+        ]}
+      ]}
+    ]},
+    {"name": "createHost", "kind": 12, "range": "8:1-18:2", "selection": "8:10-8:20", "children": [
+      {"name": "startEligible", "kind": 12, "range": "9:3-9:30", "selection": "9:12-9:25", "children": []},
+      {"name": "run", "kind": 13, "range": "10:9-10:16", "selection": "10:9-10:12", "children": [
+        {"name": "nested", "kind": 12, "range": "14:7-14:27", "selection": "14:16-14:22", "children": []}
+      ]},
+      {"name": "other", "kind": 6, "range": "16:5-16:15", "selection": "16:5-16:10", "children": []}
+    ]},
+    {"name": "Counter", "kind": 5, "range": "20:1-23:2", "selection": "20:7-20:14", "children": [
+      {"name": "size", "kind": 7, "range": "21:3-21:27", "selection": "21:7-21:11", "children": []},
+      {"name": "size2", "kind": 7, "range": "22:3-22:13", "selection": "22:3-22:8", "children": []}
+    ]},
+    {"name": "size", "kind": 12, "range": "24:1-24:19", "selection": "24:10-24:14", "children": []},
+    {"name": "config", "kind": 13, "range": "26:7-26:30", "selection": "26:7-26:13", "children": [
+      {"name": "retries", "kind": 7, "range": "26:18-26:28", "selection": "26:18-26:25", "children": []}
+    ]},
+    {"name": "standalone", "kind": 7, "range": "27:19-27:32", "selection": "27:19-27:29", "children": []},
+    {"name": "call", "kind": 12, "range": "28:1-28:44", "selection": "28:18-28:22", "children": []},
+    {"name": "outer", "kind": 12, "range": "32:1-37:2", "selection": "32:10-32:15", "children": [
+      {"name": "inner", "kind": 12, "range": "33:3-33:22", "selection": "33:12-33:17", "children": [
+        {"name": "attached", "kind": 13, "range": "34:3-34:17", "selection": "34:9-34:17", "children": [
+          {"name": "attached", "kind": 12, "range": "34:20-36:4", "selection": "34:20-34:20", "children": [
+            {"name": "keepInner", "kind": 12, "range": "35:5-35:28", "selection": "35:14-35:23", "children": []}
+          ]}
+        ]}
+      ]}
+    ]}
+  ]
+}

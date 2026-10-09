@@ -7,14 +7,50 @@
 //! Markers are comments, so the same sources remain valid TypeScript.
 #![allow(dead_code)]
 
+pub mod service;
+
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicUsize, Ordering};
+use typescript_parser::analysis::{AnalysisError, InputError, QueryError, QueryErrorKind};
+use typescript_parser::project::{Project, ProjectRequest, ProjectResponse, ProjectSession};
 use typescript_parser::references::{
-    Location, ProjectError, QueryErrorKind, ReferenceGroup, ReferenceProject, ReferenceQuery, Role,
-    SourcePosition,
+    Location, ReferenceGroup, ReferenceQuery, ReferenceResult, Role,
 };
+use typescript_parser::source::SourcePosition;
+
+/// A reference query through a session's one request boundary.
+pub fn references(
+    session: &mut ProjectSession,
+    query: ReferenceQuery,
+) -> Result<ReferenceResult, AnalysisError> {
+    session
+        .execute(ProjectRequest::References(query))
+        .map(|response| match response {
+            ProjectResponse::References(result) => result,
+            other => panic!("a references request answered {other:?}"),
+        })
+}
+
+/// The query failure of a result that must be one.
+pub fn query_error<T: std::fmt::Debug>(result: Result<T, AnalysisError>) -> QueryError {
+    match result {
+        Err(AnalysisError::Query(error)) => error,
+        other => panic!("expected a query failure: {other:?}"),
+    }
+}
+
+/// `query_error` as a method, for a query's result.
+pub trait QueryFailure {
+    fn query_error(self) -> QueryError;
+}
+
+impl<T: std::fmt::Debug> QueryFailure for Result<T, AnalysisError> {
+    fn query_error(self) -> QueryError {
+        query_error(self)
+    }
+}
 
 /// The configuration of most test projects: no standard library.
 pub const CONFIG: &str = r#"{ "compilerOptions": { "noLib": true } }"#;
@@ -33,10 +69,9 @@ pub fn check(files: &[(&str, &str)]) {
 }
 
 /// The error from loading a temporary `CONFIG` project with `files`.
-pub fn load_error(files: &[(&str, &str)]) -> ProjectError {
+pub fn load_error(files: &[(&str, &str)]) -> InputError {
     let fixture = project(files);
-    ReferenceProject::load(&fixture.path("tsconfig.json"))
-        .expect_err("the project should fail to load")
+    Project::load(&fixture.path("tsconfig.json")).expect_err("the project should fail to load")
 }
 
 /// The directory of the checked-in marker fixtures.
@@ -106,12 +141,12 @@ impl Fixture {
         self.root.join(relative)
     }
 
-    pub fn load(&self) -> ReferenceProject {
+    pub fn load(&self) -> Project {
         self.load_config("tsconfig.json")
     }
 
-    pub fn load_config(&self, config: &str) -> ReferenceProject {
-        ReferenceProject::load(&self.path(config))
+    pub fn load_config(&self, config: &str) -> Project {
+        Project::load(&self.path(config))
             .unwrap_or_else(|error| panic!("project failed to load: {error}"))
     }
 
@@ -123,7 +158,7 @@ impl Fixture {
     }
 
     /// Query every marked token and compare its groups with the marked sets.
-    pub fn check_markers(&self, project: &ReferenceProject) {
+    pub fn check_markers(&self, project: &Project) {
         let markers = self.markers();
         assert!(!markers.is_empty(), "fixture has no markers");
         let groups = expected_groups(&markers);
@@ -142,7 +177,7 @@ impl Fixture {
                         QueryErrorKind::UnresolvedTarget
                     };
                     match result {
-                        Err(error) if error.kind == wanted => {}
+                        Err(AnalysisError::Query(error)) if error.kind == wanted => {}
                         Err(error) => panic!("{}: expected {wanted:?}, got {error}", context()),
                         Ok(result) => panic!(
                             "{}: expected {wanted:?}, got groups\n{}",
@@ -162,13 +197,7 @@ impl Fixture {
     }
 
     /// Compare an exact-name query with the marked groups `labels`.
-    pub fn check_name(
-        &self,
-        project: &ReferenceProject,
-        name: &str,
-        file: Option<&str>,
-        labels: &[&str],
-    ) {
+    pub fn check_name(&self, project: &Project, name: &str, file: Option<&str>, labels: &[&str]) {
         let markers = self.markers();
         let groups = expected_groups(&markers);
         let query = ReferenceQuery::Name {

@@ -1,0 +1,696 @@
+{
+  "description": "Ambient modules of one name declared in several files merge as TypeScript's `initializeChecker` merges them after `declare global` blocks (`mergeGlobalSymbol` on each file's symbol, `mergeSymbol`): alias forms, file arrangements and orders, shorthand declarations (`isShorthandAmbientModuleSymbol`), star exports, and pattern modules.",
+  "cases": [
+    {
+      "name": "ambient-merge-0",
+      "files": {
+        "base.d.ts": "declare namespace Lib { interface X { first: string } }\ndeclare module \"base\" { export interface X { first: string } }",
+        "main.ts": "import {X} from \"m\"; let value: X; export const marker=1;",
+        "one.d.ts": "declare module \"m\" { export import X = Lib.X; }",
+        "two.d.ts": "declare module \"m\" { export interface X { second: number } }",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": []}, \"files\": [\"base.d.ts\", \"one.d.ts\", \"two.d.ts\", \"main.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "native": {
+        "program": [
+          "base.d.ts",
+          "one.d.ts",
+          "two.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:9 X -> Interface|Transient [base.d.ts:1:25 InterfaceDeclaration, two.d.ts:1:22 InterfaceDeclaration]",
+          "1:33 X -> Interface|Transient [base.d.ts:1:25 InterfaceDeclaration, two.d.ts:1:22 InterfaceDeclaration]",
+          "1:49 marker -> BlockScopedVariable [main.ts:1:49 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "ambient-merge-1",
+      "files": {
+        "base.d.ts": "declare namespace Lib { interface X { first: string } }\ndeclare module \"base\" { export interface X { first: string } }",
+        "main.ts": "import {X} from \"m\"; let value: X; export const marker=1;",
+        "one.d.ts": "declare module \"m\" { export import X = Lib.X; }\ndeclare module \"m\" { export interface X { second: number } }",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": []}, \"files\": [\"base.d.ts\", \"one.d.ts\", \"main.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "one.d.ts:1:36"
+        ],
+        "note": "Reported at the alias's name; TypeScript reports TS2440 at the whole `import =` declaration."
+      },
+      "native": {
+        "program": [
+          "base.d.ts",
+          "one.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2440 one.d.ts:1:22"
+        ],
+        "names": [
+          "1:9 X -> Interface|Alias|AliasExcludes [one.d.ts:1:22 ImportEqualsDeclaration, one.d.ts:2:22 InterfaceDeclaration]",
+          "1:33 X -> Interface|Alias|AliasExcludes [one.d.ts:1:22 ImportEqualsDeclaration, one.d.ts:2:22 InterfaceDeclaration]",
+          "1:49 marker -> BlockScopedVariable [main.ts:1:49 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "ambient-merge-2",
+      "files": {
+        "base.d.ts": "declare namespace Lib { interface X { first: string } }\ndeclare module \"base\" { export interface X { first: string } }",
+        "main.ts": "import {X} from \"m\"; let value: X; export const marker=1;",
+        "one.d.ts": "declare module \"m\" { export interface X { second: number } }",
+        "two.d.ts": "declare module \"m\" { export import X = Lib.X; }",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": []}, \"files\": [\"base.d.ts\", \"one.d.ts\", \"two.d.ts\", \"main.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "two.d.ts:1:36"
+        ],
+        "note": "Reported at the alias's name; TypeScript reports TS2440 at the whole `import =` declaration."
+      },
+      "native": {
+        "program": [
+          "base.d.ts",
+          "one.d.ts",
+          "two.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2440 two.d.ts:1:22"
+        ],
+        "names": [
+          "1:9 X -> Interface|Alias|Transient|AliasExcludes [one.d.ts:1:22 InterfaceDeclaration, two.d.ts:1:22 ImportEqualsDeclaration]",
+          "1:33 X -> Interface|Alias|Transient|AliasExcludes [one.d.ts:1:22 InterfaceDeclaration, two.d.ts:1:22 ImportEqualsDeclaration]",
+          "1:49 marker -> BlockScopedVariable [main.ts:1:49 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "ambient-merge-3",
+      "files": {
+        "base.d.ts": "declare namespace Lib { interface X { first: string } }\ndeclare module \"base\" { export interface X { first: string } }",
+        "main.ts": "import {X} from \"m\"; let value: X; export const marker=1;",
+        "one.d.ts": "declare module \"m\" { export interface X { second: number } }\ndeclare module \"m\" { export import X = Lib.X; }",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": []}, \"files\": [\"base.d.ts\", \"one.d.ts\", \"main.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "one.d.ts:2:36"
+        ],
+        "note": "Reported at the alias's name; TypeScript reports TS2440 at the whole `import =` declaration."
+      },
+      "native": {
+        "program": [
+          "base.d.ts",
+          "one.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2440 one.d.ts:2:22"
+        ],
+        "names": [
+          "1:9 X -> Interface|Alias|AliasExcludes [one.d.ts:1:22 InterfaceDeclaration, one.d.ts:2:22 ImportEqualsDeclaration]",
+          "1:33 X -> Interface|Alias|AliasExcludes [one.d.ts:1:22 InterfaceDeclaration, one.d.ts:2:22 ImportEqualsDeclaration]",
+          "1:49 marker -> BlockScopedVariable [main.ts:1:49 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "ambient-merge-4",
+      "files": {
+        "base.d.ts": "declare namespace Lib { interface X { first: string } }\ndeclare module \"base\" { export interface X { first: string } }",
+        "main.ts": "import {X} from \"m\"; let value: X; export const marker=1;",
+        "one.d.ts": "declare module \"m\" { export {X} from \"base\"; }",
+        "two.d.ts": "declare module \"m\" { export interface X { second: number } }",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": []}, \"files\": [\"base.d.ts\", \"one.d.ts\", \"two.d.ts\", \"main.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "native": {
+        "program": [
+          "base.d.ts",
+          "one.d.ts",
+          "two.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:9 X -> Interface|Transient [base.d.ts:2:25 InterfaceDeclaration, two.d.ts:1:22 InterfaceDeclaration]",
+          "1:33 X -> Interface|Transient [base.d.ts:2:25 InterfaceDeclaration, two.d.ts:1:22 InterfaceDeclaration]",
+          "1:49 marker -> BlockScopedVariable [main.ts:1:49 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "ambient-merge-5",
+      "files": {
+        "base.d.ts": "declare namespace Lib { interface X { first: string } }\ndeclare module \"base\" { export interface X { first: string } }",
+        "main.ts": "import {X} from \"m\"; let value: X; export const marker=1;",
+        "one.d.ts": "declare module \"m\" { export {X} from \"base\"; }\ndeclare module \"m\" { export interface X { second: number } }",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": []}, \"files\": [\"base.d.ts\", \"one.d.ts\", \"main.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2484"
+        ]
+      },
+      "native": {
+        "program": [
+          "base.d.ts",
+          "one.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2484 one.d.ts:1:30"
+        ],
+        "names": [
+          "1:9 X -> Interface|Alias|AliasExcludes [one.d.ts:1:30 ExportSpecifier, one.d.ts:2:22 InterfaceDeclaration]",
+          "1:33 X -> Interface|Alias|AliasExcludes [one.d.ts:1:30 ExportSpecifier, one.d.ts:2:22 InterfaceDeclaration]",
+          "1:49 marker -> BlockScopedVariable [main.ts:1:49 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "ambient-merge-6",
+      "files": {
+        "base.d.ts": "declare namespace Lib { interface X { first: string } }\ndeclare module \"base\" { export interface X { first: string } }",
+        "main.ts": "import {X} from \"m\"; let value: X; export const marker=1;",
+        "one.d.ts": "declare module \"m\" { export interface X { second: number } }",
+        "two.d.ts": "declare module \"m\" { export {X} from \"base\"; }",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": []}, \"files\": [\"base.d.ts\", \"one.d.ts\", \"two.d.ts\", \"main.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2484"
+        ]
+      },
+      "native": {
+        "program": [
+          "base.d.ts",
+          "one.d.ts",
+          "two.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2484 two.d.ts:1:30"
+        ],
+        "names": [
+          "1:9 X -> Interface|Alias|Transient|AliasExcludes [one.d.ts:1:22 InterfaceDeclaration, two.d.ts:1:30 ExportSpecifier]",
+          "1:33 X -> Interface|Alias|Transient|AliasExcludes [one.d.ts:1:22 InterfaceDeclaration, two.d.ts:1:30 ExportSpecifier]",
+          "1:49 marker -> BlockScopedVariable [main.ts:1:49 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "ambient-merge-7",
+      "files": {
+        "base.d.ts": "declare namespace Lib { interface X { first: string } }\ndeclare module \"base\" { export interface X { first: string } }",
+        "main.ts": "import {X} from \"m\"; let value: X; export const marker=1;",
+        "one.d.ts": "declare module \"m\" { export interface X { second: number } }\ndeclare module \"m\" { export {X} from \"base\"; }",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": []}, \"files\": [\"base.d.ts\", \"one.d.ts\", \"main.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2484"
+        ]
+      },
+      "native": {
+        "program": [
+          "base.d.ts",
+          "one.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2484 one.d.ts:2:30"
+        ],
+        "names": [
+          "1:9 X -> Interface|Alias|AliasExcludes [one.d.ts:1:22 InterfaceDeclaration, one.d.ts:2:30 ExportSpecifier]",
+          "1:33 X -> Interface|Alias|AliasExcludes [one.d.ts:1:22 InterfaceDeclaration, one.d.ts:2:30 ExportSpecifier]",
+          "1:49 marker -> BlockScopedVariable [main.ts:1:49 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "alias-first-other-file",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.d.ts\",\"b.d.ts\",\"main.ts\"]}",
+        "a.d.ts": "declare namespace Other { interface X { a: number } }\ndeclare module \"foo\" { export import X = Other.X; }\n",
+        "b.d.ts": "declare module \"foo\" { interface X { b: number } }\n",
+        "main.ts": "import { X } from \"foo\";\nexport let v: X;\n"
+      },
+      "watch": [
+        "X"
+      ],
+      "native": {
+        "program": [
+          "a.d.ts",
+          "b.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 X -> Interface|Transient [a.d.ts:1:27 InterfaceDeclaration, b.d.ts:1:24 InterfaceDeclaration]",
+          "2:15 X -> Interface|Transient [a.d.ts:1:27 InterfaceDeclaration, b.d.ts:1:24 InterfaceDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "alias-first-dependencies",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"main.ts\"]}",
+        "main.ts": "/// <reference types=\"a\" />\n/// <reference types=\"b\" />\nimport { X } from \"foo\";\nexport let v: X;\n",
+        "node_modules/@types/a/index.d.ts": "declare namespace Other { interface X { a: number } }\ndeclare module \"foo\" { export import X = Other.X; }\n",
+        "node_modules/@types/b/index.d.ts": "declare module \"foo\" { interface X { b: number } }\n"
+      },
+      "watch": [
+        "X"
+      ],
+      "native": {
+        "program": [
+          "node_modules/@types/a/index.d.ts (external)",
+          "node_modules/@types/b/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "3:10 X -> Interface|Transient [node_modules/@types/a/index.d.ts:1:27 InterfaceDeclaration, node_modules/@types/b/index.d.ts:1:24 InterfaceDeclaration]",
+          "4:15 X -> Interface|Transient [node_modules/@types/a/index.d.ts:1:27 InterfaceDeclaration, node_modules/@types/b/index.d.ts:1:24 InterfaceDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "alias-after-other-file",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.d.ts\",\"b.d.ts\",\"main.ts\"]}",
+        "a.d.ts": "declare module \"foo\" { interface X { b: number } }\n",
+        "b.d.ts": "declare namespace Other { interface X { a: number } }\ndeclare module \"foo\" { export import X = Other.X; }\n",
+        "main.ts": "import { X } from \"foo\";\nexport let v: X;\n"
+      },
+      "watch": [
+        "X"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "b.d.ts:2:38"
+        ],
+        "note": "Reported at the alias's name; TypeScript reports TS2440 at the whole `import =` declaration."
+      },
+      "native": {
+        "program": [
+          "a.d.ts",
+          "b.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2440 b.d.ts:2:24"
+        ],
+        "names": [
+          "1:10 X -> Interface|Alias|Transient|AliasExcludes [a.d.ts:1:24 InterfaceDeclaration, b.d.ts:2:24 ImportEqualsDeclaration]",
+          "2:15 X -> Interface|Alias|Transient|AliasExcludes [a.d.ts:1:24 InterfaceDeclaration, b.d.ts:2:24 ImportEqualsDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "shorthand-first",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.d.ts\",\"b.d.ts\",\"main.ts\"]}",
+        "a.d.ts": "declare module \"foo\";\n",
+        "b.d.ts": "declare module \"foo\" { export const x: number; }\n",
+        "main.ts": "import { x, y } from \"foo\";\nexport const v = [x, y];\n"
+      },
+      "watch": [
+        "x",
+        "y"
+      ],
+      "native": {
+        "program": [
+          "a.d.ts",
+          "b.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 x -> ValueModule|Transient [a.d.ts:1:1 ModuleDeclaration, b.d.ts:1:1 ModuleDeclaration]",
+          "1:13 y -> ValueModule|Transient [a.d.ts:1:1 ModuleDeclaration, b.d.ts:1:1 ModuleDeclaration]",
+          "2:19 x -> ValueModule|Transient [a.d.ts:1:1 ModuleDeclaration, b.d.ts:1:1 ModuleDeclaration]",
+          "2:22 y -> ValueModule|Transient [a.d.ts:1:1 ModuleDeclaration, b.d.ts:1:1 ModuleDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "shorthand-later",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"b.d.ts\",\"a.d.ts\",\"main.ts\"]}",
+        "a.d.ts": "declare module \"foo\";\n",
+        "b.d.ts": "declare module \"foo\" { export const x: number; }\n",
+        "main.ts": "import { x, y } from \"foo\";\nexport const v = [x, y];\n"
+      },
+      "watch": [
+        "x",
+        "y"
+      ],
+      "native": {
+        "program": [
+          "b.d.ts",
+          "a.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:1:13"
+        ],
+        "names": [
+          "1:10 x -> BlockScopedVariable [b.d.ts:1:37 VariableDeclaration]",
+          "1:13 y -> none",
+          "2:19 x -> BlockScopedVariable [b.d.ts:1:37 VariableDeclaration]",
+          "2:22 y -> none"
+        ]
+      }
+    },
+    {
+      "name": "shorthand-first-one-file",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.d.ts\",\"main.ts\"]}",
+        "a.d.ts": "declare module \"foo\";\ndeclare module \"foo\" { export const x: number; }\n",
+        "main.ts": "import { x, y } from \"foo\";\nexport const v = [x, y];\n"
+      },
+      "watch": [
+        "x",
+        "y"
+      ],
+      "native": {
+        "program": [
+          "a.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 x -> ValueModule [a.d.ts:1:1 ModuleDeclaration, a.d.ts:2:1 ModuleDeclaration]",
+          "1:13 y -> ValueModule [a.d.ts:1:1 ModuleDeclaration, a.d.ts:2:1 ModuleDeclaration]",
+          "2:19 x -> ValueModule [a.d.ts:1:1 ModuleDeclaration, a.d.ts:2:1 ModuleDeclaration]",
+          "2:22 y -> ValueModule [a.d.ts:1:1 ModuleDeclaration, a.d.ts:2:1 ModuleDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "shorthand-later-one-file",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.d.ts\",\"main.ts\"]}",
+        "a.d.ts": "declare module \"foo\" { export const x: number; }\ndeclare module \"foo\";\n",
+        "main.ts": "import { x, y } from \"foo\";\nexport const v = [x, y];\n"
+      },
+      "watch": [
+        "x",
+        "y"
+      ],
+      "native": {
+        "program": [
+          "a.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:1:13"
+        ],
+        "names": [
+          "1:10 x -> BlockScopedVariable [a.d.ts:1:37 VariableDeclaration]",
+          "1:13 y -> none",
+          "2:19 x -> BlockScopedVariable [a.d.ts:1:37 VariableDeclaration]",
+          "2:22 y -> none"
+        ]
+      }
+    },
+    {
+      "name": "variables-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.d.ts\",\"b.d.ts\",\"main.ts\"]}",
+        "a.d.ts": "declare module \"foo\" { export let x: number; }\n",
+        "b.d.ts": "declare module \"foo\" { export let x: number; }\n",
+        "main.ts": "import { x } from \"foo\";\nexport const v = x;\n"
+      },
+      "watch": [
+        "x"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "b.d.ts:1:35"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.d.ts",
+          "b.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 a.d.ts:1:35",
+          "TS2451 b.d.ts:1:35"
+        ],
+        "names": [
+          "1:10 x -> BlockScopedVariable [a.d.ts:1:35 VariableDeclaration]",
+          "2:18 x -> BlockScopedVariable [a.d.ts:1:35 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "variables-skip-lib-check",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"a.d.ts\",\"b.d.ts\",\"main.ts\"]}",
+        "a.d.ts": "declare module \"foo\" { export let x: number; }\n",
+        "b.d.ts": "declare module \"foo\" { export let x: number; }\n",
+        "main.ts": "import { x } from \"foo\";\nexport const v = x;\n"
+      },
+      "watch": [
+        "x"
+      ],
+      "native": {
+        "program": [
+          "a.d.ts",
+          "b.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 x -> BlockScopedVariable [a.d.ts:1:35 VariableDeclaration]",
+          "2:18 x -> BlockScopedVariable [a.d.ts:1:35 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "variables-dependency-and-project",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"main.ts\",\"b.d.ts\"]}",
+        "main.ts": "/// <reference types=\"a\" />\nimport { x } from \"foo\";\nexport const v = x;\n",
+        "b.d.ts": "declare module \"foo\" { export let x: number; }\n",
+        "node_modules/@types/a/index.d.ts": "declare module \"foo\" { export let x: number; }\n"
+      },
+      "watch": [
+        "x"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2451"
+        ]
+      },
+      "native": {
+        "program": [
+          "node_modules/@types/a/index.d.ts (external)",
+          "main.ts",
+          "b.d.ts"
+        ],
+        "diagnostics": [
+          "TS2451 b.d.ts:1:35",
+          "TS2451 node_modules/@types/a/index.d.ts:1:35"
+        ],
+        "names": [
+          "2:10 x -> BlockScopedVariable [node_modules/@types/a/index.d.ts:1:35 VariableDeclaration]",
+          "3:18 x -> BlockScopedVariable [node_modules/@types/a/index.d.ts:1:35 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "later-block-sees-earlier",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.d.ts\",\"b.d.ts\",\"main.ts\"]}",
+        "a.d.ts": "declare module \"m\" { export interface A { a: number } }\n",
+        "b.d.ts": "declare module \"m\" { export interface B extends A { b: number } }\n",
+        "main.ts": "import { A, B } from \"m\";\nexport let v: A | B;\n"
+      },
+      "watch": [
+        "A",
+        "B"
+      ],
+      "watchFile": "b.d.ts",
+      "native": {
+        "program": [
+          "a.d.ts",
+          "b.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:39 B -> Interface [b.d.ts:1:22 InterfaceDeclaration]",
+          "1:49 A -> Interface [a.d.ts:1:22 InterfaceDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "stars-and-declarations",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"base.d.ts\",\"a.d.ts\",\"b.d.ts\",\"main.ts\"]}",
+        "base.d.ts": "declare module \"base\" { export interface X { a: number } }\n",
+        "a.d.ts": "declare module \"m\" { export * from \"base\"; }\n",
+        "b.d.ts": "declare module \"m\" { export interface Y { b: number } }\n",
+        "main.ts": "import { X, Y } from \"m\";\nexport let v: X | Y;\n"
+      },
+      "watch": [
+        "X",
+        "Y"
+      ],
+      "native": {
+        "program": [
+          "base.d.ts",
+          "a.d.ts",
+          "b.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 X -> Interface [base.d.ts:1:25 InterfaceDeclaration]",
+          "1:13 Y -> Interface [b.d.ts:1:22 InterfaceDeclaration]",
+          "2:15 X -> Interface [base.d.ts:1:25 InterfaceDeclaration]",
+          "2:19 Y -> Interface [b.d.ts:1:22 InterfaceDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "declaration-after-star",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"base.d.ts\",\"a.d.ts\",\"b.d.ts\",\"main.ts\"]}",
+        "base.d.ts": "declare module \"base\" { export interface X { a: number } }\n",
+        "a.d.ts": "declare module \"m\" { export * from \"base\"; }\n",
+        "b.d.ts": "declare module \"m\" { export interface X { b: number } }\n",
+        "main.ts": "import { X } from \"m\";\nexport let v: X;\n"
+      },
+      "watch": [
+        "X"
+      ],
+      "native": {
+        "program": [
+          "base.d.ts",
+          "a.d.ts",
+          "b.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 X -> Interface [b.d.ts:1:22 InterfaceDeclaration]",
+          "2:15 X -> Interface [b.d.ts:1:22 InterfaceDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "pattern-two-files",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.d.ts\",\"b.d.ts\",\"main.ts\"]}",
+        "a.d.ts": "declare module \"*.view\" { export interface A { a: number } }\n",
+        "b.d.ts": "declare module \"*.view\" { export interface B { b: number } }\n",
+        "main.ts": "import { A, B } from \"x.view\";\nexport let v: A | B;\n"
+      },
+      "watch": [
+        "A",
+        "B"
+      ],
+      "native": {
+        "program": [
+          "a.d.ts",
+          "b.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 A -> Interface [a.d.ts:1:27 InterfaceDeclaration]",
+          "1:13 B -> Interface [b.d.ts:1:27 InterfaceDeclaration]",
+          "2:15 A -> Interface [a.d.ts:1:27 InterfaceDeclaration]",
+          "2:19 B -> Interface [b.d.ts:1:27 InterfaceDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "pattern-shorthand-first",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.d.ts\",\"b.d.ts\",\"main.ts\"]}",
+        "a.d.ts": "declare module \"*.view\";\n",
+        "b.d.ts": "declare module \"*.view\" { export interface B { b: number } }\n",
+        "main.ts": "import { A, B } from \"x.view\";\nexport let v: A | B;\n"
+      },
+      "watch": [
+        "A",
+        "B"
+      ],
+      "tool": {
+        "names": {
+          "2:15": "declared",
+          "2:19": "declared"
+        },
+        "note": "A named import from a shorthand ambient module denotes the module in a type position too, where TypeScript reports TS2709 (docs/references.md)."
+      },
+      "native": {
+        "program": [
+          "a.d.ts",
+          "b.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2709 main.ts:2:15",
+          "TS2709 main.ts:2:19"
+        ],
+        "names": [
+          "1:10 A -> ValueModule|Transient [a.d.ts:1:1 ModuleDeclaration, b.d.ts:1:1 ModuleDeclaration]",
+          "1:13 B -> ValueModule|Transient [a.d.ts:1:1 ModuleDeclaration, b.d.ts:1:1 ModuleDeclaration]",
+          "2:15 A -> TypeAlias|Transient []",
+          "2:19 B -> TypeAlias|Transient []"
+        ]
+      }
+    }
+  ]
+}

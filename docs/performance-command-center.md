@@ -1,10 +1,120 @@
-# Command Center parser and reference performance baseline
+# Command Center performance
 
-This report records the implementation before optimization. See [performance improvements](performance-improvements.md) for the implemented changes, fresh comparisons, and verification.
+The unchanged Command Center configuration loads and answers outline, show, and
+reference queries; this report records what that costs. [Current
+state](#current-state-2026-10-08) measures the finished navigation delivery on
+the real `tsconfig.json`. The [historical baseline](#historical-baseline-2026-10-06)
+below it is the original report from before the compatibility work and the
+optimizations in [performance improvements](performance-improvements.md),
+kept as measured: its reference timings used benchmark shims and do not describe
+the unchanged project.
 
-Measured 2026-10-06. All 5,316 project roots parse successfully. Parsing the 53.0 MB source corpus takes a median **4.10 seconds**. Reference queries expose substantial repeated work when materializing large results; project loading also has a much larger cost than parsing alone. The original project does not load unchanged: standard libraries and JSON modules are outside the documented supported profile, and a valid TipTap module augmentation produces a binding error. The reference timings below use explicit benchmark shims and must not be presented as successful analysis of the unchanged project.
+## Current state (2026-10-08)
 
-## Scope and method
+Command Center `7706073d233d45c69b60421d7bb16fc0f778aeb4`, its worktree clean
+before and after; parser `dfc65e2` (the code of plan step 6), release profile
+(thin LTO, one codegen unit), binary SHA-256 `d8118ab612349c10…`. Host: Intel
+Core i9-9880H at 2.30 GHz, 16 logical CPUs, 16 GiB RAM, macOS 15.7.7, Rust
+1.96. `pmset -g therm` reported no thermal or performance warning and a CPU
+speed limit of 100 before and after; other sessions (a browser and another
+agent) kept the one-minute load average at 2.7–3.2 throughout. Every CLI sample
+is a separate process, including startup, file I/O, IPC where used, output, and
+exit; values are medians with the range in parentheses. Raw samples are
+session-local (`.cc/temp/nav/step6/measure.json`, produced by
+`.cc/temp/nav/step6/measure.py`).
+
+**Inputs.** The configuration selects 7,639 program inputs: 89 standard
+libraries, 2,225 declaration files from 255 installed packages, and 5,325
+searched files (4,158 `.ts`, 1,153 `.tsx`, 8 declaration files including the
+generated `.next/types/routes.d.ts`, `cache-life.d.ts`, and `root-params.d.ts`,
+and 6 JSON modules). They are the pinned compiler's program in set, order, and
+provenance ([validation](validation.md#command-center-checkpoint)). No shim,
+substitute root list, or edited source is involved. The small file below is
+`src/features/tickets/components/TicketChildSummary.tsx` (2,052 bytes, 20
+entries); the largest is `src/lib/workflow-graph/workflow-manager.test.ts`
+(342,467 bytes, 5,358 entries).
+
+| Measurement | Small file | Largest file |
+| --- | ---: | ---: |
+| File-only outline, text (no project) | 5.0 ms (4.9–5.4) | 35.3 ms (34.9–37.1) |
+| File-only outline, `--json --depth all` | 5.1 ms | 91.3 ms (1.54 MB) |
+| File-only show `--at` the last entry | 4.8 ms | 30.9 ms |
+| File-only show `--name` (qualified, unique) | 4.8 ms | 30.3 ms |
+| Warm service outline, text (10 samples) | 402 ms (393–419) | 437 ms (427–450) |
+| Warm service outline, `--json --depth all` (5) | — | 494 ms |
+| Warm service show `--at` (10) | 398 ms | 421 ms |
+| Warm service show by a unique qualified name across the project (10) | 406 ms | 433 ms |
+
+| Project measurement | Result |
+| --- | ---: |
+| Cold load with one query, `--direct` (3 samples each: outline, show, references) | 8.83 s (8.80–9.23), 9.20 s, 9.17 s |
+| Peak resident memory of a `--direct` process | 1.09–1.12 GiB |
+| Cold service, first request (starts the service and loads) | 9.15 s |
+| Warm show of an ambiguous name, `reason` (2,312 candidates, 424 KB of JSON) | 408 ms |
+| Warm show of a missing name | 418 ms |
+| Warm references `getTicketService` (7 occurrences) / an unmatched name | 403 ms / 399 ms |
+| Warm references `expect` (73,719 occurrences, 12.5 MB) | 511 ms (505–528) |
+| Service resident memory after the warm requests (generation 1) | 678 MiB |
+| Requested heap while loading, peak / retained (`cargo bench --bench navigation`) | 1,008.8 MiB / 334.4 MiB |
+| Refresh: the first request after editing a source (3 edits) | 10.12 s (9.97–10.19) |
+| Refresh after editing the largest file | 10.14 s |
+| Direct load after the edits | 9.91 s |
+| Service resident memory after four generations | 986 MiB |
+
+Every warm answer was byte-identical to the `--direct` answer for the same
+query, the service stayed at generation 1 through every unchanged request, and
+the cold service's first answer equaled the direct one.
+
+**Refresh.** Edits ran on a disposable copy (`rsync -a` of the checkout without
+`.git`, `.worktrees`, and `.next` apart from `.next/types`, including a full
+copy of `node_modules`), never on Command Center. Each appended
+`export const refreshProbeN = N;` to the small file; the next outline listed
+the new declaration, the service advanced one generation per edit, and the
+refreshed answer equaled a new direct load byte for byte. A refresh rebuilds
+the whole snapshot, so it costs a load (about 10 s here), whichever file
+changed. At the copy's location, six directories deeper than the original, a
+warm request took about 0.1 s longer (0.50–0.54 s, against 0.39–0.40 s at the
+original, measured one after the other) for the same contents; this was not
+investigated further. Resident memory grew from 678 MiB to 986 MiB over four
+generations, which includes allocator retention across rebuilds.
+
+**Where a warm request goes.** The benchmark answers the same queries from a
+loaded snapshot and through a warm `ProjectSession`, which first validates
+freshness: a missing name takes 5.8 ms from the snapshot and 385 ms through
+the session, the largest file's outline 30 ms and 402 ms, and the small file's
+0.19 ms and 372 ms. Freshness validation (re-reading and comparing every
+captured source, configuration, and manifest, and repeating every directory
+and resolution probe) therefore costs about 370–380 ms per request, over 90%
+of a 0.40 s warm CLI request; process startup, IPC, and output make up most of
+the rest. This is the known limit of the full-validation freshness contract:
+warm queries are not sub-100-ms lookups on a project of this size, and an
+edit costs a full load.
+
+**Against the previous service baseline.** The [reference service on Command
+Center](reference-service-command-center.md) (2026-10-07) measured warm
+queries of 0.71–0.94 s, direct loads of 10–12 s, a cold service of 16.6 s, a
+refresh of 18.6 s, and 662 MiB resident, through a shimmed configuration
+(`noLib`, a JSON shim, a TipTap shim, frozen roots) on a host then limited to
+45% CPU speed. The unchanged configuration now loads 89 standard libraries,
+the JSON modules, and every TipTap declaration, and the snapshot also keeps
+the navigation index, yet warm queries take 0.40–0.51 s, direct loads
+8.8–9.2 s, a cold service 9.2 s, and a refresh 10.1 s, with 678 MiB resident.
+The conditions differ (load, thermal limit, configuration, and commits in
+between), so these are observations, not a measured speedup.
+[Navigation storage](navigation-performance.md) records the snapshot-level
+costs of outline and show, which this run reproduces (outline of the largest
+file 30.2 ms from the snapshot, 7.66 MiB peak; load median 8.08 s).
+
+## Historical baseline (2026-10-06)
+
+This is the original report, measured before standard libraries, JSON
+modules, and the augmentation fix existed. It records the implementation
+before optimization; see [performance improvements](performance-improvements.md)
+for the changes that followed.
+
+Measured 2026-10-06. All 5,316 project roots parse successfully. Parsing the 53.0 MB source corpus takes a median **4.10 seconds**. Reference queries expose substantial repeated work when materializing large results; project loading also has a much larger cost than parsing alone. At the time, the original project did not load unchanged: standard libraries and JSON modules were outside the documented supported profile, and a valid TipTap module augmentation produced a binding error. The reference timings below use explicit benchmark shims and must not be presented as successful analysis of the unchanged project; the [current state](#current-state-2026-10-08) above measures the unchanged project.
+
+### Scope and method
 
 - Parser revision: `d0e04f1728cf8b5ed083bb667145f512928716dc`. Command Center revision: `7706073d233d45c69b60421d7bb16fc0f778aeb4`; its Git worktree was clean.
 - Host: Intel Core i9-9880H, 2.30 GHz, 8 physical cores / 16 logical CPUs, 16 GiB RAM, macOS 15.7.7. Rust 1.96.0; release optimization, thin LTO, one codegen unit. TypeScript oracle: pinned 7.0.2; syntax AST sampling uses the repository’s pinned 6.0.3 projection API.
@@ -16,7 +126,7 @@ Measured 2026-10-06. All 5,316 project roots parse successfully. Parsing the 53.
 - A late `pmset -g therm` read reports `CPU_Speed_Limit = 33`, with 16 CPUs available; another project’s registered tests were active. The fresh CLI reference calls vary from 34–39 seconds despite small differences in query work. CPU throttling and host contention materially limit absolute timing comparisons; repeat on a cool, idle machine when measuring an implementation change.
 - All 5,316 root source hashes were unchanged before and after the investigation. No production parser or reference implementation was modified.
 
-## Parsing
+### Parsing
 
 | Measurement | Result |
 | --- | --- |
@@ -55,7 +165,7 @@ The native compiler’s complete program contains 7,639 files, including six JSO
 
 Allocation accounting on the eight selected slow or low-throughput modules shows 1,619–24,976 allocations/reallocations per parse. The 318,517-byte execution-loop test retains 5,597,867 requested AST bytes and peaks at 8,218,394. See `parser-memory.csv`; these counts were not collected in the parser latency runs.
 
-## Reference loading and compatibility
+### Reference loading and compatibility
 
 | Configuration | Outcome |
 | --- | --- |
@@ -88,11 +198,11 @@ These shims alter JSON and TipTap symbol identity and resolution; additional Tip
 | Retained requested heap | 273,153,626 bytes (260.5 MiB) |
 | After project drop | 0 outstanding requested bytes |
 
-The **4.10-second parsing sweep** starts with the 5,316 project files already in memory and measures parsing and AST disposal. The **20.55-second reference index initialization** times `ReferenceProject::load`: reading configuration and source files, resolving imports, parsing project files and their dependencies, extracting syntax facts, binding symbols and aliases, and building the index used by reference queries. It includes parsing; it is the total initialization time, not an additional cost on top of 4.10 seconds. Neither measurement includes running reference queries or serializing results.
+The **4.10-second parsing sweep** starts with the 5,316 project files already in memory and measures parsing and AST disposal. The **20.55-second reference index initialization** times `ReferenceProject::load` (now `Project::load`): reading configuration and source files, resolving imports, parsing project files and their dependencies, extracting syntax facts, binding symbols and aliases, and building the index used by reference queries. It includes parsing; it is the total initialization time, not an additional cost on top of 4.10 seconds. Neither measurement includes running reference queries or serializing results.
 
 The different file sets and timing boundaries prevent subtracting 4.10 from 20.55 to obtain an exact binding/indexing cost. The 10-second load profile samples only part of a load: it identifies scanner work, source indexing, allocation and filesystem probes/canonicalization, but should not be read as whole-load percentages.
 
-## Reference queries
+### Reference queries
 
 | Outcome | Requests |
 | --- | --- |
@@ -136,7 +246,7 @@ The different file sets and timing boundaries prevent subtracting 4.10 from 20.5
 
 Every request, its source location, outcome, result size and timing is recorded in `reference-queries.csv`; `summary.json` contains per-AST-category distributions and the slowest position queries.
 
-## CLI costs
+### CLI costs
 
 | Operation | Input / result | Median wall time (ms) |
 | --- | --- | --- |
@@ -150,7 +260,7 @@ Every request, its source location, outcome, result size and timing is recorded 
 
 Parse CLI samples use `--check`: they include process startup and reading the file, but no AST JSON. Reference CLI samples include a fresh project load, result construction and compact JSON; three invocations per selected query assert the expected group and occurrence counts. The immutable library project is reused for the broad query sweep. These are different usage patterns and should be evaluated separately.
 
-## Improvements to investigate next
+### Improvements to investigate next
 
 1. **Avoid rebuilding ordered locations on every query.** `src/references/query.rs::group` allocates a `BTreeMap<Location, Occurrence>`, clones each location into its key, rebuilds UTF-16 positions, and drops the duplicate keys when returning values. The query profile shows location conversion, string comparison and allocation/freeing as prominent work. Consider freezing occurrence ordering/deduplication and compact position metadata when the index is built; measure the extra retained memory against lower query latency.
 2. **Remove allocation inside the group-sort comparator.** The `first` closure in `query::find` clones a declaration or occurrence `Location` for every comparison. A borrowed comparison should preserve ordering while avoiding repeated filename allocations, especially for project-wide names that select many shadowed symbols. Check both output size and group count when profiling.
@@ -160,7 +270,7 @@ Parse CLI samples use `--check`: they include process startup and reading the fi
 
 Standard-library/JSON support and the TipTap binding issue are separate correctness/scope decisions. Resolve them before claiming that the unchanged Command Center project is supported. Keep the same corpus, shims and query selection for any before/after performance comparison, then prove changed behavior against the pinned compiler and the repository’s registered checks.
 
-## Evidence and reproduction
+### Evidence and reproduction
 
 Evidence and the investigation-only harness are under `.cc/temp/performance/`: `inventory.json`, `source-hashes.json`, `metadata.json`, `parse.json`, `parse-files.csv`, `program-parse.json`, `native-project.json`, `queries.json`, `supported-core-references.json`, `reference-queries.csv`, `summary.json`, `reference-memory.json`, `parser-memory.csv`, `cli.json`, process timing logs and the three `.sample.txt` profiles. The full early four-timings-per-position sweep was stopped after the five load samples; its query samples are not included in the final results.
 

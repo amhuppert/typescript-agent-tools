@@ -92,7 +92,7 @@ Both instrumented processes return to zero outstanding requested bytes after dro
 - All 5,316 original source hashes are unchanged. The Command Center corpus and explicit no-library/JSON/TipTap benchmark shims remain the same. The unchanged original config is still outside the supported reference profile; these changes do not add library, JSON, or TipTap compatibility.
 - Host CPU speed-limit readings varied from 33 to 45, and other sessions share the machine. The repeated large query gains and allocation budgets are clear; small throughput changes need a cool, idle-host rerun.
 
-The oracle also exposed a pre-existing first-line BOM mismatch: native TypeScript removes a leading BOM when reading a source file, while this loader retains it and counts it in first-line columns. A marked first-line identifier was at column 23 in the native oracle and column 24 here. The new fixture puts its BOM on its own line; the first-line mismatch remains a correctness candidate outside these performance changes.
+The oracle also exposed a pre-existing first-line BOM mismatch: native TypeScript removes a leading BOM when reading a source file, while this loader retains it and counts it in first-line columns. A marked first-line identifier was at column 23 in the native oracle and column 24 here. The new fixture puts its BOM on its own line; the first-line mismatch remained a correctness candidate outside these performance changes. It was later fixed: every analysis read now drops a leading BOM as TypeScript's `decodeBytes` does (`source::decode` and `source::read_text`).
 
 ## Evidence and next candidates
 

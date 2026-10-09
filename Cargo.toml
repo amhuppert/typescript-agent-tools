@@ -36,3 +36,7 @@ codegen-units = 1
 [[bench]]
 name = "references"
 harness = false
+
+[[bench]]
+name = "navigation"
+harness = false

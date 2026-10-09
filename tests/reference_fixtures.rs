@@ -4,7 +4,8 @@ mod support;
 
 use std::collections::BTreeSet;
 use support::{Expect, Fixture, fixtures_root, parse_markers};
-use typescript_parser::references::{Role, SourcePosition};
+use typescript_parser::references::Role;
+use typescript_parser::source::SourcePosition;
 
 #[test]
 fn every_marked_fixture_project_matches_its_markers() {

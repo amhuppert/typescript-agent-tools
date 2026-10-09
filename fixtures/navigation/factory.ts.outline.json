@@ -1,0 +1,61 @@
+{
+  "entries": [
+    {"anchor":{"column":18,"line":2},"key":"RunHostDeps","kind":"interface","label":"RunHostDeps","range":{"end":{"column":47,"line":2},"start":{"column":1,"line":2}},"selector":"RunHostDeps","signature":"export interface RunHostDeps", "children": [
+      {"anchor":{"column":32,"line":2},"key":"start","kind":"method","label":"start","range":{"end":{"column":45,"line":2},"start":{"column":32,"line":2}},"selector":"RunHostDeps.start","signature":"start(): void", "children": []}
+    ]},
+    {"anchor":{"column":18,"line":3},"key":"RunHost","kind":"interface","label":"RunHost","range":{"end":{"column":67,"line":3},"start":{"column":1,"line":3}},"selector":"RunHost","signature":"export interface RunHost", "children": [
+      {"anchor":{"column":28,"line":3},"key":"startEligible","kind":"method","label":"startEligible","range":{"end":{"column":53,"line":3},"start":{"column":28,"line":3}},"selector":"RunHost.startEligible","signature":"startEligible(): boolean", "children": []},
+      {"anchor":{"column":54,"line":3},"key":"run","kind":"method","label":"run","range":{"end":{"column":65,"line":3},"start":{"column":54,"line":3}},"selector":"RunHost.run","signature":"run(): void", "children": []}
+    ]},
+    {"anchor":{"column":17,"line":5},"key":"createRunHost","kind":"function","label":"createRunHost","range":{"end":{"column":2,"line":14},"start":{"column":1,"line":5}},"selector":"createRunHost","signature":"export function createRunHost(deps: RunHostDeps): RunHost", "children": [
+      {"anchor":{"column":12,"line":6},"key":"startEligible","kind":"function","label":"startEligible","range":{"end":{"column":4,"line":8},"start":{"column":3,"line":6}},"selector":"createRunHost.startEligible","signature":"function startEligible()", "children": []},
+      {"anchor":{"column":9,"line":9},"key":"helper","kind":"variable","label":"helper","range":{"end":{"column":5,"line":12},"start":{"column":3,"line":9}},"selector":"createRunHost.helper","signature":"const helper = () => { … }", "children": [
+        {"anchor":{"column":14,"line":10},"key":"step","kind":"function","label":"step","range":{"end":{"column":23,"line":10},"start":{"column":5,"line":10}},"selector":"createRunHost.helper.step","signature":"function step()", "children": []}
+      ]},
+      {"anchor":{"column":27,"line":13},"key":"run","kind":"method","label":"run","range":{"end":{"column":46,"line":13},"start":{"column":27,"line":13}},"selector":"createRunHost.run","signature":"run()", "children": []},
+      {"anchor":{"column":48,"line":13},"key":"stop","kind":"property","label":"stop","range":{"end":{"column":82,"line":13},"start":{"column":48,"line":13}},"selector":"createRunHost.stop","signature":"stop: () => { … }", "children": [
+        {"anchor":{"column":71,"line":13},"key":"halt","kind":"function","label":"halt","range":{"end":{"column":80,"line":13},"start":{"column":62,"line":13}},"selector":"createRunHost.stop.halt","signature":"function halt()", "children": []}
+      ]}
+    ]},
+    {"anchor":{"column":7,"line":16},"key":"settings","kind":"variable","label":"settings","range":{"end":{"column":3,"line":22},"start":{"column":1,"line":16}},"selector":"settings","signature":"const settings = { retries: 3, \"display-name\": \"runner\", handlers: { onStart() { … }, onStop: function named() { … } }, compute: (value: number) => value * 2,…", "children": [
+      {"anchor":{"column":3,"line":17},"key":"retries","kind":"property","label":"retries","range":{"end":{"column":13,"line":17},"start":{"column":3,"line":17}},"selector":"settings.retries","signature":"retries: 3", "children": []},
+      {"anchor":{"column":3,"line":18},"key":"display-name","kind":"property","label":"\"display-name\"","range":{"end":{"column":27,"line":18},"start":{"column":3,"line":18}},"selector":"settings.display-name","signature":"\"display-name\": \"runner\"", "children": []},
+      {"anchor":{"column":3,"line":19},"key":"handlers","kind":"property","label":"handlers","range":{"end":{"column":58,"line":19},"start":{"column":3,"line":19}},"selector":"settings.handlers","signature":"handlers: { onStart() { … }, onStop: function named() { … } }", "children": [
+        {"anchor":{"column":15,"line":19},"key":"onStart","kind":"method","label":"onStart","range":{"end":{"column":27,"line":19},"start":{"column":15,"line":19}},"selector":"settings.handlers.onStart","signature":"onStart()", "children": []},
+        {"anchor":{"column":29,"line":19},"key":"onStop","kind":"property","label":"onStop","range":{"end":{"column":56,"line":19},"start":{"column":29,"line":19}},"selector":"settings.handlers.onStop","signature":"onStop: function named() { … }", "children": []}
+      ]},
+      {"anchor":{"column":3,"line":20},"key":"compute","kind":"property","label":"compute","range":{"end":{"column":40,"line":20},"start":{"column":3,"line":20}},"selector":"settings.compute","signature":"compute: (value: number) => value * 2", "children": []}
+    ]},
+    {"anchor":{"column":15,"line":23},"key":"defaults","kind":"variable","label":"defaults","range":{"end":{"column":32,"line":23},"start":{"column":1,"line":23}},"selector":"defaults","signature":"declare const defaults: object", "children": []},
+    {"anchor":{"column":7,"line":25},"key":"wrapped","kind":"variable","label":"wrapped","range":{"end":{"column":4,"line":27},"start":{"column":1,"line":25}},"selector":"wrapped","signature":"const wrapped = wrap(() => { … })", "children": [
+      {"anchor":{"column":22,"line":25},"kind":"function","label":"wrap() callback","range":{"end":{"column":2,"line":27},"start":{"column":22,"line":25}}, "children": [
+        {"anchor":{"column":9,"line":26},"key":"inner","kind":"variable","label":"inner","range":{"end":{"column":19,"line":26},"start":{"column":3,"line":26}},"selector":"wrapped.inner","signature":"const inner = 1", "children": []}
+      ]}
+    ]},
+    {"anchor":{"column":18,"line":28},"key":"wrap","kind":"function","label":"wrap","range":{"end":{"column":51,"line":28},"start":{"column":1,"line":28}},"selector":"wrap","signature":"declare function wrap(callback: () => void): void", "children": []},
+    {"anchor":{"column":14,"line":30},"key":"Widget","kind":"class","label":"Widget","range":{"end":{"column":2,"line":48},"start":{"column":1,"line":30}},"selector":"Widget","signature":"export class Widget", "children": [
+      {"anchor":{"column":3,"line":31},"key":"handle","kind":"property","label":"handle","range":{"end":{"column":5,"line":33},"start":{"column":3,"line":31}},"selector":"Widget.handle","signature":"handle = (event: string) => { … }", "children": [
+        {"anchor":{"column":14,"line":32},"key":"deep","kind":"function","label":"deep","range":{"end":{"column":23,"line":32},"start":{"column":5,"line":32}},"selector":"Widget.handle.deep","signature":"function deep()", "children": []}
+      ]},
+      {"anchor":{"column":10,"line":34},"key":"#count","kind":"property","label":"#count","range":{"end":{"column":21,"line":34},"start":{"column":3,"line":34}},"selector":"Widget.#count","signature":"static #count = 0", "children": []},
+      {"anchor":{"column":3,"line":35},"key":"label","kind":"property","label":"label","range":{"end":{"column":28,"line":35},"start":{"column":3,"line":35}},"selector":"Widget.label","signature":"label: string = 'widget'", "children": []},
+      {"anchor":{"column":3,"line":36},"key":"method","kind":"method","label":"method","range":{"end":{"column":18,"line":36},"start":{"column":3,"line":36}},"selector":"Widget.method","signature":"method(): void", "children": []},
+      {"anchor":{"column":3,"line":37},"key":"method","kind":"method","label":"method","range":{"end":{"column":31,"line":37},"start":{"column":3,"line":37}},"selector":"Widget.method","signature":"method(value: number): void", "children": []},
+      {"anchor":{"column":3,"line":38},"key":"method","kind":"method","label":"method","range":{"end":{"column":28,"line":38},"start":{"column":3,"line":38}},"selector":"Widget.method","signature":"method(value?: number)", "children": []},
+      {"anchor":{"column":3,"line":39},"kind":"constructor","label":"constructor","range":{"end":{"column":82,"line":39},"start":{"column":3,"line":39}},"signature":"constructor(private readonly id: string, public name: string, plain: number)", "children": []},
+      {"anchor":{"column":32,"line":39},"key":"id","kind":"property","label":"id","range":{"end":{"column":42,"line":39},"start":{"column":15,"line":39}},"selector":"Widget.id","signature":"private readonly id: string", "children": []},
+      {"anchor":{"column":51,"line":39},"key":"name","kind":"property","label":"name","range":{"end":{"column":63,"line":39},"start":{"column":44,"line":39}},"selector":"Widget.name","signature":"public name: string", "children": []},
+      {"anchor":{"column":7,"line":40},"key":"size","kind":"accessor","label":"size","range":{"end":{"column":4,"line":42},"start":{"column":3,"line":40}},"selector":"Widget.size","signature":"get size(): number", "children": []},
+      {"anchor":{"column":7,"line":43},"key":"size","kind":"accessor","label":"size","range":{"end":{"column":29,"line":43},"start":{"column":3,"line":43}},"selector":"Widget.size","signature":"set size(value: number)", "children": []},
+      {"anchor":{"column":11,"line":45},"key":"blockLocal","kind":"variable","label":"blockLocal","range":{"end":{"column":26,"line":45},"start":{"column":5,"line":45}},"selector":"Widget.blockLocal","signature":"const blockLocal = 1", "children": []},
+      {"anchor":{"column":3,"line":47},"kind":"signature","label":"[]","range":{"end":{"column":26,"line":47},"start":{"column":3,"line":47}},"signature":"[key: string]: unknown", "children": []}
+    ]},
+    {"anchor":{"column":18,"line":50},"key":"Shape","kind":"interface","label":"Shape","range":{"end":{"column":2,"line":56},"start":{"column":1,"line":50}},"selector":"Shape","signature":"export interface Shape", "children": [
+      {"anchor":{"column":3,"line":51},"key":"area","kind":"method","label":"area","range":{"end":{"column":18,"line":51},"start":{"column":3,"line":51}},"selector":"Shape.area","signature":"area(): number", "children": []},
+      {"anchor":{"column":3,"line":52},"key":"name","kind":"property","label":"name","range":{"end":{"column":16,"line":52},"start":{"column":3,"line":52}},"selector":"Shape.name","signature":"name: string", "children": []},
+      {"anchor":{"column":3,"line":53},"kind":"signature","label":"()","range":{"end":{"column":21,"line":53},"start":{"column":3,"line":53}},"signature":"(x: number): void", "children": []},
+      {"anchor":{"column":3,"line":54},"kind":"signature","label":"new()","range":{"end":{"column":17,"line":54},"start":{"column":3,"line":54}},"signature":"new (): Shape", "children": []},
+      {"anchor":{"column":3,"line":55},"kind":"signature","label":"[]","range":{"end":{"column":36,"line":55},"start":{"column":3,"line":55}},"signature":"readonly [index: number]: string", "children": []}
+    ]}
+  ]
+}

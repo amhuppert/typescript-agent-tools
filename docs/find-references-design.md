@@ -13,6 +13,20 @@ places where TypeScript 7.0.2 behavior overrode this design (such as `types`
 defaulting to `[]` and `baseUrl` being removed), are documented in
 [find references](references.md).
 
+Names below are those of this design. When navigation joined the snapshot
+([navigation design](navigation-design.md)), `ReferenceProject` became
+`project::Project` and `ReferenceSession` became `project::ProjectSession`,
+whose one `execute` method answers every operation. The owners moved with
+them: `references::project` is `project::program`, `references::binding` is
+`project::binding`, `references::query` is `project::references`, and
+`references::source` became the crate's `source` (captured text and
+positions, shared with file navigation) and `project::sources` (captured
+inputs and their `FileId`s). The public query and result types, with
+`Location`, remain in `references`; `SourcePosition` is in `source`, and the
+errors every analysis operation reports are in `analysis` (`ProjectError` is
+`analysis::InputError`, and `find_references` fails with an `AnalysisError`,
+which also covers a query path that names no file exactly).
+
 ## Refinements after implementation
 
 The public operation and immutable snapshot remain the intended boundary.
@@ -26,10 +40,12 @@ The implementation review refined three private contracts:
   used by queries. `project::paths::FileLookup` uses the same normalization and
   case policy as loading, including clamping parent traversal at a path root.
   The public façade and query owner do not reconstruct identity rules.
-- A per-file diagnostic policy owns binding leniency, unsupported dependency
-  tolerance, `skipLibCheck`, and comment suppressions. File provenance informs
-  both that policy and search inclusion during loading; the binder does not
-  infer diagnostic permissions from whether occurrences appear in results.
+- A per-file diagnostic policy owns the one decision whether a binding error
+  or missing input is reported (`Diagnostics::reports`: TypeScript's
+  `SkipTypeChecking`, comment directives, and dependency leniency) and,
+  separately, unsupported dependency tolerance. File provenance informs both
+  that policy and search inclusion during loading; the binder does not infer
+  diagnostic permissions from whether occurrences appear in results.
 
 Semantic links use distinct private IDs for scopes, declarations, references,
 aliases, requests, and index records. Optional type-parameter-list identity is

@@ -1,19 +1,37 @@
-//! A borrowing, arena-based TypeScript syntax parser.
+//! A borrowing, arena-based TypeScript syntax parser, with project-wide
+//! reference lookup and declaration navigation built on it.
 //!
 //! ```
 //! let ast = typescript_parser::parse("const value: number = 42;")?;
 //! assert_eq!(ast.root().kind, "SourceFile");
 //! # Ok::<(), typescript_parser::Diagnostic>(())
 //! ```
+//!
+//! - `project`: one configured project, as an immutable snapshot and a
+//!   refreshable session.
+//! - `references`: reference queries and their results.
+//! - `navigation`: declaration outlines and selections, for one file or a
+//!   project's searched files.
+//! - `editing`: source-preserving body replacement and statement insertion,
+//!   prepared as a batch, previewed, and applied.
+//! - `analysis`: the failures every operation reports (`AnalysisError`).
+//! - `source`: positions in analyzed text (`SourcePosition`).
 
+pub mod analysis;
 pub mod ast;
 mod compiler;
+pub mod editing;
 mod identifier_exclusions;
+mod input;
 mod json;
 mod lexer;
+pub mod navigation;
 mod parser;
 mod pragmas;
+pub mod project;
 pub mod references;
+pub mod source;
+mod syntax;
 mod syntax_kind;
 pub use ast::{Ast, Diagnostic, Fields, Node, NodeId, NodeView, Span, Value};
 
@@ -69,12 +87,45 @@ impl ParseOptions {
     }
 }
 
-/// TypeScript's `getScriptKindFromFileName` for TSX and JSX: the text after
-/// the last `.`, without case.
+/// How TypeScript parses a file, by its name.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ScriptKind {
+    Ts,
+    Tsx,
+    Js,
+    Jsx,
+    Json,
+    Unknown,
+}
+
+/// TypeScript's `GetScriptKindFromFileName`: the text after the last `.`,
+/// without case (`strings.ToLower`, which for these extensions is ASCII
+/// case folding), so `X.JSON` parses as JSON and `A.TSX` with JSX under any
+/// file-system case policy. Whether such a file is a supported input is a
+/// separate question that follows the case policy (`input::InputKind`).
+pub(crate) fn script_kind(file_name: &str) -> ScriptKind {
+    let Some((_, extension)) = file_name.rsplit_once('.') else {
+        return ScriptKind::Unknown;
+    };
+    [
+        ("js", ScriptKind::Js),
+        ("cjs", ScriptKind::Js),
+        ("mjs", ScriptKind::Js),
+        ("jsx", ScriptKind::Jsx),
+        ("ts", ScriptKind::Ts),
+        ("cts", ScriptKind::Ts),
+        ("mts", ScriptKind::Ts),
+        ("tsx", ScriptKind::Tsx),
+        ("json", ScriptKind::Json),
+    ]
+    .into_iter()
+    .find(|(name, _)| extension.eq_ignore_ascii_case(name))
+    .map_or(ScriptKind::Unknown, |(_, kind)| kind)
+}
+
+/// Whether a file's script kind parses JSX.
 fn jsx_file_name(name: &str) -> bool {
-    name.rsplit_once('.').is_some_and(|(_, extension)| {
-        extension.eq_ignore_ascii_case("tsx") || extension.eq_ignore_ascii_case("jsx")
-    })
+    matches!(script_kind(name), ScriptKind::Tsx | ScriptKind::Jsx)
 }
 
 /// TypeScript's declaration file names: `.d.ts`, `.d.mts`, `.d.cts`, or an

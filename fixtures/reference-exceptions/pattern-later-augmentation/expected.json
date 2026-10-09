@@ -1,0 +1,176 @@
+{
+  "difference": "A later augmentation of a pattern-matched specifier that declares a name only the pattern declares extends that specifier alone here; TypeScript merges it into the pattern's own symbol, so the pattern's declaration joins that group, while `y.css`'s `Other` still resolves to the unmerged symbol.",
+  "queries": [
+    {
+      "at": "css.d.ts:3:13",
+      "typescript": [
+        {
+          "declarations": [
+            "css.d.ts:3:13",
+            "main2.ts:3:13"
+          ],
+          "occurrences": [
+            "css.d.ts:3:13",
+            "main2.ts:1:15",
+            "main2.ts:3:13",
+            "main2.ts:5:26"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "css.d.ts:3:13"
+          ],
+          "occurrences": [
+            "css.d.ts:3:13",
+            "other.ts:1:15",
+            "other.ts:2:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "other.ts:1:15",
+      "typescript": [
+        {
+          "declarations": [
+            "css.d.ts:3:13"
+          ],
+          "occurrences": [
+            "other.ts:1:15",
+            "other.ts:2:25"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "css.d.ts:3:13"
+          ],
+          "occurrences": [
+            "css.d.ts:3:13",
+            "other.ts:1:15",
+            "other.ts:2:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "other.ts:2:25",
+      "typescript": [
+        {
+          "declarations": [
+            "css.d.ts:3:13"
+          ],
+          "occurrences": [
+            "other.ts:1:15",
+            "other.ts:2:25"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "css.d.ts:3:13"
+          ],
+          "occurrences": [
+            "css.d.ts:3:13",
+            "other.ts:1:15",
+            "other.ts:2:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "main2.ts:1:15",
+      "typescript": [
+        {
+          "declarations": [
+            "css.d.ts:3:13",
+            "main2.ts:3:13"
+          ],
+          "occurrences": [
+            "css.d.ts:3:13",
+            "main2.ts:1:15",
+            "main2.ts:3:13",
+            "main2.ts:5:26"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "css.d.ts:3:13",
+            "main2.ts:3:13"
+          ],
+          "occurrences": [
+            "main2.ts:1:15",
+            "main2.ts:3:13",
+            "main2.ts:5:26"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "main2.ts:3:13",
+      "typescript": [
+        {
+          "declarations": [
+            "css.d.ts:3:13",
+            "main2.ts:3:13"
+          ],
+          "occurrences": [
+            "css.d.ts:3:13",
+            "main2.ts:1:15",
+            "main2.ts:3:13",
+            "main2.ts:5:26"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "css.d.ts:3:13",
+            "main2.ts:3:13"
+          ],
+          "occurrences": [
+            "main2.ts:1:15",
+            "main2.ts:3:13",
+            "main2.ts:5:26"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "main2.ts:5:26",
+      "typescript": [
+        {
+          "declarations": [
+            "css.d.ts:3:13",
+            "main2.ts:3:13"
+          ],
+          "occurrences": [
+            "css.d.ts:3:13",
+            "main2.ts:1:15",
+            "main2.ts:3:13",
+            "main2.ts:5:26"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "css.d.ts:3:13",
+            "main2.ts:3:13"
+          ],
+          "occurrences": [
+            "main2.ts:1:15",
+            "main2.ts:3:13",
+            "main2.ts:5:26"
+          ]
+        }
+      ]
+    }
+  ]
+}

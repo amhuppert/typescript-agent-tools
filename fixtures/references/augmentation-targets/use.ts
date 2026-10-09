@@ -1,0 +1,10 @@
+import type { /*@Starred:i*/Starred } from "./barrel";
+import type { /*@Settings:i*/Settings } from "./legacy";
+import { /*@ns:i*/ns } from "./api";
+import type { /*@Extra:i*/Extra } from "./inner";
+import type { /*@X:i*/Styles } from "x.css";
+export declare const /*@a:de*/a: /*@Starred:u*/Starred & /*@Settings:u*/Settings;
+export declare const /*@e:de*/e: /*@ns:u*/ns./*@Extra:u*/Extra & /*@Extra:u*/Extra & /*@ns:u*/ns./*@Base:u*/Base;
+export declare const /*@x:de*/x: /*@X:u*/Styles;
+export const /*@b:de*/b: string = /*@x:u*/x./*@!*/a + /*@x:u*/x./*@!*/b;
+export declare const /*@g:de*/g: /*@FromAmbient:u*/FromAmbient;

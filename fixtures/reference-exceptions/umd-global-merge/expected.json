@@ -1,0 +1,122 @@
+{
+  "difference": "A `declare global` namespace merges into the module a UMD global names, and the `export as namespace` alias resolves to the merged module here; TypeScript keeps the module it resolved before the merge as the alias's target.",
+  "queries": [
+    {
+      "at": "umd.d.ts:2:21",
+      "typescript": [
+        {
+          "declarations": [
+            "umd.d.ts:1:1"
+          ],
+          "occurrences": [
+            "umd.d.ts:2:21"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "aug.ts:3:13",
+            "umd.d.ts:1:1"
+          ],
+          "occurrences": [
+            "aug.ts:3:13",
+            "umd.d.ts:2:21",
+            "use.ts:1:1",
+            "use.ts:2:1"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "aug.ts:3:13",
+      "typescript": [
+        {
+          "declarations": [
+            "aug.ts:3:13",
+            "umd.d.ts:1:1"
+          ],
+          "occurrences": [
+            "aug.ts:3:13",
+            "use.ts:1:1",
+            "use.ts:2:1"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "aug.ts:3:13",
+            "umd.d.ts:1:1"
+          ],
+          "occurrences": [
+            "aug.ts:3:13",
+            "umd.d.ts:2:21",
+            "use.ts:1:1",
+            "use.ts:2:1"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "use.ts:1:1",
+      "typescript": [
+        {
+          "declarations": [
+            "aug.ts:3:13",
+            "umd.d.ts:1:1"
+          ],
+          "occurrences": [
+            "aug.ts:3:13",
+            "use.ts:1:1",
+            "use.ts:2:1"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "aug.ts:3:13",
+            "umd.d.ts:1:1"
+          ],
+          "occurrences": [
+            "aug.ts:3:13",
+            "umd.d.ts:2:21",
+            "use.ts:1:1",
+            "use.ts:2:1"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "use.ts:2:1",
+      "typescript": [
+        {
+          "declarations": [
+            "aug.ts:3:13",
+            "umd.d.ts:1:1"
+          ],
+          "occurrences": [
+            "aug.ts:3:13",
+            "use.ts:1:1",
+            "use.ts:2:1"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "aug.ts:3:13",
+            "umd.d.ts:1:1"
+          ],
+          "occurrences": [
+            "aug.ts:3:13",
+            "umd.d.ts:2:21",
+            "use.ts:1:1",
+            "use.ts:2:1"
+          ]
+        }
+      ]
+    }
+  ]
+}

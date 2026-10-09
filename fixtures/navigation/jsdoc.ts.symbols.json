@@ -1,0 +1,14 @@
+{
+  "compiler": "7.0.2",
+  "symbols": [
+    {"name": "Name", "kind": 5, "range": "2:5-2:27", "selection": "2:23-2:27", "children": []},
+    {"name": "named", "kind": 13, "range": "3:14-3:25", "selection": "3:14-3:19", "children": []},
+    {"name": "Handler", "kind": 5, "range": "6:4-9:2", "selection": "6:14-6:21", "children": []},
+    {"name": "handle", "kind": 12, "range": "10:1-13:2", "selection": "10:17-10:23", "children": [
+      {"name": "Local", "kind": 5, "range": "11:7-11:41", "selection": "11:36-11:41", "children": []},
+      {"name": "local", "kind": 13, "range": "12:9-12:18", "selection": "12:9-12:14", "children": []}
+    ]},
+    {"name": "is", "kind": 5, "range": "15:39-15:72", "selection": "15:48-15:50", "children": []},
+    {"name": "Documented", "kind": 5, "range": "16:1-16:27", "selection": "16:14-16:24", "children": []}
+  ]
+}

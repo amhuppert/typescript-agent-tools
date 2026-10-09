@@ -1,0 +1,1732 @@
+{
+  "description": "JSON modules as program inputs: `resolveJsonModule` and its defaults, resolution of `.json` specifiers, `files`, `include`, and reference paths naming JSON, ambient modules beside JSON files, the import forms and what they name, and module augmentation of a JSON module.",
+  "cases": [
+    {
+      "name": "forms",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nimport { greeting } from \"./data.json\";\nimport { missing } from \"./data.json\";\nimport * as ns from \"./data.json\";\nimport req = require(\"./data.json\");\nimport { default as dflt } from \"./data.json\";\nimport { \"a-b\" as ab, \"1\" as one } from \"./data.json\";\nexport { greeting as g2, default as d2, missing as m2 } from \"./data.json\";\ntype T = typeof import(\"./data.json\");\ntype U = typeof import(\"./data.json\").greeting;\ntype V = import(\"./data.json\").greeting;\ntype W = typeof data.nested;\nconst dyn = import(\"./data.json\");\ndata; greeting; ns; req; ns.greeting; data.value; dflt; ab; one; data.nested.x; dyn; missing;\n",
+        "data.json": "{ \"greeting\": \"hi\", \"value\": 1, \"a-b\": 2, \"1\": 3, \"default\": 4, \"nested\": { \"x\": 1 } }"
+      },
+      "watch": [
+        "data",
+        "greeting",
+        "missing",
+        "ns",
+        "req",
+        "g2",
+        "d2",
+        "dflt",
+        "ab",
+        "one",
+        "x",
+        "T",
+        "U",
+        "V",
+        "W",
+        "dyn",
+        "nested",
+        "value",
+        "m2"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:3:10",
+          "TS1202 main.ts:5:1",
+          "TS2305 main.ts:8:41",
+          "TS2694 main.ts:11:32",
+          "TS2711 main.ts:13:13"
+        ],
+        "names": [
+          "1:8 data -> Property [data.json SourceFile]",
+          "2:10 greeting -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "3:10 missing -> none",
+          "4:13 ns -> Property|Transient [data.json SourceFile]",
+          "5:8 req -> Property [data.json SourceFile]",
+          "6:21 dflt -> Property [data.json SourceFile]",
+          "7:19 ab -> Property|Transient [data.json:1:33 PropertyAssignment]",
+          "7:30 one -> Property|Transient [data.json:1:43 PropertyAssignment]",
+          "8:10 greeting -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "8:22 g2 -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "8:37 d2 -> Property [data.json SourceFile]",
+          "8:41 missing -> none",
+          "8:52 m2 -> none",
+          "9:6 T -> TypeAlias [main.ts:9:1 TypeAliasDeclaration]",
+          "10:6 U -> TypeAlias [main.ts:10:1 TypeAliasDeclaration]",
+          "10:39 greeting -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "11:6 V -> TypeAlias [main.ts:11:1 TypeAliasDeclaration]",
+          "11:32 greeting -> none",
+          "12:6 W -> TypeAlias [main.ts:12:1 TypeAliasDeclaration]",
+          "12:17 data -> Property [data.json SourceFile]",
+          "12:22 nested -> Property|Transient [data.json:1:65 PropertyAssignment]",
+          "13:7 dyn -> BlockScopedVariable [main.ts:13:7 VariableDeclaration]",
+          "14:1 data -> Property [data.json SourceFile]",
+          "14:7 greeting -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "14:17 ns -> Property|Transient [data.json SourceFile]",
+          "14:21 req -> Property [data.json SourceFile]",
+          "14:26 ns -> Property|Transient [data.json SourceFile]",
+          "14:29 greeting -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "14:39 data -> Property [data.json SourceFile]",
+          "14:44 value -> Property|Transient [data.json:1:21 PropertyAssignment]",
+          "14:51 dflt -> Property [data.json SourceFile]",
+          "14:57 ab -> Property|Transient [data.json:1:33 PropertyAssignment]",
+          "14:61 one -> Property|Transient [data.json:1:43 PropertyAssignment]",
+          "14:66 data -> Property [data.json SourceFile]",
+          "14:71 nested -> Property|Transient [data.json:1:65 PropertyAssignment]",
+          "14:78 x -> Property|Transient [data.json:1:77 PropertyAssignment]",
+          "14:81 dyn -> BlockScopedVariable [main.ts:13:7 VariableDeclaration]",
+          "14:86 missing -> none"
+        ]
+      }
+    },
+    {
+      "name": "reexport-star",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { greeting } from \"./re\";\nimport { whole } from \"./re2\";\ngreeting; whole;\n",
+        "re.ts": "export * from \"./data.json\";\n",
+        "re2.ts": "export * as whole from \"./data.json\";\n",
+        "data.json": "{ \"greeting\": \"hi\", \"value\": 1, \"a-b\": 2, \"1\": 3, \"default\": 4, \"nested\": { \"x\": 1 } }"
+      },
+      "watch": [
+        "greeting",
+        "whole"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "re.ts",
+          "re2.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:1:10",
+          "TS2498 re.ts:1:15",
+          "TS2498 re2.ts:1:24"
+        ],
+        "names": [
+          "1:10 greeting -> none",
+          "2:10 whole -> Property [data.json SourceFile]",
+          "3:1 greeting -> none",
+          "3:11 whole -> Property [data.json SourceFile]"
+        ]
+      }
+    },
+    {
+      "name": "array-root",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nimport { length, x } from \"./data.json\";\ndata; length; x;\n",
+        "data.json": "[1, 2]"
+      },
+      "watch": [
+        "data",
+        "length",
+        "x"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:2:10",
+          "TS2305 main.ts:2:18"
+        ],
+        "names": [
+          "1:8 data -> Property [data.json SourceFile]",
+          "2:10 length -> none",
+          "2:18 x -> none",
+          "3:1 data -> Property [data.json SourceFile]",
+          "3:7 length -> none",
+          "3:15 x -> none"
+        ]
+      }
+    },
+    {
+      "name": "empty-root",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nimport { x } from \"./data.json\";\ndata; x;\n",
+        "data.json": "// nothing\n"
+      },
+      "watch": [
+        "data",
+        "x"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:2:10"
+        ],
+        "names": [
+          "1:8 data -> Property [data.json SourceFile]",
+          "2:10 x -> none",
+          "3:1 data -> Property [data.json SourceFile]",
+          "3:7 x -> none"
+        ]
+      }
+    },
+    {
+      "name": "string-root",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nimport { length } from \"./data.json\";\ndata; length;\n",
+        "data.json": "\"text\""
+      },
+      "watch": [
+        "data",
+        "length"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:2:10"
+        ],
+        "names": [
+          "1:8 data -> Property [data.json SourceFile]",
+          "2:10 length -> none",
+          "3:1 data -> Property [data.json SourceFile]",
+          "3:7 length -> none"
+        ]
+      }
+    },
+    {
+      "name": "dup-keys",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { a } from \"./data.json\";\na;\n",
+        "data.json": "{ \"a\": 1, \"a\": \"two\" }"
+      },
+      "watch": [
+        "a"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 a -> Property|Transient [data.json:1:3 PropertyAssignment, data.json:1:11 PropertyAssignment]",
+          "2:1 a -> Property|Transient [data.json:1:3 PropertyAssignment, data.json:1:11 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "surrogate-key",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { \"\\ud800\" as s, \"\\udc00\" as t } from \"./data.json\";\ns; t;\n",
+        "data.json": "{ \"\\ud800\": 1 }"
+      },
+      "watch": [
+        "s",
+        "t"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:1:25"
+        ],
+        "names": [
+          "1:22 s -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "1:37 t -> none",
+          "2:1 s -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "2:4 t -> none"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Unsupported",
+          "main.ts:1:10"
+        ],
+        "note": "docs/references.md: a name with an unpaired UTF-16 surrogate is unsupported"
+      }
+    },
+    {
+      "name": "ambient-and-file",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\",\"decl.d.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nimport { v } from \"./data.json\";\ndata; v;\n",
+        "decl.d.ts": "declare module \"*.json\" { export const v: number; }\n",
+        "data.json": "{ \"v\": 1 }"
+      },
+      "watch": [
+        "data",
+        "v"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts",
+          "decl.d.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:8 data -> Property [data.json SourceFile]",
+          "2:10 v -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "3:1 data -> Property [data.json SourceFile]",
+          "3:7 v -> Property|Transient [data.json:1:3 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "ambient-off",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\",\"resolveJsonModule\":false},\"files\":[\"main.ts\",\"decl.d.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nimport { v } from \"./data.json\";\ndata; v;\n",
+        "decl.d.ts": "declare module \"*.json\" { export const v: number; }\n",
+        "data.json": "{ \"v\": 1 }"
+      },
+      "watch": [
+        "data",
+        "v"
+      ],
+      "native": {
+        "program": [
+          "main.ts",
+          "decl.d.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:8 data -> ValueModule [decl.d.ts:1:1 ModuleDeclaration]",
+          "2:10 v -> BlockScopedVariable [decl.d.ts:1:40 VariableDeclaration]",
+          "3:1 data -> ValueModule [decl.d.ts:1:1 ModuleDeclaration]",
+          "3:7 v -> BlockScopedVariable [decl.d.ts:1:40 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "exact-ambient",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\",\"decl.d.ts\"]}",
+        "main.ts": "import data from \"pkg/data.json\";\nimport { v } from \"pkg/data.json\";\ndata; v;\n",
+        "decl.d.ts": "declare module \"pkg/data.json\" { export const v: number; }\n",
+        "node_modules/pkg/data.json": "{ \"v\": 1 }",
+        "node_modules/pkg/package.json": "{\"name\":\"pkg\"}"
+      },
+      "watch": [
+        "data",
+        "v"
+      ],
+      "native": {
+        "program": [
+          "node_modules/pkg/data.json (external)",
+          "main.ts",
+          "decl.d.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:8 data -> ValueModule [decl.d.ts:1:1 ModuleDeclaration]",
+          "2:10 v -> BlockScopedVariable [decl.d.ts:1:47 VariableDeclaration]",
+          "3:1 data -> ValueModule [decl.d.ts:1:1 ModuleDeclaration]",
+          "3:7 v -> BlockScopedVariable [decl.d.ts:1:47 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "json-ref-directive",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import d from \"./data.json\";\nd;\n",
+        "data.json": "/// <reference path=\"./extra.ts\" />\n{\"a\":1}",
+        "extra.ts": "export {};\n"
+      },
+      "native": {
+        "program": [
+          "extra.ts",
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "json-ref-missing",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import d from \"./data.json\";\nd;\n",
+        "data.json": "/// <reference path=\"./nope.ts\" />\n{\"a\":1}"
+      },
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "json-ref-invalid",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import d from \"./data.json\";\nd;\n",
+        "data.json": "/// <reference types=\"x\" resolution-mode=\"bad\" />\n{\"a\":1}"
+      },
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS1453 data.json:1:43"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Syntax",
+          "TS1453"
+        ]
+      }
+    },
+    {
+      "name": "json-ts-ignore-ref",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import d from \"./data.json\";\nd;\n",
+        "data.json": "// @ts-ignore\n/// <reference path=\"./nope.ts\" />\n{\"a\":1}"
+      },
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "dep-json",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { x } from \"pkg\";\nx;\n",
+        "node_modules/pkg/package.json": "{\"name\":\"pkg\",\"types\":\"index.d.ts\"}",
+        "node_modules/pkg/index.d.ts": "import data from \"./data.json\";\nexport declare const x: typeof data;\n",
+        "node_modules/pkg/data.json": "{\"a\":1}"
+      },
+      "native": {
+        "program": [
+          "node_modules/pkg/data.json (external)",
+          "node_modules/pkg/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "dep-json-local",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { x } from \"./lib\";\nx;\n",
+        "lib.ts": "import data from \"./data.json\";\nexport const x = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "native": {
+        "program": [
+          "data.json",
+          "lib.ts",
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "json-d-ts-sibling-dts-json",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import d from \"./data.json\";\nd;\n",
+        "data.json": "{\"a\":1}",
+        "data.json.d.ts": "declare const v: number; export default v;\n"
+      },
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "json-off-ts-sibling-nodenext-esm",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"nodenext\",\"resolveJsonModule\":false},\"files\":[\"main.ts\"]}",
+        "package.json": "{\"type\":\"module\"}",
+        "main.ts": "import d from \"./data.json\";\nd;\n",
+        "data.json": "{\"a\":1}",
+        "data.json.ts": "export default 1;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2732 main.ts:1:15"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2732"
+        ]
+      }
+    },
+    {
+      "name": "json-on-ts-sibling",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import d from \"./data.json\";\nd;\n",
+        "data.json": "{\"a\":1}",
+        "data.json.ts": "export default 1;\n"
+      },
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "upper-specifier",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import d from \"./DATA.JSON\";\nd;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:1:15"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      }
+    },
+    {
+      "name": "upper-file-files",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\",\"Data.JSON\"]}",
+        "main.ts": "export {};\n",
+        "Data.JSON": "{\"a\":1}"
+      },
+      "native": {
+        "program": [
+          "main.ts",
+          "Data.JSON"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "node18-default",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"node18\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import d from \"./data.json\";\nd;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2732 main.ts:1:15"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2732"
+        ]
+      }
+    },
+    {
+      "name": "nodenext-default",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"nodenext\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import d from \"./data.json\";\nd;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "preserve-default",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"preserve\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import d from \"./data.json\";\nd;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "node16-explicit-true",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"node16\",\"resolveJsonModule\":true},\"files\":[\"main.ts\"]}",
+        "main.ts": "import d from \"./data.json\";\nd;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "node16-resolution-nodenext",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"node16\",\"moduleResolution\":\"nodenext\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import d from \"./data.json\";\nd;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2732 main.ts:1:15"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2732"
+        ]
+      }
+    },
+    {
+      "name": "node20-explicit-false",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"node20\",\"resolveJsonModule\":false},\"files\":[\"main.ts\"]}",
+        "main.ts": "import d from \"./data.json\";\nd;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2732 main.ts:1:15"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2732"
+        ]
+      }
+    },
+    {
+      "name": "json-bad-in-dep",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { x } from \"pkg\";\nx;\n",
+        "node_modules/pkg/package.json": "{\"name\":\"pkg\",\"types\":\"index.d.ts\"}",
+        "node_modules/pkg/index.d.ts": "import data from \"./data.json\";\nexport declare const x: typeof data;\n",
+        "node_modules/pkg/data.json": "{\"a\":01}"
+      },
+      "native": {
+        "program": [
+          "node_modules/pkg/data.json (external)",
+          "node_modules/pkg/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS1121 node_modules/pkg/data.json:1:6"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Syntax",
+          "TS1121"
+        ]
+      }
+    },
+    {
+      "name": "augment-json",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nimport { x } from \"./data.json\";\ndeclare module \"./data.json\" { export const x: number; }\ndata; x;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "watch": [
+        "x",
+        "data"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:2:10",
+          "TS2671 main.ts:3:16"
+        ],
+        "names": [
+          "1:8 data -> Property [data.json SourceFile]",
+          "2:10 x -> none",
+          "3:45 x -> BlockScopedVariable [main.ts:3:45 VariableDeclaration]",
+          "4:1 data -> Property [data.json SourceFile]",
+          "4:7 x -> none"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2671"
+        ]
+      }
+    },
+    {
+      "name": "augment-json-dts",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\",\"skipLibCheck\":true},\"files\":[\"main.ts\",\"aug.d.ts\"]}",
+        "main.ts": "import { x } from \"./data.json\";\nx;\n",
+        "aug.d.ts": "export {};\ndeclare module \"./data.json\" { export const x: number; }\n",
+        "data.json": "{\"a\":1}"
+      },
+      "watch": [
+        "x"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts",
+          "aug.d.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:1:10"
+        ],
+        "names": [
+          "1:10 x -> none",
+          "2:1 x -> none"
+        ]
+      }
+    },
+    {
+      "name": "nodenext-noattr",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"nodenext\"},\"files\":[\"main.ts\"]}",
+        "package.json": "{\"type\":\"module\"}",
+        "main.ts": "import data from \"./data.json\";\nimport { greeting } from \"./data.json\";\ndata; greeting;\n",
+        "data.json": "{ \"greeting\": \"hi\" }"
+      },
+      "watch": [
+        "data",
+        "greeting"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS1543 main.ts:1:18",
+          "TS1544 main.ts:2:10",
+          "TS1543 main.ts:2:26"
+        ],
+        "names": [
+          "1:8 data -> Property [data.json SourceFile]",
+          "2:10 greeting -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "3:1 data -> Property [data.json SourceFile]",
+          "3:7 greeting -> Property|Transient [data.json:1:3 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "nodenext-attr",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"nodenext\"},\"files\":[\"main.ts\"]}",
+        "package.json": "{\"type\":\"module\"}",
+        "main.ts": "import data from \"./data.json\" with { type: \"json\" };\nimport { greeting } from \"./data.json\" with { type: \"json\" };\ndata; greeting;\n",
+        "data.json": "{ \"greeting\": \"hi\" }"
+      },
+      "watch": [
+        "data",
+        "greeting"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS1544 main.ts:2:10"
+        ],
+        "names": [
+          "1:8 data -> Property [data.json SourceFile]",
+          "2:10 greeting -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "3:1 data -> Property [data.json SourceFile]",
+          "3:7 greeting -> Property|Transient [data.json:1:3 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "nodenext-cjs",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"nodenext\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nimport { greeting } from \"./data.json\";\ndata; greeting;\n",
+        "data.json": "{ \"greeting\": \"hi\" }"
+      },
+      "watch": [
+        "data",
+        "greeting"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:8 data -> Property [data.json SourceFile]",
+          "2:10 greeting -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "3:1 data -> Property [data.json SourceFile]",
+          "3:7 greeting -> Property|Transient [data.json:1:3 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "node16-default",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"node16\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\ndata;\n",
+        "data.json": "{ \"greeting\": \"hi\" }"
+      },
+      "watch": [
+        "data"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2732 main.ts:1:18"
+        ],
+        "names": [
+          "1:8 data -> none",
+          "2:1 data -> none"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2732"
+        ]
+      }
+    },
+    {
+      "name": "node18-explicit",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"node18\",\"resolveJsonModule\":true},\"files\":[\"main.ts\"]}",
+        "package.json": "{\"type\":\"module\"}",
+        "main.ts": "import data from \"./data.json\";\nimport { greeting } from \"./data.json\";\ndata; greeting;\n",
+        "data.json": "{ \"greeting\": \"hi\" }"
+      },
+      "watch": [
+        "data",
+        "greeting"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS1543 main.ts:1:18",
+          "TS1544 main.ts:2:10",
+          "TS1543 main.ts:2:26"
+        ],
+        "names": [
+          "1:8 data -> Property [data.json SourceFile]",
+          "2:10 greeting -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "3:1 data -> Property [data.json SourceFile]",
+          "3:7 greeting -> Property|Transient [data.json:1:3 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "node20-default",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"node20\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\ndata;\n",
+        "data.json": "{ \"greeting\": \"hi\" }"
+      },
+      "watch": [
+        "data"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:8 data -> Property [data.json SourceFile]",
+          "2:1 data -> Property [data.json SourceFile]"
+        ]
+      }
+    },
+    {
+      "name": "bundler-off",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\",\"resolveJsonModule\":false},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\ndata;\n",
+        "data.json": "{ \"greeting\": \"hi\" }"
+      },
+      "watch": [
+        "data"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2732 main.ts:1:18"
+        ],
+        "names": [
+          "1:8 data -> none",
+          "2:1 data -> none"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2732"
+        ]
+      }
+    },
+    {
+      "name": "commonjs-default",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"commonjs\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\ndata;\n",
+        "data.json": "{ \"greeting\": \"hi\" }"
+      },
+      "watch": [
+        "data"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:8 data -> Property [data.json SourceFile]",
+          "2:1 data -> Property [data.json SourceFile]"
+        ]
+      }
+    },
+    {
+      "name": "extensionless",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data\";\ndata;\n",
+        "data.json": "{ \"greeting\": \"hi\" }"
+      },
+      "watch": [
+        "data"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:1:18"
+        ],
+        "names": [
+          "1:8 data -> none",
+          "2:1 data -> none"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      }
+    },
+    {
+      "name": "dts-json-wins",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\ndata;\n",
+        "data.json": "{ \"greeting\": \"hi\" }",
+        "data.d.json.ts": "declare const x: { a: 1 }; export default x;"
+      },
+      "watch": [
+        "data"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6263 main.ts:1:18"
+        ],
+        "names": [
+          "1:8 data -> none",
+          "2:1 data -> none"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS6263"
+        ]
+      }
+    },
+    {
+      "name": "json-ts-sibling",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\",\"resolveJsonModule\":false},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\ndata;\n",
+        "data.json": "{ \"greeting\": \"hi\" }",
+        "data.json.ts": "export default 1;"
+      },
+      "watch": [
+        "data"
+      ],
+      "native": {
+        "program": [
+          "data.json.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:8 data -> Property [data.json.ts:1:1 ExportAssignment]",
+          "2:1 data -> Property [data.json.ts:1:1 ExportAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "files-json-on",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\",\"data.json\"]}",
+        "main.ts": "export {};",
+        "data.json": "{ \"a\": 1 }"
+      },
+      "native": {
+        "program": [
+          "main.ts",
+          "data.json"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "files-json-off",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\",\"resolveJsonModule\":false},\"files\":[\"main.ts\",\"data.json\"]}",
+        "main.ts": "export {};",
+        "data.json": "{ \"a\": 1 }"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6054 -"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "tsconfig.json:1:138"
+        ],
+        "note": "TypeScript reports this diagnostic without a position; this tool reports it at the value"
+      }
+    },
+    {
+      "name": "files-json-missing",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\",\"nope.json\"]}",
+        "main.ts": "export {};"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6053 -"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Io",
+          "tsconfig.json:1:112"
+        ],
+        "note": "TypeScript reports this diagnostic without a position; this tool reports it at the value"
+      }
+    },
+    {
+      "name": "include-star",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"include\":[\"**/*\"]}",
+        "main.ts": "export {};",
+        "data.json": "{ \"a\": 1 }"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "include-json",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"include\":[\"*.ts\",\"*.json\"]}",
+        "main.ts": "export {};",
+        "data.json": "{ \"a\": 1 }"
+      },
+      "native": {
+        "program": [
+          "main.ts",
+          "data.json",
+          "tsconfig.json"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "include-json-off",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\",\"resolveJsonModule\":false},\"include\":[\"*.ts\",\"*.json\"]}",
+        "main.ts": "export {};",
+        "data.json": "{ \"a\": 1 }"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "include-json-dir",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"include\":[\"src\"]}",
+        "src/main.ts": "export {};",
+        "src/data.json": "{ \"a\": 1 }",
+        "main.ts": ""
+      },
+      "native": {
+        "program": [
+          "src/main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "ref-json-on",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "/// <reference path=\"./data.json\" />\nexport {};",
+        "data.json": "{ \"a\": 1 }"
+      },
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "ref-json-off",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\",\"resolveJsonModule\":false},\"files\":[\"main.ts\"]}",
+        "main.ts": "/// <reference path=\"./data.json\" />\nexport {};",
+        "data.json": "{ \"a\": 1 }"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6054 main.ts:1:22"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Unsupported",
+          "TS6054"
+        ]
+      }
+    },
+    {
+      "name": "ref-json-missing",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "/// <reference path=\"./nope.json\" />\nexport {};"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6053 main.ts:1:22"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS6053"
+        ]
+      }
+    },
+    {
+      "name": "pkg-json-subpath",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import x from \"pkg/data.json\";\nx;",
+        "node_modules/pkg/package.json": "{\"name\":\"pkg\"}",
+        "node_modules/pkg/data.json": "{ \"a\": 1 }"
+      },
+      "watch": [
+        "x"
+      ],
+      "native": {
+        "program": [
+          "node_modules/pkg/data.json (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:8 x -> Property [node_modules/pkg/data.json SourceFile]",
+          "2:1 x -> Property [node_modules/pkg/data.json SourceFile]"
+        ]
+      }
+    },
+    {
+      "name": "pkg-exports-json",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import x from \"pkg/data\";\nx;",
+        "node_modules/pkg/package.json": "{\"name\":\"pkg\",\"exports\":{\"./data\":\"./data.json\"}}",
+        "node_modules/pkg/data.json": "{ \"a\": 1 }"
+      },
+      "watch": [
+        "x"
+      ],
+      "native": {
+        "program": [
+          "node_modules/pkg/data.json (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:8 x -> Property [node_modules/pkg/data.json SourceFile]",
+          "2:1 x -> Property [node_modules/pkg/data.json SourceFile]"
+        ]
+      }
+    },
+    {
+      "name": "pkg-exports-json-off",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\",\"resolveJsonModule\":false},\"files\":[\"main.ts\"]}",
+        "main.ts": "import x from \"pkg/data\";\nx;",
+        "node_modules/pkg/package.json": "{\"name\":\"pkg\",\"exports\":{\"./data\":\"./data.json\"}}",
+        "node_modules/pkg/data.json": "{ \"a\": 1 }"
+      },
+      "watch": [
+        "x"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:1:15"
+        ],
+        "names": [
+          "1:8 x -> none",
+          "2:1 x -> none"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      }
+    },
+    {
+      "name": "pkg-main-json",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import x from \"pkg\";\nx;",
+        "node_modules/pkg/package.json": "{\"name\":\"pkg\",\"main\":\"data.json\"}",
+        "node_modules/pkg/data.json": "{ \"a\": 1 }"
+      },
+      "watch": [
+        "x"
+      ],
+      "native": {
+        "program": [
+          "node_modules/pkg/data.json (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:8 x -> Property [node_modules/pkg/data.json SourceFile]",
+          "2:1 x -> Property [node_modules/pkg/data.json SourceFile]"
+        ]
+      }
+    },
+    {
+      "name": "paths-json",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\",\"paths\":{\"@d\":[\"./data.json\"]}},\"files\":[\"main.ts\"]}",
+        "main.ts": "import x from \"@d\";\nx;",
+        "data.json": "{ \"a\": 1 }"
+      },
+      "watch": [
+        "x"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:8 x -> Property [data.json SourceFile]",
+          "2:1 x -> Property [data.json SourceFile]"
+        ]
+      }
+    },
+    {
+      "name": "ambient-pattern-and-file",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\",\"decl.d.ts\"]}",
+        "main.ts": "import x from \"./data.json\";\nx;",
+        "decl.d.ts": "declare module \"*.json\" { const v: number; export default v; }",
+        "data.json": "{ \"a\": 1 }"
+      },
+      "watch": [
+        "x"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts",
+          "decl.d.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:8 x -> Property [data.json SourceFile]",
+          "2:1 x -> Property [data.json SourceFile]"
+        ]
+      }
+    },
+    {
+      "name": "ambient-pattern-off",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\",\"resolveJsonModule\":false},\"files\":[\"main.ts\",\"decl.d.ts\"]}",
+        "main.ts": "import x from \"./data.json\";\nx;",
+        "decl.d.ts": "declare module \"*.json\" { const v: number; export default v; }",
+        "data.json": "{ \"a\": 1 }"
+      },
+      "watch": [
+        "x"
+      ],
+      "native": {
+        "program": [
+          "main.ts",
+          "decl.d.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:8 x -> BlockScopedVariable [decl.d.ts:1:33 VariableDeclaration]",
+          "2:1 x -> BlockScopedVariable [decl.d.ts:1:33 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "json-dts-sibling",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import x from \"./data.json\";\nx;",
+        "data.json.d.ts": "declare const v: 5; export default v;",
+        "data.json": "{ \"a\": 1 }"
+      },
+      "watch": [
+        "x"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:8 x -> Property [data.json SourceFile]",
+          "2:1 x -> Property [data.json SourceFile]"
+        ]
+      }
+    },
+    {
+      "name": "nodenext-dir-json",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"nodenext\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import x = require(\"./data.json\");\nx;",
+        "data.json": "{ \"a\": 1 }"
+      },
+      "watch": [
+        "x"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:8 x -> Property [data.json SourceFile]",
+          "2:1 x -> Property [data.json SourceFile]"
+        ]
+      }
+    },
+    {
+      "name": "json-reexport-star",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { a } from \"./re\";\na;",
+        "re.ts": "export * from \"./data.json\";",
+        "data.json": "{ \"a\": 1 }"
+      },
+      "watch": [
+        "a"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "re.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:1:10",
+          "TS2498 re.ts:1:15"
+        ],
+        "names": [
+          "1:10 a -> none",
+          "2:1 a -> none"
+        ]
+      }
+    },
+    {
+      "name": "json-export-equals-ns",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import * as ns from \"./data.json\";\nns.a;",
+        "data.json": "{ \"a\": 1 }"
+      },
+      "watch": [
+        "ns",
+        "a"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:13 ns -> Property [data.json SourceFile]",
+          "2:1 ns -> Property [data.json SourceFile]",
+          "2:4 a -> Property|Transient [data.json:1:3 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "json-root-files-no-import",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\",\"data.json\"]}",
+        "main.ts": "const a = 1; a;",
+        "data.json": "{ \"a\": 1 }"
+      },
+      "watch": [
+        "a"
+      ],
+      "native": {
+        "program": [
+          "main.ts",
+          "data.json"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:7 a -> BlockScopedVariable [main.ts:1:7 VariableDeclaration]",
+          "1:14 a -> BlockScopedVariable [main.ts:1:7 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "json-script-global",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\",\"data.json\"]}",
+        "main.ts": "a;",
+        "data.json": "{ \"a\": 1 }"
+      },
+      "watch": [
+        "a"
+      ],
+      "native": {
+        "program": [
+          "main.ts",
+          "data.json"
+        ],
+        "diagnostics": [
+          "TS2304 main.ts:1:1"
+        ],
+        "names": [
+          "1:1 a -> none"
+        ]
+      }
+    },
+    {
+      "name": "refs-default-named",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\",\"other.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nimport { a } from \"./data.json\";\nimport * as ns from \"./data.json\";\ndata; a; data.a; ns.a;\n",
+        "other.ts": "import d from \"./data.json\";\nexport const z = d.a;\n",
+        "data.json": "{ \"a\": 1, \"b\": { \"a\": 2 } }"
+      },
+      "watch": [
+        "data",
+        "a"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts",
+          "other.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:8 data -> Property [data.json SourceFile]",
+          "2:10 a -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "4:1 data -> Property [data.json SourceFile]",
+          "4:7 a -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "4:10 data -> Property [data.json SourceFile]",
+          "4:15 a -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "4:21 a -> Property|Transient [data.json:1:3 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "number-root",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nimport { a } from \"./data.json\";\ndata; a;\n",
+        "data.json": "-1"
+      },
+      "watch": [
+        "data",
+        "a"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:2:10"
+        ],
+        "names": [
+          "1:8 data -> Property [data.json SourceFile]",
+          "2:10 a -> none",
+          "3:1 data -> Property [data.json SourceFile]",
+          "3:7 a -> none"
+        ]
+      }
+    },
+    {
+      "name": "empty-file",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nimport { a } from \"./data.json\";\ndata; a;\n",
+        "data.json": ""
+      },
+      "watch": [
+        "data",
+        "a"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:2:10"
+        ],
+        "names": [
+          "1:8 data -> Property [data.json SourceFile]",
+          "2:10 a -> none",
+          "3:1 data -> Property [data.json SourceFile]",
+          "3:7 a -> none"
+        ]
+      }
+    },
+    {
+      "name": "numeric-key",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { \"1\" as one, a } from \"./data.json\";\none; a;\n",
+        "data.json": "{ \"1\": 1, \"a\": 2 }"
+      },
+      "watch": [
+        "one",
+        "a"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:17 one -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "1:22 a -> Property|Transient [data.json:1:11 PropertyAssignment]",
+          "2:1 one -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "2:6 a -> Property|Transient [data.json:1:11 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "key-not-ident",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { \"a-b\" as ab } from \"./data.json\";\nab;\n",
+        "data.json": "{ \"a-b\": 1 }"
+      },
+      "watch": [
+        "ab"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:19 ab -> Property|Transient [data.json:1:3 PropertyAssignment]",
+          "2:1 ab -> Property|Transient [data.json:1:3 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "missing-named",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nimport { a } from \"./data.json\";\ndata; a;\n",
+        "data.json": "{ \"x\": 1 }"
+      },
+      "watch": [
+        "data",
+        "a"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:2:10"
+        ],
+        "names": [
+          "1:8 data -> Property [data.json SourceFile]",
+          "2:10 a -> none",
+          "3:1 data -> Property [data.json SourceFile]",
+          "3:7 a -> none"
+        ]
+      }
+    },
+    {
+      "name": "default-key",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import d, { default as d2 } from \"./data.json\";\nd; d2;\n",
+        "data.json": "{ \"default\": 1, \"a\": 2 }"
+      },
+      "watch": [
+        "d",
+        "d2"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:8 d -> Property [data.json SourceFile]",
+          "1:24 d2 -> Property [data.json SourceFile]",
+          "2:1 d -> Property [data.json SourceFile]",
+          "2:4 d2 -> Property [data.json SourceFile]"
+        ]
+      }
+    },
+    {
+      "name": "type-query",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"esnext\",\"moduleResolution\":\"bundler\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\ntype T = typeof data;\ntype U = typeof import(\"./data.json\");\nconst x = import(\"./data.json\");\n",
+        "data.json": "{ \"a\": 1 }"
+      },
+      "watch": [
+        "data",
+        "T",
+        "U"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2711 main.ts:4:11"
+        ],
+        "names": [
+          "1:8 data -> Property [data.json SourceFile]",
+          "2:6 T -> TypeAlias [main.ts:2:1 TypeAliasDeclaration]",
+          "2:17 data -> Property [data.json SourceFile]",
+          "3:6 U -> TypeAlias [main.ts:3:1 TypeAliasDeclaration]"
+        ]
+      }
+    }
+  ]
+}

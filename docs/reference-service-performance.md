@@ -13,8 +13,10 @@ profile (thin LTO and one codegen unit).
 
 The follow-up [Command Center measurement](reference-service-command-center.md)
 exercises the real 5,316-root codebase, including large results, concurrent
-clients, and refresh. Its original configuration still requires the previously
-documented compatibility adjustments.
+clients, and refresh, through the compatibility adjustments its configuration
+then required; the unchanged configuration has loaded since, and
+[Command Center performance](performance-command-center.md#current-state-2026-10-08)
+measures it.
 
 ## End-to-end CLI measurement
 

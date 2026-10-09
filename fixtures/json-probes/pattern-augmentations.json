@@ -1,0 +1,571 @@
+{
+  "description": "When an augmentation of a specifier that only a pattern ambient module matches makes a module of its own (`mergeModuleAugmentation` with `patternAmbientModuleAugmentations`): at that augmentation's turn, and only while no merge has changed the pattern module itself; merges before it see the pattern module.",
+  "cases": [
+    {
+      "name": "pattern-module-0-none",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": []}, \"files\": [\"pattern.d.ts\", \"bridge.ts\", \"early.ts\", \"main.ts\"]}",
+        "pattern.d.ts": "declare module \"*.view\" { export interface Base {} }",
+        "bridge.ts": "export * as X from \"a.view\";",
+        "early.ts": "export {}; declare module \"./bridge\" { namespace X { export interface Early {} } }",
+        "late.ts": "export {}; declare module \"a.view\" { export interface Late {} }",
+        "main.ts": "import {Early as A} from \"a.view\";\nimport {Early as B} from \"b.view\";\nimport {Base as C} from \"a.view\";\nimport {Base as D} from \"b.view\";\nexport const marker=1;\n"
+      },
+      "watch": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "marker"
+      ],
+      "native": {
+        "program": [
+          "pattern.d.ts",
+          "bridge.ts",
+          "early.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:18 A -> Interface [early.ts:1:54 InterfaceDeclaration]",
+          "2:18 B -> Interface [early.ts:1:54 InterfaceDeclaration]",
+          "3:17 C -> Interface [pattern.d.ts:1:27 InterfaceDeclaration]",
+          "4:17 D -> Interface [pattern.d.ts:1:27 InterfaceDeclaration]",
+          "5:14 marker -> BlockScopedVariable [main.ts:5:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "pattern-module-1-none",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": []}, \"files\": [\"pattern.d.ts\", \"bridge.ts\", \"early.ts\", \"main.ts\"]}",
+        "pattern.d.ts": "declare module \"*.view\" { export interface Base {} }",
+        "bridge.ts": "import X = require(\"a.view\"); export {X};",
+        "early.ts": "export {}; declare module \"./bridge\" { namespace X { export interface Early {} } }",
+        "late.ts": "export {}; declare module \"a.view\" { export interface Late {} }",
+        "main.ts": "import {Early as A} from \"a.view\";\nimport {Early as B} from \"b.view\";\nimport {Base as C} from \"a.view\";\nimport {Base as D} from \"b.view\";\nexport const marker=1;\n"
+      },
+      "watch": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "marker"
+      ],
+      "native": {
+        "program": [
+          "pattern.d.ts",
+          "bridge.ts",
+          "early.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS1202 bridge.ts:1:1"
+        ],
+        "names": [
+          "1:18 A -> Interface [early.ts:1:54 InterfaceDeclaration]",
+          "2:18 B -> Interface [early.ts:1:54 InterfaceDeclaration]",
+          "3:17 C -> Interface [pattern.d.ts:1:27 InterfaceDeclaration]",
+          "4:17 D -> Interface [pattern.d.ts:1:27 InterfaceDeclaration]",
+          "5:14 marker -> BlockScopedVariable [main.ts:5:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "pattern-module-2-before",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": []}, \"files\": [\"pattern.d.ts\", \"bridge.ts\", \"late.ts\", \"early.ts\", \"main.ts\"]}",
+        "pattern.d.ts": "declare module \"*.view\" { export interface Base {} }",
+        "bridge.ts": "export * as X from \"a.view\";",
+        "early.ts": "export {}; declare module \"./bridge\" { namespace X { export interface Early {} } }",
+        "late.ts": "export {}; declare module \"a.view\" { export interface Late {} }",
+        "main.ts": "import {Early as A} from \"a.view\";\nimport {Early as B} from \"b.view\";\nimport {Base as C} from \"a.view\";\nimport {Base as D} from \"b.view\";\nexport const marker=1;\n"
+      },
+      "watch": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "marker"
+      ],
+      "native": {
+        "program": [
+          "pattern.d.ts",
+          "bridge.ts",
+          "late.ts",
+          "early.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:2:9"
+        ],
+        "names": [
+          "1:18 A -> Interface [early.ts:1:54 InterfaceDeclaration]",
+          "2:18 B -> none",
+          "3:17 C -> Interface [pattern.d.ts:1:27 InterfaceDeclaration]",
+          "4:17 D -> Interface [pattern.d.ts:1:27 InterfaceDeclaration]",
+          "5:14 marker -> BlockScopedVariable [main.ts:5:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "pattern-module-3-before",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": []}, \"files\": [\"pattern.d.ts\", \"bridge.ts\", \"late.ts\", \"early.ts\", \"main.ts\"]}",
+        "pattern.d.ts": "declare module \"*.view\" { export interface Base {} }",
+        "bridge.ts": "import X = require(\"a.view\"); export {X};",
+        "early.ts": "export {}; declare module \"./bridge\" { namespace X { export interface Early {} } }",
+        "late.ts": "export {}; declare module \"a.view\" { export interface Late {} }",
+        "main.ts": "import {Early as A} from \"a.view\";\nimport {Early as B} from \"b.view\";\nimport {Base as C} from \"a.view\";\nimport {Base as D} from \"b.view\";\nexport const marker=1;\n"
+      },
+      "watch": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "marker"
+      ],
+      "native": {
+        "program": [
+          "pattern.d.ts",
+          "bridge.ts",
+          "late.ts",
+          "early.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS1202 bridge.ts:1:1",
+          "TS2305 main.ts:2:9"
+        ],
+        "names": [
+          "1:18 A -> Interface [early.ts:1:54 InterfaceDeclaration]",
+          "2:18 B -> none",
+          "3:17 C -> Interface [pattern.d.ts:1:27 InterfaceDeclaration]",
+          "4:17 D -> Interface [pattern.d.ts:1:27 InterfaceDeclaration]",
+          "5:14 marker -> BlockScopedVariable [main.ts:5:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "pattern-module-4-after",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": []}, \"files\": [\"pattern.d.ts\", \"bridge.ts\", \"early.ts\", \"late.ts\", \"main.ts\"]}",
+        "pattern.d.ts": "declare module \"*.view\" { export interface Base {} }",
+        "bridge.ts": "export * as X from \"a.view\";",
+        "early.ts": "export {}; declare module \"./bridge\" { namespace X { export interface Early {} } }",
+        "late.ts": "export {}; declare module \"a.view\" { export interface Late {} }",
+        "main.ts": "import {Early as A} from \"a.view\";\nimport {Early as B} from \"b.view\";\nimport {Base as C} from \"a.view\";\nimport {Base as D} from \"b.view\";\nexport const marker=1;\n"
+      },
+      "watch": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "marker"
+      ],
+      "native": {
+        "program": [
+          "pattern.d.ts",
+          "bridge.ts",
+          "early.ts",
+          "late.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:18 A -> Interface [early.ts:1:54 InterfaceDeclaration]",
+          "2:18 B -> Interface [early.ts:1:54 InterfaceDeclaration]",
+          "3:17 C -> Interface [pattern.d.ts:1:27 InterfaceDeclaration]",
+          "4:17 D -> Interface [pattern.d.ts:1:27 InterfaceDeclaration]",
+          "5:14 marker -> BlockScopedVariable [main.ts:5:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "pattern-module-5-after",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": []}, \"files\": [\"pattern.d.ts\", \"bridge.ts\", \"early.ts\", \"late.ts\", \"main.ts\"]}",
+        "pattern.d.ts": "declare module \"*.view\" { export interface Base {} }",
+        "bridge.ts": "import X = require(\"a.view\"); export {X};",
+        "early.ts": "export {}; declare module \"./bridge\" { namespace X { export interface Early {} } }",
+        "late.ts": "export {}; declare module \"a.view\" { export interface Late {} }",
+        "main.ts": "import {Early as A} from \"a.view\";\nimport {Early as B} from \"b.view\";\nimport {Base as C} from \"a.view\";\nimport {Base as D} from \"b.view\";\nexport const marker=1;\n"
+      },
+      "watch": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "marker"
+      ],
+      "native": {
+        "program": [
+          "pattern.d.ts",
+          "bridge.ts",
+          "early.ts",
+          "late.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS1202 bridge.ts:1:1"
+        ],
+        "names": [
+          "1:18 A -> Interface [early.ts:1:54 InterfaceDeclaration]",
+          "2:18 B -> Interface [early.ts:1:54 InterfaceDeclaration]",
+          "3:17 C -> Interface [pattern.d.ts:1:27 InterfaceDeclaration]",
+          "4:17 D -> Interface [pattern.d.ts:1:27 InterfaceDeclaration]",
+          "5:14 marker -> BlockScopedVariable [main.ts:5:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "pattern-module-6-empty-after",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": []}, \"files\": [\"pattern.d.ts\", \"bridge.ts\", \"early.ts\", \"late.ts\", \"main.ts\"]}",
+        "pattern.d.ts": "declare module \"*.view\" { export interface Base {} }",
+        "bridge.ts": "export * as X from \"a.view\";",
+        "early.ts": "export {}; declare module \"./bridge\" { namespace X { export interface Early {} } }",
+        "late.ts": "export {}; declare module \"a.view\" {}",
+        "main.ts": "import {Early as A} from \"a.view\";\nimport {Early as B} from \"b.view\";\nimport {Base as C} from \"a.view\";\nimport {Base as D} from \"b.view\";\nexport const marker=1;\n"
+      },
+      "watch": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "marker"
+      ],
+      "native": {
+        "program": [
+          "pattern.d.ts",
+          "bridge.ts",
+          "early.ts",
+          "late.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:18 A -> Interface [early.ts:1:54 InterfaceDeclaration]",
+          "2:18 B -> Interface [early.ts:1:54 InterfaceDeclaration]",
+          "3:17 C -> Interface [pattern.d.ts:1:27 InterfaceDeclaration]",
+          "4:17 D -> Interface [pattern.d.ts:1:27 InterfaceDeclaration]",
+          "5:14 marker -> BlockScopedVariable [main.ts:5:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "namespace-alias-then-specifier",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"pattern.d.ts\",\"bridge.ts\",\"early.ts\",\"late.ts\",\"main.ts\"]}",
+        "pattern.d.ts": "declare module \"*.view\" { export interface Base {} }\n",
+        "bridge.ts": "export * as X from \"a.view\";\n",
+        "early.ts": "export {}; declare module \"./bridge\" { namespace X { export interface Early {} } }\n",
+        "late.ts": "export {}; declare module \"a.view\" { export interface Late {} }\n",
+        "main.ts": "import { Early as A } from \"a.view\";\nimport { Early as B } from \"b.view\";\nimport { Late as C } from \"a.view\";\nimport { Late as D } from \"b.view\";\nexport const marker = 1;\n"
+      },
+      "watch": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "native": {
+        "program": [
+          "pattern.d.ts",
+          "bridge.ts",
+          "early.ts",
+          "late.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:19 A -> Interface [early.ts:1:54 InterfaceDeclaration]",
+          "2:19 B -> Interface [early.ts:1:54 InterfaceDeclaration]",
+          "3:18 C -> Interface [late.ts:1:38 InterfaceDeclaration]",
+          "4:18 D -> Interface [late.ts:1:38 InterfaceDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "specifier-then-namespace-alias",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"pattern.d.ts\",\"bridge.ts\",\"late.ts\",\"early.ts\",\"main.ts\"]}",
+        "pattern.d.ts": "declare module \"*.view\" { export interface Base {} }\n",
+        "bridge.ts": "export * as X from \"a.view\";\n",
+        "early.ts": "export {}; declare module \"./bridge\" { namespace X { export interface Early {} } }\n",
+        "late.ts": "export {}; declare module \"a.view\" { export interface Late {} }\n",
+        "main.ts": "import { Early as A } from \"a.view\";\nimport { Early as B } from \"b.view\";\nimport { Late as C } from \"a.view\";\nimport { Late as D } from \"b.view\";\nexport const marker = 1;\n"
+      },
+      "watch": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "native": {
+        "program": [
+          "pattern.d.ts",
+          "bridge.ts",
+          "late.ts",
+          "early.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:2:10",
+          "TS2305 main.ts:4:10"
+        ],
+        "names": [
+          "1:19 A -> Interface [early.ts:1:54 InterfaceDeclaration]",
+          "2:19 B -> none",
+          "3:18 C -> Interface [late.ts:1:38 InterfaceDeclaration]",
+          "4:18 D -> none"
+        ]
+      }
+    },
+    {
+      "name": "export-alias-then-specifier",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"pattern.d.ts\",\"bridge.ts\",\"early.ts\",\"late.ts\",\"main.ts\"]}",
+        "pattern.d.ts": "declare module \"*.view\" { export interface Base {} }\n",
+        "bridge.ts": "export { Base } from \"a.view\";\n",
+        "early.ts": "export {}; declare module \"./bridge\" { interface Base { early: number } }\n",
+        "late.ts": "export {}; declare module \"a.view\" { export interface Late {} }\n",
+        "main.ts": "import { Base as A, Late as C } from \"a.view\";\nimport { Base as B, Late as D } from \"b.view\";\nexport const marker = 1;\n"
+      },
+      "watch": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "native": {
+        "program": [
+          "pattern.d.ts",
+          "bridge.ts",
+          "early.ts",
+          "late.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:2:21"
+        ],
+        "names": [
+          "1:18 A -> Interface|Transient [pattern.d.ts:1:27 InterfaceDeclaration, early.ts:1:40 InterfaceDeclaration]",
+          "1:29 C -> Interface [late.ts:1:38 InterfaceDeclaration]",
+          "2:18 B -> Interface [pattern.d.ts:1:27 InterfaceDeclaration]",
+          "2:29 D -> none"
+        ]
+      }
+    },
+    {
+      "name": "specifier-then-export-alias",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"pattern.d.ts\",\"bridge.ts\",\"late.ts\",\"early.ts\",\"main.ts\"]}",
+        "pattern.d.ts": "declare module \"*.view\" { export interface Base {} }\n",
+        "bridge.ts": "export { Base } from \"a.view\";\n",
+        "early.ts": "export {}; declare module \"./bridge\" { interface Base { early: number } }\n",
+        "late.ts": "export {}; declare module \"a.view\" { export interface Late {} }\n",
+        "main.ts": "import { Base as A, Late as C } from \"a.view\";\nimport { Base as B, Late as D } from \"b.view\";\nexport const marker = 1;\n"
+      },
+      "watch": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "native": {
+        "program": [
+          "pattern.d.ts",
+          "bridge.ts",
+          "late.ts",
+          "early.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:2:21"
+        ],
+        "names": [
+          "1:18 A -> Interface [pattern.d.ts:1:27 InterfaceDeclaration]",
+          "1:29 C -> Interface [late.ts:1:38 InterfaceDeclaration]",
+          "2:18 B -> Interface [pattern.d.ts:1:27 InterfaceDeclaration]",
+          "2:29 D -> none"
+        ]
+      }
+    },
+    {
+      "name": "value-alias-then-specifier",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"pattern.d.ts\",\"bridge.ts\",\"early.ts\",\"late.ts\",\"main.ts\"]}",
+        "pattern.d.ts": "declare module \"*.view\" { export const v: number; }\n",
+        "bridge.ts": "export { v } from \"a.view\";\n",
+        "early.ts": "export {}; declare module \"./bridge\" { namespace v { export interface Early {} } }\n",
+        "late.ts": "export {}; declare module \"a.view\" { export interface Late {} }\n",
+        "main.ts": "import { v as A, Late as C } from \"a.view\";\nimport { v as B, Late as D } from \"b.view\";\nexport let e: A.Early | B.Early;\nexport const marker = A + B;\n"
+      },
+      "watch": [
+        "C",
+        "D"
+      ],
+      "native": {
+        "program": [
+          "pattern.d.ts",
+          "bridge.ts",
+          "early.ts",
+          "late.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:2:18",
+          "TS2694 main.ts:3:27"
+        ],
+        "names": [
+          "1:26 C -> Interface [late.ts:1:38 InterfaceDeclaration]",
+          "2:26 D -> none"
+        ]
+      }
+    },
+    {
+      "name": "specifier-then-value-alias",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"pattern.d.ts\",\"bridge.ts\",\"late.ts\",\"early.ts\",\"main.ts\"]}",
+        "pattern.d.ts": "declare module \"*.view\" { export const v: number; }\n",
+        "bridge.ts": "export { v } from \"a.view\";\n",
+        "early.ts": "export {}; declare module \"./bridge\" { namespace v { export interface Early {} } }\n",
+        "late.ts": "export {}; declare module \"a.view\" { export interface Late {} }\n",
+        "main.ts": "import { v as A, Late as C } from \"a.view\";\nimport { v as B, Late as D } from \"b.view\";\nexport let e: A.Early | B.Early;\nexport const marker = A + B;\n"
+      },
+      "watch": [
+        "C",
+        "D"
+      ],
+      "native": {
+        "program": [
+          "pattern.d.ts",
+          "bridge.ts",
+          "late.ts",
+          "early.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:2:18",
+          "TS2694 main.ts:3:17",
+          "TS2694 main.ts:3:27"
+        ],
+        "names": [
+          "1:26 C -> Interface [late.ts:1:38 InterfaceDeclaration]",
+          "2:26 D -> none"
+        ]
+      }
+    },
+    {
+      "name": "pattern-two-files",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"one.d.ts\",\"two.d.ts\",\"late.ts\",\"main.ts\"]}",
+        "one.d.ts": "declare module \"*.view\" { export interface Base {} }\n",
+        "two.d.ts": "declare module \"*.view\" { export interface Other {} }\n",
+        "late.ts": "export {}; declare module \"a.view\" { export interface Late {} }\n",
+        "main.ts": "import { Late as C } from \"a.view\";\nimport { Late as D } from \"b.view\";\nexport const marker = 1;\n"
+      },
+      "watch": [
+        "C",
+        "D"
+      ],
+      "native": {
+        "program": [
+          "one.d.ts",
+          "two.d.ts",
+          "late.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:18 C -> Interface [late.ts:1:38 InterfaceDeclaration]",
+          "2:18 D -> Interface [late.ts:1:38 InterfaceDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "pattern-two-blocks-one-file",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"one.d.ts\",\"late.ts\",\"main.ts\"]}",
+        "one.d.ts": "declare module \"*.view\" { export interface Base {} }\ndeclare module \"*.view\" { export interface Other {} }\n",
+        "late.ts": "export {}; declare module \"a.view\" { export interface Late {} }\n",
+        "main.ts": "import { Late as C } from \"a.view\";\nimport { Late as D } from \"b.view\";\nexport const marker = 1;\n"
+      },
+      "watch": [
+        "C",
+        "D"
+      ],
+      "native": {
+        "program": [
+          "one.d.ts",
+          "late.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:2:10"
+        ],
+        "names": [
+          "1:18 C -> Interface [late.ts:1:38 InterfaceDeclaration]",
+          "2:18 D -> none"
+        ]
+      }
+    },
+    {
+      "name": "shorthand-pattern-types",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"pattern.d.ts\",\"late.ts\",\"main.ts\"]}",
+        "pattern.d.ts": "declare module \"*.view\";\n",
+        "late.ts": "export {}; declare module \"a.view\" { export interface Late {} }\n",
+        "main.ts": "import { Any as C, Late as E } from \"a.view\";\nimport { Any as D } from \"b.view\";\nexport const marker = 1;\n"
+      },
+      "watch": [
+        "C",
+        "D",
+        "E"
+      ],
+      "native": {
+        "program": [
+          "pattern.d.ts",
+          "late.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:17 C -> ValueModule|NamespaceModule|Transient [late.ts:1:12 ModuleDeclaration, pattern.d.ts:1:1 ModuleDeclaration]",
+          "1:28 E -> ValueModule|NamespaceModule|Transient [late.ts:1:12 ModuleDeclaration, pattern.d.ts:1:1 ModuleDeclaration]",
+          "2:17 D -> ValueModule [pattern.d.ts:1:1 ModuleDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "shorthand-pattern-values",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"pattern.d.ts\",\"late.ts\",\"main.ts\"]}",
+        "pattern.d.ts": "declare module \"*.view\";\n",
+        "late.ts": "export {}; declare module \"a.view\" { export const Late: number; }\n",
+        "main.ts": "import { Any as C, Late as E } from \"a.view\";\nimport { Any as D } from \"b.view\";\nexport const marker = 1;\n"
+      },
+      "watch": [
+        "C",
+        "D",
+        "E"
+      ],
+      "native": {
+        "program": [
+          "pattern.d.ts",
+          "late.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2305 main.ts:1:10"
+        ],
+        "names": [
+          "1:17 C -> none",
+          "1:28 E -> BlockScopedVariable [late.ts:1:51 VariableDeclaration]",
+          "2:17 D -> ValueModule [pattern.d.ts:1:1 ModuleDeclaration]"
+        ]
+      }
+    }
+  ]
+}

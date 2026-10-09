@@ -1,0 +1,40 @@
+{
+  "compiler": "7.0.2",
+  "symbols": [
+    {"name": "\"pkg\"", "kind": 3, "range": "6:1-10:2", "selection": "6:16-6:21", "children": [
+      {"name": "Commands", "kind": 11, "range": "7:3-9:4", "selection": "7:13-7:21", "children": [
+        {"name": "first", "kind": 7, "range": "8:5-8:29", "selection": "8:5-8:10", "children": []}
+      ]},
+      {"name": "Commands", "kind": 11, "range": "13:3-15:4", "selection": "13:13-13:21", "children": [
+        {"name": "second", "kind": 7, "range": "14:5-14:30", "selection": "14:5-14:11", "children": []}
+      ]}
+    ]},
+    {"name": "global", "kind": 3, "range": "18:1-22:2", "selection": "18:9-18:15", "children": [
+      {"name": "Window", "kind": 11, "range": "19:3-21:4", "selection": "19:13-19:19", "children": [
+        {"name": "first", "kind": 7, "range": "20:5-20:19", "selection": "20:5-20:10", "children": []}
+      ]},
+      {"name": "Window", "kind": 11, "range": "25:3-27:4", "selection": "25:13-25:19", "children": [
+        {"name": "second", "kind": 7, "range": "26:5-26:20", "selection": "26:5-26:11", "children": []}
+      ]}
+    ]},
+    {"name": "publish", "kind": 12, "range": "30:1-40:2", "selection": "30:17-30:24", "children": [
+      {"name": "result", "kind": 13, "range": "31:7-31:22", "selection": "31:7-31:13", "children": []},
+      {"name": "records", "kind": 13, "range": "33:13-33:20", "selection": "33:13-33:20", "children": [
+        {"name": "records.map() callback", "kind": 12, "range": "34:37-34:74", "selection": "34:37-34:37", "children": [
+          {"name": "size", "kind": 7, "range": "34:54-34:71", "selection": "34:54-34:58", "children": []}
+        ]},
+        {"name": "records.map() callback", "kind": 12, "range": "37:37-37:74", "selection": "37:37-37:37", "children": [
+          {"name": "size", "kind": 7, "range": "37:54-37:71", "selection": "37:54-37:58", "children": []}
+        ]}
+      ]},
+      {"name": "records", "kind": 13, "range": "36:13-36:20", "selection": "36:13-36:20", "children": [
+        {"name": "records.map() callback", "kind": 12, "range": "34:37-34:74", "selection": "34:37-34:37", "children": [
+          {"name": "size", "kind": 7, "range": "34:54-34:71", "selection": "34:54-34:58", "children": []}
+        ]},
+        {"name": "records.map() callback", "kind": 12, "range": "37:37-37:74", "selection": "37:37-37:37", "children": [
+          {"name": "size", "kind": 7, "range": "37:54-37:71", "selection": "37:54-37:58", "children": []}
+        ]}
+      ]}
+    ]}
+  ]
+}

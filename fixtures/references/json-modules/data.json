@@ -1,0 +1,6 @@
+{
+  "greeting": "hello",
+  "count": 1,
+  "default": "a key, not the default export",
+  "nested": { "inner": true }
+}

@@ -285,6 +285,119 @@ fn analysis_failures_exit_1_with_located_diagnostics() {
 }
 
 #[test]
+fn a_leading_byte_order_mark_is_not_part_of_the_first_line() {
+    // TypeScript's `decodeBytes` drops a leading UTF-8 byte order mark when
+    // it reads a source or configuration file. For this `a.ts`, tsc 7.0.2
+    // reports TS2322 at a.ts(1,14), the declaration of `a`, and TS2345 at
+    // a.ts(1,70), its use; for the configuration, TS1136 at
+    // tsconfig.json(1,24). Each holds with or without the mark.
+    let line = "export const a: number = \"x\"; declare function g(s: string): void; g(a);\n";
+    for prefix in ["", "\u{feff}"] {
+        let fixture = project(&[
+            ("a.ts", &format!("{prefix}{line}")),
+            ("b.ts", "import { a } from \"./a\";\nconst b: string = a;\n"),
+        ]);
+        let expected = json!([{
+            "declarations": [{ "name": "a", "location": location("a.ts", 1, 14, 15) }],
+            "occurrences": [
+                occurrence("a", "a.ts", 1, 14, &["declaration", "export"]),
+                occurrence("a", "a.ts", 1, 70, &["use"]),
+                occurrence("a", "b.ts", 1, 10, &["import"]),
+                occurrence("a", "b.ts", 2, 19, &["use"]),
+            ],
+        }]);
+        for at in ["1:14", "1:70"] {
+            let result = success(tsparse(
+                &fixture,
+                &[
+                    "--references",
+                    "--project",
+                    "tsconfig.json",
+                    "--at",
+                    at,
+                    "a.ts",
+                ],
+            ));
+            assert_eq!(result["groups"], expected, "{prefix:?} {at}");
+        }
+        let result = success(tsparse(
+            &fixture,
+            &[
+                "--references",
+                "--project",
+                "tsconfig.json",
+                "--at",
+                "1:15",
+                "a.ts",
+            ],
+        ));
+        assert_eq!(result["groups"], json!([]), "{prefix:?}");
+
+        std::fs::write(
+            fixture.path("tsconfig.json"),
+            format!("{prefix}{{ \"compilerOptions\": {{ , }} }}"),
+        )
+        .unwrap();
+        let output = tsparse(
+            &fixture,
+            &["--references", "--project", "tsconfig.json", "--name", "a"],
+        );
+        assert_eq!(output.status.code(), Some(1), "{prefix:?}");
+        let message = String::from_utf8(output.stderr).unwrap();
+        assert!(
+            message.contains("tsconfig.json:1:24:"),
+            "{prefix:?} {message}"
+        );
+    }
+}
+
+#[test]
+fn a_member_chain_of_any_length_loads_and_labels_its_callback() {
+    // The parser reads a member chain in a loop, as TypeScript's
+    // `parseMemberExpressionRest` does, so no grammar budget bounds its
+    // length. Loading indexes the callback's file for navigation, and its
+    // label (`getCallExpressionName`) names the whole chain: neither may
+    // recurse over the chain or rebuild its prefix per segment. A chain of
+    // 600,000 accesses overflowed the 256 MiB parsing stack in unoptimized
+    // builds, and took over 40 seconds in optimized ones.
+    const SEGMENTS: usize = 600_000;
+    let chain = format!("x{}", ".x".repeat(SEGMENTS));
+    let fixture = project(&[(
+        "a.ts",
+        &format!("export const value = 1;\ndeclare const x: any;\n{chain}(() => {{}});\n"),
+    )]);
+    let result = success(tsparse(
+        &fixture,
+        &[
+            "--references",
+            "--project",
+            "tsconfig.json",
+            "--name",
+            "value",
+        ],
+    ));
+    assert_eq!(
+        result["groups"],
+        json!([{
+            "declarations": [{ "name": "value", "location": location("a.ts", 1, 14, 19) }],
+            "occurrences": [occurrence("value", "a.ts", 1, 14, &["declaration", "export"])],
+        }])
+    );
+
+    // The complete projection, which outlines and shows use in file and
+    // project mode alike, labels the callback with the whole chain.
+    let outline = success(tsparse(&fixture, &["--outline", "--json", "a.ts"]));
+    let entries = outline["entries"].as_array().unwrap();
+    let labels: Vec<&str> = entries
+        .iter()
+        .map(|entry| entry["label"].as_str().unwrap())
+        .collect();
+    assert_eq!(labels, ["value", "x", &format!("{chain}() callback")]);
+    let column = chain.len() + 2;
+    assert_eq!(entries[2]["anchor"], json!({ "line": 3, "column": column }));
+}
+
+#[test]
 fn help_documents_reference_mode_and_its_limits() {
     let fixture = aliases();
     let output = tsparse(&fixture, &["--help"]);
@@ -294,7 +407,10 @@ fn help_documents_reference_mode_and_its_limits() {
         "--at LINE:COLUMN",
         "--name NAME",
         "Project references are not followed",
-        "an explicit lib setting or lib reference",
+        "Standard libraries follow target, lib, noLib, and lib references",
+        "their files are never searched",
+        "JSON modules are program\ninputs where resolveJsonModule allows them",
+        "JSON module values and their properties are not reference\ntargets",
         "In reference mode, exit 1",
     ] {
         assert!(text.contains(needle), "help lacks {needle:?}:\n{text}");

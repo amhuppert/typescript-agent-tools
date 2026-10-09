@@ -19,11 +19,16 @@
 // files) is classified:
 //   symbol  - a declared target, after following aliases (getAliasedSymbol);
 //             shorthand property names use getShorthandAssignmentValueSymbol.
+//             Standard library declarations count like any others.
 //   member  - property, method, accessor, enum member, signature, or
 //             object-literal member symbols, plus the built-in `arguments`,
 //             `undefined`, and `globalThis`, which have no declarations.
-//   library - a target declared only in default-library files.
 //   none    - no symbol, the unknown symbol, or an unresolved placeholder.
+// Library files. The native compiler reads its standard libraries from its own
+// directory; the tool reads byte-identical copies vendored in this checkout. A
+// default-library file in the compiler's directory is located at the vendored
+// copy of the same name (`vendoredLibrary`), the only path normalization; a
+// replacement library from a package keeps its own path.
 // `syntax` marks positions that never enter lexical lookup: labels, JSX
 // intrinsic tags and attribute names, member, `#private`, and binding-property
 // names, meta properties, import attribute keys, `declare global`, and `as const`.
@@ -36,8 +41,8 @@
 // TypeScript reports an error but resolves. A name that
 // `export *` declarations supply with different targets is unresolved: the
 // tool treats it as ambiguous, as ECMAScript does, where TypeScript reports
-// TS2308 and keeps the first. Other none and library tokens expect
-// UnresolvedTarget; symbols expect their groups.
+// TS2308 and keeps the first. Other none tokens expect UnresolvedTarget;
+// symbols expect their groups.
 // `roles` are syntactic: declaration (a lexical declaration's name), import,
 // export (specifiers, `export =`/`export default` identifiers, and names of
 // declarations with an `export` modifier), or use. `candidate` marks the
@@ -85,6 +90,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { VENDORED } from './vendor-typescript-libs.mjs';
 
 export const SEMANTIC_VERSION = '7.0.2';
 
@@ -169,6 +175,17 @@ export function compareLocations(a, b) {
     : a.start.line - b.start.line || a.start.column - b.start.column || a.end.line - b.end.line || a.end.column - b.end.column;
 }
 
+// The vendored copy of a standard library the compiler read from its own
+// directory `compilerLibraries`, by file name; undefined for any other file.
+export function vendoredLibrary(fileName, compilerLibraries, vendored = VENDORED) {
+  let real;
+  try { real = fs.realpathSync(fileName); } catch { return undefined; }
+  if (path.dirname(real) !== compilerLibraries) return undefined;
+  const copy = path.join(vendored, path.basename(real));
+  if (!fs.existsSync(copy)) throw new Error(`${path.basename(real)} has no vendored copy in ${vendored}`);
+  return copy;
+}
+
 // Canonical paths, as the tool names files, unless symlinks are preserved:
 // then a link and its target are distinct program files.
 function displayPath(root, fileName, preserveSymlinks = false) {
@@ -216,6 +233,7 @@ class Collector {
     this.configPath = configPath;
     this.root = path.dirname(configPath);
     this.preserveSymlinks = Boolean(this.program.getCompilerOptions().preserveSymlinks);
+    this.compilerLibraries = fs.realpathSync(path.dirname(semantic.binary));
     this.files = new Map();
     this.symbols = [];
     this.symbolIndex = new Map();
@@ -243,7 +261,8 @@ class Collector {
     if (!info) {
       const metadata = this.program.getSourceFileMetadata(fileName);
       if (!metadata) throw new Error(`${fileName} is not a program file`);
-      this.files.set(fileName, info = { file: displayPath(this.root, fileName, this.preserveSymlinks), search: !metadata.isDefaultLibrary && !metadata.isFromExternalLibrary,
+      const vendored = metadata.isDefaultLibrary ? vendoredLibrary(fileName, this.compilerLibraries) : undefined;
+      this.files.set(fileName, info = { file: displayPath(this.root, vendored ?? fileName, this.preserveSymlinks), search: !metadata.isDefaultLibrary && !metadata.isFromExternalLibrary,
         defaultLibrary: metadata.isDefaultLibrary, external: metadata.isFromExternalLibrary });
     }
     return info;
@@ -695,7 +714,6 @@ export function classifySymbol(symbol) {
   if (declarations.some(declaration => declaration.category === 'export')) return 'symbol';
   if (symbol.flags.some(flag => MEMBER_FLAGS.includes(flag))) return 'member';
   if (!declarations.length) return symbol.name === 'globalThis' ? 'member' : 'none';
-  if (declarations.every(declaration => declaration.defaultLibrary)) return 'library';
   if (declarations.every(declaration => declaration.category === 'member' || declaration.category === 'alias')) return 'member';
   return 'symbol';
 }
@@ -738,7 +756,6 @@ export function clusterDeclarations(symbol) {
 //                           different targets, where TypeScript keeps the
 //                           first (TS2308): unresolved.
 //   builtin               - `undefined`, `arguments`, `globalThis`: unsupported.
-//   libraryOnly           - declared only by a standard library: unresolved.
 //   missingNamespaceExport - a missing export of a namespace qualifier: unresolved.
 //   unresolvedProperty    - any other unresolved `a.b` name: unsupported.
 //   unresolvedReceiver    - a property of an unresolved receiver: unsupported.
@@ -750,7 +767,6 @@ export function normalizationCode(token) {
   if (token.typeOnlyValue && token.classification === 'symbol') return 'typeOnlyValue';
   if (token.ambiguousStar && token.classification === 'symbol') return 'ambiguousStarExport';
   if (token.builtin) return 'builtin';
-  if (token.classification === 'library') return 'libraryOnly';
   if (token.classification === 'none' && token.syntax === 'property') return token.namespaceQualifier ? 'missingNamespaceExport' : 'unresolvedProperty';
   if (token.outsideTarget) return 'declarationOutsideTarget';
   return undefined;

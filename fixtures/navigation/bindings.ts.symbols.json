@@ -1,0 +1,31 @@
+{
+  "compiler": "7.0.2",
+  "symbols": [
+    {"name": "source", "kind": 13, "range": "2:15-2:86", "selection": "2:15-2:21", "children": []},
+    {"name": "first", "kind": 13, "range": "3:5-3:14", "selection": "3:5-3:10", "children": []},
+    {"name": "second", "kind": 13, "range": "3:16-3:57", "selection": "3:16-3:22", "children": [
+      {"name": "inSecond", "kind": 12, "range": "3:33-3:55", "selection": "3:42-3:50", "children": []}
+    ]},
+    {"name": "a", "kind": 13, "range": "4:9-4:10", "selection": "4:9-4:10", "children": []},
+    {"name": "renamed", "kind": 13, "range": "4:12-4:22", "selection": "4:15-4:22", "children": []},
+    {"name": "c", "kind": 13, "range": "4:34-4:35", "selection": "4:34-4:35", "children": []},
+    {"name": "others", "kind": 13, "range": "4:39-4:48", "selection": "4:42-4:48", "children": []},
+    {"name": "head", "kind": 13, "range": "5:8-5:12", "selection": "5:8-5:12", "children": []},
+    {"name": "tail", "kind": 13, "range": "5:16-5:31", "selection": "5:16-5:20", "children": []},
+    {"name": "legacy", "kind": 13, "range": "6:5-6:11", "selection": "6:5-6:11", "children": []},
+    {"name": "item", "kind": 13, "range": "8:12-8:16", "selection": "8:12-8:16", "children": []},
+    {"name": "perItem", "kind": 13, "range": "9:9-9:23", "selection": "9:9-9:16", "children": []},
+    {"name": "index", "kind": 13, "range": "11:10-11:19", "selection": "11:10-11:15", "children": []},
+    {"name": "limit", "kind": 13, "range": "11:21-11:30", "selection": "11:21-11:26", "children": []},
+    {"name": "key", "kind": 13, "range": "12:12-12:15", "selection": "12:12-12:15", "children": []},
+    {"name": "failure", "kind": 13, "range": "15:10-15:17", "selection": "15:10-15:17", "children": []},
+    {"name": "handled", "kind": 13, "range": "16:9-16:26", "selection": "16:9-16:16", "children": []},
+    {"name": "locals", "kind": 12, "range": "19:1-25:2", "selection": "19:10-19:16", "children": [
+      {"name": "shadowed", "kind": 13, "range": "21:11-21:23", "selection": "21:11-21:19", "children": []},
+      {"name": "shadowed", "kind": 13, "range": "23:11-23:23", "selection": "23:11-23:19", "children": []}
+    ]},
+    {"name": "message", "kind": 13, "range": "26:17-26:24", "selection": "26:17-26:24", "children": []},
+    {"name": "reason", "kind": 13, "range": "26:26-26:39", "selection": "26:33-26:39", "children": []},
+    {"name": "described", "kind": 13, "range": "27:9-27:28", "selection": "27:9-27:18", "children": []}
+  ]
+}

@@ -1,0 +1,259 @@
+{
+  "difference": "Every augmentation of one declaration merges into one identity here; TypeScript clones `X` once per module route (`aug1` augments it through `use`'s re-export, `aug2` through `api`).",
+  "queries": [
+    {
+      "at": "api.ts:1:11",
+      "typescript": [
+        {
+          "declarations": [
+            "api.ts:1:11",
+            "aug2.ts:3:9"
+          ],
+          "occurrences": [
+            "api.ts:1:11",
+            "api.ts:2:10",
+            "aug2.ts:3:9",
+            "use.ts:1:10",
+            "use.ts:2:10",
+            "use.ts:3:25"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "api.ts:1:11",
+            "aug1.ts:3:13",
+            "aug2.ts:3:9"
+          ],
+          "occurrences": [
+            "api.ts:1:11",
+            "api.ts:2:10",
+            "aug1.ts:3:13",
+            "aug2.ts:3:9",
+            "use.ts:1:10",
+            "use.ts:2:10",
+            "use.ts:3:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "api.ts:2:10",
+      "typescript": [
+        {
+          "declarations": [
+            "api.ts:1:11",
+            "aug2.ts:3:9"
+          ],
+          "occurrences": [
+            "api.ts:1:11",
+            "api.ts:2:10",
+            "aug2.ts:3:9",
+            "use.ts:1:10",
+            "use.ts:2:10",
+            "use.ts:3:25"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "api.ts:1:11",
+            "aug1.ts:3:13",
+            "aug2.ts:3:9"
+          ],
+          "occurrences": [
+            "api.ts:1:11",
+            "api.ts:2:10",
+            "aug1.ts:3:13",
+            "aug2.ts:3:9",
+            "use.ts:1:10",
+            "use.ts:2:10",
+            "use.ts:3:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "aug1.ts:3:13",
+      "typescript": [
+        {
+          "declarations": [
+            "api.ts:1:11",
+            "aug1.ts:3:13"
+          ],
+          "occurrences": [
+            "aug1.ts:3:13"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "api.ts:1:11",
+            "aug1.ts:3:13",
+            "aug2.ts:3:9"
+          ],
+          "occurrences": [
+            "api.ts:1:11",
+            "api.ts:2:10",
+            "aug1.ts:3:13",
+            "aug2.ts:3:9",
+            "use.ts:1:10",
+            "use.ts:2:10",
+            "use.ts:3:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "aug2.ts:3:9",
+      "typescript": [
+        {
+          "declarations": [
+            "api.ts:1:11",
+            "aug2.ts:3:9"
+          ],
+          "occurrences": [
+            "api.ts:1:11",
+            "api.ts:2:10",
+            "aug2.ts:3:9",
+            "use.ts:1:10",
+            "use.ts:2:10",
+            "use.ts:3:25"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "api.ts:1:11",
+            "aug1.ts:3:13",
+            "aug2.ts:3:9"
+          ],
+          "occurrences": [
+            "api.ts:1:11",
+            "api.ts:2:10",
+            "aug1.ts:3:13",
+            "aug2.ts:3:9",
+            "use.ts:1:10",
+            "use.ts:2:10",
+            "use.ts:3:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "use.ts:1:10",
+      "typescript": [
+        {
+          "declarations": [
+            "api.ts:1:11",
+            "aug2.ts:3:9"
+          ],
+          "occurrences": [
+            "api.ts:1:11",
+            "api.ts:2:10",
+            "aug2.ts:3:9",
+            "use.ts:1:10",
+            "use.ts:2:10",
+            "use.ts:3:25"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "api.ts:1:11",
+            "aug1.ts:3:13",
+            "aug2.ts:3:9"
+          ],
+          "occurrences": [
+            "api.ts:1:11",
+            "api.ts:2:10",
+            "aug1.ts:3:13",
+            "aug2.ts:3:9",
+            "use.ts:1:10",
+            "use.ts:2:10",
+            "use.ts:3:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "use.ts:2:10",
+      "typescript": [
+        {
+          "declarations": [
+            "api.ts:1:11",
+            "aug2.ts:3:9"
+          ],
+          "occurrences": [
+            "api.ts:1:11",
+            "api.ts:2:10",
+            "aug2.ts:3:9",
+            "use.ts:1:10",
+            "use.ts:2:10",
+            "use.ts:3:25"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "api.ts:1:11",
+            "aug1.ts:3:13",
+            "aug2.ts:3:9"
+          ],
+          "occurrences": [
+            "api.ts:1:11",
+            "api.ts:2:10",
+            "aug1.ts:3:13",
+            "aug2.ts:3:9",
+            "use.ts:1:10",
+            "use.ts:2:10",
+            "use.ts:3:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "use.ts:3:25",
+      "typescript": [
+        {
+          "declarations": [
+            "api.ts:1:11",
+            "aug2.ts:3:9"
+          ],
+          "occurrences": [
+            "api.ts:1:11",
+            "api.ts:2:10",
+            "aug2.ts:3:9",
+            "use.ts:1:10",
+            "use.ts:2:10",
+            "use.ts:3:25"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "api.ts:1:11",
+            "aug1.ts:3:13",
+            "aug2.ts:3:9"
+          ],
+          "occurrences": [
+            "api.ts:1:11",
+            "api.ts:2:10",
+            "aug1.ts:3:13",
+            "aug2.ts:3:9",
+            "use.ts:1:10",
+            "use.ts:2:10",
+            "use.ts:3:25"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,528 @@
+{
+  "description": "Program admission of a resolved module (`GetResolutionDiagnostic`): an arbitrary-extension declaration needs `allowArbitraryExtensions` or a declaration-file importer, JSON needs `resolveJsonModule`, and TSX needs `jsx`.",
+  "config": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"main.ts\"]}",
+  "cases": [
+    {
+      "name": "arbitrary-omitted",
+      "files": {
+        "main.ts": "import { value } from \"./data.json\";\nexport type T = typeof value;\n",
+        "data.d.json.ts": "export declare const value: 1;\n",
+        "data.json": "{\"value\":2}"
+      },
+      "watch": [
+        "value"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6263 main.ts:1:23"
+        ],
+        "names": [
+          "1:10 value -> none",
+          "2:24 value -> none"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS6263"
+        ]
+      }
+    },
+    {
+      "name": "arbitrary-false",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"allowArbitraryExtensions\":false},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { value } from \"./data.json\";\nexport type T = typeof value;\n",
+        "data.d.json.ts": "export declare const value: 1;\n",
+        "data.json": "{\"value\":2}"
+      },
+      "watch": [
+        "value"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6263 main.ts:1:23"
+        ],
+        "names": [
+          "1:10 value -> none",
+          "2:24 value -> none"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS6263"
+        ]
+      }
+    },
+    {
+      "name": "arbitrary-true",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"allowArbitraryExtensions\":true},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { value } from \"./data.json\";\nexport type T = typeof value;\n",
+        "data.d.json.ts": "export declare const value: 1;\n",
+        "data.json": "{\"value\":2}"
+      },
+      "watch": [
+        "value"
+      ],
+      "native": {
+        "program": [
+          "data.d.json.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 value -> BlockScopedVariable [data.d.json.ts:1:22 VariableDeclaration]",
+          "2:24 value -> BlockScopedVariable [data.d.json.ts:1:22 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "arbitrary-null-after-true",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"allowArbitraryExtensions\":true,\"allowArbitraryExtensions\":null},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { value } from \"./data.json\";\nexport type T = typeof value;\n",
+        "data.d.json.ts": "export declare const value: 1;\n",
+        "data.json": "{\"value\":2}"
+      },
+      "watch": [
+        "value"
+      ],
+      "native": {
+        "program": [
+          "data.d.json.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 value -> BlockScopedVariable [data.d.json.ts:1:22 VariableDeclaration]",
+          "2:24 value -> BlockScopedVariable [data.d.json.ts:1:22 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "arbitrary-declaration",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"main.d.ts\"]}",
+        "main.d.ts": "import { value } from \"./data.json\";\nexport type T = typeof value;\n",
+        "data.d.json.ts": "export declare const value: 1;\n",
+        "data.json": "{\"value\":2}"
+      },
+      "watch": [
+        "value"
+      ],
+      "native": {
+        "program": [
+          "data.d.json.ts",
+          "main.d.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 value -> BlockScopedVariable [data.d.json.ts:1:22 VariableDeclaration]",
+          "2:24 value -> BlockScopedVariable [data.d.json.ts:1:22 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "arbitrary-declaration-first",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"decl.d.ts\",\"main.ts\"]}",
+        "decl.d.ts": "import { value } from \"./data.json\";\nexport declare const other: typeof value;\n",
+        "main.ts": "import { value } from \"./data.json\";\nexport type T = typeof value;\n",
+        "data.d.json.ts": "export declare const value: 1;\n",
+        "data.json": "{\"value\":2}"
+      },
+      "watch": [
+        "value"
+      ],
+      "native": {
+        "program": [
+          "data.d.json.ts",
+          "decl.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6263 main.ts:1:23"
+        ],
+        "names": [
+          "1:10 value -> none",
+          "2:24 value -> none"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS6263"
+        ]
+      }
+    },
+    {
+      "name": "arbitrary-source-first",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"main.ts\",\"decl.d.ts\"]}",
+        "decl.d.ts": "import { value } from \"./data.json\";\nexport declare const other: typeof value;\n",
+        "main.ts": "import { value } from \"./data.json\";\nexport type T = typeof value;\n",
+        "data.d.json.ts": "export declare const value: 1;\n",
+        "data.json": "{\"value\":2}"
+      },
+      "watch": [
+        "value"
+      ],
+      "native": {
+        "program": [
+          "main.ts",
+          "data.d.json.ts",
+          "decl.d.ts"
+        ],
+        "diagnostics": [
+          "TS6263 main.ts:1:23"
+        ],
+        "names": [
+          "1:10 value -> none",
+          "2:24 value -> none"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS6263"
+        ]
+      }
+    },
+    {
+      "name": "arbitrary-css",
+      "files": {
+        "main.ts": "import { value } from \"./styles.css\";\nimport \"./side.css\";\nexport type T = typeof value;\n",
+        "styles.d.css.ts": "export declare const value: 1;\n",
+        "side.d.css.ts": "export {};\n"
+      },
+      "watch": [
+        "value"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6263 main.ts:1:23",
+          "TS6263 main.ts:2:8"
+        ],
+        "names": [
+          "1:10 value -> none",
+          "3:24 value -> none"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "main.ts:1:23"
+        ]
+      }
+    },
+    {
+      "name": "arbitrary-css-true",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"allowArbitraryExtensions\":true},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { value } from \"./styles.css\";\nexport type T = typeof value;\n",
+        "styles.d.css.ts": "export declare const value: 1;\n"
+      },
+      "watch": [
+        "value"
+      ],
+      "native": {
+        "program": [
+          "styles.d.css.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 value -> BlockScopedVariable [styles.d.css.ts:1:22 VariableDeclaration]",
+          "2:24 value -> BlockScopedVariable [styles.d.css.ts:1:22 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "arbitrary-pattern",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"main.ts\",\"shim.d.ts\"]}",
+        "shim.d.ts": "declare module \"*.css\" { export const value: 3; }\n",
+        "main.ts": "import { value } from \"./styles.css\";\nexport type T = typeof value;\n",
+        "styles.d.css.ts": "export declare const value: 1;\n"
+      },
+      "watch": [
+        "value"
+      ],
+      "native": {
+        "program": [
+          "main.ts",
+          "shim.d.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 value -> BlockScopedVariable [shim.d.ts:1:39 VariableDeclaration]",
+          "2:24 value -> BlockScopedVariable [shim.d.ts:1:39 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "arbitrary-include-root",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"include\":[\"*.ts\"]}",
+        "main.ts": "import { value } from \"./styles.css\";\nexport type T = typeof value;\n",
+        "styles.d.css.ts": "export declare const value: 1;\n"
+      },
+      "watch": [
+        "value"
+      ],
+      "native": {
+        "program": [
+          "main.ts",
+          "styles.d.css.ts"
+        ],
+        "diagnostics": [
+          "TS6263 main.ts:1:23"
+        ],
+        "names": [
+          "1:10 value -> none",
+          "2:24 value -> none"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS6263"
+        ]
+      }
+    },
+    {
+      "name": "arbitrary-dependency-declaration",
+      "files": {
+        "node_modules/pkg/package.json": "{\"name\":\"pkg\",\"types\":\"index.d.ts\"}",
+        "node_modules/pkg/index.d.ts": "export { value } from \"./styles.css\";\n",
+        "node_modules/pkg/styles.d.css.ts": "export declare const value: 1;\n",
+        "main.ts": "import { value } from \"pkg\";\nexport type T = typeof value;\n"
+      },
+      "watch": [
+        "value"
+      ],
+      "native": {
+        "program": [
+          "node_modules/pkg/styles.d.css.ts (external)",
+          "node_modules/pkg/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 value -> BlockScopedVariable [node_modules/pkg/styles.d.css.ts:1:22 VariableDeclaration]",
+          "2:24 value -> BlockScopedVariable [node_modules/pkg/styles.d.css.ts:1:22 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "arbitrary-dependency-source",
+      "files": {
+        "node_modules/pkg/package.json": "{\"name\":\"pkg\",\"types\":\"index.ts\"}",
+        "node_modules/pkg/index.ts": "export { value } from \"./styles.css\";\n",
+        "node_modules/pkg/styles.d.css.ts": "export declare const value: 1;\n",
+        "main.ts": "import { value } from \"pkg\";\nexport type T = typeof value;\n"
+      },
+      "watch": [
+        "value"
+      ],
+      "native": {
+        "program": [
+          "node_modules/pkg/index.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6263 node_modules/pkg/index.ts:1:23"
+        ],
+        "names": [
+          "1:10 value -> none",
+          "2:24 value -> none"
+        ]
+      },
+      "tool": {
+        "note": "Dependency files are not reported here (docs/references.md, Binding model); TypeScript reports TS6263 in this package's source file."
+      }
+    },
+    {
+      "name": "arbitrary-written-ts",
+      "files": {
+        "main.ts": "import { value } from \"./styles.d.css\";\nexport type T = typeof value;\n",
+        "styles.d.css.ts": "export declare const value: 1;\n"
+      },
+      "watch": [
+        "value"
+      ],
+      "native": {
+        "program": [
+          "styles.d.css.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 value -> BlockScopedVariable [styles.d.css.ts:1:22 VariableDeclaration]",
+          "2:24 value -> BlockScopedVariable [styles.d.css.ts:1:22 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "arbitrary-package-types",
+      "files": {
+        "node_modules/pkg/package.json": "{\"name\":\"pkg\",\"types\":\"index.d.css.ts\"}",
+        "node_modules/pkg/index.d.css.ts": "export declare const value: 1;\n",
+        "main.ts": "import { value } from \"pkg\";\nexport type T = typeof value;\n"
+      },
+      "watch": [
+        "value"
+      ],
+      "native": {
+        "program": [
+          "node_modules/pkg/index.d.css.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 value -> BlockScopedVariable [node_modules/pkg/index.d.css.ts:1:22 VariableDeclaration]",
+          "2:24 value -> BlockScopedVariable [node_modules/pkg/index.d.css.ts:1:22 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "json-paths-off",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"resolveJsonModule\":false,\"paths\":{\"@d\":[\"./data.json\"]}},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { a } from \"@d\";\nexport type T = typeof a;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "watch": [
+        "a"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS7042 main.ts:1:19"
+        ],
+        "names": [
+          "1:10 a -> none",
+          "2:24 a -> none"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS7042"
+        ]
+      }
+    },
+    {
+      "name": "json-paths-on",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"paths\":{\"@d\":[\"./data.json\"]}},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { a } from \"@d\";\nexport type T = typeof a;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "watch": [
+        "a"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 a -> Property|Transient [data.json:1:2 PropertyAssignment]",
+          "2:24 a -> Property|Transient [data.json:1:2 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "tsx-without-jsx",
+      "files": {
+        "main.ts": "import { C } from \"./comp\";\nexport type T = typeof C;\n",
+        "comp.tsx": "export declare const C: 1;\n"
+      },
+      "watch": [
+        "C"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6142 main.ts:1:19"
+        ],
+        "names": [
+          "1:10 C -> none",
+          "2:24 C -> none"
+        ]
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS6142"
+        ]
+      }
+    },
+    {
+      "name": "tsx-without-jsx-root",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"main.ts\",\"comp.tsx\"]}",
+        "main.ts": "import { C } from \"./comp\";\nexport type T = typeof C;\n",
+        "comp.tsx": "export declare const C: 1;\n"
+      },
+      "watch": [
+        "C"
+      ],
+      "native": {
+        "program": [
+          "main.ts",
+          "comp.tsx"
+        ],
+        "diagnostics": [
+          "TS6142 main.ts:1:19"
+        ],
+        "names": [
+          "1:10 C -> BlockScopedVariable [comp.tsx:1:22 VariableDeclaration]",
+          "2:24 C -> BlockScopedVariable [comp.tsx:1:22 VariableDeclaration]"
+        ]
+      },
+      "tool": {
+        "note": "docs/references.md: TS6142 does not change what a name denotes when the TSX file is in the program by another route"
+      }
+    },
+    {
+      "name": "tsx-with-jsx",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"jsx\":\"preserve\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { C } from \"./comp\";\nexport type T = typeof C;\n",
+        "comp.tsx": "export declare const C: 1;\n"
+      },
+      "watch": [
+        "C"
+      ],
+      "native": {
+        "program": [
+          "comp.tsx",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 C -> BlockScopedVariable [comp.tsx:1:22 VariableDeclaration]",
+          "2:24 C -> BlockScopedVariable [comp.tsx:1:22 VariableDeclaration]"
+        ]
+      }
+    }
+  ]
+}

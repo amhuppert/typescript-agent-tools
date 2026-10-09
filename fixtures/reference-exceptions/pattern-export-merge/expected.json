@@ -1,0 +1,237 @@
+{
+  "difference": "An augmentation of `./api` merges with the pattern's `X` that `api` re-exports from `x.css`, and every route to `X` reaches the merged declaration here; TypeScript keeps `api`'s alias on the declaration it resolved during the merge, and resolves `y.css`'s import through the pattern's unmerged export table.",
+  "queries": [
+    {
+      "at": "ambient.d.ts:1:36",
+      "typescript": [
+        {
+          "declarations": [
+            "ambient.d.ts:1:36",
+            "aug.ts:3:36"
+          ],
+          "occurrences": [
+            "ambient.d.ts:1:36",
+            "aug.ts:3:36",
+            "use.ts:1:10",
+            "use.ts:2:15"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "ambient.d.ts:1:36",
+            "aug.ts:3:36"
+          ],
+          "occurrences": [
+            "ambient.d.ts:1:36",
+            "api.ts:1:10",
+            "aug.ts:3:36",
+            "other.ts:1:10",
+            "other.ts:2:16",
+            "use.ts:1:10",
+            "use.ts:2:15"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "api.ts:1:10",
+      "typescript": [
+        {
+          "declarations": [
+            "ambient.d.ts:1:36"
+          ],
+          "occurrences": [
+            "api.ts:1:10",
+            "other.ts:1:10",
+            "other.ts:2:16"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "ambient.d.ts:1:36",
+            "aug.ts:3:36"
+          ],
+          "occurrences": [
+            "ambient.d.ts:1:36",
+            "api.ts:1:10",
+            "aug.ts:3:36",
+            "other.ts:1:10",
+            "other.ts:2:16",
+            "use.ts:1:10",
+            "use.ts:2:15"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "aug.ts:3:36",
+      "typescript": [
+        {
+          "declarations": [
+            "ambient.d.ts:1:36",
+            "aug.ts:3:36"
+          ],
+          "occurrences": [
+            "ambient.d.ts:1:36",
+            "aug.ts:3:36",
+            "use.ts:1:10",
+            "use.ts:2:15"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "ambient.d.ts:1:36",
+            "aug.ts:3:36"
+          ],
+          "occurrences": [
+            "ambient.d.ts:1:36",
+            "api.ts:1:10",
+            "aug.ts:3:36",
+            "other.ts:1:10",
+            "other.ts:2:16",
+            "use.ts:1:10",
+            "use.ts:2:15"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "use.ts:1:10",
+      "typescript": [
+        {
+          "declarations": [
+            "ambient.d.ts:1:36",
+            "aug.ts:3:36"
+          ],
+          "occurrences": [
+            "ambient.d.ts:1:36",
+            "aug.ts:3:36",
+            "use.ts:1:10",
+            "use.ts:2:15"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "ambient.d.ts:1:36",
+            "aug.ts:3:36"
+          ],
+          "occurrences": [
+            "ambient.d.ts:1:36",
+            "api.ts:1:10",
+            "aug.ts:3:36",
+            "other.ts:1:10",
+            "other.ts:2:16",
+            "use.ts:1:10",
+            "use.ts:2:15"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "use.ts:2:15",
+      "typescript": [
+        {
+          "declarations": [
+            "ambient.d.ts:1:36",
+            "aug.ts:3:36"
+          ],
+          "occurrences": [
+            "ambient.d.ts:1:36",
+            "aug.ts:3:36",
+            "use.ts:1:10",
+            "use.ts:2:15"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "ambient.d.ts:1:36",
+            "aug.ts:3:36"
+          ],
+          "occurrences": [
+            "ambient.d.ts:1:36",
+            "api.ts:1:10",
+            "aug.ts:3:36",
+            "other.ts:1:10",
+            "other.ts:2:16",
+            "use.ts:1:10",
+            "use.ts:2:15"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "other.ts:1:10",
+      "typescript": [
+        {
+          "declarations": [
+            "ambient.d.ts:1:36"
+          ],
+          "occurrences": [
+            "api.ts:1:10",
+            "other.ts:1:10",
+            "other.ts:2:16"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "ambient.d.ts:1:36",
+            "aug.ts:3:36"
+          ],
+          "occurrences": [
+            "ambient.d.ts:1:36",
+            "api.ts:1:10",
+            "aug.ts:3:36",
+            "other.ts:1:10",
+            "other.ts:2:16",
+            "use.ts:1:10",
+            "use.ts:2:15"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "other.ts:2:16",
+      "typescript": [
+        {
+          "declarations": [
+            "ambient.d.ts:1:36"
+          ],
+          "occurrences": [
+            "api.ts:1:10",
+            "other.ts:1:10",
+            "other.ts:2:16"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "ambient.d.ts:1:36",
+            "aug.ts:3:36"
+          ],
+          "occurrences": [
+            "ambient.d.ts:1:36",
+            "api.ts:1:10",
+            "aug.ts:3:36",
+            "other.ts:1:10",
+            "other.ts:2:16",
+            "use.ts:1:10",
+            "use.ts:2:15"
+          ]
+        }
+      ]
+    }
+  ]
+}

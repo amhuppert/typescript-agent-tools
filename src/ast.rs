@@ -3,7 +3,7 @@
 
 use crate::syntax_kind::SyntaxKind;
 use serde::{
-    Serialize, Serializer,
+    Deserialize, Serialize, Serializer,
     ser::{SerializeMap, SerializeSeq},
 };
 use std::borrow::Cow;
@@ -19,7 +19,7 @@ impl NodeId {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Span {
     /// Inclusive UTF-8 byte offset.
     pub start: usize,
@@ -227,13 +227,47 @@ impl<'src> Ast<'src> {
             _ => None,
         }
     }
-    /// Child links in field order, without the `assertClause` compatibility
-    /// alias, which repeats `attributes`.
-    pub fn children(&self, id: NodeId) -> impl Iterator<Item = NodeId> + '_ {
+    /// The tokens of the final tree whose text is literal content rather
+    /// than trivia, sorted by start: string, template, regular expression,
+    /// and JSX text tokens. Between them, `//` and `/*` always begin comments,
+    /// so scans of source text for comments and whitespace skip these spans.
+    /// Whitespace-only JSX text holds neither and may be scanned as trivia.
+    pub(crate) fn literal_token_spans(&self) -> Vec<Span> {
+        let mut spans: Vec<Span> = self
+            .walk()
+            .filter(|&id| {
+                matches!(
+                    self.node(id).syntax_kind,
+                    SyntaxKind::StringLiteral
+                        | SyntaxKind::NoSubstitutionTemplateLiteral
+                        | SyntaxKind::TemplateHead
+                        | SyntaxKind::TemplateMiddle
+                        | SyntaxKind::TemplateTail
+                        | SyntaxKind::RegularExpressionLiteral
+                        | SyntaxKind::JsxText
+                )
+            })
+            .map(|id| self.token_span(id))
+            .collect();
+        spans.sort_by_key(|span| span.start);
+        spans
+    }
+    /// A node's fields in order, without the `assertClause` compatibility
+    /// alias, which repeats `attributes`: its logical fields, each visited
+    /// once by every traversal and comparison.
+    pub(crate) fn logical_fields(
+        &self,
+        id: NodeId,
+    ) -> impl Iterator<Item = (&'static str, &Value<'src>)> + '_ {
         self.node(id)
             .fields
             .iter()
             .filter(|(key, _)| *key != "assertClause")
+            .map(|(key, value)| (*key, value))
+    }
+    /// Child links in field order, of the logical fields (`logical_fields`).
+    pub fn children(&self, id: NodeId) -> impl Iterator<Item = NodeId> + '_ {
+        self.logical_fields(id)
             .flat_map(|(_, value)| match value {
                 Value::Node(id) => std::slice::from_ref(id),
                 Value::Nodes(ids) => ids.as_slice(),

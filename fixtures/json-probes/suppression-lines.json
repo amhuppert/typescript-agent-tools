@@ -1,0 +1,5068 @@
+{
+  "description": "Which lines a comment directive suppresses (getDiagnosticsWithPrecedingDirectives and isCommentOrBlankLine): `// @ts-ignore` or `// @ts-expect-error`, then one intervening line, blank or a line comment, after an empty, space, tab, no-break space, vertical tab, form feed, or byte order mark prefix, with every line ended by LF, CR, CRLF, U+2028, or U+2029, before a missing module (TS2307) or before each of two conflicting declarations (TS2451). Only a space or tab prefix and only CR, LF, or the end of the text end a blank line.",
+  "config": "{\"compilerOptions\": {\"noLib\": true, \"types\": []}, \"files\": [\"main.ts\"]}",
+  "cases": [
+    {
+      "name": "missing-ignore-lf-empty-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\n\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-lf-empty-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\n\nlet x = 1;\n// @ts-ignore\n\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-lf-empty-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\n// explanation\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-lf-empty-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\n// explanation\nlet x = 1;\n// @ts-ignore\n// explanation\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-lf-space-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\n \nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-lf-space-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\n \nlet x = 1;\n// @ts-ignore\n \nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-lf-space-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\n // explanation\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-lf-space-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\n // explanation\nlet x = 1;\n// @ts-ignore\n // explanation\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-lf-tab-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\n\t\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-lf-tab-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\n\t\nlet x = 1;\n// @ts-ignore\n\t\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-lf-tab-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\n\t// explanation\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-lf-tab-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\n\t// explanation\nlet x = 1;\n// @ts-ignore\n\t// explanation\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-lf-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\n \nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-lf-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\n \nlet x = 1;\n// @ts-ignore\n \nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-lf-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\n // explanation\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-lf-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\n // explanation\nlet x = 1;\n// @ts-ignore\n // explanation\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-lf-vt-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\n\u000b\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-lf-vt-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\n\u000b\nlet x = 1;\n// @ts-ignore\n\u000b\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-lf-vt-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\n\u000b// explanation\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-lf-vt-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\n\u000b// explanation\nlet x = 1;\n// @ts-ignore\n\u000b// explanation\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-lf-ff-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\n\f\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-lf-ff-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\n\f\nlet x = 1;\n// @ts-ignore\n\f\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-lf-ff-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\n\f// explanation\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-lf-ff-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\n\f// explanation\nlet x = 1;\n// @ts-ignore\n\f// explanation\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-lf-bom-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\n﻿\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-lf-bom-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\n﻿\nlet x = 1;\n// @ts-ignore\n﻿\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-lf-bom-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\n﻿// explanation\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-lf-bom-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\n﻿// explanation\nlet x = 1;\n// @ts-ignore\n﻿// explanation\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-cr-empty-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-cr-empty-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\rlet x = 1;\r// @ts-ignore\r\rlet x = 2;\rexport {};\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-cr-empty-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r// explanation\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-cr-empty-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r// explanation\rlet x = 1;\r// @ts-ignore\r// explanation\rlet x = 2;\rexport {};\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-cr-space-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r \rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-cr-space-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r \rlet x = 1;\r// @ts-ignore\r \rlet x = 2;\rexport {};\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-cr-space-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r // explanation\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-cr-space-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r // explanation\rlet x = 1;\r// @ts-ignore\r // explanation\rlet x = 2;\rexport {};\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-cr-tab-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\t\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-cr-tab-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\t\rlet x = 1;\r// @ts-ignore\r\t\rlet x = 2;\rexport {};\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-cr-tab-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\t// explanation\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-cr-tab-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\t// explanation\rlet x = 1;\r// @ts-ignore\r\t// explanation\rlet x = 2;\rexport {};\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-cr-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r \rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-cr-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r \rlet x = 1;\r// @ts-ignore\r \rlet x = 2;\rexport {};\r"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-cr-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r // explanation\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-cr-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r // explanation\rlet x = 1;\r// @ts-ignore\r // explanation\rlet x = 2;\rexport {};\r"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-cr-vt-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\u000b\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-cr-vt-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\u000b\rlet x = 1;\r// @ts-ignore\r\u000b\rlet x = 2;\rexport {};\r"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-cr-vt-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\u000b// explanation\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-cr-vt-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\u000b// explanation\rlet x = 1;\r// @ts-ignore\r\u000b// explanation\rlet x = 2;\rexport {};\r"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-cr-ff-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\f\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-cr-ff-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\f\rlet x = 1;\r// @ts-ignore\r\f\rlet x = 2;\rexport {};\r"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-cr-ff-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\f// explanation\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-cr-ff-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\f// explanation\rlet x = 1;\r// @ts-ignore\r\f// explanation\rlet x = 2;\rexport {};\r"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-cr-bom-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r﻿\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-cr-bom-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r﻿\rlet x = 1;\r// @ts-ignore\r﻿\rlet x = 2;\rexport {};\r"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-cr-bom-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r﻿// explanation\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-cr-bom-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r﻿// explanation\rlet x = 1;\r// @ts-ignore\r﻿// explanation\rlet x = 2;\rexport {};\r"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-crlf-empty-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-crlf-empty-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n\r\nlet x = 1;\r\n// @ts-ignore\r\n\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-crlf-empty-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n// explanation\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-crlf-empty-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n// explanation\r\nlet x = 1;\r\n// @ts-ignore\r\n// explanation\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-crlf-space-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n \r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-crlf-space-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n \r\nlet x = 1;\r\n// @ts-ignore\r\n \r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-crlf-space-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n // explanation\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-crlf-space-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n // explanation\r\nlet x = 1;\r\n// @ts-ignore\r\n // explanation\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-crlf-tab-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n\t\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-crlf-tab-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n\t\r\nlet x = 1;\r\n// @ts-ignore\r\n\t\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-crlf-tab-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n\t// explanation\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-crlf-tab-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n\t// explanation\r\nlet x = 1;\r\n// @ts-ignore\r\n\t// explanation\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-crlf-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n \r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-crlf-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n \r\nlet x = 1;\r\n// @ts-ignore\r\n \r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-crlf-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n // explanation\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-crlf-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n // explanation\r\nlet x = 1;\r\n// @ts-ignore\r\n // explanation\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-crlf-vt-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n\u000b\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-crlf-vt-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n\u000b\r\nlet x = 1;\r\n// @ts-ignore\r\n\u000b\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-crlf-vt-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n\u000b// explanation\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-crlf-vt-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n\u000b// explanation\r\nlet x = 1;\r\n// @ts-ignore\r\n\u000b// explanation\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-crlf-ff-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n\f\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-crlf-ff-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n\f\r\nlet x = 1;\r\n// @ts-ignore\r\n\f\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-crlf-ff-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n\f// explanation\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-crlf-ff-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n\f// explanation\r\nlet x = 1;\r\n// @ts-ignore\r\n\f// explanation\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-crlf-bom-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n﻿\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-crlf-bom-blank",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n﻿\r\nlet x = 1;\r\n// @ts-ignore\r\n﻿\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-crlf-bom-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n﻿// explanation\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-crlf-bom-comment",
+      "files": {
+        "main.ts": "// @ts-ignore\r\n﻿// explanation\r\nlet x = 1;\r\n// @ts-ignore\r\n﻿// explanation\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ls-empty-blank",
+      "files": {
+        "main.ts": "// @ts-ignore  import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ls-empty-blank",
+      "files": {
+        "main.ts": "// @ts-ignore  let x = 1; // @ts-ignore  let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ls-empty-comment",
+      "files": {
+        "main.ts": "// @ts-ignore // explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-ls-empty-comment",
+      "files": {
+        "main.ts": "// @ts-ignore // explanation let x = 1; // @ts-ignore // explanation let x = 2; export {}; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-ls-space-blank",
+      "files": {
+        "main.ts": "// @ts-ignore   import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ls-space-blank",
+      "files": {
+        "main.ts": "// @ts-ignore   let x = 1; // @ts-ignore   let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ls-space-comment",
+      "files": {
+        "main.ts": "// @ts-ignore  // explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-ls-space-comment",
+      "files": {
+        "main.ts": "// @ts-ignore  // explanation let x = 1; // @ts-ignore  // explanation let x = 2; export {}; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-ls-tab-blank",
+      "files": {
+        "main.ts": "// @ts-ignore \t import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ls-tab-blank",
+      "files": {
+        "main.ts": "// @ts-ignore \t let x = 1; // @ts-ignore \t let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ls-tab-comment",
+      "files": {
+        "main.ts": "// @ts-ignore \t// explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-ls-tab-comment",
+      "files": {
+        "main.ts": "// @ts-ignore \t// explanation let x = 1; // @ts-ignore \t// explanation let x = 2; export {}; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-ls-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-ignore   import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ls-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-ignore   let x = 1; // @ts-ignore   let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ls-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-ignore  // explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ls-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-ignore  // explanation let x = 1; // @ts-ignore  // explanation let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ls-vt-blank",
+      "files": {
+        "main.ts": "// @ts-ignore \u000b import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ls-vt-blank",
+      "files": {
+        "main.ts": "// @ts-ignore \u000b let x = 1; // @ts-ignore \u000b let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ls-vt-comment",
+      "files": {
+        "main.ts": "// @ts-ignore \u000b// explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ls-vt-comment",
+      "files": {
+        "main.ts": "// @ts-ignore \u000b// explanation let x = 1; // @ts-ignore \u000b// explanation let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ls-ff-blank",
+      "files": {
+        "main.ts": "// @ts-ignore \f import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ls-ff-blank",
+      "files": {
+        "main.ts": "// @ts-ignore \f let x = 1; // @ts-ignore \f let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ls-ff-comment",
+      "files": {
+        "main.ts": "// @ts-ignore \f// explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ls-ff-comment",
+      "files": {
+        "main.ts": "// @ts-ignore \f// explanation let x = 1; // @ts-ignore \f// explanation let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ls-bom-blank",
+      "files": {
+        "main.ts": "// @ts-ignore ﻿ import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ls-bom-blank",
+      "files": {
+        "main.ts": "// @ts-ignore ﻿ let x = 1; // @ts-ignore ﻿ let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ls-bom-comment",
+      "files": {
+        "main.ts": "// @ts-ignore ﻿// explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ls-bom-comment",
+      "files": {
+        "main.ts": "// @ts-ignore ﻿// explanation let x = 1; // @ts-ignore ﻿// explanation let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ps-empty-blank",
+      "files": {
+        "main.ts": "// @ts-ignore  import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ps-empty-blank",
+      "files": {
+        "main.ts": "// @ts-ignore  let x = 1; // @ts-ignore  let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ps-empty-comment",
+      "files": {
+        "main.ts": "// @ts-ignore // explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-ps-empty-comment",
+      "files": {
+        "main.ts": "// @ts-ignore // explanation let x = 1; // @ts-ignore // explanation let x = 2; export {}; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-ps-space-blank",
+      "files": {
+        "main.ts": "// @ts-ignore   import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ps-space-blank",
+      "files": {
+        "main.ts": "// @ts-ignore   let x = 1; // @ts-ignore   let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ps-space-comment",
+      "files": {
+        "main.ts": "// @ts-ignore  // explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-ps-space-comment",
+      "files": {
+        "main.ts": "// @ts-ignore  // explanation let x = 1; // @ts-ignore  // explanation let x = 2; export {}; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-ps-tab-blank",
+      "files": {
+        "main.ts": "// @ts-ignore \t import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ps-tab-blank",
+      "files": {
+        "main.ts": "// @ts-ignore \t let x = 1; // @ts-ignore \t let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ps-tab-comment",
+      "files": {
+        "main.ts": "// @ts-ignore \t// explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-ignore-ps-tab-comment",
+      "files": {
+        "main.ts": "// @ts-ignore \t// explanation let x = 1; // @ts-ignore \t// explanation let x = 2; export {}; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore-ps-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-ignore   import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ps-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-ignore   let x = 1; // @ts-ignore   let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ps-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-ignore  // explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ps-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-ignore  // explanation let x = 1; // @ts-ignore  // explanation let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ps-vt-blank",
+      "files": {
+        "main.ts": "// @ts-ignore \u000b import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ps-vt-blank",
+      "files": {
+        "main.ts": "// @ts-ignore \u000b let x = 1; // @ts-ignore \u000b let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ps-vt-comment",
+      "files": {
+        "main.ts": "// @ts-ignore \u000b// explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ps-vt-comment",
+      "files": {
+        "main.ts": "// @ts-ignore \u000b// explanation let x = 1; // @ts-ignore \u000b// explanation let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ps-ff-blank",
+      "files": {
+        "main.ts": "// @ts-ignore \f import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ps-ff-blank",
+      "files": {
+        "main.ts": "// @ts-ignore \f let x = 1; // @ts-ignore \f let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ps-ff-comment",
+      "files": {
+        "main.ts": "// @ts-ignore \f// explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ps-ff-comment",
+      "files": {
+        "main.ts": "// @ts-ignore \f// explanation let x = 1; // @ts-ignore \f// explanation let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ps-bom-blank",
+      "files": {
+        "main.ts": "// @ts-ignore ﻿ import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ps-bom-blank",
+      "files": {
+        "main.ts": "// @ts-ignore ﻿ let x = 1; // @ts-ignore ﻿ let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-ignore-ps-bom-comment",
+      "files": {
+        "main.ts": "// @ts-ignore ﻿// explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-ignore-ps-bom-comment",
+      "files": {
+        "main.ts": "// @ts-ignore ﻿// explanation let x = 1; // @ts-ignore ﻿// explanation let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 main.ts:3:5",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-lf-empty-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\n\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-lf-empty-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\n\nlet x = 1;\n// @ts-expect-error\n\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-lf-empty-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\n// explanation\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-lf-empty-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\n// explanation\nlet x = 1;\n// @ts-expect-error\n// explanation\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-lf-space-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\n \nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-lf-space-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\n \nlet x = 1;\n// @ts-expect-error\n \nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-lf-space-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\n // explanation\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-lf-space-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\n // explanation\nlet x = 1;\n// @ts-expect-error\n // explanation\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-lf-tab-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\n\t\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-lf-tab-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\n\t\nlet x = 1;\n// @ts-expect-error\n\t\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-lf-tab-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\n\t// explanation\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-lf-tab-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\n\t// explanation\nlet x = 1;\n// @ts-expect-error\n\t// explanation\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-lf-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\n \nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-lf-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\n \nlet x = 1;\n// @ts-expect-error\n \nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-lf-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\n // explanation\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-lf-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\n // explanation\nlet x = 1;\n// @ts-expect-error\n // explanation\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-lf-vt-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\n\u000b\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-lf-vt-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\n\u000b\nlet x = 1;\n// @ts-expect-error\n\u000b\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-lf-vt-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\n\u000b// explanation\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-lf-vt-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\n\u000b// explanation\nlet x = 1;\n// @ts-expect-error\n\u000b// explanation\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-lf-ff-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\n\f\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-lf-ff-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\n\f\nlet x = 1;\n// @ts-expect-error\n\f\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-lf-ff-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\n\f// explanation\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-lf-ff-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\n\f// explanation\nlet x = 1;\n// @ts-expect-error\n\f// explanation\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-lf-bom-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\n﻿\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-lf-bom-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\n﻿\nlet x = 1;\n// @ts-expect-error\n﻿\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-lf-bom-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\n﻿// explanation\nimport { x } from \"./missing\";\nexport const y = x;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-lf-bom-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\n﻿// explanation\nlet x = 1;\n// @ts-expect-error\n﻿// explanation\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-cr-empty-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-cr-empty-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\rlet x = 1;\r// @ts-expect-error\r\rlet x = 2;\rexport {};\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-cr-empty-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r// explanation\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-cr-empty-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r// explanation\rlet x = 1;\r// @ts-expect-error\r// explanation\rlet x = 2;\rexport {};\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-cr-space-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r \rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-cr-space-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r \rlet x = 1;\r// @ts-expect-error\r \rlet x = 2;\rexport {};\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-cr-space-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r // explanation\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-cr-space-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r // explanation\rlet x = 1;\r// @ts-expect-error\r // explanation\rlet x = 2;\rexport {};\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-cr-tab-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\t\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-cr-tab-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\t\rlet x = 1;\r// @ts-expect-error\r\t\rlet x = 2;\rexport {};\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-cr-tab-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\t// explanation\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-cr-tab-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\t// explanation\rlet x = 1;\r// @ts-expect-error\r\t// explanation\rlet x = 2;\rexport {};\r"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-cr-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r \rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-cr-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r \rlet x = 1;\r// @ts-expect-error\r \rlet x = 2;\rexport {};\r"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-cr-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r // explanation\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-cr-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r // explanation\rlet x = 1;\r// @ts-expect-error\r // explanation\rlet x = 2;\rexport {};\r"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-cr-vt-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\u000b\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-cr-vt-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\u000b\rlet x = 1;\r// @ts-expect-error\r\u000b\rlet x = 2;\rexport {};\r"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-cr-vt-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\u000b// explanation\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-cr-vt-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\u000b// explanation\rlet x = 1;\r// @ts-expect-error\r\u000b// explanation\rlet x = 2;\rexport {};\r"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-cr-ff-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\f\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-cr-ff-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\f\rlet x = 1;\r// @ts-expect-error\r\f\rlet x = 2;\rexport {};\r"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-cr-ff-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\f// explanation\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-cr-ff-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\f// explanation\rlet x = 1;\r// @ts-expect-error\r\f// explanation\rlet x = 2;\rexport {};\r"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-cr-bom-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r﻿\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-cr-bom-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r﻿\rlet x = 1;\r// @ts-expect-error\r﻿\rlet x = 2;\rexport {};\r"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-cr-bom-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r﻿// explanation\rimport { x } from \"./missing\";\rexport const y = x;\r"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-cr-bom-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r﻿// explanation\rlet x = 1;\r// @ts-expect-error\r﻿// explanation\rlet x = 2;\rexport {};\r"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-crlf-empty-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-crlf-empty-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n\r\nlet x = 1;\r\n// @ts-expect-error\r\n\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-crlf-empty-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n// explanation\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-crlf-empty-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n// explanation\r\nlet x = 1;\r\n// @ts-expect-error\r\n// explanation\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-crlf-space-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n \r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-crlf-space-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n \r\nlet x = 1;\r\n// @ts-expect-error\r\n \r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-crlf-space-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n // explanation\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-crlf-space-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n // explanation\r\nlet x = 1;\r\n// @ts-expect-error\r\n // explanation\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-crlf-tab-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n\t\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-crlf-tab-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n\t\r\nlet x = 1;\r\n// @ts-expect-error\r\n\t\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-crlf-tab-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n\t// explanation\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-crlf-tab-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n\t// explanation\r\nlet x = 1;\r\n// @ts-expect-error\r\n\t// explanation\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-crlf-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n \r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-crlf-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n \r\nlet x = 1;\r\n// @ts-expect-error\r\n \r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-crlf-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n // explanation\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-crlf-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n // explanation\r\nlet x = 1;\r\n// @ts-expect-error\r\n // explanation\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-crlf-vt-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n\u000b\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-crlf-vt-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n\u000b\r\nlet x = 1;\r\n// @ts-expect-error\r\n\u000b\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-crlf-vt-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n\u000b// explanation\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-crlf-vt-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n\u000b// explanation\r\nlet x = 1;\r\n// @ts-expect-error\r\n\u000b// explanation\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-crlf-ff-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n\f\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-crlf-ff-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n\f\r\nlet x = 1;\r\n// @ts-expect-error\r\n\f\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-crlf-ff-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n\f// explanation\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-crlf-ff-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n\f// explanation\r\nlet x = 1;\r\n// @ts-expect-error\r\n\f// explanation\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-crlf-bom-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n﻿\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-crlf-bom-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n﻿\r\nlet x = 1;\r\n// @ts-expect-error\r\n﻿\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-crlf-bom-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n﻿// explanation\r\nimport { x } from \"./missing\";\r\nexport const y = x;\r\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-crlf-bom-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error\r\n﻿// explanation\r\nlet x = 1;\r\n// @ts-expect-error\r\n﻿// explanation\r\nlet x = 2;\r\nexport {};\r\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ls-empty-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error  import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ls-empty-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error  let x = 1; // @ts-expect-error  let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ls-empty-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error // explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-ls-empty-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error // explanation let x = 1; // @ts-expect-error // explanation let x = 2; export {}; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-ls-space-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error   import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ls-space-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error   let x = 1; // @ts-expect-error   let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ls-space-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error  // explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-ls-space-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error  // explanation let x = 1; // @ts-expect-error  // explanation let x = 2; export {}; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-ls-tab-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error \t import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ls-tab-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error \t let x = 1; // @ts-expect-error \t let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ls-tab-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error \t// explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-ls-tab-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error \t// explanation let x = 1; // @ts-expect-error \t// explanation let x = 2; export {}; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-ls-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error   import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ls-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error   let x = 1; // @ts-expect-error   let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ls-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error  // explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ls-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error  // explanation let x = 1; // @ts-expect-error  // explanation let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ls-vt-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error \u000b import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ls-vt-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error \u000b let x = 1; // @ts-expect-error \u000b let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ls-vt-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error \u000b// explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ls-vt-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error \u000b// explanation let x = 1; // @ts-expect-error \u000b// explanation let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ls-ff-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error \f import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ls-ff-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error \f let x = 1; // @ts-expect-error \f let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ls-ff-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error \f// explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ls-ff-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error \f// explanation let x = 1; // @ts-expect-error \f// explanation let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ls-bom-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error ﻿ import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ls-bom-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error ﻿ let x = 1; // @ts-expect-error ﻿ let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ls-bom-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error ﻿// explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ls-bom-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error ﻿// explanation let x = 1; // @ts-expect-error ﻿// explanation let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ps-empty-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error  import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ps-empty-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error  let x = 1; // @ts-expect-error  let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ps-empty-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error // explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-ps-empty-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error // explanation let x = 1; // @ts-expect-error // explanation let x = 2; export {}; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-ps-space-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error   import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ps-space-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error   let x = 1; // @ts-expect-error   let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ps-space-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error  // explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-ps-space-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error  // explanation let x = 1; // @ts-expect-error  // explanation let x = 2; export {}; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-ps-tab-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error \t import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ps-tab-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error \t let x = 1; // @ts-expect-error \t let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ps-tab-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error \t// explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "binding-expect-ps-tab-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error \t// explanation let x = 1; // @ts-expect-error \t// explanation let x = 2; export {}; "
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-expect-ps-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error   import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ps-nbsp-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error   let x = 1; // @ts-expect-error   let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ps-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error  // explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ps-nbsp-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error  // explanation let x = 1; // @ts-expect-error  // explanation let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ps-vt-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error \u000b import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ps-vt-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error \u000b let x = 1; // @ts-expect-error \u000b let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ps-vt-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error \u000b// explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ps-vt-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error \u000b// explanation let x = 1; // @ts-expect-error \u000b// explanation let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ps-ff-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error \f import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ps-ff-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error \f let x = 1; // @ts-expect-error \f let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ps-ff-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error \f// explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ps-ff-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error \f// explanation let x = 1; // @ts-expect-error \f// explanation let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ps-bom-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error ﻿ import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ps-bom-blank",
+      "files": {
+        "main.ts": "// @ts-expect-error ﻿ let x = 1; // @ts-expect-error ﻿ let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    },
+    {
+      "name": "missing-expect-ps-bom-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error ﻿// explanation import { x } from \"./missing\"; export const y = x; "
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2307 main.ts:3:19"
+        ]
+      }
+    },
+    {
+      "name": "binding-expect-ps-bom-comment",
+      "files": {
+        "main.ts": "// @ts-expect-error ﻿// explanation let x = 1; // @ts-expect-error ﻿// explanation let x = 2; export {}; "
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "main.ts:6:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2578 main.ts:1:1",
+          "TS2451 main.ts:3:5",
+          "TS2578 main.ts:4:1",
+          "TS2451 main.ts:6:5"
+        ]
+      }
+    }
+  ]
+}

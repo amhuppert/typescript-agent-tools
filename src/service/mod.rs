@@ -1,5 +1,8 @@
-//! Local process reuse for CLI reference queries. The wire format, rendezvous,
-//! startup races, and shutdown belong here; callers supply complete operations.
+//! Local process reuse for CLI project queries: references, outline, and
+//! show. One service per configuration keeps a `ProjectSession`, whose one
+//! request boundary refreshes the generation before every operation. The
+//! wire format, rendezvous, startup races, and shutdown belong here; callers
+//! supply complete operations.
 
 mod lease;
 
@@ -13,9 +16,8 @@ use std::os::unix::process::CommandExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
-use typescript_parser::references::{
-    QueryErrorKind, ReferenceError, ReferenceQuery, ReferenceResult, ReferenceSession,
-};
+use typescript_parser::analysis::AnalysisError;
+use typescript_parser::project::{ProjectRequest, ProjectResponse, ProjectSession};
 
 const STARTUP_WAIT: Duration = Duration::from_secs(10);
 const CLIENT_WAIT: Duration = Duration::from_secs(300);
@@ -25,7 +27,7 @@ const REQUEST_LIMIT: u64 = 1 << 20;
 
 #[derive(Debug)]
 pub enum Error {
-    Reference(ReferenceError),
+    Analysis(AnalysisError),
     Transport(io::Error),
 }
 
@@ -49,21 +51,21 @@ struct Request {
 
 #[derive(Serialize, Deserialize)]
 enum Action {
-    Query(ReferenceQuery),
+    Query(ProjectRequest),
     Status,
     Stop,
 }
 
 #[derive(Serialize, Deserialize)]
 enum Response {
-    Query(Result<ReferenceResult, ReferenceError>),
+    Query(Result<ProjectResponse, AnalysisError>),
     Status(Status),
     Stopped,
     Failure(String),
 }
 
-/// Administrative observation only: generation counts published indexes, and
-/// status itself neither loads a project nor validates its freshness.
+/// Administrative observation only: generation counts published snapshots,
+/// and status itself neither loads a project nor validates its freshness.
 #[derive(Serialize, Deserialize)]
 pub struct Status {
     pub running: bool,
@@ -143,8 +145,26 @@ impl Endpoint {
             {
                 Ok(None)
             }
-            Err(error) => Err(error),
+            Err(error) => Err(self.socket_error(error)),
         }
+    }
+
+    /// A failure to bind or connect the socket, naming it. A socket address
+    /// holds a path of about a hundred bytes, so a long runtime directory
+    /// makes every request fail with `InvalidInput`.
+    fn socket_error(&self, error: io::Error) -> io::Error {
+        let hint = if error.kind() == io::ErrorKind::InvalidInput {
+            "; set a shorter TSPARSE_SERVICE_DIR"
+        } else {
+            ""
+        };
+        io::Error::new(
+            error.kind(),
+            format!(
+                "Reference service socket {}: {error}{hint}",
+                self.socket.display()
+            ),
+        )
     }
 
     fn start(&self) -> io::Result<UnixStream> {
@@ -234,36 +254,15 @@ fn unexpected(response: Response) -> io::Error {
     }
 }
 
-pub fn query(config: &Path, mut query: ReferenceQuery) -> Result<ReferenceResult, Error> {
-    let original_file = match &mut query {
-        ReferenceQuery::At { file, .. }
-        | ReferenceQuery::Name {
-            file: Some(file), ..
-        } => {
-            let original = file.clone();
-            // Empty operands remain empty: the query owner reports OutsideProject.
-            if !file.as_os_str().is_empty() {
-                *file = std::path::absolute(&*file)?;
-            }
-            Some(original)
-        }
-        ReferenceQuery::Name { file: None, .. } => None,
-    };
+/// Answer `request` from the service of the project `config` selects,
+/// starting it when none is running. The service's working directory is
+/// not the caller's, so a request's file operand must already be absolute
+/// (`ProjectRequest::make_absolute`).
+pub fn execute(config: &Path, request: ProjectRequest) -> Result<ProjectResponse, Error> {
     let endpoint = Endpoint::new(config)?;
-    match endpoint.exchange(endpoint.start()?, Action::Query(query))? {
-        Response::Query(result) => result.map_err(|mut error| {
-            if let ReferenceError::Query(query_error) = &mut error {
-                // These diagnostics name the query operand. Semantic target
-                // errors name captured source files and keep their canonical path.
-                if matches!(
-                    query_error.kind,
-                    QueryErrorKind::OutsideProject | QueryErrorKind::InvalidPosition
-                ) {
-                    query_error.path = original_file;
-                }
-            }
-            Error::Reference(error)
-        }),
+    match endpoint.exchange(endpoint.start()?, Action::Query(request))? {
+        Response::Query(Ok(response)) => Ok(response),
+        Response::Query(Err(error)) => Err(Error::Analysis(error)),
         other => Err(unexpected(other).into()),
     }
 }
@@ -310,15 +309,17 @@ fn remove_socket(path: &Path) -> io::Result<()> {
 }
 
 pub fn serve(config: &Path) -> io::Result<()> {
+    close_inherited_descriptors()?;
     let endpoint = Endpoint::new(config)?;
     endpoint.prepare()?;
     let Some(_lease) = lease::Lease::acquire(&endpoint.lock)? else {
         return Ok(());
     };
     remove_socket(&endpoint.socket)?;
-    let listener = UnixListener::bind(&endpoint.socket)?;
+    let listener =
+        UnixListener::bind(&endpoint.socket).map_err(|error| endpoint.socket_error(error))?;
     listener.set_nonblocking(true)?;
-    let mut session = ReferenceSession::new(config).map_err(io::Error::other)?;
+    let mut session = ProjectSession::new(config).map_err(io::Error::other)?;
     let idle = match std::env::var("TSPARSE_SERVICE_IDLE_SECS") {
         Ok(value) => Duration::from_secs(value.parse::<u64>().ok().filter(|&s| s > 0).ok_or_else(
             || {
@@ -356,10 +357,46 @@ pub fn serve(config: &Path) -> io::Result<()> {
     result.and(cleanup)
 }
 
+/// Close every descriptor this process inherited beyond the standard
+/// streams, before the service opens its own. A service outlives the client
+/// that started it, and a descriptor that client inherited by accident, such
+/// as a pipe its parent was still marking close-on-exec when another thread
+/// spawned it (std on macOS creates a pipe and marks it in two steps), would
+/// keep that pipe, and whoever waits for its end of file, open until the
+/// service exits.
+fn close_inherited_descriptors() -> io::Result<()> {
+    /// `EBADF`, the same on Linux, macOS, and the BSDs.
+    const NOT_OPEN: i32 = 9;
+    unsafe extern "C" {
+        fn close(descriptor: std::ffi::c_int) -> std::ffi::c_int;
+    }
+    let mut inherited = Vec::new();
+    for entry in std::fs::read_dir("/dev/fd")? {
+        let name = entry?.file_name();
+        if let Some(descriptor) = name.to_str().and_then(|name| name.parse::<i32>().ok()) {
+            if descriptor > 2 {
+                inherited.push(descriptor);
+            }
+        }
+    }
+    // The listing's own descriptor is among them, closed with the listing.
+    for descriptor in inherited {
+        // SAFETY: nothing in this process owns a descriptor above the
+        // standard streams yet; `serve` runs before the service opens any.
+        if unsafe { close(descriptor) } != 0 {
+            let error = io::Error::last_os_error();
+            if error.raw_os_error() != Some(NOT_OPEN) {
+                return Err(error);
+            }
+        }
+    }
+    Ok(())
+}
+
 fn handle(
     mut stream: UnixStream,
     identity: &Identity,
-    session: &mut ReferenceSession,
+    session: &mut ProjectSession,
 ) -> io::Result<bool> {
     // On BSD/macOS accepted sockets can inherit the listener's O_NONBLOCK.
     // A client may connect before writing; that gap is not a broken request.
@@ -380,7 +417,7 @@ fn handle(
             false,
         ),
         Ok(Request { action, .. }) => match action {
-            Action::Query(query) => (Response::Query(session.find_references(query)), false),
+            Action::Query(request) => (Response::Query(session.execute(request)), false),
             Action::Status => (
                 Response::Status(Status {
                     running: true,

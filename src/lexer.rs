@@ -61,7 +61,9 @@ pub(crate) fn whitespace(c: char) -> bool {
 
 /// Where a leading `#!` line ends, or 0 without one. A byte order mark may
 /// precede it: TypeScript removes the mark when it reads a file, so its
-/// `getShebang` sees the `#!` at the start.
+/// `getShebang` sees the `#!` at the start. Analysis reads remove it the same
+/// way (`source::decode`); text given to the parser directly,
+/// as in parse mode, may still begin with it.
 pub(crate) fn shebang_end(text: &str) -> usize {
     let start = if text.starts_with('\u{FEFF}') { 3 } else { 0 };
     if !text[start..].starts_with("#!") {
@@ -112,6 +114,76 @@ pub(crate) fn comments(text: &str, mut pos: usize) -> impl Iterator<Item = Comme
         };
         pos = end;
         Some(comment)
+    })
+}
+
+/// Every comment in `text` between tokens, in source order, as spans: the
+/// trivia outside `literals`, the string, template, regular expression, and
+/// JSX text tokens of the final tree in source order (`Ast::literal_token_spans`),
+/// outside which `//` and `/*` always begin a comment. A `#!` line is not a
+/// comment, and an unterminated block comment ends the scan. TypeScript's
+/// scanner meets the same comments as it skips trivia.
+pub(crate) fn comment_spans(
+    text: &str,
+    literals: Vec<crate::Span>,
+) -> impl Iterator<Item = crate::Span> + '_ {
+    let mut literals = literals.into_iter().peekable();
+    let mut at = shebang_end(text);
+    std::iter::from_fn(move || {
+        while at < text.len() {
+            if let Some(literal) = literals.next_if(|literal| literal.start <= at) {
+                at = at.max(literal.end);
+                continue;
+            }
+            let limit = literals.peek().map_or(text.len(), |literal| literal.start);
+            let Some(slash) = text[at..limit].find('/') else {
+                at = limit;
+                continue;
+            };
+            let start = at + slash;
+            let Some(end) = comment_end(text, start) else {
+                if text[start..].starts_with("/*") {
+                    at = text.len();
+                    return None;
+                }
+                at = start + 1;
+                continue;
+            };
+            at = end;
+            return Some(crate::Span { start, end });
+        }
+        None
+    })
+}
+
+/// The JSDoc comments TypeScript collects for a node whose trivia runs from
+/// `full_start` to its first token at `token_start`: port of the collection
+/// half of `GetJSDocCommentRanges` (internal/parser/utilities.go), over
+/// `GetLeadingCommentRanges` and, for the kinds that also take trailing
+/// comments (`include_trailing`, which `crate::syntax::trailing_jsdoc`
+/// decides), `GetTrailingCommentRanges`. A leading comment is collected only at the start of
+/// the file (after a `#!` line), or once a CR or LF has appeared in the
+/// trivia: `iterateCommentRanges` switches collection on for those
+/// characters alone, so U+2028 and U+2029 do not, unlike every other
+/// line-break rule (`line_break`). A JSDoc comment is a block comment
+/// beginning `/**`, other than `/**/`.
+pub(crate) fn jsdoc_comments(
+    text: &str,
+    full_start: usize,
+    token_start: usize,
+    include_trailing: bool,
+) -> impl Iterator<Item = Comment<'_>> {
+    let trivia = &text[..token_start];
+    let from = full_start.max(shebang_end(text)).min(trivia.len());
+    let mut collecting = full_start == 0 || include_trailing;
+    comments(trivia, from).filter(move |comment| {
+        collecting |= comment.space_before.contains(['\r', '\n']);
+        collecting
+            && comment
+                .text
+                .strip_prefix("/*")
+                .and_then(|text| text.strip_suffix("*/"))
+                .is_some_and(|body| body.starts_with('*'))
     })
 }
 

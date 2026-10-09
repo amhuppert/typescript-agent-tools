@@ -1,0 +1,15 @@
+{
+  "compiler": "7.0.2",
+  "symbols": [
+    {"name": "handler", "kind": 13, "range": "2:13-2:32", "selection": "2:13-2:20", "children": []},
+    {"name": "handler", "kind": 12, "range": "3:11-5:2", "selection": "3:11-3:11", "children": [
+      {"name": "assignedLocal", "kind": 13, "range": "4:9-4:26", "selection": "4:9-4:22", "children": []}
+    ]},
+    {"name": "export=", "kind": 13, "range": "7:1-10:3", "selection": "7:1-10:3", "children": [
+      {"name": "run", "kind": 6, "range": "8:3-8:11", "selection": "8:3-8:6", "children": []},
+      {"name": "nested", "kind": 7, "range": "9:3-9:22", "selection": "9:3-9:9", "children": [
+        {"name": "deep", "kind": 7, "range": "9:13-9:20", "selection": "9:13-9:17", "children": []}
+      ]}
+    ]}
+  ]
+}

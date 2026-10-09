@@ -1,0 +1,25 @@
+{
+  "compiler": "7.0.2",
+  "symbols": [
+    {"name": "build", "kind": 12, "range": "2:1-2:65", "selection": "2:18-2:23", "children": []},
+    {"name": "base", "kind": 13, "range": "3:15-3:27", "selection": "3:15-3:19", "children": []},
+    {"name": "spread", "kind": 13, "range": "5:7-5:57", "selection": "5:7-5:13", "children": [
+      {"name": "{ run() { function nested() {} } }", "kind": 7, "range": "5:18-5:55", "selection": "5:21-5:55", "children": []}
+    ]},
+    {"name": "spreadCall", "kind": 13, "range": "6:7-6:66", "selection": "6:7-6:17", "children": [
+      {"name": "build(() => { function inSpread() {} })", "kind": 7, "range": "6:22-6:64", "selection": "6:25-6:64", "children": []}
+    ]},
+    {"name": "host", "kind": 12, "range": "7:1-13:2", "selection": "7:17-7:21", "children": [
+      {"name": "base", "kind": 7, "range": "9:5-9:12", "selection": "9:8-9:12", "children": []},
+      {"name": "{ inner: { deep() {} } }", "kind": 7, "range": "10:5-10:32", "selection": "10:8-10:32", "children": []},
+      {"name": "own", "kind": 7, "range": "11:5-11:11", "selection": "11:5-11:8", "children": []}
+    ]},
+    {"name": "elements", "kind": 13, "range": "14:7-14:46", "selection": "14:7-14:15", "children": [
+      {"name": "inArray", "kind": 12, "range": "14:23-14:44", "selection": "14:32-14:39", "children": []}
+    ]},
+    {"name": "<function>", "kind": 12, "range": "15:11-15:46", "selection": "15:11-15:11", "children": [
+      {"name": "inArguments", "kind": 12, "range": "15:19-15:44", "selection": "15:28-15:39", "children": []}
+    ]},
+    {"name": "target", "kind": 13, "range": "16:5-16:16", "selection": "16:5-16:11", "children": []}
+  ]
+}

@@ -133,7 +133,7 @@ impl<'src> Parser<'src> {
             Ok(left)
         })
     }
-    fn unary_expression(
+    pub(super) fn unary_expression(
         &mut self,
         allow_assignment: bool,
         allow_arrow_return_type: bool,
@@ -593,7 +593,7 @@ impl<'src> Parser<'src> {
         }
         true
     }
-    fn primary_expression(&mut self) -> Result<NodeId> {
+    pub(super) fn primary_expression(&mut self) -> Result<NodeId> {
         self.nest(|p| {
         p.check_token()?;
         let start = p.pos();
@@ -816,11 +816,23 @@ impl<'src> Parser<'src> {
             Ok(p.finish(NewExpression, start, fields))
         })
     }
-    fn object_literal(&mut self) -> Result<NodeId> {
+    pub(super) fn object_literal(&mut self) -> Result<NodeId> {
         let start = self.pos();
         self.expect("{")?;
         let mut properties = vec![];
         while !self.at("}") {
+            // TypeScript's `isListElement` for object literal members: a
+            // member starts with `[`, `*`, `...`, `.`, or a literal property
+            // name (an identifier, keyword, private name, string, or number),
+            // so a decorator cannot begin one.
+            if !(matches!(
+                self.current.kind,
+                Kind::Word | Kind::Private | Kind::String | Kind::Number
+            ) || matches!(self.current.raw, "[" | "*" | "..." | "."))
+            {
+                self.check_token()?;
+                return Err(self.error("Property assignment expected"));
+            }
             let pos = self.pos();
             if self.eat("...")? {
                 let expression = self.assignment_expression()?;
@@ -845,8 +857,12 @@ impl<'src> Parser<'src> {
                 let generator = self.optional_token("*", "asteriskToken", &mut fields)?;
                 let name = self.property_name()?;
                 fields.push(("name", name.into()));
-                self.optional_token("?", "questionToken", &mut fields)?;
-                self.optional_token("!", "exclamationToken", &mut fields)?;
+                // TypeScript's `parseObjectLiteralElement` takes one postfix
+                // marker: `!` only where no `?` precedes it, so in `a?!: 1`
+                // the `!` is where `:` was expected.
+                if !self.optional_token("?", "questionToken", &mut fields)? {
+                    self.optional_token("!", "exclamationToken", &mut fields)?;
+                }
                 let kind = if !generator && accessor.is_none() && self.eat(":")? {
                     fields.push(("initializer", self.assignment_allow_in()?.into()));
                     PropertyAssignment

@@ -258,5 +258,9 @@
   {
     "name": "committed-mapped-type-error",
     "source": "type T = {[K in keyof T]: };"
+  },
+  {
+    "name": "object-member-decorator",
+    "source": "declare function dec(t: any): any;\nexport const o = { @dec a: 1 };"
   }
 ]

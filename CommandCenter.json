@@ -54,7 +54,7 @@
         },
         "cost": 2,
         "timeoutMs": 900000,
-        "description": "Check fixtures/references against the pinned TypeScript 7.0.2 semantic oracle; exit 2 means the compilers were not found",
+        "description": "Check fixtures/references against the pinned TypeScript 7.0.2 semantic oracle and fixtures/navigation against its document symbols; exit 2 means the compilers were not found",
         "pathArgs": "forbid"
       }
     },

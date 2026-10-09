@@ -1,0 +1,191 @@
+{
+  "description": "A module augmentation's name adds no file to the program (`shouldAddFile`): its target is a program input only through another route, and otherwise is missing (TS2664 where reported).",
+  "cases": [
+    {
+      "name": "only-augmented",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"main.ts\"]}",
+        "main.ts": "export {};\ndeclare module \"./b\" { interface X { y: number } }\n",
+        "b.ts": "export interface X { x: number }\n",
+        "use.ts": "import { X } from \"./b\";\nexport let v: X;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2664"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2664 main.ts:2:16"
+        ]
+      }
+    },
+    {
+      "name": "augmented-and-imported",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { X } from \"./b\";\nexport let v: X;\ndeclare module \"./b\" { interface X { y: number } }\n",
+        "b.ts": "export interface X { x: number }\n"
+      },
+      "watch": [
+        "X"
+      ],
+      "native": {
+        "program": [
+          "b.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 X -> Interface|Transient [b.ts:1:1 InterfaceDeclaration, main.ts:3:24 InterfaceDeclaration]",
+          "2:15 X -> Interface|Transient [b.ts:1:1 InterfaceDeclaration, main.ts:3:24 InterfaceDeclaration]",
+          "3:34 X -> Interface|Transient [b.ts:1:1 InterfaceDeclaration, main.ts:3:24 InterfaceDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "augmented-and-root",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"main.ts\",\"b.ts\"]}",
+        "main.ts": "export {};\ndeclare module \"./b\" { interface X { y: number } }\n",
+        "b.ts": "export interface X { x: number }\n"
+      },
+      "native": {
+        "program": [
+          "main.ts",
+          "b.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "augmented-before-imported",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"main.ts\",\"c.ts\"]}",
+        "main.ts": "export {};\ndeclare module \"./b\" { interface X { y: number } }\n",
+        "b.ts": "export interface X { x: number }\n",
+        "c.ts": "import { X } from \"./b\";\nexport let v: X;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts",
+          "b.ts",
+          "c.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "augmented-from-declaration",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"main.d.ts\"]}",
+        "main.d.ts": "export {};\ndeclare module \"./b\" { interface X { y: number } }\n",
+        "b.ts": "export interface X { x: number }\n"
+      },
+      "native": {
+        "program": [
+          "main.d.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "dependency-augments-package",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"main.ts\"]}",
+        "main.ts": "import \"dep\";\ndeclare global { interface Thing { own: number } }\nexport let t: Thing;\n",
+        "node_modules/dep/package.json": "{\"name\": \"dep\", \"types\": \"index.d.ts\"}",
+        "node_modules/dep/index.d.ts": "export {};\ndeclare module \"other\" { interface X { b: number } }\n",
+        "node_modules/other/package.json": "{\"name\": \"other\", \"types\": \"index.d.ts\"}",
+        "node_modules/other/index.d.ts": "export interface X { a: number }\ndeclare global { interface Thing { extra: number } }\n"
+      },
+      "watch": [
+        "Thing"
+      ],
+      "native": {
+        "program": [
+          "node_modules/dep/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "2:28 Thing -> Interface [main.ts:2:18 InterfaceDeclaration]",
+          "3:15 Thing -> Interface [main.ts:2:18 InterfaceDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "dependency-augments-imported-package",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"main.ts\"]}",
+        "main.ts": "import \"other\";\nimport \"dep\";\ndeclare global { interface Thing { own: number } }\nexport let t: Thing;\n",
+        "node_modules/dep/package.json": "{\"name\": \"dep\", \"types\": \"index.d.ts\"}",
+        "node_modules/dep/index.d.ts": "export {};\ndeclare module \"other\" { interface X { b: number } }\n",
+        "node_modules/other/package.json": "{\"name\": \"other\", \"types\": \"index.d.ts\"}",
+        "node_modules/other/index.d.ts": "export interface X { a: number }\ndeclare global { interface Thing { extra: number } }\n"
+      },
+      "watch": [
+        "Thing"
+      ],
+      "native": {
+        "program": [
+          "node_modules/other/index.d.ts (external)",
+          "node_modules/dep/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "3:28 Thing -> Interface|Transient [node_modules/other/index.d.ts:2:18 InterfaceDeclaration, main.ts:3:18 InterfaceDeclaration]",
+          "4:15 Thing -> Interface|Transient [node_modules/other/index.d.ts:2:18 InterfaceDeclaration, main.ts:3:18 InterfaceDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "dependency-augments-package-another-imports",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"main.ts\"]}",
+        "main.ts": "import \"lib\";\nimport \"dep\";\ndeclare global { interface Thing { own: number } }\nexport let t: Thing;\n",
+        "node_modules/dep/package.json": "{\"name\": \"dep\", \"types\": \"index.d.ts\"}",
+        "node_modules/dep/index.d.ts": "export {};\ndeclare module \"other\" { interface X { b: number } }\n",
+        "node_modules/lib/package.json": "{\"name\": \"lib\", \"types\": \"index.d.ts\"}",
+        "node_modules/lib/index.d.ts": "import \"other\";\nexport {};\n",
+        "node_modules/other/package.json": "{\"name\": \"other\", \"types\": \"index.d.ts\"}",
+        "node_modules/other/index.d.ts": "export interface X { a: number }\ndeclare global { interface Thing { extra: number } }\n"
+      },
+      "watch": [
+        "Thing"
+      ],
+      "native": {
+        "program": [
+          "node_modules/other/index.d.ts (external)",
+          "node_modules/lib/index.d.ts (external)",
+          "node_modules/dep/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "3:28 Thing -> Interface|Transient [node_modules/other/index.d.ts:2:18 InterfaceDeclaration, main.ts:3:18 InterfaceDeclaration]",
+          "4:15 Thing -> Interface|Transient [node_modules/other/index.d.ts:2:18 InterfaceDeclaration, main.ts:3:18 InterfaceDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "only-augmented-nocheck",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"main.ts\"]}",
+        "main.ts": "// @ts-nocheck\nexport {};\ndeclare module \"./b\" { interface X { y: number } }\n",
+        "b.ts": "export interface X { x: number }\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,1473 @@
+{
+  "description": "Configuration conversion (`parseOwnConfigOfJsonSourceFile`, `applyExtendedConfig`, `mergeCompilerOptions`, `convertObjectLiteralExpressionToJson`): explicit nulls, empty enumeration strings, list entries, inheritance of root keys and options, and empty property names.",
+  "config": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"main.ts\"]}",
+  "cases": [
+    {
+      "name": "files-null-over-base",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"files\":null}",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "export const a = 1;\n",
+        "b.ts": "export const y = 1;\n"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "a.ts",
+          "b.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": [
+            "./a.ts",
+            "./b.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      }
+    },
+    {
+      "name": "include-null-over-base",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"include\":null}",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"include\":[\"src\"]}",
+        "src/a.ts": "export const a = 1;\n",
+        "other/b.ts": "export const y = 1;\n"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "other/b.ts",
+          "src/a.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": [
+            "./other/b.ts",
+            "./src/a.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      }
+    },
+    {
+      "name": "exclude-null-over-base",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"exclude\":null}",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"exclude\":[\"skip\"]}",
+        "a.ts": "export const a = 1;\n",
+        "skip/c.ts": "export const c = 1;\n"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "a.ts",
+          "skip/c.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": [
+            "./a.ts",
+            "./skip/c.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      }
+    },
+    {
+      "name": "files-null-in-later-base",
+      "files": {
+        "tsconfig.json": "{\"extends\":[\"./one.json\",\"./two.json\"]}",
+        "one.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "two.json": "{\"files\":null}",
+        "a.ts": "export const a = 1;\n",
+        "b.ts": "export const y = 1;\n"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": [
+            "./a.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      }
+    },
+    {
+      "name": "files-null-then-list",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":null,\"files\":[\"a.ts\"]}",
+        "a.ts": "export const a = 1;\n",
+        "b.ts": "export const y = 1;\n"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": [
+            "./a.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      }
+    },
+    {
+      "name": "files-null-entry",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[null,\"a.ts\"]}",
+        "a.ts": "export const a = 1;\n",
+        "b.ts": "export const y = 1;\n"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": [
+            "./a.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      }
+    },
+    {
+      "name": "files-empty-extends-null",
+      "files": {
+        "tsconfig.json": "{\"extends\":null,\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[]}",
+        "a.ts": "export const a = 1;\n"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [],
+        "diagnostics": [
+          "TS5024 tsconfig.json:1:12",
+          "TS18002 tsconfig.json:1:69"
+        ],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": null,
+          "include": null,
+          "exclude": null
+        }
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "TS5024"
+        ]
+      }
+    },
+    {
+      "name": "option-null-no-extends",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"resolveJsonModule\":false,\"resolveJsonModule\":null},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2732 main.ts:1:18"
+        ],
+        "config": {
+          "resolveJsonModule": false,
+          "module": null,
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2732"
+        ]
+      }
+    },
+    {
+      "name": "option-null-with-extends",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"compilerOptions\":{\"resolveJsonModule\":false,\"resolveJsonModule\":null},\"files\":[\"main.ts\"]}",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]}}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      }
+    },
+    {
+      "name": "option-null-extends-null",
+      "files": {
+        "tsconfig.json": "{\"extends\":null,\"compilerOptions\":{\"noLib\":true,\"types\":[],\"resolveJsonModule\":false,\"resolveJsonModule\":null},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS5024 tsconfig.json:1:12"
+        ],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "TS5024"
+        ]
+      }
+    },
+    {
+      "name": "option-null-extends-empty-array",
+      "files": {
+        "tsconfig.json": "{\"extends\":[],\"compilerOptions\":{\"noLib\":true,\"types\":[],\"resolveJsonModule\":false,\"resolveJsonModule\":null},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      }
+    },
+    {
+      "name": "option-null-node16-no-extends",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"node16\",\"resolveJsonModule\":true,\"resolveJsonModule\":null},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "resolveJsonModule": true,
+          "module": "node16",
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      }
+    },
+    {
+      "name": "option-null-split-earlier",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"compilerOptions\":{\"resolveJsonModule\":false,\"resolveJsonModule\":null},\"compilerOptions\":{\"noLib\":true},\"files\":[\"main.ts\"]}",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]}}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2732 main.ts:1:18"
+        ],
+        "config": {
+          "resolveJsonModule": false,
+          "module": null,
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2732"
+        ]
+      }
+    },
+    {
+      "name": "option-null-split-later",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"compilerOptions\":{\"resolveJsonModule\":false},\"compilerOptions\":{\"resolveJsonModule\":null},\"files\":[\"main.ts\"]}",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]}}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      }
+    },
+    {
+      "name": "option-null-split-no-extends",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"resolveJsonModule\":false},\"compilerOptions\":{\"resolveJsonModule\":null},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2732 main.ts:1:18"
+        ],
+        "config": {
+          "resolveJsonModule": false,
+          "module": null,
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2732"
+        ]
+      }
+    },
+    {
+      "name": "option-null-last-compiler-options-null",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"compilerOptions\":{\"resolveJsonModule\":false},\"compilerOptions\":null,\"files\":[\"main.ts\"]}",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]}}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2732 main.ts:1:18"
+        ],
+        "config": {
+          "resolveJsonModule": false,
+          "module": null,
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2732"
+        ]
+      }
+    },
+    {
+      "name": "option-null-over-base-value",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"compilerOptions\":{\"resolveJsonModule\":null},\"files\":[\"main.ts\"]}",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"resolveJsonModule\":false}}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      }
+    },
+    {
+      "name": "option-false-over-base-true",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"compilerOptions\":{\"resolveJsonModule\":false},\"files\":[\"main.ts\"]}",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"resolveJsonModule\":true}}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2732 main.ts:1:18"
+        ],
+        "config": {
+          "resolveJsonModule": false,
+          "module": null,
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2732"
+        ]
+      }
+    },
+    {
+      "name": "option-null-in-later-base",
+      "files": {
+        "tsconfig.json": "{\"extends\":[\"./one.json\",\"./two.json\"],\"files\":[\"main.ts\"]}",
+        "one.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"resolveJsonModule\":false}}",
+        "two.json": "{\"compilerOptions\":{\"resolveJsonModule\":null}}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      }
+    },
+    {
+      "name": "option-null-base-same-file",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"files\":[\"main.ts\"]}",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"resolveJsonModule\":false,\"resolveJsonModule\":null}}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      }
+    },
+    {
+      "name": "option-null-diamond",
+      "files": {
+        "tsconfig.json": "{\"extends\":[\"./a.json\",\"./b.json\"],\"files\":[\"main.ts\"]}",
+        "a.json": "{\"extends\":\"./c.json\",\"compilerOptions\":{\"resolveJsonModule\":false}}",
+        "b.json": "{\"extends\":\"./c.json\"}",
+        "c.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"resolveJsonModule\":null}}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2732 main.ts:1:18"
+        ],
+        "config": {
+          "resolveJsonModule": false,
+          "module": null,
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2732"
+        ]
+      }
+    },
+    {
+      "name": "enum-empty-after-value",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"node16\",\"module\":\"\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2732 main.ts:1:18"
+        ],
+        "config": {
+          "resolveJsonModule": false,
+          "module": "node16",
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2732"
+        ]
+      }
+    },
+    {
+      "name": "enum-empty-over-base",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"compilerOptions\":{\"module\":\"\"},\"files\":[\"main.ts\"]}",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"node16\"}}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2732 main.ts:1:18"
+        ],
+        "config": {
+          "resolveJsonModule": false,
+          "module": "node16",
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2732"
+        ]
+      }
+    },
+    {
+      "name": "enum-null-over-base",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"compilerOptions\":{\"module\":null},\"files\":[\"main.ts\"]}",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"node16\"}}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      }
+    },
+    {
+      "name": "extends-null-after-path",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"extends\":null,\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"main.ts\"]}",
+        "base.json": "{\"compilerOptions\":{\"lib\":[\"es5\"]}}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS5024 tsconfig.json:1:36"
+        ],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "TS5024"
+        ]
+      }
+    },
+    {
+      "name": "extends-path-after-null",
+      "files": {
+        "tsconfig.json": "{\"extends\":null,\"extends\":\"./base.json\",\"files\":[\"main.ts\"]}",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]}}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS5024 tsconfig.json:1:12"
+        ],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "TS5024"
+        ]
+      }
+    },
+    {
+      "name": "types-empty-over-base",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"compilerOptions\":{\"types\":[]},\"files\":[\"a.ts\"]}",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[\"x\"]}}",
+        "node_modules/@types/x/index.d.ts": "declare const fromX: 1;\n",
+        "node_modules/@types/y/index.d.ts": "declare const fromY: 1;\n",
+        "a.ts": "export const a = 1;\n"
+      },
+      "showConfig": [
+        "types",
+        "files"
+      ],
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "types": [],
+          "files": [
+            "./a.ts"
+          ]
+        }
+      }
+    },
+    {
+      "name": "types-null-over-base",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"compilerOptions\":{\"types\":null},\"files\":[\"a.ts\"]}",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[\"x\"]}}",
+        "node_modules/@types/x/index.d.ts": "declare const fromX: 1;\n",
+        "node_modules/@types/y/index.d.ts": "declare const fromY: 1;\n",
+        "a.ts": "export const a = 1;\n"
+      },
+      "showConfig": [
+        "types",
+        "files"
+      ],
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "types": null,
+          "files": [
+            "./a.ts"
+          ]
+        }
+      }
+    },
+    {
+      "name": "types-absent-over-base",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"files\":[\"a.ts\"]}",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[\"x\"]}}",
+        "node_modules/@types/x/index.d.ts": "declare const fromX: 1;\n",
+        "node_modules/@types/y/index.d.ts": "declare const fromY: 1;\n",
+        "a.ts": "export const a = 1;\n"
+      },
+      "showConfig": [
+        "types",
+        "files"
+      ],
+      "native": {
+        "program": [
+          "a.ts",
+          "node_modules/@types/x/index.d.ts (external)"
+        ],
+        "diagnostics": [],
+        "config": {
+          "types": [
+            "x"
+          ],
+          "files": [
+            "./a.ts"
+          ]
+        }
+      }
+    },
+    {
+      "name": "types-empty-entries",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[\"\",\"y\"]},\"files\":[\"a.ts\"]}",
+        "node_modules/@types/x/index.d.ts": "declare const fromX: 1;\n",
+        "node_modules/@types/y/index.d.ts": "declare const fromY: 1;\n",
+        "a.ts": "export const a = 1;\n"
+      },
+      "showConfig": [
+        "types",
+        "files"
+      ],
+      "native": {
+        "program": [
+          "a.ts",
+          "node_modules/@types/y/index.d.ts (external)"
+        ],
+        "diagnostics": [],
+        "config": {
+          "types": [
+            "y"
+          ],
+          "files": [
+            "./a.ts"
+          ]
+        }
+      }
+    },
+    {
+      "name": "types-null-entries",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[null,\"y\"]},\"files\":[\"a.ts\"]}",
+        "node_modules/@types/x/index.d.ts": "declare const fromX: 1;\n",
+        "node_modules/@types/y/index.d.ts": "declare const fromY: 1;\n",
+        "a.ts": "export const a = 1;\n"
+      },
+      "showConfig": [
+        "types",
+        "files"
+      ],
+      "native": {
+        "program": [
+          "a.ts",
+          "node_modules/@types/y/index.d.ts (external)"
+        ],
+        "diagnostics": [],
+        "config": {
+          "types": [
+            "y"
+          ],
+          "files": [
+            "./a.ts"
+          ]
+        }
+      }
+    },
+    {
+      "name": "types-unset",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true},\"files\":[\"a.ts\"]}",
+        "node_modules/@types/x/index.d.ts": "declare const fromX: 1;\n",
+        "node_modules/@types/y/index.d.ts": "declare const fromY: 1;\n",
+        "a.ts": "export const a = 1;\n"
+      },
+      "showConfig": [
+        "types",
+        "files"
+      ],
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "types": null,
+          "files": [
+            "./a.ts"
+          ]
+        }
+      }
+    },
+    {
+      "name": "string-empty-over-base",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"compilerOptions\":{\"jsxImportSource\":\"\"},\"files\":[\"a.tsx\"]}",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"jsx\":\"react-jsx\",\"jsxImportSource\":\"preact\"}}",
+        "node_modules/preact/package.json": "{\"name\":\"preact\"}",
+        "node_modules/preact/jsx-runtime.d.ts": "export {};\n",
+        "node_modules/react/package.json": "{\"name\":\"react\"}",
+        "node_modules/react/jsx-runtime.d.ts": "export {};\n",
+        "a.tsx": "export const a = <div />;\n"
+      },
+      "showConfig": [
+        "jsxImportSource",
+        "jsx"
+      ],
+      "native": {
+        "program": [
+          "node_modules/preact/jsx-runtime.d.ts (external)",
+          "a.tsx"
+        ],
+        "diagnostics": [
+          "TS7026 a.tsx:1:18"
+        ],
+        "config": {
+          "jsxImportSource": "preact",
+          "jsx": "react-jsx"
+        }
+      }
+    },
+    {
+      "name": "string-empty-after-value",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"jsx\":\"react-jsx\",\"jsxImportSource\":\"preact\",\"jsxImportSource\":\"\"},\"files\":[\"a.tsx\"]}",
+        "node_modules/preact/package.json": "{\"name\":\"preact\"}",
+        "node_modules/preact/jsx-runtime.d.ts": "export {};\n",
+        "node_modules/react/package.json": "{\"name\":\"react\"}",
+        "node_modules/react/jsx-runtime.d.ts": "export {};\n",
+        "a.tsx": "export const a = <div />;\n"
+      },
+      "showConfig": [
+        "jsxImportSource",
+        "jsx"
+      ],
+      "native": {
+        "program": [
+          "node_modules/react/jsx-runtime.d.ts (external)",
+          "a.tsx"
+        ],
+        "diagnostics": [
+          "TS7026 a.tsx:1:18"
+        ],
+        "config": {
+          "jsxImportSource": null,
+          "jsx": "react-jsx"
+        }
+      }
+    },
+    {
+      "name": "empty-path-key",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"paths\":{\"\": [\"./dep.ts\"]}},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { x } from \"\";\nexport const marker = x;\n",
+        "dep.ts": "export const x = 1;\n"
+      },
+      "showConfig": [
+        "paths"
+      ],
+      "watch": [
+        "x"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:1:19"
+        ],
+        "names": [
+          "1:10 x -> none",
+          "2:23 x -> none"
+        ],
+        "config": {
+          "paths": {}
+        }
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      }
+    },
+    {
+      "name": "empty-path-key-invalid-value",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"paths\":{\"\": 1}},\"files\":[\"main.ts\"]}",
+        "main.ts": "export const marker = 1;\n"
+      },
+      "showConfig": [
+        "paths"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "paths": {}
+        }
+      }
+    },
+    {
+      "name": "empty-path-key-beside-pattern",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"paths\":{\"\": 1, \"@x\": [\"./dep.ts\"]}},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { x } from \"@x\";\nexport const marker = x;\n",
+        "dep.ts": "export const x = 1;\n"
+      },
+      "showConfig": [
+        "paths"
+      ],
+      "watch": [
+        "x"
+      ],
+      "native": {
+        "program": [
+          "dep.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 x -> BlockScopedVariable [dep.ts:1:14 VariableDeclaration]",
+          "2:23 x -> BlockScopedVariable [dep.ts:1:14 VariableDeclaration]"
+        ],
+        "config": {
+          "paths": {
+            "@x": [
+              "./dep.ts"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "empty-specifier-star-path",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"paths\":{\"*\": [\"./dep.ts\"]}},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { x } from \"\";\nexport const marker = x;\n",
+        "dep.ts": "export const x = 1;\n"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "watch": [
+        "x"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 main.ts:1:19"
+        ],
+        "names": [
+          "1:10 x -> none",
+          "2:23 x -> none"
+        ],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      }
+    },
+    {
+      "name": "empty-compiler-option-key",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"\": 1},\"\": 2,\"files\":[\"main.ts\"]}",
+        "main.ts": "export const marker = 1;\n"
+      },
+      "showConfig": [
+        "resolveJsonModule",
+        "module",
+        "files",
+        "include",
+        "exclude"
+      ],
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "resolveJsonModule": null,
+          "module": null,
+          "files": [
+            "./main.ts"
+          ],
+          "include": null,
+          "exclude": null
+        }
+      }
+    },
+    {
+      "name": "list-null-after-value",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[\"x\"],\"types\":null},\"files\":[\"a.ts\"]}",
+        "node_modules/@types/x/index.d.ts": "declare const fromX: 1;\n",
+        "node_modules/@types/y/index.d.ts": "declare const fromY: 1;\n",
+        "a.ts": "export const a = 1;\n"
+      },
+      "showConfig": [
+        "types",
+        "files"
+      ],
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "types": null,
+          "files": [
+            "./a.ts"
+          ]
+        }
+      }
+    },
+    {
+      "name": "list-null-split",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[\"x\"]},\"compilerOptions\":{\"types\":null},\"files\":[\"a.ts\"]}",
+        "node_modules/@types/x/index.d.ts": "declare const fromX: 1;\n",
+        "node_modules/@types/y/index.d.ts": "declare const fromY: 1;\n",
+        "a.ts": "export const a = 1;\n"
+      },
+      "showConfig": [
+        "types",
+        "files"
+      ],
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "types": null,
+          "files": [
+            "./a.ts"
+          ]
+        }
+      }
+    },
+    {
+      "name": "list-null-after-lib",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"lib\":[\"es5\"],\"lib\":null},\"files\":[\"a.ts\"]}",
+        "a.ts": "export const a = 1;\n"
+      },
+      "showConfig": [
+        "lib",
+        "noLib"
+      ],
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "lib": null,
+          "noLib": true
+        }
+      }
+    },
+    {
+      "name": "string-null-after-value",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"jsx\":\"react-jsx\",\"jsxImportSource\":\"preact\",\"jsxImportSource\":null},\"files\":[\"a.tsx\"]}",
+        "node_modules/preact/package.json": "{\"name\":\"preact\"}",
+        "node_modules/preact/jsx-runtime.d.ts": "export {};\n",
+        "node_modules/react/package.json": "{\"name\":\"react\"}",
+        "node_modules/react/jsx-runtime.d.ts": "export {};\n",
+        "a.tsx": "export const a = <div />;\n"
+      },
+      "showConfig": [
+        "jsxImportSource",
+        "jsx"
+      ],
+      "native": {
+        "program": [
+          "node_modules/preact/jsx-runtime.d.ts (external)",
+          "a.tsx"
+        ],
+        "diagnostics": [
+          "TS7026 a.tsx:1:18"
+        ],
+        "config": {
+          "jsxImportSource": "preact",
+          "jsx": "react-jsx"
+        }
+      }
+    },
+    {
+      "name": "paths-null-after-value",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"paths\":{\"@x\":[\"./dep.ts\"]},\"paths\":null},\"files\":[\"main.ts\"]}",
+        "main.ts": "import { x } from \"@x\";\nexport const marker = x;\n",
+        "dep.ts": "export const x = 1;\n"
+      },
+      "watch": [
+        "x"
+      ],
+      "showConfig": [
+        "paths"
+      ],
+      "native": {
+        "program": [
+          "dep.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 x -> BlockScopedVariable [dep.ts:1:14 VariableDeclaration]",
+          "2:23 x -> BlockScopedVariable [dep.ts:1:14 VariableDeclaration]"
+        ],
+        "config": {
+          "paths": {
+            "@x": [
+              "./dep.ts"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "list-null-over-base-same-file",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"files\":[\"a.ts\"]}",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[\"x\"],\"types\":null}}",
+        "node_modules/@types/x/index.d.ts": "declare const fromX: 1;\n",
+        "node_modules/@types/y/index.d.ts": "declare const fromY: 1;\n",
+        "a.ts": "export const a = 1;\n"
+      },
+      "showConfig": [
+        "types",
+        "files"
+      ],
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "types": null,
+          "files": [
+            "./a.ts"
+          ]
+        }
+      }
+    },
+    {
+      "name": "option-null-with-extends-empty-array-split",
+      "files": {
+        "tsconfig.json": "{\"extends\":[],\"compilerOptions\":{\"noLib\":true,\"types\":[],\"resolveJsonModule\":false},\"compilerOptions\":{\"resolveJsonModule\":null},\"files\":[\"main.ts\"]}",
+        "main.ts": "import data from \"./data.json\";\nexport const marker = data;\n",
+        "data.json": "{\"a\":1}"
+      },
+      "showConfig": [
+        "resolveJsonModule"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "config": {
+          "resolveJsonModule": null
+        }
+      }
+    }
+  ]
+}

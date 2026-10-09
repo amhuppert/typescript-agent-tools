@@ -1,9 +1,13 @@
 # Persistent reference service
 
+The service began with reference queries; it now answers every project query
+(references, and outline and show with `--project`) through the same session
+request boundary. Its administration keeps the `--references-*` flags.
+
 ## Intent and operating envelope
 
-Repeated `tsparse --references` invocations should reuse a completed reference
-index across agent processes. Callers are local processes of the same user,
+Repeated `tsparse --references` invocations, and project outline and show,
+should reuse a completed project snapshot across agent processes. Callers are local processes of the same user,
 including concurrent agents, over editable files on disk. Each worktree and
 selected configuration must remain isolated. The initial service targets Unix
 (macOS and Linux); other platforms retain direct reference loading. There is no
@@ -19,7 +23,7 @@ complete rebuild. Neither IPC latency nor freshness checking is free.
 
 Saving and restoring the frozen index on every invocation would preserve the
 one-process lifecycle, but repeatedly allocates and reconstructs a large object.
-A resident process can use the existing immutable `ReferenceProject` directly.
+A resident process can use the existing immutable `Project` directly.
 Choose a resident process first; measure restart frequency before adding a disk
 format. A single global multiplexing server would need project eviction,
 multi-project scheduling, and routing. One service per selected configuration
@@ -32,10 +36,15 @@ current owners. The observer knows filesystem operations, not TypeScript rules.
 
 ## Public behavior
 
-Ordinary reference commands connect to the service, starting it when necessary.
-Each completed request performs freshness validation before answering. Query
-JSON, diagnostics, output files, and exit classes retain their CLI contracts.
-The client makes query paths absolute against its own working directory.
+Ordinary project queries connect to the service, starting it when necessary.
+Each completed request performs freshness validation before answering,
+whichever operation it is. Query JSON, diagnostics, output files, and exit
+classes retain their CLI contracts: one CLI delivery policy renders an answer
+the same way whether the service or a direct load produced it. Before
+either entry answers, the client makes the request's file operand absolute
+against its own working directory, through the one method that knows which
+operand each operation has (`ProjectRequest::make_absolute`), and restores
+the caller's spelling in diagnostics that name that path.
 
 `--references-status --project CONFIG` reports whether a service is running and,
 when it is, its PID and successful index generation. It does not start or load a
@@ -52,20 +61,26 @@ they must never accidentally reuse each other's captured lookup aliases.
 
 ## Owners
 
-* `references::project::disk`: filesystem operations and their observations:
+* `project::program::disk`: filesystem operations and their observations:
   exact text/bytes read, directory names, entry kinds (including absence), and
   canonicalization results (including absence). Share captured source text with
   `SourceText` rather than retaining another copy. Validation repeats these
   operations and compares their results; source identity does not depend on size
   or modification time. I/O failures remain failures.
-* `references::ReferenceSession`: one project's current generation. Its query
-  operation validates, loads when necessary, and answers from a complete
-  immutable `ReferenceProject`. Callers do not orchestrate refresh steps. The
-  existing `ReferenceProject` API retains its explicitly captured-snapshot
-  semantics and does not acquire hidden refresh behavior.
+* `project::ProjectSession`: one project's current generation. Its one
+  request operation (`execute(ProjectRequest)`) validates, loads when
+  necessary, and answers any operation from a complete immutable `Project`.
+  Callers do not orchestrate refresh steps. The service and the CLI's direct
+  queries both answer through it. The existing `Project` API retains its
+  explicitly captured-snapshot semantics and does not acquire hidden refresh
+  behavior.
 * Binary-private `service`: rendezvous, exclusive process ownership, private
-  socket protocol, startup, idle shutdown, and administrative operations.
-* `main`: CLI arguments, exit-code policy, diagnostics, and output formatting.
+  socket protocol, startup, idle shutdown, and administrative operations. The
+  wire carries `ProjectRequest` and `Result<ProjectResponse, AnalysisError>`
+  unchanged, so a new operation needs no protocol work.
+* `cli`: one parsed-request boundary (`cli::request`), execution in file,
+  direct, or service entry (`cli::query`), and one delivery policy for every
+  outcome's channels and exit code (`cli::delivery`).
 
 ## Freshness and failure contract
 
@@ -107,7 +122,12 @@ releases the lock automatically. Simultaneous launch attempts are harmless.
 
 The client starts the current executable with null standard streams; the service
 owns its own lifetime and exits after an idle period (default ten minutes).
-An inherited shell pipe must not keep CLI output collection open. Foreground
+An inherited shell pipe must not keep CLI output collection open, so the
+service also closes every descriptor it inherited beyond the standard streams
+before opening its own: a client can inherit a pipe its parent did not mean to
+pass (std on macOS creates a pipe and marks it close-on-exec in two steps, so
+a concurrent spawn can inherit it), and a service holding it would keep that
+parent's output collection open until the service exits. Foreground
 mode supports external supervisors. Administrative stop and test teardown must
 wait for process ownership to be released. Runtime permission failures and
 unexpected startup failures are reported, not silently converted to direct
@@ -188,3 +208,35 @@ The service retained about 662 MiB RSS. This keeps the lifecycle and observation
 boundaries justified on the real corpus, while exposing the remaining costs of
 full freshness validation and full post-edit rebuilds. The unchanged Command
 Center config still hits the known library, JSON, and TipTap compatibility limits.
+
+## Navigation checkpoint
+
+Project outline and show joined references on the same wire request and
+response enums and the same session boundary; no navigation-specific refresh,
+cache, or daemon exists. Tests run outline, show, and references through
+direct and service entry on identical inputs and require identical bytes and
+exit codes, including failures; clients in other working directories, with
+relative and absolute operands, share one generation; concurrent cold clients
+of all three operations share one build; and source, configuration,
+dependency, and library-replacement edits each publish one new generation to
+whichever operation asks first, while a failed reload answers no operation
+until the input is repaired.
+
+A concurrency test that had failed intermittently under load
+(`concurrent_cold_clients_share_one_build` reporting generation 0) had a
+cause other than timing: a client spawned concurrently with another inherited
+that client's output pipe, passed it to the service it started, and the test
+waited for end of file until the service's idle exit, after which status found
+no service. A regression test now passes the service an inherited pipe and
+requires end of file once the client exits; the service closes inherited
+descriptors at startup.
+
+On unchanged Command Center (revision `7706073d`, its own `tsconfig.json`,
+release build, a machine shared with another build), the first project query,
+an outline through a newly started service, answered in 13.9 seconds; warm
+outline, qualified show, ambiguous show (460 candidates), a candidate's
+`--at` round trip from another working directory, and a reference name query
+each answered in 0.46–0.70 seconds, including validation of every captured
+input. Direct loads took 11.6–11.9 seconds each, and their outline, ambiguous
+show, and reference outputs were byte-identical to the service's. The service
+retained about 680 MiB RSS at generation 1.

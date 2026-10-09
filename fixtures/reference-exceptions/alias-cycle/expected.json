@@ -1,0 +1,182 @@
+{
+  "difference": "When the export an augmentation names is an alias in a cycle (TS2303), the augmentation's declaration replaces it here, and the cycle's aliases and their importers resolve to it; TypeScript leaves them unresolved.",
+  "queries": [
+    {
+      "at": "a.ts:1:10",
+      "typescript": "unresolved",
+      "tool": [
+        {
+          "declarations": [
+            "aug.ts:3:13"
+          ],
+          "occurrences": [
+            "a.ts:1:10",
+            "aug.ts:3:13",
+            "b.ts:1:10",
+            "use.ts:1:15",
+            "use.ts:2:15",
+            "use.ts:2:20",
+            "use.ts:3:25",
+            "use.ts:4:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "b.ts:1:10",
+      "typescript": "unresolved",
+      "tool": [
+        {
+          "declarations": [
+            "aug.ts:3:13"
+          ],
+          "occurrences": [
+            "a.ts:1:10",
+            "aug.ts:3:13",
+            "b.ts:1:10",
+            "use.ts:1:15",
+            "use.ts:2:15",
+            "use.ts:2:20",
+            "use.ts:3:25",
+            "use.ts:4:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "use.ts:1:15",
+      "typescript": "unresolved",
+      "tool": [
+        {
+          "declarations": [
+            "aug.ts:3:13"
+          ],
+          "occurrences": [
+            "a.ts:1:10",
+            "aug.ts:3:13",
+            "b.ts:1:10",
+            "use.ts:1:15",
+            "use.ts:2:15",
+            "use.ts:2:20",
+            "use.ts:3:25",
+            "use.ts:4:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "use.ts:2:15",
+      "typescript": "unresolved",
+      "tool": [
+        {
+          "declarations": [
+            "aug.ts:3:13"
+          ],
+          "occurrences": [
+            "a.ts:1:10",
+            "aug.ts:3:13",
+            "b.ts:1:10",
+            "use.ts:1:15",
+            "use.ts:2:15",
+            "use.ts:2:20",
+            "use.ts:3:25",
+            "use.ts:4:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "use.ts:2:20",
+      "typescript": "unresolved",
+      "tool": [
+        {
+          "declarations": [
+            "aug.ts:3:13"
+          ],
+          "occurrences": [
+            "a.ts:1:10",
+            "aug.ts:3:13",
+            "b.ts:1:10",
+            "use.ts:1:15",
+            "use.ts:2:15",
+            "use.ts:2:20",
+            "use.ts:3:25",
+            "use.ts:4:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "use.ts:3:25",
+      "typescript": "unresolved",
+      "tool": [
+        {
+          "declarations": [
+            "aug.ts:3:13"
+          ],
+          "occurrences": [
+            "a.ts:1:10",
+            "aug.ts:3:13",
+            "b.ts:1:10",
+            "use.ts:1:15",
+            "use.ts:2:15",
+            "use.ts:2:20",
+            "use.ts:3:25",
+            "use.ts:4:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "use.ts:4:25",
+      "typescript": "unresolved",
+      "tool": [
+        {
+          "declarations": [
+            "aug.ts:3:13"
+          ],
+          "occurrences": [
+            "a.ts:1:10",
+            "aug.ts:3:13",
+            "b.ts:1:10",
+            "use.ts:1:15",
+            "use.ts:2:15",
+            "use.ts:2:20",
+            "use.ts:3:25",
+            "use.ts:4:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "aug.ts:3:13",
+      "typescript": [
+        {
+          "declarations": [
+            "aug.ts:3:13"
+          ],
+          "occurrences": [
+            "aug.ts:3:13"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "aug.ts:3:13"
+          ],
+          "occurrences": [
+            "a.ts:1:10",
+            "aug.ts:3:13",
+            "b.ts:1:10",
+            "use.ts:1:15",
+            "use.ts:2:15",
+            "use.ts:2:20",
+            "use.ts:3:25",
+            "use.ts:4:25"
+          ]
+        }
+      ]
+    }
+  ]
+}

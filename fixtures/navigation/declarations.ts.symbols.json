@@ -1,0 +1,44 @@
+{
+  "compiler": "7.0.2",
+  "symbols": [
+    {"name": "Alias", "kind": 5, "range": "2:1-2:50", "selection": "2:13-2:18", "children": []},
+    {"name": "Union", "kind": 5, "range": "3:1-3:24", "selection": "3:6-3:11", "children": []},
+    {"name": "Color", "kind": 10, "range": "5:1-9:2", "selection": "5:19-5:24", "children": [
+      {"name": "Red", "kind": 22, "range": "6:3-6:6", "selection": "6:3-6:6", "children": []},
+      {"name": "Green", "kind": 22, "range": "7:3-7:12", "selection": "7:3-7:8", "children": []},
+      {"name": "\"Light-Blue\"", "kind": 22, "range": "8:3-8:19", "selection": "8:3-8:15", "children": []}
+    ]},
+    {"name": "Merged", "kind": 11, "range": "11:1-11:35", "selection": "11:11-11:17", "children": [
+      {"name": "first", "kind": 7, "range": "11:20-11:33", "selection": "11:20-11:25", "children": []}
+    ]},
+    {"name": "Merged", "kind": 11, "range": "12:1-12:36", "selection": "12:11-12:17", "children": [
+      {"name": "second", "kind": 7, "range": "12:20-12:34", "selection": "12:20-12:26", "children": []}
+    ]},
+    {"name": "NS", "kind": 3, "range": "14:1-16:2", "selection": "14:11-14:13", "children": [
+      {"name": "value", "kind": 13, "range": "15:16-15:25", "selection": "15:16-15:21", "children": []},
+      {"name": "helper", "kind": 12, "range": "18:3-18:30", "selection": "18:19-18:25", "children": []}
+    ]},
+    {"name": "A.B.C", "kind": 3, "range": "21:1-26:2", "selection": "21:18-21:23", "children": [
+      {"name": "deep", "kind": 13, "range": "22:16-22:24", "selection": "22:16-22:20", "children": []},
+      {"name": "Inner", "kind": 3, "range": "23:3-25:4", "selection": "23:13-23:18", "children": [
+        {"name": "T", "kind": 5, "range": "24:5-24:28", "selection": "24:17-24:18", "children": []}
+      ]}
+    ]},
+    {"name": "Both", "kind": 5, "range": "28:1-28:14", "selection": "28:7-28:11", "children": []},
+    {"name": "Both", "kind": 3, "range": "29:1-31:2", "selection": "29:11-29:15", "children": [
+      {"name": "extra", "kind": 13, "range": "30:16-30:25", "selection": "30:16-30:21", "children": []}
+    ]},
+    {"name": "fnNs", "kind": 12, "range": "33:1-33:19", "selection": "33:10-33:14", "children": []},
+    {"name": "fnNs", "kind": 3, "range": "34:1-36:2", "selection": "34:11-34:15", "children": [
+      {"name": "attached", "kind": 13, "range": "35:16-35:28", "selection": "35:16-35:24", "children": []}
+    ]},
+    {"name": "\"ambient-mod\"", "kind": 3, "range": "38:1-40:2", "selection": "38:16-38:29", "children": [
+      {"name": "ambient", "kind": 12, "range": "39:3-39:35", "selection": "39:19-39:26", "children": []}
+    ]},
+    {"name": "global", "kind": 3, "range": "42:1-46:2", "selection": "42:9-42:15", "children": [
+      {"name": "Window", "kind": 11, "range": "43:3-45:4", "selection": "43:13-43:19", "children": [
+        {"name": "navigation", "kind": 7, "range": "44:5-44:24", "selection": "44:5-44:15", "children": []}
+      ]}
+    ]}
+  ]
+}

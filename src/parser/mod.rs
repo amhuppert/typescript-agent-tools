@@ -15,6 +15,7 @@ macro_rules! fields {
 mod angles;
 mod context;
 mod expressions;
+pub(crate) mod json;
 mod jsx;
 mod literals;
 mod statements;
@@ -26,6 +27,17 @@ use context::{
 };
 
 type Result<T> = std::result::Result<T, Diagnostic>;
+
+/// The message of the one diagnostic that reports an exhausted grammar
+/// budget rather than invalid syntax (`exhaustion`).
+const DEPTH_EXCEEDED: &str = "Maximum syntax nesting depth exceeded";
+
+/// Whether a parse failed because input exceeded the grammar budget
+/// (`ParseOptions::max_depth`), a resource limit, rather than because it is
+/// not valid syntax.
+pub(crate) fn exhaustion(diagnostic: &Diagnostic) -> bool {
+    diagnostic.message == DEPTH_EXCEEDED
+}
 
 /// Recovery is used only to decide whether malformed expression type arguments
 /// commit to type syntax. The first diagnostic survives within that probe.
@@ -210,25 +222,35 @@ impl<'src> Parser<'src> {
     fn validate_pragmas(&self) -> Result<()> {
         let leading = &self.lexer.src[..self.current.start];
         for reference in crate::pragmas::references(leading) {
-            let attribute = |name| reference.attribute(name).map(|(value, _)| value);
-            let error = if attribute("no-default-lib") == Some("true") {
-                None
-            } else if attribute("types").is_some() {
-                match attribute("resolution-mode") {
-                    Some(mode) if mode != "require" && mode != "import" => {
-                        Some("'resolution-mode' must be 'require' or 'import'")
-                    }
-                    _ => None,
+            use crate::pragmas::{Directive, TypesMode};
+            // TypeScript's `processPragmasIntoFields` reports an invalid
+            // `resolution-mode` at its value (`parseResolutionMode`) and any
+            // other invalid directive at the whole comment.
+            let error = match reference.directive() {
+                Directive::Types(_, _, TypesMode::Invalid) => {
+                    let (value, start) = reference
+                        .attribute("resolution-mode")
+                        .expect("an invalid mode is written");
+                    Some((
+                        "'resolution-mode' must be 'require' or 'import'",
+                        Span {
+                            start,
+                            end: start + value.len(),
+                        },
+                    ))
                 }
-            } else if attribute("lib").is_some() || attribute("path").is_some() {
-                None
-            } else {
-                Some("Invalid 'reference' directive syntax")
+                Directive::Invalid => {
+                    Some(("Invalid 'reference' directive syntax", reference.span()))
+                }
+                Directive::Ignored
+                | Directive::Types(..)
+                | Directive::Lib(..)
+                | Directive::Path(..) => None,
             };
-            if let Some(message) = error {
+            if let Some((message, span)) = error {
                 return Err(Diagnostic {
                     message: message.into(),
-                    span: reference.span(),
+                    span,
                 });
             }
         }
@@ -506,7 +528,7 @@ impl<'src> Parser<'src> {
     /// helpers fail with the same diagnostic, and `parse` returns it.
     fn nest<T>(&mut self, f: impl FnOnce(&mut Self) -> Result<T>) -> Result<T> {
         if self.exhausted.is_none() && self.depth >= self.options.max_depth {
-            self.exhausted = Some(self.error("Maximum syntax nesting depth exceeded"));
+            self.exhausted = Some(self.error(DEPTH_EXCEEDED));
         }
         self.check_budget()?;
         self.depth += 1;
@@ -910,41 +932,43 @@ impl<'src> Parser<'src> {
             }
         }
     }
-    /// Whether a JSDoc comment in the current token's leading trivia carries
-    /// `@deprecated`. TypeScript collects a leading comment only at the start
-    /// of the file (after a `#!` line), for trailing trivia, or after a CR or
-    /// LF in the trivia: `iterateCommentRanges` switches collection on for
-    /// those characters alone, so U+2028 and U+2029 do not, unlike every other
-    /// line-break rule (`lexer::line_break`).
-    fn deprecated_trivia(&self, include_trailing: bool) -> bool {
-        let src = self.lexer.src;
-        let trivia = &src[..self.current.start];
-        let from = self.current.full_start.max(crate::lexer::shebang_end(src));
-        if from >= trivia.len() || !trivia[from..].contains("/**") {
-            return false;
+    /// Where the JSDoc of a node starting at the current token is
+    /// collected: the trivia before it.
+    fn jsdoc_site(&self) -> JsdocSite {
+        JsdocSite {
+            full_start: self.current.full_start,
+            start: self.current.start,
         }
-        let mut collecting = self.current.full_start == 0 || include_trailing;
-        for comment in crate::lexer::comments(trivia, from) {
-            collecting |= comment.space_before.contains(['\r', '\n']);
-            let Some(body) = comment
-                .text
-                .strip_prefix("/*")
-                .and_then(|text| text.strip_suffix("*/"))
-            else {
-                continue;
-            };
-            if collecting
-                && body.starts_with('*')
-                && body
+    }
+    /// Mark `id`, which starts at `site`, deprecated when a JSDoc comment it
+    /// collects carries `@deprecated`: `crate::lexer::jsdoc_comments`, with
+    /// the trailing comments `crate::syntax::trailing_jsdoc` gives its kind.
+    fn mark_deprecated(&mut self, site: JsdocSite, id: NodeId) {
+        let src = self.lexer.src;
+        let from = site.full_start.max(crate::lexer::shebang_end(src));
+        if from >= site.start || !src[from..site.start].contains("/**") {
+            return;
+        }
+        let trailing = crate::syntax::trailing_jsdoc(self.nodes[id.0].syntax_kind);
+        let deprecated = crate::lexer::jsdoc_comments(src, site.full_start, site.start, trailing)
+            .any(|comment| {
+                comment
+                    .text
                     .split("@deprecated")
                     .skip(1)
                     .any(|tail| !tail.starts_with(crate::lexer::id_continue))
-            {
-                return true;
-            }
+            });
+        if deprecated {
+            self.nodes[id.0].flags |= node_flags::DEPRECATED;
         }
-        false
     }
+}
+
+/// The trivia before a node's first token (`Parser::jsdoc_site`).
+#[derive(Clone, Copy)]
+struct JsdocSite {
+    full_start: usize,
+    start: usize,
 }
 
 fn decode_identifier(raw: &str) -> std::result::Result<std::borrow::Cow<'_, str>, String> {

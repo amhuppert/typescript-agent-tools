@@ -2,13 +2,15 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { isDeepStrictEqual } from 'node:util';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import {
   normalizeOracle, clusterDeclarations, classifySymbol, merges, lineStarts, position, loadSemanticApi, semanticCompilerVersion,
-  SemanticSession, resultGroups,
+  SemanticSession, resultGroups, vendoredLibrary,
 } from './semantic-oracle.mjs';
+import { VENDORED } from './vendor-typescript-libs.mjs';
 import {
   parseMarkers, collectMarkers, checkMarkers, compareResponse, compareGroups, runBatch, nameQueries, compareNameResponse,
 } from './semantic-conformance.mjs';
@@ -18,6 +20,7 @@ const oracleUnavailable = (!process.env.TYPE_SCRIPT_SEMANTIC_API || !process.env
   && 'TYPE_SCRIPT_SEMANTIC_API and TYPE_SCRIPT_NATIVE are not both set';
 const conformance = fileURLToPath(new URL('./semantic-conformance.mjs', import.meta.url));
 const fixtures = fileURLToPath(new URL('../fixtures/references/', import.meta.url));
+const exceptions = fileURLToPath(new URL('../fixtures/reference-exceptions/', import.meta.url));
 
 function temporary(t) {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'tsparse-semantic-'));
@@ -66,7 +69,7 @@ test('clusters split same-named declarations by validity and carry their meaning
   assert.deepEqual(clusters({ flags: [], declarations: [at1('interface', 1), at1('namespace', 2), at1('class', 3)] }), [['interface+namespace+class', 7]]);
 });
 
-test('symbol classification separates members, library targets, and unresolved placeholders', () => {
+test('symbol classification separates members and unresolved placeholders from declared targets', () => {
   const symbol = (flags, declarations, extra = {}) => ({ name: 'x', flags, declarations, ...extra });
   const lexical = declaration('x', 'const', 'a.ts', 1, 1);
   assert.equal(classifySymbol(null), 'none');
@@ -78,7 +81,8 @@ test('symbol classification separates members, library targets, and unresolved p
   assert.equal(classifySymbol(symbol(['Property', 'Transient'], [], { special: 'unknown' })), 'none');
   assert.equal(classifySymbol(symbol(['TypeAlias', 'Transient'], [])), 'none');
   assert.equal(classifySymbol({ name: 'globalThis', flags: ['ValueModule'], declarations: [] }), 'member');
-  assert.equal(classifySymbol(symbol(['Interface'], [{ ...lexical, category: 'interface', defaultLibrary: true }])), 'library');
+  // A standard library declares targets like any other file.
+  assert.equal(classifySymbol(symbol(['Interface'], [{ ...lexical, category: 'interface', defaultLibrary: true }])), 'symbol');
   assert.equal(classifySymbol(symbol(['Interface'], [{ ...lexical, category: 'interface', defaultLibrary: true }, lexical])), 'symbol');
   // `export default <expression>` and `export = <expression>` are Property symbols in TypeScript.
   assert.equal(classifySymbol(symbol(['Property'], [declaration('default', 'export', 'a.ts', 1, 8)])), 'symbol');
@@ -161,14 +165,16 @@ test('non-reference syntax expects UnsupportedTarget; other unresolved tokens ex
     token('process', 'a.ts', 8, 1, 2, ['value'], { syntax: 'property' }),
   ]));
   assert.deepEqual(oracle.tokens.map(t => [t.classification, t.outcome]), [['none', 'unsupported'], ['none', 'unsupported'],
-    ['none', 'unsupported'], ['none', 'unsupported'], ['none', 'unresolved'], ['library', 'unresolved'], ['symbol', 'unsupported'],
+    ['none', 'unsupported'], ['none', 'unsupported'], ['none', 'unresolved'], ['symbol', 'groups'], ['symbol', 'unsupported'],
     ['symbol', 'unsupported'], ['symbol', 'groups']]);
   assert.match(oracle.tokens[7].note, /non-reference name to `process`/);
-  assert.deepEqual(oracle.groups.map(g => g.occurrences.map(o => o.name)), [['process']]);
+  // A library-declared target has a real group with its library declaration.
+  assert.deepEqual(oracle.groups.map(g => [g.declarations.map(d => d.location.file), g.occurrences.map(o => o.name)]),
+    [[['lib.d.ts'], ['Array']], [['node.d.ts'], ['process']]]);
   assert.deepEqual(oracle.anomalies, []);
   // Only departures from what TypeScript resolves are normalizations.
   assert.deepEqual(oracle.tokens.map(t => t.normalization), [undefined, undefined, 'unresolvedProperty', undefined, undefined,
-    'libraryOnly', 'nonReference:globalAugmentation', 'nonReference:propertyName', undefined]);
+    undefined, 'nonReference:globalAugmentation', 'nonReference:propertyName', undefined]);
 });
 
 test('missing namespace exports and value uses of type-only aliases expect UnresolvedTarget', () => {
@@ -331,6 +337,16 @@ test('tool comparison classifies every difference without discarding locations',
   assert.deepEqual(compareGroups([typeBox, valueBox], [valueBox, typeBox]), []);
   assert.deepEqual(compareGroups([typeBox, valueBox], [{ declarations: [...typeBox.declarations, ...valueBox.declarations],
     occurrences: [typeBox.occurrences[0], valueBox.occurrences[0], shared] }]).map(d => d.kind).sort(), ['extra-declaration', 'extra-declaration', 'merged-groups']);
+  // A one-way merge, such as a pattern ambient module augmented for one
+  // specifier, lists the pattern's declaration in both groups; sharing it does
+  // not make the groups split or merged either.
+  const pattern = { name: 'Styles', location: at('css.d.ts', 2, 13, 6) };
+  const plain = { declarations: [pattern], occurrences: [{ name: 'Styles', location: at('y.ts', 1, 15, 6) }] };
+  const augmented = { declarations: [pattern, { name: 'Styles', location: at('x.ts', 3, 13, 6) }],
+    occurrences: [{ name: 'Styles', location: at('x.ts', 1, 15, 6) }, { name: 'Styles', location: at('x.ts', 3, 13, 6) }] };
+  assert.deepEqual(compareGroups([augmented, plain], [plain, augmented]), []);
+  assert.deepEqual(compareGroups([augmented, plain], [{ declarations: augmented.declarations,
+    occurrences: [...augmented.occurrences, ...plain.occurrences] }]).map(d => d.kind).sort(), ['extra-declaration', 'merged-groups']);
   const many = { declarations: group(0).declarations, occurrences: Array.from({ length: 30 }, (_, line) => ({ name: 'run', location: at('b.ts', line + 1, 1, 3) })) };
   const [difference] = compareGroups([many], [{ declarations: group(0).declarations, occurrences: [] }]);
   assert.equal(difference.kind, 'missing-occurrence');
@@ -470,6 +486,38 @@ test('real oracle: positions, aliases, shadowing, and markers agree on a fixture
     ['api.ts:2:run', 'api.ts:3:copy', 'app.ts:2:start', 'app.ts:4:local', 'app.ts:4:start', 'barrel.ts:1:execute']);
 });
 
+test('compiler library files are located at their vendored copies, by file name only', t => {
+  const directory = temporary(t);
+  const compiler = path.join(directory, 'compiler');
+  const vendored = path.join(directory, 'vendored');
+  for (const dir of [compiler, vendored, path.join(directory, 'other')]) fs.mkdirSync(dir);
+  for (const file of [path.join(compiler, 'lib.es5.d.ts'), path.join(vendored, 'lib.es5.d.ts'), path.join(compiler, 'lib.extra.d.ts'),
+    path.join(directory, 'other', 'lib.es5.d.ts')]) fs.writeFileSync(file, '');
+  const real = fs.realpathSync(compiler);
+  assert.equal(vendoredLibrary(path.join(compiler, 'lib.es5.d.ts'), real, vendored), path.join(vendored, 'lib.es5.d.ts'));
+  // A replacement package's library keeps its own path.
+  assert.equal(vendoredLibrary(path.join(directory, 'other', 'lib.es5.d.ts'), real, vendored), undefined);
+  assert.throws(() => vendoredLibrary(path.join(compiler, 'lib.extra.d.ts'), real, vendored), /no vendored copy/);
+});
+
+test('real oracle: library targets have groups whose library declarations are vendored', { skip: oracleUnavailable }, async t => {
+  const session = new SemanticSession(await loadSemanticApi());
+  t.after(() => session.close());
+  const directory = temporary(t);
+  fs.writeFileSync(path.join(directory, 'tsconfig.json'), '{ "compilerOptions": { "lib": ["es2015.promise", "es5"] } }');
+  fs.writeFileSync(path.join(directory, 'a.ts'), 'const p: Promise<number> = Promise.resolve(1);\n');
+  const oracle = normalizeOracle(session.collect(path.join(directory, 'tsconfig.json')));
+  assert.deepEqual(oracle.anomalies, []);
+  // Library files are not searched: every token is in a.ts.
+  assert.deepEqual([...new Set(oracle.tokens.map(t => t.location.file))], ['a.ts']);
+  const root = fs.realpathSync(directory);
+  const library = name => path.relative(root, path.join(VENDORED, name)).split(path.sep).join('/');
+  const promise = oracle.tokens.filter(t => t.name === 'Promise');
+  assert.deepEqual(promise.map(t => [t.outcome, t.normalization]), [['groups', undefined], ['groups', undefined]]);
+  assert.deepEqual(promise.map(t => oracle.groups[t.groups[0]].declarations.map(d => `${d.location.file}:${d.location.start.line}`)),
+    [[`${library('lib.es5.d.ts')}:1548`], [`${library('lib.es2015.promise.d.ts')}:79`]]);
+});
+
 test('real oracle: mixed aliases retain independent type and value declarations', { skip: oracleUnavailable }, async t => {
   const session = new SemanticSession(await loadSemanticApi());
   t.after(() => session.close());
@@ -494,6 +542,63 @@ test('real oracle: ambiguous star exports are unresolved where TypeScript keeps 
     .map(t => `${t.location.file}:${t.location.start.line}:${t.name}:${t.outcome}`).sort(),
   ['app.ts:10:shared:unresolved', 'app.ts:11:shared:unresolved', 'app.ts:13:forwarded:unresolved', 'app.ts:13:shared:unresolved',
     'app.ts:3:shared:unresolved']);
+});
+
+// The compiler's answer at `file:line:column` in the shape an exception
+// fixture's `expected.json` records: groups of `file:line:column` places, or
+// the expected outcome.
+function answerAt(oracle, at) {
+  const place = location => `${location.file}:${location.start.line}:${location.start.column}`;
+  const token = oracle.tokens.find(token => place(token.location) === at);
+  assert.ok(token, `no token at ${at}`);
+  if (token.outcome !== 'groups') return token.outcome;
+  return token.groups.map(index => ({
+    declarations: oracle.groups[index].declarations.map(declaration => place(declaration.location)),
+    occurrences: oracle.groups[index].occurrences.map(occurrence => place(occurrence.location)),
+  }));
+}
+
+test('real oracle: exception fixtures record the compiler answers beside a different tool answer', { skip: oracleUnavailable }, async t => {
+  const session = new SemanticSession(await loadSemanticApi());
+  t.after(() => session.close());
+  const cases = fs.readdirSync(exceptions, { withFileTypes: true }).filter(entry => entry.isDirectory()).map(entry => entry.name).sort();
+  assert.ok(cases.length > 0);
+  for (const name of cases) {
+    const fixture = path.join(exceptions, name);
+    const expected = JSON.parse(fs.readFileSync(path.join(fixture, 'expected.json'), 'utf8'));
+    const oracle = normalizeOracle(session.collect(path.join(fixture, 'tsconfig.json')));
+    assert.deepEqual(oracle.anomalies, [], name);
+    for (const query of expected.queries) assert.deepEqual(answerAt(oracle, query.at), query.typescript, `${name}: ${query.at}`);
+    // `tests/reference_exceptions.rs` checks the tool's side.
+    assert.ok(expected.queries.some(query => !isDeepStrictEqual(query.typescript, query.tool)), `${name}: no recorded difference`);
+  }
+});
+
+test('real compiler: replacement libraries are looked up from the configuration path as spelled', { skip: oracleUnavailable }, t => {
+  // The compiler side of a documented difference: TypeScript finds an
+  // `@typescript/lib-*` package beside a symbolic link to the configuration's
+  // directory, where this tool looks from the real directory
+  // (`tests/reference_libraries.rs` checks the tool side). The semantic
+  // oracle opens the configuration's real path, so the native compiler
+  // shows this.
+  const directory = temporary(t);
+  const write = (file, text) => {
+    fs.mkdirSync(path.dirname(path.join(directory, file)), { recursive: true });
+    fs.writeFileSync(path.join(directory, file), text);
+  };
+  write('real/tsconfig.json', '{ "compilerOptions": { "lib": ["es5", "es2015.promise"], "libReplacement": true }, "files": ["a.ts"] }');
+  write('real/a.ts', 'export const n: number = replacedPromise;\n');
+  write('spelled/node_modules/@typescript/lib-es2015/package.json', '{ "name": "@typescript/lib-es2015" }');
+  write('spelled/node_modules/@typescript/lib-es2015/promise.d.ts', 'declare var replacedPromise: number;\n');
+  fs.symlinkSync('../real', path.join(directory, 'spelled', 'link'));
+  const tsc = (config, ...options) => spawnSync(process.env.TYPE_SCRIPT_NATIVE, ['-p', path.join(directory, config), ...options], { encoding: 'utf8' });
+  const spelled = tsc('spelled/link/tsconfig.json', '--listFilesOnly');
+  assert.equal(spelled.status, 0, spelled.stdout + spelled.stderr);
+  assert.ok(spelled.stdout.includes('spelled/node_modules/@typescript/lib-es2015/promise.d.ts'), spelled.stdout);
+  assert.equal(tsc('spelled/link/tsconfig.json', '--noEmit').status, 0);
+  // From the real directory the name is unresolved (TS2304), as here.
+  const real = tsc('real/tsconfig.json', '--noEmit', '--pretty', 'false');
+  assert.match(real.stdout, /TS2304: Cannot find name 'replacedPromise'/);
 });
 
 test('real oracle: preserved symlinks keep distinct program files apart', { skip: oracleUnavailable }, async t => {

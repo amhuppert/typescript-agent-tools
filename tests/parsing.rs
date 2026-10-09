@@ -117,6 +117,61 @@ fn contextual_syntax_errors_are_rejected() {
 }
 
 #[test]
+fn object_literal_members_start_where_the_compiler_allows() {
+    // TypeScript's list grammar starts an object literal member only at `[`,
+    // `*`, `...`, `.`, or a literal property name (TS1136); modifiers that
+    // are words may precede the name.
+    for source in [
+        "const o = { @dec a: 1 };",
+        "const o = { @dec m() {} };",
+        "const o = { a: 1, @dec b: 2 };",
+    ] {
+        let error = parse(source).unwrap_err();
+        assert_eq!(error.message, "Property assignment expected", "{source}");
+        assert_eq!(error.span.start, source.find('@').unwrap(), "{source}");
+    }
+    for source in [
+        "const o = { public \"a\": 1, async \"b\": 2, \"c\"?: 3, \"d\"!: 4 };",
+        "const o = { [k]: 1, *g() {}, ...rest, 1: 2, 1n: 3, \"s\": 4, if: 5, #p: 6 };",
+    ] {
+        parse(source).unwrap_or_else(|error| panic!("{source}: {error}"));
+    }
+}
+
+#[test]
+fn an_object_literal_member_takes_one_postfix_marker() {
+    // TypeScript's `parseObjectLiteralElement` takes `?`, or else `!`, after
+    // a member's name; the other marker is then where `:`, `(`, `,`, or `}`
+    // was expected (TS1005). Before the member: a byte order mark and each
+    // line break, which the error's position must survive.
+    for prefix in ["", "\u{feff}", "\n", "\r", "\r\n", "\u{2028}", "\u{2029}"] {
+        for member in [
+            "a: 1",
+            "a?: 1",
+            "a!: 1",
+            "\"a\"?: 1",
+            "\"a\"!: 1",
+            "m?() {}",
+        ] {
+            let source = format!("{prefix}const o = {{{prefix}{member} }};");
+            parse(&source).unwrap_or_else(|error| panic!("{source:?}: {error}"));
+        }
+        for (member, marker) in [
+            ("a?!: 1", "!"),
+            ("a!?: 1", "?"),
+            ("\"a\"?!: 1", "!"),
+            ("\"a\"!?: 1", "?"),
+            ("m?!() {}", "!"),
+        ] {
+            let source = format!("{prefix}const o = {{{prefix}{member} }};");
+            let error = parse(&source).unwrap_err();
+            let at = source.rfind(marker).unwrap();
+            assert_eq!(error.span.start, at, "{source:?}: {error}");
+        }
+    }
+}
+
+#[test]
 fn compiler_style_json() {
     let value = json("const value: number = 42;");
     assert_eq!(value["kind"], 308);
@@ -893,5 +948,51 @@ fn parse_options_for_a_file_follow_typescripts_name_rules() {
             declaration,
             "{name}"
         );
+    }
+}
+
+/// TypeScript 7's `processPragmasIntoFields`: `no-default-lib="true"`
+/// ignores its whole directive, even an invalid `resolution-mode` beside
+/// it; otherwise `types`, `lib`, or `path` must be present (TS1084), and a
+/// `types` directive's `resolution-mode` must be `import` or `require`
+/// (TS1453). Observed with the pinned compiler's `--noEmit`.
+#[test]
+fn reference_directives_follow_the_compilers_precedence() {
+    for source in [
+        "/// <reference no-default-lib=\"true\" types=\"x\" resolution-mode=\"bad\" />\n",
+        "/// <reference no-default-lib=\"true\" />\n",
+        "/// <reference lib=\"es5\" path=\"\" />\n",
+        "/// <reference lib=\"\" />\n",
+        "/// <reference path=\"\" types=\"x\" resolution-mode=\"import\" />\n",
+    ] {
+        parse(source).unwrap_or_else(|error| panic!("{source}: {error}"));
+    }
+    // TS1084 is reported at the comment, TS1453 at the mode's value
+    // (`fixtures/json-probes/inputs.json`, `json-ref-invalid`).
+    for (source, message, at) in [
+        (
+            "/// <reference no-default-lib=\"false\" />\n",
+            "Invalid 'reference' directive syntax",
+            0,
+        ),
+        (
+            "/// <reference foo=\"x\" />\n",
+            "Invalid 'reference' directive syntax",
+            0,
+        ),
+        (
+            "/// <reference types=\"x\" resolution-mode=\"bad\" />\n",
+            "'resolution-mode' must be 'require' or 'import'",
+            42,
+        ),
+        (
+            "\n///\t<reference types='x' resolution-mode = 'other' />\n",
+            "'resolution-mode' must be 'require' or 'import'",
+            45,
+        ),
+    ] {
+        let error = parse(source).expect_err(source);
+        assert_eq!(error.message, message, "{source}");
+        assert_eq!(error.span.start, at, "{source}");
     }
 }

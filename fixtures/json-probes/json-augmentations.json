@@ -1,0 +1,646 @@
+{
+  "description": "A module augmentation meeting an export that names a JSON value or property (`mergeSymbol` with the resolved alias target's `Property` flags): incompatible declarations conflict (TS2451, TS2300), an interface merges beside the value, which an expression still denotes; through a direct alias and a star barrel, with dependency arrangements.",
+  "cases": [
+    {
+      "name": "value-direct-const",
+      "files": {
+        "barrel.ts": "export { default as X } from \"./data.json\";",
+        "data.json": "{\"a\":{\"nested\":1}}",
+        "augment.ts": "export {}; declare module \"./barrel\" { const X: number; }",
+        "main.ts": "import { X } from \"./barrel\";\nX;\nexport const marker=1;",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": [], \"resolveJsonModule\": true}, \"files\": [\"main.ts\", \"augment.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2451"
+        ]
+      },
+      "native": {
+        "program": [
+          "data.json",
+          "barrel.ts",
+          "main.ts",
+          "augment.ts"
+        ],
+        "diagnostics": [
+          "TS2451 augment.ts:1:46",
+          "TS2451 barrel.ts:1:21"
+        ],
+        "names": [
+          "1:10 X -> BlockScopedVariable [augment.ts:1:46 VariableDeclaration]",
+          "2:1 X -> BlockScopedVariable [augment.ts:1:46 VariableDeclaration]",
+          "3:14 marker -> BlockScopedVariable [main.ts:3:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "value-star-const",
+      "files": {
+        "barrel.ts": "export { default as X } from \"./data.json\";",
+        "data.json": "{\"a\":{\"nested\":1}}",
+        "augment.ts": "export {}; declare module \"./bridge\" { const X: number; }",
+        "main.ts": "import { X } from \"./bridge\";\nX;\nexport const marker=1;",
+        "bridge.ts": "export * from \"./barrel\";",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": [], \"resolveJsonModule\": true}, \"files\": [\"main.ts\", \"augment.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2451"
+        ]
+      },
+      "native": {
+        "program": [
+          "data.json",
+          "barrel.ts",
+          "bridge.ts",
+          "main.ts",
+          "augment.ts"
+        ],
+        "diagnostics": [
+          "TS2451 augment.ts:1:46",
+          "TS2451 barrel.ts:1:21"
+        ],
+        "names": [
+          "1:10 X -> BlockScopedVariable [augment.ts:1:46 VariableDeclaration]",
+          "2:1 X -> BlockScopedVariable [augment.ts:1:46 VariableDeclaration]",
+          "3:14 marker -> BlockScopedVariable [main.ts:3:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "value-direct-namespace",
+      "files": {
+        "barrel.ts": "export { default as X } from \"./data.json\";",
+        "data.json": "{\"a\":{\"nested\":1}}",
+        "augment.ts": "export {}; declare module \"./barrel\" { namespace X { export const t: number; } }",
+        "main.ts": "import { X } from \"./barrel\";\nX;\nexport const marker=1;",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": [], \"resolveJsonModule\": true}, \"files\": [\"main.ts\", \"augment.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2300"
+        ]
+      },
+      "native": {
+        "program": [
+          "data.json",
+          "barrel.ts",
+          "main.ts",
+          "augment.ts"
+        ],
+        "diagnostics": [
+          "TS2300 augment.ts:1:50",
+          "TS2300 barrel.ts:1:21"
+        ],
+        "names": [
+          "1:10 X -> ValueModule [augment.ts:1:40 ModuleDeclaration]",
+          "2:1 X -> ValueModule [augment.ts:1:40 ModuleDeclaration]",
+          "3:14 marker -> BlockScopedVariable [main.ts:3:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "value-star-namespace",
+      "files": {
+        "barrel.ts": "export { default as X } from \"./data.json\";",
+        "data.json": "{\"a\":{\"nested\":1}}",
+        "augment.ts": "export {}; declare module \"./bridge\" { namespace X { export const t: number; } }",
+        "main.ts": "import { X } from \"./bridge\";\nX;\nexport const marker=1;",
+        "bridge.ts": "export * from \"./barrel\";",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": [], \"resolveJsonModule\": true}, \"files\": [\"main.ts\", \"augment.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2300"
+        ]
+      },
+      "native": {
+        "program": [
+          "data.json",
+          "barrel.ts",
+          "bridge.ts",
+          "main.ts",
+          "augment.ts"
+        ],
+        "diagnostics": [
+          "TS2300 augment.ts:1:50",
+          "TS2300 barrel.ts:1:21"
+        ],
+        "names": [
+          "1:10 X -> ValueModule [augment.ts:1:40 ModuleDeclaration]",
+          "2:1 X -> ValueModule [augment.ts:1:40 ModuleDeclaration]",
+          "3:14 marker -> BlockScopedVariable [main.ts:3:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "value-direct-interface",
+      "files": {
+        "barrel.ts": "export { default as X } from \"./data.json\";",
+        "data.json": "{\"a\":{\"nested\":1}}",
+        "augment.ts": "export {}; declare module \"./barrel\" { interface X { extra: number } }",
+        "main.ts": "import { X } from \"./barrel\";\nX;\nexport const marker=1;",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": [], \"resolveJsonModule\": true}, \"files\": [\"main.ts\", \"augment.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "barrel.ts",
+          "main.ts",
+          "augment.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 X -> Property|Interface|Transient [data.json SourceFile, augment.ts:1:40 InterfaceDeclaration]",
+          "2:1 X -> Property|Interface|Transient [data.json SourceFile, augment.ts:1:40 InterfaceDeclaration]",
+          "3:14 marker -> BlockScopedVariable [main.ts:3:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "value-star-interface",
+      "files": {
+        "barrel.ts": "export { default as X } from \"./data.json\";",
+        "data.json": "{\"a\":{\"nested\":1}}",
+        "augment.ts": "export {}; declare module \"./bridge\" { interface X { extra: number } }",
+        "main.ts": "import { X } from \"./bridge\";\nX;\nexport const marker=1;",
+        "bridge.ts": "export * from \"./barrel\";",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": [], \"resolveJsonModule\": true}, \"files\": [\"main.ts\", \"augment.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "barrel.ts",
+          "bridge.ts",
+          "main.ts",
+          "augment.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 X -> Property|Interface|Transient [data.json SourceFile, augment.ts:1:40 InterfaceDeclaration]",
+          "2:1 X -> Property|Interface|Transient [data.json SourceFile, augment.ts:1:40 InterfaceDeclaration]",
+          "3:14 marker -> BlockScopedVariable [main.ts:3:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "property-direct-const",
+      "files": {
+        "barrel.ts": "export { a as X } from \"./data.json\";",
+        "data.json": "{\"a\":{\"nested\":1}}",
+        "augment.ts": "export {}; declare module \"./barrel\" { const X: number; }",
+        "main.ts": "import { X } from \"./barrel\";\nX;\nexport const marker=1;",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": [], \"resolveJsonModule\": true}, \"files\": [\"main.ts\", \"augment.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2451"
+        ]
+      },
+      "native": {
+        "program": [
+          "data.json",
+          "barrel.ts",
+          "main.ts",
+          "augment.ts"
+        ],
+        "diagnostics": [
+          "TS2451 augment.ts:1:46",
+          "TS2451 barrel.ts:1:15"
+        ],
+        "names": [
+          "1:10 X -> BlockScopedVariable [augment.ts:1:46 VariableDeclaration]",
+          "2:1 X -> BlockScopedVariable [augment.ts:1:46 VariableDeclaration]",
+          "3:14 marker -> BlockScopedVariable [main.ts:3:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "property-star-const",
+      "files": {
+        "barrel.ts": "export { a as X } from \"./data.json\";",
+        "data.json": "{\"a\":{\"nested\":1}}",
+        "augment.ts": "export {}; declare module \"./bridge\" { const X: number; }",
+        "main.ts": "import { X } from \"./bridge\";\nX;\nexport const marker=1;",
+        "bridge.ts": "export * from \"./barrel\";",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": [], \"resolveJsonModule\": true}, \"files\": [\"main.ts\", \"augment.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2451"
+        ]
+      },
+      "native": {
+        "program": [
+          "data.json",
+          "barrel.ts",
+          "bridge.ts",
+          "main.ts",
+          "augment.ts"
+        ],
+        "diagnostics": [
+          "TS2451 augment.ts:1:46",
+          "TS2451 barrel.ts:1:15"
+        ],
+        "names": [
+          "1:10 X -> BlockScopedVariable [augment.ts:1:46 VariableDeclaration]",
+          "2:1 X -> BlockScopedVariable [augment.ts:1:46 VariableDeclaration]",
+          "3:14 marker -> BlockScopedVariable [main.ts:3:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "property-direct-namespace",
+      "files": {
+        "barrel.ts": "export { a as X } from \"./data.json\";",
+        "data.json": "{\"a\":{\"nested\":1}}",
+        "augment.ts": "export {}; declare module \"./barrel\" { namespace X { export const t: number; } }",
+        "main.ts": "import { X } from \"./barrel\";\nX;\nexport const marker=1;",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": [], \"resolveJsonModule\": true}, \"files\": [\"main.ts\", \"augment.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2300"
+        ]
+      },
+      "native": {
+        "program": [
+          "data.json",
+          "barrel.ts",
+          "main.ts",
+          "augment.ts"
+        ],
+        "diagnostics": [
+          "TS2300 augment.ts:1:50",
+          "TS2300 barrel.ts:1:15"
+        ],
+        "names": [
+          "1:10 X -> ValueModule [augment.ts:1:40 ModuleDeclaration]",
+          "2:1 X -> ValueModule [augment.ts:1:40 ModuleDeclaration]",
+          "3:14 marker -> BlockScopedVariable [main.ts:3:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "property-star-namespace",
+      "files": {
+        "barrel.ts": "export { a as X } from \"./data.json\";",
+        "data.json": "{\"a\":{\"nested\":1}}",
+        "augment.ts": "export {}; declare module \"./bridge\" { namespace X { export const t: number; } }",
+        "main.ts": "import { X } from \"./bridge\";\nX;\nexport const marker=1;",
+        "bridge.ts": "export * from \"./barrel\";",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": [], \"resolveJsonModule\": true}, \"files\": [\"main.ts\", \"augment.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2300"
+        ]
+      },
+      "native": {
+        "program": [
+          "data.json",
+          "barrel.ts",
+          "bridge.ts",
+          "main.ts",
+          "augment.ts"
+        ],
+        "diagnostics": [
+          "TS2300 augment.ts:1:50",
+          "TS2300 barrel.ts:1:15"
+        ],
+        "names": [
+          "1:10 X -> ValueModule [augment.ts:1:40 ModuleDeclaration]",
+          "2:1 X -> ValueModule [augment.ts:1:40 ModuleDeclaration]",
+          "3:14 marker -> BlockScopedVariable [main.ts:3:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "property-direct-interface",
+      "files": {
+        "barrel.ts": "export { a as X } from \"./data.json\";",
+        "data.json": "{\"a\":{\"nested\":1}}",
+        "augment.ts": "export {}; declare module \"./barrel\" { interface X { extra: number } }",
+        "main.ts": "import { X } from \"./barrel\";\nX;\nexport const marker=1;",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": [], \"resolveJsonModule\": true}, \"files\": [\"main.ts\", \"augment.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "barrel.ts",
+          "main.ts",
+          "augment.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 X -> Property|Interface|Transient [data.json:1:2 PropertyAssignment, augment.ts:1:40 InterfaceDeclaration]",
+          "2:1 X -> Property|Interface|Transient [data.json:1:2 PropertyAssignment, augment.ts:1:40 InterfaceDeclaration]",
+          "3:14 marker -> BlockScopedVariable [main.ts:3:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "property-star-interface",
+      "files": {
+        "barrel.ts": "export { a as X } from \"./data.json\";",
+        "data.json": "{\"a\":{\"nested\":1}}",
+        "augment.ts": "export {}; declare module \"./bridge\" { interface X { extra: number } }",
+        "main.ts": "import { X } from \"./bridge\";\nX;\nexport const marker=1;",
+        "bridge.ts": "export * from \"./barrel\";",
+        "tsconfig.json": "{\"compilerOptions\": {\"noLib\": true, \"types\": [], \"resolveJsonModule\": true}, \"files\": [\"main.ts\", \"augment.ts\"]}"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "barrel.ts",
+          "bridge.ts",
+          "main.ts",
+          "augment.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 X -> Property|Interface|Transient [data.json:1:2 PropertyAssignment, augment.ts:1:40 InterfaceDeclaration]",
+          "2:1 X -> Property|Interface|Transient [data.json:1:2 PropertyAssignment, augment.ts:1:40 InterfaceDeclaration]",
+          "3:14 marker -> BlockScopedVariable [main.ts:3:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "dependency-barrel-project-const",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"resolveJsonModule\":true,\"skipLibCheck\":true},\"files\":[\"main.ts\",\"augment.ts\"]}",
+        "node_modules/pkg/package.json": "{\"name\": \"pkg\", \"types\": \"index.d.ts\"}",
+        "node_modules/pkg/data.json": "{\"a\":{\"nested\":1}}",
+        "node_modules/pkg/index.d.ts": "export { default as X } from \"./data.json\";\n",
+        "augment.ts": "export {}; declare module \"pkg\" { const X: number; }\n",
+        "main.ts": "import { X } from \"pkg\";\nX;\nexport const marker=1;\n"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2451"
+        ]
+      },
+      "native": {
+        "program": [
+          "node_modules/pkg/data.json (external)",
+          "node_modules/pkg/index.d.ts (external)",
+          "main.ts",
+          "augment.ts"
+        ],
+        "diagnostics": [
+          "TS2451 augment.ts:1:41"
+        ],
+        "names": [
+          "1:10 X -> BlockScopedVariable [augment.ts:1:41 VariableDeclaration]",
+          "2:1 X -> BlockScopedVariable [augment.ts:1:41 VariableDeclaration]",
+          "3:14 marker -> BlockScopedVariable [main.ts:3:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "project-barrel-dependency-const",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"resolveJsonModule\":true,\"skipLibCheck\":true},\"files\":[\"main.ts\"]}",
+        "barrel.ts": "export { default as X } from \"./data.json\";\n",
+        "data.json": "{\"a\":{\"nested\":1}}",
+        "node_modules/aug/package.json": "{\"name\": \"aug\", \"types\": \"index.d.ts\"}",
+        "node_modules/aug/index.d.ts": "export {}; declare module \"../../barrel\" { const X: number; }\n",
+        "main.ts": "import \"aug\";\nimport { X } from \"./barrel\";\nX;\nexport const marker=1;\n"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2451"
+        ]
+      },
+      "native": {
+        "program": [
+          "node_modules/aug/index.d.ts (external)",
+          "data.json",
+          "barrel.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 barrel.ts:1:21"
+        ],
+        "names": [
+          "2:10 X -> BlockScopedVariable [node_modules/aug/index.d.ts:1:50 VariableDeclaration]",
+          "3:1 X -> BlockScopedVariable [node_modules/aug/index.d.ts:1:50 VariableDeclaration]",
+          "4:14 marker -> BlockScopedVariable [main.ts:4:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "dependencies-const",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"resolveJsonModule\":true},\"files\":[\"main.ts\"]}",
+        "node_modules/pkg/package.json": "{\"name\": \"pkg\", \"types\": \"index.d.ts\"}",
+        "node_modules/pkg/data.json": "{\"a\":{\"nested\":1}}",
+        "node_modules/pkg/index.d.ts": "export { default as X } from \"./data.json\";\n",
+        "node_modules/aug/package.json": "{\"name\": \"aug\", \"types\": \"index.d.ts\"}",
+        "node_modules/aug/index.d.ts": "export {}; declare module \"pkg\" { const X: number; }\n",
+        "main.ts": "import \"aug\";\nimport { X } from \"pkg\";\nX;\nexport const marker=1;\n"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "tool": {
+        "note": "Dependency files are not reported here (docs/references.md, Binding model); TypeScript reports this conflict without skipLibCheck."
+      },
+      "native": {
+        "program": [
+          "node_modules/aug/index.d.ts (external)",
+          "node_modules/pkg/data.json (external)",
+          "node_modules/pkg/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 node_modules/aug/index.d.ts:1:41",
+          "TS2451 node_modules/pkg/index.d.ts:1:21"
+        ],
+        "names": [
+          "2:10 X -> BlockScopedVariable [node_modules/aug/index.d.ts:1:41 VariableDeclaration]",
+          "3:1 X -> BlockScopedVariable [node_modules/aug/index.d.ts:1:41 VariableDeclaration]",
+          "4:14 marker -> BlockScopedVariable [main.ts:4:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "dependencies-interface",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"resolveJsonModule\":true,\"skipLibCheck\":true},\"files\":[\"main.ts\"]}",
+        "node_modules/pkg/package.json": "{\"name\": \"pkg\", \"types\": \"index.d.ts\"}",
+        "node_modules/pkg/data.json": "{\"a\":{\"nested\":1}}",
+        "node_modules/pkg/index.d.ts": "export { a as X } from \"./data.json\";\n",
+        "node_modules/aug/package.json": "{\"name\": \"aug\", \"types\": \"index.d.ts\"}",
+        "node_modules/aug/index.d.ts": "export {}; declare module \"pkg\" { interface X { extra: number } }\n",
+        "main.ts": "import \"aug\";\nimport { X } from \"pkg\";\nX;\nX.nested;\nlet t: X;\nexport const marker=1;\n"
+      },
+      "watch": [
+        "X",
+        "nested",
+        "t",
+        "marker"
+      ],
+      "tool": {
+        "names": {
+          "5:8": "declared"
+        },
+        "note": "This tool keeps separate symbols per meaning (docs/references.md), so a type use of a JSON value merged with an interface denotes the interface; TypeScript's one symbol is a property, a member."
+      },
+      "native": {
+        "program": [
+          "node_modules/aug/index.d.ts (external)",
+          "node_modules/pkg/data.json (external)",
+          "node_modules/pkg/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "2:10 X -> Property|Interface|Transient [node_modules/pkg/data.json:1:2 PropertyAssignment, node_modules/aug/index.d.ts:1:35 InterfaceDeclaration]",
+          "3:1 X -> Property|Interface|Transient [node_modules/pkg/data.json:1:2 PropertyAssignment, node_modules/aug/index.d.ts:1:35 InterfaceDeclaration]",
+          "4:1 X -> Property|Interface|Transient [node_modules/pkg/data.json:1:2 PropertyAssignment, node_modules/aug/index.d.ts:1:35 InterfaceDeclaration]",
+          "4:3 nested -> Property|Transient [node_modules/pkg/data.json:1:7 PropertyAssignment]",
+          "5:5 t -> BlockScopedVariable [main.ts:5:5 VariableDeclaration]",
+          "5:8 X -> Property|Interface|Transient [node_modules/pkg/data.json:1:2 PropertyAssignment, node_modules/aug/index.d.ts:1:35 InterfaceDeclaration]",
+          "6:14 marker -> BlockScopedVariable [main.ts:6:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "member-direct-const",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"resolveJsonModule\":true},\"files\":[\"globals.d.ts\",\"main.ts\",\"augment.ts\"]}",
+        "globals.d.ts": "interface String { readonly length: number; }\n",
+        "data.json": "\"text\"",
+        "barrel.ts": "export { length as X } from \"./data.json\";\n",
+        "augment.ts": "export {}; declare module \"./barrel\" { const X: number; }\n",
+        "main.ts": "import { X } from \"./barrel\";\nX;\nexport const marker=1;\n"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2451"
+        ]
+      },
+      "native": {
+        "program": [
+          "globals.d.ts",
+          "data.json",
+          "barrel.ts",
+          "main.ts",
+          "augment.ts"
+        ],
+        "diagnostics": [
+          "TS2451 augment.ts:1:46",
+          "TS2451 barrel.ts:1:20"
+        ],
+        "names": [
+          "1:10 X -> BlockScopedVariable [augment.ts:1:46 VariableDeclaration]",
+          "2:1 X -> BlockScopedVariable [augment.ts:1:46 VariableDeclaration]",
+          "3:14 marker -> BlockScopedVariable [main.ts:3:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "member-direct-interface",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"resolveJsonModule\":true},\"files\":[\"globals.d.ts\",\"main.ts\",\"augment.ts\"]}",
+        "globals.d.ts": "interface String { readonly length: number; }\n",
+        "data.json": "\"text\"",
+        "barrel.ts": "export { length as X } from \"./data.json\";\n",
+        "augment.ts": "export {}; declare module \"./barrel\" { interface X { extra: number } }\n",
+        "main.ts": "import { X } from \"./barrel\";\nX;\nexport const marker=1;\n"
+      },
+      "watch": [
+        "X",
+        "marker"
+      ],
+      "native": {
+        "program": [
+          "globals.d.ts",
+          "data.json",
+          "barrel.ts",
+          "main.ts",
+          "augment.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:10 X -> Property|Interface|Transient [globals.d.ts:1:20 PropertySignature, augment.ts:1:40 InterfaceDeclaration]",
+          "2:1 X -> Property|Interface|Transient [globals.d.ts:1:20 PropertySignature, augment.ts:1:40 InterfaceDeclaration]",
+          "3:14 marker -> BlockScopedVariable [main.ts:3:14 VariableDeclaration]"
+        ]
+      }
+    }
+  ]
+}

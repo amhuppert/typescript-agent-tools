@@ -1,0 +1,1880 @@
+{
+  "description": "Whether TypeScript reports a binding or module diagnostic: `SkipTypeChecking` (`noCheck`, `skipLibCheck` on a declaration file, `// @ts-nocheck` as the last leading `@ts-check` or `@ts-nocheck` line comment) and comment directives, for each diagnostic family that fails a load here, with controls where one side of a two-sided diagnostic is still checked. Dependency files are not reported here (docs/references.md).",
+  "cases": [
+    {
+      "name": "dup-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "let x = 1;\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "a.ts:2:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2451 a.ts:1:5",
+          "TS2451 a.ts:2:5"
+        ]
+      }
+    },
+    {
+      "name": "dup-ignore-both",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @ts-ignore\nlet x = 1;\n// @ts-ignore\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "dup-expect-error-both",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @ts-expect-error\nlet x = 1;\n// @ts-expect-error\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "dup-ignore-first",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @ts-ignore\nlet x = 1;\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2451"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2451 a.ts:3:5"
+        ]
+      }
+    },
+    {
+      "name": "dup-ignore-second",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "let x = 1;\n// @ts-ignore\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2451"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2451 a.ts:1:5"
+        ]
+      }
+    },
+    {
+      "name": "dup-nocheck",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @ts-nocheck\nlet x = 1;\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "dup-nocheck-after-code",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "let x = 1;\n// @ts-nocheck\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "a.ts:3:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2451 a.ts:1:5",
+          "TS2451 a.ts:3:5"
+        ]
+      }
+    },
+    {
+      "name": "dup-check-after-nocheck",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @ts-nocheck\n// @ts-check\nlet x = 1;\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "a.ts:4:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2451 a.ts:3:5",
+          "TS2451 a.ts:4:5"
+        ]
+      }
+    },
+    {
+      "name": "dup-nocheck-after-check",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @ts-check\n// @ts-nocheck\nlet x = 1;\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "dup-nocheck-triple-slash",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "/// @ts-nocheck\nlet x = 1;\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "dup-nocheck-block-comment",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "/* @ts-nocheck */\nlet x = 1;\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "a.ts:3:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2451 a.ts:2:5",
+          "TS2451 a.ts:3:5"
+        ]
+      }
+    },
+    {
+      "name": "dup-nocheck-upper-case",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @TS-NOCHECK\nlet x = 1;\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "dup-nocheck-longer-name",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @ts-nocheck-later\nlet x = 1;\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "a.ts:3:5"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2451 a.ts:2:5",
+          "TS2451 a.ts:3:5"
+        ]
+      }
+    },
+    {
+      "name": "dup-nocheck-reason",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "//\t@ts-nocheck: generated\nlet x = 1;\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "dup-nocheck-shebang",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "#!/usr/bin/env node\n// @ts-nocheck\nlet x = 1;\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "dup-nocheck-after-blank-line",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "\n\n// lead\n\n// @ts-nocheck\nlet x = 1;\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "dup-no-check-option",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"noCheck\":true},\"files\":[\"a.ts\"]}",
+        "a.ts": "let x = 1;\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "dup-declaration-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.d.ts\"]}",
+        "a.d.ts": "declare let x: number;\ndeclare let x: string;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "a.d.ts:2:13"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.d.ts"
+        ],
+        "diagnostics": [
+          "TS2451 a.d.ts:1:13",
+          "TS2451 a.d.ts:2:13"
+        ]
+      }
+    },
+    {
+      "name": "dup-declaration-skip-lib-check",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"a.d.ts\"]}",
+        "a.d.ts": "declare let x: number;\ndeclare let x: string;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "a.d.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "dup-declaration-nocheck",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.d.ts\"]}",
+        "a.d.ts": "// @ts-nocheck\ndeclare let x: number;\ndeclare let x: string;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "a.d.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "dup-dependency",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"main.ts\"]}",
+        "main.ts": "import \"dep\";\n",
+        "node_modules/dep/package.json": "{\"name\": \"dep\", \"types\": \"index.d.ts\"}",
+        "node_modules/dep/index.d.ts": "declare let x: number;\ndeclare let x: string;\nexport {};\n"
+      },
+      "tool": {
+        "note": "Dependency files are not reported here (docs/references.md, Binding model); TypeScript reports this one without skipLibCheck."
+      },
+      "native": {
+        "program": [
+          "node_modules/dep/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 node_modules/dep/index.d.ts:1:13",
+          "TS2451 node_modules/dep/index.d.ts:2:13"
+        ]
+      }
+    },
+    {
+      "name": "global-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\",\"b.ts\",\"main.ts\"]}",
+        "a.ts": "declare const V: string;\n",
+        "b.ts": "declare const V: string;\n",
+        "main.ts": "export const v = V;\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "b.ts:1:15"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts",
+          "b.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 a.ts:1:15",
+          "TS2451 b.ts:1:15"
+        ]
+      }
+    },
+    {
+      "name": "global-skip-lib-check",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"a.d.ts\",\"b.d.ts\",\"main.ts\"]}",
+        "a.d.ts": "declare const V: string;\n",
+        "b.d.ts": "declare const V: string;\n",
+        "main.ts": "export const v = V;\n"
+      },
+      "native": {
+        "program": [
+          "a.d.ts",
+          "b.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "global-skip-lib-check-later-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"a.d.ts\",\"b.ts\",\"main.ts\"]}",
+        "a.d.ts": "declare const V: string;\n",
+        "b.ts": "declare const V: string;\n",
+        "main.ts": "export const v = V;\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2451"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.d.ts",
+          "b.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 b.ts:1:15"
+        ]
+      }
+    },
+    {
+      "name": "global-skip-lib-check-earlier-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"a.ts\",\"b.d.ts\",\"main.ts\"]}",
+        "a.ts": "declare const V: string;\n",
+        "b.d.ts": "declare const V: string;\n",
+        "main.ts": "export const v = V;\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2451"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts",
+          "b.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 a.ts:1:15"
+        ]
+      }
+    },
+    {
+      "name": "global-ignore-both",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\",\"b.ts\",\"main.ts\"]}",
+        "a.ts": "// @ts-ignore\ndeclare const V: string;\n",
+        "b.ts": "// @ts-ignore\ndeclare const V: string;\n",
+        "main.ts": "export const v = V;\n"
+      },
+      "native": {
+        "program": [
+          "a.ts",
+          "b.ts",
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "global-ignore-later",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\",\"b.ts\",\"main.ts\"]}",
+        "a.ts": "declare const V: string;\n",
+        "b.ts": "// @ts-ignore\ndeclare const V: string;\n",
+        "main.ts": "export const v = V;\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2451"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts",
+          "b.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 a.ts:1:15"
+        ]
+      }
+    },
+    {
+      "name": "global-nocheck-both",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\",\"b.ts\",\"main.ts\"]}",
+        "a.ts": "// @ts-nocheck\ndeclare const V: string;\n",
+        "b.ts": "// @ts-nocheck\ndeclare const V: string;\n",
+        "main.ts": "export const v = V;\n"
+      },
+      "native": {
+        "program": [
+          "a.ts",
+          "b.ts",
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "global-nocheck-earlier",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\",\"b.ts\",\"main.ts\"]}",
+        "a.ts": "// @ts-nocheck\ndeclare const V: string;\n",
+        "b.ts": "declare const V: string;\n",
+        "main.ts": "export const v = V;\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2451"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts",
+          "b.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2451 b.ts:1:15"
+        ]
+      }
+    },
+    {
+      "name": "global-no-check-option",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"noCheck\":true},\"files\":[\"a.ts\",\"b.ts\",\"main.ts\"]}",
+        "a.ts": "declare const V: string;\n",
+        "b.ts": "declare const V: string;\n",
+        "main.ts": "export const v = V;\n"
+      },
+      "native": {
+        "program": [
+          "a.ts",
+          "b.ts",
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "global-vite-env",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"include\":[\"src\"]}",
+        "src/vite-env.d.ts": "declare const __APP_VERSION__: string;\n",
+        "src/globals.d.ts": "declare const __APP_VERSION__: string;\n",
+        "src/main.ts": "export const v = __APP_VERSION__;\n"
+      },
+      "watch": [
+        "__APP_VERSION__"
+      ],
+      "watchFile": "src/main.ts",
+      "native": {
+        "program": [
+          "src/globals.d.ts",
+          "src/main.ts",
+          "src/vite-env.d.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:18 __APP_VERSION__ -> BlockScopedVariable [src/globals.d.ts:1:15 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "global-dependency-both",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[\"one\",\"two\"]},\"files\":[\"main.ts\"]}",
+        "main.ts": "export const v = V;\n",
+        "node_modules/@types/one/index.d.ts": "declare const V: string;\n",
+        "node_modules/@types/two/index.d.ts": "declare const V: string;\n"
+      },
+      "tool": {
+        "note": "Dependency files are not reported here (docs/references.md, Binding model); TypeScript reports this one without skipLibCheck."
+      },
+      "native": {
+        "program": [
+          "main.ts",
+          "node_modules/@types/one/index.d.ts (external)",
+          "node_modules/@types/two/index.d.ts (external)"
+        ],
+        "diagnostics": [
+          "TS2451 node_modules/@types/one/index.d.ts:1:15",
+          "TS2451 node_modules/@types/two/index.d.ts:1:15"
+        ]
+      }
+    },
+    {
+      "name": "global-dependency-and-project",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[\"one\"]},\"files\":[\"main.ts\",\"b.ts\"]}",
+        "main.ts": "export const v = V;\n",
+        "b.ts": "declare const V: string;\n",
+        "node_modules/@types/one/index.d.ts": "declare const V: string;\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2451"
+        ]
+      },
+      "native": {
+        "program": [
+          "main.ts",
+          "b.ts",
+          "node_modules/@types/one/index.d.ts (external)"
+        ],
+        "diagnostics": [
+          "TS2451 b.ts:1:15",
+          "TS2451 node_modules/@types/one/index.d.ts:1:15"
+        ]
+      }
+    },
+    {
+      "name": "augment-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"types.ts\",\"aug.ts\"]}",
+        "types.ts": "export interface X { a: number }\n",
+        "aug.ts": "import \"./types\";\ndeclare module \"./types\" { type X = string; }\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2300"
+        ]
+      },
+      "native": {
+        "program": [
+          "types.ts",
+          "aug.ts"
+        ],
+        "diagnostics": [
+          "TS2300 aug.ts:2:33",
+          "TS2300 types.ts:1:18"
+        ]
+      }
+    },
+    {
+      "name": "augment-skip-lib-check",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"types.d.ts\",\"aug.d.ts\"]}",
+        "types.d.ts": "export interface X { a: number }\n",
+        "aug.d.ts": "import \"./types\";\ndeclare module \"./types\" { type X = string; }\n"
+      },
+      "native": {
+        "program": [
+          "types.d.ts",
+          "aug.d.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "augment-skip-lib-check-target",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"types.d.ts\",\"aug.ts\"]}",
+        "types.d.ts": "export interface X { a: number }\n",
+        "aug.ts": "import \"./types\";\ndeclare module \"./types\" { type X = string; }\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2300"
+        ]
+      },
+      "native": {
+        "program": [
+          "types.d.ts",
+          "aug.ts"
+        ],
+        "diagnostics": [
+          "TS2300 aug.ts:2:33"
+        ]
+      }
+    },
+    {
+      "name": "augment-skip-lib-check-augmentation",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"types.ts\",\"aug.d.ts\"]}",
+        "types.ts": "export interface X { a: number }\n",
+        "aug.d.ts": "import \"./types\";\ndeclare module \"./types\" { type X = string; }\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2300"
+        ]
+      },
+      "native": {
+        "program": [
+          "types.ts",
+          "aug.d.ts"
+        ],
+        "diagnostics": [
+          "TS2300 types.ts:1:18"
+        ]
+      }
+    },
+    {
+      "name": "augment-nocheck-augmentation",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"types.ts\",\"aug.ts\"]}",
+        "types.ts": "export interface X { a: number }\n",
+        "aug.ts": "// @ts-nocheck\nimport \"./types\";\ndeclare module \"./types\" { type X = string; }\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2300"
+        ]
+      },
+      "native": {
+        "program": [
+          "types.ts",
+          "aug.ts"
+        ],
+        "diagnostics": [
+          "TS2300 types.ts:1:18"
+        ]
+      }
+    },
+    {
+      "name": "augment-nocheck-both",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"types.ts\",\"aug.ts\"]}",
+        "types.ts": "// @ts-nocheck\nexport interface X { a: number }\n",
+        "aug.ts": "// @ts-nocheck\nimport \"./types\";\ndeclare module \"./types\" { type X = string; }\n"
+      },
+      "native": {
+        "program": [
+          "types.ts",
+          "aug.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "augment-ignore-augmentation",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"types.ts\",\"aug.ts\"]}",
+        "types.ts": "export interface X { a: number }\n",
+        "aug.ts": "import \"./types\";\n// @ts-ignore\ndeclare module \"./types\" { type X = string; }\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2300"
+        ]
+      },
+      "native": {
+        "program": [
+          "types.ts",
+          "aug.ts"
+        ],
+        "diagnostics": [
+          "TS2300 types.ts:1:18"
+        ]
+      }
+    },
+    {
+      "name": "augment-no-check-option",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"noCheck\":true},\"files\":[\"types.ts\",\"aug.ts\"]}",
+        "types.ts": "export interface X { a: number }\n",
+        "aug.ts": "import \"./types\";\ndeclare module \"./types\" { type X = string; }\n"
+      },
+      "native": {
+        "program": [
+          "types.ts",
+          "aug.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "augment-dependency",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"main.ts\"]}",
+        "main.ts": "import \"dep\";\n",
+        "node_modules/dep/package.json": "{\"name\": \"dep\", \"types\": \"index.d.ts\"}",
+        "node_modules/dep/index.d.ts": "export interface X { a: number }\ndeclare module \"./index\" { type X = string; }\n"
+      },
+      "tool": {
+        "note": "Dependency files are not reported here (docs/references.md, Binding model); TypeScript reports this one without skipLibCheck."
+      },
+      "native": {
+        "program": [
+          "node_modules/dep/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2300 node_modules/dep/index.d.ts:1:18",
+          "TS2300 node_modules/dep/index.d.ts:2:33"
+        ]
+      }
+    },
+    {
+      "name": "non-module-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"commonjs\"},\"files\":[\"api.d.ts\",\"aug.ts\"]}",
+        "api.d.ts": "declare function f(): void;\nexport = f;\n",
+        "aug.ts": "import \"./api\";\ndeclare module \"./api\" { interface X { a: number } }\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2671"
+        ]
+      },
+      "native": {
+        "program": [
+          "api.d.ts",
+          "aug.ts"
+        ],
+        "diagnostics": [
+          "TS2671 aug.ts:2:16"
+        ]
+      }
+    },
+    {
+      "name": "non-module-declaration-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"commonjs\"},\"files\":[\"api.d.ts\",\"aug.d.ts\"]}",
+        "api.d.ts": "declare function f(): void;\nexport = f;\n",
+        "aug.d.ts": "import \"./api\";\ndeclare module \"./api\" { interface X { a: number } }\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2671"
+        ]
+      },
+      "native": {
+        "program": [
+          "api.d.ts",
+          "aug.d.ts"
+        ],
+        "diagnostics": [
+          "TS2671 aug.d.ts:2:16"
+        ]
+      }
+    },
+    {
+      "name": "non-module-skip-lib-check",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"commonjs\",\"skipLibCheck\":true},\"files\":[\"api.d.ts\",\"aug.d.ts\"]}",
+        "api.d.ts": "declare function f(): void;\nexport = f;\n",
+        "aug.d.ts": "import \"./api\";\ndeclare module \"./api\" { interface X { a: number } }\n"
+      },
+      "native": {
+        "program": [
+          "api.d.ts",
+          "aug.d.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "non-module-nocheck",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"commonjs\"},\"files\":[\"api.d.ts\",\"aug.ts\"]}",
+        "api.d.ts": "declare function f(): void;\nexport = f;\n",
+        "aug.ts": "// @ts-nocheck\nimport \"./api\";\ndeclare module \"./api\" { interface X { a: number } }\n"
+      },
+      "native": {
+        "program": [
+          "api.d.ts",
+          "aug.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "non-module-ignore",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"commonjs\"},\"files\":[\"api.d.ts\",\"aug.ts\"]}",
+        "api.d.ts": "declare function f(): void;\nexport = f;\n",
+        "aug.ts": "import \"./api\";\n// @ts-ignore\ndeclare module \"./api\" { interface X { a: number } }\n"
+      },
+      "native": {
+        "program": [
+          "api.d.ts",
+          "aug.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "non-module-no-check-option",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"commonjs\",\"noCheck\":true},\"files\":[\"api.d.ts\",\"aug.ts\"]}",
+        "api.d.ts": "declare function f(): void;\nexport = f;\n",
+        "aug.ts": "import \"./api\";\ndeclare module \"./api\" { interface X { a: number } }\n"
+      },
+      "native": {
+        "program": [
+          "api.d.ts",
+          "aug.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "non-module-dependency",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"module\":\"commonjs\"},\"files\":[\"main.ts\"]}",
+        "main.ts": "import \"dep\";\n",
+        "node_modules/dep/package.json": "{\"name\": \"dep\", \"types\": \"index.d.ts\"}",
+        "node_modules/dep/api.d.ts": "declare function f(): void;\nexport = f;\n",
+        "node_modules/dep/index.d.ts": "import \"./api\";\ndeclare module \"./api\" { interface X { a: number } }\nexport {};\n"
+      },
+      "tool": {
+        "note": "Dependency files are not reported here (docs/references.md, Binding model); TypeScript reports this one without skipLibCheck."
+      },
+      "native": {
+        "program": [
+          "node_modules/dep/api.d.ts (external)",
+          "node_modules/dep/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2671 node_modules/dep/index.d.ts:2:16"
+        ]
+      }
+    },
+    {
+      "name": "type-parameters-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\",\"b.ts\"]}",
+        "a.ts": "interface X<T> { a: T }\n",
+        "b.ts": "interface X<U> { b: U }\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2428"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts",
+          "b.ts"
+        ],
+        "diagnostics": [
+          "TS2428 a.ts:1:11",
+          "TS2428 b.ts:1:11"
+        ]
+      }
+    },
+    {
+      "name": "type-parameters-skip-lib-check",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"a.d.ts\",\"b.d.ts\"]}",
+        "a.d.ts": "declare namespace N { interface X<T> { a: T } }\n",
+        "b.d.ts": "declare namespace N { interface X<U> { b: U } }\n"
+      },
+      "native": {
+        "program": [
+          "a.d.ts",
+          "b.d.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "type-parameters-skip-lib-check-one",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"a.d.ts\",\"b.ts\"]}",
+        "a.d.ts": "interface X<T> { a: T }\n",
+        "b.ts": "interface X<U> { b: U }\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2428"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.d.ts",
+          "b.ts"
+        ],
+        "diagnostics": [
+          "TS2428 b.ts:1:11"
+        ]
+      }
+    },
+    {
+      "name": "type-parameters-nocheck-one",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\",\"b.ts\"]}",
+        "a.ts": "// @ts-nocheck\ninterface X<T> { a: T }\n",
+        "b.ts": "interface X<U> { b: U }\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2428"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts",
+          "b.ts"
+        ],
+        "diagnostics": [
+          "TS2428 b.ts:1:11"
+        ]
+      }
+    },
+    {
+      "name": "type-parameters-ignore-both",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\",\"b.ts\"]}",
+        "a.ts": "// @ts-ignore\ninterface X<T> { a: T }\n",
+        "b.ts": "// @ts-ignore\ninterface X<U> { b: U }\n"
+      },
+      "native": {
+        "program": [
+          "a.ts",
+          "b.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "type-parameters-no-check-option",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"noCheck\":true},\"files\":[\"a.ts\",\"b.ts\"]}",
+        "a.ts": "interface X<T> { a: T }\n",
+        "b.ts": "interface X<U> { b: U }\n"
+      },
+      "native": {
+        "program": [
+          "a.ts",
+          "b.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "import-local-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"m.ts\",\"a.ts\"]}",
+        "m.ts": "export const x = 1;\n",
+        "a.ts": "import { x } from \"./m\";\nlet x = 2;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2440"
+        ]
+      },
+      "native": {
+        "program": [
+          "m.ts",
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2440 a.ts:1:10"
+        ]
+      }
+    },
+    {
+      "name": "import-local-nocheck",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"m.ts\",\"a.ts\"]}",
+        "m.ts": "export const x = 1;\n",
+        "a.ts": "// @ts-nocheck\nimport { x } from \"./m\";\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "m.ts",
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "import-local-ignore",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"m.ts\",\"a.ts\"]}",
+        "m.ts": "export const x = 1;\n",
+        "a.ts": "// @ts-ignore\nimport { x } from \"./m\";\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "m.ts",
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "import-local-no-check-option",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"noCheck\":true},\"files\":[\"m.ts\",\"a.ts\"]}",
+        "m.ts": "export const x = 1;\n",
+        "a.ts": "import { x } from \"./m\";\nlet x = 2;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "m.ts",
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "import-local-skip-lib-check",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"m.ts\",\"a.d.ts\"]}",
+        "m.ts": "export const x = 1;\n",
+        "a.d.ts": "import { x } from \"./m\";\ndeclare let x: number;\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "m.ts",
+          "a.d.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "import { y } from \"./missing\";\nexport const z = y;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2307 a.ts:1:19"
+        ]
+      }
+    },
+    {
+      "name": "missing-nocheck",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @ts-nocheck\nimport { y } from \"./missing\";\nexport const z = y;\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-no-check-option",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"noCheck\":true},\"files\":[\"a.ts\"]}",
+        "a.ts": "import { y } from \"./missing\";\nexport const z = y;\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-ignore",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @ts-ignore\nimport { y } from \"./missing\";\nexport const z = y;\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-declaration-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.d.ts\"]}",
+        "a.d.ts": "import { y } from \"./missing\";\nexport declare const z: typeof y;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2307"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.d.ts"
+        ],
+        "diagnostics": [
+          "TS2307 a.d.ts:1:19"
+        ]
+      }
+    },
+    {
+      "name": "missing-skip-lib-check",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"a.d.ts\"]}",
+        "a.d.ts": "import { y } from \"./missing\";\nexport declare const z: typeof y;\n"
+      },
+      "native": {
+        "program": [
+          "a.d.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-dependency",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"main.ts\"]}",
+        "main.ts": "import \"dep\";\n",
+        "node_modules/dep/package.json": "{\"name\": \"dep\", \"types\": \"index.d.ts\"}",
+        "node_modules/dep/index.d.ts": "import { y } from \"./missing\";\nexport declare const z: typeof y;\n"
+      },
+      "tool": {
+        "note": "Dependency files are not reported here (docs/references.md, Binding model); TypeScript reports this one without skipLibCheck."
+      },
+      "native": {
+        "program": [
+          "node_modules/dep/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2307 node_modules/dep/index.d.ts:1:19"
+        ]
+      }
+    },
+    {
+      "name": "missing-reference-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "/// <reference path=\"./missing.ts\" />\nexport const z = 1;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS6053"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS6053 a.ts:1:22"
+        ]
+      }
+    },
+    {
+      "name": "missing-reference-nocheck",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @ts-nocheck\n/// <reference path=\"./missing.ts\" />\nexport const z = 1;\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-reference-no-check-option",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"noCheck\":true},\"files\":[\"a.ts\"]}",
+        "a.ts": "/// <reference path=\"./missing.ts\" />\nexport const z = 1;\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "missing-reference-dependency",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"main.ts\"]}",
+        "main.ts": "import \"dep\";\n",
+        "node_modules/dep/package.json": "{\"name\": \"dep\", \"types\": \"index.d.ts\"}",
+        "node_modules/dep/index.d.ts": "/// <reference path=\"./missing.d.ts\" />\nexport declare const z: number;\n"
+      },
+      "tool": {
+        "note": "Dependency files are not reported here (docs/references.md, Binding model); TypeScript reports this one without skipLibCheck."
+      },
+      "native": {
+        "program": [
+          "node_modules/dep/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6053 node_modules/dep/index.d.ts:1:22"
+        ]
+      }
+    },
+    {
+      "name": "missing-types-reference-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "/// <reference types=\"missing\" />\nexport const z = 1;\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2688"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2688 a.ts:1:23"
+        ]
+      }
+    },
+    {
+      "name": "missing-types-reference-nocheck",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @ts-nocheck\n/// <reference types=\"missing\" />\nexport const z = 1;\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "augmentation-target-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "export {};\ndeclare module \"./missing\" { interface X {} }\n"
+      },
+      "tool": {
+        "error": [
+          "UnresolvedImport",
+          "TS2664"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2664 a.ts:2:16"
+        ]
+      }
+    },
+    {
+      "name": "augmentation-target-nocheck",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @ts-nocheck\nexport {};\ndeclare module \"./missing\" { interface X {} }\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "augmentation-target-no-check-option",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"noCheck\":true},\"files\":[\"a.ts\"]}",
+        "a.ts": "export {};\ndeclare module \"./missing\" { interface X {} }\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "augmentation-target-ignore",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "export {};\n// @ts-ignore\ndeclare module \"./missing\" { interface X {} }\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "hoisted-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "export function f() {\n  {\n    let x = 1;\n    {\n      var x = 2;\n    }\n  }\n}\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2481"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2481 a.ts:5:11"
+        ]
+      }
+    },
+    {
+      "name": "hoisted-nocheck",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @ts-nocheck\nexport function f() {\n  {\n    let x = 1;\n    {\n      var x = 2;\n    }\n  }\n}\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "hoisted-ignore",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "export function f() {\n  {\n    let x = 1;\n    {\n      // @ts-ignore\n      var x = 2;\n    }\n  }\n}\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "hoisted-no-check-option",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"noCheck\":true},\"files\":[\"a.ts\"]}",
+        "a.ts": "export function f() {\n  {\n    let x = 1;\n    {\n      var x = 2;\n    }\n  }\n}\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "mixed-exports-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "export interface I { a: number }\ninterface I { b: number }\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2395"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2395 a.ts:1:18",
+          "TS2395 a.ts:2:11"
+        ]
+      }
+    },
+    {
+      "name": "mixed-exports-ignore-first",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @ts-ignore\nexport interface I { a: number }\ninterface I { b: number }\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2395"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2395 a.ts:3:11"
+        ]
+      }
+    },
+    {
+      "name": "mixed-exports-nocheck",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @ts-nocheck\nexport interface I { a: number }\ninterface I { b: number }\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "mixed-exports-overloads",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "export declare function f(): void;\ndeclare function f(x: number): void;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2383"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2383 a.ts:2:18"
+        ]
+      }
+    },
+    {
+      "name": "mixed-exports-overloads-local-first",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "declare function f(x: number): void;\nexport declare function f(): void;\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2383"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2383 a.ts:2:25"
+        ]
+      }
+    },
+    {
+      "name": "mixed-exports-namespaces",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "export namespace N { export const a = 1; }\nnamespace N { export const b = 1; }\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2395"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2395 a.ts:1:18",
+          "TS2395 a.ts:2:11"
+        ]
+      }
+    },
+    {
+      "name": "namespace-before-class-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "namespace N { export const a = 1; }\nclass N {}\nexport {};\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2434"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2434 a.ts:1:11"
+        ]
+      }
+    },
+    {
+      "name": "namespace-before-class-nocheck",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @ts-nocheck\nnamespace N { export const a = 1; }\nclass N {}\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "namespace-before-class-ignore",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @ts-ignore\nnamespace N { export const a = 1; }\nclass N {}\nexport {};\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "misplaced-global-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "declare global { interface G {} }\n"
+      },
+      "tool": {
+        "error": [
+          "Binding",
+          "TS2669"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": [
+          "TS2669 a.ts:1:9"
+        ]
+      }
+    },
+    {
+      "name": "misplaced-global-nocheck",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\"]}",
+        "a.ts": "// @ts-nocheck\ndeclare global { interface G {} }\n"
+      },
+      "native": {
+        "program": [
+          "a.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "umd-module-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\",\"main.ts\"]}",
+        "a.ts": "export const f = 1;\nexport as namespace Lib;\n",
+        "main.ts": "Lib.f;\n"
+      },
+      "watch": [
+        "Lib"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "TS1315"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS1315 a.ts:2:1",
+          "TS2304 main.ts:1:1"
+        ],
+        "names": [
+          "1:1 Lib -> none"
+        ]
+      }
+    },
+    {
+      "name": "umd-module-nocheck",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.ts\",\"main.ts\"]}",
+        "a.ts": "// @ts-nocheck\nexport const f = 1;\nexport as namespace Lib;\n",
+        "main.ts": "Lib.f;\n"
+      },
+      "watch": [
+        "Lib"
+      ],
+      "native": {
+        "program": [
+          "a.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2304 main.ts:1:1"
+        ],
+        "names": [
+          "1:1 Lib -> none"
+        ]
+      }
+    },
+    {
+      "name": "umd-declaration",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.d.ts\",\"main.ts\"]}",
+        "a.d.ts": "export declare const f: number;\nexport as namespace Lib;\n",
+        "main.ts": "Lib.f;\n"
+      },
+      "watch": [
+        "f"
+      ],
+      "native": {
+        "program": [
+          "a.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:5 f -> BlockScopedVariable [a.d.ts:1:22 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "umd-script-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.d.ts\",\"main.ts\"]}",
+        "a.d.ts": "declare const f: number;\nexport as namespace Lib;\n",
+        "main.ts": "Lib.f;\n"
+      },
+      "watch": [
+        "Lib"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "TS1314"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS1314 a.d.ts:2:1",
+          "TS2304 main.ts:1:1"
+        ],
+        "names": [
+          "1:1 Lib -> none"
+        ]
+      }
+    },
+    {
+      "name": "umd-script-skip-lib-check",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"a.d.ts\",\"main.ts\"]}",
+        "a.d.ts": "declare const f: number;\nexport as namespace Lib;\n",
+        "main.ts": "Lib.f;\n"
+      },
+      "watch": [
+        "Lib"
+      ],
+      "native": {
+        "program": [
+          "a.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2304 main.ts:1:1"
+        ],
+        "names": [
+          "1:1 Lib -> none"
+        ]
+      }
+    },
+    {
+      "name": "umd-nested-checked",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[]},\"files\":[\"a.d.ts\",\"main.ts\"]}",
+        "a.d.ts": "declare module \"inner\" {\n  export const f: number;\n  export as namespace Lib;\n}\n",
+        "main.ts": "Lib.f;\n"
+      },
+      "watch": [
+        "Lib"
+      ],
+      "tool": {
+        "error": [
+          "Binding",
+          "TS1316"
+        ]
+      },
+      "native": {
+        "program": [
+          "a.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS1316 a.d.ts:3:3",
+          "TS2304 main.ts:1:1"
+        ],
+        "names": [
+          "1:1 Lib -> none"
+        ]
+      }
+    },
+    {
+      "name": "umd-module-dependency",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"main.ts\"]}",
+        "main.ts": "import \"umd\";\nexport const v = Lib.f;\n",
+        "node_modules/umd/package.json": "{\"name\": \"umd\", \"types\": \"index.ts\"}",
+        "node_modules/umd/index.ts": "export declare const f: number;\nexport as namespace Lib;\n"
+      },
+      "watch": [
+        "Lib"
+      ],
+      "tool": {
+        "note": "Dependency files are not reported here (docs/references.md, Binding model); TypeScript reports this one without skipLibCheck."
+      },
+      "native": {
+        "program": [
+          "node_modules/umd/index.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2304 main.ts:2:18",
+          "TS1315 node_modules/umd/index.ts:2:1"
+        ],
+        "names": [
+          "2:18 Lib -> none"
+        ]
+      }
+    },
+    {
+      "name": "umd-declaration-dependency",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"types\":[],\"skipLibCheck\":true},\"files\":[\"main.ts\"]}",
+        "main.ts": "/// <reference types=\"umd\" />\nexport const v = Lib.f;\n",
+        "node_modules/@types/umd/index.d.ts": "export declare const f: number;\nexport as namespace Lib;\n"
+      },
+      "watch": [
+        "f"
+      ],
+      "native": {
+        "program": [
+          "node_modules/@types/umd/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS2686 main.ts:2:18"
+        ],
+        "names": [
+          "2:22 f -> BlockScopedVariable [node_modules/@types/umd/index.d.ts:1:22 VariableDeclaration]"
+        ]
+      }
+    }
+  ]
+}

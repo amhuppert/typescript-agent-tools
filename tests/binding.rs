@@ -4,7 +4,7 @@
 mod support;
 
 use support::load_error;
-use typescript_parser::references::ProjectErrorKind;
+use typescript_parser::analysis::InputErrorKind;
 
 /// docs/references.md, "Differences from TypeScript 7.0.2": invalid
 /// declaration arrangements that TypeScript binds but its checker rejects are
@@ -27,7 +27,7 @@ fn invalid_declaration_arrangements_are_binding_errors() {
         "export {};\ninterface H<T, U = 1> {}\ninterface H<T, V = 1> {}\n",
     ] {
         let error = load_error(&[("app.ts", source)]);
-        assert_eq!(error.kind, ProjectErrorKind::Binding, "{source}: {error}");
+        assert_eq!(error.kind, InputErrorKind::Binding, "{source}: {error}");
     }
 }
 
@@ -53,7 +53,7 @@ fn instantiated_namespaces_conflict_with_values() {
     ] {
         let source = format!("declare namespace A {{ {body} }}\ndeclare const A: number;\n");
         let error = load_error(&[("app.ts", &source)]);
-        assert_eq!(error.kind, ProjectErrorKind::Binding, "{source}: {error}");
+        assert_eq!(error.kind, InputErrorKind::Binding, "{source}: {error}");
         assert_eq!(error.message, "duplicate declaration of `A`", "{source}");
     }
 }

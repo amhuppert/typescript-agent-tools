@@ -10,8 +10,9 @@
 // tests/support/mod.rs) agree with the normalized semantic oracle. Every
 // identifier token must be marked; each label must denote exactly the tokens
 // of one oracle group; `!` must be a member or non-reference position and `?`
-// an unresolved or library-only target; marked roles must match the tokens'
-// syntactic roles. --limit selects the first N fixtures.
+// an unresolved target; marked roles must match the tokens' syntactic roles.
+// Standard library declarations appear in groups unmarked, at their vendored
+// copies. --limit selects the first N fixtures.
 //
 // compare: queries the Rust tool at every oracle token through one
 // `reference_batch` process per project and reports per-token differences:
@@ -297,13 +298,20 @@ export function compareGroups(expected, actual) {
     const sides = groups.map(group => ({ occurrences: occurrenceKeys(group), roles: roleKeys(group), declarations: declarationKeys(group), places: declarationPlaces(group) }));
     // A token in several groups (such as `export { Name }` for a type and a
     // value) says nothing about which groups correspond; match on the others.
-    const counts = new Map();
-    for (const side of sides) for (const key of side.occurrences.keys()) counts.set(key, (counts.get(key) ?? 0) + 1);
-    for (const side of sides) side.exclusive = new Set([...side.occurrences.keys()].filter(key => counts.get(key) === 1));
+    // Neither does a declaration in several groups, such as a pattern ambient
+    // module's that a one-way augmentation merge also lists.
+    const exclusive = keys => {
+      const counts = new Map();
+      for (const side of sides) for (const key of keys(side)) counts.set(key, (counts.get(key) ?? 0) + 1);
+      return side => new Set([...keys(side)].filter(key => counts.get(key) === 1));
+    };
+    const exclusiveOccurrences = exclusive(side => side.occurrences.keys());
+    const exclusivePlaces = exclusive(side => side.places);
+    for (const side of sides) Object.assign(side, { exclusive: exclusiveOccurrences(side), exclusivePlaces: exclusivePlaces(side) });
     return sides;
   };
   const wanted = summarize(expected), found = summarize(actual);
-  const strong = (a, b) => [...a.places].some(key => b.places.has(key)) || [...a.exclusive].some(key => b.exclusive.has(key));
+  const strong = (a, b) => [...a.exclusivePlaces].some(key => b.exclusivePlaces.has(key)) || [...a.exclusive].some(key => b.exclusive.has(key));
   const weak = (a, b) => [...a.occurrences.keys()].some(key => b.occurrences.has(key));
   const related = (side, others) => {
     const indices = others.map((other, index) => (strong(side, other) ? index : -1)).filter(index => index >= 0);

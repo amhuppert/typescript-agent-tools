@@ -1,0 +1,82 @@
+{
+ "flows": [
+  {
+   "name": "factory method body with a multi-line SQL template",
+   "edits": [
+    {
+     "operation": "replace_body",
+     "name": "createAgentRunsRepo.createAgentRunRecord",
+     "file": "src/lib/agent-runs/repo.ts",
+     "fragment": "{\n  const startedAt = input.startedAt;\n  timedSync(\n    logger,\n    \"state-db.createAgentRunRecord\",\n    { runId: input.runId, backend: input.backend },\n    () => {\n      db.prepare(\n        `INSERT OR REPLACE INTO agent_run_records\n           (run_id, backend, project_name, session_name, status, started_at, owner_pid)\n         VALUES (?, ?, ?, ?, ?, ?, ?)`,\n      ).run(\n        input.runId,\n        input.backend,\n        input.projectName,\n        input.sessionName,\n        \"running\",\n        startedAt,\n        input.ownerPid,\n      );\n    },\n  );\n}\n"
+    }
+   ],
+   "then": [
+    "--show --name createAgentRunsRepo.createAgentRunRecord src/lib/agent-runs/repo.ts",
+    "--references --name createAgentRunsRepo"
+   ]
+  },
+  {
+   "name": "TSX component body and an inserted component",
+   "edits": [
+    {
+     "operation": "replace_body",
+     "name": "GenericToastSource",
+     "file": "src/components/ToastHost.tsx",
+     "fragment": "{\n  const toasts = useToasts();\n  const dismiss = useDismissToast();\n  if (toasts.length === 0) return null;\n  return (\n    <section aria-label=\"Notifications\" className=\"pointer-events-none fixed\">\n      {toasts.map((t) => (\n        <Toast\n          key={t.id}\n          message={t.message}\n          action={t.action}\n          actions={t.actions}\n          onDismiss={() => dismiss(t.id)}\n          placement=\"stacked\"\n        />\n      ))}\n    </section>\n  );\n}"
+    },
+    {
+     "operation": "insert_after",
+     "name": "MergeToastSource",
+     "file": "src/components/ToastHost.tsx",
+     "fragment": "/** Counts the toasts the store holds. */\nexport function ToastCount(): React.JSX.Element {\n  const toasts = useToasts();\n  return <span aria-live=\"polite\">{toasts.length}</span>;\n}\n"
+    }
+   ],
+   "then": [
+    "--show --name ToastCount src/components/ToastHost.tsx",
+    "--outline src/components/ToastHost.tsx"
+   ]
+  },
+  {
+   "name": "large test file",
+   "edits": [
+    {
+     "operation": "insert_after",
+     "name": "regroupedDefinition",
+     "file": "src/lib/workflow-graph/workflow-manager.test.ts",
+     "fragment": "function approvedRegroupedDefinition() {\n  return regroupedDefinition(true);\n}\n"
+    },
+    {
+     "operation": "replace_body",
+     "name": "createGraphWorkflowManager",
+     "file": "src/lib/workflow-graph/workflow-manager.test.ts",
+     "fragment": "{\n  const manager = createGraphWorkflowManagerFixture({\n    assertSessionBranchReady: async () => {},\n    captureExecutionLaneDevServerCleanup: (input) => () =>\n      deps.stopExecutionLaneDevServers(input),\n    ...deps,\n  });\n  return manager;\n}"
+    }
+   ],
+   "then": [
+    "--show --name approvedRegroupedDefinition src/lib/workflow-graph/workflow-manager.test.ts",
+    "--references --name regroupedDefinition"
+   ]
+  },
+  {
+   "name": "multi-file batch",
+   "edits": [
+    {
+     "operation": "insert_after",
+     "name": "createAgentRunsRepo",
+     "file": "src/lib/agent-runs/repo.ts",
+     "fragment": "export function agentRunsRepoName(): string {\n  return \"agent-runs\";\n}"
+    },
+    {
+     "operation": "replace_body",
+     "name": "createClientErrorRingBuffer",
+     "file": "src/lib/client-errors/ring-buffer.ts",
+     "fragment": "{\n  const limit = Math.max(1, capacity);\n  const entries: QuickTicketClientError[] = [];\n  return {\n    capture(kind, value, capturedAt = new Date()) {\n      const sanitized = sanitizeClientError(kind, value, capturedAt);\n      if (sanitized === null) return;\n      entries.push(sanitized);\n      if (entries.length > limit) {\n        entries.splice(0, entries.length - limit);\n      }\n    },\n    read() {\n      return entries.map((entry) => ({\n        ...entry,\n        stackHead: [...entry.stackHead],\n      }));\n    },\n  };\n}"
+    }
+   ],
+   "then": [
+    "--references --name agentRunsRepoName",
+    "--show --name createClientErrorRingBuffer"
+   ]
+  }
+ ]
+}

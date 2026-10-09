@@ -2,12 +2,10 @@ use super::*;
 
 impl<'src> Parser<'src> {
     pub(super) fn statement(&mut self) -> Result<NodeId> {
-        let deprecated = self.deprecated_trivia(false);
+        let site = self.jsdoc_site();
         let result = self.in_context(self.context, |p| p.nest(Self::statement_inner));
-        if deprecated {
-            if let Ok(id) = result {
-                self.nodes[id.0].flags |= node_flags::DEPRECATED;
-            }
+        if let Ok(id) = result {
+            self.mark_deprecated(site, id);
         }
         result
     }
@@ -546,7 +544,7 @@ impl<'src> Parser<'src> {
                 }
             }
             let start = self.pos();
-            let deprecated = self.deprecated_trivia(true);
+            let site = self.jsdoc_site();
             let modifiers = self.in_context(
                 self.context
                     .without(AWAIT)
@@ -572,9 +570,7 @@ impl<'src> Parser<'src> {
                 fields.push(("initializer", self.assignment_expression()?.into()));
             }
             let id = self.finish(Parameter, start, fields);
-            if deprecated {
-                self.nodes[id.0].flags |= node_flags::DEPRECATED;
-            }
+            self.mark_deprecated(site, id);
             self.attach_modifiers(id, modifiers);
             parameters.push(id);
             if !self.eat(",")? {
@@ -808,16 +804,14 @@ impl<'src> Parser<'src> {
             let mut members = vec![];
             while !p.at("}") {
                 let member_start = p.pos();
-                let deprecated = p.deprecated_trivia(false);
+                let site = p.jsdoc_site();
                 let name = p.property_name()?;
                 let mut fields = fields![("name", name.into())];
                 if p.eat("=")? {
                     fields.push(("initializer", p.assignment_expression()?.into()));
                 }
                 let member = p.finish(EnumMember, member_start, fields);
-                if deprecated {
-                    p.nodes[member.0].flags |= node_flags::DEPRECATED;
-                }
+                p.mark_deprecated(site, member);
                 members.push(member);
                 if !p.eat(",")? {
                     break;

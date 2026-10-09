@@ -1,0 +1,966 @@
+{
+  "description": "Configuration text and its conversion (`convertConfigFileToObject`, `convertToJson`, and `onPropertySet`): the shared JSON grammar, `?` after a key (TS8009), the root value, repeated keys and options validated at every occurrence.",
+  "cases": [
+    {
+      "name": "cfg-empty",
+      "files": {
+        "tsconfig.json": "",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "lib:lib.es5.d.ts",
+          "lib:lib.es2015.d.ts",
+          "lib:lib.es2016.d.ts",
+          "lib:lib.es2017.d.ts",
+          "lib:lib.es2018.d.ts",
+          "lib:lib.es2019.d.ts",
+          "lib:lib.es2020.d.ts",
+          "lib:lib.es2021.d.ts",
+          "lib:lib.es2022.d.ts",
+          "lib:lib.es2023.d.ts",
+          "lib:lib.es2024.d.ts",
+          "lib:lib.es2025.d.ts",
+          "lib:lib.dom.d.ts",
+          "lib:lib.dom.iterable.d.ts",
+          "lib:lib.dom.asynciterable.d.ts",
+          "lib:lib.webworker.importscripts.d.ts",
+          "lib:lib.scripthost.d.ts",
+          "lib:lib.es2015.core.d.ts",
+          "lib:lib.es2015.collection.d.ts",
+          "lib:lib.es2015.generator.d.ts",
+          "lib:lib.es2015.iterable.d.ts",
+          "lib:lib.es2015.promise.d.ts",
+          "lib:lib.es2015.proxy.d.ts",
+          "lib:lib.es2015.reflect.d.ts",
+          "lib:lib.es2015.symbol.d.ts",
+          "lib:lib.es2015.symbol.wellknown.d.ts",
+          "lib:lib.es2016.array.include.d.ts",
+          "lib:lib.es2016.intl.d.ts",
+          "lib:lib.es2017.arraybuffer.d.ts",
+          "lib:lib.es2017.date.d.ts",
+          "lib:lib.es2017.object.d.ts",
+          "lib:lib.es2017.sharedmemory.d.ts",
+          "lib:lib.es2017.string.d.ts",
+          "lib:lib.es2017.intl.d.ts",
+          "lib:lib.es2017.typedarrays.d.ts",
+          "lib:lib.es2018.asyncgenerator.d.ts",
+          "lib:lib.es2018.asynciterable.d.ts",
+          "lib:lib.es2018.intl.d.ts",
+          "lib:lib.es2018.promise.d.ts",
+          "lib:lib.es2018.regexp.d.ts",
+          "lib:lib.es2019.array.d.ts",
+          "lib:lib.es2019.object.d.ts",
+          "lib:lib.es2019.string.d.ts",
+          "lib:lib.es2019.symbol.d.ts",
+          "lib:lib.es2019.intl.d.ts",
+          "lib:lib.es2020.bigint.d.ts",
+          "lib:lib.es2020.date.d.ts",
+          "lib:lib.es2020.promise.d.ts",
+          "lib:lib.es2020.sharedmemory.d.ts",
+          "lib:lib.es2020.string.d.ts",
+          "lib:lib.es2020.symbol.wellknown.d.ts",
+          "lib:lib.es2020.intl.d.ts",
+          "lib:lib.es2020.number.d.ts",
+          "lib:lib.es2021.promise.d.ts",
+          "lib:lib.es2021.string.d.ts",
+          "lib:lib.es2021.weakref.d.ts",
+          "lib:lib.es2021.intl.d.ts",
+          "lib:lib.es2022.array.d.ts",
+          "lib:lib.es2022.error.d.ts",
+          "lib:lib.es2022.intl.d.ts",
+          "lib:lib.es2022.object.d.ts",
+          "lib:lib.es2022.string.d.ts",
+          "lib:lib.es2022.regexp.d.ts",
+          "lib:lib.es2023.array.d.ts",
+          "lib:lib.es2023.collection.d.ts",
+          "lib:lib.es2023.intl.d.ts",
+          "lib:lib.es2024.arraybuffer.d.ts",
+          "lib:lib.es2024.collection.d.ts",
+          "lib:lib.es2024.object.d.ts",
+          "lib:lib.es2024.promise.d.ts",
+          "lib:lib.es2024.regexp.d.ts",
+          "lib:lib.es2024.sharedmemory.d.ts",
+          "lib:lib.es2024.string.d.ts",
+          "lib:lib.es2025.collection.d.ts",
+          "lib:lib.es2025.float16.d.ts",
+          "lib:lib.es2025.intl.d.ts",
+          "lib:lib.es2025.iterator.d.ts",
+          "lib:lib.es2025.promise.d.ts",
+          "lib:lib.es2025.regexp.d.ts",
+          "lib:lib.decorators.d.ts",
+          "lib:lib.decorators.legacy.d.ts",
+          "lib:lib.es2025.full.d.ts",
+          "b.ts",
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "cfg-comment-only",
+      "files": {
+        "tsconfig.json": "// nothing",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "lib:lib.es5.d.ts",
+          "lib:lib.es2015.d.ts",
+          "lib:lib.es2016.d.ts",
+          "lib:lib.es2017.d.ts",
+          "lib:lib.es2018.d.ts",
+          "lib:lib.es2019.d.ts",
+          "lib:lib.es2020.d.ts",
+          "lib:lib.es2021.d.ts",
+          "lib:lib.es2022.d.ts",
+          "lib:lib.es2023.d.ts",
+          "lib:lib.es2024.d.ts",
+          "lib:lib.es2025.d.ts",
+          "lib:lib.dom.d.ts",
+          "lib:lib.dom.iterable.d.ts",
+          "lib:lib.dom.asynciterable.d.ts",
+          "lib:lib.webworker.importscripts.d.ts",
+          "lib:lib.scripthost.d.ts",
+          "lib:lib.es2015.core.d.ts",
+          "lib:lib.es2015.collection.d.ts",
+          "lib:lib.es2015.generator.d.ts",
+          "lib:lib.es2015.iterable.d.ts",
+          "lib:lib.es2015.promise.d.ts",
+          "lib:lib.es2015.proxy.d.ts",
+          "lib:lib.es2015.reflect.d.ts",
+          "lib:lib.es2015.symbol.d.ts",
+          "lib:lib.es2015.symbol.wellknown.d.ts",
+          "lib:lib.es2016.array.include.d.ts",
+          "lib:lib.es2016.intl.d.ts",
+          "lib:lib.es2017.arraybuffer.d.ts",
+          "lib:lib.es2017.date.d.ts",
+          "lib:lib.es2017.object.d.ts",
+          "lib:lib.es2017.sharedmemory.d.ts",
+          "lib:lib.es2017.string.d.ts",
+          "lib:lib.es2017.intl.d.ts",
+          "lib:lib.es2017.typedarrays.d.ts",
+          "lib:lib.es2018.asyncgenerator.d.ts",
+          "lib:lib.es2018.asynciterable.d.ts",
+          "lib:lib.es2018.intl.d.ts",
+          "lib:lib.es2018.promise.d.ts",
+          "lib:lib.es2018.regexp.d.ts",
+          "lib:lib.es2019.array.d.ts",
+          "lib:lib.es2019.object.d.ts",
+          "lib:lib.es2019.string.d.ts",
+          "lib:lib.es2019.symbol.d.ts",
+          "lib:lib.es2019.intl.d.ts",
+          "lib:lib.es2020.bigint.d.ts",
+          "lib:lib.es2020.date.d.ts",
+          "lib:lib.es2020.promise.d.ts",
+          "lib:lib.es2020.sharedmemory.d.ts",
+          "lib:lib.es2020.string.d.ts",
+          "lib:lib.es2020.symbol.wellknown.d.ts",
+          "lib:lib.es2020.intl.d.ts",
+          "lib:lib.es2020.number.d.ts",
+          "lib:lib.es2021.promise.d.ts",
+          "lib:lib.es2021.string.d.ts",
+          "lib:lib.es2021.weakref.d.ts",
+          "lib:lib.es2021.intl.d.ts",
+          "lib:lib.es2022.array.d.ts",
+          "lib:lib.es2022.error.d.ts",
+          "lib:lib.es2022.intl.d.ts",
+          "lib:lib.es2022.object.d.ts",
+          "lib:lib.es2022.string.d.ts",
+          "lib:lib.es2022.regexp.d.ts",
+          "lib:lib.es2023.array.d.ts",
+          "lib:lib.es2023.collection.d.ts",
+          "lib:lib.es2023.intl.d.ts",
+          "lib:lib.es2024.arraybuffer.d.ts",
+          "lib:lib.es2024.collection.d.ts",
+          "lib:lib.es2024.object.d.ts",
+          "lib:lib.es2024.promise.d.ts",
+          "lib:lib.es2024.regexp.d.ts",
+          "lib:lib.es2024.sharedmemory.d.ts",
+          "lib:lib.es2024.string.d.ts",
+          "lib:lib.es2025.collection.d.ts",
+          "lib:lib.es2025.float16.d.ts",
+          "lib:lib.es2025.intl.d.ts",
+          "lib:lib.es2025.iterator.d.ts",
+          "lib:lib.es2025.promise.d.ts",
+          "lib:lib.es2025.regexp.d.ts",
+          "lib:lib.decorators.d.ts",
+          "lib:lib.decorators.legacy.d.ts",
+          "lib:lib.es2025.full.d.ts",
+          "b.ts",
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "cfg-shebang",
+      "files": {
+        "tsconfig.json": "#!x\n{\"compilerOptions\":{\"noLib\":true},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "cfg-bom-shebang",
+      "files": {
+        "tsconfig.json": "﻿#!x\n{\"compilerOptions\":{\"noLib\":true},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "cfg-hex",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"maxNodeModuleJsDepth\":0x1},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "cfg-octal",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"maxNodeModuleJsDepth\":01},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": [
+          "TS1121 tsconfig.json:1:57"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "TS1121"
+        ]
+      }
+    },
+    {
+      "name": "cfg-escape8",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"jsxImportSource\":\"\\8\"},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": [
+          "TS1488 tsconfig.json:1:53"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "tsconfig.json:1:52"
+        ],
+        "note": "docs/references.md: a scanner error inside a token is reported at the token's start; TypeScript reports it at the offending character"
+      }
+    },
+    {
+      "name": "cfg-question",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\"?:true},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": [
+          "TS8009 tsconfig.json:1:28"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "TS8009"
+        ]
+      }
+    },
+    {
+      "name": "cfg-excl",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\"!:true},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "cfg-modifier",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{public \"noLib\":true},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "cfg-dup-bad-first",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"module\":\"bogus\",\"module\":\"esnext\"},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": [
+          "TS6046 tsconfig.json:1:43"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "TS6046"
+        ]
+      }
+    },
+    {
+      "name": "cfg-dup-bad-type-first",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"allowJs\":\"yes\",\"allowJs\":false},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": [
+          "TS5024 tsconfig.json:1:44"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "TS5024"
+        ]
+      }
+    },
+    {
+      "name": "cfg-dup-lib-bad-first",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":false,\"lib\":[\"nope\"],\"lib\":[\"es5\"]},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "lib:lib.es5.d.ts",
+          "lib:lib.decorators.d.ts",
+          "lib:lib.decorators.legacy.d.ts",
+          "b.ts"
+        ],
+        "diagnostics": [
+          "TS6046 tsconfig.json:1:42"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "TS6046"
+        ]
+      }
+    },
+    {
+      "name": "cfg-dup-removed-first",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"module\":\"amd\",\"module\":\"esnext\"},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "cfg-dup-compiler-options",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"allowJs\":true},\"compilerOptions\":{\"checkJs\":false},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "cfg-dup-compiler-options-bad",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"module\":\"bogus\"},\"compilerOptions\":{\"noLib\":true},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": [
+          "TS6046 tsconfig.json:1:43"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "TS6046"
+        ]
+      }
+    },
+    {
+      "name": "cfg-dup-files",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true},\"files\":[\"main.ts\"],\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "cfg-dup-files-bad-first",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true},\"files\":[1],\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": [
+          "TS5024 tsconfig.json:1:44"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "TS5024"
+        ]
+      }
+    },
+    {
+      "name": "cfg-dup-extends-missing-first",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./nope.json\",\"extends\":\"./base.json\",\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true}}"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "cfg-dup-null-after",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"lib\":[\"es5\"],\"lib\":null},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "cfg-dup-paths-order",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"paths\":{\"a/*\":[\"./x/*\"],\"b\":[\"./b.ts\"],\"a/*\":[\"./b.ts\"]}},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "cfg-dup-paths-bad-first",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"paths\":5,\"paths\":{\"b\":[\"./b.ts\"]}},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": [
+          "TS5024 tsconfig.json:1:42"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "TS5024"
+        ]
+      }
+    },
+    {
+      "name": "cfg-array-root",
+      "files": {
+        "tsconfig.json": "[{\"compilerOptions\":{\"noLib\":true},\"files\":[\"b.ts\"]}]",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "cfg-string-root",
+      "files": {
+        "tsconfig.json": "\"x\"",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "lib:lib.es5.d.ts",
+          "lib:lib.es2015.d.ts",
+          "lib:lib.es2016.d.ts",
+          "lib:lib.es2017.d.ts",
+          "lib:lib.es2018.d.ts",
+          "lib:lib.es2019.d.ts",
+          "lib:lib.es2020.d.ts",
+          "lib:lib.es2021.d.ts",
+          "lib:lib.es2022.d.ts",
+          "lib:lib.es2023.d.ts",
+          "lib:lib.es2024.d.ts",
+          "lib:lib.es2025.d.ts",
+          "lib:lib.dom.d.ts",
+          "lib:lib.dom.iterable.d.ts",
+          "lib:lib.dom.asynciterable.d.ts",
+          "lib:lib.webworker.importscripts.d.ts",
+          "lib:lib.scripthost.d.ts",
+          "lib:lib.es2015.core.d.ts",
+          "lib:lib.es2015.collection.d.ts",
+          "lib:lib.es2015.generator.d.ts",
+          "lib:lib.es2015.iterable.d.ts",
+          "lib:lib.es2015.promise.d.ts",
+          "lib:lib.es2015.proxy.d.ts",
+          "lib:lib.es2015.reflect.d.ts",
+          "lib:lib.es2015.symbol.d.ts",
+          "lib:lib.es2015.symbol.wellknown.d.ts",
+          "lib:lib.es2016.array.include.d.ts",
+          "lib:lib.es2016.intl.d.ts",
+          "lib:lib.es2017.arraybuffer.d.ts",
+          "lib:lib.es2017.date.d.ts",
+          "lib:lib.es2017.object.d.ts",
+          "lib:lib.es2017.sharedmemory.d.ts",
+          "lib:lib.es2017.string.d.ts",
+          "lib:lib.es2017.intl.d.ts",
+          "lib:lib.es2017.typedarrays.d.ts",
+          "lib:lib.es2018.asyncgenerator.d.ts",
+          "lib:lib.es2018.asynciterable.d.ts",
+          "lib:lib.es2018.intl.d.ts",
+          "lib:lib.es2018.promise.d.ts",
+          "lib:lib.es2018.regexp.d.ts",
+          "lib:lib.es2019.array.d.ts",
+          "lib:lib.es2019.object.d.ts",
+          "lib:lib.es2019.string.d.ts",
+          "lib:lib.es2019.symbol.d.ts",
+          "lib:lib.es2019.intl.d.ts",
+          "lib:lib.es2020.bigint.d.ts",
+          "lib:lib.es2020.date.d.ts",
+          "lib:lib.es2020.promise.d.ts",
+          "lib:lib.es2020.sharedmemory.d.ts",
+          "lib:lib.es2020.string.d.ts",
+          "lib:lib.es2020.symbol.wellknown.d.ts",
+          "lib:lib.es2020.intl.d.ts",
+          "lib:lib.es2020.number.d.ts",
+          "lib:lib.es2021.promise.d.ts",
+          "lib:lib.es2021.string.d.ts",
+          "lib:lib.es2021.weakref.d.ts",
+          "lib:lib.es2021.intl.d.ts",
+          "lib:lib.es2022.array.d.ts",
+          "lib:lib.es2022.error.d.ts",
+          "lib:lib.es2022.intl.d.ts",
+          "lib:lib.es2022.object.d.ts",
+          "lib:lib.es2022.string.d.ts",
+          "lib:lib.es2022.regexp.d.ts",
+          "lib:lib.es2023.array.d.ts",
+          "lib:lib.es2023.collection.d.ts",
+          "lib:lib.es2023.intl.d.ts",
+          "lib:lib.es2024.arraybuffer.d.ts",
+          "lib:lib.es2024.collection.d.ts",
+          "lib:lib.es2024.object.d.ts",
+          "lib:lib.es2024.promise.d.ts",
+          "lib:lib.es2024.regexp.d.ts",
+          "lib:lib.es2024.sharedmemory.d.ts",
+          "lib:lib.es2024.string.d.ts",
+          "lib:lib.es2025.collection.d.ts",
+          "lib:lib.es2025.float16.d.ts",
+          "lib:lib.es2025.intl.d.ts",
+          "lib:lib.es2025.iterator.d.ts",
+          "lib:lib.es2025.promise.d.ts",
+          "lib:lib.es2025.regexp.d.ts",
+          "lib:lib.decorators.d.ts",
+          "lib:lib.decorators.legacy.d.ts",
+          "lib:lib.es2025.full.d.ts",
+          "b.ts",
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS5092 -"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "tsconfig.json:1:1"
+        ],
+        "note": "TypeScript reports this diagnostic without a position; this tool reports it at the value"
+      }
+    },
+    {
+      "name": "cfg-dup-bad-module-resolution-first",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"module\":\"esnext\",\"moduleResolution\":\"node16\",\"moduleResolution\":\"bundler\"},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "cfg-base-bad-overridden",
+      "files": {
+        "tsconfig.json": "{\"extends\":\"./base.json\",\"compilerOptions\":{\"module\":\"esnext\"},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n",
+        "base.json": "{\"compilerOptions\":{\"noLib\":true,\"module\":\"bogus\"}}"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": [
+          "TS6046 base.json:1:43"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "TS6046"
+        ]
+      }
+    },
+    {
+      "name": "cfg-lone-surrogate-key",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"\\ud800\":1},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": [
+          "TS5023 tsconfig.json:1:34"
+        ]
+      }
+    },
+    {
+      "name": "cfg-lone-surrogate-shadowed",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"jsxImportSource\":\"\\ud800\",\"jsxImportSource\":\"react\"},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "cfg-unknown-dup",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"bogusOption\":1,\"bogusOption\":2},\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": [
+          "TS5023 tsconfig.json:1:34",
+          "TS5023 tsconfig.json:1:50"
+        ]
+      }
+    },
+    {
+      "name": "cfg-root-dup-include-bad-first",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true},\"include\":\"x\",\"include\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": [
+          "TS5024 tsconfig.json:1:45"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "TS5024"
+        ]
+      }
+    },
+    {
+      "name": "cfg-references-dup",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true},\"references\":5,\"references\":[],\"files\":[\"b.ts\"]}",
+        "main.ts": "export const m = 1;\n",
+        "b.ts": "export const b = 1;\n"
+      },
+      "native": {
+        "program": [
+          "b.ts"
+        ],
+        "diagnostics": [
+          "TS5024 tsconfig.json:1:48"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "TS5024"
+        ]
+      }
+    },
+    {
+      "name": "cfg-dup-bad-last",
+      "files": {
+        "tsconfig.json": "{ \"compilerOptions\": { \"noLib\": true, \"types\": [], \"module\": \"esnext\", \"module\": \"bogus\" }, \"files\": [\"main.ts\"] }",
+        "main.ts": "export {};"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6046 tsconfig.json:1:82"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "TS6046"
+        ]
+      }
+    },
+    {
+      "name": "cfg-escape",
+      "files": {
+        "tsconfig.json": "{ \"compilerOptions\": { \"noLib\": true, \"types\": [] }, \"files\": [\"main\\01.ts\"] }",
+        "main.ts": "export {};"
+      },
+      "native": {
+        "program": [],
+        "diagnostics": [
+          "TS1487 tsconfig.json:1:69",
+          "TS6053 -"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "tsconfig.json:1:64"
+        ],
+        "note": "docs/references.md: a scanner error inside a token is reported at the token's start; TypeScript reports it at the offending character"
+      }
+    },
+    {
+      "name": "cfg-single",
+      "files": {
+        "tsconfig.json": "{ 'compilerOptions': { 'noLib': true, 'types': [] }, 'files': ['main.ts'] }",
+        "main.ts": "export {};"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS1327 tsconfig.json:1:3",
+          "TS1327 tsconfig.json:1:24",
+          "TS1327 tsconfig.json:1:39",
+          "TS1327 tsconfig.json:1:54",
+          "TS1327 tsconfig.json:1:64"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "TS1327"
+        ]
+      }
+    },
+    {
+      "name": "cfg-space-only",
+      "files": {
+        "tsconfig.json": "  \n",
+        "main.ts": "export {};"
+      },
+      "native": {
+        "program": [
+          "lib:lib.es5.d.ts",
+          "lib:lib.es2015.d.ts",
+          "lib:lib.es2016.d.ts",
+          "lib:lib.es2017.d.ts",
+          "lib:lib.es2018.d.ts",
+          "lib:lib.es2019.d.ts",
+          "lib:lib.es2020.d.ts",
+          "lib:lib.es2021.d.ts",
+          "lib:lib.es2022.d.ts",
+          "lib:lib.es2023.d.ts",
+          "lib:lib.es2024.d.ts",
+          "lib:lib.es2025.d.ts",
+          "lib:lib.dom.d.ts",
+          "lib:lib.dom.iterable.d.ts",
+          "lib:lib.dom.asynciterable.d.ts",
+          "lib:lib.webworker.importscripts.d.ts",
+          "lib:lib.scripthost.d.ts",
+          "lib:lib.es2015.core.d.ts",
+          "lib:lib.es2015.collection.d.ts",
+          "lib:lib.es2015.generator.d.ts",
+          "lib:lib.es2015.iterable.d.ts",
+          "lib:lib.es2015.promise.d.ts",
+          "lib:lib.es2015.proxy.d.ts",
+          "lib:lib.es2015.reflect.d.ts",
+          "lib:lib.es2015.symbol.d.ts",
+          "lib:lib.es2015.symbol.wellknown.d.ts",
+          "lib:lib.es2016.array.include.d.ts",
+          "lib:lib.es2016.intl.d.ts",
+          "lib:lib.es2017.arraybuffer.d.ts",
+          "lib:lib.es2017.date.d.ts",
+          "lib:lib.es2017.object.d.ts",
+          "lib:lib.es2017.sharedmemory.d.ts",
+          "lib:lib.es2017.string.d.ts",
+          "lib:lib.es2017.intl.d.ts",
+          "lib:lib.es2017.typedarrays.d.ts",
+          "lib:lib.es2018.asyncgenerator.d.ts",
+          "lib:lib.es2018.asynciterable.d.ts",
+          "lib:lib.es2018.intl.d.ts",
+          "lib:lib.es2018.promise.d.ts",
+          "lib:lib.es2018.regexp.d.ts",
+          "lib:lib.es2019.array.d.ts",
+          "lib:lib.es2019.object.d.ts",
+          "lib:lib.es2019.string.d.ts",
+          "lib:lib.es2019.symbol.d.ts",
+          "lib:lib.es2019.intl.d.ts",
+          "lib:lib.es2020.bigint.d.ts",
+          "lib:lib.es2020.date.d.ts",
+          "lib:lib.es2020.promise.d.ts",
+          "lib:lib.es2020.sharedmemory.d.ts",
+          "lib:lib.es2020.string.d.ts",
+          "lib:lib.es2020.symbol.wellknown.d.ts",
+          "lib:lib.es2020.intl.d.ts",
+          "lib:lib.es2020.number.d.ts",
+          "lib:lib.es2021.promise.d.ts",
+          "lib:lib.es2021.string.d.ts",
+          "lib:lib.es2021.weakref.d.ts",
+          "lib:lib.es2021.intl.d.ts",
+          "lib:lib.es2022.array.d.ts",
+          "lib:lib.es2022.error.d.ts",
+          "lib:lib.es2022.intl.d.ts",
+          "lib:lib.es2022.object.d.ts",
+          "lib:lib.es2022.string.d.ts",
+          "lib:lib.es2022.regexp.d.ts",
+          "lib:lib.es2023.array.d.ts",
+          "lib:lib.es2023.collection.d.ts",
+          "lib:lib.es2023.intl.d.ts",
+          "lib:lib.es2024.arraybuffer.d.ts",
+          "lib:lib.es2024.collection.d.ts",
+          "lib:lib.es2024.object.d.ts",
+          "lib:lib.es2024.promise.d.ts",
+          "lib:lib.es2024.regexp.d.ts",
+          "lib:lib.es2024.sharedmemory.d.ts",
+          "lib:lib.es2024.string.d.ts",
+          "lib:lib.es2025.collection.d.ts",
+          "lib:lib.es2025.float16.d.ts",
+          "lib:lib.es2025.intl.d.ts",
+          "lib:lib.es2025.iterator.d.ts",
+          "lib:lib.es2025.promise.d.ts",
+          "lib:lib.es2025.regexp.d.ts",
+          "lib:lib.decorators.d.ts",
+          "lib:lib.decorators.legacy.d.ts",
+          "lib:lib.es2025.full.d.ts",
+          "main.ts"
+        ],
+        "diagnostics": []
+      }
+    }
+  ]
+}

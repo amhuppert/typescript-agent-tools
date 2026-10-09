@@ -1,9 +1,10 @@
 mod support;
 
-use support::{CONFIG, Fixture, load_error, project};
-use typescript_parser::references::{
-    ProjectErrorKind, QueryErrorKind, ReferenceProject, ReferenceQuery, SourcePosition,
-};
+use support::{CONFIG, Fixture, QueryFailure, load_error, project};
+use typescript_parser::analysis::{InputErrorKind, QueryErrorKind};
+use typescript_parser::project::Project;
+use typescript_parser::references::ReferenceQuery;
+use typescript_parser::source::SourcePosition;
 
 /// TypeScript reports no errors in declaration files under this setting.
 const SKIP_LIB_CHECK: &str = r#"{ "compilerOptions": { "noLib": true, "skipLibCheck": true } }"#;
@@ -134,7 +135,7 @@ fn positions_select_tokens_start_inclusive_end_exclusive() {
 fn invalid_queries_have_typed_errors() {
     let fixture = Fixture::checked_in(ALIASES);
     let project = fixture.load();
-    let error = |query| project.find_references(query).unwrap_err().kind;
+    let error = |query| project.find_references(query).query_error().kind;
     let position = |file: &str, line, column| ReferenceQuery::At {
         file: fixture.path(file),
         position: at(line, column),
@@ -179,33 +180,36 @@ fn columns_inside_surrogate_pairs_are_invalid() {
         })
     };
     assert_eq!(query(14).unwrap().groups.len(), 1);
-    assert_eq!(query(15).unwrap_err().kind, QueryErrorKind::InvalidPosition);
+    assert_eq!(
+        query(15).query_error().kind,
+        QueryErrorKind::InvalidPosition
+    );
     assert_eq!(query(16).unwrap().groups.len(), 0);
 }
 
 #[test]
 fn invalid_projects_report_typed_errors_with_locations() {
     let error = load_error(&[("dup.ts", "export {};\nlet x = 1;\nlet x = 2;\n")]);
-    assert_eq!(error.kind, ProjectErrorKind::Binding);
+    assert_eq!(error.kind, InputErrorKind::Binding);
     assert!(error.path.unwrap().ends_with("dup.ts"));
     assert_eq!(error.position, Some(at(3, 5)));
 
     let error = load_error(&[("missing.ts", "import { x } from \"./nowhere\";\nx;\n")]);
-    assert_eq!(error.kind, ProjectErrorKind::UnresolvedImport);
+    assert_eq!(error.kind, InputErrorKind::UnresolvedImport);
     assert_eq!(error.position, Some(at(1, 19)));
 
     let error = load_error(&[("with.ts", "declare const o: any;\nwith (o) {}\n")]);
-    assert_eq!(error.kind, ProjectErrorKind::Unsupported);
+    assert_eq!(error.kind, InputErrorKind::Unsupported);
     assert!(error.path.unwrap().ends_with("with.ts"));
 
     let error = load_error(&[("syntax.ts", "let = ;\n")]);
-    assert_eq!(error.kind, ProjectErrorKind::Syntax);
+    assert_eq!(error.kind, InputErrorKind::Syntax);
 }
 
 #[test]
 fn side_effect_imports_must_resolve_unless_unchecked() {
     let error = load_error(&[("app.ts", "import \"./absent\";\nexport const x = 1;\n")]);
-    assert_eq!(error.kind, ProjectErrorKind::UnresolvedImport);
+    assert_eq!(error.kind, InputErrorKind::UnresolvedImport);
     assert_eq!(error.position, Some(at(1, 8)));
 
     let fixture = project(&[
@@ -387,8 +391,8 @@ fn alias_cycles_resolve_through_local_declarations_whichever_file_loads_first() 
     for order in [r#"["a.ts", "b.ts"]"#, r#"["b.ts", "a.ts"]"#] {
         let config = format!(r#"{{ "compilerOptions": {{ "noLib": true }}, "files": {order} }}"#);
         let fixture = Fixture::new(&[("tsconfig.json", &config), ("a.ts", a), ("b.ts", b)]);
-        let error = ReferenceProject::load(&fixture.path("tsconfig.json")).unwrap_err();
-        assert_eq!(error.kind, ProjectErrorKind::Binding, "{order}: {error}");
+        let error = Project::load(&fixture.path("tsconfig.json")).unwrap_err();
+        assert_eq!(error.kind, InputErrorKind::Binding, "{order}: {error}");
         assert!(error.path.unwrap().ends_with("a.ts"));
         assert_eq!(error.position, Some(at(1, 10)), "{order}");
     }
@@ -445,7 +449,7 @@ fn exporting_a_merged_local_declaration_is_not_a_conflict() {
     }
     // An import that resolves back to its own module's local is TS2440.
     let error = load_error(&[("a.ts", "import { x } from \"./a\";\nexport const x = 1;\n")]);
-    assert_eq!(error.kind, ProjectErrorKind::Binding, "{error}");
+    assert_eq!(error.kind, InputErrorKind::Binding, "{error}");
     assert_eq!(error.position, Some(at(1, 10)));
 }
 
@@ -591,7 +595,7 @@ fn mixed_export_declarations_are_binding_errors_only_in_checked_files() {
     let mixed =
         "export declare function f(): void;\ndeclare function f(x: number): void;\nexport {};\n";
     let error = load_error(&[("mixed.ts", mixed)]);
-    assert_eq!(error.kind, ProjectErrorKind::Binding);
+    assert_eq!(error.kind, InputErrorKind::Binding);
     assert!(error.path.unwrap().ends_with("mixed.ts"));
     assert_eq!(error.position, Some(at(2, 18)));
     // Dependency-only declarations are lenient regardless of skipLibCheck.
@@ -653,7 +657,7 @@ fn comment_directives_count_between_any_tokens_but_not_inside_literals() {
         "literal.ts",
         "export const t = `\n// @ts-ignore`;\nimport { b } from \"./absent\";\n",
     )]);
-    assert_eq!(error.kind, ProjectErrorKind::UnresolvedImport);
+    assert_eq!(error.kind, InputErrorKind::UnresolvedImport);
     assert_eq!(error.position, Some(at(3, 19)));
 }
 
@@ -679,8 +683,9 @@ fn generated_declarations_may_nest_deeper_than_the_default_parse_budget() {
     ]);
     fixture.check_markers(&fixture.load());
 
+    // Past the budget, loading fails with a resource limit, not a syntax error.
     let error = load_error(&[("hostile.ts", &deep(5_000))]);
-    assert_eq!(error.kind, ProjectErrorKind::Syntax);
+    assert_eq!(error.kind, InputErrorKind::ResourceLimit);
 }
 
 #[test]
@@ -741,7 +746,7 @@ fn name_candidates_that_are_not_reference_targets_fail_the_query() {
                 name: name.into(),
                 file: None,
             })
-            .unwrap_err()
+            .query_error()
     };
     let resolve = error("resolve");
     assert_eq!(resolve.kind, QueryErrorKind::UnsupportedTarget);
@@ -847,8 +852,8 @@ fn automatic_jsx_runtimes_enter_the_program() {
     ]);
     missing.load();
     std::fs::write(missing.path("view.tsx"), "export const v = <div />;\n").unwrap();
-    let error = ReferenceProject::load(&missing.path("tsconfig.json")).unwrap_err();
-    assert_eq!(error.kind, ProjectErrorKind::UnresolvedImport);
+    let error = Project::load(&missing.path("tsconfig.json")).unwrap_err();
+    assert_eq!(error.kind, InputErrorKind::UnresolvedImport);
 }
 
 #[cfg(unix)]
@@ -867,7 +872,7 @@ fn a_symlinked_configuration_directory_does_not_redirect_parent_paths() {
         ("real/deep/z.ts", "export const far = 1;\n"),
     ]);
     std::os::unix::fs::symlink(fixture.path("real/deep/x"), fixture.path("L/x")).unwrap();
-    let project = ReferenceProject::load(&fixture.path("L/x/tsconfig.json")).unwrap();
+    let project = Project::load(&fixture.path("L/x/tsconfig.json")).unwrap();
     let query = |file| {
         project
             .find_references(ReferenceQuery::At {
@@ -951,10 +956,10 @@ fn input_extensions_follow_the_file_system_case_policy() {
     let configure = |files: &str| {
         let config = format!(r#"{{ "compilerOptions": {{ "noLib": true }}, "files": {files} }}"#);
         std::fs::write(fixture.path("tsconfig.json"), config).unwrap();
-        ReferenceProject::load(&fixture.path("tsconfig.json"))
+        Project::load(&fixture.path("tsconfig.json"))
     };
     let error = configure(r#"["SCRIPT.JS"]"#).unwrap_err();
-    assert_eq!(error.kind, ProjectErrorKind::Unsupported, "{error}");
+    assert_eq!(error.kind, InputErrorKind::Unsupported, "{error}");
     let project = configure(r#"["app.ts"]"#).unwrap_or_else(|error| panic!("{error}"));
     let result = project
         .find_references(ReferenceQuery::Name {
@@ -998,7 +1003,7 @@ g;
             file: fixture.path("main.ts"),
             position: SourcePosition { line: 2, column: 1 },
         })
-        .unwrap_err();
+        .query_error();
     assert_eq!(error.kind, QueryErrorKind::UnresolvedTarget, "{error}");
 }
 
@@ -1031,15 +1036,42 @@ fn equally_specific_pattern_ambient_modules_resolve_to_the_first() {
         "client.d.ts"
     );
     assert_eq!(result.groups[0].declarations[0].location.start.line, 1);
-    let error = resolve("onlyPlain").unwrap_err();
+    let error = resolve("onlyPlain").query_error();
     assert_eq!(error.kind, QueryErrorKind::UnresolvedTarget, "{error}");
 
     let fixture = project(&[
         ("client.d.ts", client),
         ("app.ts", "import { twoStars } from \"aZb*c\";\ntwoStars;\n"),
     ]);
-    let error = ReferenceProject::load(&fixture.path("tsconfig.json")).unwrap_err();
-    assert_eq!(error.kind, ProjectErrorKind::UnresolvedImport, "{error}");
+    let error = Project::load(&fixture.path("tsconfig.json")).unwrap_err();
+    assert_eq!(error.kind, InputErrorKind::UnresolvedImport, "{error}");
+}
+
+#[test]
+fn equally_specific_patterns_in_different_files_follow_program_order() {
+    // TypeScript collects pattern ambient modules file by file in program
+    // order, which lists `b.d.ts`, referenced from the first root, before
+    // the second root `c.d.ts`; both patterns have an empty prefix, so
+    // `b.d.ts`'s `"*s"` wins for `x.css`, as tsc 7.0.2's groups show.
+    let fixture = Fixture::new(&[
+        (
+            "tsconfig.json",
+            r#"{ "compilerOptions": { "noLib": true }, "files": ["a.ts", "c.d.ts"] }"#,
+        ),
+        (
+            "a.ts",
+            "/// <reference path=\"./b.d.ts\" />\nimport { /*@X:i*/X } from \"x.css\";\nexport let /*@x:de*/x: /*@X:u*/X;\n",
+        ),
+        (
+            "b.d.ts",
+            "declare module \"*s\" { interface /*@X:d*/X { /*@!*/s: number } }\n",
+        ),
+        (
+            "c.d.ts",
+            "declare module \"*.css\" { interface /*@Y:d*/X { /*@!*/css: number } }\n",
+        ),
+    ]);
+    fixture.check_markers(&fixture.load());
 }
 
 #[test]
@@ -1064,7 +1096,7 @@ fn a_star_export_route_that_fails_still_exports_its_name() {
                     column: 10,
                 },
             })
-            .unwrap_err()
+            .query_error()
     };
     let error = query("export * from \"./b.js\";\nexport * from \"./c.js\";\n");
     assert_eq!(error.kind, QueryErrorKind::UnresolvedTarget, "{error}");
@@ -1081,7 +1113,7 @@ fn exported_and_local_declarations_conflict_by_declaration_space() {
     // namespace but not with a local instantiated one.
     let load = |source: &str| {
         let fixture = project(&[("a.ts", source)]);
-        ReferenceProject::load(&fixture.path("tsconfig.json"))
+        Project::load(&fixture.path("tsconfig.json"))
     };
     for source in [
         "export enum Color { Red }\nnamespace Color { export type Name = keyof typeof Color; }\n",
@@ -1095,7 +1127,7 @@ fn exported_and_local_declarations_conflict_by_declaration_space() {
         "export class C {}\ninterface C { x: number }\n",
     ] {
         let error = load(source).unwrap_err();
-        assert_eq!(error.kind, ProjectErrorKind::Binding, "{source}: {error}");
+        assert_eq!(error.kind, InputErrorKind::Binding, "{source}: {error}");
     }
 }
 
@@ -1107,7 +1139,7 @@ fn a_const_enum_namespace_precedes_a_function_unless_const_enums_are_kept() {
     let load = |options: &str| {
         let config = format!(r#"{{ "compilerOptions": {{ "noLib": true{options} }} }}"#);
         let fixture = Fixture::new(&[("tsconfig.json", config.as_str()), ("a.ts", source)]);
-        ReferenceProject::load(&fixture.path("tsconfig.json"))
+        Project::load(&fixture.path("tsconfig.json"))
     };
     load("").unwrap_or_else(|error| panic!("{error}"));
     for option in [
@@ -1116,12 +1148,12 @@ fn a_const_enum_namespace_precedes_a_function_unless_const_enums_are_kept() {
         "verbatimModuleSyntax",
     ] {
         let error = load(&format!(r#", "{option}": true"#)).unwrap_err();
-        assert_eq!(error.kind, ProjectErrorKind::Binding, "{option}: {error}");
+        assert_eq!(error.kind, InputErrorKind::Binding, "{option}: {error}");
     }
     let instantiated = "namespace f { export const x = 1; }\nfunction f() {}\nexport {};\n";
     let fixture = project(&[("a.ts", instantiated)]);
-    let error = ReferenceProject::load(&fixture.path("tsconfig.json")).unwrap_err();
-    assert_eq!(error.kind, ProjectErrorKind::Binding, "{error}");
+    let error = Project::load(&fixture.path("tsconfig.json")).unwrap_err();
+    assert_eq!(error.kind, InputErrorKind::Binding, "{error}");
 }
 
 #[test]
@@ -1163,13 +1195,13 @@ fn both_entry_points_report_a_failing_token_at_the_same_path() {
                 column: 10,
             },
         })
-        .unwrap_err();
+        .query_error();
     let named = project
         .find_references(ReferenceQuery::Name {
             name: "b".into(),
             file: None,
         })
-        .unwrap_err();
+        .query_error();
     assert_eq!(at.kind, QueryErrorKind::UnresolvedTarget, "{at}");
     assert_eq!(named.kind, QueryErrorKind::UnresolvedTarget, "{named}");
     assert_eq!(at.path, named.path);
@@ -1190,8 +1222,8 @@ fn reference_directives_in_selected_package_files_must_resolve() {
             "/// <reference path=\"./absent.d.ts\" />\ninterface G {}\n",
         ),
     ]);
-    let error = ReferenceProject::load(&fixture.path("tsconfig.json")).unwrap_err();
-    assert_eq!(error.kind, ProjectErrorKind::UnresolvedImport);
+    let error = Project::load(&fixture.path("tsconfig.json")).unwrap_err();
+    assert_eq!(error.kind, InputErrorKind::UnresolvedImport);
 }
 
 #[test]
@@ -1202,7 +1234,7 @@ fn long_lines_convert_positions_in_linear_time() {
     let config = fixture.path("tsconfig.json");
     let (send, receive) = std::sync::mpsc::channel();
     std::thread::spawn(move || {
-        let project = ReferenceProject::load(&config).unwrap();
+        let project = Project::load(&config).unwrap();
         let query = ReferenceQuery::Name {
             name: "x".into(),
             file: None,
@@ -1230,7 +1262,7 @@ fn many_suppressed_imports_load_in_linear_time() {
     let config = fixture.path("tsconfig.json");
     let (send, receive) = std::sync::mpsc::channel();
     std::thread::spawn(move || {
-        send.send(ReferenceProject::load(&config).is_ok()).unwrap();
+        send.send(Project::load(&config).is_ok()).unwrap();
     });
     let loaded = receive
         .recv_timeout(std::time::Duration::from_secs(20))
@@ -1250,11 +1282,7 @@ fn block_comment_directives_count_on_their_last_line() {
     }
     for directive in ["/* @ts-ignore\n explanation */", "/*\n * @ts-ignore\n */"] {
         let error = load_error(&[("app.ts", &format!("{directive}\n{import}"))]);
-        assert_eq!(
-            error.kind,
-            ProjectErrorKind::UnresolvedImport,
-            "{directive}"
-        );
+        assert_eq!(error.kind, InputErrorKind::UnresolvedImport, "{directive}");
     }
 }
 
@@ -1267,16 +1295,16 @@ fn comment_directives_suppress_missing_reference_directives() {
         let suppressed = format!("// @ts-ignore\n{directive}\nexport const y = 1;\n");
         project(&[("app.ts", &suppressed)]).load();
         let error = load_error(&[("app.ts", &format!("{directive}\nexport const y = 1;\n"))]);
-        assert_eq!(
-            error.kind,
-            ProjectErrorKind::UnresolvedImport,
-            "{directive}"
-        );
+        assert_eq!(error.kind, InputErrorKind::UnresolvedImport, "{directive}");
     }
 }
 
+/// An unresolved module or reference directive target fails the load only
+/// where it is reported (`fixtures/json-probes/reporting.json`): in a
+/// project file, unless skipLibCheck covers it as a declaration file. A
+/// package's are never reported here.
 #[test]
-fn skip_lib_check_tolerates_unresolved_inputs_only_in_declaration_files() {
+fn unresolved_inputs_fail_only_where_reported() {
     let manifest = |types: &str| format!(r#"{{ "types": "{types}" }}"#);
     let packages = [
         (
@@ -1330,8 +1358,8 @@ fn skip_lib_check_tolerates_unresolved_inputs_only_in_declaration_files() {
                         .map(|(path, text)| (path.as_str(), text.as_str())),
                 );
                 let fixture = Fixture::new(&all);
-                let result = ReferenceProject::load(&fixture.path("tsconfig.json"));
-                let tolerated = skip && file.ends_with(".d.ts");
+                let result = Project::load(&fixture.path("tsconfig.json"));
+                let tolerated = !local || skip && file.ends_with(".d.ts");
                 match result {
                     Ok(_) => assert!(tolerated, "{name} {file} local={local} skip={skip} loaded"),
                     Err(error) => {
@@ -1339,7 +1367,7 @@ fn skip_lib_check_tolerates_unresolved_inputs_only_in_declaration_files() {
                             !tolerated,
                             "{name} {file} local={local} skip={skip}: {error}"
                         );
-                        assert_eq!(error.kind, ProjectErrorKind::UnresolvedImport, "{error}");
+                        assert_eq!(error.kind, InputErrorKind::UnresolvedImport, "{error}");
                     }
                 }
             }
@@ -1356,11 +1384,11 @@ fn missing_jsx_runtimes_are_reported_at_the_first_jsx_tag() {
     };
     let load = |checked: bool, source: &str| {
         let fixture = Fixture::new(&[("tsconfig.json", &config(checked)), ("app.tsx", source)]);
-        ReferenceProject::load(&fixture.path("tsconfig.json")).map(|_| ())
+        Project::load(&fixture.path("tsconfig.json")).map(|_| ())
     };
     // Unchecked side-effect imports do not include the runtime.
     let error = load(false, "export const y = <div />;\n").unwrap_err();
-    assert_eq!(error.kind, ProjectErrorKind::UnresolvedImport);
+    assert_eq!(error.kind, InputErrorKind::UnresolvedImport);
     assert_eq!(error.position, Some(at(1, 18)));
     // A directive before the first tag suppresses the file's one error.
     load(
@@ -1390,7 +1418,7 @@ fn jsx_pragmas_are_read_from_block_comments() {
             ),
             ("app.tsx", source),
         ]);
-        ReferenceProject::load(&fixture.path("tsconfig.json")).map(|_| ())
+        Project::load(&fixture.path("tsconfig.json")).map(|_| ())
     };
     load("// @jsxImportSource preact\nexport const e = <div />;\n").unwrap();
     for pragma in [
@@ -1398,7 +1426,7 @@ fn jsx_pragmas_are_read_from_block_comments() {
         "/**\n * @jsxImportSource preact\n */",
     ] {
         let error = load(&format!("{pragma}\nexport const e = <div />;\n")).unwrap_err();
-        assert_eq!(error.kind, ProjectErrorKind::UnresolvedImport, "{pragma}");
+        assert_eq!(error.kind, InputErrorKind::UnresolvedImport, "{pragma}");
     }
 }
 
@@ -1409,7 +1437,7 @@ fn suppression_directives_are_real_comments_on_preceding_lines() {
         "app.ts",
         "/*\n// @ts-ignore\n*/ import { x } from \"./missing\";\nexport const y = 1;\n",
     )]);
-    assert_eq!(error.kind, ProjectErrorKind::UnresolvedImport);
+    assert_eq!(error.kind, InputErrorKind::UnresolvedImport);
     // A directive applies across blank and comment-only lines.
     let fixture = project(&[(
         "app.ts",
@@ -1421,14 +1449,14 @@ fn suppression_directives_are_real_comments_on_preceding_lines() {
         "app.ts",
         "// @ts-ignore\nexport const z = 1;\nimport { x } from \"./missing\";\n",
     )]);
-    assert_eq!(error.kind, ProjectErrorKind::UnresolvedImport);
+    assert_eq!(error.kind, InputErrorKind::UnresolvedImport);
 }
 
 #[test]
 fn alias_errors_are_reported_at_the_alias_name_or_its_keyword() {
     let duplicate = |file: &str, source: &str| {
         let error = load_error(&[("lib.ts", "export const x = 1;\n"), (file, source)]);
-        assert_eq!(error.kind, ProjectErrorKind::Binding, "{source}: {error}");
+        assert_eq!(error.kind, InputErrorKind::Binding, "{source}: {error}");
         assert!(error.message.contains("duplicate"), "{source}: {error}");
         error.position
     };
@@ -1463,15 +1491,35 @@ fn alias_errors_are_reported_at_the_alias_name_or_its_keyword() {
 }
 
 #[test]
-fn identifiers_without_a_binding_rule_name_their_construct() {
-    // Only the coverage pass sees a decorator on an object literal member.
+fn a_decorator_cannot_begin_an_object_literal_member() {
+    // TypeScript 7.0.2 reports TS1136 at the `@`: an object literal member
+    // starts only with `[`, `*`, `...`, `.`, or a literal property name.
     let error = load_error(&[(
         "app.ts",
         "declare function dec(t: any): any;\nexport const o = { @dec a: 1 };\n",
     )]);
-    assert_eq!(error.kind, ProjectErrorKind::Unsupported, "{error}");
-    assert!(error.message.contains("Decorator"), "{error}");
-    assert_eq!(error.position, Some(at(2, 21)));
+    assert_eq!(error.kind, InputErrorKind::Syntax, "{error}");
+    assert_eq!(error.message, "Property assignment expected");
+    assert_eq!(error.position, Some(at(2, 20)));
+}
+
+#[test]
+fn identifiers_without_a_binding_rule_name_their_construct() {
+    // TypeScript 7.0.2 parses decorators after a member's modifier
+    // (`parseModifiersEx`) and reports only TS1042, a checker grammar error
+    // (`fixtures/json-probes/parsing.json`, `decorator-after-export-modifier`).
+    // No binding rule covers such a decorator, so the binder's coverage check
+    // rejects the file instead of indexing it without the identifier.
+    let error = load_error(&[(
+        "app.ts",
+        "declare function dec(t: any): any;\nexport const o = { export @dec a: 1 };\n",
+    )]);
+    assert_eq!(error.kind, InputErrorKind::Unsupported, "{error}");
+    assert_eq!(
+        error.message,
+        "unsupported identifier in Decorator (Identifier)"
+    );
+    assert_eq!(error.position, Some(at(2, 28)));
 }
 
 #[test]
@@ -1484,7 +1532,7 @@ fn augmentations_of_scripts_fail_only_where_bindings_are_checked() {
             "export {};\ndeclare module \"./globals\" { export interface Options { extra: string } }\n",
         ),
     ]);
-    assert_eq!(error.kind, ProjectErrorKind::UnresolvedImport);
+    assert_eq!(error.kind, InputErrorKind::UnresolvedImport);
     assert_eq!(error.position, Some(at(2, 16)));
 
     // A package's augmentation of a script binds nothing.

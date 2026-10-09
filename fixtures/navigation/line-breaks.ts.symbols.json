@@ -1,0 +1,14 @@
+{
+  "compiler": "7.0.2",
+  "symbols": [
+    {"name": "cr", "kind": 13, "range": "2:7-2:13", "selection": "2:7-2:9", "children": []},
+    {"name": "lf", "kind": 13, "range": "3:7-3:13", "selection": "3:7-3:9", "children": []},
+    {"name": "crlf", "kind": 13, "range": "4:7-4:15", "selection": "4:7-4:11", "children": []},
+    {"name": "ls", "kind": 13, "range": "5:7-5:13", "selection": "5:7-5:9", "children": []},
+    {"name": "ps", "kind": 13, "range": "6:7-6:13", "selection": "6:7-6:9", "children": []},
+    {"name": "spans", "kind": 12, "range": "7:1-10:2", "selection": "7:10-7:15", "children": [
+      {"name": "inner", "kind": 13, "range": "8:9-8:18", "selection": "8:9-8:14", "children": []}
+    ]},
+    {"name": "After", "kind": 5, "range": "11:1-11:22", "selection": "11:14-11:19", "children": []}
+  ]
+}

@@ -3,8 +3,11 @@
 Measured 2026-10-07 against `/Users/alex/github/command-center` at
 `7706073d233d45c69b60421d7bb16fc0f778aeb4`. Repeated CLI queries reuse the index
 and take **0.71–0.94 seconds**, versus **10–12 seconds** for direct loading in
-this run. The unchanged configuration still cannot load; these performance
-results use the compatibility adjustments described below.
+this run. At the time the unchanged configuration could not load; these
+performance results use the compatibility adjustments described below. It has
+loaded since standard libraries, JSON modules, and the augmentation fix landed;
+[Command Center performance](performance-command-center.md#current-state-2026-10-08)
+measures the service on the unchanged configuration (2026-10-08).
 
 ## Configuration and compatibility
 

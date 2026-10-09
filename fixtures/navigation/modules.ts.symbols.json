@@ -1,0 +1,19 @@
+{
+  "compiler": "7.0.2",
+  "symbols": [
+    {"name": "def", "kind": 13, "range": "2:8-2:11", "selection": "2:8-2:11", "children": []},
+    {"name": "alias", "kind": 13, "range": "2:15-2:29", "selection": "2:24-2:29", "children": []},
+    {"name": "Only", "kind": 13, "range": "2:31-2:40", "selection": "2:36-2:40", "children": []},
+    {"name": "starNs", "kind": 13, "range": "3:8-3:19", "selection": "3:13-3:19", "children": []},
+    {"name": "Req", "kind": 13, "range": "5:1-5:33", "selection": "5:8-5:11", "children": []},
+    {"name": "Reexported", "kind": 13, "range": "6:1-6:38", "selection": "6:15-6:25", "children": []},
+    {"name": "value", "kind": 13, "range": "8:7-8:16", "selection": "8:7-8:12", "children": []},
+    {"name": "exportedValue", "kind": 13, "range": "9:10-9:32", "selection": "9:19-9:32", "children": []},
+    {"name": "\"string name\"", "kind": 13, "range": "9:34-9:56", "selection": "9:43-9:56", "children": []},
+    {"name": "value", "kind": 13, "range": "10:10-10:15", "selection": "10:10-10:15", "children": []},
+    {"name": "OnlyType", "kind": 13, "range": "13:15-13:31", "selection": "13:23-13:31", "children": []},
+    {"name": "default", "kind": 12, "range": "15:1-17:2", "selection": "15:1-15:1", "children": [
+      {"name": "insideDefault", "kind": 13, "range": "16:9-16:26", "selection": "16:9-16:22", "children": []}
+    ]}
+  ]
+}

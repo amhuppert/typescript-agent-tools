@@ -1,0 +1,119 @@
+{
+  "difference": "A name that two `export *` sources supply with different targets is ambiguous here, so an augmentation that declares it becomes the module's own export; TypeScript reports TS2308 and merges the augmentation into the first source's symbol.",
+  "queries": [
+    {
+      "at": "aug.ts:3:13",
+      "typescript": [
+        {
+          "declarations": [
+            "a.ts:1:18",
+            "aug.ts:3:13"
+          ],
+          "occurrences": [
+            "a.ts:1:18",
+            "aug.ts:3:13",
+            "use.ts:1:15",
+            "use.ts:2:25"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "aug.ts:3:13"
+          ],
+          "occurrences": [
+            "aug.ts:3:13",
+            "use.ts:1:15",
+            "use.ts:2:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "use.ts:1:15",
+      "typescript": [
+        {
+          "declarations": [
+            "a.ts:1:18",
+            "aug.ts:3:13"
+          ],
+          "occurrences": [
+            "a.ts:1:18",
+            "aug.ts:3:13",
+            "use.ts:1:15",
+            "use.ts:2:25"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "aug.ts:3:13"
+          ],
+          "occurrences": [
+            "aug.ts:3:13",
+            "use.ts:1:15",
+            "use.ts:2:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "use.ts:2:25",
+      "typescript": [
+        {
+          "declarations": [
+            "a.ts:1:18",
+            "aug.ts:3:13"
+          ],
+          "occurrences": [
+            "a.ts:1:18",
+            "aug.ts:3:13",
+            "use.ts:1:15",
+            "use.ts:2:25"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "aug.ts:3:13"
+          ],
+          "occurrences": [
+            "aug.ts:3:13",
+            "use.ts:1:15",
+            "use.ts:2:25"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "a.ts:1:18",
+      "typescript": [
+        {
+          "declarations": [
+            "a.ts:1:18",
+            "aug.ts:3:13"
+          ],
+          "occurrences": [
+            "a.ts:1:18",
+            "aug.ts:3:13",
+            "use.ts:1:15",
+            "use.ts:2:25"
+          ]
+        }
+      ],
+      "tool": [
+        {
+          "declarations": [
+            "a.ts:1:18"
+          ],
+          "occurrences": [
+            "a.ts:1:18"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -8,10 +8,11 @@
 //! `{"name":"…","file":null|"…"}`; relative paths resolve against the working
 //! directory. Each query prints one line: `{"result": ReferenceResult}`,
 //! `{"error": {"kind": "<QueryErrorKind>", "message": "…", "path": …,
-//! "position": …}}`, or `{"panic": "…"}` when the implementation panics. A
-//! project that fails to load prints `{"projectError": {...}}` with a
-//! `ProjectErrorKind` and exits 1. Kinds are the variant names. Usage errors
-//! and malformed query lines exit 2.
+//! "position": …}}`, whose kind is an `InputErrorKind` instead for a query
+//! path that names no file exactly, or `{"panic": "…"}` when the
+//! implementation panics. A project that fails to load prints
+//! `{"projectError": {...}}` with an `InputErrorKind` and exits 1. Kinds are
+//! the variant names. Usage errors and malformed query lines exit 2.
 
 use serde::{Deserialize, Serialize};
 use std::io::{BufRead, Write};
@@ -19,10 +20,10 @@ use std::panic::AssertUnwindSafe;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::sync::Mutex;
-use typescript_parser::references::{
-    ProjectErrorKind, QueryErrorKind, ReferenceProject, ReferenceQuery, ReferenceResult,
-    SourcePosition,
-};
+use typescript_parser::analysis::{AnalysisError, InputErrorKind};
+use typescript_parser::project::Project;
+use typescript_parser::references::{ReferenceQuery, ReferenceResult};
+use typescript_parser::source::SourcePosition;
 
 #[derive(Deserialize)]
 #[serde(untagged)]
@@ -43,14 +44,14 @@ struct At {
 enum Response<'a> {
     Result(&'a ReferenceResult),
     Error {
-        kind: QueryErrorKind,
+        kind: serde_json::Value,
         message: String,
         path: Option<String>,
         position: Option<SourcePosition>,
     },
     Panic(String),
     ProjectError {
-        kind: ProjectErrorKind,
+        kind: InputErrorKind,
         message: String,
         path: Option<String>,
         position: Option<SourcePosition>,
@@ -86,7 +87,7 @@ fn main() -> ExitCode {
 fn run(config: &std::path::Path) -> Result<ExitCode, Box<dyn std::error::Error>> {
     let stdout = std::io::stdout();
     let mut out = stdout.lock();
-    let project = match ReferenceProject::load(config) {
+    let project = match Project::load(config) {
         Ok(project) => project,
         Err(error) => {
             let response = Response::ProjectError {
@@ -130,15 +131,25 @@ fn run(config: &std::path::Path) -> Result<ExitCode, Box<dyn std::error::Error>>
         let outcome = std::panic::catch_unwind(AssertUnwindSafe(|| project.find_references(query)));
         match outcome {
             Ok(Ok(result)) => write_line(&mut out, &Response::Result(&result))?,
-            Ok(Err(error)) => write_line(
-                &mut out,
-                &Response::Error {
-                    kind: error.kind,
-                    message: error.to_string(),
-                    path: display(error.path.as_deref()),
-                    position: error.position,
-                },
-            )?,
+            Ok(Err(error)) => {
+                let (kind, path, position) = match &error {
+                    AnalysisError::Query(error) => {
+                        (serde_json::json!(error.kind), &error.path, error.position)
+                    }
+                    AnalysisError::Input(error) => {
+                        (serde_json::json!(error.kind), &error.path, error.position)
+                    }
+                };
+                write_line(
+                    &mut out,
+                    &Response::Error {
+                        kind,
+                        message: error.to_string(),
+                        path: display(path.as_deref()),
+                        position,
+                    },
+                )?
+            }
             Err(_) => {
                 let message = LAST_PANIC
                     .lock()

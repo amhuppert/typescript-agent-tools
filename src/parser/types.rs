@@ -773,12 +773,10 @@ impl<'src> Parser<'src> {
     }
 
     pub(super) fn member(&mut self, signature: bool) -> Result<NodeId> {
-        let deprecated = self.deprecated_trivia(false);
+        let site = self.jsdoc_site();
         let result = self.in_context(self.context, |p| p.nest(|p| p.member_inner(signature)));
-        if deprecated {
-            if let Ok(id) = result {
-                self.nodes[id.0].flags |= node_flags::DEPRECATED;
-            }
+        if let Ok(id) = result {
+            self.mark_deprecated(site, id);
         }
         result
     }

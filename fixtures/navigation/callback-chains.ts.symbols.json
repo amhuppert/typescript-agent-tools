@@ -1,0 +1,28 @@
+{
+  "compiler": "7.0.2",
+  "symbols": [
+    {"name": "chain", "kind": 13, "range": "5:15-5:25", "selection": "5:15-5:20", "children": []},
+    {"name": "make", "kind": 12, "range": "6:1-6:30", "selection": "6:18-6:22", "children": []},
+    {"name": "Base", "kind": 5, "range": "8:1-10:2", "selection": "8:7-8:11", "children": [
+      {"name": "run", "kind": 6, "range": "9:3-9:31", "selection": "9:3-9:6", "children": []}
+    ]},
+    {"name": "Holder", "kind": 5, "range": "11:1-19:2", "selection": "11:7-11:13", "children": [
+      {"name": "#queue", "kind": 7, "range": "12:3-12:15", "selection": "12:3-12:9", "children": []},
+      {"name": "tasks", "kind": 7, "range": "13:3-13:14", "selection": "13:3-13:8", "children": []},
+      {"name": "start", "kind": 6, "range": "14:3-18:4", "selection": "14:3-14:8", "children": [
+        {"name": "#queue.push() callback", "kind": 12, "range": "15:22-15:30", "selection": "15:22-15:22", "children": []},
+        {"name": "tasks.add() callback", "kind": 12, "range": "16:20-16:28", "selection": "16:20-16:20", "children": []},
+        {"name": "run() callback", "kind": 12, "range": "17:15-17:23", "selection": "17:15-17:15", "children": []}
+      ]}
+    ]},
+    {"name": "chain.a.b() callback", "kind": 12, "range": "21:11-21:19", "selection": "21:11-21:11", "children": []},
+    {"name": "b() callback", "kind": 12, "range": "22:12-22:20", "selection": "22:12-22:12", "children": []},
+    {"name": "then() callback", "kind": 12, "range": "23:13-23:21", "selection": "23:13-23:13", "children": []},
+    {"name": "b() callback", "kind": 12, "range": "24:11-24:19", "selection": "24:11-24:11", "children": []},
+    {"name": "chain.e() callback", "kind": 12, "range": "25:9-25:17", "selection": "25:9-25:9", "children": []},
+    {"name": "chain.a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.aa.bb.cc.dd.ee.ff.gg.hh.ii.jj.kk.ll.mm.nn() callback", "kind": 12, "range": "26:101-26:109", "selection": "26:101-26:101", "children": []},
+    {"name": "<function>", "kind": 12, "range": "27:24-27:32", "selection": "27:24-27:24", "children": []},
+    {"name": "chain.each('x', `y ${chain}`) callback", "kind": 12, "range": "28:34-28:42", "selection": "28:34-28:34", "children": []},
+    {"name": "chain.each() callback", "kind": 12, "range": "29:22-29:30", "selection": "29:22-29:22", "children": []}
+  ]
+}

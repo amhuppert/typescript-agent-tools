@@ -1,0 +1,2 @@
+Lib.f();
+Lib.extra;

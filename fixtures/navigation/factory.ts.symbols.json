@@ -1,0 +1,63 @@
+{
+  "compiler": "7.0.2",
+  "symbols": [
+    {"name": "RunHostDeps", "kind": 11, "range": "2:1-2:47", "selection": "2:18-2:29", "children": [
+      {"name": "start", "kind": 6, "range": "2:32-2:45", "selection": "2:32-2:37", "children": []}
+    ]},
+    {"name": "RunHost", "kind": 11, "range": "3:1-3:67", "selection": "3:18-3:25", "children": [
+      {"name": "startEligible", "kind": 6, "range": "3:28-3:53", "selection": "3:28-3:41", "children": []},
+      {"name": "run", "kind": 6, "range": "3:54-3:65", "selection": "3:54-3:57", "children": []}
+    ]},
+    {"name": "createRunHost", "kind": 12, "range": "5:1-14:2", "selection": "5:17-5:30", "children": [
+      {"name": "startEligible", "kind": 12, "range": "6:3-8:4", "selection": "6:12-6:25", "children": []},
+      {"name": "helper", "kind": 13, "range": "9:9-12:4", "selection": "9:9-9:15", "children": [
+        {"name": "step", "kind": 12, "range": "10:5-10:23", "selection": "10:14-10:18", "children": []}
+      ]},
+      {"name": "run", "kind": 6, "range": "13:27-13:46", "selection": "13:27-13:30", "children": []},
+      {"name": "stop", "kind": 7, "range": "13:48-13:82", "selection": "13:48-13:52", "children": [
+        {"name": "halt", "kind": 12, "range": "13:62-13:80", "selection": "13:71-13:75", "children": []}
+      ]}
+    ]},
+    {"name": "settings", "kind": 13, "range": "16:7-22:2", "selection": "16:7-16:15", "children": [
+      {"name": "retries", "kind": 7, "range": "17:3-17:13", "selection": "17:3-17:10", "children": []},
+      {"name": "\"display-name\"", "kind": 7, "range": "18:3-18:27", "selection": "18:3-18:17", "children": []},
+      {"name": "handlers", "kind": 7, "range": "19:3-19:58", "selection": "19:3-19:11", "children": [
+        {"name": "onStart", "kind": 6, "range": "19:15-19:27", "selection": "19:15-19:22", "children": []},
+        {"name": "onStop", "kind": 7, "range": "19:29-19:56", "selection": "19:29-19:35", "children": []}
+      ]},
+      {"name": "compute", "kind": 7, "range": "20:3-20:40", "selection": "20:3-20:10", "children": []},
+      {"name": "defaults", "kind": 7, "range": "21:3-21:14", "selection": "21:6-21:14", "children": []}
+    ]},
+    {"name": "defaults", "kind": 13, "range": "23:15-23:31", "selection": "23:15-23:23", "children": []},
+    {"name": "wrapped", "kind": 13, "range": "25:7-27:3", "selection": "25:7-25:14", "children": [
+      {"name": "wrap() callback", "kind": 12, "range": "25:22-27:2", "selection": "25:22-25:22", "children": [
+        {"name": "inner", "kind": 13, "range": "26:9-26:18", "selection": "26:9-26:14", "children": []}
+      ]}
+    ]},
+    {"name": "wrap", "kind": 12, "range": "28:1-28:51", "selection": "28:18-28:22", "children": []},
+    {"name": "Widget", "kind": 5, "range": "30:1-48:2", "selection": "30:14-30:20", "children": [
+      {"name": "handle", "kind": 7, "range": "31:3-33:5", "selection": "31:3-31:9", "children": [
+        {"name": "deep", "kind": 12, "range": "32:5-32:23", "selection": "32:14-32:18", "children": []}
+      ]},
+      {"name": "#count", "kind": 7, "range": "34:3-34:21", "selection": "34:10-34:16", "children": []},
+      {"name": "label", "kind": 7, "range": "35:3-35:28", "selection": "35:3-35:8", "children": []},
+      {"name": "method", "kind": 6, "range": "36:3-36:18", "selection": "36:3-36:9", "children": []},
+      {"name": "method", "kind": 6, "range": "37:3-37:31", "selection": "37:3-37:9", "children": []},
+      {"name": "method", "kind": 6, "range": "38:3-38:28", "selection": "38:3-38:9", "children": []},
+      {"name": "constructor", "kind": 9, "range": "39:3-39:82", "selection": "39:3-39:3", "children": []},
+      {"name": "id", "kind": 7, "range": "39:15-39:42", "selection": "39:32-39:34", "children": []},
+      {"name": "name", "kind": 7, "range": "39:44-39:63", "selection": "39:51-39:55", "children": []},
+      {"name": "size", "kind": 7, "range": "40:3-42:4", "selection": "40:7-40:11", "children": []},
+      {"name": "size", "kind": 7, "range": "43:3-43:29", "selection": "43:7-43:11", "children": []},
+      {"name": "blockLocal", "kind": 13, "range": "45:11-45:25", "selection": "45:11-45:21", "children": []},
+      {"name": "[]", "kind": 7, "range": "47:3-47:26", "selection": "47:3-47:3", "children": []}
+    ]},
+    {"name": "Shape", "kind": 11, "range": "50:1-56:2", "selection": "50:18-50:23", "children": [
+      {"name": "area", "kind": 6, "range": "51:3-51:18", "selection": "51:3-51:7", "children": []},
+      {"name": "name", "kind": 7, "range": "52:3-52:16", "selection": "52:3-52:7", "children": []},
+      {"name": "()", "kind": 6, "range": "53:3-53:21", "selection": "53:3-53:3", "children": []},
+      {"name": "new()", "kind": 9, "range": "54:3-54:17", "selection": "54:3-54:3", "children": []},
+      {"name": "[]", "kind": 7, "range": "55:3-55:36", "selection": "55:3-55:3", "children": []}
+    ]}
+  ]
+}

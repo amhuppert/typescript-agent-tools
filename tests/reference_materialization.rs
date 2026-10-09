@@ -9,8 +9,8 @@ use allocations::counted;
 use support::{Expect, Fixture, project};
 use typescript_parser::references::{
     NamedLocation, Occurrence, ReferenceGroup, ReferenceQuery, ReferenceResult, Role,
-    SourcePosition,
 };
+use typescript_parser::source::SourcePosition;
 
 #[test]
 fn large_results_allocate_for_owned_output_without_duplicate_location_keys() {
