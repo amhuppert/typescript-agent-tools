@@ -374,7 +374,7 @@ impl SearchState<'_> {
                     .bindings
                     .reference_tokens(&search.key, self.control.as_ref());
                 if require_name
-                    && !tokens.iter().any(|&token| {
+                    && !tokens.iter().any(|token| {
                         self.project.bindings.reference_token_facts(token).file == file
                     })
                 {
@@ -387,7 +387,7 @@ impl SearchState<'_> {
                 if !fresh {
                     return Ok(Vec::new());
                 }
-                Ok(self.work(tokens.iter().copied().filter_map(|token| {
+                Ok(self.work(tokens.iter().filter_map(|token| {
                     let facts = self.project.bindings.reference_token_facts(token);
                     if facts.file != file
                         || span.is_some_and(|span| {

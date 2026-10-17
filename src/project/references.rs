@@ -3,7 +3,7 @@
 //! one grouping operation.
 
 use super::Project;
-use super::binding::{self, Index, SymbolId, Target, roles};
+use super::binding::{self, Index, OccurrenceTarget, SymbolId, roles};
 use crate::analysis::{AnalysisError, QueryError, QueryErrorKind};
 use crate::references::{
     Location, NamedLocation, Occurrence, ReferenceBaseline, ReferenceCoverage, ReferenceFilters,
@@ -42,7 +42,7 @@ pub(super) fn has_lexical_target(
         .bindings
         .index
         .occurrence_at(file, offset)
-        .is_some_and(|occurrence| matches!(occurrence.target, Target::Symbols(_)))
+        .is_some_and(|occurrence| matches!(occurrence.target, OccurrenceTarget::Symbols(_)))
 }
 
 /// The existing lexical question, also used by filtered lexical requests.
@@ -129,22 +129,24 @@ fn first_location(group: &ReferenceGroup) -> Option<&Location> {
 /// it vanish from an otherwise successful result.
 fn selected<'a>(
     index: &Index,
-    occurrence: &'a binding::Occurrence,
+    occurrence: binding::Occurrence<'a>,
     at: impl FnOnce() -> (PathBuf, SourcePosition),
 ) -> Result<&'a [SymbolId], QueryError> {
-    let (kind, message) = match &occurrence.target {
-        Target::Symbols(found) => return Ok(found),
-        Target::Unsearched => unreachable!("dependency tokens never enter lexical selectors"),
-        Target::NotReference(why) => (
+    let (kind, message) = match occurrence.target {
+        OccurrenceTarget::Symbols(found) => return Ok(found),
+        OccurrenceTarget::Unsearched => {
+            unreachable!("dependency tokens never enter lexical selectors")
+        }
+        OccurrenceTarget::NotReference(why) => (
             QueryErrorKind::UnsupportedTarget,
             format!(
                 "`{}` is not a supported reference target ({why})",
                 index.text(occurrence.name)
             ),
         ),
-        Target::Unresolved(why) => (
+        OccurrenceTarget::Unresolved(why) => (
             QueryErrorKind::UnresolvedTarget,
-            format!("`{}`: {}", index.text(occurrence.name), index.text(*why)),
+            format!("`{}`: {}", index.text(occurrence.name), why),
         ),
     };
     let (path, position) = at();
@@ -167,21 +169,24 @@ fn group(
         .iter()
         .map(|site| NamedLocation {
             name: site.name.clone(),
-            location: location(project, site.location),
+            location: location(project, site.file, site.span),
         })
         .collect();
     let occurrences = index
         .occurrences_of(symbol)
         .iter()
-        .filter(|occurrence| {
-            (!filters.calls || occurrence.call)
+        .filter(|indexed| {
+            (!filters.calls || indexed.call)
                 && (!filters.exclude_tests
-                    || !is_test_path(&project.sources.get(occurrence.location.file).display))
+                    || !is_test_path(&project.sources.get(indexed.occurrence.file).display))
         })
-        .map(|occurrence| Occurrence {
-            name: index.text(occurrence.name).to_string(),
-            location: location(project, occurrence.location),
-            roles: role_list(occurrence.roles).collect(),
+        .map(|indexed| {
+            let occurrence = index.occurrence(indexed.occurrence);
+            Occurrence {
+                name: index.text(occurrence.name).to_string(),
+                location: location(project, indexed.occurrence.file, occurrence.span),
+                roles: role_list(indexed.roles).collect(),
+            }
         })
         .collect();
     ReferenceGroup {
@@ -222,11 +227,13 @@ pub(super) fn role_list(bits: u8) -> impl Iterator<Item = Role> {
     .map(|(_, role)| role)
 }
 
-fn location(project: &Project, location: binding::IndexedLocation) -> Location {
-    let source = project.sources.get(location.file);
+/// The public location of `span` in `file`; the index keeps offsets, and a
+/// query converts only the locations it returns.
+fn location(project: &Project, file: super::sources::FileId, span: crate::Span) -> Location {
+    let source = project.sources.get(file);
     Location {
         file: source.display.clone(),
-        start: location.start,
-        end: location.end,
+        start: source.text.position(span.start),
+        end: source.text.position(span.end),
     }
 }

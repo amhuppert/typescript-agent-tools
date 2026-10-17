@@ -201,7 +201,7 @@ impl File {
 mod tests {
     use crate::analysis::{AnalysisError, InputErrorKind, QueryErrorKind};
     use crate::project::Project;
-    use crate::project::binding::index::{OccurrenceRef, Target};
+    use crate::project::binding::index::{OccurrenceRef, OccurrenceTarget};
     use crate::references::ReferenceQuery;
     use std::collections::BTreeMap;
     use std::path::PathBuf;
@@ -743,16 +743,16 @@ mod tests {
                         file: fixture.0.join("a.ts"),
                         position: project.sources.get(id).text.position(occurrence.span.start),
                     });
-                    match &occurrence.target {
-                        Target::Symbols(symbols) => {
+                    match occurrence.target {
+                        OccurrenceTarget::Symbols(symbols) => {
                             assert_eq!(symbols.len(), 1);
                             let groups = result.unwrap().groups;
                             assert_eq!(groups.len(), 1);
                             assert_eq!(groups[0].declarations.len(), 1);
                             assert_eq!(groups[0].declarations[0].name, name);
                         }
-                        Target::NotReference(reason) => {
-                            assert_eq!(*reason, "property");
+                        OccurrenceTarget::NotReference(reason) => {
+                            assert_eq!(reason, "property");
                             assert!(reference.property);
                             let AnalysisError::Query(error) = result.unwrap_err() else {
                                 panic!("a property remains an unsupported lexical target");
@@ -873,7 +873,7 @@ mod tests {
                 file: id,
                 id: reference.source,
             }).target,
-            Target::Unsearched
+            OccurrenceTarget::Unsearched
         )));
         let missing = facts
             .refs
@@ -894,10 +894,7 @@ mod tests {
             file: id,
             id: missing.source,
         });
-        assert!(matches!(
-            occurrence.target,
-            super::super::index::Target::Unsearched
-        ));
+        assert!(matches!(occurrence.target, OccurrenceTarget::Unsearched));
         assert_eq!(bindings.index.text(occurrence.name), "Missing");
         let source = project.sources.get(id).text.as_str();
         assert_eq!(

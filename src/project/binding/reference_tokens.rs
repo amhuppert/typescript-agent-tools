@@ -64,7 +64,7 @@ impl super::Bindings {
         &self,
         key: &str,
         control: Option<&crate::resources::Control>,
-    ) -> &[ReferenceToken] {
+    ) -> super::index::ReferenceTokens<'_> {
         self.index.reference_tokens(key, control)
     }
 
@@ -99,21 +99,18 @@ impl super::Bindings {
     ) -> ReferenceTokenFacts<'_> {
         match token.entry {
             ReferenceTokenEntry::Syntax(id) => {
-                let occurrence = self.index.occurrence(super::index::OccurrenceRef {
+                let at = super::index::OccurrenceRef {
                     file: token.file,
                     id,
-                });
-                let reference = occurrence
-                    .reference
-                    .as_ref()
-                    .expect("reference handle has inventory facts");
-                let key = match &reference.key {
-                    Ok(id) => Ok(self.index.text(*id)),
-                    Err(error) => Err(error.as_str()),
                 };
+                let occurrence = self.index.occurrence(at);
+                let reference = self
+                    .index
+                    .reference_data(at)
+                    .expect("reference handle has inventory facts");
                 ReferenceTokenFacts {
                     file: token.file,
-                    key,
+                    key: reference.key,
                     selection_span: occurrence.span,
                     occurrence_span: reference.syntax.occurrence_span,
                     roles: reference.syntax.roles,

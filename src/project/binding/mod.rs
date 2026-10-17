@@ -199,7 +199,7 @@ pub(super) enum ModuleResolution {
 }
 
 pub(super) use ids::SymbolId;
-pub(super) use index::{Index, IndexedLocation, Occurrence, Target};
+pub(super) use index::{Index, Occurrence, OccurrenceTarget};
 pub(super) use retained::Bindings;
 pub(super) use semantic::{
     BoundClassKind, BoundClassOrInterface, BoundDeclaration, BoundDeclaredType, BoundJson,
