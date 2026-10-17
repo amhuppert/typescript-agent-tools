@@ -97,7 +97,27 @@ impl Project {
         disk: &program::disk::Disk,
         parser: &crate::analysis::Parser,
     ) -> Result<Self, AnalysisError> {
-        let mut program = program::load(config, disk, parser)?;
+        Self::from_program(program::load(config, disk, parser)?, parser)
+    }
+
+    fn load_reusing(
+        config: &Path,
+        disk: &program::disk::Disk,
+        parser: &crate::analysis::Parser,
+        previous: &mut program::Reuse,
+    ) -> Result<(Self, program::Reuse), AnalysisError> {
+        let (program, next) = program::load_reusing(config, disk, parser, previous)?;
+        // New captures already share every reusable input they need. Release
+        // obsolete inputs before the binding peak, without publishing a cache
+        // from an unvalidated generation. A later failure simply retries cold.
+        *previous = program::Reuse::default();
+        Ok((Self::from_program(program, parser)?, next))
+    }
+
+    fn from_program(
+        mut program: program::Program,
+        parser: &crate::analysis::Parser,
+    ) -> Result<Self, AnalysisError> {
         let files = program.file_lookup();
         let linked = binding::bind(&program, parser)?;
         let navigation = navigation::Navigation::new(

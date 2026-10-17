@@ -14,7 +14,7 @@ function fixture(t) {
   const bin = path.join(directory, 'bin');
   const log = path.join(directory, 'cargo-calls.json');
   fs.mkdirSync(bin);
-  for (const file of ['tests/cli.rs', 'tests/literals.rs', 'tests/nested/main.rs', 'src/lib.rs', 'src/main.rs', 'src/project/semantic/resources_tests.rs', 'src/project/semantic/resources_tests/expression_projection.rs']) {
+  for (const file of ['tests/cli.rs', 'tests/literals.rs', 'tests/nested/main.rs', 'src/lib.rs', 'src/main.rs', 'src/project/semantic/resources_tests.rs', 'src/project/semantic/resources_tests/expression_projection.rs', 'src/project/program/resolve/reuse_tests.rs']) {
     const target = path.join(directory, file);
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.writeFileSync(target, '');
@@ -242,4 +242,32 @@ test('binary, library and integration scopes select exactly those targets', t =>
   assert.equal(result.calls.length, 1);
   assert.deepEqual(result.calls[0].args,
     ['test', '--offline', '--jobs', '2', '--bin', 'tsparse', '--lib', '--test', 'cli', '--', '--test-threads=2', '--show-output']);
+});
+
+test('resolution reuse tests select only their module with fixed resources', t => {
+  const result = fixture(t)(['src/project/program/resolve/reuse_tests.rs']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(result.calls, [{
+    args: ['test', '--offline', '--jobs', '2', '--lib', 'project::program::resolve::reuse_tests::', '--', '--test-threads=2', '--show-output'],
+    cwd: result.directory,
+    threads: '2', nodeOptions: '--max-old-space-size=2048', forceColor: '0', noColor: '1',
+  }]);
+});
+
+test('resolution reuse filtering rejects mixed or missing paths and empty execution', t => {
+  const run = fixture(t);
+  const target = 'src/project/program/resolve/reuse_tests.rs';
+  for (const args of [[target, 'src/lib.rs'], ['tests/cli.rs', target], [target, target]]) {
+    const result = run(args);
+    assert.equal(result.status, 2, result.stderr);
+    assert.deepEqual(result.calls, []);
+  }
+  const empty = run([target], 0, '', 0);
+  assert.equal(empty.status, 1, empty.stderr);
+  assert.match(empty.stderr, /no tests executed/);
+  assert.match(empty.stderr, /cargo stdout diagnostic/);
+  fs.rmSync(path.join(empty.directory, target));
+  const missing = run([target]);
+  assert.equal(missing.status, 2, missing.stderr);
+  assert.deepEqual(missing.calls, []);
 });

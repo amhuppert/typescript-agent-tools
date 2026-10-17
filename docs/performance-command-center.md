@@ -1,5 +1,10 @@
 # Command Center performance
 
+The latest follow-up, [unchanged-file and resolution reuse](performance-refresh-reuse.md),
+records refresh improvements and their retained-memory cost. It builds on
+[relative path preparation](performance-relative-paths.md). The tables below
+describe the preceding binaries and remain unchanged for comparison.
+
 The unchanged Command Center configuration loads and answers every CLI command;
 this report records what that costs. [Current state](#current-state-2026-10-17-after-the-performance-work)
 compares the commands before and after the 2026-10-17 performance work.

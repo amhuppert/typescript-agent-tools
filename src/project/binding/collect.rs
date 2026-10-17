@@ -21,6 +21,9 @@ use crate::syntax_kind::SyntaxKind;
 use crate::{Ast, Node, NodeId, Span};
 use std::collections::{HashMap, HashSet};
 
+mod facts;
+pub(super) use facts::{Facts, SharedFacts};
+
 pub(crate) const DECLARATION: u8 = 1;
 pub(crate) const USE: u8 = 2;
 pub(crate) const IMPORT: u8 = 4;
@@ -389,7 +392,7 @@ pub(super) struct ModuleDeclaration {
 
 /// Captured facts for one file, with file-local indices.
 #[derive(Debug, Default)]
-pub(super) struct Facts {
+struct CollectedFacts {
     pub(super) module_declarations: Vec<ModuleDeclaration>,
     /// The existing lexical traversal's exact lookup location, for checker
     /// resolveName questions whose text is synthesized instead of in source.
@@ -552,7 +555,7 @@ pub(super) struct Collector<'a, 's> {
     /// The parsed text, for error positions.
     source: &'a SourceText,
     module: bool,
-    facts: Facts,
+    facts: CollectedFacts,
     // Scope capture mixes overwrite and first-write-only rules. Keep that
     // builder behavior intact, then compact its final associations once.
     scope_sites: HashMap<(SyntaxKind, Span), ScopeId>,
@@ -595,7 +598,7 @@ impl<'a, 's> Collector<'a, 's> {
             ast,
             source,
             module,
-            facts: Facts::default(),
+            facts: CollectedFacts::default(),
             scope_sites: HashMap::new(),
             requests: Vec::new(),
             work: Vec::new(),
@@ -662,7 +665,7 @@ impl<'a, 's> Collector<'a, 's> {
         self.facts.flow = Some(capture.graph);
         self.facts.lookup_scopes =
             super::site_map::SiteMap::from_entries(self.scope_sites.into_iter().collect());
-        Ok((self.facts, self.requests))
+        Ok((self.facts.into(), self.requests))
     }
 
     /// The declarations TypeScript reports for one name declared both

@@ -108,7 +108,7 @@ pub(crate) fn project(config: &Path, mut request: ProjectRequest, direct: bool) 
 /// with the process instead of being freed piece by piece, which takes
 /// seconds for a large project.
 fn one_shot(config: &Path, request: ProjectRequest) -> Result<ProjectResponse, AnalysisError> {
-    let session = ProjectSession::new(config).map_err(AnalysisError::from)?;
+    let session = ProjectSession::for_one_request(config).map_err(AnalysisError::from)?;
     std::mem::ManuallyDrop::new(session).execute(request)
 }
 

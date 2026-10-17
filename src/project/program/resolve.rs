@@ -20,6 +20,13 @@ use std::path::Path;
 use std::rc::Rc;
 use std::sync::Arc;
 
+mod reuse;
+pub(super) use reuse::Reuse;
+use reuse::{Access, Memo};
+
+#[cfg(test)]
+mod reuse_tests;
+
 /// Extension families a lookup may produce.
 const TS: u8 = 1;
 const DTS: u8 = 2;
@@ -314,9 +321,13 @@ impl PackageJson {
 struct Host<'a> {
     disk: &'a disk::Disk,
     case: Case,
-    files: HashMap<String, Result<bool, InputError>>,
-    directories: HashMap<String, Result<bool, InputError>>,
-    packages: HashMap<String, Result<Option<Rc<PackageJson>>, InputError>>,
+    files: HashMap<String, Memo<bool>>,
+    directories: HashMap<String, Memo<bool>>,
+    packages: HashMap<String, Memo<Option<Arc<PackageJson>>>>,
+    /// Session-only receipts are retained even outside an active resolution:
+    /// a later lookup may use a package first read for a source's format.
+    recording: bool,
+    trace: Option<reuse::Trace>,
     /// The first input that lookups could not use: an existing file or
     /// directory that could not be read, or a manifest beyond the JSON
     /// reader's limit. A lookup continues as if it were absent, but loading
@@ -334,28 +345,32 @@ impl Host<'_> {
     }
 
     fn file_exists(&mut self, path: &str) -> bool {
-        let result = self
-            .files
-            .entry(path.to_owned())
-            .or_insert_with(|| {
+        let cached = self.files.entry(path.to_owned()).or_insert_with(|| {
+            Memo::read(path, self.recording, self.disk, || {
                 self.disk
                     .file_exists(path)
                     .map_err(|error| io_error(Path::new(path), &error))
             })
-            .clone();
+        });
+        if let Some(trace) = &mut self.trace {
+            trace.observe(cached, Access::File);
+        }
+        let result = cached.answer();
         self.admit(result).unwrap_or(false)
     }
 
     fn directory_exists(&mut self, path: &str) -> bool {
-        let result = self
-            .directories
-            .entry(path.to_owned())
-            .or_insert_with(|| {
+        let cached = self.directories.entry(path.to_owned()).or_insert_with(|| {
+            Memo::read(path, self.recording, self.disk, || {
                 self.disk
                     .is_dir(path)
                     .map_err(|error| io_error(Path::new(path), &error))
             })
-            .clone();
+        });
+        if let Some(trace) = &mut self.trace {
+            trace.observe(cached, Access::Directory);
+        }
+        let result = cached.answer();
         self.admit(result).unwrap_or(false)
     }
 
@@ -372,38 +387,43 @@ impl Host<'_> {
         }
     }
 
-    fn package_observation(&mut self, dir: &str) -> Result<Option<Rc<PackageJson>>, InputError> {
+    fn package_observation(&mut self, dir: &str) -> Result<Option<Arc<PackageJson>>, InputError> {
         let dir = paths::directory(dir.to_owned());
         // `InfoCache.Get/Set` uses the canonical absolute path, while
         // getPackageJsonInfo projects PackageDirectory back to this caller.
-        let package = self
+        let cached = self
             .packages
             .entry(self.case.key(&dir))
-            .or_insert_with(|| {
-                PackageInfo::read(&dir, self.disk)
-                    .map(|info| info.map(|info| Rc::new(PackageJson::from_info(info))))
-            })
-            .clone()?;
+            .or_insert_with_key(|key| {
+                Memo::read(key, self.recording, self.disk, || {
+                    PackageInfo::read(&dir, self.disk)
+                        .map(|info| info.map(|info| Arc::new(PackageJson::from_info(info))))
+                })
+            });
+        if let Some(trace) = &mut self.trace {
+            trace.observe(cached, Access::Package);
+        }
+        let package = cached.answer()?;
         Ok(
             package.map(|package| match package.info.with_directory(&dir) {
                 std::borrow::Cow::Borrowed(_) => package.clone(),
-                std::borrow::Cow::Owned(info) => Rc::new(PackageJson::from_info(Arc::new(info))),
+                std::borrow::Cow::Owned(info) => Arc::new(PackageJson::from_info(Arc::new(info))),
             }),
         )
     }
 
-    fn package(&mut self, dir: &str) -> Option<Rc<PackageJson>> {
+    fn package(&mut self, dir: &str) -> Option<Arc<PackageJson>> {
         let result = self.package_observation(dir);
         self.admit(result).flatten()
     }
 
     /// The nearest `package.json` at or above `dir`.
-    fn scope(&mut self, dir: &str) -> Option<Rc<PackageJson>> {
+    fn scope(&mut self, dir: &str) -> Option<Arc<PackageJson>> {
         let result = self.scope_observation(dir);
         self.admit(result).flatten()
     }
 
-    fn scope_observation(&mut self, dir: &str) -> Result<Option<Rc<PackageJson>>, InputError> {
+    fn scope_observation(&mut self, dir: &str) -> Result<Option<Arc<PackageJson>>, InputError> {
         for ancestor in paths::ancestors(dir) {
             if let Some(package) = self.package_observation(ancestor)? {
                 return Ok(Some(package));
@@ -449,10 +469,10 @@ enum Continuation {
     /// A relative module name, which may name a directory with a manifest.
     Relative,
     /// A file named by a manifest field of this package directory.
-    PackageField(Option<Rc<PackageJson>>),
+    PackageField(Option<Arc<PackageJson>>),
     /// A path inside a package in `node_modules`.
     Package {
-        package: Option<Rc<PackageJson>>,
+        package: Option<Arc<PackageJson>>,
         subpath: bool,
     },
 }
@@ -479,6 +499,7 @@ pub(super) struct Resolver<'a> {
     arbitrary: HashSet<String>,
     too_deep: bool,
     symlink_resolutions: Vec<(String, String)>,
+    reuse: Option<reuse::State<'a>>,
 }
 
 impl<'a> Resolver<'a> {
@@ -504,6 +525,8 @@ impl<'a> Resolver<'a> {
                 files: HashMap::new(),
                 directories: HashMap::new(),
                 packages: HashMap::new(),
+                recording: false,
+                trace: None,
                 failure: None,
             },
             modules: HashMap::new(),
@@ -512,7 +535,50 @@ impl<'a> Resolver<'a> {
             arbitrary: HashSet::new(),
             too_deep: false,
             symlink_resolutions: Vec::new(),
+            reuse: None,
         }
+    }
+
+    /// Retain exact resolution inputs for a session refresh. Configuration,
+    /// file identity/admission, automatic type discovery, and all binding
+    /// remain current-generation work; only module/type lookup decisions are
+    /// reused. Call immediately after construction, before any host access.
+    pub(super) fn reusing(mut self, previous: &'a Reuse) -> Self {
+        self.reuse = Some(reuse::State::new(
+            previous,
+            self.options,
+            self.config_dir,
+            self.config_file,
+            self.case,
+        ));
+        self.host.recording = true;
+        self
+    }
+
+    /// Finish the current generation after all resolution and specifier
+    /// capture. The session publishes this only if binding and final exact
+    /// input validation also succeed.
+    pub(super) fn take_reuse(&mut self) -> Reuse {
+        self.reuse
+            .take()
+            .map(|state| state.next)
+            .unwrap_or_default()
+    }
+
+    fn begin_trace(&mut self) -> usize {
+        if self.reuse.is_some() {
+            assert!(self.host.trace.is_none(), "resolution traces do not nest");
+            self.host.trace = Some(reuse::Trace::default());
+        }
+        self.symlink_resolutions.len()
+    }
+
+    fn finish_trace<T>(&mut self, value: T, symlinks: usize) -> Option<Arc<reuse::Saved<T>>> {
+        let trace = self.host.trace.take()?;
+        if self.host.failure.is_some() {
+            return None;
+        }
+        reuse::Saved::new(value, trace, &self.symlink_resolutions[symlinks..])
     }
 
     /// `GetConditions` preserves native mode-less resolution: Bundler supplies
@@ -549,6 +615,23 @@ impl<'a> Resolver<'a> {
         if let Some(resolved) = self.modules.get(&key) {
             return resolved.clone();
         }
+        if let Some(saved) = self.reuse.as_ref().and_then(|state| state.module(&key))
+            && saved.adopt(&mut self.host)
+        {
+            self.symlink_resolutions.extend_from_slice(&saved.symlinks);
+            let result = saved.value.clone();
+            self.modules.insert(key.clone(), result.clone());
+            self.reuse
+                .as_mut()
+                .expect("reuse is enabled")
+                .save_module(key, saved);
+            #[cfg(test)]
+            reuse_tests::finished(self.config_file, specifier);
+            return result;
+        }
+        let symlinks = self.begin_trace();
+        #[cfg(test)]
+        reuse_tests::worked(self.config_file, false);
         let mut extensions = TS | DTS | JS;
         if self.options.resolve_json_module {
             extensions |= JSON;
@@ -590,7 +673,17 @@ impl<'a> Resolver<'a> {
                 }
             }
         };
+        if self.reuse.is_some()
+            && let Some(saved) = self.finish_trace(resolved.clone(), symlinks)
+        {
+            self.reuse
+                .as_mut()
+                .expect("reuse is enabled")
+                .save_module(key.clone(), saved);
+        }
         self.modules.insert(key, resolved.clone());
+        #[cfg(test)]
+        reuse_tests::finished(self.config_file, specifier);
         resolved
     }
 
@@ -603,6 +696,42 @@ impl<'a> Resolver<'a> {
         directory: &str,
         mode: Option<ResolutionMode>,
     ) -> Option<ResolvedPath> {
+        if self.reuse.is_none() {
+            return self.type_reference_worker(name, directory, mode);
+        }
+        let key = (directory.to_owned(), name.to_owned(), mode);
+        if let Some(saved) = self.reuse.as_ref().and_then(|state| state.types(&key))
+            && saved.adopt(&mut self.host)
+        {
+            // Unlike module(), type_reference() has no per-load result memo:
+            // every invocation contributes its original symlink effect.
+            self.symlink_resolutions.extend_from_slice(&saved.symlinks);
+            let result = saved.value.clone();
+            self.reuse
+                .as_mut()
+                .expect("reuse is enabled")
+                .save_types(key, saved);
+            return result;
+        }
+        let symlinks = self.begin_trace();
+        let resolved = self.type_reference_worker(name, directory, mode);
+        if let Some(saved) = self.finish_trace(resolved.clone(), symlinks) {
+            self.reuse
+                .as_mut()
+                .expect("reuse is enabled")
+                .save_types(key, saved);
+        }
+        resolved
+    }
+
+    fn type_reference_worker(
+        &mut self,
+        name: &str,
+        directory: &str,
+        mode: Option<ResolutionMode>,
+    ) -> Option<ResolvedPath> {
+        #[cfg(test)]
+        reuse_tests::worked(self.config_file, true);
         let state = self.state(mode, DTS);
         for root in self.type_roots() {
             if !self.host.directory_exists(&root) {
@@ -648,10 +777,17 @@ impl<'a> Resolver<'a> {
                 external,
             };
         }
-        let real = self
-            .host
-            .disk
-            .canonicalize(&path)
+        let real = if let Some(trace) = &mut self.host.trace {
+            let (result, receipt) = self
+                .host
+                .disk
+                .capture(|| self.host.disk.canonicalize(&path));
+            trace.canonical(receipt);
+            result
+        } else {
+            self.host.disk.canonicalize(&path)
+        };
+        let real = real
             .map_err(|error| io_error(Path::new(&path), &error))
             .and_then(|path| paths::from_path(&path));
         let real = match real {
@@ -1172,7 +1308,7 @@ impl<'a> Resolver<'a> {
         &mut self,
         state: &State,
         candidate: &str,
-        package: Option<Rc<PackageJson>>,
+        package: Option<Arc<PackageJson>>,
     ) -> Option<String> {
         let field = package.as_ref().and_then(|p| {
             if state.config_lookup {
@@ -1336,7 +1472,7 @@ impl<'a> Resolver<'a> {
     fn exports(
         &mut self,
         state: &State,
-        scope: &Rc<PackageJson>,
+        scope: &Arc<PackageJson>,
         subpath: &str,
     ) -> Option<Option<String>> {
         let Some(exports) = scope.exports.as_ref() else {
@@ -1368,7 +1504,7 @@ impl<'a> Resolver<'a> {
     fn lookup_table(
         &mut self,
         state: &State,
-        scope: &Rc<PackageJson>,
+        scope: &Arc<PackageJson>,
         name: &str,
         table: &Table,
         imports: bool,
@@ -1402,7 +1538,7 @@ impl<'a> Resolver<'a> {
     fn target(
         &mut self,
         state: &State,
-        scope: &Rc<PackageJson>,
+        scope: &Arc<PackageJson>,
         target: &Value,
         subpath: &str,
         pattern: bool,
@@ -1460,7 +1596,7 @@ impl<'a> Resolver<'a> {
     fn string_target(
         &mut self,
         state: &State,
-        scope: &Rc<PackageJson>,
+        scope: &Arc<PackageJson>,
         target: &str,
         subpath: &str,
         pattern: bool,

@@ -56,6 +56,7 @@ use crate::source::SourceText;
 use crate::syntax;
 use crate::syntax_kind::SyntaxKind;
 use crate::{Ast, Span};
+use std::sync::Arc;
 
 /// A module one file requests, including the program's synthetic imports.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -148,7 +149,7 @@ pub(super) struct FileOptions {
 }
 
 /// Owned semantic facts captured from one parsed file.
-#[derive(Debug, Default)]
+#[derive(Debug, Clone, Default)]
 pub(super) struct FileFacts {
     /// Whether top-level declarations are module-local rather than global.
     pub(super) module: bool,
@@ -160,9 +161,19 @@ pub(super) struct FileFacts {
     /// Where `@ts-ignore` and `@ts-expect-error` comment directives begin
     /// (`crate::pragmas::comment_directives`).
     directives: Vec<u32>,
-    facts: collect::Facts,
+    facts: Arc<collect::Facts>,
     /// A JSON source file's module, which declares no names.
-    json: Option<JsonFacts>,
+    json: Option<Arc<JsonFacts>>,
+}
+
+#[cfg(test)]
+impl FileFacts {
+    pub(super) fn collection_identity(&self) -> usize {
+        self.json.as_ref().map_or_else(
+            || Arc::as_ptr(&self.facts) as usize,
+            |json| Arc::as_ptr(json) as usize,
+        )
+    }
 }
 
 use json::APPARENT_INTERFACES;
@@ -214,14 +225,14 @@ pub(super) mod meaning {
 
 /// Capture one file's semantic facts from `ast`, parsed from `source`.
 /// Errors carry a position but no path.
-/// `indicators` are the file's own (`ModuleIndicators::of`).
+/// `indicators` are the file's own (`ModuleIndicators::of`); `module`, their
+/// effective module decision, is collection's only configuration input.
 pub(super) fn collect(
     ast: &Ast<'_>,
     source: &SourceText,
     indicators: ModuleIndicators,
-    options: FileOptions,
+    module: bool,
 ) -> Result<FileFacts, InputError> {
-    let module = indicators.module(options);
     let (facts, requests) = collect::Collector::new(ast, source, module).run()?;
     Ok(FileFacts {
         module,
@@ -229,7 +240,7 @@ pub(super) fn collect(
         jsx: indicators.first_jsx,
         requests,
         directives: comment_directives(ast.source(), ast.literal_token_spans()),
-        facts,
+        facts: Arc::new(facts),
         json: None,
     })
 }
@@ -241,7 +252,7 @@ pub(super) fn collect_json(text: &JsonText, source: &str) -> FileFacts {
     FileFacts {
         module: true,
         directives: comment_directives(source, text.literal_spans()),
-        json: Some(JsonFacts::new(text.root.as_ref())),
+        json: Some(Arc::new(JsonFacts::new(text.root.as_ref()))),
         ..FileFacts::default()
     }
 }

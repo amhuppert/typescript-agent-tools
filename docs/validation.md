@@ -79,10 +79,59 @@ The native runners compare native diagnostics rather than syntax trees, so they 
 
 ## Focused Rust targets
 
+### Relative path preparation
+
+`fixtures/paths/relative.json` records 172 calls to TypeScript 7.0.2's
+`tspath.GetRelativePathToDirectoryOrUrl`. The Rust library checks both individual
+results and their unions over importer directories, including root kinds,
+normalization, separators, cwd, and sensitive/insensitive Unicode comparisons.
+The native check uses the same pristine Go source verification as the type
+oracles above and the test-only overlay in `fixtures/paths/oracle_test.go`:
+
+```sh
+cctl validate run harness-test --queue-if-busy --require-match -- tools/relative-path-oracle.test.mjs
+cctl validate run test --queue-if-busy --require-match -- src/lib.rs
+cctl validate run test --queue-if-busy --require-match -- tests/project_path_allocations.rs
+```
+
+To add cases, add input rows to the fixture and run the native check. It writes
+the compiler's complete answers to `.cc/temp/relative-path-native.json` before
+comparing them with the fixture; inspect those answers before updating the
+expected fields. The allocation regression loads sibling index modules through
+`Project::load`, checks the final references, and bounds allocation counts and
+requested allocation bytes. It covers ordinary relative spellings; `rootDirs`
+still uses its existing per-directory transforms.
+
+### Session reuse
+
+The library tests in `project::session::reuse_tests` and
+`project::program::resolve::reuse_tests` check reuse through published session
+responses and compare them with fresh projects. They cover source/fact/navigation
+sharing, current file identities, module status and library roles, JSON and BOM
+changes, synthetic requests, obsolete-input release, resolution invalidation,
+and failures. Deterministic resolver counters distinguish reuse from recomputation.
+The existing session integration tests also exercise exact observations, FIFO
+reads, and files changing during construction.
+
+```sh
+cctl validate run test --queue-if-busy --require-match -- src/lib.rs tests/reference_session.rs tests/project_service.rs
+```
+
+For the resolution tests alone, select
+`src/project/program/resolve/reuse_tests.rs`. This exact existing file is accepted
+only on its own and must execute at least one test; mixing it with another target
+fails before Cargo runs. It retains two build jobs and two test threads. Until
+the wrapper change reaches the canonical checkout, exercise that new selector
+locally with `scripts/validate/test-changed.sh src/project/program/resolve/reuse_tests.rs`;
+Command Center resolves registered wrappers from the canonical checkout.
+
+### Selecting Rust tests
+
 The registered `test` command accepts explicit Cargo test roots. Use
 `cctl validate run test --queue-if-busy --require-match -- src/lib.rs` for the
 library tests, or `tests/<target>.rs` for integration tests; the two can be
-combined. Other source paths are rejected before Cargo starts. With no explicit
+combined. Apart from the explicitly supported resource and reuse test modules,
+other source paths are rejected before Cargo starts. With no explicit
 paths, the command retains the full suite. Both modes retain two build jobs and
 two test threads; merge validation still runs the full suite.
 

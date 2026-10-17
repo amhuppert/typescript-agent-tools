@@ -13,11 +13,15 @@ pub struct ProjectSession {
     config: PathBuf,
     generation: u64,
     current: Option<(Project, disk::Observations)>,
+    reuse: Option<super::program::Reuse>,
     #[cfg(test)]
     tests: tests::Hooks,
 }
 
 type Answer = Result<ProjectResponse, AnalysisError>;
+
+#[cfg(test)]
+mod reuse_tests;
 
 /// The answer a thread `answering` started gives, resuming its panic; without
 /// a thread of its own the answer is made here.
@@ -47,9 +51,19 @@ impl ProjectSession {
             })?,
             generation: 0,
             current: None,
+            reuse: Some(super::program::Reuse::default()),
             #[cfg(test)]
             tests: tests::Hooks::default(),
         })
+    }
+
+    /// A session for a caller that answers one request and exits. It performs
+    /// the same input validation, but retains no file products or resolution
+    /// decisions for a future refresh. Repeated use remains correct.
+    pub fn for_one_request(config: &Path) -> Result<Self, InputError> {
+        let mut session = Self::new(config)?;
+        session.reuse = None;
+        Ok(session)
     }
 
     /// The number of successfully published snapshots, initially zero.
@@ -157,12 +171,19 @@ impl ProjectSession {
     }
 
     fn reload(&mut self) -> Result<(), AnalysisError> {
-        // Release the obsolete snapshot before loading: large projects already
-        // have a much higher construction peak than their retained state.
+        // Release the obsolete project before loading. Reusable file products
+        // survive capture; load_reusing releases the unused ones before binding.
         self.current = None;
-        let captured = Project::on_loading_thread(&self.config, |parser| {
+        let (project, observations, reuse) = Project::on_loading_thread(&self.config, |parser| {
             let disk = disk::Disk::recording();
-            let project = Project::load_here(&self.config, &disk, parser)?;
+            let (project, reuse) = match self.reuse.as_mut() {
+                Some(previous) => {
+                    let (project, reuse) =
+                        Project::load_reusing(&self.config, &disk, parser, previous)?;
+                    (project, Some(reuse))
+                }
+                None => (Project::load_here(&self.config, &disk, parser)?, None),
+            };
             let observations = disk.finish();
             if !observations.unchanged()? {
                 return Err(InputError {
@@ -175,9 +196,10 @@ impl ProjectSession {
                 }
                 .into());
             }
-            Ok((project, observations))
+            Ok((project, observations, reuse))
         })?;
-        self.current = Some(captured);
+        self.current = Some((project, observations));
+        self.reuse = reuse;
         self.generation += 1;
         Ok(())
     }

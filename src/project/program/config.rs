@@ -98,7 +98,7 @@ pub(super) enum Detection {
 /// Directory-valued settings (`rootDirs`, `typeRoots`, `outDir`,
 /// `declarationDir`, `rootDir`) are absolute and normalized, without a
 /// trailing separator except at a root.
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct Options {
     pub(crate) semantic: SemanticOptions,
     pub(super) resolution: Resolution,
@@ -332,7 +332,7 @@ impl SemanticOptions {
 
 /// `paths` patterns and their substitutions, relative to `base`: the
 /// directory of the configuration that declared them.
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct Paths {
     pub(super) base: String,
     pub(super) patterns: Vec<(String, Vec<String>)>,

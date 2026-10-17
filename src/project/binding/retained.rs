@@ -4,13 +4,13 @@
 //! queries consume the completed Index. The mutable lexical Store and its
 //! resolution work belong only to loading and are dropped after final checks.
 
-use super::collect::{Alias, AmbientModule, Decl, ModuleDeclaration, RefBase, Scope, Star};
-use super::ids::{OccurrenceId, RequestId};
+use super::collect::{RefBase, SharedFacts};
+use super::ids::OccurrenceId;
 use super::index::Index;
 use super::link::ValueOrigin;
 use super::{JsonFacts, ModuleRequest, ModuleResolution};
 use crate::project::program::{Diagnostics, ProgramFile};
-use std::collections::HashMap;
+use std::sync::Arc;
 
 /// Published only after lexical checks and index construction complete.
 /// Raw native identities remain independent of the Index's lexical groups.
@@ -72,8 +72,7 @@ impl Linked {
 #[allow(dead_code)] // Existing lexical facts; complete semantic recipes pending.
 pub(super) struct File {
     pub(super) module_semantics: crate::project::program::FileModuleSemantics,
-    pub(super) conditional_scopes: HashMap<crate::Span, super::ids::ScopeId>,
-    pub(super) lookup_scopes: super::site_map::SiteMap<super::ids::ScopeId>,
+    shared: Arc<SharedFacts>,
     pub(super) search: bool,
     pub(super) module: bool,
     pub(super) declaration: bool,
@@ -81,16 +80,16 @@ pub(super) struct File {
     pub(super) requests: Box<[ModuleRequest]>,
     pub(super) modules: Box<[ModuleResolution]>,
     pub(super) diagnostics: Diagnostics,
-    pub(super) scopes: Box<[Scope]>,
-    pub(super) decls: Box<[Decl]>,
     pub(super) refs: Box<[Reference]>,
-    pub(super) aliases: Box<[Alias]>,
-    pub(super) stars: Box<[Star]>,
-    pub(super) ambient_modules: Box<[AmbientModule]>,
-    pub(super) module_declarations: Box<[ModuleDeclaration]>,
-    pub(super) instantiated_augmentations: Box<[RequestId]>,
-    pub(super) json: Option<JsonFacts>,
-    pub(super) flow: Option<super::flow::Graph>,
+    pub(super) json: Option<Arc<JsonFacts>>,
+}
+
+impl std::ops::Deref for File {
+    type Target = SharedFacts;
+
+    fn deref(&self) -> &Self::Target {
+        &self.shared
+    }
 }
 
 #[derive(Debug)]
@@ -138,32 +137,12 @@ impl File {
             // The Diagnostics product already owns directive coverage.
             directives: _,
         } = facts;
-        let super::collect::Facts {
-            module_declarations,
-            conditional_scopes,
-            lookup_scopes,
-            names,
-            flow,
-            scopes,
-            decls,
-            binding_order: _,
-            // Native headers retain both roles; allocation orchestration is
-            // transient and is not a second inventory.
-            anonymous_signatures: _,
-            refs,
-            aliases,
-            stars,
-            ambient_modules,
-            instantiated_augmentations,
-            // All validation consumers have finished before publication.
-            mixed_exports: _,
-            misplaced_modules: _,
-        } = facts;
-        assert_eq!(refs.len(), sources.len());
-        assert_eq!(refs.len(), origins.len());
-        assert_eq!(refs.len(), type_alias_origins.len());
-        let refs = refs
-            .into_iter()
+        assert_eq!(facts.refs.len(), sources.len());
+        assert_eq!(facts.refs.len(), origins.len());
+        assert_eq!(facts.refs.len(), type_alias_origins.len());
+        let refs = facts
+            .refs
+            .iter()
             .zip(sources)
             .zip(origins)
             .zip(type_alias_origins)
@@ -174,7 +153,7 @@ impl File {
                     meaning: reference.meaning,
                     property: reference.property,
                     type_context: reference.type_context,
-                    flow: names[reference.token.index()].flow,
+                    flow: facts.names[reference.token.index()].flow,
                     value_origin,
                     type_alias_origin,
                 },
@@ -183,24 +162,15 @@ impl File {
         Self {
             module_semantics,
             search,
-            conditional_scopes,
-            lookup_scopes,
+            shared: Arc::clone(&facts.shared),
             module,
             declaration,
             jsx,
             requests: requests.into_boxed_slice(),
             modules: modules.into_boxed_slice(),
             diagnostics,
-            scopes: scopes.into_boxed_slice(),
-            decls: decls.into_boxed_slice(),
             refs,
-            aliases: aliases.into_boxed_slice(),
-            stars: stars.into_boxed_slice(),
-            ambient_modules: ambient_modules.into_boxed_slice(),
-            module_declarations: module_declarations.into_boxed_slice(),
-            instantiated_augmentations: instantiated_augmentations.into_boxed_slice(),
             json,
-            flow,
         }
     }
 }

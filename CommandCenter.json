@@ -44,7 +44,7 @@
         },
         "cost": 2,
         "timeoutMs": 900000,
-        "description": "Run Rust tests, explicit library/binary/integration roots, or one resource-test module file with two build jobs and two test threads",
+        "description": "Run Rust tests, explicit library/binary/integration roots, or one supported resource/reuse test module file with two build jobs and two test threads",
         "pathArgs": "paths"
       },
       "harness-test": {

@@ -41,10 +41,10 @@ pub(super) enum Named<'p> {
 }
 
 /// What loading captures of one input for navigation.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(super) enum Captured {
     /// A TypeScript file's selection index.
-    Index(Index),
+    Index(Arc<Index>),
     /// A JSON module, which is not navigation input.
     Json,
 }
@@ -52,7 +52,7 @@ pub(super) enum Captured {
 impl Captured {
     /// The index of a TypeScript input, parsed into `ast` from `source`.
     pub(super) fn typescript(ast: &Ast<'_>, source: &Arc<SourceText>) -> Self {
-        Self::Index(Index::new(ast, Arc::clone(source)))
+        Self::Index(Arc::new(Index::new(ast, Arc::clone(source))))
     }
 }
 
@@ -228,7 +228,7 @@ impl Project {
                 .ids()
                 .zip(&self.navigation.files)
                 .filter_map(|(id, captured)| match captured {
-                    Some(Captured::Index(index)) => Some((id, index)),
+                    Some(Captured::Index(index)) => Some((id, index.as_ref())),
                     _ => None,
                 })
                 .collect(),

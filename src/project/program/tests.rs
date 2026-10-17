@@ -2353,9 +2353,9 @@ fn imports_chains_beyond_the_limit_fail_the_load() {
 #[test]
 fn module_specifier_capture_does_not_visit_every_importer_target_pair() {
     // 1,200 importers in 120 directories and 300 `index` modules, all
-    // imported by one file. Capturing module-specifier probes is quadratic in
-    // importer directories and index targets by design, never per importer
-    // file times every target.
+    // imported by one file. Capturing module-specifier probes deduplicates
+    // importer directories and relative path shapes; it must never construct
+    // candidates per importer file times every target.
     let mut files: Vec<(String, String)> = vec![(
         "tsconfig.json".into(),
         r#"{ "compilerOptions": { "noLib": true }, "include": ["src"] }"#.into(),

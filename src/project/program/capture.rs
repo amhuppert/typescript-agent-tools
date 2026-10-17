@@ -3,8 +3,10 @@
 //! (`Loader::load_file`); meanwhile worker threads capture inputs it has
 //! reserved but not reached: they read, parse, index, and collect each one.
 //! A capture is file-local. It depends on the input's path and text and on
-//! options the loader settled when it reserved the input, never on another
-//! input or on the resolver, so the loader alone decides what a capture means
+//! its effective module status, never on another input or on the resolver.
+//! Captures may reuse an earlier generation's products after reading equal
+//! text; the loader rechecks module status before using collected facts.
+//! The loader alone decides what a capture means
 //! for the program: it observes the read where it uses it, and a capture's
 //! failure surfaces only when the loader reaches its input, exactly where a
 //! capture of its own would have failed. Workers read speculatively
@@ -51,29 +53,64 @@ pub(super) struct Capture {
     pub(super) parsed: Option<Parsed>,
 }
 
+#[derive(Clone)]
 pub(super) struct Parsed {
     pub(super) source: Arc<SourceText>,
     pub(super) contents: Result<Contents, InputError>,
 }
 
+#[derive(Clone)]
 pub(super) enum Contents {
     /// A JSON module (`binding::collect_json`).
     Json(FileFacts),
     /// A TypeScript input: its navigation index, unless it is a library,
-    /// its module indicators, and its facts as collected with `options`,
-    /// the job's.
+    /// its module indicators, and the effective `module` decision under
+    /// which its facts were collected. This is collection's whole cache key.
     TypeScript {
         navigation: Option<Captured>,
         indicators: ModuleIndicators,
-        options: FileOptions,
+        module: bool,
         facts: Result<FileFacts, InputError>,
     },
 }
 
+/// Only the last successful generation's reached inputs. Cached facts are
+/// pure collection, before synthetic requests or resolution mutate a load's
+/// request list; the final module decision is kept with those facts.
+pub(super) type Cache = HashMap<String, Cached>;
+
+pub(super) struct Cached {
+    pub(super) text: Arc<str>,
+    pub(super) library: bool,
+    pub(super) json: bool,
+    pub(super) parsed: Parsed,
+}
+
 /// Capture `job`'s input with `parser`, reading as `reading` reads; nothing
 /// when that reading declines to read the input.
+#[cfg(test)]
 pub(super) fn capture(parser: &Parser, job: &Job, reading: Reading<'_>) -> Option<Capture> {
-    let read = TextRead::with(job.path.as_ref(), reading)?;
+    capture_reusing(parser, job, reading, &Cache::new())
+}
+
+fn capture_reusing(
+    parser: &Parser,
+    job: &Job,
+    reading: Reading<'_>,
+    previous: &Cache,
+) -> Option<Capture> {
+    let mut read = TextRead::with(job.path.as_ref(), reading)?;
+    if let Some(cached) = previous.get(&job.path)
+        && cached.library == job.library
+        && cached.json == job.json
+        && read.reuse_text(&cached.text)
+    {
+        return Some(Capture {
+            read,
+            json: job.json,
+            parsed: Some(cached.parsed.clone()),
+        });
+    }
     let parsed = read.text().ok().map(|text| {
         let source = Arc::new(SourceText::shared(Arc::clone(text)));
         let contents = contents(parser, job, &source);
@@ -111,11 +148,12 @@ fn contents(parser: &Parser, job: &Job, source: &Arc<SourceText>) -> Result<Cont
         .parse(source.as_str(), &job.path)
         .map_err(|error| InputError::unparsable(error, source, &file_path))?;
     let indicators = ModuleIndicators::of(&ast);
+    let module = indicators.module(job.options);
     Ok(Contents::TypeScript {
         navigation: (!job.library).then(|| Captured::typescript(&ast, source)),
         indicators,
-        options: job.options,
-        facts: collect(&ast, source, indicators, job.options, &file_path),
+        module,
+        facts: collect(&ast, source, indicators, module, &file_path),
     })
 }
 
@@ -124,10 +162,10 @@ pub(super) fn collect(
     ast: &crate::Ast<'_>,
     source: &SourceText,
     indicators: ModuleIndicators,
-    options: FileOptions,
+    module: bool,
     path: &std::path::Path,
 ) -> Result<FileFacts, InputError> {
-    binding::collect(ast, source, indicators, options).map_err(|mut error| {
+    binding::collect(ast, source, indicators, module).map_err(|mut error| {
         error.path.get_or_insert_with(|| path.to_path_buf());
         error
     })
@@ -169,11 +207,18 @@ impl Captures<'_> {
     /// the others and to the loader, which captures any job no worker has
     /// started when it needs it, so the result does not depend on how many
     /// workers there are.
-    pub(super) fn with<'c, T>(waits: &'c Waits, load: impl FnOnce(&Captures<'c>) -> T) -> T {
+    pub(super) fn with_reuse<T>(
+        waits: &Waits,
+        previous: &Cache,
+        load: impl FnOnce(&Captures<'_>) -> T,
+    ) -> T {
+        let capture = |parser: &Parser, job: &Job, reading: Reading<'_>| {
+            capture_reusing(parser, job, reading, previous)
+        };
         Captures::run(workers(), waits, &capture, load)
     }
 
-    /// `with`, on `workers` workers that capture each job with `capture`.
+    /// `with_reuse`, on `workers` workers that capture each job with `capture`.
     fn run<'c, T>(
         workers: usize,
         waits: &'c Waits,

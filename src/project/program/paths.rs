@@ -8,6 +8,9 @@ use crate::project::sources::FileId;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
+mod relative;
+pub(super) use relative::{RelativePaths, relative_with_case};
+
 /// Captured input spellings and query membership. Construction and queries use
 /// the loader's normalization and case policy; lookup reads no files.
 #[derive(Debug)]
@@ -308,38 +311,6 @@ pub(super) fn ancestors(path: &str) -> impl Iterator<Item = &str> {
 /// where needed; `to` itself when the roots differ.
 pub(super) fn relative(from: &str, to: &str) -> String {
     relative_with_case(from, to, "", Case::Sensitive)
-}
-
-/// `GetPathComponentsRelativeTo` / `GetRelativePathFromDirectory`. Roots
-/// always use EqualFold; non-root components use the host's equality policy.
-/// The operation also serves GetRelativePathToDirectoryOrUrl with a cwd.
-pub(super) fn relative_with_case(from: &str, to: &str, cwd: &str, case: Case) -> String {
-    let (from, to) = (resolve(cwd, from), resolve(cwd, to));
-    let (from_root, to_root) = (root_length(&from), root_length(&to));
-    if !text_equal(&from[..from_root], &to[..to_root], Case::Insensitive) {
-        return if to_root == to.len() {
-            if to.ends_with('/') {
-                to
-            } else {
-                format!("{to}/")
-            }
-        } else {
-            to.trim_end_matches('/').to_owned()
-        };
-    }
-    let from: Vec<_> = from[from_root..]
-        .split('/')
-        .filter(|p| !p.is_empty())
-        .collect();
-    let target: Vec<_> = to[to_root..].split('/').filter(|p| !p.is_empty()).collect();
-    let common = from
-        .iter()
-        .zip(&target)
-        .take_while(|(a, b)| text_equal(a, b, case))
-        .count();
-    let mut components = vec![".."; from.len() - common];
-    components.extend(&target[common..]);
-    components.join("/")
 }
 
 /// Native `ContainsPath`, distinct from canonical Path.ContainsPath and

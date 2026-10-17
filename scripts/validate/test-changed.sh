@@ -13,8 +13,12 @@ if (( $# == 0 )); then
   exit 0
 fi
 
-# A module filter applies to every selected Cargo binary. Admit this one
-# explicit file only on its own, so mixed paths cannot silently lose tests.
+# A module filter applies to every selected Cargo binary. Admit each
+# explicit module only on its own, so mixed paths cannot silently lose tests.
+if (( $# == 1 )) && [[ "$1" == src/project/program/resolve/reuse_tests.rs ]] && [[ -f "$1" ]]; then
+  run_rust_tests "$TEST_WORKERS" --require-executed --lib 'project::program::resolve::reuse_tests::'
+  exit 0
+fi
 if (( $# == 1 )) && [[ "$1" == src/project/semantic/resources_tests.rs ]] && [[ -f "$1" ]]; then
   run_rust_tests "$TEST_WORKERS" --require-executed --lib 'project::semantic::resources_tests::'
   exit 0

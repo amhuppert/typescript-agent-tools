@@ -15,8 +15,10 @@ use std::collections::BTreeSet;
 /// directory alone. Those spellings keep the file's final component, so they
 /// ask the collision question exactly when the file itself does. The probes
 /// may therefore include ones a particular importer never asks; each is a
-/// recorded physical observation, and the closure stays quadratic only in
-/// importer directories and index-like targets.
+/// recorded physical observation. Ordinary relative spellings are constructed
+/// once per distinct path shape, rather than once per importer directory.
+/// Comparisons still visit directory/target pairs, and rootDirs keeps its
+/// per-pair transforms and order-sensitive choice of spelling.
 pub(in crate::project::program) fn index_collision_paths(
     env: &SpecifierEnvironment,
     importers: &[String],
@@ -32,6 +34,7 @@ pub(in crate::project::program) fn index_collision_paths(
         .iter()
         .map(|importer| paths::parent(importer))
         .collect();
+    let relatives = paths::RelativePaths::new(directories.iter().copied(), &env.cwd, env.case);
     let mut presence = module_paths::ImporterPresence::new(importers, env.case);
     for target in targets {
         let module_paths = match module_paths::for_any_importer(env, &mut presence, target) {
@@ -42,12 +45,12 @@ pub(in crate::project::program) fn index_collision_paths(
         for path in module_paths {
             let target = &path.file_name;
             if asks_collision(env, target) {
-                for &directory in &directories {
-                    spellings.insert(non_module_name(paths::relative_with_case(
-                        directory, target, &env.cwd, env.case,
-                    )));
-                    if let Some(rooted) = mappings::root_dirs_relative(target, directory, env) {
-                        spellings.insert(rooted);
+                spellings.extend(relatives.to(target).into_iter().map(non_module_name));
+                if !env.options.root_dirs.is_empty() {
+                    for &directory in &directories {
+                        if let Some(rooted) = mappings::root_dirs_relative(target, directory, env) {
+                            spellings.insert(rooted);
+                        }
                     }
                 }
             }

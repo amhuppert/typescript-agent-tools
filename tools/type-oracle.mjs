@@ -404,7 +404,7 @@ function runProcess(binary, args, options = {}) {
   return result.stdout.trim();
 }
 
-function pinnedGoSource() {
+export function pinnedGoSource() {
   const common = runProcess('git', ['rev-parse', '--path-format=absolute', '--git-common-dir']);
   const directory = process.env.TYPE_SCRIPT_GO_SOURCE || path.join(path.dirname(common), '.cache/typescript-go-7.0.2');
   if (runProcess('git', ['rev-parse', 'HEAD'], { cwd: directory }) !== GO_SOURCE_COMMIT)

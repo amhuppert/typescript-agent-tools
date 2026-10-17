@@ -1,9 +1,10 @@
 //! Project configuration, file selection, and module resolution.
 //!
 //! Loading reads the selected configuration and its `extends` chain, selects
-//! root files and standard libraries, then parses each program input exactly
-//! once while following its module requests and reference directives. Search
-//! files are the roots and every input reachable from them, or from a root
+//! root files and standard libraries, then captures each program input while
+//! following its module requests and reference directives. An unchanged
+//! input can reuse its capture; a changed module status recollects its facts.
+//! Search files are the roots and every input reachable from them, or from a root
 //! library, without crossing an external-library edge, matching the
 //! compiler's `isSourceFileFromExternalLibrary`, less the standard libraries
 //! (`IsSourceFileDefaultLibrary`). Program order is `Program.GetSourceFiles`':
@@ -50,6 +51,35 @@ pub(super) use module_semantics::{FileModuleSemantics, ModuleKind};
 pub(super) use paths::FileLookup;
 pub(super) use paths::{from_path as native_file_name, remove_file_extension};
 pub(super) use resolve::is_relative_name;
+
+/// Reusable file products and resolution decisions of the last successfully
+/// published generation.
+/// A refresh still assigns new FileIds and rebuilds all project relationships.
+#[derive(Default)]
+pub(in crate::project) struct Reuse {
+    captures: capture::Cache,
+    resolutions: resolve::Reuse,
+}
+
+#[cfg(test)]
+impl Reuse {
+    pub(in crate::project) fn capture_identity(&self, path: &Path) -> (usize, Option<usize>) {
+        let path = std::fs::canonicalize(path).unwrap();
+        let capture = &self.captures[path.to_str().unwrap()];
+        match capture.parsed.contents.as_ref().unwrap() {
+            capture::Contents::Json(facts) => (facts.collection_identity(), None),
+            capture::Contents::TypeScript {
+                navigation, facts, ..
+            } => (
+                facts.as_ref().unwrap().collection_identity(),
+                navigation.as_ref().and_then(|index| match index {
+                    Captured::Index(index) => Some(std::sync::Arc::as_ptr(index) as usize),
+                    Captured::Json => None,
+                }),
+            ),
+        }
+    }
+}
 
 /// Captured program inputs with their facts and resolved module edges.
 #[derive(Debug)]
@@ -122,6 +152,23 @@ pub(super) fn load(
     load_with_libraries(config, disk, parser, &libraries::directory())
 }
 
+pub(super) fn load_reusing(
+    config: &Path,
+    disk: &disk::Disk,
+    parser: &Parser,
+    previous: &Reuse,
+) -> Result<(Program, Reuse), InputError> {
+    let mut next = Reuse::default();
+    let program = load_program(
+        config,
+        disk,
+        parser,
+        &libraries::directory(),
+        Some((previous, &mut next)),
+    )?;
+    Ok((program, next))
+}
+
 /// `load` with the standard library declarations in `library_dir`, the
 /// vendored directory except where a test removes data from a copy.
 fn load_with_libraries(
@@ -129,6 +176,16 @@ fn load_with_libraries(
     disk: &disk::Disk,
     parser: &Parser,
     library_dir: &str,
+) -> Result<Program, InputError> {
+    load_program(config, disk, parser, library_dir, None)
+}
+
+fn load_program(
+    config: &Path,
+    disk: &disk::Disk,
+    parser: &Parser,
+    library_dir: &str,
+    reuse: Option<(&Reuse, &mut Reuse)>,
 ) -> Result<Program, InputError> {
     // `Program.GetCurrentDirectory` belongs to the module-spelling host. An
     // absolute configuration and lexical query do not ask that question.
@@ -142,10 +199,25 @@ fn load_with_libraries(
     let case = Case::detect();
     let roots = files::roots(&config, case, disk)?;
     // Inputs are captured ahead of the loader while it reserves them.
-    capture::Captures::with(disk.waits(), |captures| {
+    let empty = Reuse::default();
+    let (previous, next) = match reuse {
+        Some((previous, next)) => (previous, Some(next)),
+        None => (&empty, None),
+    };
+    capture::Captures::with_reuse(disk.waits(), &previous.captures, |captures| {
+        let (next_captures, next_resolutions) = match next {
+            Some(next) => (Some(&mut next.captures), Some(&mut next.resolutions)),
+            None => (None, None),
+        };
+        let resolver = Resolver::new(&config, case, disk);
+        let resolver = if next_resolutions.is_some() {
+            resolver.reusing(&previous.resolutions)
+        } else {
+            resolver
+        };
         let mut loader = Loader {
             config: &config,
-            resolver: Resolver::new(&config, case, disk),
+            resolver,
             disk,
             parser,
             case,
@@ -162,6 +234,7 @@ fn load_with_libraries(
             library_ids: HashMap::new(),
             program_only: Vec::new(),
             captures,
+            next_captures,
         };
         let loaded = loader.load_all(&roots);
         // An unreadable manifest or type root may have caused another failure.
@@ -236,6 +309,9 @@ fn load_with_libraries(
                 &files,
             )
         });
+        if let Some(next) = next_resolutions {
+            *next = loader.resolver.take_reuse();
+        }
         Ok(Program {
             semantic: config.options.semantic.clone(),
             preserve_const_enums: config.options.preserve_const_enums,
@@ -265,7 +341,7 @@ fn spelled_under(spelled_dir: &Path, display: &str) -> Option<String> {
 }
 
 /// Where a configuration value or directive was written, for diagnostics.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 struct Origin {
     path: PathBuf,
     position: Option<SourcePosition>,
@@ -292,6 +368,7 @@ fn io_error(path: &Path, error: &std::io::Error) -> InputError {
 }
 
 struct Loader<'a> {
+    next_captures: Option<&'a mut capture::Cache>,
     disk: &'a disk::Disk,
     parser: &'a Parser,
     config: &'a Config,
@@ -536,13 +613,14 @@ impl Loader<'_> {
         paths::relative(&self.config.dir, path)
     }
 
-    /// Integrates one input's capture (`capture::capture`): it was read and
-    /// parsed once, and its facts collected, ahead of this or now. Then
-    /// resolves its edges.
+    /// Integrates one freshly read input and its capture products, reused or
+    /// computed ahead of this or now. Settles its collection's module key
+    /// before resolving generation-local edges.
     fn load_file(&mut self, path: String, id: FileId) -> Result<(), InputError> {
         let file_path = PathBuf::from(&path);
         let capture = self.captures.take(id, self.parser);
-        self.disk
+        let text = self
+            .disk
             .receive(capture.read)
             .map_err(|error| io_error(&file_path, &error))?;
         let parsed = capture.parsed.expect("a successful read is parsed");
@@ -559,16 +637,16 @@ impl Loader<'_> {
         let declaration = paths::is_declaration(&path);
         let module_semantics = self.resolver.module_semantics(format, json);
         let jsx = crate::ParseOptions::for_file(path.as_str()).jsx;
-        let (navigation, mut facts) = match parsed.contents? {
-            capture::Contents::Json(facts) => (Some(Captured::Json), facts),
+        let (navigation, mut facts, collected_module) = match parsed.contents? {
+            capture::Contents::Json(facts) => (Some(Captured::Json), facts, None),
             capture::Contents::TypeScript {
                 navigation,
                 indicators,
-                options: captured,
+                module: captured,
                 facts,
             } => {
-                let options = self.file_options(&path, declaration, format);
-                let facts = if indicators.module(options) == indicators.module(captured) {
+                let module = indicators.module(self.file_options(&path, declaration, format));
+                let facts = if module == captured {
                     facts?
                 } else {
                     // The format forces module semantics the capture did not
@@ -580,11 +658,34 @@ impl Loader<'_> {
                         .parse(source.as_str(), &path)
                         .map_err(|error| InputError::unparsable(error, &source, &file_path))?;
                     let indicators = binding::ModuleIndicators::of(&ast);
-                    capture::collect(&ast, &source, indicators, options, &file_path)?
+                    capture::collect(&ast, &source, indicators, module, &file_path)?
                 };
-                (navigation, facts)
+                (navigation, facts, Some((indicators, module)))
             }
         };
+        if let Some(cache) = &mut self.next_captures {
+            let contents = match collected_module {
+                Some((indicators, module)) => capture::Contents::TypeScript {
+                    navigation: navigation.clone(),
+                    indicators,
+                    module,
+                    facts: Ok(facts.clone()),
+                },
+                None => capture::Contents::Json(facts.clone()),
+            };
+            cache.insert(
+                path.clone(),
+                capture::Cached {
+                    text,
+                    library,
+                    json,
+                    parsed: capture::Parsed {
+                        source: source.clone(),
+                        contents: Ok(contents),
+                    },
+                },
+            );
+        }
         // `resolveImportsAndModuleAugmentations` resolves synthetic helpers
         // before JSX and written requests. Helpers are loaded even when no
         // emitted construct needs one; missing helpers are demanded only by

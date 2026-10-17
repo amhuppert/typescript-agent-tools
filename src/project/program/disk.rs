@@ -16,6 +16,9 @@ use std::sync::{Arc, Mutex};
 #[derive(Default)]
 pub(in crate::project) struct Disk {
     observations: RefCell<Option<Observations>>,
+    /// Reads of one primitive resolver operation, only while a session is
+    /// capturing reusable inputs. Ordinary project loads never open a trace.
+    receipt: RefCell<Option<Vec<(PathBuf, Operation, Observation)>>>,
     /// The real paths this load found. It asks each path's once, so it sees
     /// one file system however often it asks, as the module resolution of
     /// every importer does.
@@ -32,7 +35,7 @@ enum Operation {
     Entry,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 enum Observation {
     Text(Arc<str>),
     Bytes(Arc<[u8]>),
@@ -43,6 +46,21 @@ enum Observation {
     /// Anticipatory module-specifier probes can fail without failing load;
     /// query-time demand still depends on that exact captured failure.
     Failed(io::ErrorKind, Option<i32>, String),
+}
+
+/// Exact physical evidence for one logical resolver-host answer. Logical
+/// memoization belongs to the host: this does not imply that another host
+/// operation asking about the same path has already run.
+#[derive(Debug, PartialEq, Eq)]
+pub(super) struct Receipt(Box<[(PathBuf, Operation, Observation)]>);
+
+/// A primitive read's temporary trace is discarded even if its reader panics.
+struct ReceiptScope<'a>(&'a Disk);
+
+impl Drop for ReceiptScope<'_> {
+    fn drop(&mut self) {
+        self.0.receipt.borrow_mut().take();
+    }
 }
 
 /// The actual answers used during construction, including unsuccessful probes.
@@ -392,6 +410,7 @@ impl Disk {
     pub(in crate::project) fn recording() -> Self {
         Self {
             observations: RefCell::new(Some(Observations::default())),
+            receipt: RefCell::default(),
             real_paths: RefCell::default(),
             waits: Waits::default(),
         }
@@ -403,15 +422,78 @@ impl Disk {
             .expect("a recording disk owns observations")
     }
 
+    /// Capture one primitive host operation, including its unsuccessful
+    /// probes. Its normal load observations and failures are unchanged.
+    pub(super) fn capture<T>(&self, read: impl FnOnce() -> T) -> (T, Receipt) {
+        assert!(
+            self.receipt.borrow().is_none(),
+            "primitive reads do not nest"
+        );
+        *self.receipt.borrow_mut() = Some(Vec::new());
+        let _scope = ReceiptScope(self);
+        let value = read();
+        let receipt = self.receipt.borrow_mut().take().expect("active receipt");
+        (value, Receipt(receipt.into_boxed_slice()))
+    }
+
+    /// Whether a missing logical host answer may be adopted. This has no
+    /// effects on the current load and never opens a pipe: a changed, failed,
+    /// or deferred probe means the resolver must perform its ordinary lookup,
+    /// which owns demand and error order. Real paths already memoized by this
+    /// load are authoritative, just as they are in `canonicalize`.
+    pub(super) fn can_replay(&self, receipt: &Receipt) -> bool {
+        for (path, operation, before) in &receipt.0 {
+            if let Observation::Canonical(expected) = before
+                && let Some(current) = self.real_paths.borrow().get(path)
+            {
+                if current != expected {
+                    return false;
+                }
+                continue;
+            }
+            match still(path, *operation, before, Reading::Speculative) {
+                Some(Ok(true)) => {}
+                Some(Ok(false) | Err(_)) | None => return false,
+            }
+        }
+        true
+    }
+
+    /// Commit evidence after every access in the resolution has been checked.
+    /// This also restores canonicalization's first-answer memo, a side effect
+    /// a cached resolution must preserve for subsequent fresh lookups.
+    pub(super) fn replay(&self, receipt: &Receipt) {
+        for (path, operation, value) in &receipt.0 {
+            if let Observation::Canonical(real) = value {
+                let mut paths = self.real_paths.borrow_mut();
+                match paths.entry(path.clone()) {
+                    std::collections::hash_map::Entry::Vacant(entry) => {
+                        entry.insert(real.clone());
+                    }
+                    std::collections::hash_map::Entry::Occupied(entry) => {
+                        assert_eq!(entry.get(), real, "replay was validated before commit");
+                    }
+                }
+            }
+            self.record(path, *operation, Ok(value.clone()));
+        }
+    }
+
     fn record(&self, path: &Path, operation: Operation, result: Result<Observation, &io::Error>) {
         let mut observations = self.observations.borrow_mut();
-        let Some(observations) = observations.as_mut() else {
+        if observations.is_none() && self.receipt.borrow().is_none() {
             return;
-        };
+        }
         let value = match result {
             Ok(value) => value,
             Err(error) if is_absence(error) => Observation::Absent,
             Err(error) => failure(error),
+        };
+        if let Some(receipt) = self.receipt.borrow_mut().as_mut() {
+            receipt.push((path.to_path_buf(), operation, value.clone()));
+        }
+        let Some(observations) = observations.as_mut() else {
+            return;
         };
         match observations.values.entry((path.to_path_buf(), operation)) {
             std::collections::btree_map::Entry::Vacant(entry) => {
@@ -470,6 +552,15 @@ impl Disk {
     pub(super) fn canonicalize(&self, path: impl AsRef<Path>) -> io::Result<PathBuf> {
         let path = path.as_ref();
         if let Some(real) = self.real_paths.borrow().get(path) {
+            // A newly captured resolver decision may depend on a real path
+            // that another operation already asked for in this generation.
+            if self.receipt.borrow().is_some() {
+                self.record(
+                    path,
+                    Operation::Canonical,
+                    Ok(Observation::Canonical(real.clone())),
+                );
+            }
             return Ok(real.clone());
         }
         let result = std::fs::canonicalize(path);
@@ -549,6 +640,19 @@ impl TextRead {
     /// The text read, before any load observes it.
     pub(super) fn text(&self) -> Result<&Arc<str>, &io::Error> {
         self.text.as_ref()
+    }
+
+    /// Share an earlier allocation only after this read returned the exact
+    /// same decoded text. The current read (including any failure or wait)
+    /// still happens at its normal place in loading.
+    pub(super) fn reuse_text(&mut self, previous: &Arc<str>) -> bool {
+        match &mut self.text {
+            Ok(text) if text.as_ref() == previous.as_ref() => {
+                *text = Arc::clone(previous);
+                true
+            }
+            _ => false,
+        }
     }
 }
 
