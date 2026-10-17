@@ -1,0 +1,14 @@
+export {};
+declare const wideString: string;
+declare const otherString: string;
+declare const wideNumber: number;
+declare const wideSymbol: symbol;
+declare const exactKey: "value";
+declare const uniqueKey: unique symbol;
+declare const /*#readonlyStringIndex*/readonlyStringIndex: { readonly [wideString]: 71 };
+declare const /*#mutableStringIndex*/mutableStringIndex: { [wideString]: 71 };
+declare const /*#mixedReadonlyIndex*/mixedReadonlyIndex: { readonly [wideString]: 72; [otherString]: 73 };
+declare const /*#readonlyNumberIndex*/readonlyNumberIndex: { readonly [wideNumber]: 74 };
+declare const /*#readonlySymbolIndex*/readonlySymbolIndex: { readonly [wideSymbol]: 75 };
+declare const /*#optionalLateProperty*/optionalLateProperty: { readonly [exactKey]?: 76 };
+declare const /*#optionalUniqueProperty*/optionalUniqueProperty: { readonly [uniqueKey]?: 77 };

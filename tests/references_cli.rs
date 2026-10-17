@@ -80,7 +80,12 @@ fn position_query_emits_the_aliased_symbol_group() {
     assert_eq!(
         result,
         json!({
+            "operation": "references",
+            "outcome": "complete",
             "project": project,
+            "filters": { "calls": false, "excludeTests": false },
+            "coverage": { "baseline": "lexical", "status": "complete", "gaps": [] },
+            "unsearchedMembers": { "count": 0, "selectors": [] },
             "groups": [{
                 "declarations": [{ "name": "run", "location": location("src/api.ts", 1, 17, 20) }],
                 "occurrences": [
@@ -142,7 +147,7 @@ fn pretty_and_output_file_keep_their_meanings() {
     assert!(output.status.success());
     assert!(output.stdout.is_empty());
     let text = std::fs::read_to_string(fixture.path("out.json")).unwrap();
-    assert!(text.starts_with("{\n  \"project\": "));
+    assert!(text.starts_with("{\n  \"operation\": \"references\",\n  \"outcome\": \"complete\","));
     assert!(text.ends_with("}\n"));
     let compact = success(tsparse(
         &fixture,
@@ -410,7 +415,7 @@ fn help_documents_reference_mode_and_its_limits() {
         "Standard libraries follow target, lib, noLib, and lib references",
         "their files are never searched",
         "JSON modules are program\ninputs where resolveJsonModule allows them",
-        "JSON module values and their properties are not reference\ntargets",
+        "Positions\ninside JSON are not selectable",
         "In reference mode, exit 1",
     ] {
         assert!(text.contains(needle), "help lacks {needle:?}:\n{text}");

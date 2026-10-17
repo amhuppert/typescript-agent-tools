@@ -1,0 +1,9 @@
+import fs from 'node:fs';import path from 'node:path';
+import {loadSemanticApi} from '../../tools/semantic-oracle.mjs';
+const root=path.resolve('fixtures/types/json-types'),sem=await loadSemanticApi(),rows=[];
+for(const strict of [0,1]) for(const marker of ['empty','numbers','mixed','shapes','recursive']){
+ const config=path.join(root,`strict-${strict}-exact-0-unchecked-0.json`),api=new sem.API({tsserverPath:sem.binary,cwd:root});let snapshot;
+ try{snapshot=api.updateSnapshot({openProject:config});const p=snapshot.getProject(config),c=p.checker,s=p.program.getSourceFile(path.join(root,'cases.ts')),annotation=`/*#${marker}*/`,at=s.text.indexOf(annotation)+annotation.length,symbol=c.getSymbolAtLocation(sem.getTokenAtPosition(s,at)),type=c.getTypeOfSymbol(symbol);
+ rows.push({strict,marker,question:'GetTypeOfSymbol',summary:c.typeToString(type),errorType:type.isErrorType(),flags:type.flags,objectFlags:type.objectFlags,isArray:c.isArrayType(type),isTuple:c.isTupleType(type),targetName:type.isTypeReference()?type.getTarget().getSymbol()?.name??null:null,properties:c.getPropertiesOfType(type).map(x=>x.name),calls:c.getSignaturesOfType(type,sem.SignatureKind.Call).length,constructs:c.getSignaturesOfType(type,sem.SignatureKind.Construct).length,indexes:c.getIndexInfosOfType(type).map(x=>({key:c.typeToString(x.keyType),value:c.typeToString(x.valueType),readonly:x.isReadonly})),preDemandDiagnostics:[...p.program.getConfigFileParsingDiagnostics(),...p.program.getProgramDiagnostics(),...p.program.getSyntacticDiagnostics(),...p.program.getBindDiagnostics()].map(d=>d.code)});
+ }finally{snapshot?.dispose();api.close();}}
+fs.writeFileSync('.cc/temp/json-native-array-shape-probe.json',JSON.stringify(rows,null,2)+'\n');console.log(JSON.stringify(rows));

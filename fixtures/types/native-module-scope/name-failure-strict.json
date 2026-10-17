@@ -1,0 +1,1 @@
+{"extends": "./strict.json", "files": ["globals.d.ts", "name-failure.ts"]}

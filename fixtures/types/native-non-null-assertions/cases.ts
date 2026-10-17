@@ -1,0 +1,17 @@
+export {};
+declare const maybe: { value: number | undefined; nested?: { value: string | undefined }; method?(): string | undefined } | undefined;
+declare const mystery: unknown;
+declare const anything: any;
+declare const bad: MissingOperand;
+declare const later: MissingLater;
+const /*#plain*/plain = maybe!;
+const /*#outer*/outer = maybe?.value!;
+const /*#inner*/inner = maybe?.nested!.value;
+const /*#restarted*/restarted = maybe?.nested!?.value;
+const /*#parenthesized*/parenthesized = (maybe?.nested)!.value;
+const /*#callOuter*/callOuter = maybe?.method?.()!;
+const /*#rootAssertion*/rootAssertion = maybe!?.value;
+const /*#unknown*/unknownResult = mystery!;
+const /*#any*/anyResult = anything!;
+const /*#operandRecovery*/operandRecovery = bad!;
+const /*#continuation*/continuation = (bad!, later);

@@ -1,0 +1,19 @@
+{
+  "source": "sources/over-budget.ts",
+  "depth": 300,
+  "nativeExit": 0,
+  "nativeStdout": "",
+  "nativeStderr": "",
+  "toolBudget": 1024,
+  "toolObservedError": "Maximum syntax nesting depth exceeded at bytes 189..190",
+  "toolControlOriginal": "export type Deep = 300 nested tuples; (exact retained source)",
+  "toolExit": 101,
+  "toolStdout": "build\trequested_heap_accounting\tfalse\n",
+  "toolStderr": "\nthread 'representation-spike' (79537964) panicked at .cc/temp/types-representation/spike.rs:89:29:\nexcluded-300-tuples.ts: Maximum syntax nesting depth exceeded at bytes 189..190\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\nthread 'main' (79537963) panicked at .cc/temp/types-representation/spike.rs:184:61:\ncalled `Result::unwrap()` on an `Err` value: Any { .. }\n",
+  "toolSourceSha256": "7beec34efd99db9530b78431617b08402452cce0cf3c3f5d6a819322bc72e103",
+  "toolArgumentArray": [
+    "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/spike-time",
+    "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/excluded-input.tsv",
+    "1"
+  ]
+}

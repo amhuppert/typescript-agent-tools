@@ -1,0 +1,236 @@
+[
+  {
+    "name": "string_plain",
+    "base": "string",
+    "value": "ready",
+    "summary": "\"ready\""
+  },
+  {
+    "name": "string_hex",
+    "base": "string",
+    "value": "A",
+    "summary": "\"A\""
+  },
+  {
+    "name": "string_unicode",
+    "base": "string",
+    "value": "A",
+    "summary": "\"A\""
+  },
+  {
+    "name": "string_braced",
+    "base": "string",
+    "value": "😀",
+    "summary": "\"😀\""
+  },
+  {
+    "name": "string_pair",
+    "base": "string",
+    "value": "😀",
+    "summary": "\"😀\""
+  },
+  {
+    "name": "string_zero",
+    "base": "string",
+    "value": "\u0000",
+    "summary": "\"\\0\""
+  },
+  {
+    "name": "string_zero_digit",
+    "base": "string",
+    "value": "\u00001",
+    "summary": "\"\\x001\""
+  },
+  {
+    "name": "string_unicode_separators",
+    "base": "string",
+    "value": "  ",
+    "summary": "\"\\u2028\\u2029\\u0085\""
+  },
+  {
+    "name": "string_raw_next_line",
+    "base": "string",
+    "value": "",
+    "summary": "\"\\u0085\""
+  },
+  {
+    "name": "string_controls",
+    "base": "string",
+    "value": "\n\r\t\b\f\u000b",
+    "summary": "\"\\n\\r\\t\\b\\f\\v\""
+  },
+  {
+    "name": "string_quote",
+    "base": "string",
+    "value": "a\"b\\c",
+    "summary": "\"a\\\"b\\\\c\""
+  },
+  {
+    "name": "string_identity",
+    "base": "string",
+    "value": "z",
+    "summary": "\"z\""
+  },
+  {
+    "name": "string_continued_lf",
+    "base": "string",
+    "value": "ab",
+    "summary": "\"ab\""
+  },
+  {
+    "name": "string_continued_cr",
+    "base": "string",
+    "value": "ab",
+    "summary": "\"ab\""
+  },
+  {
+    "name": "string_continued_crlf",
+    "base": "string",
+    "value": "ab",
+    "summary": "\"ab\""
+  },
+  {
+    "name": "string_continued_ls",
+    "base": "string",
+    "value": "ab",
+    "summary": "\"ab\""
+  },
+  {
+    "name": "string_continued_ps",
+    "base": "string",
+    "value": "ab",
+    "summary": "\"ab\""
+  },
+  {
+    "name": "number_zero",
+    "base": "number",
+    "value": "0",
+    "summary": "0"
+  },
+  {
+    "name": "number_integer",
+    "base": "number",
+    "value": "123",
+    "summary": "123"
+  },
+  {
+    "name": "number_fraction",
+    "base": "number",
+    "value": "1.5",
+    "summary": "1.5"
+  },
+  {
+    "name": "number_leading_dot",
+    "base": "number",
+    "value": "0.5",
+    "summary": "0.5"
+  },
+  {
+    "name": "number_trailing_dot",
+    "base": "number",
+    "value": "1",
+    "summary": "1"
+  },
+  {
+    "name": "number_exponent",
+    "base": "number",
+    "value": "100",
+    "summary": "100"
+  },
+  {
+    "name": "number_upper_exponent",
+    "base": "number",
+    "value": "100",
+    "summary": "100"
+  },
+  {
+    "name": "number_negative_exponent",
+    "base": "number",
+    "value": "0.01",
+    "summary": "0.01"
+  },
+  {
+    "name": "number_hex_lower",
+    "base": "number",
+    "value": "57005",
+    "summary": "57005"
+  },
+  {
+    "name": "number_hex_upper",
+    "base": "number",
+    "value": "57005",
+    "summary": "57005"
+  },
+  {
+    "name": "number_binary_lower",
+    "base": "number",
+    "value": "5",
+    "summary": "5"
+  },
+  {
+    "name": "number_binary_upper",
+    "base": "number",
+    "value": "5",
+    "summary": "5"
+  },
+  {
+    "name": "number_octal_lower",
+    "base": "number",
+    "value": "15",
+    "summary": "15"
+  },
+  {
+    "name": "number_octal_upper",
+    "base": "number",
+    "value": "15",
+    "summary": "15"
+  },
+  {
+    "name": "number_separator",
+    "base": "number",
+    "value": "1000",
+    "summary": "1000"
+  },
+  {
+    "name": "number_exponent_separator",
+    "base": "number",
+    "value": "10000000000",
+    "summary": "10000000000"
+  },
+  {
+    "name": "number_hex_separator",
+    "base": "number",
+    "value": "57005",
+    "summary": "57005"
+  },
+  {
+    "name": "number_rounded",
+    "base": "number",
+    "value": "9007199254740992",
+    "summary": "9007199254740992"
+  },
+  {
+    "name": "number_large",
+    "base": "number",
+    "value": "1e+21",
+    "summary": "1e+21"
+  },
+  {
+    "name": "number_small",
+    "base": "number",
+    "value": "1e-7",
+    "summary": "1e-7"
+  },
+  {
+    "name": "number_infinity",
+    "base": "number",
+    "value": "Infinity",
+    "summary": "Infinity"
+  },
+  {
+    "name": "number_underflow",
+    "base": "number",
+    "value": "0",
+    "summary": "0"
+  }
+]

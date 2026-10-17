@@ -2,7 +2,7 @@
 //! stderr, the `-o` file, and the exit status, whether file navigation, a
 //! project loaded in this process, or the project's service answered it.
 //!
-//! | Format | Result (exit 0) | Selection or analysis failure (exit 1 or 2) |
+//! | Format | Result (complete exit 0, partial exit 1) | Selection or analysis failure (exit 1 or 2) |
 //! | --- | --- | --- |
 //! | text (navigation's default; references) | text, or a reference result document, to stdout or `-o` | diagnostic to stderr |
 //! | JSON (navigation's `--json`) | document to stdout or `-o` | document to stdout or `-o` |
@@ -23,7 +23,9 @@ use serde_json::{Value, json};
 use std::fs;
 use std::io::{self, BufWriter, Write};
 use std::path::Path;
-use typescript_parser::analysis::{AnalysisError, InputErrorKind, QueryErrorKind};
+use typescript_parser::analysis::{
+    AnalysisError, InputErrorKind, QueryErrorKind, SemanticErrorKind,
+};
 use typescript_parser::editing::{Applied, ApplyFailureKind, Effect, LoadErrorKind};
 
 /// How a request asks for its outcomes, chosen at the request boundary.
@@ -43,12 +45,15 @@ pub(crate) type WriteDocument<'a> = Box<dyn FnOnce(&mut dyn Write, bool) -> io::
 /// this outcome, such as JSON naming a path that is not Unicode, is never
 /// attempted.
 pub(crate) struct Delivery<'a> {
-    /// 0 for a result; otherwise the outcome's exit code.
+    /// The outcome's exit code, including 1 for a partial type result.
     pub(crate) code: u8,
     pub(crate) document: WriteDocument<'a>,
     /// The outcome as text: a navigation result, or a failure's diagnostic.
     /// `None` for a reference result, whose one form is its document.
     pub(crate) text: Option<Box<dyn FnOnce() -> String + 'a>>,
+    /// A result belongs to stdout/output even when partial (exit 1). A
+    /// diagnostic belongs to stderr. Exit status alone cannot decide this.
+    pub(crate) text_is_result: bool,
 }
 
 /// Deliver `outcome`, the outcome of a valid request, or report the
@@ -89,19 +94,23 @@ pub(crate) fn try_deliver(
         Format::Text => delivery.text,
         Format::Json => None,
     };
-    match (text, delivery.code) {
-        (Some(text), 0) => {
+    match (text, delivery.text_is_result) {
+        (Some(text), true) => {
             let text = text();
             write_to(output, new_file, |writer| writer.write_all(text.as_bytes()))
-                .map_err(Undelivered::Write)
+                .map_err(Undelivered::Write)?;
+            match delivery.code {
+                0 => Ok(()),
+                code => Err(Undelivered::Outcome((code, String::new()))),
+            }
         }
-        (Some(text), code) => Err(Undelivered::Outcome((code, text()))),
-        (None, code) => {
+        (Some(text), false) => Err(Undelivered::Outcome((delivery.code, text()))),
+        (None, _) => {
             write_to(output, new_file, |writer| {
                 (delivery.document)(writer, pretty)
             })
             .map_err(Undelivered::Write)?;
-            match code {
+            match delivery.code {
                 0 => Ok(()),
                 code => Err(Undelivered::Outcome((code, String::new()))),
             }
@@ -127,8 +136,19 @@ pub(crate) fn failure_code(error: &AnalysisError) -> u8 {
             | InputErrorKind::UnresolvedImport => 1,
         },
         AnalysisError::Query(error) => match error.kind {
-            QueryErrorKind::OutsideProject | QueryErrorKind::InvalidPosition => 2,
+            QueryErrorKind::OutsideProject
+            | QueryErrorKind::InvalidPosition
+            | QueryErrorKind::InvalidRequest => 2,
             QueryErrorKind::UnsupportedTarget | QueryErrorKind::UnresolvedTarget => 1,
+        },
+        AnalysisError::Semantic(error) => match error.kind {
+            SemanticErrorKind::Internal => 2,
+            SemanticErrorKind::UnsupportedSemantic
+            | SemanticErrorKind::InvalidSemantic
+            | SemanticErrorKind::SemanticMemoryLimit
+            | SemanticErrorKind::SemanticDepthLimit
+            | SemanticErrorKind::SemanticDeadline
+            | SemanticErrorKind::OutputLimit => 1,
         },
     }
 }
@@ -203,6 +223,7 @@ pub(crate) fn failure_with<'a>(
 ) -> Delivery<'a> {
     Delivery {
         code: failure_code(error),
+        text_is_result: false,
         document: Box::new(move |writer, pretty| {
             let (kind, message, error_path, position) = match error {
                 AnalysisError::Input(error) => (
@@ -212,6 +233,12 @@ pub(crate) fn failure_with<'a>(
                     error.position,
                 ),
                 AnalysisError::Query(error) => (
+                    json!(error.kind),
+                    &error.message,
+                    &error.path,
+                    error.position,
+                ),
+                AnalysisError::Semantic(error) => (
                     json!(error.kind),
                     &error.message,
                     &error.path,
@@ -242,6 +269,15 @@ pub(crate) fn failure_with<'a>(
                 "path": error_path.as_deref().and_then(Path::to_str),
                 "position": position,
             });
+            if let AnalysisError::Semantic(error) = error {
+                document["error"]["reason"] = json!(error.reason);
+                if !error.causes.is_empty() {
+                    document["error"]["causes"] = json!(error.causes);
+                }
+                if let Some(omitted) = error.omitted_causes {
+                    document["error"]["omittedCauses"] = json!(omitted);
+                }
+            }
             write_document(writer, &document, pretty)
         }),
         text: Some(Box::new(|| error.to_string())),

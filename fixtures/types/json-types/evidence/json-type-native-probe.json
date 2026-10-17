@@ -1,0 +1,610 @@
+[
+  {
+    "marker": "root",
+    "nodeKind": "Identifier",
+    "name": "root",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "{ text: string; number: number; boolean: boolean; nil: null; empty: never[]; numbers: number[]; mixed: (string | number | null)[]; shapes: ({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]; nested: { kept: boolean; dup: { ...; }; }; ... 7 more ...; recursive: (number[] | (string | null)[])[]; }",
+    "typeFlags": 1048576,
+    "errorType": false,
+    "properties": [
+      {
+        "name": "text",
+        "summary": "string"
+      },
+      {
+        "name": "number",
+        "summary": "number"
+      },
+      {
+        "name": "boolean",
+        "summary": "boolean"
+      },
+      {
+        "name": "nil",
+        "summary": "null"
+      },
+      {
+        "name": "empty",
+        "summary": "never[]"
+      },
+      {
+        "name": "numbers",
+        "summary": "number[]"
+      },
+      {
+        "name": "mixed",
+        "summary": "(string | number | null)[]"
+      },
+      {
+        "name": "shapes",
+        "summary": "({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]"
+      },
+      {
+        "name": "nested",
+        "summary": "{ kept: boolean; dup: { last: string; }; }"
+      },
+      {
+        "name": "dup",
+        "summary": "number"
+      },
+      {
+        "name": "a",
+        "summary": "boolean"
+      },
+      {
+        "name": "",
+        "summary": "number"
+      },
+      {
+        "name": "01",
+        "summary": "string"
+      },
+      {
+        "name": "1",
+        "summary": "boolean"
+      },
+      {
+        "name": "😀",
+        "summary": "boolean"
+      },
+      {
+        "name": "default",
+        "summary": "string"
+      },
+      {
+        "name": "recursive",
+        "summary": "(number[] | (string | null)[])[]"
+      }
+    ]
+  },
+  {
+    "marker": "text",
+    "nodeKind": "Identifier",
+    "name": "text",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "string",
+    "typeFlags": 32,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "number",
+    "nodeKind": "Identifier",
+    "name": "number",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "number",
+    "typeFlags": 64,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "boolean",
+    "nodeKind": "Identifier",
+    "name": "boolean",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "boolean",
+    "typeFlags": 134217984,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "nil",
+    "nodeKind": "Identifier",
+    "name": "nil",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "null",
+    "typeFlags": 8,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "empty",
+    "nodeKind": "Identifier",
+    "name": "empty",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "never[]",
+    "typeFlags": 1048576,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "numbers",
+    "nodeKind": "Identifier",
+    "name": "numbers",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "number[]",
+    "typeFlags": 1048576,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "numbers0",
+    "nodeKind": "Identifier",
+    "name": "numbers0",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "number",
+    "typeFlags": 64,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "empty0",
+    "nodeKind": "Identifier",
+    "name": "empty0",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "never",
+    "typeFlags": 262144,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "mixed",
+    "nodeKind": "Identifier",
+    "name": "mixed",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "(string | number | null)[]",
+    "typeFlags": 1048576,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "mixed0",
+    "nodeKind": "Identifier",
+    "name": "mixed0",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "string | number | null",
+    "typeFlags": 134217728,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "shapes",
+    "nodeKind": "Identifier",
+    "name": "shapes",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]",
+    "typeFlags": 1048576,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "shape0",
+    "nodeKind": "Identifier",
+    "name": "shape0",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "{ a: number; b?: undefined; } | { a?: undefined; b: string; }",
+    "typeFlags": 134217728,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "shapeA",
+    "nodeKind": "Identifier",
+    "name": "shapeA",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "number | undefined",
+    "typeFlags": 134217728,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "duplicate",
+    "nodeKind": "Identifier",
+    "name": "duplicate",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "number",
+    "typeFlags": 64,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "nestedDuplicate",
+    "nodeKind": "Identifier",
+    "name": "nestedDuplicate",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "{ last: string; }",
+    "typeFlags": 1048576,
+    "errorType": false,
+    "properties": [
+      {
+        "name": "last",
+        "summary": "string"
+      }
+    ]
+  },
+  {
+    "marker": "escaped",
+    "nodeKind": "Identifier",
+    "name": "escaped",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "boolean",
+    "typeFlags": 134217984,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "emptyKey",
+    "nodeKind": "Identifier",
+    "name": "emptyKey",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "number",
+    "typeFlags": 64,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "numericCanonical",
+    "nodeKind": "Identifier",
+    "name": "numericCanonical",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "boolean",
+    "typeFlags": 134217984,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "numericNonCanonical",
+    "nodeKind": "Identifier",
+    "name": "numericNonCanonical",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "string",
+    "typeFlags": 32,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "astral",
+    "nodeKind": "Identifier",
+    "name": "astral",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "boolean",
+    "typeFlags": 134217984,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "defaultKey",
+    "nodeKind": "Identifier",
+    "name": "defaultKey",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "string",
+    "typeFlags": 32,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "namespaceWhole",
+    "nodeKind": "Identifier",
+    "name": "namespaceWhole",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "{ text: string; number: number; boolean: boolean; nil: null; empty: never[]; numbers: number[]; mixed: (string | number | null)[]; shapes: ({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]; nested: { kept: boolean; dup: { ...; }; }; ... 7 more ...; default: { ...; }; }",
+    "typeFlags": 1048576,
+    "errorType": false,
+    "properties": [
+      {
+        "name": "text",
+        "summary": "string"
+      },
+      {
+        "name": "number",
+        "summary": "number"
+      },
+      {
+        "name": "boolean",
+        "summary": "boolean"
+      },
+      {
+        "name": "nil",
+        "summary": "null"
+      },
+      {
+        "name": "empty",
+        "summary": "never[]"
+      },
+      {
+        "name": "numbers",
+        "summary": "number[]"
+      },
+      {
+        "name": "mixed",
+        "summary": "(string | number | null)[]"
+      },
+      {
+        "name": "shapes",
+        "summary": "({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]"
+      },
+      {
+        "name": "nested",
+        "summary": "{ kept: boolean; dup: { last: string; }; }"
+      },
+      {
+        "name": "dup",
+        "summary": "number"
+      },
+      {
+        "name": "a",
+        "summary": "boolean"
+      },
+      {
+        "name": "",
+        "summary": "number"
+      },
+      {
+        "name": "01",
+        "summary": "string"
+      },
+      {
+        "name": "1",
+        "summary": "boolean"
+      },
+      {
+        "name": "😀",
+        "summary": "boolean"
+      },
+      {
+        "name": "recursive",
+        "summary": "(number[] | (string | null)[])[]"
+      },
+      {
+        "name": "default",
+        "summary": "{ text: string; number: number; boolean: boolean; nil: null; empty: never[]; numbers: number[]; mixed: (string | number | null)[]; shapes: ({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]; nested: { kept: boolean; dup: { ...; }; }; ... 7 more ...; recursive: (number[] | (string | null)[])[]; }"
+      }
+    ]
+  },
+  {
+    "marker": "syntheticCopy",
+    "nodeKind": "Identifier",
+    "name": "syntheticCopy",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "{ text: string; number: number; boolean: boolean; nil: null; empty: never[]; numbers: number[]; mixed: (string | number | null)[]; shapes: ({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]; nested: { kept: boolean; dup: { ...; }; }; ... 7 more ...; recursive: (number[] | (string | null)[])[]; }",
+    "typeFlags": 1048576,
+    "errorType": false,
+    "properties": [
+      {
+        "name": "text",
+        "summary": "string"
+      },
+      {
+        "name": "number",
+        "summary": "number"
+      },
+      {
+        "name": "boolean",
+        "summary": "boolean"
+      },
+      {
+        "name": "nil",
+        "summary": "null"
+      },
+      {
+        "name": "empty",
+        "summary": "never[]"
+      },
+      {
+        "name": "numbers",
+        "summary": "number[]"
+      },
+      {
+        "name": "mixed",
+        "summary": "(string | number | null)[]"
+      },
+      {
+        "name": "shapes",
+        "summary": "({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]"
+      },
+      {
+        "name": "nested",
+        "summary": "{ kept: boolean; dup: { last: string; }; }"
+      },
+      {
+        "name": "dup",
+        "summary": "number"
+      },
+      {
+        "name": "a",
+        "summary": "boolean"
+      },
+      {
+        "name": "",
+        "summary": "number"
+      },
+      {
+        "name": "01",
+        "summary": "string"
+      },
+      {
+        "name": "1",
+        "summary": "boolean"
+      },
+      {
+        "name": "😀",
+        "summary": "boolean"
+      },
+      {
+        "name": "default",
+        "summary": "string"
+      },
+      {
+        "name": "recursive",
+        "summary": "(number[] | (string | null)[])[]"
+      }
+    ]
+  },
+  {
+    "marker": "namedCopy",
+    "nodeKind": "Identifier",
+    "name": "namedCopy",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "number",
+    "typeFlags": 64,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "missing",
+    "nodeKind": "Identifier",
+    "name": "missing",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "any",
+    "typeFlags": 1,
+    "errorType": true,
+    "properties": []
+  },
+  {
+    "marker": "unknown",
+    "nodeKind": "Identifier",
+    "name": "unknown",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "unknown",
+    "typeFlags": 2,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "unknownRead",
+    "nodeKind": "Identifier",
+    "name": "unknownRead",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "any",
+    "typeFlags": 1,
+    "errorType": true,
+    "properties": []
+  },
+  {
+    "marker": "genuineAny",
+    "nodeKind": "Identifier",
+    "name": "genuineAny",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "any",
+    "typeFlags": 1,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "recursive",
+    "nodeKind": "Identifier",
+    "name": "recursive",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "(number[] | (string | null)[])[]",
+    "typeFlags": 1048576,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "rootNull",
+    "nodeKind": "Identifier",
+    "name": "rootNullCopy",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "null",
+    "typeFlags": 8,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "rootEmpty",
+    "nodeKind": "Identifier",
+    "name": "rootEmptyCopy",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "never[]",
+    "typeFlags": 1048576,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "rootNumber",
+    "nodeKind": "Identifier",
+    "name": "rootNumberCopy",
+    "followedAlias": false,
+    "fatalDiagnostics": [],
+    "summary": "number",
+    "typeFlags": 64,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "importRoot",
+    "nodeKind": "Identifier",
+    "name": "export=",
+    "followedAlias": true,
+    "fatalDiagnostics": [],
+    "summary": "{ text: string; number: number; boolean: boolean; nil: null; empty: never[]; numbers: number[]; mixed: (string | number | null)[]; shapes: ({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]; nested: { kept: boolean; dup: { ...; }; }; ... 7 more ...; recursive: (number[] | (string | null)[])[]; }",
+    "typeFlags": 1048576,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "syntheticDefault",
+    "nodeKind": "Identifier",
+    "name": "export=",
+    "followedAlias": true,
+    "fatalDiagnostics": [],
+    "summary": "{ text: string; number: number; boolean: boolean; nil: null; empty: never[]; numbers: number[]; mixed: (string | number | null)[]; shapes: ({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]; nested: { kept: boolean; dup: { ...; }; }; ... 7 more ...; recursive: (number[] | (string | null)[])[]; }",
+    "typeFlags": 1048576,
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "marker": "namedDup",
+    "nodeKind": "Identifier",
+    "name": "dup",
+    "followedAlias": true,
+    "fatalDiagnostics": [],
+    "summary": "number",
+    "typeFlags": 64,
+    "errorType": false,
+    "properties": []
+  }
+]

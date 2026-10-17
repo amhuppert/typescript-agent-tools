@@ -1,0 +1,108 @@
+[
+  {
+    "name": "module",
+    "file": "case.ts",
+    "source": "export {};\ndeclare let /*selected*/ selected: typeof helperMarker;\n",
+    "options": {
+      "importHelpers": true
+    },
+    "loaded": true
+  },
+  {
+    "name": "disabled",
+    "file": "case.ts",
+    "source": "export {};\ndeclare let /*selected*/ selected: typeof helperMarker;\n",
+    "options": {
+      "importHelpers": false
+    },
+    "loaded": false
+  },
+  {
+    "name": "script",
+    "file": "case.ts",
+    "source": "declare let /*selected*/ selected: typeof helperMarker;\n",
+    "options": {
+      "importHelpers": true
+    },
+    "loaded": false
+  },
+  {
+    "name": "isolated",
+    "file": "case.ts",
+    "source": "declare let /*selected*/ selected: typeof helperMarker;\n",
+    "options": {
+      "importHelpers": true,
+      "isolatedModules": true
+    },
+    "loaded": true
+  },
+  {
+    "name": "verbatim",
+    "file": "case.ts",
+    "source": "declare let /*selected*/ selected: typeof helperMarker;\n",
+    "options": {
+      "importHelpers": true,
+      "isolatedModules": false,
+      "verbatimModuleSyntax": true
+    },
+    "loaded": true
+  },
+  {
+    "name": "declaration",
+    "file": "case.d.ts",
+    "source": "export {};\ndeclare let /*selected*/ selected: typeof helperMarker;\n",
+    "options": {
+      "importHelpers": true
+    },
+    "loaded": false
+  },
+  {
+    "name": "declaration-isolated",
+    "file": "case.d.ts",
+    "source": "export {};\ndeclare let /*selected*/ selected: typeof helperMarker;\n",
+    "options": {
+      "importHelpers": true,
+      "isolatedModules": true
+    },
+    "loaded": false
+  },
+  {
+    "name": "esm-extension",
+    "file": "case.mts",
+    "source": "export {};\ndeclare let /*selected*/ selected: typeof helperMarker;\n",
+    "options": {
+      "importHelpers": true
+    },
+    "loaded": true
+  },
+  {
+    "name": "cjs-extension",
+    "file": "case.cts",
+    "source": "export {};\ndeclare let /*selected*/ selected: typeof helperMarker;\n",
+    "options": {
+      "importHelpers": true
+    },
+    "loaded": true
+  },
+  {
+    "name": "json-module",
+    "file": "case.json",
+    "source": "{\"ok\":true}",
+    "options": {
+      "importHelpers": true,
+      "resolveJsonModule": true
+    },
+    "loaded": false
+  },
+  {
+    "name": "json-isolated",
+    "file": "case.json",
+    "source": "{\"ok\":true}",
+    "options": {
+      "importHelpers": true,
+      "resolveJsonModule": true,
+      "isolatedModules": true
+    },
+    "loaded": true
+  }
+]

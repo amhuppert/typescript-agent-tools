@@ -1,0 +1,123 @@
+[
+  {
+    "name": "own-direct",
+    "files": {
+      "barrel.ts": "export { a as X } from \"./data.json\";\n",
+      "data.json": "{\"a\":{\"nested\":1}}\n",
+      "augment.ts": "export {}; declare module \"./barrel\" { interface X { extra: number } }\n",
+      "main.ts": "import { /*#alias*/X } from \"./barrel\";\nX./*#detail*/nested;\nexport const /*#healthy*/healthy: 44 = 44;\n",
+      "globals.d.ts": "interface Object {}\ninterface Function {}\ninterface CallableFunction extends Function {}\ninterface NewableFunction extends Function {}\ninterface String { readonly length: number; }\ninterface Number {}\ninterface Boolean {}\ninterface RegExp {}\ninterface IArguments { length: number; [index: number]: any; }\ninterface ReadonlyArray<T> { readonly length: number; readonly [index: number]: T; }\ninterface Array<T> { length: number; [index: number]: T; }\n"
+    }
+  },
+  {
+    "name": "own-star",
+    "files": {
+      "barrel.ts": "export { a as X } from \"./data.json\";\n",
+      "data.json": "{\"a\":{\"nested\":1}}\n",
+      "augment.ts": "export {}; declare module \"./bridge\" { interface X { extra: number } }\n",
+      "main.ts": "import { /*#alias*/X } from \"./bridge\";\nX./*#detail*/nested;\nexport const /*#healthy*/healthy: 44 = 44;\n",
+      "globals.d.ts": "interface Object {}\ninterface Function {}\ninterface CallableFunction extends Function {}\ninterface NewableFunction extends Function {}\ninterface String { readonly length: number; }\ninterface Number {}\ninterface Boolean {}\ninterface RegExp {}\ninterface IArguments { length: number; [index: number]: any; }\ninterface ReadonlyArray<T> { readonly length: number; readonly [index: number]: T; }\ninterface Array<T> { length: number; [index: number]: T; }\n",
+      "bridge.ts": "export * from \"./barrel\";\n"
+    }
+  },
+  {
+    "name": "duplicate-last-object",
+    "files": {
+      "barrel.ts": "export { a as X } from \"./data.json\";\n",
+      "data.json": "{\"a\":{\"first\":1},\"a\":{\"last\":\"kept\"}}\n",
+      "augment.ts": "export {}; declare module \"./barrel\" { interface X { extra: number } }\n",
+      "main.ts": "import { /*#alias*/X } from \"./barrel\";\nX./*#detail*/last;\nexport const /*#healthy*/healthy: 44 = 44;\n",
+      "globals.d.ts": "interface Object {}\ninterface Function {}\ninterface CallableFunction extends Function {}\ninterface NewableFunction extends Function {}\ninterface String { readonly length: number; }\ninterface Number {}\ninterface Boolean {}\ninterface RegExp {}\ninterface IArguments { length: number; [index: number]: any; }\ninterface ReadonlyArray<T> { readonly length: number; readonly [index: number]: T; }\ninterface Array<T> { length: number; [index: number]: T; }\n"
+    }
+  },
+  {
+    "name": "duplicate-last-scalar",
+    "files": {
+      "barrel.ts": "export { a as X } from \"./data.json\";\n",
+      "data.json": "{\"a\":{\"first\":1},\"a\":7}\n",
+      "augment.ts": "export {}; declare module \"./barrel\" { interface X { extra: number } }\n",
+      "main.ts": "import { /*#alias*/X } from \"./barrel\";\n/*#detail*/X;\nexport const /*#healthy*/healthy: 44 = 44;\n",
+      "globals.d.ts": "interface Object {}\ninterface Function {}\ninterface CallableFunction extends Function {}\ninterface NewableFunction extends Function {}\ninterface String { readonly length: number; }\ninterface Number {}\ninterface Boolean {}\ninterface RegExp {}\ninterface IArguments { length: number; [index: number]: any; }\ninterface ReadonlyArray<T> { readonly length: number; readonly [index: number]: T; }\ninterface Array<T> { length: number; [index: number]: T; }\n"
+    }
+  },
+  {
+    "name": "nullable",
+    "files": {
+      "barrel.ts": "export { a as X } from \"./data.json\";\n",
+      "data.json": "{\"a\":{\"value\":null}}\n",
+      "augment.ts": "export {}; declare module \"./barrel\" { interface X { extra: number } }\n",
+      "main.ts": "import { /*#alias*/X } from \"./barrel\";\nX./*#detail*/value;\nexport const /*#healthy*/healthy: 44 = 44;\n",
+      "globals.d.ts": "interface Object {}\ninterface Function {}\ninterface CallableFunction extends Function {}\ninterface NewableFunction extends Function {}\ninterface String { readonly length: number; }\ninterface Number {}\ninterface Boolean {}\ninterface RegExp {}\ninterface IArguments { length: number; [index: number]: any; }\ninterface ReadonlyArray<T> { readonly length: number; readonly [index: number]: T; }\ninterface Array<T> { length: number; [index: number]: T; }\n"
+    }
+  },
+  {
+    "name": "array-valid",
+    "files": {
+      "barrel.ts": "export { a as X } from \"./data.json\";\n",
+      "data.json": "{\"a\":[1,2]}\n",
+      "augment.ts": "export {}; declare module \"./barrel\" { interface X { extra: number } }\n",
+      "main.ts": "import { /*#alias*/X } from \"./barrel\";\nX[0/*#detail*/];\nexport const /*#healthy*/healthy: 44 = 44;\n",
+      "globals.d.ts": "interface Object {}\ninterface Function {}\ninterface CallableFunction extends Function {}\ninterface NewableFunction extends Function {}\ninterface String { readonly length: number; }\ninterface Number {}\ninterface Boolean {}\ninterface RegExp {}\ninterface IArguments { length: number; [index: number]: any; }\ninterface ReadonlyArray<T> { readonly length: number; readonly [index: number]: T; }\ninterface Array<T> { length: number; [index: number]: T; }\n"
+    }
+  },
+  {
+    "name": "array-missing",
+    "files": {
+      "barrel.ts": "export { a as X } from \"./data.json\";\n",
+      "data.json": "{\"a\":[1,2]}\n",
+      "augment.ts": "export {}; declare module \"./barrel\" { interface X { extra: number } }\n",
+      "main.ts": "import { /*#alias*/X } from \"./barrel\";\n/*#detail*/X;\nexport const /*#healthy*/healthy: 44 = 44;\n",
+      "globals.d.ts": "interface Object {}\ninterface Function {}\ninterface CallableFunction extends Function {}\ninterface NewableFunction extends Function {}\ninterface String { readonly length: number; }\ninterface Number {}\ninterface Boolean {}\ninterface RegExp {}\ninterface IArguments { length: number; [index: number]: any; }\ninterface ReadonlyArray<T> { readonly length: number; readonly [index: number]: T; }\n"
+    }
+  },
+  {
+    "name": "array-wrong-arity",
+    "files": {
+      "barrel.ts": "export { a as X } from \"./data.json\";\n",
+      "data.json": "{\"a\":[1,2]}\n",
+      "augment.ts": "export {}; declare module \"./barrel\" { interface X { extra: number } }\n",
+      "main.ts": "import { /*#alias*/X } from \"./barrel\";\n/*#detail*/X;\nexport const /*#healthy*/healthy: 44 = 44;\n",
+      "globals.d.ts": "interface Object {}\ninterface Function {}\ninterface CallableFunction extends Function {}\ninterface NewableFunction extends Function {}\ninterface String { readonly length: number; }\ninterface Number {}\ninterface Boolean {}\ninterface RegExp {}\ninterface IArguments { length: number; [index: number]: any; }\ninterface ReadonlyArray<T> { readonly length: number; readonly [index: number]: T; }\ninterface Array { length: number; [index: number]: string; }\n"
+    }
+  },
+  {
+    "name": "nested-array",
+    "files": {
+      "barrel.ts": "export { a as X } from \"./data.json\";\n",
+      "data.json": "{\"a\":{\"entries\":[1,null,{\"deep\":2}]}}\n",
+      "augment.ts": "export {}; declare module \"./barrel\" { interface X { extra: number } }\n",
+      "main.ts": "import { /*#alias*/X } from \"./barrel\";\nX./*#detail*/entries;\nexport const /*#healthy*/healthy: 44 = 44;\n",
+      "globals.d.ts": "interface Object {}\ninterface Function {}\ninterface CallableFunction extends Function {}\ninterface NewableFunction extends Function {}\ninterface String { readonly length: number; }\ninterface Number {}\ninterface Boolean {}\ninterface RegExp {}\ninterface IArguments { length: number; [index: number]: any; }\ninterface ReadonlyArray<T> { readonly length: number; readonly [index: number]: T; }\ninterface Array<T> { length: number; [index: number]: T; }\n"
+    }
+  },
+  {
+    "name": "primitive-member",
+    "files": {
+      "barrel.ts": "export { length as X } from \"./data.json\";\n",
+      "data.json": "\"text\"\n",
+      "augment.ts": "export {}; declare module \"./barrel\" { interface X { extra: number } }\n",
+      "main.ts": "import { /*#alias*/X } from \"./barrel\";\n/*#detail*/X;\nexport const /*#healthy*/healthy: 44 = 44;\n",
+      "globals.d.ts": "interface Object {}\ninterface Function {}\ninterface CallableFunction extends Function {}\ninterface NewableFunction extends Function {}\ninterface String { readonly length: number; }\ninterface Number {}\ninterface Boolean {}\ninterface RegExp {}\ninterface IArguments { length: number; [index: number]: any; }\ninterface ReadonlyArray<T> { readonly length: number; readonly [index: number]: T; }\ninterface Array<T> { length: number; [index: number]: T; }\n"
+    }
+  },
+  {
+    "name": "whole-object",
+    "files": {
+      "barrel.ts": "export { default as X } from \"./data.json\";\n",
+      "data.json": "{\"a\":{\"nested\":1}}\n",
+      "augment.ts": "export {}; declare module \"./barrel\" { interface X { extra: number } }\n",
+      "main.ts": "import { /*#alias*/X } from \"./barrel\";\nX./*#detail*/a;\nexport const /*#healthy*/healthy: 44 = 44;\n",
+      "globals.d.ts": "interface Object {}\ninterface Function {}\ninterface CallableFunction extends Function {}\ninterface NewableFunction extends Function {}\ninterface String { readonly length: number; }\ninterface Number {}\ninterface Boolean {}\ninterface RegExp {}\ninterface IArguments { length: number; [index: number]: any; }\ninterface ReadonlyArray<T> { readonly length: number; readonly [index: number]: T; }\ninterface Array<T> { length: number; [index: number]: T; }\n"
+    }
+  },
+  {
+    "name": "whole-string",
+    "files": {
+      "barrel.ts": "export { default as X } from \"./data.json\";\n",
+      "data.json": "\"text\"\n",
+      "augment.ts": "export {}; declare module \"./barrel\" { interface X { extra: number } }\n",
+      "main.ts": "import { /*#alias*/X } from \"./barrel\";\nX./*#detail*/length;\nexport const /*#healthy*/healthy: 44 = 44;\n",
+      "globals.d.ts": "interface Object {}\ninterface Function {}\ninterface CallableFunction extends Function {}\ninterface NewableFunction extends Function {}\ninterface String { readonly length: number; }\ninterface Number {}\ninterface Boolean {}\ninterface RegExp {}\ninterface IArguments { length: number; [index: number]: any; }\ninterface ReadonlyArray<T> { readonly length: number; readonly [index: number]: T; }\ninterface Array<T> { length: number; [index: number]: T; }\n"
+    }
+  }
+]

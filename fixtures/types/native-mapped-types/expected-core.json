@@ -1,0 +1,3854 @@
+[
+  {
+    "config": "tsconfig",
+    "name": "pick",
+    "summary": "Pick<Source, \"explicit\" | \"keep\" | \"plain\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "omit",
+    "summary": "Omit<Source, \"drop\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "renamed",
+    "summary": "ExceptFields<Source, \"drop\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "inline",
+    "summary": "Inline<Source, \"drop\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "emptyPick",
+    "summary": "Pick<Source, never>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "emptyOmit",
+    "summary": "Omit<Source, keyof Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "keep",
+    "summary": "Keep<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "addReadonly",
+    "summary": "AddReadonly<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "removeReadonly",
+    "summary": "RemoveReadonly<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "addOptional",
+    "summary": "AddOptional<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "bothAdd",
+    "summary": "BothAdd<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "mutableOptional",
+    "summary": "MutableOptional<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "removeOptional",
+    "summary": "RemoveOptional<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "readonlyRequired",
+    "summary": "ReadonlyRequired<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "bothRemove",
+    "summary": "BothRemove<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "filter",
+    "summary": "Filter<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "mergedName",
+    "summary": "{ one: \"a\" | \"b\"; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "one",
+        "summary": "\"a\" | \"b\"",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "numericName",
+    "summary": "{ 1: \"1\" | 1; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "1",
+        "summary": "\"1\" | 1",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "templateNames",
+    "summary": "Getters<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "getDrop",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "getExplicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "getKeep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "getPlain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "patternIndex",
+    "summary": "{ readonly [x: `key:${string}`]: `key:${string}`; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "stringIndex",
+    "summary": "{ [x: string]: string; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "numberIndex",
+    "summary": "{ [x: number]: number; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "symbolIndex",
+    "summary": "{ [x: symbol]: symbol; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "uniqueKeys",
+    "summary": "{ [token]: unique symbol; [token]: unique symbol; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "unique:0",
+        "summary": "unique symbol",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "unique:1",
+        "summary": "unique symbol",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "pick",
+    "summary": "Pick<Source, \"explicit\" | \"keep\" | \"plain\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "omit",
+    "summary": "Omit<Source, \"drop\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "renamed",
+    "summary": "ExceptFields<Source, \"drop\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "inline",
+    "summary": "Inline<Source, \"drop\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "explicit",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "emptyPick",
+    "summary": "Pick<Source, never>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "emptyOmit",
+    "summary": "Omit<Source, keyof Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "keep",
+    "summary": "Keep<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "addReadonly",
+    "summary": "AddReadonly<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "removeReadonly",
+    "summary": "RemoveReadonly<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "addOptional",
+    "summary": "AddOptional<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "bothAdd",
+    "summary": "BothAdd<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "mutableOptional",
+    "summary": "MutableOptional<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "removeOptional",
+    "summary": "RemoveOptional<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "readonlyRequired",
+    "summary": "ReadonlyRequired<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "bothRemove",
+    "summary": "BothRemove<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "filter",
+    "summary": "Filter<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "mergedName",
+    "summary": "{ one: \"a\" | \"b\"; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "one",
+        "summary": "\"a\" | \"b\"",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "numericName",
+    "summary": "{ 1: \"1\" | 1; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "1",
+        "summary": "\"1\" | 1",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "templateNames",
+    "summary": "Getters<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "getDrop",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "getExplicit",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "getKeep",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "getPlain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "patternIndex",
+    "summary": "{ readonly [x: `key:${string}`]: `key:${string}`; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "stringIndex",
+    "summary": "{ [x: string]: string; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "numberIndex",
+    "summary": "{ [x: number]: number; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "symbolIndex",
+    "summary": "{ [x: symbol]: symbol; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "uniqueKeys",
+    "summary": "{ [token]: unique symbol; [token]: unique symbol; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "unique:0",
+        "summary": "unique symbol",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "unique:1",
+        "summary": "unique symbol",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "pick",
+    "summary": "Pick<Source, \"explicit\" | \"keep\" | \"plain\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "omit",
+    "summary": "Omit<Source, \"drop\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "renamed",
+    "summary": "ExceptFields<Source, \"drop\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "inline",
+    "summary": "Inline<Source, \"drop\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "emptyPick",
+    "summary": "Pick<Source, never>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "emptyOmit",
+    "summary": "Omit<Source, keyof Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "keep",
+    "summary": "Keep<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "addReadonly",
+    "summary": "AddReadonly<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "removeReadonly",
+    "summary": "RemoveReadonly<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "addOptional",
+    "summary": "AddOptional<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "bothAdd",
+    "summary": "BothAdd<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "mutableOptional",
+    "summary": "MutableOptional<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "removeOptional",
+    "summary": "RemoveOptional<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "readonlyRequired",
+    "summary": "ReadonlyRequired<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "bothRemove",
+    "summary": "BothRemove<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "drop",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 41
+              },
+              "end": {
+                "line": 2,
+                "column": 45
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "filter",
+    "summary": "Filter<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "plain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 55
+              },
+              "end": {
+                "line": 2,
+                "column": 60
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "core.ts",
+              "start": {
+                "line": 2,
+                "column": 71
+              },
+              "end": {
+                "line": 2,
+                "column": 79
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "mergedName",
+    "summary": "{ one: \"a\" | \"b\"; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "one",
+        "summary": "\"a\" | \"b\"",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "numericName",
+    "summary": "{ 1: \"1\" | 1; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "1",
+        "summary": "\"1\" | 1",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "templateNames",
+    "summary": "Getters<Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "getDrop",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "getExplicit",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "getKeep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "getPlain",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "patternIndex",
+    "summary": "{ readonly [x: `key:${string}`]: `key:${string}`; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "stringIndex",
+    "summary": "{ [x: string]: string; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "numberIndex",
+    "summary": "{ [x: number]: number; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "symbolIndex",
+    "summary": "{ [x: symbol]: symbol; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "uniqueKeys",
+    "summary": "{ [token]: unique symbol; [token]: unique symbol; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "unique:0",
+        "summary": "unique symbol",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "unique:1",
+        "summary": "unique symbol",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  }
+]

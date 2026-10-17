@@ -1,0 +1,422 @@
+{
+  "sequence": "fresh selected R<T,N>; base, resolved cache sentinel; summary afterward",
+  "answers": [
+    {
+      "count": 5,
+      "source": "interface Array<T> { length: number; }\ntype R<T, N extends number, C extends unknown[] = []> = C[\"length\"] extends N ? \"done\" : T extends string ? R<{[P in keyof T]:T[P]}, N, [...C,unknown]> : number;\ninterface Host<T> { value: R<T,5>; }\n",
+      "answer": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/bounded-repeat-5/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/bounded-repeat-5/tsconfig.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/bounded-repeat-5/cases.ts",
+            "sha256": "260fc0e9c4e506a494e2a6e09edf0b873bca8d319d3b9514c4fb8c94d81bc7de"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/bounded-repeat-5/tsconfig.json",
+            "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f"
+          }
+        ],
+        "kind": "type",
+        "symbolFlags": 0,
+        "symbolMode": "",
+        "summary": "T extends string ? { [P in keyof T]: T[P]; } extends string ? { [P in keyof (string & { [P in keyof T]: T[P]; })]: (string & { [P in keyof T]: T[P]; })[P]; } extends string ? ... : number : number : number",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {
+            "conditionalTail": 0,
+            "instantiationCount": 5,
+            "instantiationDepth": 2
+          },
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "baseConstraint": {
+          "base": {
+            "errorType": false,
+            "flags": 134217728,
+            "same": false,
+            "summary": "number | \"done\""
+          },
+          "resolvedKind": "type"
+        },
+        "afterBaseConstraint": {
+          "counters": {
+            "baseConstraintDepth": 9,
+            "conditionalTail": 0,
+            "instantiationCount": 120,
+            "instantiationDepth": 6,
+            "relationAllowanceUsed": 0,
+            "relationCacheSize": 1,
+            "relationFinishedCount": 7,
+            "relationInitialAllowance": 2000000,
+            "relationSourceDepth": 0,
+            "relationTargetDepth": 0
+          },
+          "demandFailures": [],
+          "observations": {
+            "baseConstraintRepeat": {
+              "depth": 2
+            },
+            "relationFirstFinish": {
+              "allowance": 1999999,
+              "cacheSize": 1,
+              "overflow": false,
+              "result": 0
+            }
+          },
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "counters": {
+          "baseConstraintDepth": 9,
+          "conditionalTail": 0,
+          "instantiationCount": 120,
+          "instantiationDepth": 6,
+          "relationAllowanceUsed": 0,
+          "relationCacheSize": 1,
+          "relationFinishedCount": 9,
+          "relationInitialAllowance": 2000000,
+          "relationSourceDepth": 0,
+          "relationTargetDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "baseConstraintRepeat": {
+            "depth": 2
+          },
+          "relationFirstFinish": {
+            "allowance": 1999999,
+            "cacheSize": 1,
+            "overflow": false,
+            "result": 0
+          }
+        },
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "compilerOptions": {
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/bounded-repeat-5/tsconfig.json"
+        }
+      }
+    },
+    {
+      "count": 6,
+      "source": "interface Array<T> { length: number; }\ntype R<T, N extends number, C extends unknown[] = []> = C[\"length\"] extends N ? \"done\" : T extends string ? R<{[P in keyof T]:T[P]}, N, [...C,unknown]> : number;\ninterface Host<T> { value: R<T,6>; }\n",
+      "answer": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/bounded-repeat-6/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/bounded-repeat-6/tsconfig.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/bounded-repeat-6/cases.ts",
+            "sha256": "cdd93ff431c43d3384725370d71524cb7e5f4ec22ab920fef60760d2d17c9fdc"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/bounded-repeat-6/tsconfig.json",
+            "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f"
+          }
+        ],
+        "kind": "type",
+        "symbolFlags": 0,
+        "symbolMode": "",
+        "summary": "T extends string ? { [P in keyof T]: T[P]; } extends string ? { [P in keyof (string & { [P in keyof T]: T[P]; })]: (string & { [P in keyof T]: T[P]; })[P]; } extends string ? ... : number : number : number",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {
+            "conditionalTail": 0,
+            "instantiationCount": 5,
+            "instantiationDepth": 2
+          },
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "baseConstraint": {
+          "base": null,
+          "resolvedKind": "noConstraint"
+        },
+        "afterBaseConstraint": {
+          "counters": {
+            "baseConstraintDepth": 10,
+            "conditionalTail": 0,
+            "instantiationCount": 132,
+            "instantiationDepth": 7,
+            "relationAllowanceUsed": 0,
+            "relationCacheSize": 1,
+            "relationFinishedCount": 9,
+            "relationInitialAllowance": 2000000,
+            "relationSourceDepth": 0,
+            "relationTargetDepth": 0
+          },
+          "demandFailures": [],
+          "observations": {
+            "baseConstraintRepeat": {
+              "depth": 2
+            },
+            "baseConstraintStop": {
+              "depth": 10,
+              "repeat": true
+            },
+            "relationFirstFinish": {
+              "allowance": 1999999,
+              "cacheSize": 1,
+              "overflow": false,
+              "result": 0
+            }
+          },
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "counters": {
+          "baseConstraintDepth": 10,
+          "conditionalTail": 0,
+          "instantiationCount": 142,
+          "instantiationDepth": 7,
+          "relationAllowanceUsed": 0,
+          "relationCacheSize": 1,
+          "relationFinishedCount": 11,
+          "relationInitialAllowance": 2000000,
+          "relationSourceDepth": 0,
+          "relationTargetDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "baseConstraintRepeat": {
+            "depth": 2
+          },
+          "baseConstraintStop": {
+            "depth": 10,
+            "repeat": true
+          },
+          "relationFirstFinish": {
+            "allowance": 1999999,
+            "cacheSize": 1,
+            "overflow": false,
+            "result": 0
+          }
+        },
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "compilerOptions": {
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/bounded-repeat-6/tsconfig.json"
+        }
+      }
+    },
+    {
+      "count": 7,
+      "source": "interface Array<T> { length: number; }\ntype R<T, N extends number, C extends unknown[] = []> = C[\"length\"] extends N ? \"done\" : T extends string ? R<{[P in keyof T]:T[P]}, N, [...C,unknown]> : number;\ninterface Host<T> { value: R<T,7>; }\n",
+      "answer": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/bounded-repeat-7/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/bounded-repeat-7/tsconfig.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/bounded-repeat-7/cases.ts",
+            "sha256": "2a7df9befbfdc12a8ea87d6ff86f1993c027cc5c8f1d1e73c933f7ed7916b1a8"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/bounded-repeat-7/tsconfig.json",
+            "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f"
+          }
+        ],
+        "kind": "type",
+        "symbolFlags": 0,
+        "symbolMode": "",
+        "summary": "T extends string ? { [P in keyof T]: T[P]; } extends string ? { [P in keyof (string & { [P in keyof T]: T[P]; })]: (string & { [P in keyof T]: T[P]; })[P]; } extends string ? ... : number : number : number",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {
+            "conditionalTail": 0,
+            "instantiationCount": 5,
+            "instantiationDepth": 2
+          },
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "baseConstraint": {
+          "base": null,
+          "resolvedKind": "noConstraint"
+        },
+        "afterBaseConstraint": {
+          "counters": {
+            "baseConstraintDepth": 10,
+            "conditionalTail": 0,
+            "instantiationCount": 132,
+            "instantiationDepth": 7,
+            "relationAllowanceUsed": 0,
+            "relationCacheSize": 1,
+            "relationFinishedCount": 9,
+            "relationInitialAllowance": 2000000,
+            "relationSourceDepth": 0,
+            "relationTargetDepth": 0
+          },
+          "demandFailures": [],
+          "observations": {
+            "baseConstraintRepeat": {
+              "depth": 2
+            },
+            "baseConstraintStop": {
+              "depth": 10,
+              "repeat": true
+            },
+            "relationFirstFinish": {
+              "allowance": 1999999,
+              "cacheSize": 1,
+              "overflow": false,
+              "result": 0
+            }
+          },
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "counters": {
+          "baseConstraintDepth": 10,
+          "conditionalTail": 0,
+          "instantiationCount": 142,
+          "instantiationDepth": 7,
+          "relationAllowanceUsed": 0,
+          "relationCacheSize": 1,
+          "relationFinishedCount": 11,
+          "relationInitialAllowance": 2000000,
+          "relationSourceDepth": 0,
+          "relationTargetDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "baseConstraintRepeat": {
+            "depth": 2
+          },
+          "baseConstraintStop": {
+            "depth": 10,
+            "repeat": true
+          },
+          "relationFirstFinish": {
+            "allowance": 1999999,
+            "cacheSize": 1,
+            "overflow": false,
+            "result": 0
+          }
+        },
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "compilerOptions": {
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/bounded-repeat-7/tsconfig.json"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+[
+  {
+    "name": "callbackConstraint",
+    "summary": "MissingConstraintTail",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      1320
+    ],
+    "demandFailures": [],
+    "lastErrorProperty": null
+  },
+  {
+    "name": "callbackCircular",
+    "summary": "MissingCircularTail",
+    "errorType": true,
+    "codes": [
+      2313,
+      2304,
+      1320
+    ],
+    "demandFailures": [],
+    "lastErrorProperty": null
+  },
+  {
+    "name": "callbackHealthy",
+    "summary": "1",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "lastErrorProperty": null
+  },
+  {
+    "name": "thenInventory",
+    "summary": "MissingThenTail",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "lastErrorProperty": null
+  },
+  {
+    "name": "thenHealthy",
+    "summary": "1",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "lastErrorProperty": null
+  },
+  {
+    "name": "callbackInventory",
+    "summary": "MissingCallbackTail",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "lastErrorProperty": null
+  },
+  {
+    "name": "callbackInventoryHealthy",
+    "summary": "1",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "lastErrorProperty": null
+  },
+  {
+    "name": "deferredInventory",
+    "summary": "MissingDeferredTail",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "lastErrorProperty": null
+  },
+  {
+    "name": "deferredHealthy",
+    "summary": "1",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "lastErrorProperty": null
+  },
+  {
+    "name": "unionInventory",
+    "summary": "MissingCompositeTail",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "lastErrorProperty": null
+  },
+  {
+    "name": "intersectionInventory",
+    "summary": "MissingCompositeTail",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "lastErrorProperty": null
+  },
+  {
+    "name": "compositeHealthy",
+    "summary": "1",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "lastErrorProperty": null
+  },
+  {
+    "name": "falsyTemplateBase",
+    "summary": "false | `${number}`",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "lastErrorProperty": null
+  },
+  {
+    "name": "falsyMappingBase",
+    "summary": "false | Uppercase<string>",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "lastErrorProperty": null
+  }
+]

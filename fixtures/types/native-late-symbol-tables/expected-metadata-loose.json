@@ -1,0 +1,702 @@
+[
+  {
+    "file": "metadata.ts",
+    "name": "readonlyStringIndex",
+    "summary": "{ readonly [x: string]: 71; }",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 309,
+        "declarationPos": 234,
+        "depth": 0,
+        "event": "enter",
+        "name": "readonlyStringIndex",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 309,
+        "event": "enter",
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 279
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 43,
+        "declarationPos": 24,
+        "depth": 2,
+        "event": "enter",
+        "name": "wideString",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 3,
+        "end": 43,
+        "event": "enter",
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 36
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 3,
+        "end": 43,
+        "errorType": false,
+        "event": "exit",
+        "flags": 32,
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 36,
+        "type": 16
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 43,
+        "declarationPos": 24,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 32,
+        "name": "wideString",
+        "operation": "getTypeOfSymbol",
+        "type": 16
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 309,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 279,
+        "type": 81
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 309,
+        "declarationPos": 234,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "readonlyStringIndex",
+        "operation": "getTypeOfSymbol",
+        "type": 81
+      }
+    ]
+  },
+  {
+    "file": "metadata.ts",
+    "name": "mutableStringIndex",
+    "summary": "{ [x: string]: 71; }",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 388,
+        "declarationPos": 324,
+        "depth": 0,
+        "event": "enter",
+        "name": "mutableStringIndex",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 388,
+        "event": "enter",
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 367
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 43,
+        "declarationPos": 24,
+        "depth": 2,
+        "event": "enter",
+        "name": "wideString",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 3,
+        "end": 43,
+        "event": "enter",
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 36
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 3,
+        "end": 43,
+        "errorType": false,
+        "event": "exit",
+        "flags": 32,
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 36,
+        "type": 16
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 43,
+        "declarationPos": 24,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 32,
+        "name": "wideString",
+        "operation": "getTypeOfSymbol",
+        "type": 16
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 388,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 367,
+        "type": 81
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 388,
+        "declarationPos": 324,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "mutableStringIndex",
+        "operation": "getTypeOfSymbol",
+        "type": 81
+      }
+    ]
+  },
+  {
+    "file": "metadata.ts",
+    "name": "mixedReadonlyIndex",
+    "summary": "{ [x: string]: 72 | 73; }",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 495,
+        "declarationPos": 403,
+        "depth": 0,
+        "event": "enter",
+        "name": "mixedReadonlyIndex",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 495,
+        "event": "enter",
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 446
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 43,
+        "declarationPos": 24,
+        "depth": 2,
+        "event": "enter",
+        "name": "wideString",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 3,
+        "end": 43,
+        "event": "enter",
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 36
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 3,
+        "end": 43,
+        "errorType": false,
+        "event": "exit",
+        "flags": 32,
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 36,
+        "type": 16
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 43,
+        "declarationPos": 24,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 32,
+        "name": "wideString",
+        "operation": "getTypeOfSymbol",
+        "type": 16
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 78,
+        "declarationPos": 58,
+        "depth": 2,
+        "event": "enter",
+        "name": "otherString",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 3,
+        "end": 78,
+        "event": "enter",
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 71
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 3,
+        "end": 78,
+        "errorType": false,
+        "event": "exit",
+        "flags": 32,
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 71,
+        "type": 16
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 78,
+        "declarationPos": 58,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 32,
+        "name": "otherString",
+        "operation": "getTypeOfSymbol",
+        "type": 16
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 495,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 446,
+        "type": 81
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 495,
+        "declarationPos": 403,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "mixedReadonlyIndex",
+        "operation": "getTypeOfSymbol",
+        "type": 81
+      }
+    ]
+  },
+  {
+    "file": "metadata.ts",
+    "name": "readonlyNumberIndex",
+    "summary": "{ readonly [x: number]: 74; }",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 585,
+        "declarationPos": 510,
+        "depth": 0,
+        "event": "enter",
+        "name": "readonlyNumberIndex",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 585,
+        "event": "enter",
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 555
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 112,
+        "declarationPos": 93,
+        "depth": 2,
+        "event": "enter",
+        "name": "wideNumber",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 3,
+        "end": 112,
+        "event": "enter",
+        "kind": 150,
+        "operation": "getTypeFromTypeNode",
+        "pos": 105
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 3,
+        "end": 112,
+        "errorType": false,
+        "event": "exit",
+        "flags": 64,
+        "kind": 150,
+        "operation": "getTypeFromTypeNode",
+        "pos": 105,
+        "type": 17
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 112,
+        "declarationPos": 93,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 64,
+        "name": "wideNumber",
+        "operation": "getTypeOfSymbol",
+        "type": 17
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 585,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 555,
+        "type": 81
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 585,
+        "declarationPos": 510,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "readonlyNumberIndex",
+        "operation": "getTypeOfSymbol",
+        "type": 81
+      }
+    ]
+  },
+  {
+    "file": "metadata.ts",
+    "name": "readonlySymbolIndex",
+    "summary": "{ readonly [x: symbol]: 75; }",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 675,
+        "declarationPos": 600,
+        "depth": 0,
+        "event": "enter",
+        "name": "readonlySymbolIndex",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 675,
+        "event": "enter",
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 645
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 146,
+        "declarationPos": 127,
+        "depth": 2,
+        "event": "enter",
+        "name": "wideSymbol",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 3,
+        "end": 146,
+        "event": "enter",
+        "kind": 155,
+        "operation": "getTypeFromTypeNode",
+        "pos": 139
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 3,
+        "end": 146,
+        "errorType": false,
+        "event": "exit",
+        "flags": 512,
+        "kind": 155,
+        "operation": "getTypeFromTypeNode",
+        "pos": 139,
+        "type": 24
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 146,
+        "declarationPos": 127,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 512,
+        "name": "wideSymbol",
+        "operation": "getTypeOfSymbol",
+        "type": 24
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 675,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 645,
+        "type": 81
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 675,
+        "declarationPos": 600,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "readonlySymbolIndex",
+        "operation": "getTypeOfSymbol",
+        "type": 81
+      }
+    ]
+  },
+  {
+    "file": "metadata.ts",
+    "name": "optionalLateProperty",
+    "summary": "{ readonly value?: 76; }",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 766,
+        "declarationPos": 690,
+        "depth": 0,
+        "event": "enter",
+        "name": "optionalLateProperty",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 766,
+        "event": "enter",
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 737
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 179,
+        "declarationPos": 161,
+        "depth": 2,
+        "event": "enter",
+        "name": "exactKey",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 3,
+        "end": 179,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 171
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 3,
+        "end": 179,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 171,
+        "type": 81
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 179,
+        "declarationPos": 161,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "name": "exactKey",
+        "operation": "getTypeOfSymbol",
+        "type": 81
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 766,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 737,
+        "type": 83
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 766,
+        "declarationPos": 690,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "optionalLateProperty",
+        "operation": "getTypeOfSymbol",
+        "type": 83
+      }
+    ]
+  },
+  {
+    "file": "metadata.ts",
+    "name": "optionalUniqueProperty",
+    "summary": "{ readonly [uniqueKey]?: 77; }",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 862,
+        "declarationPos": 781,
+        "depth": 0,
+        "event": "enter",
+        "name": "optionalUniqueProperty",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 862,
+        "event": "enter",
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 832
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 219,
+        "declarationPos": 194,
+        "depth": 2,
+        "event": "enter",
+        "name": "uniqueKey",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 3,
+        "end": 219,
+        "event": "enter",
+        "kind": 199,
+        "operation": "getTypeFromTypeNode",
+        "pos": 205
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 3,
+        "end": 219,
+        "errorType": false,
+        "event": "exit",
+        "flags": 16384,
+        "kind": 199,
+        "operation": "getTypeFromTypeNode",
+        "pos": 205,
+        "type": 81
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 219,
+        "declarationPos": 194,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 16384,
+        "name": "uniqueKey",
+        "operation": "getTypeOfSymbol",
+        "type": 81
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 862,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 832,
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 862,
+        "declarationPos": 781,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "optionalUniqueProperty",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      }
+    ]
+  }
+]

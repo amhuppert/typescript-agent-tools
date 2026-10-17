@@ -1,0 +1,821 @@
+{
+  "sequence": "fresh selected type; base, resolved cache identity, guarded declared constraint, raw worker, then summary; no diagnostics pass",
+  "answers": [
+    {
+      "count": 9,
+      "source": "interface Chain<T0 extends T1, T1 extends T2, T2 extends T3, T3 extends T4, T4 extends T5, T5 extends T6, T6 extends T7, T7 extends T8, T8 extends \"ready\"> { value: T0; }\n",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 1,
+          "column": 166
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-9/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-9/tsconfig.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-9/cases.ts",
+            "sha256": "997b3f11a29844f10a1dedbcdb38d50830273e97aaae95c704aae1f2e4ad3931"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-9/tsconfig.json",
+            "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f"
+          }
+        ],
+        "kind": "type",
+        "symbolFlags": 0,
+        "symbolMode": "",
+        "summary": "T0",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "baseConstraint": {
+          "base": {
+            "errorType": false,
+            "flags": 1024,
+            "same": false,
+            "summary": "\"ready\""
+          },
+          "guarded": {
+            "errorType": false,
+            "flags": 524288,
+            "same": false,
+            "summary": "T1"
+          },
+          "raw": {
+            "errorType": false,
+            "flags": 524288,
+            "same": false,
+            "summary": "T1"
+          },
+          "resolvedKind": "type"
+        },
+        "afterBaseConstraint": {
+          "counters": {
+            "baseConstraintDepth": 8
+          },
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "counters": {
+          "baseConstraintDepth": 8
+        },
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "compilerOptions": {
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-9/tsconfig.json"
+        }
+      }
+    },
+    {
+      "count": 10,
+      "source": "interface Chain<T0 extends T1, T1 extends T2, T2 extends T3, T3 extends T4, T4 extends T5, T5 extends T6, T6 extends T7, T7 extends T8, T8 extends T9, T9 extends \"ready\"> { value: T0; }\n",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 1,
+          "column": 181
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-10/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-10/tsconfig.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-10/cases.ts",
+            "sha256": "41bc7ffb3239a07da7065c4f21c5071571503301a883b131700d17902eed7a03"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-10/tsconfig.json",
+            "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f"
+          }
+        ],
+        "kind": "type",
+        "symbolFlags": 0,
+        "symbolMode": "",
+        "summary": "T0",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "baseConstraint": {
+          "base": {
+            "errorType": false,
+            "flags": 1024,
+            "same": false,
+            "summary": "\"ready\""
+          },
+          "guarded": {
+            "errorType": false,
+            "flags": 524288,
+            "same": false,
+            "summary": "T1"
+          },
+          "raw": {
+            "errorType": false,
+            "flags": 524288,
+            "same": false,
+            "summary": "T1"
+          },
+          "resolvedKind": "type"
+        },
+        "afterBaseConstraint": {
+          "counters": {
+            "baseConstraintDepth": 9
+          },
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "counters": {
+          "baseConstraintDepth": 9
+        },
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "compilerOptions": {
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-10/tsconfig.json"
+        }
+      }
+    },
+    {
+      "count": 11,
+      "source": "interface Chain<T0 extends T1, T1 extends T2, T2 extends T3, T3 extends T4, T4 extends T5, T5 extends T6, T6 extends T7, T7 extends T8, T8 extends T9, T9 extends T10, T10 extends \"ready\"> { value: T0; }\n",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 1,
+          "column": 198
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-11/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-11/tsconfig.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-11/cases.ts",
+            "sha256": "ddf9aef6256139751307ceef291b12aff1795f298a8258c7e6797c74c0aa6825"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-11/tsconfig.json",
+            "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f"
+          }
+        ],
+        "kind": "type",
+        "symbolFlags": 0,
+        "symbolMode": "",
+        "summary": "T0",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "baseConstraint": {
+          "base": {
+            "errorType": false,
+            "flags": 1024,
+            "same": false,
+            "summary": "\"ready\""
+          },
+          "guarded": {
+            "errorType": false,
+            "flags": 524288,
+            "same": false,
+            "summary": "T1"
+          },
+          "raw": {
+            "errorType": false,
+            "flags": 524288,
+            "same": false,
+            "summary": "T1"
+          },
+          "resolvedKind": "type"
+        },
+        "afterBaseConstraint": {
+          "counters": {
+            "baseConstraintDepth": 10
+          },
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "counters": {
+          "baseConstraintDepth": 10
+        },
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "compilerOptions": {
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-11/tsconfig.json"
+        }
+      }
+    },
+    {
+      "count": 49,
+      "source": "interface Chain<T0 extends T1, T1 extends T2, T2 extends T3, T3 extends T4, T4 extends T5, T5 extends T6, T6 extends T7, T7 extends T8, T8 extends T9, T9 extends T10, T10 extends T11, T11 extends T12, T12 extends T13, T13 extends T14, T14 extends T15, T15 extends T16, T16 extends T17, T17 extends T18, T18 extends T19, T19 extends T20, T20 extends T21, T21 extends T22, T22 extends T23, T23 extends T24, T24 extends T25, T25 extends T26, T26 extends T27, T27 extends T28, T28 extends T29, T29 extends T30, T30 extends T31, T31 extends T32, T32 extends T33, T33 extends T34, T34 extends T35, T35 extends T36, T36 extends T37, T37 extends T38, T38 extends T39, T39 extends T40, T40 extends T41, T41 extends T42, T42 extends T43, T43 extends T44, T44 extends T45, T45 extends T46, T46 extends T47, T47 extends T48, T48 extends \"ready\"> { value: T0; }\n",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 1,
+          "column": 844
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-49/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-49/tsconfig.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-49/cases.ts",
+            "sha256": "1afd50acd41eef0a124d03b1eda76ca7fed6634bbf322b8ad52642a20ee1687e"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-49/tsconfig.json",
+            "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f"
+          }
+        ],
+        "kind": "type",
+        "symbolFlags": 0,
+        "symbolMode": "",
+        "summary": "T0",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "baseConstraint": {
+          "base": {
+            "errorType": false,
+            "flags": 1024,
+            "same": false,
+            "summary": "\"ready\""
+          },
+          "guarded": {
+            "errorType": false,
+            "flags": 524288,
+            "same": false,
+            "summary": "T1"
+          },
+          "raw": {
+            "errorType": false,
+            "flags": 524288,
+            "same": false,
+            "summary": "T1"
+          },
+          "resolvedKind": "type"
+        },
+        "afterBaseConstraint": {
+          "counters": {
+            "baseConstraintDepth": 48
+          },
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "counters": {
+          "baseConstraintDepth": 48
+        },
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "compilerOptions": {
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-49/tsconfig.json"
+        }
+      }
+    },
+    {
+      "count": 50,
+      "source": "interface Chain<T0 extends T1, T1 extends T2, T2 extends T3, T3 extends T4, T4 extends T5, T5 extends T6, T6 extends T7, T7 extends T8, T8 extends T9, T9 extends T10, T10 extends T11, T11 extends T12, T12 extends T13, T13 extends T14, T14 extends T15, T15 extends T16, T16 extends T17, T17 extends T18, T18 extends T19, T19 extends T20, T20 extends T21, T21 extends T22, T22 extends T23, T23 extends T24, T24 extends T25, T25 extends T26, T26 extends T27, T27 extends T28, T28 extends T29, T29 extends T30, T30 extends T31, T31 extends T32, T32 extends T33, T33 extends T34, T34 extends T35, T35 extends T36, T36 extends T37, T37 extends T38, T38 extends T39, T39 extends T40, T40 extends T41, T41 extends T42, T42 extends T43, T43 extends T44, T44 extends T45, T45 extends T46, T46 extends T47, T47 extends T48, T48 extends T49, T49 extends \"ready\"> { value: T0; }\n",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 1,
+          "column": 861
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-50/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-50/tsconfig.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-50/cases.ts",
+            "sha256": "32efc5d149ae6de8e8707da23e3a6f9aa98c9b940de473cc8d6ea4e87a540a31"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-50/tsconfig.json",
+            "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f"
+          }
+        ],
+        "kind": "type",
+        "symbolFlags": 0,
+        "symbolMode": "",
+        "summary": "T0",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "baseConstraint": {
+          "base": {
+            "errorType": false,
+            "flags": 1024,
+            "same": false,
+            "summary": "\"ready\""
+          },
+          "guarded": {
+            "errorType": false,
+            "flags": 524288,
+            "same": false,
+            "summary": "T1"
+          },
+          "raw": {
+            "errorType": false,
+            "flags": 524288,
+            "same": false,
+            "summary": "T1"
+          },
+          "resolvedKind": "type"
+        },
+        "afterBaseConstraint": {
+          "counters": {
+            "baseConstraintDepth": 49
+          },
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "counters": {
+          "baseConstraintDepth": 49
+        },
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "compilerOptions": {
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-50/tsconfig.json"
+        }
+      }
+    },
+    {
+      "count": 51,
+      "source": "interface Chain<T0 extends T1, T1 extends T2, T2 extends T3, T3 extends T4, T4 extends T5, T5 extends T6, T6 extends T7, T7 extends T8, T8 extends T9, T9 extends T10, T10 extends T11, T11 extends T12, T12 extends T13, T13 extends T14, T14 extends T15, T15 extends T16, T16 extends T17, T17 extends T18, T18 extends T19, T19 extends T20, T20 extends T21, T21 extends T22, T22 extends T23, T23 extends T24, T24 extends T25, T25 extends T26, T26 extends T27, T27 extends T28, T28 extends T29, T29 extends T30, T30 extends T31, T31 extends T32, T32 extends T33, T33 extends T34, T34 extends T35, T35 extends T36, T36 extends T37, T37 extends T38, T38 extends T39, T39 extends T40, T40 extends T41, T41 extends T42, T42 extends T43, T43 extends T44, T44 extends T45, T45 extends T46, T46 extends T47, T47 extends T48, T48 extends T49, T49 extends T50, T50 extends \"ready\"> { value: T0; }\n",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 1,
+          "column": 878
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-51/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-51/tsconfig.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-51/cases.ts",
+            "sha256": "81e800970d147b6887e198285f6919fa1292f9f80527ee2412b8edc3b40b8e5f"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-51/tsconfig.json",
+            "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f"
+          }
+        ],
+        "kind": "type",
+        "symbolFlags": 0,
+        "symbolMode": "",
+        "summary": "T0",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "baseConstraint": {
+          "base": null,
+          "guarded": {
+            "errorType": false,
+            "flags": 524288,
+            "same": false,
+            "summary": "T1"
+          },
+          "raw": {
+            "errorType": false,
+            "flags": 524288,
+            "same": false,
+            "summary": "T1"
+          },
+          "resolvedKind": "noConstraint"
+        },
+        "afterBaseConstraint": {
+          "counters": {
+            "baseConstraintDepth": 50
+          },
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "counters": {
+          "baseConstraintDepth": 50
+        },
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "compilerOptions": {
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-51/tsconfig.json"
+        }
+      }
+    },
+    {
+      "count": 52,
+      "source": "interface Chain<T0 extends T1, T1 extends T2, T2 extends T3, T3 extends T4, T4 extends T5, T5 extends T6, T6 extends T7, T7 extends T8, T8 extends T9, T9 extends T10, T10 extends T11, T11 extends T12, T12 extends T13, T13 extends T14, T14 extends T15, T15 extends T16, T16 extends T17, T17 extends T18, T18 extends T19, T19 extends T20, T20 extends T21, T21 extends T22, T22 extends T23, T23 extends T24, T24 extends T25, T25 extends T26, T26 extends T27, T27 extends T28, T28 extends T29, T29 extends T30, T30 extends T31, T31 extends T32, T32 extends T33, T33 extends T34, T34 extends T35, T35 extends T36, T36 extends T37, T37 extends T38, T38 extends T39, T39 extends T40, T40 extends T41, T41 extends T42, T42 extends T43, T43 extends T44, T44 extends T45, T45 extends T46, T46 extends T47, T47 extends T48, T48 extends T49, T49 extends T50, T50 extends T51, T51 extends \"ready\"> { value: T0; }\n",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 1,
+          "column": 895
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-52/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-52/tsconfig.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-52/cases.ts",
+            "sha256": "260a1766a89605e577e6154a75261e68bec5a56620ab6ce338887cbee777843f"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-52/tsconfig.json",
+            "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f"
+          }
+        ],
+        "kind": "type",
+        "symbolFlags": 0,
+        "symbolMode": "",
+        "summary": "T0",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "baseConstraint": {
+          "base": null,
+          "guarded": {
+            "errorType": false,
+            "flags": 524288,
+            "same": false,
+            "summary": "T1"
+          },
+          "raw": {
+            "errorType": false,
+            "flags": 524288,
+            "same": false,
+            "summary": "T1"
+          },
+          "resolvedKind": "noConstraint"
+        },
+        "afterBaseConstraint": {
+          "counters": {
+            "baseConstraintDepth": 50
+          },
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "counters": {
+          "baseConstraintDepth": 50
+        },
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "compilerOptions": {
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-base-constraints/chain-52/tsconfig.json"
+        }
+      }
+    }
+  ]
+}

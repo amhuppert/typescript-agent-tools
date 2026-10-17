@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noLib": true,
+    "target": "esnext",
+    "module": "esnext"
+  },
+  "files": [
+    "cases.ts"
+  ]
+}

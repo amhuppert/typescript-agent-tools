@@ -1,0 +1,1 @@
+{"compilerOptions": {"strict": true, "noLib": true, "types": []}, "files": ["kind.d.ts", "cases.ts"]}

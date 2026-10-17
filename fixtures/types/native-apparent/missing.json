@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "files": [
+    "missing.d.ts",
+    "cases.ts"
+  ]
+}

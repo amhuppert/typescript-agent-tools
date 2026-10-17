@@ -1,0 +1,132 @@
+{
+  "scope": "fresh hash-frozen registered API replay; original scratch observations retain their separate weaker metadata provenance",
+  "compiler": "7.0.2",
+  "pinnedCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "nativeSourceStatus": "clean including untracked files",
+  "binary": {
+    "file": "../../.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/tsc",
+    "bytes": 24971184,
+    "sha256": "76e4987d060ef8207875a53a73619ce665ff16fb2800c0d57a452e21c829bd7b"
+  },
+  "apiPackage": "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-7.0.2/package",
+  "apiInventory": "installed-api-inventory.json",
+  "requests": 86,
+  "diagnostics": "freshRequest input config/program/syntax/bind gates only; no semantic diagnostics pass",
+  "inputHashes": "API replay captures selected sourceHash, not compilerHookOracle full filesystem inputHashes; installed package inventory is separate",
+  "before": [
+    {
+      "file": "tools/type-switch-flow-oracle.test.mjs",
+      "bytes": 2308,
+      "sha256": "f25780ea3763233efdb896b5e63aa22b51c4fcf53617eb90ad5cb9eee735f082"
+    },
+    {
+      "file": "tools/type-oracle.mjs",
+      "bytes": 39604,
+      "sha256": "2b88ee398209e24c9b3b28a6c39e9d6fbcb3c463f6902638c797e02ae3560b2e"
+    },
+    {
+      "file": "tools/semantic-oracle.mjs",
+      "bytes": 49378,
+      "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+    },
+    {
+      "file": "tools/navigation-oracle.mjs",
+      "bytes": 15291,
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+    },
+    {
+      "file": "tools/corpus-selection.mjs",
+      "bytes": 2003,
+      "sha256": "132d08e26e251c0d55cb39ce8d15b59735524bdd4e03fe1d5c691643abc3afa5"
+    },
+    {
+      "file": "tools/vendor-typescript-libs.mjs",
+      "bytes": 8387,
+      "sha256": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d"
+    },
+    {
+      "file": "fixtures/types/native-switch-flow/flow.ts",
+      "bytes": 3947,
+      "sha256": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992"
+    },
+    {
+      "file": "fixtures/types/native-switch-flow/tsconfig.json",
+      "bytes": 149,
+      "sha256": "be655463ad3fc6c85ea8dd5c65028719cf961713b9302265d1cfe8acf0b4ac47"
+    },
+    {
+      "file": "fixtures/types/native-switch-flow/loose.json",
+      "bytes": 65,
+      "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+    },
+    {
+      "file": "fixtures/types/native-switch-flow/native-observations.json",
+      "bytes": 12813,
+      "sha256": "b845a6ce2c89bbb4ef589f01ff6845df63a85d8389184308670dc17f02a749c2"
+    }
+  ],
+  "after": [
+    {
+      "file": "tools/type-switch-flow-oracle.test.mjs",
+      "bytes": 2308,
+      "sha256": "f25780ea3763233efdb896b5e63aa22b51c4fcf53617eb90ad5cb9eee735f082"
+    },
+    {
+      "file": "tools/type-oracle.mjs",
+      "bytes": 39604,
+      "sha256": "2b88ee398209e24c9b3b28a6c39e9d6fbcb3c463f6902638c797e02ae3560b2e"
+    },
+    {
+      "file": "tools/semantic-oracle.mjs",
+      "bytes": 49378,
+      "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+    },
+    {
+      "file": "tools/navigation-oracle.mjs",
+      "bytes": 15291,
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+    },
+    {
+      "file": "tools/corpus-selection.mjs",
+      "bytes": 2003,
+      "sha256": "132d08e26e251c0d55cb39ce8d15b59735524bdd4e03fe1d5c691643abc3afa5"
+    },
+    {
+      "file": "tools/vendor-typescript-libs.mjs",
+      "bytes": 8387,
+      "sha256": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d"
+    },
+    {
+      "file": "fixtures/types/native-switch-flow/flow.ts",
+      "bytes": 3947,
+      "sha256": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992"
+    },
+    {
+      "file": "fixtures/types/native-switch-flow/tsconfig.json",
+      "bytes": 149,
+      "sha256": "be655463ad3fc6c85ea8dd5c65028719cf961713b9302265d1cfe8acf0b4ac47"
+    },
+    {
+      "file": "fixtures/types/native-switch-flow/loose.json",
+      "bytes": 65,
+      "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+    },
+    {
+      "file": "fixtures/types/native-switch-flow/native-observations.json",
+      "bytes": 12813,
+      "sha256": "b845a6ce2c89bbb4ef589f01ff6845df63a85d8389184308670dc17f02a749c2"
+    }
+  ],
+  "nativeSources": [
+    {
+      "file": "internal/binder/binder.go",
+      "bytes": 118394,
+      "sha256": "84e8c0e303cd929f84dbe4594700d5af28e290d71a88564264422705c61cd84c"
+    },
+    {
+      "file": "internal/checker/flow.go",
+      "bytes": 113988,
+      "sha256": "8ed1ee4e3b34a479376c94180ec3acf579ce521e0f42b4ae2a6cfc93a6eaae64"
+    }
+  ]
+}

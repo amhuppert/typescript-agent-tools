@@ -1,0 +1,302 @@
+[
+  {
+    "profile": "healthy",
+    "name": "ordinary",
+    "summary": "Box<number>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "profile": "healthy",
+    "name": "composite",
+    "summary": "Box<string> | Box<number>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "profile": "healthy",
+    "name": "array",
+    "summary": "number[]",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "profile": "healthy",
+    "name": "readonly",
+    "summary": "readonly number[]",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "profile": "healthy",
+    "name": "contextualThis",
+    "summary": "{ value: number; method(): number; }",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "profile": "absent",
+    "name": "ordinary",
+    "summary": "Box<number>",
+    "errorType": false,
+    "before": [
+      2318
+    ],
+    "after": [
+      2318
+    ]
+  },
+  {
+    "profile": "absent",
+    "name": "composite",
+    "summary": "Box<string> | Box<number>",
+    "errorType": false,
+    "before": [
+      2318
+    ],
+    "after": [
+      2318
+    ]
+  },
+  {
+    "profile": "absent",
+    "name": "array",
+    "summary": "{}",
+    "errorType": false,
+    "before": [
+      2318
+    ],
+    "after": [
+      2318
+    ]
+  },
+  {
+    "profile": "absent",
+    "name": "readonly",
+    "summary": "{}",
+    "errorType": false,
+    "before": [
+      2318
+    ],
+    "after": [
+      2318
+    ]
+  },
+  {
+    "profile": "absent",
+    "name": "contextualThis",
+    "summary": "{ value: number; method(): number; }",
+    "errorType": false,
+    "before": [
+      2318
+    ],
+    "after": [
+      2318
+    ]
+  },
+  {
+    "profile": "arity",
+    "name": "ordinary",
+    "summary": "Box<number>",
+    "errorType": false,
+    "before": [
+      2317
+    ],
+    "after": [
+      2317
+    ]
+  },
+  {
+    "profile": "arity",
+    "name": "composite",
+    "summary": "Box<string> | Box<number>",
+    "errorType": false,
+    "before": [
+      2317
+    ],
+    "after": [
+      2317
+    ]
+  },
+  {
+    "profile": "arity",
+    "name": "array",
+    "summary": "{}",
+    "errorType": false,
+    "before": [
+      2317
+    ],
+    "after": [
+      2317
+    ]
+  },
+  {
+    "profile": "arity",
+    "name": "readonly",
+    "summary": "{}",
+    "errorType": false,
+    "before": [
+      2317
+    ],
+    "after": [
+      2317
+    ]
+  },
+  {
+    "profile": "arity",
+    "name": "contextualThis",
+    "summary": "{ value: number; method(): number; }",
+    "errorType": false,
+    "before": [
+      2317
+    ],
+    "after": [
+      2317
+    ]
+  },
+  {
+    "profile": "recovery",
+    "name": "ordinary",
+    "summary": "Box<number>",
+    "errorType": false,
+    "before": [
+      2316
+    ],
+    "after": [
+      2316
+    ]
+  },
+  {
+    "profile": "recovery",
+    "name": "composite",
+    "summary": "Box<string> | Box<number>",
+    "errorType": false,
+    "before": [
+      2316
+    ],
+    "after": [
+      2316
+    ]
+  },
+  {
+    "profile": "recovery",
+    "name": "array",
+    "summary": "{}",
+    "errorType": false,
+    "before": [
+      2316
+    ],
+    "after": [
+      2316
+    ]
+  },
+  {
+    "profile": "recovery",
+    "name": "readonly",
+    "summary": "{}",
+    "errorType": false,
+    "before": [
+      2316
+    ],
+    "after": [
+      2316
+    ]
+  },
+  {
+    "profile": "recovery",
+    "name": "contextualThis",
+    "summary": "{ value: number; method(): number; }",
+    "errorType": false,
+    "before": [
+      2316
+    ],
+    "after": [
+      2316
+    ]
+  },
+  {
+    "profile": "arrayOnly",
+    "name": "ordinary",
+    "summary": "Box<number>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "profile": "arrayOnly",
+    "name": "composite",
+    "summary": "Box<string> | Box<number>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "profile": "arrayOnly",
+    "name": "array",
+    "summary": "number[]",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "profile": "arrayOnly",
+    "name": "readonly",
+    "summary": "number[]",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "profile": "arrayOnly",
+    "name": "contextualThis",
+    "summary": "{ value: number; method(): number; }",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "profile": "readonlyRecovery",
+    "name": "ordinary",
+    "summary": "Box<number>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "profile": "readonlyRecovery",
+    "name": "composite",
+    "summary": "Box<string> | Box<number>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "profile": "readonlyRecovery",
+    "name": "array",
+    "summary": "number[]",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "profile": "readonlyRecovery",
+    "name": "readonly",
+    "summary": "number[]",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "profile": "readonlyRecovery",
+    "name": "contextualThis",
+    "summary": "{ value: number; method(): number; }",
+    "errorType": false,
+    "before": [],
+    "after": []
+  }
+]

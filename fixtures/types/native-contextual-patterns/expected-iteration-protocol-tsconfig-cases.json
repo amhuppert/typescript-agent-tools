@@ -1,0 +1,317 @@
+[
+  {
+    "name": "object",
+    "kind": "expression",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "renamed",
+    "kind": "expression",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "nested",
+    "kind": "expression",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "objectRest",
+    "kind": "expression",
+    "summary": "{ b: string; deep: { c: boolean; }; }",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "tuple",
+    "kind": "expression",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:498:505:193": {
+        "end": 505,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 498,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "omitted",
+    "kind": "expression",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:560:570:193": {
+        "end": 570,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 560,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "tupleDefault",
+    "kind": "expression",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:628:646:193": {
+        "end": 646,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 628,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "tupleRest",
+    "kind": "expression",
+    "summary": "[string, (boolean | undefined)?]",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:708:729:193": {
+        "end": 729,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 708,
+        "use": 193
+      },
+      "checkedIteration:708:729:65": {
+        "end": 729,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 708,
+        "use": 65
+      }
+    }
+  },
+  {
+    "name": "emptyObject",
+    "kind": "value",
+    "summary": "void",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "emptyArray",
+    "kind": "value",
+    "summary": "void",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "soleRest",
+    "kind": "expression",
+    "summary": "number[]",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:1047:1061:65": {
+        "end": 1061,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 1047,
+        "use": 65
+      }
+    }
+  },
+  {
+    "name": "unknownObject",
+    "kind": "expression",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "unknownArray",
+    "kind": "expression",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:1264:1280:193": {
+        "end": 1280,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 1264,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "unknownNested",
+    "kind": "expression",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "annotated",
+    "kind": "expression",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "initializedContext",
+    "kind": "expression",
+    "summary": "0",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "thisPattern",
+    "kind": "expression",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "unusedFields",
+    "kind": "expression",
+    "summary": "MissingPatternFirst",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "quickUnusedFields",
+    "kind": "value",
+    "summary": "void",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "nestedDefaults",
+    "kind": "expression",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "unknownDefaults",
+    "kind": "expression",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "independentParameters",
+    "kind": "expression",
+    "summary": "MissingFirstParameter",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "duplicateKey",
+    "kind": "expression",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "computedLiteralKey",
+    "kind": "expression",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "numericKey",
+    "kind": "expression",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "dynamicPattern",
+    "kind": "expression",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "healthyAfter",
+    "kind": "expression",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  }
+]

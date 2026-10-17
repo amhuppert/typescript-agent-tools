@@ -1,0 +1,303 @@
+{
+  "compiler": "7.0.2",
+  "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "sourceStatus": "",
+  "sequence": "fresh selected type, base getter, resolved cache sentinel identity, guarded declared constraint, raw worker, then summary; no diagnostics pass",
+  "historicalArtifacts": [
+    {
+      "file": "fixtures/types/base-constraints/evidence/answers.json",
+      "sha256": "aade8b67925ed0951e21f53d82ec4c59f08242c7a6e45adf4e32515d314498ad",
+      "historicalPath": ".cc/temp/types-base-constraints/answers.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/bounded-repeat-1/cases.ts",
+      "sha256": "9d9545c4673c09cf76c82ecd22c59e0feaf18959a59fbe0039e0f5c8fce334da",
+      "historicalPath": ".cc/temp/types-base-constraints/bounded-repeat-1/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/bounded-repeat-1/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/bounded-repeat-1/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/bounded-repeat-2/cases.ts",
+      "sha256": "b0ffce2719aeba9b7710f48662d36dc84b57f0f8a67448354ca50f2df03f4bf4",
+      "historicalPath": ".cc/temp/types-base-constraints/bounded-repeat-2/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/bounded-repeat-2/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/bounded-repeat-2/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/bounded-repeat-3/cases.ts",
+      "sha256": "672ce4e05e9ef7567e0d8f40803e03e73556162b7448c5ec61446ecb43157578",
+      "historicalPath": ".cc/temp/types-base-constraints/bounded-repeat-3/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/bounded-repeat-3/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/bounded-repeat-3/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/bounded-repeat-4/cases.ts",
+      "sha256": "f100e8470c3bcea59b61c627b881cac69a6ab2314b9d06fe5a68225bf3560f13",
+      "historicalPath": ".cc/temp/types-base-constraints/bounded-repeat-4/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/bounded-repeat-4/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/bounded-repeat-4/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/bounded-repeat-5/cases.ts",
+      "sha256": "260fc0e9c4e506a494e2a6e09edf0b873bca8d319d3b9514c4fb8c94d81bc7de",
+      "historicalPath": ".cc/temp/types-base-constraints/bounded-repeat-5/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/bounded-repeat-5/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/bounded-repeat-5/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/bounded-repeat-6/cases.ts",
+      "sha256": "cdd93ff431c43d3384725370d71524cb7e5f4ec22ab920fef60760d2d17c9fdc",
+      "historicalPath": ".cc/temp/types-base-constraints/bounded-repeat-6/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/bounded-repeat-6/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/bounded-repeat-6/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/bounded-repeat-7/cases.ts",
+      "sha256": "2a7df9befbfdc12a8ea87d6ff86f1993c027cc5c8f1d1e73c933f7ed7916b1a8",
+      "historicalPath": ".cc/temp/types-base-constraints/bounded-repeat-7/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/bounded-repeat-7/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/bounded-repeat-7/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/bounded-repeat-answers.json",
+      "sha256": "609bf6e167a31d4d8c33f9c668e93fe5f323c77c293e5ac1f013c48d2e738739",
+      "historicalPath": ".cc/temp/types-base-constraints/bounded-repeat-answers.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/chain-10/cases.ts",
+      "sha256": "41bc7ffb3239a07da7065c4f21c5071571503301a883b131700d17902eed7a03",
+      "historicalPath": ".cc/temp/types-base-constraints/chain-10/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/chain-10/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/chain-10/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/chain-11/cases.ts",
+      "sha256": "ddf9aef6256139751307ceef291b12aff1795f298a8258c7e6797c74c0aa6825",
+      "historicalPath": ".cc/temp/types-base-constraints/chain-11/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/chain-11/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/chain-11/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/chain-49/cases.ts",
+      "sha256": "1afd50acd41eef0a124d03b1eda76ca7fed6634bbf322b8ad52642a20ee1687e",
+      "historicalPath": ".cc/temp/types-base-constraints/chain-49/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/chain-49/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/chain-49/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/chain-50/cases.ts",
+      "sha256": "32efc5d149ae6de8e8707da23e3a6f9aa98c9b940de473cc8d6ea4e87a540a31",
+      "historicalPath": ".cc/temp/types-base-constraints/chain-50/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/chain-50/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/chain-50/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/chain-51/cases.ts",
+      "sha256": "81e800970d147b6887e198285f6919fa1292f9f80527ee2412b8edc3b40b8e5f",
+      "historicalPath": ".cc/temp/types-base-constraints/chain-51/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/chain-51/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/chain-51/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/chain-52/cases.ts",
+      "sha256": "260a1766a89605e577e6154a75261e68bec5a56620ab6ce338887cbee777843f",
+      "historicalPath": ".cc/temp/types-base-constraints/chain-52/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/chain-52/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/chain-52/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/chain-9/cases.ts",
+      "sha256": "997b3f11a29844f10a1dedbcdb38d50830273e97aaae95c704aae1f2e4ad3931",
+      "historicalPath": ".cc/temp/types-base-constraints/chain-9/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/chain-9/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/chain-9/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/checker-hook.go",
+      "sha256": "edd23cdfb35c07c07f5d54dfdc1d5685f99526a56e0f00db2b14510e113c1a32",
+      "historicalPath": ".cc/temp/types-base-constraints/checker-hook.go"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/ls-hook.go",
+      "sha256": "73c9a52f43914571bdf7f29e8817720d0ff98bdb0aeb7cad183fa8397a848dce",
+      "historicalPath": ".cc/temp/types-base-constraints/ls-hook.go"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/oracle-test.go",
+      "sha256": "84e00685c0cb3b5ed2aeb16344f1c104f95626323831e68cc8b07fdf11762603",
+      "historicalPath": ".cc/temp/types-base-constraints/oracle-test.go"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/oracle.mjs",
+      "sha256": "65f0e34dafc9462280a30cbe5003f3b7bd0939bf81da20acadc06b209187bfb8",
+      "historicalPath": ".cc/temp/types-base-constraints/oracle.mjs"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/probe.mjs",
+      "sha256": "f4d2b3a0d6be990a7f325a6778ea290a658b10967e2a13d534fe581d4e7481a8",
+      "historicalPath": ".cc/temp/types-base-constraints/probe.mjs"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/repeat-alternating/cases.ts",
+      "sha256": "345722a2c96c836090d09e2c03d161bf30edd199966a0e114f8ba8ae8a5de671",
+      "historicalPath": ".cc/temp/types-base-constraints/repeat-alternating/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/repeat-alternating/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/repeat-alternating/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/repeat-answers.json",
+      "sha256": "ec00de94b6cef52d38df27770901f4b5c9ed6c46e82cd94a2b2899ab07eb0828",
+      "historicalPath": ".cc/temp/types-base-constraints/repeat-answers.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/repeat-boundary.mjs",
+      "sha256": "26fc848c5bafe7b4df6f8c281aba13c087ffd2ef61cc49875a850cbaffeeb961",
+      "historicalPath": ".cc/temp/types-base-constraints/repeat-boundary.mjs"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/repeat-indexed/cases.ts",
+      "sha256": "7778ed6e9d3f7871c9ec2ad025feeef303ac55c6c1eda24565de96397dbdf457",
+      "historicalPath": ".cc/temp/types-base-constraints/repeat-indexed/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/repeat-indexed/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/repeat-indexed/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/repeat-intersection/cases.ts",
+      "sha256": "7db481fc643a9a4ecfcedddb537e367f79490cf03b80f3b84b2f34e6745be8cf",
+      "historicalPath": ".cc/temp/types-base-constraints/repeat-intersection/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/repeat-intersection/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/repeat-intersection/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/repeat-mapped/cases.ts",
+      "sha256": "18cc5e11f51ad2835a11656dcae68dc28414abd7ef0740495e8ebf048026a0b8",
+      "historicalPath": ".cc/temp/types-base-constraints/repeat-mapped/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/repeat-mapped/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/repeat-mapped/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/repeat-same/cases.ts",
+      "sha256": "1eacb7ab0ec63d1e0424b677fb0e98e8ed450044f0c50576bbf87bd5316a1bef",
+      "historicalPath": ".cc/temp/types-base-constraints/repeat-same/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/repeat-same/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/repeat-same/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/repeat-union/cases.ts",
+      "sha256": "06a81c87c4bbaaac9b4a825b9a85c4b857ddf135c6ce6c6604c6a43fd5b95f1f",
+      "historicalPath": ".cc/temp/types-base-constraints/repeat-union/cases.ts"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/repeat-union/tsconfig.json",
+      "sha256": "ce72762c10c2926973d473a083368c03d1fa26b7fff2c77b74398195560e298f",
+      "historicalPath": ".cc/temp/types-base-constraints/repeat-union/tsconfig.json"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/repeats.mjs",
+      "sha256": "59929b66304a010a35de0443e70e7a63a3d4f2a46a21012a27d13fd2fbb7cdf4",
+      "historicalPath": ".cc/temp/types-base-constraints/repeats.mjs"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/setup.mjs",
+      "sha256": "d9f0a0fe726bec412dedae41abe606635c9d7a639ef613058eb3e1f788a1d8a3",
+      "historicalPath": ".cc/temp/types-base-constraints/setup.mjs"
+    }
+  ],
+  "capturedDependencies": [
+    {
+      "file": "fixtures/types/base-constraints/evidence/captured-tooling/semantic-oracle.mjs",
+      "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597",
+      "historicalPath": "tools/semantic-oracle.mjs"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/captured-tooling/navigation-oracle.mjs",
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3",
+      "historicalPath": "tools/navigation-oracle.mjs"
+    },
+    {
+      "file": "fixtures/types/base-constraints/evidence/captured-tooling/vendor-typescript-libs.mjs",
+      "sha256": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d",
+      "historicalPath": "tools/vendor-typescript-libs.mjs"
+    }
+  ],
+  "compilerPins": [
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/tsc",
+      "sha256": "76e4987d060ef8207875a53a73619ce665ff16fb2800c0d57a452e21c829bd7b"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-7.0.2/package/package.json",
+      "sha256": "3722b30210616a13a3213ded11575ba6b2dbab10c32a5ef67afca8513e27017e"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.cache/typescript-go-7.0.2/internal/checker/checker.go",
+      "sha256": "32384dde486c33c59c5695505f4c951c3009c6d7e50589cb5b18d0ea92cbf161"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.cache/typescript-go-7.0.2/internal/checker/relater.go",
+      "sha256": "9a5d7039121f59978ecafe2549c93f9b16a3d4cbbb31ae0e8e0953185f86fa60"
+    }
+  ],
+  "gates": {
+    "native4": "vrun-f0aa41a3-3178-49ff-a3d6-2d14b0c6fbab",
+    "projectRed3": "vrun-4b8fb865-f2f9-445a-b63b-03021b14ef49",
+    "projectGreen3": "vrun-3ef4c7a9-3e64-41c4-b13e-b6c2d376f2ff"
+  }
+}

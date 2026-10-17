@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "es2022",
+    "module": "nodenext",
+    "noEmit": true,
+    "resolveJsonModule": true
+  },
+  "files": [
+    "cases.ts",
+    "exports.ts",
+    "types-only.ts",
+    "equals.cts",
+    "keys.json",
+    "history.ts"
+  ]
+}

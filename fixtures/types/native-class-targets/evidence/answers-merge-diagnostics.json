@@ -1,0 +1,29 @@
+[
+  {
+    "semanticDiagnostics": [
+      {
+        "fileName": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-class-targets/namespace-first/globals.ts",
+        "pos": 10,
+        "end": 13,
+        "code": 2434,
+        "category": 1,
+        "text": "A namespace declaration cannot be located prior to a class or function with which it is merged."
+      }
+    ],
+    "name": "namespace-first",
+    "source": "namespace Box { export const tag = 0; }\nclass Box<T> { value!:T; }\ndeclare const result: /*#query*/Box<number>;\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "Box<number>",
+    "flags": 1048576,
+    "errorType": false,
+    "arguments": [
+      {
+        "summary": "number",
+        "flags": 64,
+        "errorType": false
+      }
+    ]
+  }
+]

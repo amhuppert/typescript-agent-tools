@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "repository": "command-center",
+  "revision": "92fe6ab06fbea2c4b6a305689f8cf336173eef81",
+  "configuration": {
+    "file": "tsconfig.json",
+    "sha256": "2e09a91453030c847eedec0c49fc5aa2c707d9221a968588b7b5988cbfa31279",
+    "resolvedConfigOptions": {
+      "allowJs": false,
+      "exactOptionalPropertyTypes": false,
+      "isolatedModules": true,
+      "incremental": true,
+      "jsx": 4,
+      "lib": [
+        "lib.dom.d.ts",
+        "lib.dom.iterable.d.ts",
+        "lib.esnext.d.ts"
+      ],
+      "module": 99,
+      "moduleResolution": 100,
+      "noEmit": true,
+      "noUncheckedIndexedAccess": true,
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      "paths": {
+        "@/*": [
+          "./src/*"
+        ]
+      },
+      "resolveJsonModule": true,
+      "skipLibCheck": true,
+      "strict": true,
+      "target": 9,
+      "esModuleInterop": true,
+      "configFilePath": "/Users/alex/github/command-center/tsconfig.json",
+      "pathsBasePath": "/Users/alex/github/command-center"
+    },
+    "optionsNote": "Inherited/configuration values returned by getCompilerOptions; strict-family and other operation defaults are not separately materialized by this API."
+  },
+  "compiler": {
+    "version": "7.0.2",
+    "nativeVersion": "Version 7.0.2",
+    "binarySha256": "76e4987d060ef8207875a53a73619ce665ff16fb2800c0d57a452e21c829bd7b",
+    "apiPackageSha256": "3722b30210616a13a3213ded11575ba6b2dbab10c32a5ef67afca8513e27017e"
+  },
+  "locks": [
+    {
+      "file": "package.json",
+      "sha256": "b357d66d3abd00ea319a74e526a33dfcc3e43f32469160c489ec87319bffe6d6"
+    },
+    {
+      "file": "bun.lock",
+      "sha256": "b55105eeed80fff1365a71396c73f9cb13af8b8a595f0d9696b4282827001a9a"
+    }
+  ],
+  "queries": [
+    {
+      "id": "annotated-member",
+      "selector": "SpecWorkflowCleanupPort.observe",
+      "at": {
+        "file": "src/lib/specs/execution-service.ts",
+        "line": 236,
+        "column": 3
+      },
+      "question": "value",
+      "sourceSha256": "5b097f165850936a775642e17ab9da2758a0da02e0cdacf1d14146ac2edb84a7"
+    },
+    {
+      "id": "contextual-member",
+      "selector": null,
+      "at": {
+        "file": "src/lib/specs/workflow-cleanup-port.ts",
+        "line": 24,
+        "column": 5
+      },
+      "question": "value",
+      "sourceSha256": "e8c64277a0fc46dd5aa76d909c7228b6cd6753ad8aa81ef6638fe15157047491"
+    },
+    {
+      "id": "inferred-factory",
+      "selector": "createAgentGatewayHandlers",
+      "at": {
+        "file": "src/lib/agent-gateway/route-handlers.ts",
+        "line": 38,
+        "column": 17
+      },
+      "question": "value",
+      "sourceSha256": "bc78d61ff67550459d52e50b52b98530582de3501391af4e7673c6582b0d1939"
+    },
+    {
+      "id": "jsx-member",
+      "selector": "CollapsibleTextProps.maxCollapsedHeight",
+      "at": {
+        "file": "src/components/CollapsibleText.tsx",
+        "line": 7,
+        "column": 3
+      },
+      "question": "value",
+      "sourceSha256": "5a929889f25698f0e19bf71e40bf84c85b3266e0aa2248692c6ab48945f489d1"
+    },
+    {
+      "id": "predicate-callback",
+      "selector": null,
+      "at": {
+        "file": "src/lib/notepads/service.ts",
+        "line": 389,
+        "column": 16
+      },
+      "question": "expression",
+      "sourceSha256": "47e6f966c40d306c78d58ac436d0d4343a875c6af47c91937f10d1755e3ef5d0"
+    }
+  ],
+  "generatedInputs": [
+    {
+      "file": ".next/types/cache-life.d.ts",
+      "sha256": "4f984436b10cfb43ccf7fc3114dcb851cbefa4d58b7d8ae741aaae0f6e330129",
+      "bytes": 5905,
+      "tracked": false,
+      "defaultLibrary": false,
+      "externalLibrary": false
+    },
+    {
+      "file": ".next/types/root-params.d.ts",
+      "sha256": "f3387dd7800eec3c34273f7a8efad13e864598c7e8f788d321e407390989bb59",
+      "bytes": 101,
+      "tracked": false,
+      "defaultLibrary": false,
+      "externalLibrary": false
+    },
+    {
+      "file": ".next/types/routes.d.ts",
+      "sha256": "a805c7989a95e39143c20c892e01b6b1c3a951df4b467d72af29ed0069a53e65",
+      "bytes": 54402,
+      "tracked": false,
+      "defaultLibrary": false,
+      "externalLibrary": false
+    },
+    {
+      "file": ".next/types/validator.ts",
+      "sha256": "d6be539777f0effa658c0f0f821df7ac1c17f44b320c5b04b1672c36cb0ec5f0",
+      "bytes": 146385,
+      "tracked": false,
+      "defaultLibrary": false,
+      "externalLibrary": false
+    },
+    {
+      "file": "next-env.d.ts",
+      "sha256": "1862ac4bbbc5192d4bf562161df66ea547ed3e67173100656ab606ae9797db2b",
+      "bytes": 288,
+      "tracked": false,
+      "defaultLibrary": false,
+      "externalLibrary": false
+    },
+    {
+      "file": "src/lib/build-info/build-info.generated.ts",
+      "sha256": "a173a7d4a06e8c8ff3bfaae8d0fed9ea538b2e2d99fa6aa8daa7f010550e354f",
+      "bytes": 744,
+      "tracked": false,
+      "defaultLibrary": false,
+      "externalLibrary": false
+    }
+  ],
+  "inputInventory": {
+    "files": 7639,
+    "bytes": 76174045,
+    "defaultLibraries": 89,
+    "externalLibraries": 2260,
+    "fullManifest": "fixtures/types/command-center/input-manifest.json",
+    "sha256": "53cdf23518d299cba7b6540985cd76538147da0cd5016b05098ff577f3e42f1f"
+  }
+}

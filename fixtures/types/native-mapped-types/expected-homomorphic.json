@@ -1,0 +1,803 @@
+[
+  {
+    "config": "tsconfig",
+    "name": "primitive",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "union",
+    "summary": "Copy<{ left: string; } | { right: number; }>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "array",
+    "summary": "string[]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "../native-variable-patterns/globals.d.ts",
+              "start": {
+                "line": 10,
+                "column": 31
+              },
+              "end": {
+                "line": 10,
+                "column": 37
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "readonlyArray",
+    "summary": "readonly string[]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "../native-variable-patterns/globals.d.ts",
+              "start": {
+                "line": 11,
+                "column": 39
+              },
+              "end": {
+                "line": 11,
+                "column": 45
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "tuple",
+    "summary": "readonly [first: string, second?: number | undefined, ...tail: boolean[]]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number | undefined",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "mutableTuple",
+    "summary": "[first: string, second: number]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "optionalTuple",
+    "summary": "readonly [first?: string | undefined, second?: number | undefined]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number | undefined",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "0 | 1 | 2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "namedTuple",
+    "summary": "Named<readonly [first: string, second?: number | undefined]>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number | undefined",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "1 | 2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "namedArray",
+    "summary": "Named<readonly string[]>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "../native-variable-patterns/globals.d.ts",
+              "start": {
+                "line": 11,
+                "column": 39
+              },
+              "end": {
+                "line": 11,
+                "column": 45
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "intersection",
+    "summary": "string[] & readonly number[]",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "any",
+    "summary": "Copy<any>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "unknown",
+    "summary": "Copy<unknown>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "never",
+    "summary": "never",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "variadic",
+    "summary": "[first: string, ...tail: Copy<T>]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "primitive",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "union",
+    "summary": "Copy<{ left: string; } | { right: number; }>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "array",
+    "summary": "string[]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "../native-variable-patterns/globals.d.ts",
+              "start": {
+                "line": 10,
+                "column": 31
+              },
+              "end": {
+                "line": 10,
+                "column": 37
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "readonlyArray",
+    "summary": "readonly string[]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "../native-variable-patterns/globals.d.ts",
+              "start": {
+                "line": 11,
+                "column": 39
+              },
+              "end": {
+                "line": 11,
+                "column": 45
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "tuple",
+    "summary": "readonly [first: string, second?: number, ...tail: boolean[]]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "mutableTuple",
+    "summary": "[first: string, second: number]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "optionalTuple",
+    "summary": "readonly [first?: string, second?: number]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "0 | 1 | 2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "namedTuple",
+    "summary": "Named<readonly [first: string, second?: number]>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "1 | 2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "namedArray",
+    "summary": "Named<readonly string[]>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "../native-variable-patterns/globals.d.ts",
+              "start": {
+                "line": 11,
+                "column": 39
+              },
+              "end": {
+                "line": 11,
+                "column": 45
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "intersection",
+    "summary": "string[] & readonly number[]",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "any",
+    "summary": "Copy<any>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "unknown",
+    "summary": "Copy<unknown>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "never",
+    "summary": "never",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "variadic",
+    "summary": "[first: string, ...tail: Copy<T>]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "primitive",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "union",
+    "summary": "Copy<{ left: string; } | { right: number; }>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "array",
+    "summary": "string[]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "../native-variable-patterns/globals.d.ts",
+              "start": {
+                "line": 10,
+                "column": 31
+              },
+              "end": {
+                "line": 10,
+                "column": 37
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "readonlyArray",
+    "summary": "readonly string[]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "../native-variable-patterns/globals.d.ts",
+              "start": {
+                "line": 11,
+                "column": 39
+              },
+              "end": {
+                "line": 11,
+                "column": 45
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "tuple",
+    "summary": "readonly [first: string, second?: number, ...tail: boolean[]]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number | undefined",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "mutableTuple",
+    "summary": "[first: string, second: number]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "optionalTuple",
+    "summary": "readonly [first?: string, second?: number]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number | undefined",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "0 | 1 | 2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "namedTuple",
+    "summary": "Named<readonly [first: string, second?: number]>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number | undefined",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "1 | 2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "namedArray",
+    "summary": "Named<readonly string[]>",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "../native-variable-patterns/globals.d.ts",
+              "start": {
+                "line": 11,
+                "column": 39
+              },
+              "end": {
+                "line": 11,
+                "column": 45
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "intersection",
+    "summary": "string[] & readonly number[]",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "any",
+    "summary": "Copy<any>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "unknown",
+    "summary": "Copy<unknown>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "never",
+    "summary": "never",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "variadic",
+    "summary": "[first: string, ...tail: Copy<T>]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  }
+]

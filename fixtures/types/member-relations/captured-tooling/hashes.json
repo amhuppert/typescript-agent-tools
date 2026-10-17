@@ -1,0 +1,6 @@
+{
+  "type-oracle.mjs": "c37d927f8d158683bc1f08812e46b3d70b0fcb02463ebfea9730c0485b589e89",
+  "oracle-test.go": "9ce47f74a9973a1b8c56544ee50aa5d1499f9416119129d4de8218b38bc67fd9",
+  "checker-hook.go": "a5126a28ba18275c125ce73a7d603bdc0b3907156bfb96e8947cee192610fb9c",
+  "ls-hook.go": "73c9a52f43914571bdf7f29e8817720d0ff98bdb0aeb7cad183fa8397a848dce"
+}

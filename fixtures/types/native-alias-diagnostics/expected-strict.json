@@ -1,0 +1,109 @@
+{
+  "rows": [
+    {
+      "name": "missing",
+      "unknown": true
+    },
+    {
+      "name": "defaultFallback",
+      "unknown": true
+    },
+    {
+      "name": "suggestValue",
+      "unknown": true
+    },
+    {
+      "name": "suggestType",
+      "unknown": true
+    },
+    {
+      "name": "suggestAlias",
+      "unknown": true
+    },
+    {
+      "name": "suggestTypeAlias",
+      "unknown": true
+    },
+    {
+      "name": "quotedNoSuggestion",
+      "unknown": true
+    },
+    {
+      "name": "emptyName",
+      "unknown": true
+    },
+    {
+      "name": "nonExported",
+      "unknown": true
+    },
+    {
+      "name": "renamedExport",
+      "unknown": true
+    },
+    {
+      "name": "equalsLocal",
+      "unknown": true
+    },
+    {
+      "name": "equalsAbsent",
+      "unknown": true
+    },
+    {
+      "name": "defaultMissing",
+      "unknown": true
+    },
+    {
+      "name": "defaultNamed",
+      "unknown": true
+    },
+    {
+      "name": "defaultStar",
+      "unknown": true
+    },
+    {
+      "name": "namedDefaultMissing",
+      "unknown": true
+    },
+    {
+      "name": "reexportMissing",
+      "unknown": true
+    },
+    {
+      "name": "reexportDefaultMissing",
+      "unknown": true
+    },
+    {
+      "name": "cycleSuggestion",
+      "unknown": true
+    },
+    {
+      "name": "healthy",
+      "unknown": false,
+      "summary": "3"
+    }
+  ],
+  "codes": [
+    1192,
+    1192,
+    2303,
+    2303,
+    2305,
+    2305,
+    2305,
+    2305,
+    2305,
+    2305,
+    2305,
+    2459,
+    2460,
+    2564,
+    2595,
+    2613,
+    2614,
+    2724,
+    2724,
+    2724,
+    2724,
+    2724
+  ]
+}

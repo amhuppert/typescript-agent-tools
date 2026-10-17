@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "capturedAt": "2026-10-12T14:36:44Z",
+  "sourceRoot": "/Users/alex/github/command-center",
+  "snapshotRoot": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/command-center-aa484f4-corpus",
+  "revision": "aa484f422f00dfb64967d2008fac3c4f9a92538e",
+  "trackedFiles": "independent local git clone --no-hardlinks; detached exact commit; no live tracked working-tree bytes copied",
+  "dependencies": {
+    "method": "macOS cp -cR (independent copy-on-write files), internal symlinks preserved",
+    "regularFiles": 61710,
+    "bytes": 1518400874,
+    "symlinks": 103,
+    "inventory": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/stage66-corpus-copy/dependency-inputs.json",
+    "inventorySha256": "b9bc5b66707f801d47e389b3070d9645da790177365f1160227b92f6d733fc97",
+    "verification": "source before == snapshot after == source after; separate inode per regular file"
+  },
+  "generatedInputs": [
+    {
+      "file": ".next/types/cache-life.d.ts",
+      "sha256": "4f984436b10cfb43ccf7fc3114dcb851cbefa4d58b7d8ae741aaae0f6e330129",
+      "bytes": 5905
+    },
+    {
+      "file": ".next/types/root-params.d.ts",
+      "sha256": "f3387dd7800eec3c34273f7a8efad13e864598c7e8f788d321e407390989bb59",
+      "bytes": 101
+    },
+    {
+      "file": ".next/types/routes.d.ts",
+      "sha256": "25ef8348417e89fdd9c146378e5cf1d35ddbc709914ff343e8102ee5c63217ae",
+      "bytes": 54657
+    },
+    {
+      "file": ".next/types/validator.ts",
+      "sha256": "9b58bfbb7f5921c7f6c28f9068494889786db71c9d0a9c072e709c330f6bb034",
+      "bytes": 147174
+    },
+    {
+      "file": "next-env.d.ts",
+      "sha256": "1862ac4bbbc5192d4bf562161df66ea547ed3e67173100656ab606ae9797db2b",
+      "bytes": 288
+    },
+    {
+      "file": "src/lib/build-info/build-info.generated.ts",
+      "sha256": "06ad69274765874025deba937a317fab1b1ab314641084037013a11d2b51879b",
+      "bytes": 1250
+    },
+    {
+      "file": ".next/package.json",
+      "sha256": "091a04fa67c7907b98e106fcff8b964e13129754fce72d24f3025b97c4887fa3",
+      "bytes": 20
+    }
+  ],
+  "absentGeneratedDirectories": [
+    ".next/dev/types",
+    ".next/dev/dev/types"
+  ],
+  "excludedLiveTrackedChange": {
+    "file": "src/lib/agent-backends/cursor/generated-model-catalog.json",
+    "liveSha256": "ed28ab44a6f55636e5ad05f44fd9f588473ba889d26d42e1a8871d63a258188c",
+    "snapshotSha256": "1fa361c67cd946cc7ebf382522547c8ce2af22c9bac0ce993e8af23d8393af42"
+  },
+  "complete": true,
+  "historicalManifestSha256": "53cdf23518d299cba7b6540985cd76538147da0cd5016b05098ff577f3e42f1f",
+  "baselineChoice": "New clean tracked revision plus explicitly captured current generated inputs; historical observations remain unchanged.",
+  "captureStatus": "native manifest complete; query capture pending",
+  "manifest": {
+    "file": "input-manifest.json",
+    "sha256": "b1664a530e0485856b9b08908017f33004ce8979922708e56b2092c2ed8fe039",
+    "receipt": "vrun-e49f15cb-88b6-42e4-8e43-02540aedac67",
+    "sourceFiles": 7639,
+    "projectFiles": 5325,
+    "dependencyFiles": 2225,
+    "defaultLibraries": 89
+  }
+}

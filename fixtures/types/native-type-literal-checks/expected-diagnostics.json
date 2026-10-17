@@ -1,0 +1,395 @@
+{
+  "tsconfig.json/plain": [],
+  "tsconfig.json/optional": [
+    2411
+  ],
+  "tsconfig.json/explicitUndefined": [
+    2411
+  ],
+  "tsconfig.json/patternMatch": [],
+  "tsconfig.json/patternMiss": [],
+  "tsconfig.json/patternRejected": [
+    2411
+  ],
+  "tsconfig.json/stringNumber": [
+    2413
+  ],
+  "tsconfig.json/symbol": [],
+  "tsconfig.json/duplicateIndex": [
+    2374,
+    2374
+  ],
+  "tsconfig.json/unionIndex": [
+    2374,
+    2374
+  ],
+  "tsconfig.json/literalKey": [
+    1337
+  ],
+  "tsconfig.json/invalidKey": [
+    1268
+  ],
+  "tsconfig.json/intersectionKey": [],
+  "tsconfig.json/duplicateProperty": [
+    2300,
+    2300,
+    2717
+  ],
+  "tsconfig.json/duplicateAccessor": [],
+  "tsconfig.json/propertyAccessor": [
+    2300,
+    2300
+  ],
+  "tsconfig.json/overloads": [],
+  "tsconfig.json/computedLiteral": [],
+  "tsconfig.json/computedStable": [],
+  "tsconfig.json/nested": [],
+  "tsconfig.json/propertyConstraint": [
+    2304
+  ],
+  "tsconfig.json/propertyFirst": [
+    2304,
+    2304
+  ],
+  "tsconfig.json/duplicateThenMissing": [
+    2304,
+    2300,
+    2300,
+    2717
+  ],
+  "tsconfig.json/propertyRaw": [
+    2304
+  ],
+  "tsconfig.json/indexKeyFirst": [
+    2304,
+    2304
+  ],
+  "tsconfig.json/indexValue": [
+    2304
+  ],
+  "tsconfig.json/invalidKeyValue": [
+    2304,
+    1268
+  ],
+  "tsconfig.json/duplicateIndexLater": [
+    2304,
+    2374,
+    2374
+  ],
+  "tsconfig.json/methodParameter": [
+    2304
+  ],
+  "tsconfig.json/methodReturn": [
+    2304
+  ],
+  "tsconfig.json/getterReturn": [
+    2304
+  ],
+  "tsconfig.json/setterParameter": [
+    2304
+  ],
+  "tsconfig.json/computedBeforeAnnotation": [
+    2304,
+    2304
+  ],
+  "tsconfig.json/computedBinaryAfterAnnotation": [
+    2304,
+    1170,
+    2304
+  ],
+  "tsconfig.json/quick": [],
+  "tsconfig.json/healthyAfter": [],
+  "tsconfig.json/displayColdNoIndex": [],
+  "tsconfig.json/displayPropertyMismatch": [
+    2304,
+    2411
+  ],
+  "tsconfig.json/displayIndexMismatch": [
+    2304,
+    2413
+  ],
+  "tsconfig.json/displaySecondaryMismatch": [
+    2304,
+    2300,
+    2300,
+    2717
+  ],
+  "tsconfig.json/displayNonmatchingIndex": [],
+  "tsconfig.json/initializedProperty": [
+    1247,
+    2304
+  ],
+  "tsconfig.json/bodylessInitializer": [
+    2371
+  ],
+  "tsconfig.json/indexInitializer": [
+    2304,
+    2304,
+    1020,
+    2371
+  ],
+  "tsconfig.json/indexRest": [
+    2304,
+    1017
+  ],
+  "loose.json/plain": [],
+  "loose.json/optional": [],
+  "loose.json/explicitUndefined": [],
+  "loose.json/patternMatch": [],
+  "loose.json/patternMiss": [],
+  "loose.json/patternRejected": [
+    2411
+  ],
+  "loose.json/stringNumber": [
+    2413
+  ],
+  "loose.json/symbol": [],
+  "loose.json/duplicateIndex": [
+    2374,
+    2374
+  ],
+  "loose.json/unionIndex": [
+    2374,
+    2374
+  ],
+  "loose.json/literalKey": [
+    1337
+  ],
+  "loose.json/invalidKey": [
+    1268
+  ],
+  "loose.json/intersectionKey": [],
+  "loose.json/duplicateProperty": [
+    2300,
+    2300,
+    2717
+  ],
+  "loose.json/duplicateAccessor": [],
+  "loose.json/propertyAccessor": [
+    2300,
+    2300
+  ],
+  "loose.json/overloads": [],
+  "loose.json/computedLiteral": [],
+  "loose.json/computedStable": [],
+  "loose.json/nested": [],
+  "loose.json/propertyConstraint": [
+    2304
+  ],
+  "loose.json/propertyFirst": [
+    2304,
+    2304
+  ],
+  "loose.json/duplicateThenMissing": [
+    2304,
+    2300,
+    2300,
+    2717
+  ],
+  "loose.json/propertyRaw": [
+    2304
+  ],
+  "loose.json/indexKeyFirst": [
+    2304,
+    2304
+  ],
+  "loose.json/indexValue": [
+    2304
+  ],
+  "loose.json/invalidKeyValue": [
+    2304,
+    1268
+  ],
+  "loose.json/duplicateIndexLater": [
+    2304,
+    2374,
+    2374
+  ],
+  "loose.json/methodParameter": [
+    2304
+  ],
+  "loose.json/methodReturn": [
+    2304
+  ],
+  "loose.json/getterReturn": [
+    2304
+  ],
+  "loose.json/setterParameter": [
+    2304
+  ],
+  "loose.json/computedBeforeAnnotation": [
+    2304,
+    2304
+  ],
+  "loose.json/computedBinaryAfterAnnotation": [
+    2304,
+    1170,
+    2304
+  ],
+  "loose.json/quick": [],
+  "loose.json/healthyAfter": [],
+  "loose.json/displayColdNoIndex": [],
+  "loose.json/displayPropertyMismatch": [
+    2304,
+    2411
+  ],
+  "loose.json/displayIndexMismatch": [
+    2304,
+    2413
+  ],
+  "loose.json/displaySecondaryMismatch": [
+    2304,
+    2300,
+    2300,
+    2717
+  ],
+  "loose.json/displayNonmatchingIndex": [],
+  "loose.json/initializedProperty": [
+    1247,
+    2304
+  ],
+  "loose.json/bodylessInitializer": [
+    2371
+  ],
+  "loose.json/indexInitializer": [
+    2304,
+    2304,
+    1020,
+    2371
+  ],
+  "loose.json/indexRest": [
+    2304,
+    1017
+  ],
+  "exact.json/plain": [],
+  "exact.json/optional": [],
+  "exact.json/explicitUndefined": [
+    2411
+  ],
+  "exact.json/patternMatch": [],
+  "exact.json/patternMiss": [],
+  "exact.json/patternRejected": [
+    2411
+  ],
+  "exact.json/stringNumber": [
+    2413
+  ],
+  "exact.json/symbol": [],
+  "exact.json/duplicateIndex": [
+    2374,
+    2374
+  ],
+  "exact.json/unionIndex": [
+    2374,
+    2374
+  ],
+  "exact.json/literalKey": [
+    1337
+  ],
+  "exact.json/invalidKey": [
+    1268
+  ],
+  "exact.json/intersectionKey": [],
+  "exact.json/duplicateProperty": [
+    2300,
+    2300,
+    2717
+  ],
+  "exact.json/duplicateAccessor": [],
+  "exact.json/propertyAccessor": [
+    2300,
+    2300
+  ],
+  "exact.json/overloads": [],
+  "exact.json/computedLiteral": [],
+  "exact.json/computedStable": [],
+  "exact.json/nested": [],
+  "exact.json/propertyConstraint": [
+    2304
+  ],
+  "exact.json/propertyFirst": [
+    2304,
+    2304
+  ],
+  "exact.json/duplicateThenMissing": [
+    2304,
+    2300,
+    2300,
+    2717
+  ],
+  "exact.json/propertyRaw": [
+    2304
+  ],
+  "exact.json/indexKeyFirst": [
+    2304,
+    2304
+  ],
+  "exact.json/indexValue": [
+    2304
+  ],
+  "exact.json/invalidKeyValue": [
+    2304,
+    1268
+  ],
+  "exact.json/duplicateIndexLater": [
+    2304,
+    2374,
+    2374
+  ],
+  "exact.json/methodParameter": [
+    2304
+  ],
+  "exact.json/methodReturn": [
+    2304
+  ],
+  "exact.json/getterReturn": [
+    2304
+  ],
+  "exact.json/setterParameter": [
+    2304
+  ],
+  "exact.json/computedBeforeAnnotation": [
+    2304,
+    2304
+  ],
+  "exact.json/computedBinaryAfterAnnotation": [
+    2304,
+    1170,
+    2304
+  ],
+  "exact.json/quick": [],
+  "exact.json/healthyAfter": [],
+  "exact.json/displayColdNoIndex": [],
+  "exact.json/displayPropertyMismatch": [
+    2304,
+    2411
+  ],
+  "exact.json/displayIndexMismatch": [
+    2304,
+    2413
+  ],
+  "exact.json/displaySecondaryMismatch": [
+    2304,
+    2300,
+    2300,
+    2717
+  ],
+  "exact.json/displayNonmatchingIndex": [],
+  "exact.json/initializedProperty": [
+    1247,
+    2304
+  ],
+  "exact.json/bodylessInitializer": [
+    2371
+  ],
+  "exact.json/indexInitializer": [
+    2304,
+    2304,
+    1020,
+    2371
+  ],
+  "exact.json/indexRest": [
+    2304,
+    1017
+  ]
+}

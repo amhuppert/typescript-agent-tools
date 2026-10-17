@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "strictNullChecks": false,
+    "noCheck": true,
+    "exactOptionalPropertyTypes": false,
+    "noLib": true,
+    "target": "ESNext"
+  },
+  "files": [
+    "deep-small.ts",
+    "deep-wide.ts",
+    "flat-small.ts",
+    "flat-wide.ts"
+  ]
+}

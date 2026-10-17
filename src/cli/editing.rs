@@ -301,6 +301,7 @@ fn unreserved<'a>(
 fn preview<'a>(batch: &'a PreparedBatch, plan: Option<&'a Path>) -> Delivery<'a> {
     Delivery {
         code: 0,
+        text_is_result: true,
         document: Box::new(move |writer, pretty| {
             let files: Vec<Value> = batch
                 .files()
@@ -412,6 +413,7 @@ fn unselected_delivery<'a>(unselected: &'a Unselected, project: Option<&'a str>)
     let text = format!("edit {}: {}", edit + 1, navigation::show_text(&show));
     Delivery {
         code: delivery::UNSELECTED,
+        text_is_result: false,
         document: Box::new(move |writer, pretty| write_document(writer, &document, pretty)),
         text: Some(Box::new(move || text)),
     }
@@ -420,6 +422,7 @@ fn unselected_delivery<'a>(unselected: &'a Unselected, project: Option<&'a str>)
 /// A rejected batch.
 fn rejected(rejection: &Rejection) -> Delivery<'_> {
     Delivery {
+        text_is_result: false,
         code: delivery::REJECTED,
         document: Box::new(move |writer, pretty| {
             let document = json!({
@@ -532,6 +535,7 @@ fn undelivered(applied: &Applied, (code, error): Exit) -> Exit {
 
 fn load_failure(error: &LoadError) -> Delivery<'_> {
     Delivery {
+        text_is_result: false,
         code: delivery::load_failure_code(error.kind),
         document: Box::new(move |writer, pretty| {
             let document = json!({
@@ -549,6 +553,7 @@ fn load_failure(error: &LoadError) -> Delivery<'_> {
 fn applied_delivery(applied: &Applied) -> Delivery<'_> {
     Delivery {
         code: delivery::applied_code(applied),
+        text_is_result: delivery::applied_code(applied) == 0,
         document: Box::new(move |writer, pretty| {
             let outcome = match applied.effect {
                 Effect::Applied => "applied",

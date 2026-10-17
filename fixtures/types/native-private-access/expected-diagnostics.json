@@ -1,0 +1,562 @@
+[
+  {
+    "name": "missingName",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2339
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 169,
+        "event": "members",
+        "found": false,
+        "pos": 146
+      },
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 169,
+        "event": "exports",
+        "found": false,
+        "pos": 146
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 169,
+        "event": "linked",
+        "parentType": true,
+        "pos": 139,
+        "property": false
+      },
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 169,
+        "event": "members",
+        "found": false,
+        "pos": 146
+      },
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 169,
+        "event": "exports",
+        "found": false,
+        "pos": 146
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 169,
+        "event": "linked",
+        "parentType": true,
+        "pos": 139,
+        "property": false
+      }
+    ]
+  },
+  {
+    "name": "errorReceiver",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 241,
+        "event": "members",
+        "found": true,
+        "pos": 218
+      },
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 241,
+        "event": "members",
+        "found": true,
+        "pos": 218
+      }
+    ]
+  },
+  {
+    "name": "readonlyWrite",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2540,
+      2540
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 296,
+        "event": "members",
+        "found": true,
+        "pos": 272
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 296,
+        "event": "linked",
+        "parentType": true,
+        "pos": 266,
+        "property": true
+      },
+      {
+        "end": 271,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 266,
+        "result": true
+      },
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 296,
+        "event": "members",
+        "found": true,
+        "pos": 272
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 296,
+        "event": "linked",
+        "parentType": true,
+        "pos": 266,
+        "property": true
+      },
+      {
+        "end": 271,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 266,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "instanceStatic",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2339
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 365,
+        "event": "members",
+        "found": false,
+        "pos": 339
+      },
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 365,
+        "event": "exports",
+        "found": true,
+        "pos": 339
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 365,
+        "event": "linked",
+        "parentType": true,
+        "pos": 333,
+        "property": false
+      },
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 365,
+        "event": "members",
+        "found": false,
+        "pos": 339
+      },
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 365,
+        "event": "exports",
+        "found": true,
+        "pos": 339
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 365,
+        "event": "linked",
+        "parentType": true,
+        "pos": 333,
+        "property": false
+      }
+    ]
+  },
+  {
+    "name": "staticInstance",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2339
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 436,
+        "event": "members",
+        "found": true,
+        "pos": 412
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 436,
+        "event": "linked",
+        "parentType": true,
+        "pos": 405,
+        "property": false
+      },
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 436,
+        "event": "members",
+        "found": true,
+        "pos": 412
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 436,
+        "event": "linked",
+        "parentType": true,
+        "pos": 405,
+        "property": false
+      }
+    ]
+  },
+  {
+    "name": "anyMissing",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2339
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 504,
+        "event": "members",
+        "found": false,
+        "pos": 482
+      },
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 504,
+        "event": "exports",
+        "found": false,
+        "pos": 482
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 504,
+        "event": "linked",
+        "parentType": true,
+        "pos": 475,
+        "property": false
+      },
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 504,
+        "event": "members",
+        "found": false,
+        "pos": 482
+      },
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 504,
+        "event": "exports",
+        "found": false,
+        "pos": 482
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 504,
+        "event": "linked",
+        "parentType": true,
+        "pos": 475,
+        "property": false
+      }
+    ]
+  },
+  {
+    "name": "neverReceiver",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2339
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 570,
+        "event": "members",
+        "found": true,
+        "pos": 547
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 570,
+        "event": "linked",
+        "parentType": true,
+        "pos": 540,
+        "property": false
+      },
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 570,
+        "event": "members",
+        "found": true,
+        "pos": 547
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 570,
+        "event": "linked",
+        "parentType": true,
+        "pos": 540,
+        "property": false
+      }
+    ]
+  },
+  {
+    "name": "unionMissing",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2339
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 658,
+        "event": "members",
+        "found": true,
+        "pos": 636
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 658,
+        "event": "linked",
+        "parentType": true,
+        "pos": 629,
+        "property": false
+      },
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 658,
+        "event": "members",
+        "found": true,
+        "pos": 636
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 658,
+        "event": "linked",
+        "parentType": true,
+        "pos": 629,
+        "property": false
+      }
+    ]
+  },
+  {
+    "name": "unrelated",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      18013,
+      18013
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 728,
+        "event": "members",
+        "found": true,
+        "pos": 709
+      },
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 728,
+        "event": "members",
+        "found": true,
+        "pos": 709
+      }
+    ]
+  },
+  {
+    "name": "shadowed",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      18014,
+      18014
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 841,
+        "classPos": 758,
+        "end": 836,
+        "event": "members",
+        "found": true,
+        "pos": 818
+      },
+      {
+        "classEnd": 841,
+        "classPos": 758,
+        "end": 836,
+        "event": "members",
+        "found": true,
+        "pos": 818
+      }
+    ]
+  },
+  {
+    "name": "shadowedDisplay",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      18014,
+      18014
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1028,
+        "classPos": 938,
+        "end": 1023,
+        "event": "members",
+        "found": true,
+        "pos": 998
+      },
+      {
+        "classEnd": 1028,
+        "classPos": 938,
+        "end": 1023,
+        "event": "members",
+        "found": true,
+        "pos": 998
+      }
+    ]
+  },
+  {
+    "name": "nonexistentDisplay",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2339
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 1173,
+        "event": "members",
+        "found": true,
+        "pos": 1145
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1173,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1138,
+        "property": false
+      },
+      {
+        "classEnd": 1182,
+        "classPos": 10,
+        "end": 1173,
+        "event": "members",
+        "found": true,
+        "pos": 1145
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1173,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1138,
+        "property": false
+      }
+    ]
+  },
+  {
+    "name": "outsideClass",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      18013,
+      18013
+    ],
+    "demandFailures": [],
+    "access": []
+  },
+  {
+    "name": "outsideAny",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      18016,
+      18016
+    ],
+    "demandFailures": [],
+    "access": []
+  }
+]

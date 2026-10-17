@@ -1,0 +1,23 @@
+[
+  {
+    "name": "globalAliasTail",
+    "summary": "MissingGlobalTail",
+    "errorType": true,
+    "codes": [
+      2318,
+      2304
+    ],
+    "demandFailures": [],
+    "lastErrorProperty": null
+  },
+  {
+    "name": "globalAliasHealthy",
+    "summary": "1",
+    "errorType": false,
+    "codes": [
+      2318
+    ],
+    "demandFailures": [],
+    "lastErrorProperty": null
+  }
+]

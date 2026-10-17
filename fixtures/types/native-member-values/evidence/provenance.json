@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "compiler": "7.0.2",
+  "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "rows": 24,
+  "history": "baseline",
+  "answerSha256": "192bb4de979ad6753e3fb26374c5fb2e178161d274f3f2b577fc9eb899a1bec2",
+  "capturedInputs": [
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+      "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703",
+      "archive": "captured-inputs/fixtures/types/native-member-values/cases.ts"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+      "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca",
+      "archive": "captured-inputs/fixtures/types/native-member-values/tsconfig.json"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/exact.json",
+      "sha256": "9656561e46a1b1209afea30b456835daca2ed7b80434961d0b95910221799fea",
+      "archive": "captured-inputs/fixtures/types/native-member-values/exact.json"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose.json",
+      "sha256": "41156ed0d344408f7cd9be939b86f360225945353589c28ec51bb0499ff94a7e",
+      "archive": "captured-inputs/fixtures/types/native-member-values/loose.json"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose-exact.json",
+      "sha256": "2afab1c41085327eb0ebb9ae3d7c8027e49d350f0423da5624c1861438f88136",
+      "archive": "captured-inputs/fixtures/types/native-member-values/loose-exact.json"
+    }
+  ],
+  "code": [
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-values/setup.mjs",
+      "archive": "code/.cc/temp/types-member-values/setup.mjs",
+      "sha256": "3a183ac04ad13b2e870a06ae2ecea302b5796cb39473b1ddb5f880e2a498ab27"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-values/probe.mjs",
+      "archive": "code/.cc/temp/types-member-values/probe.mjs",
+      "sha256": "2ce0539959391c710735c888644c0dbfcf51010c3851314028a4eed7058490ec"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-values/probe-extra.mjs",
+      "archive": "code/.cc/temp/types-member-values/probe-extra.mjs",
+      "sha256": "d9868398c57f6562065ee24c707b6d71288f5a79baf4a25dfb87b1e6bca3e567"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-values/freeze.mjs",
+      "archive": "code/.cc/temp/types-member-values/freeze.mjs",
+      "sha256": "14f2ab1de7b4bca69687fc97ab25eef37a716e762930a0343d4faaa7e99e9a8c"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-values/oracle.mjs",
+      "archive": "code/.cc/temp/types-member-values/oracle.mjs",
+      "sha256": "6dee0f5640403657660bfd07446bd4f053b3e3f687c819b12b7126c97d693165"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-values/checker-hook.go",
+      "archive": "code/.cc/temp/types-member-values/checker-hook.go",
+      "sha256": "3a761dd1907257625516f0f1ee525b983604573d601c4255ecd5f20123485014"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-values/ls-hook.go",
+      "archive": "code/.cc/temp/types-member-values/ls-hook.go",
+      "sha256": "73c9a52f43914571bdf7f29e8817720d0ff98bdb0aeb7cad183fa8397a848dce"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-values/oracle-test.go",
+      "archive": "code/.cc/temp/types-member-values/oracle-test.go",
+      "sha256": "d3802d71e04fcda779adde08c9eb62ff91680571278aeb2006c80be0fcd4e28c"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/tools/semantic-oracle.mjs",
+      "archive": "code/tools/semantic-oracle.mjs",
+      "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/tools/vendor-typescript-libs.mjs",
+      "archive": "code/tools/vendor-typescript-libs.mjs",
+      "sha256": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/tools/navigation-oracle.mjs",
+      "archive": "code/tools/navigation-oracle.mjs",
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+    }
+  ],
+  "command": {
+    "setup": "node .cc/temp/types-member-values/setup.mjs",
+    "probes": [
+      "node .cc/temp/types-member-values/probe.mjs",
+      "node .cc/temp/types-member-values/probe-extra.mjs"
+    ],
+    "environment": {
+      "TYPE_SCRIPT_SEMANTIC_API": "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-7.0.2/package",
+      "TYPE_SCRIPT_NATIVE": "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/tsc"
+    }
+  },
+  "limitations": [
+    "Disposable native checker shim research, not a registered product validation run.",
+    "Generated copied oracle imports the exact original absolute dependency paths. Archived hashes bind the read sources; this archive is not a standalone replay bundle.",
+    "Raw read and its TypeToString precede nonmissing read, then write, then own-location reads. Signatures may consume dependencies during the summary.",
+    "Diagnostic snapshots read only accumulated checker diagnostics; no semantic diagnostic checking prelude. Initial noLib TS2318 diagnostics are retained separately.",
+    "Only exactOptionalPropertyTypes plus strictNullChecks false TS5052 is permitted by this disposable replay. Native API and replay Program diagnostics retain 5052; all other setup diagnostics still reject.",
+    "Single-file early ordinary member family, no full method body/context, alias, inheritance, circular accessor or property initialization proof."
+  ]
+}

@@ -1,0 +1,441 @@
+{
+  "compiler": "7.0.2",
+  "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "history": "baseline",
+  "status": "observed",
+  "inputFiles": [
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.decorators.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.decorators.legacy.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.asynciterable.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.iterable.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2015.collection.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2015.core.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2015.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2015.generator.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2015.iterable.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2015.promise.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2015.proxy.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2015.reflect.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2015.symbol.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2015.symbol.wellknown.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2016.array.include.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2016.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2016.intl.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2017.arraybuffer.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2017.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2017.date.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2017.intl.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2017.object.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2017.sharedmemory.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2017.string.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2017.typedarrays.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2018.asyncgenerator.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2018.asynciterable.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2018.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2018.intl.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2018.promise.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2018.regexp.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2019.array.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2019.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2019.intl.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2019.object.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2019.string.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2019.symbol.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2020.bigint.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2020.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2020.date.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2020.intl.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2020.number.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2020.promise.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2020.sharedmemory.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2020.string.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2020.symbol.wellknown.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2021.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2021.intl.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2021.promise.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2021.string.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2021.weakref.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2022.array.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2022.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2022.error.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2022.intl.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2022.object.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2022.regexp.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2022.string.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2023.array.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2023.collection.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2023.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2023.intl.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2024.arraybuffer.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2024.collection.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2024.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2024.object.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2024.promise.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2024.regexp.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2024.sharedmemory.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2024.string.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2025.collection.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2025.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2025.float16.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2025.intl.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2025.iterator.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2025.promise.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es2025.regexp.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.esnext.array.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.esnext.collection.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.esnext.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.esnext.date.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.esnext.decorators.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.esnext.disposable.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.esnext.error.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.esnext.full.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.esnext.intl.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.esnext.sharedmemory.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.esnext.temporal.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.esnext.typedarrays.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.scripthost.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.webworker.importscripts.d.ts",
+    "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-relation-limits/removal-1250-43/cases.ts",
+    "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-relation-limits/removal-1250-43/tsconfig.json"
+  ],
+  "summary": "({ tag: 0; } | { tag: 1; } | { tag: 2; } | { tag: 3; } | { tag: 4; } | { tag: 5; } | { tag: 6; } | { tag: 7; } | { tag: 8; } | { tag: 9; } | { tag: 10; } | { tag: 11; } | { tag: 12; } | { tag: 13; } | { tag: 14; } | { tag: 15; } | { tag: 16; } | { ...; } | ... 1188 more ... | { ...; })[]",
+  "errorType": false,
+  "beforeSummary": {
+    "researchEvents": [
+      {
+        "allowance": 1999999,
+        "cacheSize": 1,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999998,
+        "cacheSize": 2,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999998,
+        "cacheSize": 3,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999998,
+        "cacheSize": 4,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999998,
+        "cacheSize": 5,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999998,
+        "cacheSize": 6,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999998,
+        "cacheSize": 7,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999998,
+        "cacheSize": 8,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999998,
+        "cacheSize": 9,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999997,
+        "cacheSize": 10,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999997,
+        "cacheSize": 11,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999997,
+        "cacheSize": 12,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999997,
+        "cacheSize": 13,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999997,
+        "cacheSize": 14,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999997,
+        "cacheSize": 15,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999997,
+        "cacheSize": 16,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999997,
+        "cacheSize": 17,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999996,
+        "cacheSize": 18,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999996,
+        "cacheSize": 19,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999996,
+        "cacheSize": 20,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999996,
+        "cacheSize": 21,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999996,
+        "cacheSize": 22,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999996,
+        "cacheSize": 23,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999996,
+        "cacheSize": 24,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999996,
+        "cacheSize": 25,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999995,
+        "cacheSize": 26,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999995,
+        "cacheSize": 27,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999995,
+        "cacheSize": 28,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999995,
+        "cacheSize": 29,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999995,
+        "cacheSize": 30,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999995,
+        "cacheSize": 31,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999995,
+        "cacheSize": 32,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999995,
+        "cacheSize": 33,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999994,
+        "cacheSize": 34,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999994,
+        "cacheSize": 35,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999994,
+        "cacheSize": 36,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999994,
+        "cacheSize": 37,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999994,
+        "cacheSize": 38,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999994,
+        "cacheSize": 39,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999994,
+        "cacheSize": 40,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999994,
+        "cacheSize": 41,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999993,
+        "cacheSize": 42,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "allowance": 1999993,
+        "cacheSize": 43,
+        "name": "relation_finished",
+        "overflow": false,
+        "result": -1
+      },
+      {
+        "count": 100000,
+        "estimate": 991250,
+        "length": 1250,
+        "name": "subtype_estimate",
+        "processed": 126
+      }
+    ],
+    "counters": {
+      "relationAllowanceUsed": 6,
+      "relationCacheSize": 42,
+      "relationInitialAllowance": 2000000
+    },
+    "demandFailures": []
+  },
+  "diagnosticCodes": [],
+  "arrayElement": {
+    "constituents": 1207,
+    "errorType": false
+  },
+  "counters": {
+    "relationAllowanceUsed": 6,
+    "relationCacheSize": 42,
+    "relationInitialAllowance": 2000000
+  },
+  "demandFailures": [],
+  "compilerOptions": {
+    "module": 99,
+    "noEmit": true,
+    "strict": true,
+    "target": 99,
+    "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-relation-limits/removal-1250-43/tsconfig.json"
+  }
+}

@@ -11,8 +11,9 @@
 //! "position": …}}`, whose kind is an `InputErrorKind` instead for a query
 //! path that names no file exactly, or `{"panic": "…"}` when the
 //! implementation panics. A project that fails to load prints
-//! `{"projectError": {...}}` with an `InputErrorKind` and exits 1. Kinds are
-//! the variant names. Usage errors and malformed query lines exit 2.
+//! `{"projectError": {...}}` and exits 1. Input failures retain their
+//! `InputErrorKind`; semantic initialization failures retain their reason and
+//! causes. Kinds use their error family's serialized spelling. Usage errors and malformed query lines exit 2.
 
 use serde::{Deserialize, Serialize};
 use std::io::{BufRead, Write};
@@ -20,7 +21,7 @@ use std::panic::AssertUnwindSafe;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::sync::Mutex;
-use typescript_parser::analysis::{AnalysisError, InputErrorKind};
+use typescript_parser::analysis::AnalysisError;
 use typescript_parser::project::Project;
 use typescript_parser::references::{ReferenceQuery, ReferenceResult};
 use typescript_parser::source::SourcePosition;
@@ -50,12 +51,7 @@ enum Response<'a> {
         position: Option<SourcePosition>,
     },
     Panic(String),
-    ProjectError {
-        kind: InputErrorKind,
-        message: String,
-        path: Option<String>,
-        position: Option<SourcePosition>,
-    },
+    ProjectError(serde_json::Value),
 }
 
 fn display(path: Option<&Path>) -> Option<String> {
@@ -90,12 +86,17 @@ fn run(config: &std::path::Path) -> Result<ExitCode, Box<dyn std::error::Error>>
     let project = match Project::load(config) {
         Ok(project) => project,
         Err(error) => {
-            let response = Response::ProjectError {
-                kind: error.kind,
-                message: error.to_string(),
-                path: display(error.path.as_deref()),
-                position: error.position,
+            let document = match &error {
+                // Preserve the existing input wire record exactly. New semantic
+                // load interruptions retain their reason and complete causes.
+                AnalysisError::Input(input) => serde_json::json!({
+                    "kind": input.kind, "message": error.to_string(),
+                    "path": display(input.path.as_deref()), "position": input.position,
+                }),
+                AnalysisError::Semantic(semantic) => serde_json::to_value(semantic)?,
+                AnalysisError::Query(query) => serde_json::to_value(query)?,
             };
+            let response = Response::ProjectError(document);
             write_line(&mut out, &response)?;
             return Ok(ExitCode::from(1));
         }
@@ -137,6 +138,9 @@ fn run(config: &std::path::Path) -> Result<ExitCode, Box<dyn std::error::Error>>
                         (serde_json::json!(error.kind), &error.path, error.position)
                     }
                     AnalysisError::Input(error) => {
+                        (serde_json::json!(error.kind), &error.path, error.position)
+                    }
+                    AnalysisError::Semantic(error) => {
                         (serde_json::json!(error.kind), &error.path, error.position)
                     }
                 };

@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "revision": "aa484f422f00dfb64967d2008fac3c4f9a92538e",
+  "physicalRoot": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/command-center-aa484f4-corpus",
+  "baseSnapshotProvenance": {
+    "file": "../snapshot-provenance.json",
+    "sha256": "348196e9fa3eb2a51dcf34cac1d4d38b5b27e7a47d53f1508d907e0d6e04e25b"
+  },
+  "configuration": {
+    "file": "tsconfig.native-corpus.json",
+    "sha256": "563bd5f1c045574432d556fd2c09f9bfa4f71325fff7fc6633ce8f889339d464",
+    "text": "{\n  \"extends\": \"./tsconfig.json\",\n  \"compilerOptions\": { \"singleThreaded\": true }\n}\n"
+  },
+  "baseConfiguration": {
+    "file": "tsconfig.json",
+    "sha256": "2e09a91453030c847eedec0c49fc5aa2c707d9221a968588b7b5988cbfa31279"
+  },
+  "purpose": "Explicit native discovery/replay execution profile to eliminate pinned parallel parser provenance nondeterminism; Rust workers and original tracked configuration remain unchanged.",
+  "historicalParallelArtifacts": "../superseded-api-baseline"
+}

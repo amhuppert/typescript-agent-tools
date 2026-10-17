@@ -1,0 +1,8 @@
+{
+  "interface": "keyof InterfaceB",
+  "reverse": "keyof InterfaceA",
+  "class": "keyof ClassB",
+  "alias": "keyof AliasB",
+  "plainFirst": "keyof InterfaceB",
+  "indexFirst": "\"first\" | \"second\""
+}

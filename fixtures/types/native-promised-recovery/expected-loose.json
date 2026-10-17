@@ -1,0 +1,305 @@
+[
+  {
+    "name": "directPromise",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "nestedPromise",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "structuralThen",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "absentThen",
+    "summary": "{ value: number; }",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "nonCallableThen",
+    "summary": "{ then: number; }",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "anyThenType",
+    "summary": "{ then: any; }",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "optionalThenType",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "voidThisType",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "matchingThisType",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "wrongThisType",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      1320
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "hiddenThisTypes",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      1320
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": {
+      "instantiated": false,
+      "name": "receiver"
+    }
+  },
+  {
+    "name": "anyCallbackType",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      1320
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "noCallbackType",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      1320
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "noValueType",
+    "summary": "never",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "missingCallbackType",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      1320
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "missingFulfilledType",
+    "summary": "MissingFulfilled",
+    "errorType": true,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "overloadedThenType",
+    "summary": "never",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "mixedThisType",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "overloadedCallbackType",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "selfRecursive",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      1062
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "mutualRecursive",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      1062
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "unionNilThenMissing",
+    "summary": "MissingUnionValue",
+    "errorType": true,
+    "codes": [
+      2304,
+      1320
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "unionAllNil",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      1062,
+      1320
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "quickAwaitAssertion",
+    "summary": "MissingQuickValue",
+    "errorType": true,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "checkedAwaitAssertion",
+    "summary": "MissingCheckedValue",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "invocationMissingAwait",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "checkedInvocationMissingAwait",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2349
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": {
+      "instantiated": false,
+      "name": "tail"
+    }
+  },
+  {
+    "name": "repeatedAwait",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "healthyAfter",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  }
+]

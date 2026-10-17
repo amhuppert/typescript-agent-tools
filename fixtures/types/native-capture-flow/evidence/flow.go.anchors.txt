@@ -1,0 +1,110 @@
+func (c *Checker) isSymbolAssignedDefinitely(symbol *ast.Symbol) bool {
+	c.ensureAssignmentsMarked(symbol)
+	return c.markedAssignmentSymbolLinks.Get(symbol).hasDefiniteAssignment
+}
+
+// Check if a parameter, catch variable, or mutable local variable is assigned anywhere
+func (c *Checker) isSymbolAssigned(symbol *ast.Symbol) bool {
+	c.ensureAssignmentsMarked(symbol)
+	return c.markedAssignmentSymbolLinks.Get(symbol).lastAssignmentPos != 0
+}
+
+// Return true if there are no assignments to the given symbol or if the given location
+// is past the last assignment to the symbol.
+func (c *Checker) isPastLastAssignment(symbol *ast.Symbol, location *ast.Node) bool {
+	c.ensureAssignmentsMarked(symbol)
+	lastAssignmentPos := c.markedAssignmentSymbolLinks.Get(symbol).lastAssignmentPos
+	return lastAssignmentPos == 0 || location != nil && int(lastAssignmentPos) < location.Pos()
+}
+
+func (c *Checker) ensureAssignmentsMarked(symbol *ast.Symbol) {
+	if c.markedAssignmentSymbolLinks.Get(symbol).lastAssignmentPos != 0 {
+		return
+	}
+	parent := ast.FindAncestor(symbol.ValueDeclaration, ast.IsFunctionOrSourceFile)
+	if parent == nil {
+		return
+	}
+	links := c.nodeLinks.Get(parent)
+	if links.flags&NodeCheckFlagsAssignmentsMarked == 0 {
+		links.flags |= NodeCheckFlagsAssignmentsMarked
+		if !c.hasParentWithAssignmentsMarked(parent) {
+			c.markNodeAssignments(parent)
+		}
+	}
+}
+
+func (c *Checker) hasParentWithAssignmentsMarked(node *ast.Node) bool {
+	return ast.FindAncestor(node.Parent, func(node *ast.Node) bool {
+		return ast.IsFunctionOrSourceFile(node) && c.nodeLinks.Get(node).flags&NodeCheckFlagsAssignmentsMarked != 0
+	}) != nil
+}
+
+// For all assignments within the given root node, record the last assignment source position for all
+// referenced parameters and mutable local variables. When assignments occur in nested functions  or
+// references occur in export specifiers, record math.MaxInt32 as the assignment position. When
+// assignments occur in compound statements, record the ending source position of the compound statement
+// as the assignment position (this is more conservative than full control flow analysis, but requires
+// only a single walk over the AST).
+func (c *Checker) markNodeAssignmentsWorker(node *ast.Node) bool {
+	switch node.Kind {
+	case ast.KindIdentifier:
+		assignmentKind := getAssignmentTargetKind(node)
+		if assignmentKind != AssignmentKindNone {
+			symbol := c.getResolvedSymbol(node)
+			if c.isParameterOrMutableLocalVariable(symbol) {
+				links := c.markedAssignmentSymbolLinks.Get(symbol)
+				if pos := links.lastAssignmentPos; pos == 0 || pos != math.MaxInt32 {
+					referencingFunction := ast.FindAncestor(node, ast.IsFunctionOrSourceFile)
+					declaringFunction := ast.FindAncestor(symbol.ValueDeclaration, ast.IsFunctionOrSourceFile)
+					if referencingFunction == declaringFunction {
+						links.lastAssignmentPos = int32(c.extendAssignmentPosition(node, symbol.ValueDeclaration))
+					} else {
+						links.lastAssignmentPos = math.MaxInt32
+					}
+				}
+				if assignmentKind == AssignmentKindDefinite {
+					links.hasDefiniteAssignment = true
+				}
+			}
+		}
+		return false
+	case ast.KindExportSpecifier:
+		exportDeclaration := node.AsExportSpecifier().Parent.Parent.AsExportDeclaration()
+		name := node.PropertyNameOrName()
+		if !node.IsTypeOnly() && !exportDeclaration.IsTypeOnly && exportDeclaration.ModuleSpecifier == nil && !ast.IsStringLiteral(name) {
+			symbol := c.resolveEntityName(name, ast.SymbolFlagsValue, true /*ignoreErrors*/, true /*dontResolveAlias*/, nil)
+			if symbol != nil && c.isParameterOrMutableLocalVariable(symbol) {
+				links := c.markedAssignmentSymbolLinks.Get(symbol)
+				links.lastAssignmentPos = math.MaxInt32
+			}
+		}
+		return false
+	case ast.KindInterfaceDeclaration,
+		ast.KindTypeAliasDeclaration,
+		ast.KindJSTypeAliasDeclaration,
+		ast.KindEnumDeclaration:
+		return false
+	}
+	if ast.IsTypeNode(node) {
+		return false
+	}
+	return node.ForEachChild(c.markNodeAssignments)
+}
+
+// Extend the position of the given assignment target node to the end of any intervening variable statement,
+// expression statement, compound statement, or class declaration occurring between the node and the given
+// declaration node.
+func (c *Checker) extendAssignmentPosition(node *ast.Node, declaration *ast.Node) int {
+	pos := node.Pos()
+	for node != nil && node.Pos() > declaration.Pos() {
+		switch node.Kind {
+		case ast.KindVariableStatement, ast.KindExpressionStatement, ast.KindIfStatement, ast.KindDoStatement, ast.KindWhileStatement,
+			ast.KindForStatement, ast.KindForInStatement, ast.KindForOfStatement, ast.KindWithStatement, ast.KindSwitchStatement,
+			ast.KindTryStatement, ast.KindClassDeclaration:
+			pos = node.End()
+		}
+		node = node.Parent
+	}
+	return pos
+}

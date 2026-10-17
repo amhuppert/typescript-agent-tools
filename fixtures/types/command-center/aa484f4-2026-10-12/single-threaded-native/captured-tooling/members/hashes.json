@@ -1,0 +1,46 @@
+[
+  {
+    "file": "tools/type-command-center-capture.test.mjs",
+    "sha256": "fb7bda3b7a4f8ef8ae660f272c721253b9431ab06eb6f457cebd5668bc7bfe3a"
+  },
+  {
+    "file": "tools/type-oracle.mjs",
+    "sha256": "8a7b8c3438c0450d1ad40f1567f554f31b71603686d7b7e2603236a74aa7ff50"
+  },
+  {
+    "file": "tools/type-oracle-filesystem.mjs",
+    "sha256": "c9fd4d034313fec931e8068548a80cc38b86ac84d429a7c7857dcf7d231997c8"
+  },
+  {
+    "file": "tools/type-corpus-capture.mjs",
+    "sha256": "18bf979691eac86df3096e710c57f57fe93e2d60d08685e88b912ffa6818078b"
+  },
+  {
+    "file": "tools/semantic-oracle.mjs",
+    "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+  },
+  {
+    "file": "tools/navigation-oracle.mjs",
+    "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+  },
+  {
+    "file": "tools/corpus-selection.mjs",
+    "sha256": "132d08e26e251c0d55cb39ce8d15b59735524bdd4e03fe1d5c691643abc3afa5"
+  },
+  {
+    "file": "tools/vendor-typescript-libs.mjs",
+    "sha256": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d"
+  },
+  {
+    "file": "fixtures/types/compiler-hook/checker-hook.go",
+    "sha256": "581fc25188d3f24283c0da09c280fc413a72540ee5270de29a90d041b6a63fef"
+  },
+  {
+    "file": "fixtures/types/compiler-hook/ls-hook.go",
+    "sha256": "b9c73116cc961b3b94c0b32c3052bf9c47b3dbfd5fe991fddc917d54c2095b94"
+  },
+  {
+    "file": "fixtures/types/compiler-hook/oracle-test.go",
+    "sha256": "3b5b5b153c010eed4828b936bebbe25944db58b354cfcb83628726ab6a273f24"
+  }
+]

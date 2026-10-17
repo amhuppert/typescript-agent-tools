@@ -1,0 +1,163 @@
+[
+  {
+    "name": "identifier",
+    "summary": "(value: number) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "escapedIdentifier",
+    "summary": "(value: number) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "object",
+    "summary": "({ value }: { value: number; }) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "array",
+    "summary": "([value]: [number]) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "nested",
+    "summary": "({ outer: [value, { inner }] }: { outer: [number, { inner: string; }]; }) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "renamed",
+    "summary": "({ value: local }: { value: number; }) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "singleQuote",
+    "summary": "({ 'a-b': local }: { 'a-b': number; }) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "doubleQuote",
+    "summary": "({ \"a-b\": local }: { \"a-b\": number; }) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "escapedString",
+    "summary": "({ \"a-b\": local }: { \"a-b\": number; }) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "numeric",
+    "summary": "({ 16: local }: { 16: number; }) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "objectDefault",
+    "summary": "({ value }?: { value?: number | undefined; }) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "arrayDefault",
+    "summary": "([value]?: [(number | undefined)?]) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "emptyObject",
+    "summary": "({}: {}) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "emptyArray",
+    "summary": "([]: []) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "hole",
+    "summary": "([, value]: [number, string]) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "holes",
+    "summary": "([, , value]: [number, number, string]) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "terminalHole",
+    "summary": "([,]: [number]) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "objectComma",
+    "summary": "({ value, }: { value: number; }) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "arrayComma",
+    "summary": "([value,]: [number]) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "arrayRest",
+    "summary": "([head, ...tail]: [number, ...string[]]) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "computedLiteral",
+    "summary": "({ [\"value\"]: local }: { value: number; }) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "computedEntity",
+    "summary": "({ [key]: local }: { value: number; }) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "removedInitializer",
+    "summary": "({ value }: { value?: { value: number; } | undefined; }) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  }
+]

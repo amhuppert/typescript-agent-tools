@@ -1,0 +1,245 @@
+[
+  {
+    "name": "recoveredThenMissing",
+    "kind": "value",
+    "summary": "MissingLater",
+    "errorType": true,
+    "codes": [
+      2304,
+      2365,
+      2695
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "missingThenRecovered",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "recoveredThenHealthy",
+    "kind": "value",
+    "summary": "1",
+    "errorType": false,
+    "codes": [
+      2365,
+      2695
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "healthyThenRecovered",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2695,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "missingThenMissing",
+    "kind": "value",
+    "summary": "MissingLater",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "conditionalFirst",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "conditionalSecond",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "conditionalLiteralTrue",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "conditionalLiteralFalse",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "conditionalHealthy",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "typeofRecovered",
+    "kind": "value",
+    "summary": "\"bigint\" | \"boolean\" | \"function\" | \"number\" | \"object\" | \"string\" | \"symbol\" | \"undefined\"",
+    "errorType": false,
+    "codes": [
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "genuineAnyThenHealthy",
+    "kind": "value",
+    "summary": "1",
+    "errorType": false,
+    "codes": [
+      2365,
+      2695
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "genuineAnyThenMissing",
+    "kind": "value",
+    "summary": "MissingLater",
+    "errorType": true,
+    "codes": [
+      2304,
+      2365,
+      2695
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "bothDisplays",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "left"
+    }
+  },
+  {
+    "name": "bothDisplaysAndSetter",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "left"
+    }
+  },
+  {
+    "name": "compositeReturn",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "unaryMinusRecovered",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "unaryNotRecovered",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "deleteRecovered",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2365,
+      2703
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "voidDeferred",
+    "kind": "value",
+    "summary": "undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  }
+]

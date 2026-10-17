@@ -1,0 +1,85 @@
+[
+  {
+    "name": "plain",
+    "summary": "{ value: number | undefined; nested?: { value: string | undefined; } | undefined; method?(): string | undefined; }",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "outer",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "inner",
+    "summary": "string | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "restarted",
+    "summary": "string | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "parenthesized",
+    "summary": "string | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "callOuter",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "rootAssertion",
+    "summary": "number | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "unknown",
+    "summary": "{}",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "any",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "operandRecovery",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "continuation",
+    "summary": "MissingLater",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2695
+    ],
+    "demandFailures": []
+  }
+]

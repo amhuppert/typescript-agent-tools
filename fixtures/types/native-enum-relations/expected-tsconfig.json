@@ -1,0 +1,389 @@
+[
+  {
+    "name": "same",
+    "kind": "value",
+    "summary": "\"match\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "sameNameEqual",
+    "kind": "value",
+    "summary": "\"match\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "sourceExtra",
+    "kind": "value",
+    "summary": "\"fallback\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "sourceMissing",
+    "kind": "value",
+    "summary": "\"match\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "differentValue",
+    "kind": "value",
+    "summary": "\"fallback\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "differentName",
+    "kind": "value",
+    "summary": "\"fallback\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "stringEqual",
+    "kind": "value",
+    "summary": "\"match\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "stringDifferent",
+    "kind": "value",
+    "summary": "\"fallback\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "opaqueEqual",
+    "kind": "value",
+    "summary": "\"match\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "knownToOpaque",
+    "kind": "value",
+    "summary": "\"match\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "opaqueToKnown",
+    "kind": "value",
+    "summary": "\"match\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "stringToOpaque",
+    "kind": "value",
+    "summary": "\"fallback\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "opaqueToString",
+    "kind": "value",
+    "summary": "\"fallback\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "constSame",
+    "kind": "value",
+    "summary": "\"match\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "constDifferent",
+    "kind": "value",
+    "summary": "\"fallback\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "cachedSuccess",
+    "kind": "value",
+    "summary": "\"match\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "cachedFailure",
+    "kind": "value",
+    "summary": "\"fallback\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "reportValues",
+    "kind": "value",
+    "summary": "\"match\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "reportMissing",
+    "kind": "value",
+    "summary": "\"match\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "reportOpaque",
+    "kind": "value",
+    "summary": "\"match\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "reportTwice",
+    "kind": "value",
+    "summary": "\"match\"",
+    "errorType": false,
+    "codes": [
+      2345,
+      2345
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "enumKeys",
+    "kind": "declared",
+    "summary": "\"A\" | \"B\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "ownReverse",
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "otherReverse",
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "numberReverse",
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "constString",
+    "kind": "value",
+    "summary": "E.A",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "constNumber",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2476
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "constDynamicString",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2476
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "qualifiedConst",
+    "kind": "value",
+    "summary": "E.A",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "mappedEnum",
+    "kind": "declared",
+    "summary": "MappedEnum",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "numericTemplate",
+    "kind": "declared",
+    "summary": "\"1\" | \"2\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "stringTemplate",
+    "kind": "declared",
+    "summary": "\"a\" | \"b\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "normalValues",
+    "kind": "value",
+    "summary": "0",
+    "errorType": false,
+    "codes": [
+      2345
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "normalMissing",
+    "kind": "value",
+    "summary": "0",
+    "errorType": false,
+    "codes": [
+      2345
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "normalOpaque",
+    "kind": "value",
+    "summary": "0",
+    "errorType": false,
+    "codes": [
+      2345
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "normalMissingTwice",
+    "kind": "value",
+    "summary": "0",
+    "errorType": false,
+    "codes": [
+      2345,
+      2345
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "normalOpaqueTwice",
+    "kind": "value",
+    "summary": "0",
+    "errorType": false,
+    "codes": [
+      2345,
+      2345
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "computedFreshIdentity",
+    "kind": "declared",
+    "summary": "\"same\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "computedReverseIdentity",
+    "kind": "declared",
+    "summary": "\"same\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "computedOtherIdentity",
+    "kind": "declared",
+    "summary": "\"different\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "computedFreshArgument",
+    "kind": "value",
+    "summary": "\"computed\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "computedRegularArgument",
+    "kind": "value",
+    "summary": "\"computed\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "computedOtherArgument",
+    "kind": "value",
+    "summary": "\"fallback\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "qualifiedVariableKey",
+    "kind": "value",
+    "summary": "E.A",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "qualifiedAnnotatedKey",
+    "kind": "value",
+    "summary": "E.B",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "automaticEnumKey",
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  }
+]

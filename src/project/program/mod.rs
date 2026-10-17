@@ -17,8 +17,11 @@ pub(super) mod disk;
 mod files;
 mod libraries;
 mod manifest;
-mod paths;
+mod module_semantics;
+pub(in crate::project) mod paths;
 mod resolve;
+pub(in crate::project) mod specifier_environment;
+pub(in crate::project) mod specifiers;
 #[cfg(test)]
 mod tests;
 mod version;
@@ -34,7 +37,7 @@ use crate::parser::json::JsonErrorKind;
 use crate::source::SourcePosition;
 use crate::source::SourceText;
 use config::{Config, Detection};
-use diagnostics::{Checking, Diagnostics, FileOrigin, Unchecked};
+use diagnostics::{Checking, FileOrigin, Unchecked};
 use directives::Directive;
 use libraries::Library;
 use resolve::{FileFormat, NotAdmitted, Resolved, Resolver};
@@ -42,7 +45,12 @@ use std::collections::{HashMap, VecDeque};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+pub(super) use config::Resolution as ModuleResolutionKind;
+pub(super) use config::SemanticOptions;
+pub(super) use diagnostics::Diagnostics;
+pub(super) use module_semantics::{FileModuleSemantics, ModuleKind};
 pub(super) use paths::FileLookup;
+pub(super) use paths::{from_path as native_file_name, remove_file_extension};
 pub(super) use resolve::is_relative_name;
 
 /// Captured program inputs with their facts and resolved module edges.
@@ -58,20 +66,25 @@ pub(super) struct Program {
     /// TypeScript's `shouldPreserveConstEnums`, which binding's merge checks
     /// need (`config::Options::preserve_const_enums`).
     pub(super) preserve_const_enums: bool,
+    pub(super) semantic: SemanticOptions,
+    pub(super) specifier_environment:
+        Result<specifier_environment::SpecifierEnvironment, InputError>,
 }
 
 impl Program {
-    /// Freeze every spelling through which a searched file may be queried.
+    /// Freeze all captured spellings and their query membership together.
     pub(super) fn file_lookup(&self) -> FileLookup {
         let mut lookup = FileLookup::new(self.case);
         for id in self.sources.ids() {
             let file = &self.files[id.index()];
-            if file.search {
-                let identity = self.sources.get(id).path.to_str();
-                lookup.insert(identity.expect("loading names its inputs with text"), id);
-                for path in &file.paths {
-                    lookup.insert(path, id);
-                }
+            let identity = self.sources.get(id).path.to_str();
+            lookup.insert(
+                identity.expect("loading names its inputs with text"),
+                id,
+                file.search,
+            );
+            for path in &file.paths {
+                lookup.insert(path, id, file.search);
             }
         }
         lookup
@@ -80,6 +93,7 @@ impl Program {
 
 #[derive(Debug)]
 pub(super) struct ProgramFile {
+    pub(super) module_semantics: FileModuleSemantics,
     /// Whether occurrences in this file belong in results.
     pub(super) search: bool,
     /// Normalized absolute paths through which the file was reached or
@@ -118,6 +132,13 @@ fn load_with_libraries(
     parser: &Parser,
     library_dir: &str,
 ) -> Result<Program, InputError> {
+    // `Program.GetCurrentDirectory` belongs to the module-spelling host. An
+    // absolute configuration and lexical query do not ask that question.
+    // Retain a failed observation for generation instead of making unrelated
+    // loading fail or substituting another directory.
+    let cwd = std::env::current_dir()
+        .map_err(|error| io_error(Path::new("."), &error))
+        .and_then(|cwd| paths::from_path(&cwd).map(|cwd| paths::normalize(&cwd)));
     let path = std::path::absolute(config).map_err(|error| io_error(config, &error))?;
     let config = config::load(&path, disk, parser)?;
     let case = Case::detect();
@@ -194,6 +215,7 @@ fn load_with_libraries(
             })
             .collect();
         files.push(ProgramFile {
+            module_semantics: loaded.module_semantics,
             search,
             paths,
             facts: loaded.facts,
@@ -202,12 +224,25 @@ fn load_with_libraries(
             navigation: loaded.navigation.filter(|_| search),
         });
     }
+    let specifier_environment = cwd.map(|cwd| {
+        specifier_environment::SpecifierEnvironment::capture(
+            &config,
+            &cwd,
+            case,
+            disk,
+            &mut loader.resolver,
+            &loader.sources,
+            &files,
+        )
+    });
     Ok(Program {
+        semantic: config.options.semantic.clone(),
         preserve_const_enums: config.options.preserve_const_enums,
         config: PathBuf::from(&config.file),
         case,
         sources: loader.sources,
         files,
+        specifier_environment,
     })
 }
 
@@ -295,6 +330,7 @@ struct Loader<'a> {
 
 /// One captured input whose provenance is not yet known.
 struct Loaded {
+    module_semantics: FileModuleSemantics,
     facts: FileFacts,
     modules: Vec<ModuleResolution>,
     checking: Checking,
@@ -378,9 +414,9 @@ impl Loader<'_> {
     fn replacement(&mut self, file: &'static str) -> Result<Option<String>, InputError> {
         let package = libraries::replacement_package(file);
         let from = libraries::replacement_lookup(&self.config.dir, file);
-        let resolved = self
-            .resolver
-            .module(&package, &from, binding::ResolutionMode::Require);
+        let resolved =
+            self.resolver
+                .module(&package, &from, Some(binding::ResolutionMode::Require));
         let reason = match resolved {
             Resolved::File { path, .. } if crate::script_kind(&path) == ScriptKind::Json => {
                 format!(
@@ -388,11 +424,15 @@ impl Loader<'_> {
                     self.display(&path)
                 )
             }
-            Resolved::File { path, .. } => return Ok(Some(path)),
+            Resolved::File {
+                path,
+                original_path,
+                ..
+            } => return Ok(Some(original_path.unwrap_or(path))),
             Resolved::Missing => return Ok(None),
             Resolved::JavaScript(target) => format!(
                 "resolves to the JavaScript file '{}', which has no TypeScript declarations",
-                self.display(&target)
+                self.display(&target.path)
             ),
             Resolved::TooDeep => format!(
                 "follows more than {} package imports redirects",
@@ -463,9 +503,9 @@ impl Loader<'_> {
                     format!("Cannot find type definition file for '{name}'"),
                 ));
             };
-            let id = self.enqueue(&found)?;
+            let id = self.enqueue(found.reached_path())?;
             self.root_tasks.push(id);
-            if !paths::has_node_modules(&found) {
+            if !found.external {
                 self.search_roots.push(id);
             }
         }
@@ -497,6 +537,7 @@ impl Loader<'_> {
             self.resolver.file_format(&path)
         };
         let declaration = paths::is_declaration(&path);
+        let module_semantics = self.resolver.module_semantics(format, json);
         let jsx = crate::ParseOptions::for_file(path.as_str()).jsx;
         let navigation;
         let mut facts = if json {
@@ -529,6 +570,25 @@ impl Loader<'_> {
                 },
             )?
         };
+        // `resolveImportsAndModuleAugmentations` resolves synthetic helpers
+        // before JSX and written requests. Helpers are loaded even when no
+        // emitted construct needs one; missing helpers are demanded only by
+        // checking, never diagnosed just for this synthetic program edge.
+        if !declaration
+            && self.config.options.semantic.import_helpers
+            && (self.config.options.semantic.isolated_modules || !json && facts.module)
+        {
+            facts.requests.push(ModuleRequest {
+                specifier: "tslib".into(),
+                kind: RequestKind::Import { side_effect: true },
+                mode: None,
+                span: crate::Span { start: 0, end: 0 },
+                implicit: Some(binding::ImplicitImport::Helpers),
+                emit_mode: None,
+                resolution_mode: None,
+                resolved_path: None,
+            });
+        }
         // TypeScript imports an automatic JSX runtime into every TSX file and
         // reports a missing one at the file's first JSX tag.
         let runtime = self.jsx_runtime(jsx, declaration, source.as_str());
@@ -539,9 +599,22 @@ impl Loader<'_> {
                 kind: RequestKind::Import { side_effect: true },
                 mode: None,
                 span: crate::Span { start: at, end: at },
+                implicit: Some(binding::ImplicitImport::JsxRuntime),
+                emit_mode: None,
+                resolution_mode: None,
+                resolved_path: None,
             });
         }
         let options = &self.config.options;
+        for request in &mut facts.requests {
+            request.emit_mode =
+                module_semantics.emit_syntax(options.semantic.module_kind, request.kind);
+            request.resolution_mode = module_semantics.resolution_mode(
+                options.semantic.module_kind,
+                request.kind,
+                request.mode,
+            );
+        }
         let unchecked = Unchecked {
             no_check: options.no_check,
             declaration,
@@ -554,7 +627,7 @@ impl Loader<'_> {
         let checking = Checking::new(unchecked, &source, &facts);
         let runtime_request = runtime.map(|_| facts.requests.len() - 1);
         // TypeScript's subtask order: `/// <reference path>`s, then `types`
-        // and `lib` references, then module names: the JSX runtime, then each
+        // and `lib` references, then module names: helpers, JSX, then each
         // request by its `subtask_rank` and, within a rank, by its position,
         // since binding collects requests in no particular order. Following
         // them in this order keeps the queue's reservation order
@@ -591,23 +664,25 @@ impl Loader<'_> {
         missing.sort_by_key(|&(offset, _)| offset);
         let unsupported = unsupported.map(|(_, error)| error);
         let mut requests: Vec<usize> = (0..facts.requests.len()).collect();
-        requests.sort_by_key(|&index| match runtime_request {
-            Some(runtime) if runtime == index => (0, 0),
-            _ => {
-                let request = &facts.requests[index];
-                (1 + request.kind.subtask_rank(), request.span.start)
-            }
+        requests.sort_by_key(|&index| match facts.requests[index].implicit {
+            Some(binding::ImplicitImport::Helpers) => (0, 0),
+            Some(binding::ImplicitImport::JsxRuntime) => (1, 0),
+            None => (
+                2 + facts.requests[index].kind.subtask_rank(),
+                facts.requests[index].span.start,
+            ),
         });
         let mut modules = vec![ModuleResolution::Missing; facts.requests.len()];
         for index in requests {
             let request = &facts.requests[index];
-            let mode = self
-                .resolver
-                .request_mode(format, request.kind, request.mode);
+            let mode = request.resolution_mode;
             // A request that reaches no program input: an ambient module may
             // still satisfy it, and otherwise `not_admitted` says why
             // resolution's file does not count.
             let unresolved = |not_admitted: Option<String>| {
+                if request.implicit == Some(binding::ImplicitImport::Helpers) {
+                    return ModuleResolution::Unchecked;
+                }
                 if runtime_request == Some(index) {
                     // TypeScript requires the runtime only where JSX is used.
                     if facts.jsx.is_none() {
@@ -626,9 +701,15 @@ impl Loader<'_> {
             } else {
                 self.resolver.module(&request.specifier, &path, mode)
             };
+            let resolved_path = match &resolved {
+                Resolved::File { path, .. } => Some(path.clone()),
+                Resolved::JavaScript(resolved) => Some(resolved.path.clone()),
+                Resolved::Missing | Resolved::TooDeep => None,
+            };
             modules[index] = match resolved {
                 Resolved::File {
                     path: target,
+                    original_path,
                     external,
                     extension,
                 } => match resolve::admission(&self.config.options, extension, declaration) {
@@ -640,7 +721,7 @@ impl Loader<'_> {
                         ModuleResolution::Missing
                     }
                     None => {
-                        let target = self.enqueue(&target)?;
+                        let target = self.enqueue(original_path.as_deref().unwrap_or(&target))?;
                         targets.push((target, external));
                         ModuleResolution::File(target)
                     }
@@ -659,7 +740,7 @@ impl Loader<'_> {
                 Resolved::JavaScript(target) => ModuleResolution::Unsupported(format!(
                     "'{}' resolves to the JavaScript file '{}', which has no TypeScript declarations",
                     request.specifier,
-                    self.display(&target)
+                    self.display(&target.path)
                 )),
                 // A limit of this tool, not an unsupported input: no file's
                 // diagnostic policy may tolerate it.
@@ -676,6 +757,7 @@ impl Loader<'_> {
                     });
                 }
             };
+            facts.requests[index].resolved_path = resolved_path;
         }
         let display = self.display(&path);
         self.sources.capture(
@@ -687,6 +769,7 @@ impl Loader<'_> {
             },
         );
         self.loaded.push(Loaded {
+            module_semantics,
             facts,
             modules,
             checking,
@@ -789,8 +872,8 @@ impl Loader<'_> {
                         format!("Cannot find type definition file for '{name}'"),
                     )));
                 };
-                let id = self.enqueue(&found)?;
-                Ok(Followed::Edge(id, paths::has_node_modules(&found)))
+                let id = self.enqueue(found.reached_path())?;
+                Ok(Followed::Edge(id, found.external))
             }
             Directive::Path(reference) => {
                 let target = paths::resolve(paths::parent(path), &reference);

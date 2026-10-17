@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "noLib": true,
+    "target": "es2025",
+    "strict": false
+  },
+  "files": [
+    "cases.ts",
+    "consumer.ts"
+  ]
+}

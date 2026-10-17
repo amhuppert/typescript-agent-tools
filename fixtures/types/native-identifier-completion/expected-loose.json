@@ -1,0 +1,167 @@
+[
+  {
+    "name": "localThenLater",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "importedThenLater",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "aliasSuggestion",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "assignmentThenLater",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2588
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "defaultThenLater",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "defaultClean",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "defaultUndefined",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "defaultOmitted",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "bindingPlain",
+    "kind": "value",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "bindingNarrowed",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "mutableUncorrelated",
+    "kind": "value",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "parameterPlain",
+    "kind": "value",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "parameterNarrowed",
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "contextualPlain",
+    "kind": "value",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "contextualNarrowed",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "defaultUncorrelated",
+    "kind": "value",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "healthyAfter",
+    "kind": "value",
+    "summary": "1",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  }
+]

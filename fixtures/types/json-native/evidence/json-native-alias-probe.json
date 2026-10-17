@@ -1,0 +1,3094 @@
+[
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "stringValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "text",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 9
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "numberValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "number",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 3,
+          "column": 3
+        },
+        "end": {
+          "line": 3,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "booleanValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "boolean",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 4,
+          "column": 3
+        },
+        "end": {
+          "line": 4,
+          "column": 12
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "duplicateValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "dup",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 11,
+          "column": 3
+        },
+        "end": {
+          "line": 11,
+          "column": 8
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 12,
+          "column": 3
+        },
+        "end": {
+          "line": 12,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "decodedValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "a",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 13,
+          "column": 3
+        },
+        "end": {
+          "line": 13,
+          "column": 6
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 14,
+          "column": 3
+        },
+        "end": {
+          "line": 14,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "emptyValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 15,
+          "column": 3
+        },
+        "end": {
+          "line": 15,
+          "column": 5
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "canonicalNumber",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "1",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 17,
+          "column": 3
+        },
+        "end": {
+          "line": 17,
+          "column": 6
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "noncanonicalNumber",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "01",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 16,
+          "column": 3
+        },
+        "end": {
+          "line": 16,
+          "column": 7
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "astralValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "😀",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 18,
+          "column": 3
+        },
+        "end": {
+          "line": 18,
+          "column": 7
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "nestedValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nested",
+    "summary": "{ kept: boolean; dup: { last: string; }; }",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 10,
+          "column": 3
+        },
+        "end": {
+          "line": 10,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [
+      {
+        "name": "kept",
+        "summary": "boolean",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 14
+            },
+            "end": {
+              "line": 10,
+              "column": 20
+            }
+          }
+        ],
+        "children": []
+      },
+      {
+        "name": "dup",
+        "summary": "{ last: string; }",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 29
+            },
+            "end": {
+              "line": 10,
+              "column": 34
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 48
+            },
+            "end": {
+              "line": 10,
+              "column": 53
+            }
+          }
+        ],
+        "children": [
+          {
+            "name": "last",
+            "summary": "string",
+            "origins": [
+              {
+                "kind": "PropertyAssignment",
+                "file": "data.json",
+                "start": {
+                  "line": 10,
+                  "column": 56
+                },
+                "end": {
+                  "line": 10,
+                  "column": 62
+                }
+              }
+            ],
+            "children": []
+          }
+        ]
+      }
+    ],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "typeOnlyValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "text",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 9
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "stringValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "text",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 9
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "numberValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "number",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 3,
+          "column": 3
+        },
+        "end": {
+          "line": 3,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "booleanValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "boolean",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 4,
+          "column": 3
+        },
+        "end": {
+          "line": 4,
+          "column": 12
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "duplicateValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "dup",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 11,
+          "column": 3
+        },
+        "end": {
+          "line": 11,
+          "column": 8
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 12,
+          "column": 3
+        },
+        "end": {
+          "line": 12,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "decodedValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "a",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 13,
+          "column": 3
+        },
+        "end": {
+          "line": 13,
+          "column": 6
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 14,
+          "column": 3
+        },
+        "end": {
+          "line": 14,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "emptyValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 15,
+          "column": 3
+        },
+        "end": {
+          "line": 15,
+          "column": 5
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "canonicalNumber",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "1",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 17,
+          "column": 3
+        },
+        "end": {
+          "line": 17,
+          "column": 6
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "noncanonicalNumber",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "01",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 16,
+          "column": 3
+        },
+        "end": {
+          "line": 16,
+          "column": 7
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "astralValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "😀",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 18,
+          "column": 3
+        },
+        "end": {
+          "line": 18,
+          "column": 7
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "nestedValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nested",
+    "summary": "{ kept: boolean; dup: { last: string; }; }",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 10,
+          "column": 3
+        },
+        "end": {
+          "line": 10,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [
+      {
+        "name": "kept",
+        "summary": "boolean",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 14
+            },
+            "end": {
+              "line": 10,
+              "column": 20
+            }
+          }
+        ],
+        "children": []
+      },
+      {
+        "name": "dup",
+        "summary": "{ last: string; }",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 29
+            },
+            "end": {
+              "line": 10,
+              "column": 34
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 48
+            },
+            "end": {
+              "line": 10,
+              "column": 53
+            }
+          }
+        ],
+        "children": [
+          {
+            "name": "last",
+            "summary": "string",
+            "origins": [
+              {
+                "kind": "PropertyAssignment",
+                "file": "data.json",
+                "start": {
+                  "line": 10,
+                  "column": 56
+                },
+                "end": {
+                  "line": 10,
+                  "column": 62
+                }
+              }
+            ],
+            "children": []
+          }
+        ]
+      }
+    ],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "typeOnlyValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "text",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 9
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "stringValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "text",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 9
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "numberValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "number",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 3,
+          "column": 3
+        },
+        "end": {
+          "line": 3,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "booleanValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "boolean",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 4,
+          "column": 3
+        },
+        "end": {
+          "line": 4,
+          "column": 12
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "duplicateValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "dup",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 11,
+          "column": 3
+        },
+        "end": {
+          "line": 11,
+          "column": 8
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 12,
+          "column": 3
+        },
+        "end": {
+          "line": 12,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "decodedValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "a",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 13,
+          "column": 3
+        },
+        "end": {
+          "line": 13,
+          "column": 6
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 14,
+          "column": 3
+        },
+        "end": {
+          "line": 14,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "emptyValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 15,
+          "column": 3
+        },
+        "end": {
+          "line": 15,
+          "column": 5
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "canonicalNumber",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "1",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 17,
+          "column": 3
+        },
+        "end": {
+          "line": 17,
+          "column": 6
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "noncanonicalNumber",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "01",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 16,
+          "column": 3
+        },
+        "end": {
+          "line": 16,
+          "column": 7
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "astralValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "😀",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 18,
+          "column": 3
+        },
+        "end": {
+          "line": 18,
+          "column": 7
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "nestedValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nested",
+    "summary": "{ kept: boolean; dup: { last: string; }; }",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 10,
+          "column": 3
+        },
+        "end": {
+          "line": 10,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [
+      {
+        "name": "kept",
+        "summary": "boolean",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 14
+            },
+            "end": {
+              "line": 10,
+              "column": 20
+            }
+          }
+        ],
+        "children": []
+      },
+      {
+        "name": "dup",
+        "summary": "{ last: string; }",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 29
+            },
+            "end": {
+              "line": 10,
+              "column": 34
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 48
+            },
+            "end": {
+              "line": 10,
+              "column": 53
+            }
+          }
+        ],
+        "children": [
+          {
+            "name": "last",
+            "summary": "string",
+            "origins": [
+              {
+                "kind": "PropertyAssignment",
+                "file": "data.json",
+                "start": {
+                  "line": 10,
+                  "column": 56
+                },
+                "end": {
+                  "line": 10,
+                  "column": 62
+                }
+              }
+            ],
+            "children": []
+          }
+        ]
+      }
+    ],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "typeOnlyValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "text",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 9
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "stringValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "text",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 9
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "numberValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "number",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 3,
+          "column": 3
+        },
+        "end": {
+          "line": 3,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "booleanValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "boolean",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 4,
+          "column": 3
+        },
+        "end": {
+          "line": 4,
+          "column": 12
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "duplicateValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "dup",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 11,
+          "column": 3
+        },
+        "end": {
+          "line": 11,
+          "column": 8
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 12,
+          "column": 3
+        },
+        "end": {
+          "line": 12,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "decodedValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "a",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 13,
+          "column": 3
+        },
+        "end": {
+          "line": 13,
+          "column": 6
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 14,
+          "column": 3
+        },
+        "end": {
+          "line": 14,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "emptyValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 15,
+          "column": 3
+        },
+        "end": {
+          "line": 15,
+          "column": 5
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "canonicalNumber",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "1",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 17,
+          "column": 3
+        },
+        "end": {
+          "line": 17,
+          "column": 6
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "noncanonicalNumber",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "01",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 16,
+          "column": 3
+        },
+        "end": {
+          "line": 16,
+          "column": 7
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "astralValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "😀",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 18,
+          "column": 3
+        },
+        "end": {
+          "line": 18,
+          "column": 7
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "nestedValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nested",
+    "summary": "{ kept: boolean; dup: { last: string; }; }",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 10,
+          "column": 3
+        },
+        "end": {
+          "line": 10,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [
+      {
+        "name": "kept",
+        "summary": "boolean",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 14
+            },
+            "end": {
+              "line": 10,
+              "column": 20
+            }
+          }
+        ],
+        "children": []
+      },
+      {
+        "name": "dup",
+        "summary": "{ last: string; }",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 29
+            },
+            "end": {
+              "line": 10,
+              "column": 34
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 48
+            },
+            "end": {
+              "line": 10,
+              "column": 53
+            }
+          }
+        ],
+        "children": [
+          {
+            "name": "last",
+            "summary": "string",
+            "origins": [
+              {
+                "kind": "PropertyAssignment",
+                "file": "data.json",
+                "start": {
+                  "line": 10,
+                  "column": 56
+                },
+                "end": {
+                  "line": 10,
+                  "column": 62
+                }
+              }
+            ],
+            "children": []
+          }
+        ]
+      }
+    ],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "typeOnlyValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "text",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 9
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "stringValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "text",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 9
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "numberValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "number",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 3,
+          "column": 3
+        },
+        "end": {
+          "line": 3,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "booleanValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "boolean",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 4,
+          "column": 3
+        },
+        "end": {
+          "line": 4,
+          "column": 12
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "duplicateValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "dup",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 11,
+          "column": 3
+        },
+        "end": {
+          "line": 11,
+          "column": 8
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 12,
+          "column": 3
+        },
+        "end": {
+          "line": 12,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "decodedValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "a",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 13,
+          "column": 3
+        },
+        "end": {
+          "line": 13,
+          "column": 6
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 14,
+          "column": 3
+        },
+        "end": {
+          "line": 14,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "emptyValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 15,
+          "column": 3
+        },
+        "end": {
+          "line": 15,
+          "column": 5
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "canonicalNumber",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "1",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 17,
+          "column": 3
+        },
+        "end": {
+          "line": 17,
+          "column": 6
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "noncanonicalNumber",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "01",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 16,
+          "column": 3
+        },
+        "end": {
+          "line": 16,
+          "column": 7
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "astralValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "😀",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 18,
+          "column": 3
+        },
+        "end": {
+          "line": 18,
+          "column": 7
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "nestedValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nested",
+    "summary": "{ kept: boolean; dup: { last: string; }; }",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 10,
+          "column": 3
+        },
+        "end": {
+          "line": 10,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [
+      {
+        "name": "kept",
+        "summary": "boolean",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 14
+            },
+            "end": {
+              "line": 10,
+              "column": 20
+            }
+          }
+        ],
+        "children": []
+      },
+      {
+        "name": "dup",
+        "summary": "{ last: string; }",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 29
+            },
+            "end": {
+              "line": 10,
+              "column": 34
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 48
+            },
+            "end": {
+              "line": 10,
+              "column": 53
+            }
+          }
+        ],
+        "children": [
+          {
+            "name": "last",
+            "summary": "string",
+            "origins": [
+              {
+                "kind": "PropertyAssignment",
+                "file": "data.json",
+                "start": {
+                  "line": 10,
+                  "column": 56
+                },
+                "end": {
+                  "line": 10,
+                  "column": 62
+                }
+              }
+            ],
+            "children": []
+          }
+        ]
+      }
+    ],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "typeOnlyValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "text",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 9
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "stringValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "text",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 9
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "numberValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "number",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 3,
+          "column": 3
+        },
+        "end": {
+          "line": 3,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "booleanValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "boolean",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 4,
+          "column": 3
+        },
+        "end": {
+          "line": 4,
+          "column": 12
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "duplicateValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "dup",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 11,
+          "column": 3
+        },
+        "end": {
+          "line": 11,
+          "column": 8
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 12,
+          "column": 3
+        },
+        "end": {
+          "line": 12,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "decodedValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "a",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 13,
+          "column": 3
+        },
+        "end": {
+          "line": 13,
+          "column": 6
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 14,
+          "column": 3
+        },
+        "end": {
+          "line": 14,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "emptyValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 15,
+          "column": 3
+        },
+        "end": {
+          "line": 15,
+          "column": 5
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "canonicalNumber",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "1",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 17,
+          "column": 3
+        },
+        "end": {
+          "line": 17,
+          "column": 6
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "noncanonicalNumber",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "01",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 16,
+          "column": 3
+        },
+        "end": {
+          "line": 16,
+          "column": 7
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "astralValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "😀",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 18,
+          "column": 3
+        },
+        "end": {
+          "line": 18,
+          "column": 7
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "nestedValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nested",
+    "summary": "{ kept: boolean; dup: { last: string; }; }",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 10,
+          "column": 3
+        },
+        "end": {
+          "line": 10,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [
+      {
+        "name": "kept",
+        "summary": "boolean",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 14
+            },
+            "end": {
+              "line": 10,
+              "column": 20
+            }
+          }
+        ],
+        "children": []
+      },
+      {
+        "name": "dup",
+        "summary": "{ last: string; }",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 29
+            },
+            "end": {
+              "line": 10,
+              "column": 34
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 48
+            },
+            "end": {
+              "line": 10,
+              "column": 53
+            }
+          }
+        ],
+        "children": [
+          {
+            "name": "last",
+            "summary": "string",
+            "origins": [
+              {
+                "kind": "PropertyAssignment",
+                "file": "data.json",
+                "start": {
+                  "line": 10,
+                  "column": 56
+                },
+                "end": {
+                  "line": 10,
+                  "column": 62
+                }
+              }
+            ],
+            "children": []
+          }
+        ]
+      }
+    ],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "typeOnlyValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "text",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 9
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "stringValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "text",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 9
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "numberValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "number",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 3,
+          "column": 3
+        },
+        "end": {
+          "line": 3,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "booleanValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "boolean",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 4,
+          "column": 3
+        },
+        "end": {
+          "line": 4,
+          "column": 12
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "duplicateValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "dup",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 11,
+          "column": 3
+        },
+        "end": {
+          "line": 11,
+          "column": 8
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 12,
+          "column": 3
+        },
+        "end": {
+          "line": 12,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "decodedValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "a",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 13,
+          "column": 3
+        },
+        "end": {
+          "line": 13,
+          "column": 6
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 14,
+          "column": 3
+        },
+        "end": {
+          "line": 14,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "emptyValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 15,
+          "column": 3
+        },
+        "end": {
+          "line": 15,
+          "column": 5
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "canonicalNumber",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "1",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 17,
+          "column": 3
+        },
+        "end": {
+          "line": 17,
+          "column": 6
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "noncanonicalNumber",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "01",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 16,
+          "column": 3
+        },
+        "end": {
+          "line": 16,
+          "column": 7
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "astralValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "😀",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 18,
+          "column": 3
+        },
+        "end": {
+          "line": 18,
+          "column": 7
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "nestedValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nested",
+    "summary": "{ kept: boolean; dup: { last: string; }; }",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 10,
+          "column": 3
+        },
+        "end": {
+          "line": 10,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [
+      {
+        "name": "kept",
+        "summary": "boolean",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 14
+            },
+            "end": {
+              "line": 10,
+              "column": 20
+            }
+          }
+        ],
+        "children": []
+      },
+      {
+        "name": "dup",
+        "summary": "{ last: string; }",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 29
+            },
+            "end": {
+              "line": 10,
+              "column": 34
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 48
+            },
+            "end": {
+              "line": 10,
+              "column": 53
+            }
+          }
+        ],
+        "children": [
+          {
+            "name": "last",
+            "summary": "string",
+            "origins": [
+              {
+                "kind": "PropertyAssignment",
+                "file": "data.json",
+                "start": {
+                  "line": 10,
+                  "column": 56
+                },
+                "end": {
+                  "line": 10,
+                  "column": 62
+                }
+              }
+            ],
+            "children": []
+          }
+        ]
+      }
+    ],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "typeOnlyValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "text",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 9
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "stringValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "text",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 9
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "numberValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "number",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 3,
+          "column": 3
+        },
+        "end": {
+          "line": 3,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "booleanValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "boolean",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 4,
+          "column": 3
+        },
+        "end": {
+          "line": 4,
+          "column": 12
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "duplicateValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "dup",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 11,
+          "column": 3
+        },
+        "end": {
+          "line": 11,
+          "column": 8
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 12,
+          "column": 3
+        },
+        "end": {
+          "line": 12,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "decodedValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "a",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 13,
+          "column": 3
+        },
+        "end": {
+          "line": 13,
+          "column": 6
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 14,
+          "column": 3
+        },
+        "end": {
+          "line": 14,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "emptyValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 15,
+          "column": 3
+        },
+        "end": {
+          "line": 15,
+          "column": 5
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "canonicalNumber",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "1",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 17,
+          "column": 3
+        },
+        "end": {
+          "line": 17,
+          "column": 6
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "noncanonicalNumber",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "01",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 16,
+          "column": 3
+        },
+        "end": {
+          "line": 16,
+          "column": 7
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "astralValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "😀",
+    "summary": "boolean",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 18,
+          "column": 3
+        },
+        "end": {
+          "line": 18,
+          "column": 7
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "nestedValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nested",
+    "summary": "{ kept: boolean; dup: { last: string; }; }",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 10,
+          "column": 3
+        },
+        "end": {
+          "line": 10,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [
+      {
+        "name": "kept",
+        "summary": "boolean",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 14
+            },
+            "end": {
+              "line": 10,
+              "column": 20
+            }
+          }
+        ],
+        "children": []
+      },
+      {
+        "name": "dup",
+        "summary": "{ last: string; }",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 29
+            },
+            "end": {
+              "line": 10,
+              "column": 34
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 10,
+              "column": 48
+            },
+            "end": {
+              "line": 10,
+              "column": 53
+            }
+          }
+        ],
+        "children": [
+          {
+            "name": "last",
+            "summary": "string",
+            "origins": [
+              {
+                "kind": "PropertyAssignment",
+                "file": "data.json",
+                "start": {
+                  "line": 10,
+                  "column": 56
+                },
+                "end": {
+                  "line": 10,
+                  "column": 62
+                }
+              }
+            ],
+            "children": []
+          }
+        ]
+      }
+    ],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "typeOnlyValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "text",
+    "summary": "string",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 9
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  }
+]

@@ -1,0 +1,155 @@
+{
+  "queries": [
+    {
+      "name": "substitutions",
+      "summary": "string",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 32,
+          "end": 57
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 68,
+          "end": 94
+        }
+      ]
+    },
+    {
+      "name": "constantContext",
+      "summary": "`x${A}y${B}`",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 214,
+          "end": 232
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 243,
+          "end": 262
+        }
+      ]
+    },
+    {
+      "name": "elementContext",
+      "summary": "31",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 391,
+          "end": 411
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 422,
+          "end": 443
+        }
+      ]
+    },
+    {
+      "name": "contextual",
+      "summary": "21",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304,
+        2345
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 595,
+          "end": 610
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 621,
+          "end": 641
+        }
+      ]
+    },
+    {
+      "name": "healthyRuntime",
+      "summary": "string",
+      "errorType": false,
+      "codes": [],
+      "demandFailures": [],
+      "errors": []
+    },
+    {
+      "name": "healthyConstant",
+      "summary": "\"x1y\"",
+      "errorType": false,
+      "codes": [],
+      "demandFailures": [],
+      "errors": []
+    },
+    {
+      "name": "healthyContext",
+      "summary": "41",
+      "errorType": false,
+      "codes": [],
+      "demandFailures": [],
+      "errors": []
+    },
+    {
+      "name": "symbolConversion",
+      "summary": "string",
+      "errorType": false,
+      "codes": [
+        2731
+      ],
+      "demandFailures": [],
+      "errors": []
+    },
+    {
+      "name": "contextualConditional",
+      "summary": "51",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304,
+        2304
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 1277,
+          "end": 1300
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 1302,
+          "end": 1326
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 1184,
+          "end": 1208
+        }
+      ]
+    }
+  ]
+}

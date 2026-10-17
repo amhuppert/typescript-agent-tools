@@ -1,0 +1,230 @@
+[
+  {
+    "name": "double-empty-lf",
+    "source": "/** @see chosen\n * @type {\"\n*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "double-empty-cr",
+    "source": "/** @see chosen\n * @type {\"\r*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "double-empty-crlf",
+    "source": "/** @see chosen\n * @type {\"\r\n*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "double-empty-comment_end",
+    "source": "/** @see chosen\n * @type {\"*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "double-ascii-lf",
+    "source": "/** @see chosen\n * @type {\"abc\n*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "double-ascii-cr",
+    "source": "/** @see chosen\n * @type {\"abc\r*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "double-ascii-crlf",
+    "source": "/** @see chosen\n * @type {\"abc\r\n*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "double-ascii-comment_end",
+    "source": "/** @see chosen\n * @type {\"abc*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "double-unicode-lf",
+    "source": "/** @see chosen\n * @type {\"é\n*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "double-unicode-cr",
+    "source": "/** @see chosen\n * @type {\"é\r*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "double-unicode-crlf",
+    "source": "/** @see chosen\n * @type {\"é\r\n*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "double-unicode-comment_end",
+    "source": "/** @see chosen\n * @type {\"é*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "double-escaped_close-lf",
+    "source": "/** @see chosen\n * @type {\"tail\\\"\n*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "double-escaped_close-cr",
+    "source": "/** @see chosen\n * @type {\"tail\\\"\r*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "double-escaped_close-crlf",
+    "source": "/** @see chosen\n * @type {\"tail\\\"\r\n*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "double-escaped_close-comment_end",
+    "source": "/** @see chosen\n * @type {\"tail\\\"*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "single-empty-lf",
+    "source": "/** @see chosen\n * @type {'\n*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "single-empty-cr",
+    "source": "/** @see chosen\n * @type {'\r*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "single-empty-crlf",
+    "source": "/** @see chosen\n * @type {'\r\n*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "single-empty-comment_end",
+    "source": "/** @see chosen\n * @type {'*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "single-ascii-lf",
+    "source": "/** @see chosen\n * @type {'abc\n*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "single-ascii-cr",
+    "source": "/** @see chosen\n * @type {'abc\r*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "single-ascii-crlf",
+    "source": "/** @see chosen\n * @type {'abc\r\n*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "single-ascii-comment_end",
+    "source": "/** @see chosen\n * @type {'abc*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "single-unicode-lf",
+    "source": "/** @see chosen\n * @type {'é\n*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "single-unicode-cr",
+    "source": "/** @see chosen\n * @type {'é\r*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "single-unicode-crlf",
+    "source": "/** @see chosen\n * @type {'é\r\n*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "single-unicode-comment_end",
+    "source": "/** @see chosen\n * @type {'é*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "single-escaped_close-lf",
+    "source": "/** @see chosen\n * @type {'tail\\'\n*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "single-escaped_close-cr",
+    "source": "/** @see chosen\n * @type {'tail\\'\r*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "single-escaped_close-crlf",
+    "source": "/** @see chosen\n * @type {'tail\\'\r\n*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "single-escaped_close-comment_end",
+    "source": "/** @see chosen\n * @type {'tail\\'*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "template-empty",
+    "source": "/** @see chosen\n * @type {`*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "template-ascii",
+    "source": "/** @see chosen\n * @type {`abc*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "template-unicode",
+    "source": "/** @see chosen\n * @type {`é*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "template-escaped_close",
+    "source": "/** @see chosen\n * @type {`tail\\`*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "template-tail",
+    "source": "/** @see chosen\n * @type {`${0}tail*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  },
+  {
+    "name": "template-second_tail",
+    "source": "/** @see chosen\n * @type {`${0}tail${1}final*/ const chosen = 1;",
+    "nameText": "chosen",
+    "literalText": "1"
+  }
+]

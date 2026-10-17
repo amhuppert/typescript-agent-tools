@@ -1,0 +1,604 @@
+[
+  {
+    "config": "tsconfig.json",
+    "marker": "unrelated-case",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "unrelated-default",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "unrelated-after",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "direct-case",
+    "summary": "1",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "direct-default",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "direct-after",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "typeof-number",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "typeof-default",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "typeof-after",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "duplicate-first",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "duplicate-second",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "duplicate-default",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "nil-string",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "nil-missing",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "nil-default",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "nil-after",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "host-case",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "host-default",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "grouped-types",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "grouped-default",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "default-grouped-number",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "default-later-string",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "fallthrough-string",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "fallthrough-number",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "fallthrough-after",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "exhaustive-function",
+    "summary": "() => 1 | 2",
+    "kind": "value",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "incomplete-function",
+    "summary": "() => 1 | undefined",
+    "kind": "value",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "nil-function",
+    "summary": "() => 1 | 2 | undefined",
+    "kind": "value",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "true-function",
+    "summary": "() => 1 | 2",
+    "kind": "value",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "unpaired-case",
+    "summary": "\"\\uD800\"",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "unpaired-default",
+    "summary": "string",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "unpaired-witness",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "unpaired-witness-default",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "escaped-witness-number",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "template-witness-string",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "escaped-witness-default",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "parenthesized-witness-string",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "parenthesized-witness-number",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "parenthesized-witness-default",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "empty-witness-case",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "empty-witness-default",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "all-typeof-function",
+    "summary": "(value: any) => 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8",
+    "kind": "value",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "incomplete-typeof-function",
+    "summary": "(value: any) => 1 | 2 | 3 | 4 | 5 | 6 | 7 | undefined",
+    "kind": "value",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "unrelated-case",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "unrelated-default",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "unrelated-after",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "direct-case",
+    "summary": "1",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "direct-default",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "direct-after",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "typeof-number",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "typeof-default",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "typeof-after",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "duplicate-first",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "duplicate-second",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "duplicate-default",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "nil-string",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "nil-missing",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "nil-default",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "nil-after",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "host-case",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "host-default",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "grouped-types",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "grouped-default",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "default-grouped-number",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "default-later-string",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "fallthrough-string",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "fallthrough-number",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "fallthrough-after",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "exhaustive-function",
+    "summary": "() => 1 | 2",
+    "kind": "value",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "incomplete-function",
+    "summary": "() => number",
+    "kind": "value",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "nil-function",
+    "summary": "() => 1 | 2",
+    "kind": "value",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "true-function",
+    "summary": "() => 1 | 2",
+    "kind": "value",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "unpaired-case",
+    "summary": "\"\\uD800\"",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "unpaired-default",
+    "summary": "string",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "unpaired-witness",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "unpaired-witness-default",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "escaped-witness-number",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "template-witness-string",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "escaped-witness-default",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "parenthesized-witness-string",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "parenthesized-witness-number",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "parenthesized-witness-default",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "empty-witness-case",
+    "summary": "never",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "empty-witness-default",
+    "summary": "number",
+    "kind": "expression",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "all-typeof-function",
+    "summary": "(value: any) => 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8",
+    "kind": "value",
+    "errorType": false
+  },
+  {
+    "config": "loose.json",
+    "marker": "incomplete-typeof-function",
+    "summary": "(value: any) => 1 | 2 | 3 | 4 | 5 | 6 | 7",
+    "kind": "value",
+    "errorType": false
+  }
+]

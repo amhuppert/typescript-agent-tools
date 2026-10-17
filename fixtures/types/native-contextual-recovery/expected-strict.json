@@ -1,0 +1,275 @@
+[
+  {
+    "name": "properties",
+    "summary": "41",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 463,
+        "end": 478
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 495,
+        "end": 510
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 490,
+        "declarationEnd": 510,
+        "name": "item"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 490,
+        "declarationEnd": 510,
+        "name": "item"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 622,
+        "declarationEnd": 626,
+        "name": "item"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 622,
+        "declarationEnd": 626,
+        "name": "item"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 490,
+        "declarationEnd": 510,
+        "name": "item"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 622,
+        "declarationEnd": 626,
+        "name": "item"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 622,
+        "declarationEnd": 626,
+        "name": "item"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 490,
+        "declarationEnd": 510,
+        "name": "item"
+      }
+    ]
+  },
+  {
+    "name": "computed",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      2741,
+      2304,
+      7006,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "indexed",
+    "summary": "42",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 915,
+        "end": 937
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 913,
+        "declarationEnd": 937,
+        "name": "n"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 913,
+        "declarationEnd": 937,
+        "name": "n"
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 941,
+        "end": 960
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1026,
+        "declarationEnd": 1027,
+        "name": "n"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 913,
+        "declarationEnd": 937,
+        "name": "n"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1051,
+        "declarationEnd": 1052,
+        "name": "n"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1026,
+        "declarationEnd": 1027,
+        "name": "n"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 913,
+        "declarationEnd": 937,
+        "name": "n"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1051,
+        "declarationEnd": 1052,
+        "name": "n"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 913,
+        "declarationEnd": 937,
+        "name": "n"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1026,
+        "declarationEnd": 1027,
+        "name": "n"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1026,
+        "declarationEnd": 1027,
+        "name": "n"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 913,
+        "declarationEnd": 937,
+        "name": "n"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1051,
+        "declarationEnd": 1052,
+        "name": "n"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1051,
+        "declarationEnd": 1052,
+        "name": "n"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 913,
+        "declarationEnd": 937,
+        "name": "n"
+      }
+    ]
+  },
+  {
+    "name": "mapped",
+    "summary": "43",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1190,
+        "end": 1211
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1228,
+        "end": 1249
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1223,
+        "declarationEnd": 1249,
+        "name": "item"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1223,
+        "declarationEnd": 1249,
+        "name": "item"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1350,
+        "declarationEnd": 1354,
+        "name": "item"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1350,
+        "declarationEnd": 1354,
+        "name": "item"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1223,
+        "declarationEnd": 1249,
+        "name": "item"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1350,
+        "declarationEnd": 1354,
+        "name": "item"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1350,
+        "declarationEnd": 1354,
+        "name": "item"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1223,
+        "declarationEnd": 1249,
+        "name": "item"
+      }
+    ]
+  },
+  {
+    "name": "healthy",
+    "summary": "44",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "errors": []
+  }
+]

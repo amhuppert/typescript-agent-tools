@@ -1,0 +1,2 @@
+interface Object {}
+interface Function {}

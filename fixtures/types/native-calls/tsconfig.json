@@ -1,0 +1,4 @@
+{
+  "compilerOptions": { "strict": true, "noLib": true, "types": [], "module": "esnext", "target": "esnext" },
+  "files": ["functions.ts", "consumer.ts"]
+}

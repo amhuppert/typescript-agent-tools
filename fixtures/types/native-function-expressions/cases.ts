@@ -1,0 +1,14 @@
+export {};
+const /*#ordinary*/ordinary = function (value: number): number { return value; };
+const /*#named*/named = function recur(value: string): string { return value; };
+const /*#arrow*/arrow = (value: number) => value;
+const /*#generic*/generic = <T>(value: T): T => value;
+const /*#initialized*/initialized = function (value = 1) { return value; };
+const /*#rest*/rest = function (...values: string[]): string { return values[0]; };
+const /*#iife*/iife = (function (value) { return value; })(1);
+declare function use(callback: (value: string) => number): number;
+const /*#context*/context = use(/*#contextParameter*/value => value.length);
+declare function useThis(callback: (this: { value: number }, value: string) => number): number;
+const /*#contextThis*/contextThis = useThis(function (value) { return 1; });
+const /*#constantPredicate*/constantPredicate = (x => true) satisfies (x: number) => boolean;
+const /*#constantComparison*/constantComparison = (x => 1 === 1) satisfies (x: number) => boolean;

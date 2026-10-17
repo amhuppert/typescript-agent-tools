@@ -1,0 +1,1 @@
+{"extends":"./tsconfig.json","files":["globals-second.ts","globals-first.ts","definitions.ts","sites.ts"]}

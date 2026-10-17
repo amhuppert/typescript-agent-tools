@@ -1,0 +1,32 @@
+type Uppercase<S extends string> = intrinsic;
+type Lowercase<S extends string> = intrinsic;
+type Capitalize<S extends string> = intrinsic;
+type Uncapitalize<S extends string> = intrinsic;
+type /*#match*/Match = `get${string}` & "getX";
+type /*#reverse*/Reverse = "getX" & `get${string}`;
+type /*#miss*/Miss = `get${string}` & "setX";
+type /*#upper*/Upper = Uppercase<string> & "ABC";
+type /*#upperMiss*/UpperMiss = Uppercase<string> & "abc";
+type /*#nested*/Nested = Uppercase<Lowercase<string>> & "ABC";
+type /*#multiple*/Multiple = `a${string}` & `${string}b` & "ab";
+type /*#multipleMiss*/MultipleMiss = `a${string}` & `${string}b` & "ac";
+type /*#primitive*/Primitive = string & `a${number}` & "a1";
+type /*#union*/Union = (`a${number}` | `b${number}`) & ("a1" | "b2" | "x");
+type /*#numberSpelling*/NumberSpelling = `${number}` & "0x10";
+type /*#numberMiss*/NumberMiss = `${number}` & "Infinity";
+type /*#anyMiss*/AnyMiss = any & `get${string}` & "setX";
+type /*#never*/Never = never & `get${string}` & "getX";
+type /*#unknown*/Unknown = unknown & `get${string}` & "getX";
+type /*#nullable*/Nullable = null & `get${string}` & "getX";
+type Generic<T extends string> = `get${T}` & "getX";
+type /*#substituted*/Substituted = Generic<"X">;
+type /*#substitutedMiss*/SubstitutedMiss = Generic<"Y">;
+declare function /*#deferred*/deferred<T extends string>(): `get${T}` & "getX";
+type /*#missing*/Missing = `get${MissingIntersection}` & "getX";
+namespace N { export type Uppercase<S extends string> = intrinsic; }
+type /*#qualified*/Qualified = N.Uppercase<string>;
+namespace M { export type Uppercase<S extends string> = intrinsic; }
+type /*#distinctMappings*/DistinctMappings = N.Uppercase<string> | M.Uppercase<string>;
+type /*#versionLower*/VersionLower = Lowercase<"\uA7CB\uA7CC\uA7DA">;
+type /*#versionUpper*/VersionUpper = Uppercase<"\u0264\uA7CD\uA7DB">;
+declare const unionExpanded: (`a${number}` | `b${number}`) & ("a1" | "b2" | "x");

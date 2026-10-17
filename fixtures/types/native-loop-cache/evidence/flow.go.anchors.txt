@@ -1,0 +1,199 @@
+internal/checker/flow.go:1300-1394
+1300: 	}
+1301: 	return result
+1302: }
+1303: 
+1304: func (c *Checker) getTypeAtFlowLoopLabel(f *FlowState, flow *ast.FlowNode) FlowType {
+1305: 	if f.refKey.IsZero() {
+1306: 		f.refKey = c.getFlowReferenceKey(f)
+1307: 	}
+1308: 	if f.refKey == nonDottedNameCacheKey {
+1309: 		// No cache key is generated when binding patterns are in unnarrowable situations
+1310: 		return FlowType{t: f.declaredType}
+1311: 	}
+1312: 	key := FlowLoopKey{flowNode: flow, refKey: f.refKey}
+1313: 	// If we have previously computed the control flow type for the reference at
+1314: 	// this flow loop junction, return the cached type.
+1315: 	if cached := c.flowLoopCache[key]; cached != nil {
+1316: 		return FlowType{t: cached}
+1317: 	}
+1318: 	// If this flow loop junction and reference are already being processed, return
+1319: 	// the union of the types computed for each branch so far, marked as incomplete.
+1320: 	// It is possible to see an empty array in cases where loops are nested and the
+1321: 	// back edge of the outer loop reaches an inner loop that is already being analyzed.
+1322: 	// In such cases we restart the analysis of the inner loop, which will then see
+1323: 	// a non-empty in-process array for the outer loop and eventually terminate because
+1324: 	// the first antecedent of a loop junction is always the non-looping control flow
+1325: 	// path that leads to the top.
+1326: 	for _, loopInfo := range c.flowLoopStack {
+1327: 		if loopInfo.key == key && len(loopInfo.types) != 0 {
+1328: 			return c.newFlowType(c.getUnionOrEvolvingArrayType(f, loopInfo.types, UnionReductionLiteral), true /*incomplete*/)
+1329: 		}
+1330: 	}
+1331: 	// Add the flow loop junction and reference to the in-process stack and analyze
+1332: 	// each antecedent code path.
+1333: 	antecedentTypes := make([]*Type, 0, 4)
+1334: 	subtypeReduction := false
+1335: 	var firstAntecedentType FlowType
+1336: 	for list := flow.Antecedents; list != nil; list = list.Next {
+1337: 		var flowType FlowType
+1338: 		if firstAntecedentType.isNil() {
+1339: 			// The first antecedent of a loop junction is always the non-looping control
+1340: 			// flow path that leads to the top.
+1341: 			firstAntecedentType = c.getTypeAtFlowNode(f, list.Flow)
+1342: 			flowType = firstAntecedentType
+1343: 		} else {
+1344: 			// All but the first antecedent are the looping control flow paths that lead
+1345: 			// back to the loop junction. We track these on the flow loop stack.
+1346: 			c.flowLoopStack = append(c.flowLoopStack, FlowLoopInfo{key: key, types: antecedentTypes})
+1347: 			saveFlowTypeCache := c.flowTypeCache
+1348: 			c.flowTypeCache = nil
+1349: 			flowType = c.getTypeAtFlowNode(f, list.Flow)
+1350: 			c.flowTypeCache = saveFlowTypeCache
+1351: 			c.flowLoopStack = c.flowLoopStack[:len(c.flowLoopStack)-1]
+1352: 			// If we see a value appear in the cache it is a sign that control flow analysis
+1353: 			// was restarted and completed by checkExpressionCached. We can simply pick up
+1354: 			// the resulting type and bail out.
+1355: 			if cached := c.flowLoopCache[key]; cached != nil {
+1356: 				return FlowType{t: cached}
+1357: 			}
+1358: 		}
+1359: 		antecedentTypes = core.AppendIfUnique(antecedentTypes, flowType.t)
+1360: 		// If an antecedent type is not a subset of the declared type, we need to perform
+1361: 		// subtype reduction. This happens when a "foreign" type is injected into the control
+1362: 		// flow using the instanceof operator or a user defined type predicate.
+1363: 		if !c.isTypeSubsetOf(flowType.t, f.initialType) {
+1364: 			subtypeReduction = true
+1365: 		}
+1366: 		// If the type at a particular antecedent path is the declared type there is no
+1367: 		// reason to process more antecedents since the only possible outcome is subtypes
+1368: 		// that will be removed in the final union type anyway.
+1369: 		if flowType.t == f.declaredType {
+1370: 			break
+1371: 		}
+1372: 	}
+1373: 	// The result is incomplete if the first antecedent (the non-looping control flow path)
+1374: 	// is incomplete.
+1375: 	result := c.getUnionOrEvolvingArrayType(f, antecedentTypes, core.IfElse(subtypeReduction, UnionReductionSubtype, UnionReductionLiteral))
+1376: 	if firstAntecedentType.incomplete {
+1377: 		return c.newFlowType(result, true /*incomplete*/)
+1378: 	}
+1379: 	c.flowLoopCache[key] = result
+1380: 	return FlowType{t: result}
+1381: }
+1382: 
+1383: func (c *Checker) getTypeAtFlowArrayMutation(f *FlowState, flow *ast.FlowNode) FlowType {
+1384: 	if f.declaredType == c.autoType || f.declaredType == c.autoArrayType {
+1385: 		node := flow.Node
+1386: 		var expr *ast.Node
+1387: 		if ast.IsCallExpression(node) {
+1388: 			expr = node.Expression().Expression()
+1389: 		} else {
+1390: 			expr = node.AsBinaryExpression().Left.Expression()
+1391: 		}
+1392: 		if c.isMatchingReference(f.reference, c.getReferenceCandidate(expr)) {
+1393: 			flowType := c.getTypeAtFlowNode(f, flow.Antecedent)
+1394: 			if flowType.t.objectFlags&ObjectFlagsEvolvingArray != 0 {
+
+internal/checker/flow.go:1628-1664
+1628: }
+1629: 
+1630: var nonDottedNameCacheKey = CacheHashKey(xxh3.HashString128("?"))
+1631: 
+1632: // Return the flow cache key for a "dotted name" (i.e. a sequence of identifiers
+1633: // separated by dots). The key consists of the id of the symbol referenced by the
+1634: // leftmost identifier followed by zero or more property names separated by dots.
+1635: // The result is nonDottedNameCacheKey if the reference isn't a dotted name.
+1636: func (c *Checker) getFlowReferenceKey(f *FlowState) CacheHashKey {
+1637: 	var b keyBuilder
+1638: 	if c.writeFlowCacheKey(&b, f.reference, f.declaredType, f.initialType, f.flowContainer) {
+1639: 		return b.hash()
+1640: 	}
+1641: 	return nonDottedNameCacheKey // Reference isn't a dotted name
+1642: }
+1643: 
+1644: func (c *Checker) writeFlowCacheKey(b *keyBuilder, node *ast.Node, declaredType *Type, initialType *Type, flowContainer *ast.Node) bool {
+1645: 	switch node.Kind {
+1646: 	case ast.KindIdentifier:
+1647: 		if !ast.IsThisInTypeQuery(node) {
+1648: 			symbol := c.getResolvedSymbol(node)
+1649: 			if symbol == c.unknownSymbol {
+1650: 				return false
+1651: 			}
+1652: 			b.writeSymbol(symbol)
+1653: 		}
+1654: 		fallthrough
+1655: 	case ast.KindThisKeyword:
+1656: 		b.writeByte(':')
+1657: 		b.writeType(declaredType)
+1658: 		if initialType != declaredType {
+1659: 			b.writeByte('=')
+1660: 			b.writeType(initialType)
+1661: 		}
+1662: 		if flowContainer != nil {
+1663: 			b.writeByte('@')
+1664: 			b.writeNode(flowContainer)
+
+internal/checker/flow.go:225-285
+225: 		if !c.isReachableFlowNode(flow) {
+226: 			return FlowType{t: c.unreachableNeverType}
+227: 		}
+228: 		if getAssignmentTargetKind(node) == AssignmentKindCompound {
+229: 			flowType := c.getTypeAtFlowNode(f, flow.Antecedent)
+230: 			return c.newFlowType(c.getBaseTypeOfLiteralType(flowType.t), flowType.incomplete)
+231: 		}
+232: 		if f.declaredType == c.autoType || f.declaredType == c.autoArrayType {
+233: 			if c.isEmptyArrayAssignment(node) {
+234: 				return FlowType{t: c.getEvolvingArrayType(c.neverType)}
+235: 			}
+236: 			assignedType := c.getWidenedLiteralType(c.getInitialOrAssignedType(f, flow))
+237: 			if c.isTypeAssignableTo(assignedType, f.declaredType) {
+238: 				return FlowType{t: assignedType}
+239: 			}
+240: 			return FlowType{t: c.anyArrayType}
+241: 		}
+242: 		t := f.declaredType
+243: 		if isInCompoundLikeAssignment(node) {
+244: 			t = c.getBaseTypeOfLiteralType(t)
+245: 		}
+246: 		if t.flags&TypeFlagsUnion != 0 {
+247: 			return FlowType{t: c.getAssignmentReducedType(t, c.getInitialOrAssignedType(f, flow))}
+248: 		}
+249: 		return FlowType{t: t}
+250: 	}
+251: 	// We didn't have a direct match. However, if the reference is a dotted name, this
+252: 	// may be an assignment to a left hand part of the reference. For example, for a
+253: 	// reference 'x.y.z', we may be at an assignment to 'x.y' or 'x'. In that case,
+254: 	// return the declared type.
+255: 	if c.containsMatchingReference(f.reference, node) {
+256: 		if !c.isReachableFlowNode(flow) {
+257: 			return FlowType{t: c.unreachableNeverType}
+258: 		}
+259: 		// A matching dotted name might also be an expando property on a function *expression*,
+260: 		// in which case we continue control flow analysis back to the function's declaration
+261: 		if ast.IsVariableDeclaration(node) && (ast.IsInJSFile(node) || ast.IsVarConstLike(node)) {
+262: 			if init := node.Initializer(); init != nil && ast.IsFunctionExpressionOrArrowFunction(init) {
+263: 				return c.getTypeAtFlowNode(f, flow.Antecedent)
+264: 			}
+265: 		}
+266: 		return FlowType{t: f.declaredType}
+267: 	}
+268: 	// for (const _ in ref) acts as a nonnull on ref
+269: 	if ast.IsVariableDeclaration(node) && ast.IsForInStatement(node.Parent.Parent) && (c.isMatchingReference(f.reference, node.Parent.Parent.Expression()) || c.optionalChainContainsReference(node.Parent.Parent.Expression(), f.reference)) {
+270: 		return FlowType{t: c.getNonNullableTypeIfNeeded(c.finalizeEvolvingArrayType(c.getTypeAtFlowNode(f, flow.Antecedent).t))}
+271: 	}
+272: 	// Assignment doesn't affect reference
+273: 	return FlowType{}
+274: }
+275: 
+276: func (c *Checker) getInitialOrAssignedType(f *FlowState, flow *ast.FlowNode) *Type {
+277: 	if ast.IsVariableDeclaration(flow.Node) || ast.IsBindingElement(flow.Node) {
+278: 		return c.getNarrowableTypeForReference(c.getInitialType(flow.Node), f.reference, CheckModeNormal)
+279: 	}
+280: 	return c.getNarrowableTypeForReference(c.getAssignedType(flow.Node), f.reference, CheckModeNormal)
+281: }
+282: 
+283: func (c *Checker) isEmptyArrayAssignment(node *ast.Node) bool {
+284: 	return ast.IsVariableDeclaration(node) && node.Initializer() != nil && isEmptyArrayLiteral(node.Initializer()) ||
+285: 		!ast.IsBindingElement(node) && ast.IsBinaryExpression(node.Parent) && isEmptyArrayLiteral(node.Parent.AsBinaryExpression().Right)
+

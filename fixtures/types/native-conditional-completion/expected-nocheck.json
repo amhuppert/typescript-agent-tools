@@ -1,0 +1,424 @@
+[
+  {
+    "name": "directAny",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 459,
+        "end": 477
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 479,
+        "end": 498
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 438,
+        "end": 498
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 413,
+        "declarationEnd": 498,
+        "name": "directAny"
+      }
+    ]
+  },
+  {
+    "name": "genericAny",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 535,
+        "end": 554
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 556,
+        "end": 576
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 618,
+        "end": 630
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 591,
+        "declarationEnd": 630,
+        "name": "genericAny"
+      }
+    ]
+  },
+  {
+    "name": "distributed",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 535,
+        "end": 554
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 556,
+        "end": 576
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 674,
+        "end": 693
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 645,
+        "declarationEnd": 693,
+        "name": "distributed"
+      }
+    ]
+  },
+  {
+    "name": "trueOnly",
+    "summary": "41",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "falseOnly",
+    "summary": "42",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "errorAlias",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 903,
+        "end": 916
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 903,
+        "end": 916
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 933,
+        "end": 950
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 952,
+        "end": 970
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 903,
+        "end": 970
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 876,
+        "declarationEnd": 970,
+        "name": "errorAlias"
+      }
+    ]
+  },
+  {
+    "name": "bareCheck",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2339,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1010,
+        "end": 1028
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1036,
+        "end": 1051
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1010,
+        "end": 1098
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 985,
+        "declarationEnd": 1098,
+        "name": "bareCheck"
+      }
+    ]
+  },
+  {
+    "name": "bareExtends",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2339
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1142,
+        "end": 1156
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1164,
+        "end": 1182
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1142,
+        "end": 1228
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1113,
+        "declarationEnd": 1228,
+        "name": "bareExtends"
+      }
+    ]
+  },
+  {
+    "name": "inference",
+    "summary": "[MissingInferSource, MissingInferAfter]",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1277,
+        "end": 1296
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1270,
+        "declarationEnd": 1296,
+        "name": "value"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1308,
+        "declarationEnd": 1323,
+        "name": "value"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1308,
+        "declarationEnd": 1323,
+        "name": "value"
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1331,
+        "end": 1349
+      }
+    ]
+  },
+  {
+    "name": "tailFalse",
+    "summary": "MissingTailTrue",
+    "errorType": true,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1397,
+        "end": 1413
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1524,
+        "end": 1532
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1499,
+        "declarationEnd": 1532,
+        "name": "tailFalse"
+      }
+    ]
+  },
+  {
+    "name": "nestedAny",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1566,
+        "end": 1585
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1603,
+        "end": 1623
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1625,
+        "end": 1643
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1683,
+        "end": 1695
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1658,
+        "declarationEnd": 1695,
+        "name": "nestedAny"
+      }
+    ]
+  },
+  {
+    "name": "mappedLowerBound",
+    "summary": "MissingMappedValue",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1726,
+        "end": 1743
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1726,
+        "end": 1743
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1726,
+        "end": 1743
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1819,
+        "end": 1838
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1726,
+        "end": 1743
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1915,
+        "declarationEnd": 1955,
+        "name": "selected"
+      }
+    ]
+  },
+  {
+    "name": "healthyLowerBound",
+    "summary": "44",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "repeatedInstantiation",
+    "summary": "[any, any]",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 535,
+        "end": 554
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 556,
+        "end": 576
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 2270,
+        "end": 2281
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 2282,
+        "end": 2294
+      }
+    ]
+  },
+  {
+    "name": "healthy",
+    "summary": "45",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "errors": []
+  }
+]

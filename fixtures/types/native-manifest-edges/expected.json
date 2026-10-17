@@ -1,0 +1,1006 @@
+[
+  {
+    "name": "versions-control",
+    "selected": {
+      "summary": "\"first\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "versions-empty-range",
+    "selected": {
+      "summary": "\"base\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts",
+        "node_modules/pkg/index.d.ts"
+      ]
+    },
+    "display": "\"pkg/first.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "versions-first-matching-invalid",
+    "selected": {
+      "summary": "\"base\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts",
+        "node_modules/pkg/index.d.ts"
+      ]
+    },
+    "display": "\"pkg/first.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "versions-first-matching-empty",
+    "selected": {
+      "summary": "\"base\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts",
+        "node_modules/pkg/index.d.ts"
+      ]
+    },
+    "display": "\"pkg/first.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "versions-invalid-range-skipped",
+    "selected": {
+      "summary": "\"first\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "versions-nonarray-target-skipped",
+    "selected": {
+      "summary": "\"first\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"pkg/*\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "versions-empty-target-array",
+    "selected": {
+      "summary": "\"base\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts",
+        "node_modules/pkg/index.d.ts"
+      ]
+    },
+    "display": "\"pkg/*\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "versions-nonstring-first",
+    "selected": {
+      "summary": "\"base\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts",
+        "node_modules/pkg/index.d.ts"
+      ]
+    },
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "versions-null-first",
+    "selected": {
+      "summary": "\"base\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts",
+        "node_modules/pkg/index.d.ts"
+      ]
+    },
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "versions-empty-string-first",
+    "selected": {
+      "summary": "\"base\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts",
+        "node_modules/pkg/index.d.ts"
+      ]
+    },
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "versions-nonstring-after-miss",
+    "selected": {
+      "summary": "\"base\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts",
+        "node_modules/pkg/index.d.ts"
+      ]
+    },
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "versions-duplicate-mapping",
+    "selected": {
+      "summary": "\"second\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts",
+        "node_modules/pkg/second.d.ts"
+      ]
+    },
+    "display": "\"pkg/first.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/second.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "versions-duplicate-range",
+    "selected": {
+      "summary": "\"second\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts",
+        "node_modules/pkg/second.d.ts"
+      ]
+    },
+    "display": "\"pkg/first.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/second.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "exports-subpath-control",
+    "selected": {
+      "summary": "\"first\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "exports-dot-hash",
+    "selected": {
+      "summary": "\"first\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "exports-hash-dot",
+    "selected": {
+      "summary": "\"first\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "exports-empty-dot",
+    "selected": {
+      "summary": "\"first\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "exports-empty-conditions",
+    "selected": {
+      "summary": "\"first\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "exports-empty-default",
+    "selected": {
+      "summary": "\"second\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts",
+        "node_modules/pkg/second.d.ts"
+      ]
+    },
+    "display": "\"./node_modules/pkg/first.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/second.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "exports-empty-only",
+    "selected": {
+      "summary": "any",
+      "errorType": true,
+      "unknown": true,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"./node_modules/pkg/first.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": null,
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "exports-empty-object",
+    "selected": {
+      "summary": "any",
+      "errorType": true,
+      "unknown": true,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"./node_modules/pkg/first.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": null,
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "exports-hash-only",
+    "selected": {
+      "summary": "any",
+      "errorType": true,
+      "unknown": true,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"./node_modules/pkg/first.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": null,
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "exports-dot-condition-invalid",
+    "selected": {
+      "summary": "\"first\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"./node_modules/pkg/first.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "exports-hash-condition-invalid",
+    "selected": {
+      "summary": "any",
+      "errorType": true,
+      "unknown": true,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"./node_modules/pkg/first.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": null,
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "exports-dot-hash-condition-invalid",
+    "selected": {
+      "summary": "\"first\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"./node_modules/pkg/first.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "exports-duplicate-subpath",
+    "selected": {
+      "summary": "\"second\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts",
+        "node_modules/pkg/second.d.ts"
+      ]
+    },
+    "display": "\"./node_modules/pkg/first.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/second.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "exports-duplicate-condition",
+    "selected": {
+      "summary": "\"first\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "exports-entry-dot-hash",
+    "selected": {
+      "summary": "\"first\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"pkg/entry\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "pkg/entry"
+      }
+    ]
+  },
+  {
+    "name": "exports-entry-hash-dot",
+    "selected": {
+      "summary": "\"first\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"pkg/entry\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "pkg/entry"
+      }
+    ]
+  },
+  {
+    "name": "exports-entry-empty-dot",
+    "selected": {
+      "summary": "\"first\"",
+      "errorType": false,
+      "unknown": false,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"pkg/entry\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "pkg/entry"
+      }
+    ]
+  },
+  {
+    "name": "exports-entry-dot-condition-invalid",
+    "selected": {
+      "summary": "any",
+      "errorType": true,
+      "unknown": true,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"./node_modules/pkg/first.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": null,
+        "text": "pkg/entry"
+      }
+    ]
+  },
+  {
+    "name": "exports-entry-empty-conditions",
+    "selected": {
+      "summary": "any",
+      "errorType": true,
+      "unknown": true,
+      "loaded": [
+        "node_modules/pkg/first.d.ts"
+      ]
+    },
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/first.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/first.d.ts",
+        "text": "./node_modules/pkg/first.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": null,
+        "text": "pkg/entry"
+      }
+    ]
+  }
+]

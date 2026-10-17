@@ -1,0 +1,21 @@
+export {};
+declare const mixed: Function | ((value?: string) => number);
+const /*#chosen*/chosen = (
+    /* a */ mixed(),
+    /* a */ mixed(),
+    /* a */ mixed(),
+    /* a */ mixed(),
+    /* a */ mixed(),
+    /* a */ mixed(),
+    /* a */ mixed(),
+    /* a */ mixed(),
+    /* a */ mixed(),
+    /* a */ mixed(),
+    /* a */ mixed(),
+    /* a */ mixed(),
+    /* a */ mixed(),
+    /* a */ mixed(),
+    /* a */ mixed(),
+    /* a */ mixed(),
+    17 as const);
+let healthy: number;

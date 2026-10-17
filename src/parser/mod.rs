@@ -1,5 +1,6 @@
 use crate::compiler::{node as node_flags, script, target, token as token_flags, variant};
 use crate::lexer::{Kind, Lexer, Token};
+use crate::resources::{Control, Stop};
 use crate::syntax_kind::{SyntaxKind, SyntaxKind::*};
 use crate::{Ast, Diagnostic, Node, NodeId, ParseOptions, Span, Value};
 use std::collections::HashSet;
@@ -7,7 +8,10 @@ use std::collections::HashSet;
 type Fields<'src> = crate::ast::Fields<'src>;
 macro_rules! fields {
     ($($value:tt)*) => {{
-        let fields: Fields<'_> = smallvec::smallvec![$($value)*];
+        let mut fields: Fields<'_> = Fields::new();
+        for value in [$($value)*] {
+            fields.push(value);
+        }
         fields
     }};
 }
@@ -15,9 +19,10 @@ macro_rules! fields {
 mod angles;
 mod context;
 mod expressions;
+pub(crate) mod jsdoc;
 pub(crate) mod json;
 mod jsx;
-mod literals;
+pub(crate) mod literals;
 mod statements;
 mod types;
 
@@ -26,7 +31,23 @@ use context::{
     YIELD,
 };
 
-type Result<T> = std::result::Result<T, Diagnostic>;
+type Result<T> = std::result::Result<T, Failure>;
+
+#[derive(Clone, Debug)]
+pub(crate) enum Failure {
+    Syntax(Diagnostic),
+    Interrupted(Stop),
+}
+impl From<Diagnostic> for Failure {
+    fn from(error: Diagnostic) -> Self {
+        Self::Syntax(error)
+    }
+}
+impl From<Stop> for Failure {
+    fn from(error: Stop) -> Self {
+        Self::Interrupted(error)
+    }
+}
 
 /// The message of the one diagnostic that reports an exhausted grammar
 /// budget rather than invalid syntax (`exhaustion`).
@@ -62,6 +83,8 @@ struct FailedProbe {
     depth: usize,
     recovering_types: bool,
 }
+// Only fixed tags/offsets/grammar bits participate in this identity; growth
+// can rehash it without visiting source text or allocating key payload.
 
 pub(crate) struct Parser<'src> {
     lexer: Lexer<'src>,
@@ -89,6 +112,7 @@ pub(crate) struct Parser<'src> {
     // The first depth-budget diagnostic, including one raised by a speculative
     // interpretation. Rollback keeps it, so exhaustion always ends the parse.
     exhausted: Option<Diagnostic>,
+    control: Option<Control>,
 }
 
 /// A speculative parse owns newly appended nodes. Existing nodes are read-only
@@ -107,33 +131,85 @@ struct Checkpoint<'src> {
 
 impl<'src> Parser<'src> {
     pub fn new(source: &'src str, options: ParseOptions) -> Self {
-        let mut lexer = Lexer {
-            src: source,
-            pos: 0,
+        Self::initialize(source, options, None).expect("uncontrolled parser cannot stop")
+    }
+
+    fn initialize(
+        source: &'src str,
+        options: ParseOptions,
+        control: Option<Control>,
+    ) -> Result<Self> {
+        Self::initialize_at(source, options, control, None)
+    }
+
+    /// A JSDoc fragment borrows the original prefix so offsets stay exact.
+    /// It does not repeat whole-file await discovery or reserve a file arena.
+    fn initialize_at(
+        source: &'src str,
+        options: ParseOptions,
+        control: Option<Control>,
+        jsdoc_start: Option<usize>,
+    ) -> Result<Self> {
+        let mut lexer = Lexer::new(source, jsdoc_start.unwrap_or(0));
+        let current = if jsdoc_start.is_some() {
+            lexer.next_jsdoc(control.as_ref())?
+        } else {
+            lexer.next_controlled(control.as_ref())?
         };
-        let current = lexer.next();
-        let context = GrammarContext::new(options.declaration_file());
-        let track_await = !options.declaration_file() && source.contains("await");
-        Self {
+        let context =
+            GrammarContext::new(options.declaration_file()).with(if jsdoc_start.is_some() {
+                node_flags::JSDOC
+            } else {
+                0
+            });
+        let track_await =
+            jsdoc_start.is_none() && !options.declaration_file() && source.contains("await");
+        let nodes = Vec::with_capacity(if jsdoc_start.is_some() {
+            0
+        } else {
+            (source.len() / 16).min(16_384)
+        });
+        Ok(Self {
             lexer,
             current,
             end: 0,
-            nodes: Vec::with_capacity((source.len() / 16).min(16_384)),
+            nodes,
             options,
             depth: 0,
             context,
             source_flags: 0,
             track_await,
-            type_recovery: TypeRecovery::Strict,
+            type_recovery: if jsdoc_start.is_some() {
+                TypeRecovery::Recovering(None)
+            } else {
+                TypeRecovery::Strict
+            },
             failed_probes: HashSet::new(),
             angles: angles::Angles::default(),
             speculation: None,
             type_argument_frames: 0,
             exhausted: None,
+            control,
+        })
+    }
+
+    pub fn parse(self) -> std::result::Result<Ast<'src>, Diagnostic> {
+        match self.parse_result() {
+            Ok(ast) => Ok(ast),
+            Err(Failure::Syntax(error)) => Err(error),
+            Err(Failure::Interrupted(_)) => unreachable!("uncontrolled parser was interrupted"),
         }
     }
 
-    pub fn parse(mut self) -> Result<Ast<'src>> {
+    pub(crate) fn with_control(
+        source: &'src str,
+        options: ParseOptions,
+        control: Control,
+    ) -> Result<Self> {
+        Self::initialize(source, options, Some(control))
+    }
+
+    pub(crate) fn parse_result(mut self) -> Result<Ast<'src>> {
         self.validate_pragmas()?;
         let mut statements = Vec::new();
         let mut deferred_error = None;
@@ -146,7 +222,7 @@ impl<'src> Parser<'src> {
             };
             let statement = match parsed {
                 Ok(statement) => statement,
-                Err(error) if has_await && self.module_token_present() => {
+                Err(error) if has_await && self.module_token_present()? => {
                     if deferred_error.is_none() {
                         deferred_error = Some(error);
                     }
@@ -166,7 +242,9 @@ impl<'src> Parser<'src> {
         }
         // Exhaustion in a discarded interpretation still fails the parse.
         self.check_budget()?;
+        let eof_site = self.jsdoc_site();
         let eof = self.token_node()?;
+        self.native_jsdoc(eof_site, eof)?;
         let root = self.make(
             SourceFile,
             0,
@@ -196,11 +274,11 @@ impl<'src> Parser<'src> {
                 ("fileName", self.options.file_name.clone().into()),
                 ("parseDiagnostics", Vec::<NodeId>::new().into()),
             ],
-        );
+        )?;
         self.nodes[root.0].flags |= self.source_flags;
         let mut utf16_deltas = Vec::new();
         let mut delta = 0;
-        if !self.lexer.src.is_ascii() {
+        {
             for (byte, c) in self.lexer.src.char_indices() {
                 if !c.is_ascii() {
                     delta += c.len_utf8() - c.len_utf16();
@@ -208,7 +286,8 @@ impl<'src> Parser<'src> {
                 }
             }
         }
-        if self.nodes.capacity() > self.nodes.len() + self.nodes.len() / 2 {
+        if self.control.is_none() && self.nodes.capacity() > self.nodes.len() + self.nodes.len() / 2
+        {
             self.nodes.shrink_to_fit();
         }
         Ok(Ast {
@@ -221,15 +300,16 @@ impl<'src> Parser<'src> {
 
     fn validate_pragmas(&self) -> Result<()> {
         let leading = &self.lexer.src[..self.current.start];
-        for reference in crate::pragmas::references(leading) {
+        for reference in crate::pragmas::references_controlled(leading, self.control.as_ref()) {
+            let reference = reference?;
             use crate::pragmas::{Directive, TypesMode};
             // TypeScript's `processPragmasIntoFields` reports an invalid
             // `resolution-mode` at its value (`parseResolutionMode`) and any
             // other invalid directive at the whole comment.
-            let error = match reference.directive() {
+            let error = match reference.directive_controlled()? {
                 Directive::Types(_, _, TypesMode::Invalid) => {
                     let (value, start) = reference
-                        .attribute("resolution-mode")
+                        .attribute_controlled("resolution-mode")?
                         .expect("an invalid mode is written");
                     Some((
                         "'resolution-mode' must be 'require' or 'import'",
@@ -251,27 +331,25 @@ impl<'src> Parser<'src> {
                 return Err(Diagnostic {
                     message: message.into(),
                     span,
-                });
+                }
+                .into());
             }
         }
         Ok(())
     }
 
-    fn module_token_present(&self) -> bool {
-        let mut lexer = Lexer {
-            src: self.lexer.src,
-            pos: 0,
-        };
+    fn module_token_present(&self) -> Result<bool> {
+        let mut lexer = Lexer::new(self.lexer.src, 0);
         loop {
-            let token = lexer.next();
+            let token = lexer.next_controlled(self.control.as_ref())?;
             if token.kind == Kind::Eof {
-                return false;
+                return Ok(false);
             }
             if token.raw == "export" {
-                return true;
+                return Ok(true);
             }
-            if token.raw == "import" && lexer.next().raw != "(" {
-                return true;
+            if token.raw == "import" && lexer.next_controlled(self.control.as_ref())?.raw != "(" {
+                return Ok(true);
             }
         }
     }
@@ -286,13 +364,15 @@ impl<'src> Parser<'src> {
     /// A method's computed name and decorators belong to its enclosing scope;
     /// its body does not. Property initializers still trigger class reparsing,
     /// although their grammar context continues to disallow await expressions.
-    fn await_summary(&self, kind: SyntaxKind, fields: &Fields<'src>) -> bool {
+    fn await_summary(&self, kind: SyntaxKind, fields: &Fields<'src>) -> Result<bool> {
         if !self.track_await {
-            return false;
+            return Ok(false);
         }
         if kind == Identifier {
-            return matches!(fields.iter().find(|(key, _)| *key == "escapedText"),
-                Some((_, Value::Text(text))) if text == "await");
+            return Ok(
+                matches!(fields.iter().find(|(key, _)| *key == "escapedText"),
+                Some((_, Value::Text(text))) if text == "await"),
+            );
         }
         if (TypePredicate.number()..=ImportType.number()).contains(&kind.number())
             || matches!(
@@ -324,50 +404,60 @@ impl<'src> Parser<'src> {
                     | NamespaceExportDeclaration
             )
         {
-            return false;
+            return Ok(false);
         }
         let method = matches!(kind, MethodDeclaration | GetAccessor | SetAccessor);
         if method && !fields.iter().any(|(key, _)| *key == "body") {
-            return false;
+            return Ok(false);
         }
         if matches!(kind, ClassDeclaration | ClassExpression)
             && matches!(fields.iter().find(|(key, _)| *key == "modifiers"),
-                Some((_, Value::Nodes(ids))) if ids.iter().any(|id| self.nodes[id.0].syntax_kind == DeclareKeyword))
+                Some((_, Value::Nodes(ids))) if self.has_modifier(ids, DeclareKeyword)?)
         {
-            return false;
+            return Ok(false);
         }
-        fields.iter().any(|(key, value)| {
+        for (key, value) in fields {
             if matches!(*key, "type" | "typeArguments" | "typeParameters")
                 || method && *key == "body"
             {
-                return false;
+                continue;
             }
-            let child = |id: &NodeId| {
+            let child = |id: &NodeId| -> Result<bool> {
                 let node = &self.nodes[id.0];
-                // Identifier names may be spelled `await`; computed names and
-                // binding patterns retain the summaries of their expressions.
-                !(matches!(*key, "name" | "propertyName" | "label")
+                Ok(!(matches!(*key, "name" | "propertyName" | "label")
                     && node.syntax_kind == Identifier)
-                    && node.possible_top_level_await
+                    && node.possible_top_level_await)
             };
             match value {
-                Value::Node(id) => child(id),
-                Value::Nodes(ids) => ids.iter().any(child),
-                _ => false,
+                Value::Node(id) => {
+                    if child(id)? {
+                        return Ok(true);
+                    }
+                }
+                Value::Nodes(ids) => {
+                    for id in ids {
+                        if child(id)? {
+                            return Ok(true);
+                        }
+                    }
+                }
+                _ => {}
             }
-        })
+        }
+        Ok(false)
     }
 
-    fn refresh_await_summary(&mut self, id: NodeId) {
+    fn refresh_await_summary(&mut self, id: NodeId) -> Result<()> {
         let node = &self.nodes[id.0];
-        let summary = self.await_summary(node.syntax_kind, &node.fields);
+        let summary = self.await_summary(node.syntax_kind, &node.fields)?;
         self.nodes[id.0].possible_top_level_await = summary;
+        Ok(())
     }
 
-    fn set_kind(&mut self, id: NodeId, kind: SyntaxKind) {
+    fn set_kind(&mut self, id: NodeId, kind: SyntaxKind) -> Result<()> {
         self.nodes[id.0].syntax_kind = kind;
         self.nodes[id.0].kind = kind.name();
-        self.refresh_await_summary(id);
+        self.refresh_await_summary(id)
     }
 
     fn reparse_top_level_await(&mut self, original: Vec<NodeId>) -> Result<Vec<NodeId>> {
@@ -386,7 +476,7 @@ impl<'src> Parser<'src> {
                     continue;
                 }
                 p.lexer.pos = p.start(original[index]);
-                p.current = p.lexer.next();
+                p.current = p.lexer.next_controlled(p.control.as_ref())?;
                 p.end = p.current.full_start;
                 let mut limit = p.nodes[original[index].0].span.end;
                 loop {
@@ -414,7 +504,7 @@ impl<'src> Parser<'src> {
         result
     }
 
-    fn error(&self, message: impl Into<String>) -> Diagnostic {
+    fn diagnostic(&self, message: impl Into<String>) -> Diagnostic {
         Diagnostic {
             message: message.into(),
             span: Span {
@@ -423,8 +513,16 @@ impl<'src> Parser<'src> {
             },
         }
     }
-    fn check_token(&self) -> Result<()> {
+    fn error(&self, message: impl Into<String>) -> Failure {
+        self.diagnostic(message).into()
+    }
+    fn check_token(&mut self) -> Result<()> {
+        self.check_budget()?;
         match self.current.error {
+            Some(message) if self.context.contains(node_flags::JSDOC) => {
+                self.type_recovery_diagnostic(message);
+                Ok(())
+            }
             Some(message) => Err(self.error(message)),
             None => Ok(()),
         }
@@ -433,23 +531,23 @@ impl<'src> Parser<'src> {
         self.check_token()?;
         let previous = self.current;
         self.end = previous.end;
-        self.current = self.lexer.next();
+        self.current = self.lexer.next_controlled(self.control.as_ref())?;
         Ok(previous)
     }
     fn at(&self, raw: &str) -> bool {
         self.current.raw == raw
     }
-    fn peek(&self) -> Token<'src> {
+    fn peek(&self) -> Result<Token<'src>> {
         let mut lexer = self.lexer;
-        lexer.next()
+        Ok(lexer.next_controlled(self.control.as_ref())?)
     }
-    fn peek_at(&self, raw: &str) -> bool {
-        self.peek().raw == raw
+    fn peek_at(&self, raw: &str) -> Result<bool> {
+        Ok(self.peek()?.raw == raw)
     }
-    fn peek_second(&self) -> Token<'src> {
+    fn peek_second(&self) -> Result<Token<'src>> {
         let mut lexer = self.lexer;
-        lexer.next();
-        lexer.next()
+        lexer.next_controlled(self.control.as_ref())?;
+        Ok(lexer.next_controlled(self.control.as_ref())?)
     }
     fn eat(&mut self, raw: &str) -> Result<bool> {
         if self.at(raw) {
@@ -462,6 +560,21 @@ impl<'src> Parser<'src> {
     fn expect(&mut self, raw: &str) -> Result<Token<'src>> {
         if self.at(raw) {
             self.bump()
+        } else if self.context.contains(node_flags::JSDOC) {
+            // Native JSDoc parsing records missing syntax without consuming
+            // the next token; TS discards those diagnostics after the comment.
+            // This mode is private to a JSDoc fragment, never source recovery.
+            self.check_budget()?;
+            self.type_recovery_diagnostic(&format!("Expected '{raw}'"));
+            Ok(Token {
+                kind: Kind::Punct,
+                raw: "",
+                start: self.pos(),
+                full_start: self.pos(),
+                end: self.pos(),
+                newline: false,
+                error: None,
+            })
         } else {
             Err(self.error(format!("Expected '{raw}', found '{}'", self.current.raw)))
         }
@@ -472,37 +585,74 @@ impl<'src> Parser<'src> {
     fn start(&self, id: NodeId) -> usize {
         self.nodes[id.0].span.start
     }
+    fn clone_fields(&self, id: NodeId) -> Result<Fields<'src>> {
+        let mut fields = Fields::new();
+        for (name, value) in &self.nodes[id.0].fields {
+            let value = match value {
+                Value::Nodes(ids) => {
+                    let mut copy = Vec::with_capacity(ids.len());
+                    for &id in ids {
+                        copy.push(id);
+                    }
+                    Value::Nodes(copy)
+                }
+                Value::Utf16(units) => {
+                    let mut copy = Vec::with_capacity(units.len());
+                    for &unit in units {
+                        copy.push(unit);
+                    }
+                    Value::Utf16(copy)
+                }
+                Value::Text(std::borrow::Cow::Owned(text)) => {
+                    let mut copy = String::new();
+                    copy.push_str(text);
+                    Value::from(copy)
+                }
+                value => value.clone(),
+            };
+            fields.push((*name, value));
+        }
+        Ok(fields)
+    }
     fn make(
         &mut self,
         kind: SyntaxKind,
         start: usize,
         end: usize,
         fields: impl Into<Fields<'src>>,
-    ) -> NodeId {
+    ) -> Result<NodeId> {
         let id = NodeId(self.nodes.len());
         let fields = fields.into();
-        let summary = self.await_summary(kind, &fields);
+        let summary = self.await_summary(kind, &fields)?;
         self.nodes.push(Node {
             kind: kind.name(),
             syntax_kind: kind,
             possible_top_level_await: summary,
+            native_jsdoc: None,
+            native_literal_text: None,
             span: Span { start, end },
             flags: self.context.node_flags(),
             fields,
         });
-        id
+        Ok(id)
     }
     fn finish(
         &mut self,
         kind: SyntaxKind,
         start: usize,
         fields: impl Into<Fields<'src>>,
-    ) -> NodeId {
+    ) -> Result<NodeId> {
         self.make(kind, start, self.end, fields)
     }
-    fn field(&mut self, id: NodeId, key: &'static str, value: impl Into<Value<'src>>) {
+    fn field(
+        &mut self,
+        id: NodeId,
+        key: &'static str,
+        value: impl Into<Value<'src>>,
+    ) -> Result<()> {
         self.nodes[id.0].fields.push((key, value.into()));
-        self.refresh_await_summary(id);
+        self.refresh_await_summary(id)?;
+        Ok(())
     }
     fn expression_allow_in(&mut self) -> Result<NodeId> {
         self.in_context(self.context.with_in(true), Self::expression)
@@ -528,17 +678,21 @@ impl<'src> Parser<'src> {
     /// helpers fail with the same diagnostic, and `parse` returns it.
     fn nest<T>(&mut self, f: impl FnOnce(&mut Self) -> Result<T>) -> Result<T> {
         if self.exhausted.is_none() && self.depth >= self.options.max_depth {
-            self.exhausted = Some(self.error(DEPTH_EXCEEDED));
+            self.exhausted = Some(self.diagnostic(DEPTH_EXCEEDED));
         }
         self.check_budget()?;
+        let _depth = self.control.as_ref().map(Control::enter).transpose()?;
         self.depth += 1;
         let result = f(self);
         self.depth -= 1;
         result
     }
     fn check_budget(&self) -> Result<()> {
+        if let Some(control) = &self.control {
+            control.poll()?;
+        }
         match &self.exhausted {
-            Some(error) => Err(error.clone()),
+            Some(error) => Err(error.clone().into()),
             None => Ok(()),
         }
     }
@@ -546,7 +700,11 @@ impl<'src> Parser<'src> {
     /// (`None`), but budget exhaustion is a failure and propagates.
     fn matched<T>(&self, result: Result<T>) -> Result<Option<T>> {
         self.check_budget()?;
-        Ok(result.ok())
+        match result {
+            Ok(value) => Ok(Some(value)),
+            Err(Failure::Syntax(_)) => Ok(None),
+            Err(error @ Failure::Interrupted(_)) => Err(error),
+        }
     }
     fn attempt<T>(&mut self, f: impl FnOnce(&mut Self) -> Result<T>) -> Result<Option<T>> {
         let result = self.attempt_result(f);
@@ -560,6 +718,7 @@ impl<'src> Parser<'src> {
         kind: ProbeKind,
         parse: impl FnOnce(&mut Self) -> Result<Option<T>>,
     ) -> Result<Option<T>> {
+        self.check_budget()?;
         let probe = FailedProbe {
             kind,
             offset: self.current.start,
@@ -572,6 +731,7 @@ impl<'src> Parser<'src> {
         }
         let result = self.probe(parse);
         if matches!(result, Ok(None)) {
+            self.failed_probes.reserve(1);
             self.failed_probes.insert(probe);
         }
         result
@@ -637,7 +797,7 @@ impl<'src> Parser<'src> {
         }
     }
     fn type_recovery_diagnostic(&mut self, message: &str) {
-        self.record_type_error(self.error(message));
+        self.record_type_error(self.diagnostic(message));
     }
     /// Recover missing type syntax inside a probe, returning its first diagnostic
     /// and restoring the enclosing recovery mode on both success and error.
@@ -675,7 +835,7 @@ impl<'src> Parser<'src> {
     fn token_node(&mut self) -> Result<NodeId> {
         let token = self.bump()?;
         let kind = token_kind(token.raw, token.kind);
-        Ok(self.make(kind, token.full_start, token.end, vec![]))
+        self.make(kind, token.full_start, token.end, vec![])
     }
     fn optional_token(
         &mut self,
@@ -692,18 +852,33 @@ impl<'src> Parser<'src> {
     }
     fn identifier(&mut self) -> Result<NodeId> {
         if !matches!(self.current.kind, Kind::Word | Kind::Private) {
+            if self.context.contains(node_flags::JSDOC) {
+                self.check_budget()?;
+                self.type_recovery_diagnostic("Expected identifier");
+                return self.make(
+                    Identifier,
+                    self.pos(),
+                    self.pos(),
+                    fields![("escapedText", "".into())],
+                );
+            }
             return Err(self.error("Expected identifier"));
         }
         let token = self.bump()?;
-        let text = decode_identifier(token.raw).map_err(|message| Diagnostic {
-            message,
-            span: Span {
+        let text = decode_identifier(
+            token.raw,
+            Span {
                 start: token.start,
                 end: token.end,
             },
-        })?;
+        )?;
         let escaped = if text.starts_with("__") {
-            format!("_{text}").into()
+            {
+                let mut escaped = String::new();
+                escaped.push('_');
+                escaped.push_str(&text);
+                escaped.into()
+            }
         } else {
             text
         };
@@ -716,17 +891,30 @@ impl<'src> Parser<'src> {
             token.full_start,
             token.end,
             fields![("escapedText", Value::Text(escaped))],
-        );
+        )?;
         if token.kind == Kind::Word && token.raw.contains("\\u{") {
             self.nodes[id.0].flags |= node_flags::IDENTIFIER_HAS_EXTENDED_UNICODE_ESCAPE;
         }
         Ok(id)
     }
     fn binding_identifier(&mut self) -> Result<NodeId> {
+        if self.context.contains(node_flags::JSDOC) {
+            return if self.jsdoc_is_identifier()? || self.current.kind == Kind::Private {
+                self.identifier()
+            } else {
+                self.missing_jsdoc_identifier("Expected a binding identifier")
+            };
+        }
         if self.current.kind != Kind::Word {
             return Err(self.error("Expected a binding identifier"));
         }
-        let name = decode_identifier(self.current.raw).map_err(|message| self.error(message))?;
+        let name = decode_identifier(
+            self.current.raw,
+            Span {
+                start: self.current.start,
+                end: self.current.end,
+            },
+        )?;
         if reserved_word(&name) {
             return Err(self.error(format!(
                 "Reserved word '{name}' cannot be used as a binding name"
@@ -754,19 +942,18 @@ impl<'src> Parser<'src> {
         };
         let mut template_flags = 0;
         let mut raw_text = None;
+        let mut native_literal_text = None;
         let text = if token.kind == Kind::Number {
-            Value::Text(numeric_text(token.raw))
+            Value::Text(
+                numeric_text(token.raw, self.control.as_ref())?
+                    .map_err(|message| self.error(message))?,
+            )
         } else {
-            let trim = if matches!(token.kind, Kind::TemplateHead | Kind::TemplateMiddle) {
-                2
-            } else {
-                1
-            };
-            let raw = &token.raw[1..token.raw.len().saturating_sub(trim)];
+            let raw = literals::token_body(token);
             if token.kind != Kind::String {
                 raw_text = Some(Value::from(raw));
             }
-            let decoded = literals::decode(raw);
+            let decoded = literals::decode(raw, self.control.as_ref())?;
             template_flags = decoded.flags;
             if !allow_invalid_escape {
                 if let Some(message) = decoded.error {
@@ -776,10 +963,13 @@ impl<'src> Parser<'src> {
                             start: token.start,
                             end: token.end,
                         },
-                    });
+                    }
+                    .into());
                 }
             }
-            decoded.text
+            let (text, native) = decoded.into_public_text()?;
+            native_literal_text = native;
+            text
         };
         let mut fields = fields![("text", text)];
         let extended_escape = template_flags & token_flags::EXTENDED_UNICODE_ESCAPE != 0;
@@ -791,10 +981,10 @@ impl<'src> Parser<'src> {
                 [b'0', b'x' | b'X', ..] => token_flags::HEX_SPECIFIER,
                 [b'0', b'b' | b'B', ..] => token_flags::BINARY_SPECIFIER,
                 [b'0', b'o' | b'O', ..] => token_flags::OCTAL_SPECIFIER,
-                _ if token.raw.contains(['e', 'E']) => token_flags::SCIENTIFIC,
+                _ if token.raw.find(['e', 'E']).is_some() => token_flags::SCIENTIFIC,
                 _ => 0,
             };
-            if token.raw.contains('_') {
+            if token.raw.contains("_") {
                 flags |= token_flags::CONTAINS_SEPARATOR;
             }
             fields.push(("numericLiteralFlags", Value::Number(flags)));
@@ -803,7 +993,9 @@ impl<'src> Parser<'src> {
             fields.push(("rawText", raw));
             fields.push(("templateFlags", Value::Number(template_flags)));
         }
-        Ok(self.make(kind, token.full_start, token.end, fields))
+        let literal = self.make(kind, token.full_start, token.end, fields)?;
+        self.nodes[literal.0].native_literal_text = native_literal_text;
+        Ok(literal)
     }
     fn property_name(&mut self) -> Result<NodeId> {
         let start = self.pos();
@@ -814,7 +1006,7 @@ impl<'src> Parser<'src> {
                 ComputedPropertyName,
                 start,
                 fields![("expression", expression.into())],
-            ))
+            )?)
         } else if matches!(self.current.kind, Kind::String | Kind::Number) {
             self.literal()
         } else {
@@ -831,7 +1023,7 @@ impl<'src> Parser<'src> {
     ) -> Result<Vec<NodeId>> {
         let mut modifiers = Vec::new();
         loop {
-            if stop_static_block && self.at("static") && self.peek_at("{") {
+            if stop_static_block && self.at("static") && self.peek_at("{")? {
                 break;
             }
             if self.at("@") {
@@ -844,7 +1036,7 @@ impl<'src> Parser<'src> {
                     Decorator,
                     start,
                     fields![("expression", expression.into())],
-                ));
+                )?);
                 continue;
             }
             let modifier = matches!(
@@ -862,17 +1054,17 @@ impl<'src> Parser<'src> {
                     | "async"
             ) || class_member
                 && matches!(self.current.raw, "override" | "in" | "out")
-                || self.at("const") && (stop_static_block || self.peek_at("enum"));
+                || self.at("const") && (stop_static_block || self.peek_at("enum")?);
             if !modifier {
                 break;
             }
-            let next = self.peek();
+            let next = self.peek()?;
             if self.at("export")
                 && (matches!(next.raw, "{" | "*" | "as")
-                    || next.raw == "type" && matches!(self.peek_second().raw, "{" | "*")
+                    || next.raw == "type" && matches!(self.peek_second()?.raw, "{" | "*")
                     || next.raw == "default"
                         && !matches!(
-                            self.peek_second().raw,
+                            self.peek_second()?.raw,
                             "class" | "function" | "interface" | "@" | "abstract" | "async"
                         ))
             {
@@ -892,10 +1084,7 @@ impl<'src> Parser<'src> {
                     Kind::Word | Kind::Private | Kind::String | Kind::Number
                 ) || matches!(next.raw, "[" | "{" | "*" | "...")
                     || next.raw == "@" && matches!(self.current.raw, "export" | "default"))
-                || self.at("static")
-                    && modifiers
-                        .iter()
-                        .any(|id| self.nodes[id.0].syntax_kind == StaticKeyword)
+                || self.at("static") && self.has_modifier(&modifiers, StaticKeyword)?
             {
                 break;
             }
@@ -903,34 +1092,52 @@ impl<'src> Parser<'src> {
         }
         Ok(modifiers)
     }
-    fn attach_modifiers(&mut self, id: NodeId, modifiers: Vec<NodeId>) {
+    fn attach_modifiers(&mut self, id: NodeId, modifiers: Vec<NodeId>) -> Result<()> {
         if !modifiers.is_empty() {
-            self.field(id, "modifiers", modifiers);
+            self.field(id, "modifiers", modifiers)?;
         }
+        Ok(())
     }
-    fn prepend_modifiers(&mut self, id: NodeId, mut modifiers: Vec<NodeId>) {
+    fn prepend_modifiers(&mut self, id: NodeId, mut modifiers: Vec<NodeId>) -> Result<()> {
         if let Some((_, Value::Nodes(existing))) = self.nodes[id.0]
             .fields
             .iter_mut()
             .find(|(key, _)| *key == "modifiers")
         {
-            modifiers.append(existing);
+            for value in existing.drain(..) {
+                modifiers.push(value);
+            }
             *existing = modifiers;
-            self.refresh_await_summary(id);
+            self.refresh_await_summary(id)?;
         } else {
-            self.attach_modifiers(id, modifiers);
+            self.attach_modifiers(id, modifiers)?;
         }
+        Ok(())
     }
-    fn ambient_modifiers(&mut self, modifiers: &[NodeId]) {
-        if modifiers
-            .iter()
-            .any(|id| self.nodes[id.0].syntax_kind == DeclareKeyword)
-        {
+    fn has_modifier(&self, modifiers: &[NodeId], kind: SyntaxKind) -> Result<bool> {
+        for id in modifiers {
+            if self.nodes[id.0].syntax_kind == kind {
+                return Ok(true);
+            }
+        }
+        Ok(false)
+    }
+    fn has_export_or_decorator(&self, modifiers: &[NodeId]) -> Result<bool> {
+        for id in modifiers {
+            if matches!(self.nodes[id.0].syntax_kind, ExportKeyword | Decorator) {
+                return Ok(true);
+            }
+        }
+        Ok(false)
+    }
+    fn ambient_modifiers(&mut self, modifiers: &[NodeId]) -> Result<()> {
+        if self.has_modifier(modifiers, DeclareKeyword)? {
             self.context = self.context.with(AMBIENT);
             for modifier in modifiers {
                 self.nodes[modifier.0].flags |= AMBIENT;
             }
         }
+        Ok(())
     }
     /// Where the JSDoc of a node starting at the current token is
     /// collected: the trivia before it.
@@ -943,24 +1150,35 @@ impl<'src> Parser<'src> {
     /// Mark `id`, which starts at `site`, deprecated when a JSDoc comment it
     /// collects carries `@deprecated`: `crate::lexer::jsdoc_comments`, with
     /// the trailing comments `crate::syntax::trailing_jsdoc` gives its kind.
-    fn mark_deprecated(&mut self, site: JsdocSite, id: NodeId) {
+    fn mark_deprecated(&mut self, site: JsdocSite, id: NodeId) -> Result<()> {
+        self.native_jsdoc(site, id)?;
         let src = self.lexer.src;
-        let from = site.full_start.max(crate::lexer::shebang_end(src));
+        let control = self.control.as_ref();
+        let from = site
+            .full_start
+            .max(crate::lexer::shebang_end_controlled(src, control)?);
         if from >= site.start || !src[from..site.start].contains("/**") {
-            return;
+            return Ok(());
         }
         let trailing = crate::syntax::trailing_jsdoc(self.nodes[id.0].syntax_kind);
-        let deprecated = crate::lexer::jsdoc_comments(src, site.full_start, site.start, trailing)
-            .any(|comment| {
-                comment
-                    .text
-                    .split("@deprecated")
-                    .skip(1)
-                    .any(|tail| !tail.starts_with(crate::lexer::id_continue))
-            });
-        if deprecated {
-            self.nodes[id.0].flags |= node_flags::DEPRECATED;
+        for comment in crate::lexer::jsdoc_comments_controlled(
+            src,
+            site.full_start,
+            site.start,
+            trailing,
+            control,
+        ) {
+            let comment = comment?;
+            let mut tail = comment.text;
+            while let Some(at) = tail.find("@deprecated") {
+                tail = &tail[at + "@deprecated".len()..];
+                if !tail.starts_with(crate::lexer::id_continue) {
+                    self.nodes[id.0].flags |= node_flags::DEPRECATED;
+                    return Ok(());
+                }
+            }
         }
+        Ok(())
     }
 }
 
@@ -971,11 +1189,18 @@ struct JsdocSite {
     start: usize,
 }
 
-fn decode_identifier(raw: &str) -> std::result::Result<std::borrow::Cow<'_, str>, String> {
-    if !raw.contains('\\') {
+fn decode_identifier<'s>(raw: &'s str, span: Span) -> Result<std::borrow::Cow<'s, str>> {
+    let invalid = |message: &str| {
+        Failure::Syntax(Diagnostic {
+            message: message.into(),
+            span,
+        })
+    };
+    if !raw.contains("\\") {
         return Ok(raw.into());
     }
-    let mut text = String::with_capacity(raw.len());
+    let mut text = String::new();
+    text.reserve(raw.len());
     let mut chars = raw.chars().peekable();
     while let Some(c) = chars.next() {
         if c != '\\' {
@@ -983,103 +1208,118 @@ fn decode_identifier(raw: &str) -> std::result::Result<std::borrow::Cow<'_, str>
             continue;
         }
         if chars.next() != Some('u') {
-            return Err("Expected Unicode escape in identifier".into());
+            return Err(invalid("Expected Unicode escape in identifier"));
         }
         let braced = chars.peek() == Some(&'{');
         if braced {
             chars.next();
         }
-        let mut hex = String::new();
-        if braced {
-            for c in chars.by_ref() {
-                if c == '}' {
-                    break;
-                }
-                hex.push(c);
+        let mut value = Some(0u32);
+        let mut count = 0usize;
+        loop {
+            if !braced && count == 4 {
+                break;
             }
-        } else {
-            for _ in 0..4 {
-                hex.push(chars.next().ok_or("Incomplete Unicode escape")?);
-            }
+            let c = match chars.next() {
+                Some('}') if braced => break,
+                Some(c) => c,
+                None if braced => break,
+                None => return Err(invalid("Incomplete Unicode escape")),
+            };
+
+            count += 1;
+            value = value
+                .and_then(|value| value.checked_mul(16))
+                .and_then(|value| c.to_digit(16).and_then(|digit| value.checked_add(digit)));
         }
-        let c = u32::from_str_radix(&hex, 16)
-            .ok()
+        let c = value
+            .filter(|_| count != 0)
             .and_then(char::from_u32)
-            .ok_or("Invalid Unicode code point")?;
+            .ok_or_else(|| invalid("Invalid Unicode code point"))?;
         let valid = if text.is_empty() || text == "#" {
             crate::lexer::id_start(c)
         } else {
             crate::lexer::id_continue(c)
         };
         if !valid {
-            return Err("Invalid identifier character in Unicode escape".into());
+            return Err(invalid("Invalid identifier character in Unicode escape"));
         }
         text.push(c);
     }
     Ok(text.into())
 }
 
-fn decode_string(raw: &str) -> std::result::Result<Value<'_>, &'static str> {
-    let decoded = literals::decode(raw);
-    match decoded.error {
+fn decode_string<'s>(
+    token: Token<'s>,
+    control: Option<&Control>,
+) -> std::result::Result<std::result::Result<Value<'s>, &'static str>, Stop> {
+    let decoded = literals::decode(literals::token_body(token), control)?;
+    Ok(match decoded.error {
         Some(error) => Err(error),
-        None => Ok(decoded.text),
-    }
+        None => Ok(decoded.into_public_text()?.0),
+    })
 }
 
-fn numeric_text(raw: &str) -> std::borrow::Cow<'_, str> {
+fn numeric_text<'s>(
+    raw: &'s str,
+    control: Option<&Control>,
+) -> std::result::Result<std::result::Result<std::borrow::Cow<'s, str>, &'static str>, Stop> {
     if raw.ends_with('n') {
-        return if raw.contains('_') || raw.bytes().any(|b| b.is_ascii_uppercase()) {
-            raw.replace('_', "").to_ascii_lowercase().into()
-        } else {
-            raw.into()
-        };
+        if raw
+            .find(|c: char| c == '_' || c.is_ascii_uppercase())
+            .is_none()
+        {
+            return Ok(Ok(raw.into()));
+        }
+        let mut clean = String::new();
+        clean.reserve(raw.len());
+        for c in raw.chars() {
+            if c != '_' {
+                clean.push(c.to_ascii_lowercase());
+            }
+        }
+        return Ok(Ok(clean.into()));
     }
     if raw.len() <= 15
         && raw.bytes().all(|b| b.is_ascii_digit())
         && (raw == "0" || !raw.starts_with('0'))
     {
-        return raw.into();
+        return Ok(Ok(raw.into()));
     }
-    let clean = raw.replace('_', "");
-    let value = if clean.starts_with("0x") || clean.starts_with("0X") {
-        radix_number(&clean[2..], 4)
-    } else if clean.starts_with("0o") || clean.starts_with("0O") {
-        radix_number(&clean[2..], 3)
-    } else if clean.starts_with("0b") || clean.starts_with("0B") {
-        radix_number(&clean[2..], 1)
-    } else {
-        clean.parse::<f64>().unwrap_or(f64::NAN)
-    };
-    if value.is_infinite() {
-        return "Infinity".into();
-    }
-    let decimal = value.to_string();
-    if !decimal.contains('.') && decimal.len() > 21 {
-        let digits = decimal.trim_end_matches('0');
-        return if digits.len() == 1 {
-            format!("{digits}e+{}", decimal.len() - 1).into()
-        } else {
-            format!("{}.{}e+{}", &digits[..1], &digits[1..], decimal.len() - 1).into()
-        };
-    }
-    if let Some(fraction) = decimal.strip_prefix("0.") {
-        let zeros = fraction.bytes().take_while(|b| *b == b'0').count();
-        if zeros >= 6 {
-            let digits = &fraction[zeros..];
-            return if digits.len() == 1 {
-                format!("{digits}e-{}", zeros + 1).into()
-            } else {
-                format!("{}.{}e-{}", &digits[..1], &digits[1..], zeros + 1).into()
-            };
+    let mut clean = String::new();
+    clean.reserve(raw.len());
+    for c in raw.chars() {
+        if c != '_' {
+            clean.push(c);
         }
     }
-    decimal.into()
+    let value = if clean.starts_with("0x") || clean.starts_with("0X") {
+        radix_number(&clean[2..], 4)?
+    } else if clean.starts_with("0o") || clean.starts_with("0O") {
+        radix_number(&clean[2..], 3)?
+    } else if clean.starts_with("0b") || clean.starts_with("0B") {
+        radix_number(&clean[2..], 1)?
+    } else {
+        if let Some(control) = control {
+            control.check()?;
+        }
+        let value = clean.parse::<f64>();
+        if let Some(control) = control {
+            control.check()?;
+        }
+        match value {
+            Ok(value) => value,
+            Err(_) => return Ok(Err("Invalid numeric literal")),
+        }
+    };
+    let value = crate::numbers::number_to_string(value);
+
+    Ok(Ok(value.into()))
 }
 
 // Integer-to-float conversion retains a guard bit and sticky bit so rounding
 // a long radix literal happens once, even beyond the capacity of u128.
-fn radix_number(digits: &str, bits_per_digit: usize) -> f64 {
+fn radix_number(digits: &str, bits_per_digit: usize) -> std::result::Result<f64, Stop> {
     let mut significant_bits = 0usize;
     let mut top = 0u64;
     let mut guard = false;
@@ -1102,15 +1342,15 @@ fn radix_number(digits: &str, bits_per_digit: usize) -> f64 {
         }
     }
     if significant_bits <= 53 {
-        return top as f64;
+        return Ok(top as f64);
     }
     if guard && (sticky || top & 1 != 0) {
         top += 1;
     }
     if significant_bits > 1024 {
-        return f64::INFINITY;
+        return Ok(f64::INFINITY);
     }
-    (top as f64) * 2.0f64.powi(significant_bits as i32 - 53)
+    Ok((top as f64) * 2.0f64.powi(significant_bits as i32 - 53))
 }
 
 fn token_kind(raw: &str, kind: Kind) -> SyntaxKind {
@@ -1174,78 +1414,13 @@ fn token_kind(raw: &str, kind: Kind) -> SyntaxKind {
         "||=" => BarBarEqualsToken,
         "&&=" => AmpersandAmpersandEqualsToken,
         "??=" => QuestionQuestionEqualsToken,
-        "abstract" => AbstractKeyword,
-        "accessor" => AccessorKeyword,
-        "as" => AsKeyword,
-        "asserts" => AssertsKeyword,
-        "async" => AsyncKeyword,
-        "await" => AwaitKeyword,
-        "const" => ConstKeyword,
-        "declare" => DeclareKeyword,
-        "default" => DefaultKeyword,
-        "export" => ExportKeyword,
-        "extends" => ExtendsKeyword,
-        "implements" => ImplementsKeyword,
-        "import" => ImportKeyword,
-        "intrinsic" => IntrinsicKeyword,
-        "in" => InKeyword,
-        "out" => OutKeyword,
-        "instanceof" => InstanceOfKeyword,
-        "new" => NewKeyword,
-        "override" => OverrideKeyword,
-        "private" => PrivateKeyword,
-        "protected" => ProtectedKeyword,
-        "public" => PublicKeyword,
-        "readonly" => ReadonlyKeyword,
-        "static" => StaticKeyword,
-        "this" => ThisKeyword,
-        "super" => SuperKeyword,
-        "null" => NullKeyword,
-        "true" => TrueKeyword,
-        "false" => FalseKeyword,
-        "satisfies" => SatisfiesKeyword,
+        _ if kind == Kind::Word => {
+            crate::lexer::identifier_keyword_syntax(raw).unwrap_or(Identifier)
+        }
         _ => Identifier,
     }
 }
 
 fn reserved_word(raw: &str) -> bool {
-    matches!(
-        raw,
-        "break"
-            | "case"
-            | "catch"
-            | "class"
-            | "const"
-            | "continue"
-            | "debugger"
-            | "default"
-            | "delete"
-            | "do"
-            | "else"
-            | "enum"
-            | "export"
-            | "extends"
-            | "false"
-            | "finally"
-            | "for"
-            | "function"
-            | "if"
-            | "import"
-            | "in"
-            | "instanceof"
-            | "new"
-            | "null"
-            | "return"
-            | "super"
-            | "switch"
-            | "this"
-            | "throw"
-            | "true"
-            | "try"
-            | "typeof"
-            | "var"
-            | "void"
-            | "while"
-            | "with"
-    )
+    crate::lexer::identifier_class(raw) == crate::lexer::IdentifierClass::ReservedWord
 }

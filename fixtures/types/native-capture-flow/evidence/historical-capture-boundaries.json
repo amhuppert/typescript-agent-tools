@@ -1,0 +1,434 @@
+[
+  {
+    "config": "tsconfig.json",
+    "marker": "variable-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "variable-after",
+    "summary": "string",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "expression-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "expression-after",
+    "summary": "string",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "if-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "if-after",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "do-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "do-after",
+    "summary": "string",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "while-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "while-after",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "for-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "for-after",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "for-in-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "for-in-after",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "for-of-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "for-of-after",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "switch-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "switch-after",
+    "summary": "string",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "try-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "try-after",
+    "summary": "string",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "class-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "class-after",
+    "summary": "string",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "nested-arrow",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "nested-declaration",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "shadow-read",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "nested-compound",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "nested-definite",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "variable-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "variable-after",
+    "summary": "string",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "expression-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "expression-after",
+    "summary": "string",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "if-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "if-after",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "do-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "do-after",
+    "summary": "string",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "while-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "while-after",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "for-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "for-after",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "for-in-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "for-in-after",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "for-of-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "for-of-after",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "switch-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "switch-after",
+    "summary": "string",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "try-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "try-after",
+    "summary": "string",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "class-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "class-after",
+    "summary": "string",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "nested-arrow",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "nested-declaration",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "shadow-read",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "nested-compound",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  },
+  {
+    "config": "loose.json",
+    "marker": "nested-definite",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": []
+  }
+]

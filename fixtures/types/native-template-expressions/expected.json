@@ -1,0 +1,192 @@
+{
+  "directString": {
+    "kind": "value",
+    "summary": "\"abc\"",
+    "errorType": false,
+    "codes": []
+  },
+  "directNumber": {
+    "kind": "value",
+    "summary": "\"n12z\"",
+    "errorType": false,
+    "codes": []
+  },
+  "directBoolean": {
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": []
+  },
+  "directBigint": {
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": []
+  },
+  "nullValue": {
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": []
+  },
+  "undefinedValue": {
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": []
+  },
+  "constant": {
+    "kind": "value",
+    "summary": "\"known\"",
+    "errorType": false,
+    "codes": []
+  },
+  "constantRead": {
+    "kind": "value",
+    "summary": "\"aknownz\"",
+    "errorType": false,
+    "codes": []
+  },
+  "annotatedRead": {
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": []
+  },
+  "mutableRead": {
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": []
+  },
+  "parentheses": {
+    "kind": "value",
+    "summary": "\"abz\"",
+    "errorType": false,
+    "codes": []
+  },
+  "assertion": {
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": []
+  },
+  "constAssertion": {
+    "kind": "value",
+    "summary": "\"abz\"",
+    "errorType": false,
+    "codes": []
+  },
+  "pattern": {
+    "kind": "value",
+    "summary": "`a${string}z`",
+    "errorType": false,
+    "codes": []
+  },
+  "numericPattern": {
+    "kind": "value",
+    "summary": "`a${number}z`",
+    "errorType": false,
+    "codes": []
+  },
+  "unionPattern": {
+    "kind": "value",
+    "summary": "\"aaz\" | \"abz\"",
+    "errorType": false,
+    "codes": []
+  },
+  "anyPattern": {
+    "kind": "value",
+    "summary": "`a${any}z`",
+    "errorType": false,
+    "codes": []
+  },
+  "unknownPattern": {
+    "kind": "value",
+    "summary": "`a${string}z`",
+    "errorType": false,
+    "codes": []
+  },
+  "objectPattern": {
+    "kind": "value",
+    "summary": "`a${string}z`",
+    "errorType": false,
+    "codes": []
+  },
+  "symbolPattern": {
+    "kind": "value",
+    "summary": "`a${string}z`",
+    "errorType": false,
+    "codes": [
+      2731
+    ]
+  },
+  "nested": {
+    "kind": "value",
+    "summary": "\"ab1cz\"",
+    "errorType": false,
+    "codes": []
+  },
+  "freshMutable": {
+    "kind": "value",
+    "summary": "\"a1z\"",
+    "errorType": false,
+    "codes": []
+  },
+  "widenedMutable": {
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": []
+  },
+  "cook": {
+    "kind": "value",
+    "summary": "\"ab\\n\"",
+    "errorType": false,
+    "codes": []
+  },
+  "missing": {
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": [
+      2304
+    ]
+  },
+  "neverPattern": {
+    "kind": "value",
+    "summary": "never",
+    "errorType": false,
+    "codes": []
+  },
+  "contextual": {
+    "kind": "expression",
+    "summary": "void",
+    "errorType": false,
+    "codes": []
+  },
+  "element": {
+    "kind": "expression",
+    "summary": "number",
+    "errorType": false,
+    "codes": []
+  },
+  "negativeNumber": {
+    "kind": "value",
+    "summary": "\"a-1z\"",
+    "errorType": false,
+    "codes": []
+  },
+  "constBoolean": {
+    "kind": "value",
+    "summary": "\"btruez\"",
+    "errorType": false,
+    "codes": []
+  },
+  "constBigint": {
+    "kind": "value",
+    "summary": "\"b12z\"",
+    "errorType": false,
+    "codes": []
+  }
+}

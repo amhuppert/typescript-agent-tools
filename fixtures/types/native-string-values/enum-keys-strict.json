@@ -1,0 +1,1 @@
+{"compilerOptions": {"strict": true, "target": "ESNext", "module": "ESNext", "noLib": true}, "files": ["../native-generated-literal-context/globals.d.ts", "enum-keys.ts"]}

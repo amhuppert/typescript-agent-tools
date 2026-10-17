@@ -1,0 +1,330 @@
+[
+  {
+    "name": "selected",
+    "summary": "1",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "unknownTag",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      7006
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "checkExpressionEx",
+        "pos": 608,
+        "end": 619
+      },
+      {
+        "operation": "getContextFreeTypeOfExpression",
+        "pos": 608,
+        "end": 619
+      },
+      {
+        "operation": "getContextFreeTypeOfExpression",
+        "pos": 608,
+        "end": 619
+      }
+    ]
+  },
+  {
+    "name": "broken",
+    "summary": "MissingFirst",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "checkExpressionEx",
+        "pos": 810,
+        "end": 827
+      },
+      {
+        "operation": "getContextFreeTypeOfExpression",
+        "pos": 810,
+        "end": 827
+      },
+      {
+        "operation": "getContextFreeTypeOfExpression",
+        "pos": 810,
+        "end": 827
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 699,
+        "end": 712
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 693,
+        "declarationEnd": 712,
+        "name": "value"
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 754,
+        "end": 768
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 748,
+        "declarationEnd": 768,
+        "name": "value"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 693,
+        "declarationEnd": 712,
+        "name": "value"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 748,
+        "declarationEnd": 768,
+        "name": "value"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 693,
+        "declarationEnd": 712,
+        "name": "value"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 837,
+        "declarationEnd": 853,
+        "name": "value"
+      }
+    ]
+  },
+  {
+    "name": "shorthand",
+    "summary": "MissingFirst",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 879,
+        "end": 896
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 874,
+        "declarationEnd": 896,
+        "name": "tag"
+      },
+      {
+        "operation": "checkExpressionEx",
+        "pos": 925,
+        "end": 929
+      },
+      {
+        "operation": "getContextFreeTypeOfExpression",
+        "pos": 925,
+        "end": 929
+      },
+      {
+        "operation": "getContextFreeTypeOfExpression",
+        "pos": 925,
+        "end": 929
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 699,
+        "end": 712
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 693,
+        "declarationEnd": 712,
+        "name": "value"
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 754,
+        "end": 768
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 748,
+        "declarationEnd": 768,
+        "name": "value"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 693,
+        "declarationEnd": 712,
+        "name": "value"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 748,
+        "declarationEnd": 768,
+        "name": "value"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 693,
+        "declarationEnd": 712,
+        "name": "value"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 939,
+        "declarationEnd": 958,
+        "name": "value"
+      }
+    ]
+  },
+  {
+    "name": "omitted",
+    "summary": "3",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "present",
+    "summary": "3",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "bothOmitted",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      7006
+    ],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "firstMethod",
+    "summary": "7",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "secondMethod",
+    "summary": "8",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "at9Match",
+    "summary": "0",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "at9Miss",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      7006
+    ],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "at9Duplicate",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      7006
+    ],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "at10Match",
+    "summary": "0",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "at10Miss",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      7006
+    ],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "at10Duplicate",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      7006
+    ],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "at11Match",
+    "summary": "0",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "at11Miss",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      7006
+    ],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "at11Duplicate",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      7006
+    ],
+    "demandFailures": [],
+    "errors": []
+  },
+  {
+    "name": "healthy",
+    "summary": "44",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "errors": []
+  }
+]

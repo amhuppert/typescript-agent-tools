@@ -1,0 +1,22 @@
+# Request resources: Source/parser checkpoint
+
+The operating envelope is one scoped semantic worker over one immutable captured project. Type inspection and member-reference search share that boundary. The source text has already passed project loading; semantic reprojection parses that exact text again. The worker is synchronous, and its request state must be dropped before the caller regains control.
+
+The chosen owner is `resources::Control`: one same-thread handle, sticky first interruption, checked cumulative work/allocation counters, balanced recursion guards and a 30-second deadline. An alternative was separate parser and checker budgets connected by conversions. That would make speculative rollback, failure precedence and remaining allowance caller responsibilities, so it was rejected. The parser keeps its ordinary entry point and Diagnostic contract; its opt-in controlled entry returns a distinct typed interruption. No parser policy or native limit is replaced by a product limit.
+
+The initial slice routes the semantic worker, Source syntax cache acquisition, parser arena/list growth, token and literal scanning, angle/speculation caches, shared pragma/JSDoc scans, final UTF16 indexing and Source parent/attachment construction through this owner. Existing uncontrolled comment, pragma, AST and parser callers use the same decision workers. Grammar rollback restores syntax/cursor state but never refunds resources or clears an interruption. Grammar-mismatch classification explicitly propagates the interruption variant.
+
+Work counts checked traversal/scanning steps, not CPU instructions. Allocation bytes count cumulative requested payload capacities, including replacement capacity, not exact allocator overhead or peak resident memory. Controlled dynamic growth is fallible. The initial production work, byte and product-depth maxima remain unset until measured calibration; the ledger still records usage and the deadline is enabled. Tests inject exact limits privately at the worker boundary. These choices are not a claim that the whole request is resource bounded.
+
+Failures retain their distinct public kinds: work, memory, depth and deadline. They cannot become syntax errors, describable Q4 leaves, candidate gaps or grammar mismatches. An already returned failure remains primary; the worker's final deadline observation guards successful completion after its local evaluator has dropped. Parser native grammar exhaustion retains its existing diagnostic classification.
+
+The final-query tests in `semantic/resources_tests.rs` measure a successful request, then prove immediately below, at and above its work/allocation/depth allowance. They assert the final `number` answer, distinct whole failures and a subsequent healthy semantic and lexical request. Long comments, pragma attributes, JSDoc, escaped literal decoding and wide speculative arrow parameters exercise Source reparsing. Wide flat parameters must not consume nesting depth proportional to their length. The existing parser/native AST corpus remains the grammar compatibility gate.
+
+Still required before the design's production safety obligation is complete:
+
+- Extend this same handle into evaluator scheduling/recursion, Model and signature/property arenas, binding request caches, relation/inference loops, diagnostic rendering and output construction. Source recipe operations beyond initial capture also remain to migrate.
+- Measure and bound indivisible standard-library work: allocation/hash-table rehash, vector movement, decimal floating-point parsing, error formatting and collection drop. The current checks before/after these units do not establish a numerical latency bound.
+- Account for worker startup allocations and file-option copies, and measure all request-state teardown and thread join. Arena links flatten AST drop, but other semantic recipes still have their own structure.
+- Calibrate production work/bytes/depth constants against representative native-limit and healthy-input corpora. Prove just-under/at/over boundaries, preserve native compiler limits as separate InvalidSemantic outcomes, and demonstrate deadline exits plus queued lexical latency on the fixed workload.
+
+No resource-safety completion claim follows from this checkpoint's compile or isolated tests. It establishes a single owner and an opt-in parser path that later stages can extend without duplicating interruption or rollback policy.

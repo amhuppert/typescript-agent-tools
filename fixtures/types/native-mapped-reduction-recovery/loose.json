@@ -1,0 +1,1 @@
+{"compilerOptions": {"strict": false, "noLib": true, "types": [], "target": "ESNext"}, "files": ["cases.ts"]}

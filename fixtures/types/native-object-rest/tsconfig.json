@@ -1,0 +1,1 @@
+{"compilerOptions":{"strict":true,"target":"es2018","noLib":true},"files":["../native-variable-patterns/globals.d.ts","omit.d.ts","cases.ts"]}

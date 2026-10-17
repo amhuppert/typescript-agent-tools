@@ -1,0 +1,4926 @@
+{
+  "inventory": {
+    "src/lib/specs/execution-service.ts": {
+      "sourceBytes": 101599,
+      "finalSites": 9649,
+      "childLinks": 9648,
+      "primitiveAnnotations": 142,
+      "arenaNodes": 9664,
+      "termBytes": 40
+    },
+    "src/lib/specs/workflow-cleanup-port.ts": {
+      "sourceBytes": 1891,
+      "finalSites": 108,
+      "childLinks": 107,
+      "primitiveAnnotations": 0,
+      "arenaNodes": 108,
+      "termBytes": 40
+    },
+    "src/lib/agent-gateway/route-handlers.ts": {
+      "sourceBytes": 4130,
+      "finalSites": 403,
+      "childLinks": 402,
+      "primitiveAnnotations": 4,
+      "arenaNodes": 403,
+      "termBytes": 40
+    },
+    "src/components/CollapsibleText.tsx": {
+      "sourceBytes": 1902,
+      "finalSites": 254,
+      "childLinks": 253,
+      "primitiveAnnotations": 1,
+      "arenaNodes": 254,
+      "termBytes": 40
+    },
+    "src/lib/notepads/service.ts": {
+      "sourceBytes": 31656,
+      "finalSites": 3388,
+      "childLinks": 3387,
+      "primitiveAnnotations": 63,
+      "arenaNodes": 3403,
+      "termBytes": 40
+    },
+    "src/lib/workflow-graph/workflow-manager.test.ts": {
+      "sourceBytes": 342467,
+      "finalSites": 34466,
+      "childLinks": 34465,
+      "primitiveAnnotations": 53,
+      "arenaNodes": 34470,
+      "termBytes": 40
+    },
+    "src/lib/workflow-graph/execution-loop.test.ts": {
+      "sourceBytes": 318517,
+      "finalSites": 38251,
+      "childLinks": 38250,
+      "primitiveAnnotations": 50,
+      "arenaNodes": 38306,
+      "termBytes": 40
+    },
+    "src/lib/workflow-graph/iteration-orchestrator.test.ts": {
+      "sourceBytes": 315399,
+      "finalSites": 36280,
+      "childLinks": 36279,
+      "primitiveAnnotations": 159,
+      "arenaNodes": 36287,
+      "termBytes": 40
+    },
+    "src/features/tickets/components/TicketChildSummary.tsx": {
+      "sourceBytes": 2052,
+      "finalSites": 315,
+      "childLinks": 314,
+      "primitiveAnnotations": 0,
+      "arenaNodes": 316,
+      "termBytes": 40
+    },
+    "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts": {
+      "sourceBytes": 2349483,
+      "finalSites": 109605,
+      "childLinks": 109604,
+      "primitiveAnnotations": 6781,
+      "arenaNodes": 109605,
+      "termBytes": 40
+    },
+    "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts": {
+      "sourceBytes": 218947,
+      "finalSites": 10297,
+      "childLinks": 10296,
+      "primitiveAnnotations": 1316,
+      "arenaNodes": 10297,
+      "termBytes": 40
+    },
+    "node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts": {
+      "sourceBytes": 1860055,
+      "finalSites": 203116,
+      "childLinks": 203115,
+      "primitiveAnnotations": 10978,
+      "arenaNodes": 203116,
+      "termBytes": 40
+    },
+    ".next/types/validator.ts": {
+      "sourceBytes": 146385,
+      "finalSites": 10837,
+      "childLinks": 10836,
+      "primitiveAnnotations": 4,
+      "arenaNodes": 10837,
+      "termBytes": 40
+    },
+    "synthetic-annotated.ts": {
+      "sourceBytes": 520560,
+      "finalSites": 105002,
+      "childLinks": 105001,
+      "primitiveAnnotations": 15000,
+      "arenaNodes": 105002,
+      "termBytes": 40
+    },
+    "synthetic-shallow.ts": {
+      "sourceBytes": 588961,
+      "finalSites": 100017,
+      "childLinks": 100016,
+      "primitiveAnnotations": 1,
+      "arenaNodes": 100017,
+      "termBytes": 40
+    },
+    "synthetic-deep.ts": {
+      "sourceBytes": 317,
+      "finalSites": 141,
+      "childLinks": 140,
+      "primitiveAnnotations": 1,
+      "arenaNodes": 141,
+      "termBytes": 40
+    },
+    "synthetic-roles.ts": {
+      "sourceBytes": 152,
+      "finalSites": 37,
+      "childLinks": 36,
+      "primitiveAnnotations": 5,
+      "arenaNodes": 37,
+      "termBytes": 40
+    },
+    "synthetic-reparse.ts": {
+      "sourceBytes": 51,
+      "finalSites": 15,
+      "childLinks": 14,
+      "primitiveAnnotations": 1,
+      "arenaNodes": 20,
+      "termBytes": 40
+    }
+  },
+  "sourceBytes": 6804524,
+  "finalSites": 662181,
+  "primitiveAnnotations": 34559,
+  "demandedSourceCount": 16,
+  "descriptionBytes": 29135892,
+  "timeSummary": [
+    18,
+    29135892,
+    0
+  ],
+  "memorySummary": [
+    18,
+    29135892,
+    29136916
+  ],
+  "metrics": [
+    {
+      "file": "src/lib/specs/execution-service.ts",
+      "operation": "parse-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 3988028,
+        "min": 3444109,
+        "max": 5595442
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 1668381,
+          "max": 1668381
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 5728,
+          "max": 5728
+        }
+      },
+      "parses": 1,
+      "inventorySites": 9649,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/specs/execution-service.ts",
+      "operation": "eager-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 5949597,
+        "min": 5127390,
+        "max": 11441403
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 2284617,
+          "max": 2284617
+        },
+        "retainedDeltaBytes": {
+          "min": 429672,
+          "max": 429672
+        },
+        "allocationCalls": {
+          "min": 5762,
+          "max": 5762
+        }
+      },
+      "parses": 1,
+      "inventorySites": 9649,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/specs/execution-service.ts",
+      "operation": "reprojection-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 5683931,
+        "min": 3698920,
+        "max": 7416359
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 1842337,
+          "max": 1842337
+        },
+        "retainedDeltaBytes": {
+          "min": 5120,
+          "max": 5120
+        },
+        "allocationCalls": {
+          "min": 5752,
+          "max": 5752
+        }
+      },
+      "parses": 1,
+      "inventorySites": 9649,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/specs/execution-service.ts",
+      "operation": "projection-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 1845905,
+        "min": 1212727,
+        "max": 3039555
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 442280,
+          "max": 442280
+        },
+        "retainedDeltaBytes": {
+          "min": 424552,
+          "max": 424552
+        },
+        "allocationCalls": {
+          "min": 10,
+          "max": 10
+        }
+      },
+      "parses": 0,
+      "inventorySites": 9649,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/specs/execution-service.ts",
+      "operation": "eager-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 99,
+        "min": 90,
+        "max": 111
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 9649,
+      "queries": 1
+    },
+    {
+      "file": "src/lib/specs/execution-service.ts",
+      "operation": "reproject-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 7323130,
+        "min": 5616725,
+        "max": 7553207
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 2284617,
+          "max": 2284617
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 5762,
+          "max": 5762
+        }
+      },
+      "parses": 1,
+      "inventorySites": 9649,
+      "queries": 1
+    },
+    {
+      "file": "src/lib/specs/execution-service.ts",
+      "operation": "eager-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 332,
+        "min": 304,
+        "max": 337
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 9649,
+      "queries": 16
+    },
+    {
+      "file": "src/lib/specs/execution-service.ts",
+      "operation": "reproject-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 6968725,
+        "min": 5476243,
+        "max": 9224408
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 2284617,
+          "max": 2284617
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 5762,
+          "max": 5762
+        }
+      },
+      "parses": 1,
+      "inventorySites": 9649,
+      "queries": 16
+    },
+    {
+      "file": "src/lib/specs/execution-service.ts",
+      "operation": "eager-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 1849,
+        "min": 1802,
+        "max": 1953
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 9649,
+      "queries": 142
+    },
+    {
+      "file": "src/lib/specs/execution-service.ts",
+      "operation": "reproject-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 9108948,
+        "min": 5459441,
+        "max": 10624559
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 2284617,
+          "max": 2284617
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 5762,
+          "max": 5762
+        }
+      },
+      "parses": 1,
+      "inventorySites": 9649,
+      "queries": 142
+    },
+    {
+      "file": "src/lib/specs/workflow-cleanup-port.ts",
+      "operation": "parse-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 41914,
+        "min": 41461,
+        "max": 50192
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 17328,
+          "max": 17328
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 74,
+          "max": 74
+        }
+      },
+      "parses": 1,
+      "inventorySites": 108,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/specs/workflow-cleanup-port.ts",
+      "operation": "eager-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 62871,
+        "min": 60693,
+        "max": 69638
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 23544,
+          "max": 23544
+        },
+        "retainedDeltaBytes": {
+          "min": 4748,
+          "max": 4748
+        },
+        "allocationCalls": {
+          "min": 93,
+          "max": 93
+        }
+      },
+      "parses": 1,
+      "inventorySites": 108,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/specs/workflow-cleanup-port.ts",
+      "operation": "reprojection-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 50558,
+        "min": 46837,
+        "max": 82404
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 18712,
+          "max": 18712
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 85,
+          "max": 85
+        }
+      },
+      "parses": 1,
+      "inventorySites": 108,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/specs/workflow-cleanup-port.ts",
+      "operation": "projection-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 15774,
+        "min": 14881,
+        "max": 16136
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 4832,
+          "max": 4832
+        },
+        "retainedDeltaBytes": {
+          "min": 4748,
+          "max": 4748
+        },
+        "allocationCalls": {
+          "min": 8,
+          "max": 8
+        }
+      },
+      "parses": 0,
+      "inventorySites": 108,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/agent-gateway/route-handlers.ts",
+      "operation": "parse-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 164375,
+        "min": 139365,
+        "max": 167985
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 68834,
+          "max": 68834
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 247,
+          "max": 247
+        }
+      },
+      "parses": 1,
+      "inventorySites": 403,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/agent-gateway/route-handlers.ts",
+      "operation": "eager-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 226671,
+        "min": 203243,
+        "max": 274622
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 92461,
+          "max": 92461
+        },
+        "retainedDeltaBytes": {
+          "min": 17808,
+          "max": 17808
+        },
+        "allocationCalls": {
+          "min": 268,
+          "max": 268
+        }
+      },
+      "parses": 1,
+      "inventorySites": 403,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/agent-gateway/route-handlers.ts",
+      "operation": "reprojection-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 196565,
+        "min": 157892,
+        "max": 254082
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 74549,
+          "max": 74549
+        },
+        "retainedDeltaBytes": {
+          "min": 80,
+          "max": 80
+        },
+        "allocationCalls": {
+          "min": 260,
+          "max": 260
+        }
+      },
+      "parses": 1,
+      "inventorySites": 403,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/agent-gateway/route-handlers.ts",
+      "operation": "projection-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 56754,
+        "min": 52688,
+        "max": 61030
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 17912,
+          "max": 17912
+        },
+        "retainedDeltaBytes": {
+          "min": 17728,
+          "max": 17728
+        },
+        "allocationCalls": {
+          "min": 8,
+          "max": 8
+        }
+      },
+      "parses": 0,
+      "inventorySites": 403,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/agent-gateway/route-handlers.ts",
+      "operation": "eager-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 120,
+        "min": 91,
+        "max": 148
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 403,
+      "queries": 1
+    },
+    {
+      "file": "src/lib/agent-gateway/route-handlers.ts",
+      "operation": "reproject-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 225144,
+        "min": 210605,
+        "max": 243000
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 92461,
+          "max": 92461
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 268,
+          "max": 268
+        }
+      },
+      "parses": 1,
+      "inventorySites": 403,
+      "queries": 1
+    },
+    {
+      "file": "src/lib/agent-gateway/route-handlers.ts",
+      "operation": "eager-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 133,
+        "min": 107,
+        "max": 163
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 403,
+      "queries": 4
+    },
+    {
+      "file": "src/lib/agent-gateway/route-handlers.ts",
+      "operation": "reproject-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 218586,
+        "min": 207383,
+        "max": 246343
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 92461,
+          "max": 92461
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 268,
+          "max": 268
+        }
+      },
+      "parses": 1,
+      "inventorySites": 403,
+      "queries": 4
+    },
+    {
+      "file": "src/lib/agent-gateway/route-handlers.ts",
+      "operation": "eager-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 137,
+        "min": 122,
+        "max": 139
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 403,
+      "queries": 4
+    },
+    {
+      "file": "src/lib/agent-gateway/route-handlers.ts",
+      "operation": "reproject-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 231359,
+        "min": 207305,
+        "max": 274083
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 92461,
+          "max": 92461
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 268,
+          "max": 268
+        }
+      },
+      "parses": 1,
+      "inventorySites": 403,
+      "queries": 4
+    },
+    {
+      "file": "src/components/CollapsibleText.tsx",
+      "operation": "parse-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 88269,
+        "min": 85771,
+        "max": 91690
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 58752,
+          "max": 58752
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 176,
+          "max": 176
+        }
+      },
+      "parses": 1,
+      "inventorySites": 254,
+      "queries": 0
+    },
+    {
+      "file": "src/components/CollapsibleText.tsx",
+      "operation": "eager-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 127507,
+        "min": 126117,
+        "max": 131554
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 58752,
+          "max": 58752
+        },
+        "retainedDeltaBytes": {
+          "min": 11252,
+          "max": 11252
+        },
+        "allocationCalls": {
+          "min": 198,
+          "max": 198
+        }
+      },
+      "parses": 1,
+      "inventorySites": 254,
+      "queries": 0
+    },
+    {
+      "file": "src/components/CollapsibleText.tsx",
+      "operation": "reprojection-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 99522,
+        "min": 97666,
+        "max": 105527
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 58752,
+          "max": 58752
+        },
+        "retainedDeltaBytes": {
+          "min": 80,
+          "max": 80
+        },
+        "allocationCalls": {
+          "min": 189,
+          "max": 189
+        }
+      },
+      "parses": 1,
+      "inventorySites": 254,
+      "queries": 0
+    },
+    {
+      "file": "src/components/CollapsibleText.tsx",
+      "operation": "projection-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 30292,
+        "min": 29626,
+        "max": 32646
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 11440,
+          "max": 11440
+        },
+        "retainedDeltaBytes": {
+          "min": 11172,
+          "max": 11172
+        },
+        "allocationCalls": {
+          "min": 9,
+          "max": 9
+        }
+      },
+      "parses": 0,
+      "inventorySites": 254,
+      "queries": 0
+    },
+    {
+      "file": "src/components/CollapsibleText.tsx",
+      "operation": "eager-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 92,
+        "min": 73,
+        "max": 121
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 254,
+      "queries": 1
+    },
+    {
+      "file": "src/components/CollapsibleText.tsx",
+      "operation": "reproject-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 134033,
+        "min": 128723,
+        "max": 148017
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 58752,
+          "max": 58752
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 198,
+          "max": 198
+        }
+      },
+      "parses": 1,
+      "inventorySites": 254,
+      "queries": 1
+    },
+    {
+      "file": "src/components/CollapsibleText.tsx",
+      "operation": "eager-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 90,
+        "min": 72,
+        "max": 277
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 254,
+      "queries": 1
+    },
+    {
+      "file": "src/components/CollapsibleText.tsx",
+      "operation": "reproject-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 131568,
+        "min": 127102,
+        "max": 138273
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 58752,
+          "max": 58752
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 198,
+          "max": 198
+        }
+      },
+      "parses": 1,
+      "inventorySites": 254,
+      "queries": 1
+    },
+    {
+      "file": "src/components/CollapsibleText.tsx",
+      "operation": "eager-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 90,
+        "min": 74,
+        "max": 104
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 254,
+      "queries": 1
+    },
+    {
+      "file": "src/components/CollapsibleText.tsx",
+      "operation": "reproject-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 131951,
+        "min": 127237,
+        "max": 139271
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 58752,
+          "max": 58752
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 198,
+          "max": 198
+        }
+      },
+      "parses": 1,
+      "inventorySites": 254,
+      "queries": 1
+    },
+    {
+      "file": "src/lib/notepads/service.ts",
+      "operation": "parse-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 1291814,
+        "min": 1069205,
+        "max": 1957052
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 531806,
+          "max": 531806
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 1898,
+          "max": 1898
+        }
+      },
+      "parses": 1,
+      "inventorySites": 3388,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/notepads/service.ts",
+      "operation": "eager-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 2142711,
+        "min": 1714075,
+        "max": 2351157
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 733177,
+          "max": 733177
+        },
+        "retainedDeltaBytes": {
+          "min": 150348,
+          "max": 150348
+        },
+        "allocationCalls": {
+          "min": 1928,
+          "max": 1928
+        }
+      },
+      "parses": 1,
+      "inventorySites": 3388,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/notepads/service.ts",
+      "operation": "reprojection-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 1308723,
+        "min": 1188190,
+        "max": 2232066
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 578713,
+          "max": 578713
+        },
+        "retainedDeltaBytes": {
+          "min": 1280,
+          "max": 1280
+        },
+        "allocationCalls": {
+          "min": 1918,
+          "max": 1918
+        }
+      },
+      "parses": 1,
+      "inventorySites": 3388,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/notepads/service.ts",
+      "operation": "projection-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 705356,
+        "min": 392887,
+        "max": 841753
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 154464,
+          "max": 154464
+        },
+        "retainedDeltaBytes": {
+          "min": 149068,
+          "max": 149068
+        },
+        "allocationCalls": {
+          "min": 10,
+          "max": 10
+        }
+      },
+      "parses": 0,
+      "inventorySites": 3388,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/notepads/service.ts",
+      "operation": "eager-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 112,
+        "min": 84,
+        "max": 122
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 3388,
+      "queries": 1
+    },
+    {
+      "file": "src/lib/notepads/service.ts",
+      "operation": "reproject-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 1752783,
+        "min": 1609691,
+        "max": 3611877
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 733177,
+          "max": 733177
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 1928,
+          "max": 1928
+        }
+      },
+      "parses": 1,
+      "inventorySites": 3388,
+      "queries": 1
+    },
+    {
+      "file": "src/lib/notepads/service.ts",
+      "operation": "eager-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 248,
+        "min": 230,
+        "max": 252
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 3388,
+      "queries": 16
+    },
+    {
+      "file": "src/lib/notepads/service.ts",
+      "operation": "reproject-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 1866014,
+        "min": 1602118,
+        "max": 3061619
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 733177,
+          "max": 733177
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 1928,
+          "max": 1928
+        }
+      },
+      "parses": 1,
+      "inventorySites": 3388,
+      "queries": 16
+    },
+    {
+      "file": "src/lib/notepads/service.ts",
+      "operation": "eager-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 899,
+        "min": 858,
+        "max": 917
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 3388,
+      "queries": 63
+    },
+    {
+      "file": "src/lib/notepads/service.ts",
+      "operation": "reproject-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 1750125,
+        "min": 1601626,
+        "max": 3116366
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 733177,
+          "max": 733177
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 1928,
+          "max": 1928
+        }
+      },
+      "parses": 1,
+      "inventorySites": 3388,
+      "queries": 63
+    },
+    {
+      "file": "src/lib/workflow-graph/workflow-manager.test.ts",
+      "operation": "parse-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 19821175,
+        "min": 16942623,
+        "max": 21191174
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 8029339,
+          "max": 8029339
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 22266,
+          "max": 22266
+        }
+      },
+      "parses": 1,
+      "inventorySites": 34466,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/workflow-graph/workflow-manager.test.ts",
+      "operation": "eager-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 29361365,
+        "min": 27834990,
+        "max": 30288359
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 8029339,
+          "max": 8029339
+        },
+        "retainedDeltaBytes": {
+          "min": 1517780,
+          "max": 1517780
+        },
+        "allocationCalls": {
+          "min": 22304,
+          "max": 22304
+        }
+      },
+      "parses": 1,
+      "inventorySites": 34466,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/workflow-graph/workflow-manager.test.ts",
+      "operation": "reprojection-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 24834602,
+        "min": 23162723,
+        "max": 26317419
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 8029339,
+          "max": 8029339
+        },
+        "retainedDeltaBytes": {
+          "min": 1280,
+          "max": 1280
+        },
+        "allocationCalls": {
+          "min": 22291,
+          "max": 22291
+        }
+      },
+      "parses": 1,
+      "inventorySites": 34466,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/workflow-graph/workflow-manager.test.ts",
+      "operation": "projection-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 5551610,
+        "min": 5180236,
+        "max": 6927586
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 1567056,
+          "max": 1567056
+        },
+        "retainedDeltaBytes": {
+          "min": 1516500,
+          "max": 1516500
+        },
+        "allocationCalls": {
+          "min": 13,
+          "max": 13
+        }
+      },
+      "parses": 0,
+      "inventorySites": 34466,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/workflow-graph/workflow-manager.test.ts",
+      "operation": "eager-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 116,
+        "min": 78,
+        "max": 137
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 34466,
+      "queries": 1
+    },
+    {
+      "file": "src/lib/workflow-graph/workflow-manager.test.ts",
+      "operation": "reproject-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 27539349,
+        "min": 26727309,
+        "max": 28847136
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 8029339,
+          "max": 8029339
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 22304,
+          "max": 22304
+        }
+      },
+      "parses": 1,
+      "inventorySites": 34466,
+      "queries": 1
+    },
+    {
+      "file": "src/lib/workflow-graph/workflow-manager.test.ts",
+      "operation": "eager-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 290,
+        "min": 275,
+        "max": 307
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 34466,
+      "queries": 16
+    },
+    {
+      "file": "src/lib/workflow-graph/workflow-manager.test.ts",
+      "operation": "reproject-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 27672994,
+        "min": 25471294,
+        "max": 30793658
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 8029339,
+          "max": 8029339
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 22304,
+          "max": 22304
+        }
+      },
+      "parses": 1,
+      "inventorySites": 34466,
+      "queries": 16
+    },
+    {
+      "file": "src/lib/workflow-graph/workflow-manager.test.ts",
+      "operation": "eager-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 985,
+        "min": 957,
+        "max": 1360
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 34466,
+      "queries": 53
+    },
+    {
+      "file": "src/lib/workflow-graph/workflow-manager.test.ts",
+      "operation": "reproject-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 28733712,
+        "min": 27222269,
+        "max": 32514262
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 8029339,
+          "max": 8029339
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 22304,
+          "max": 22304
+        }
+      },
+      "parses": 1,
+      "inventorySites": 34466,
+      "queries": 53
+    },
+    {
+      "file": "src/lib/workflow-graph/execution-loop.test.ts",
+      "operation": "parse-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 23283320,
+        "min": 22505248,
+        "max": 28215925
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 8218394,
+          "max": 8218394
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 24325,
+          "max": 24325
+        }
+      },
+      "parses": 1,
+      "inventorySites": 38251,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/workflow-graph/execution-loop.test.ts",
+      "operation": "eager-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 35943829,
+        "min": 32279250,
+        "max": 39116136
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 8218394,
+          "max": 8218394
+        },
+        "retainedDeltaBytes": {
+          "min": 1684320,
+          "max": 1684320
+        },
+        "allocationCalls": {
+          "min": 24362,
+          "max": 24362
+        }
+      },
+      "parses": 1,
+      "inventorySites": 38251,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/workflow-graph/execution-loop.test.ts",
+      "operation": "reprojection-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 29881217,
+        "min": 25638479,
+        "max": 42343772
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 8218394,
+          "max": 8218394
+        },
+        "retainedDeltaBytes": {
+          "min": 1280,
+          "max": 1280
+        },
+        "allocationCalls": {
+          "min": 24349,
+          "max": 24349
+        }
+      },
+      "parses": 1,
+      "inventorySites": 38251,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/workflow-graph/execution-loop.test.ts",
+      "operation": "projection-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 6462210,
+        "min": 5052194,
+        "max": 7787211
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 1755320,
+          "max": 1755320
+        },
+        "retainedDeltaBytes": {
+          "min": 1683040,
+          "max": 1683040
+        },
+        "allocationCalls": {
+          "min": 13,
+          "max": 13
+        }
+      },
+      "parses": 0,
+      "inventorySites": 38251,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/workflow-graph/execution-loop.test.ts",
+      "operation": "eager-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 105,
+        "min": 100,
+        "max": 131
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 38251,
+      "queries": 1
+    },
+    {
+      "file": "src/lib/workflow-graph/execution-loop.test.ts",
+      "operation": "reproject-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 39250966,
+        "min": 31265620,
+        "max": 39941413
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 8218394,
+          "max": 8218394
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 24362,
+          "max": 24362
+        }
+      },
+      "parses": 1,
+      "inventorySites": 38251,
+      "queries": 1
+    },
+    {
+      "file": "src/lib/workflow-graph/execution-loop.test.ts",
+      "operation": "eager-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 376,
+        "min": 326,
+        "max": 597
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 38251,
+      "queries": 16
+    },
+    {
+      "file": "src/lib/workflow-graph/execution-loop.test.ts",
+      "operation": "reproject-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 36130222,
+        "min": 35268488,
+        "max": 39530657
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 8218394,
+          "max": 8218394
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 24362,
+          "max": 24362
+        }
+      },
+      "parses": 1,
+      "inventorySites": 38251,
+      "queries": 16
+    },
+    {
+      "file": "src/lib/workflow-graph/execution-loop.test.ts",
+      "operation": "eager-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 791,
+        "min": 770,
+        "max": 807
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 38251,
+      "queries": 50
+    },
+    {
+      "file": "src/lib/workflow-graph/execution-loop.test.ts",
+      "operation": "reproject-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 39482108,
+        "min": 36246834,
+        "max": 43134006
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 8218394,
+          "max": 8218394
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 24362,
+          "max": 24362
+        }
+      },
+      "parses": 1,
+      "inventorySites": 38251,
+      "queries": 50
+    },
+    {
+      "file": "src/lib/workflow-graph/iteration-orchestrator.test.ts",
+      "operation": "parse-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 23736331,
+        "min": 23163547,
+        "max": 27077173
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 8095694,
+          "max": 8095694
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 23142,
+          "max": 23142
+        }
+      },
+      "parses": 1,
+      "inventorySites": 36280,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/workflow-graph/iteration-orchestrator.test.ts",
+      "operation": "eager-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 33915426,
+        "min": 32511414,
+        "max": 38976071
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 8095694,
+          "max": 8095694
+        },
+        "retainedDeltaBytes": {
+          "min": 1601436,
+          "max": 1601436
+        },
+        "allocationCalls": {
+          "min": 23181,
+          "max": 23181
+        }
+      },
+      "parses": 1,
+      "inventorySites": 36280,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/workflow-graph/iteration-orchestrator.test.ts",
+      "operation": "reprojection-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 28186674,
+        "min": 25700389,
+        "max": 30475359
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 8095694,
+          "max": 8095694
+        },
+        "retainedDeltaBytes": {
+          "min": 5120,
+          "max": 5120
+        },
+        "allocationCalls": {
+          "min": 23168,
+          "max": 23168
+        }
+      },
+      "parses": 1,
+      "inventorySites": 36280,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/workflow-graph/iteration-orchestrator.test.ts",
+      "operation": "projection-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 10305725,
+        "min": 5980560,
+        "max": 11004293
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 1721536,
+          "max": 1721536
+        },
+        "retainedDeltaBytes": {
+          "min": 1596316,
+          "max": 1596316
+        },
+        "allocationCalls": {
+          "min": 13,
+          "max": 13
+        }
+      },
+      "parses": 0,
+      "inventorySites": 36280,
+      "queries": 0
+    },
+    {
+      "file": "src/lib/workflow-graph/iteration-orchestrator.test.ts",
+      "operation": "eager-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 104,
+        "min": 91,
+        "max": 132
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 36280,
+      "queries": 1
+    },
+    {
+      "file": "src/lib/workflow-graph/iteration-orchestrator.test.ts",
+      "operation": "reproject-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 37481743,
+        "min": 34033020,
+        "max": 39848824
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 8095694,
+          "max": 8095694
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 23181,
+          "max": 23181
+        }
+      },
+      "parses": 1,
+      "inventorySites": 36280,
+      "queries": 1
+    },
+    {
+      "file": "src/lib/workflow-graph/iteration-orchestrator.test.ts",
+      "operation": "eager-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 356,
+        "min": 295,
+        "max": 402
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 36280,
+      "queries": 16
+    },
+    {
+      "file": "src/lib/workflow-graph/iteration-orchestrator.test.ts",
+      "operation": "reproject-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 38478196,
+        "min": 33481862,
+        "max": 41668897
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 8095694,
+          "max": 8095694
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 23181,
+          "max": 23181
+        }
+      },
+      "parses": 1,
+      "inventorySites": 36280,
+      "queries": 16
+    },
+    {
+      "file": "src/lib/workflow-graph/iteration-orchestrator.test.ts",
+      "operation": "eager-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 2167,
+        "min": 2012,
+        "max": 2962
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 36280,
+      "queries": 159
+    },
+    {
+      "file": "src/lib/workflow-graph/iteration-orchestrator.test.ts",
+      "operation": "reproject-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 39461365,
+        "min": 33067061,
+        "max": 40837284
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 8095694,
+          "max": 8095694
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 23181,
+          "max": 23181
+        }
+      },
+      "parses": 1,
+      "inventorySites": 36280,
+      "queries": 159
+    },
+    {
+      "file": "src/features/tickets/components/TicketChildSummary.tsx",
+      "operation": "parse-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 126735,
+        "min": 113648,
+        "max": 138192
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 69072,
+          "max": 69072
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 239,
+          "max": 239
+        }
+      },
+      "parses": 1,
+      "inventorySites": 315,
+      "queries": 0
+    },
+    {
+      "file": "src/features/tickets/components/TicketChildSummary.tsx",
+      "operation": "eager-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 177146,
+        "min": 168091,
+        "max": 201057
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 69128,
+          "max": 69128
+        },
+        "retainedDeltaBytes": {
+          "min": 13856,
+          "max": 13856
+        },
+        "allocationCalls": {
+          "min": 262,
+          "max": 262
+        }
+      },
+      "parses": 1,
+      "inventorySites": 315,
+      "queries": 0
+    },
+    {
+      "file": "src/features/tickets/components/TicketChildSummary.tsx",
+      "operation": "reprojection-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 133362,
+        "min": 128842,
+        "max": 152864
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 69072,
+          "max": 69072
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 253,
+          "max": 253
+        }
+      },
+      "parses": 1,
+      "inventorySites": 315,
+      "queries": 0
+    },
+    {
+      "file": "src/features/tickets/components/TicketChildSummary.tsx",
+      "operation": "projection-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 41750,
+        "min": 40624,
+        "max": 45915
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 13880,
+          "max": 13880
+        },
+        "retainedDeltaBytes": {
+          "min": 13856,
+          "max": 13856
+        },
+        "allocationCalls": {
+          "min": 9,
+          "max": 9
+        }
+      },
+      "parses": 0,
+      "inventorySites": 315,
+      "queries": 0
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts",
+      "operation": "parse-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 71167068,
+        "min": 61778194,
+        "max": 76336511
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 17424722,
+          "max": 17424722
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 68178,
+          "max": 68178
+        }
+      },
+      "parses": 1,
+      "inventorySites": 109605,
+      "queries": 0
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts",
+      "operation": "eager-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 112431888,
+        "min": 110747288,
+        "max": 116022723
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 24162856,
+          "max": 24162856
+        },
+        "retainedDeltaBytes": {
+          "min": 4986456,
+          "max": 4986456
+        },
+        "allocationCalls": {
+          "min": 68219,
+          "max": 68219
+        }
+      },
+      "parses": 1,
+      "inventorySites": 109605,
+      "queries": 0
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts",
+      "operation": "reprojection-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 81472149,
+        "min": 74401368,
+        "max": 84924034
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 19060576,
+          "max": 19060576
+        },
+        "retainedDeltaBytes": {
+          "min": 163840,
+          "max": 163840
+        },
+        "allocationCalls": {
+          "min": 68210,
+          "max": 68210
+        }
+      },
+      "parses": 1,
+      "inventorySites": 109605,
+      "queries": 0
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts",
+      "operation": "projection-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 31070779,
+        "min": 29024443,
+        "max": 33884867
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 5102280,
+          "max": 5102280
+        },
+        "retainedDeltaBytes": {
+          "min": 4822616,
+          "max": 4822616
+        },
+        "allocationCalls": {
+          "min": 9,
+          "max": 9
+        }
+      },
+      "parses": 0,
+      "inventorySites": 109605,
+      "queries": 0
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts",
+      "operation": "eager-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 113,
+        "min": 93,
+        "max": 125
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 109605,
+      "queries": 1
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts",
+      "operation": "reproject-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 112341862,
+        "min": 107510583,
+        "max": 124982243
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 24162856,
+          "max": 24162856
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 68219,
+          "max": 68219
+        }
+      },
+      "parses": 1,
+      "inventorySites": 109605,
+      "queries": 1
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts",
+      "operation": "eager-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 319,
+        "min": 294,
+        "max": 383
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 109605,
+      "queries": 16
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts",
+      "operation": "reproject-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 115999256,
+        "min": 107423293,
+        "max": 138256821
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 24162856,
+          "max": 24162856
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 68219,
+          "max": 68219
+        }
+      },
+      "parses": 1,
+      "inventorySites": 109605,
+      "queries": 16
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts",
+      "operation": "eager-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 509679,
+        "min": 263478,
+        "max": 1235260
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 109605,
+      "queries": 6781
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts",
+      "operation": "reproject-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 112385283,
+        "min": 106902418,
+        "max": 141596736
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 24162856,
+          "max": 24162856
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 68219,
+          "max": 68219
+        }
+      },
+      "parses": 1,
+      "inventorySites": 109605,
+      "queries": 6781
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts",
+      "operation": "parse-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 4858214,
+        "min": 4752097,
+        "max": 5779304
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 1786192,
+          "max": 1786192
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 6033,
+          "max": 6033
+        }
+      },
+      "parses": 1,
+      "inventorySites": 10297,
+      "queries": 0
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts",
+      "operation": "eager-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 6926244,
+        "min": 5750768,
+        "max": 12075438
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 2486290,
+          "max": 2486290
+        },
+        "retainedDeltaBytes": {
+          "min": 494024,
+          "max": 494024
+        },
+        "allocationCalls": {
+          "min": 6070,
+          "max": 6070
+        }
+      },
+      "parses": 1,
+      "inventorySites": 10297,
+      "queries": 0
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts",
+      "operation": "reprojection-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 7701138,
+        "min": 4408002,
+        "max": 7895874
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 1999146,
+          "max": 1999146
+        },
+        "retainedDeltaBytes": {
+          "min": 40960,
+          "max": 40960
+        },
+        "allocationCalls": {
+          "min": 6060,
+          "max": 6060
+        }
+      },
+      "parses": 1,
+      "inventorySites": 10297,
+      "queries": 0
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts",
+      "operation": "projection-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 2342538,
+        "min": 1836782,
+        "max": 3368622
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 487144,
+          "max": 487144
+        },
+        "retainedDeltaBytes": {
+          "min": 453064,
+          "max": 453064
+        },
+        "allocationCalls": {
+          "min": 10,
+          "max": 10
+        }
+      },
+      "parses": 0,
+      "inventorySites": 10297,
+      "queries": 0
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts",
+      "operation": "eager-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 138,
+        "min": 125,
+        "max": 220
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 10297,
+      "queries": 1
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts",
+      "operation": "reproject-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 6379551,
+        "min": 5996651,
+        "max": 7877744
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 2486290,
+          "max": 2486290
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 6070,
+          "max": 6070
+        }
+      },
+      "parses": 1,
+      "inventorySites": 10297,
+      "queries": 1
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts",
+      "operation": "eager-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 434,
+        "min": 351,
+        "max": 448
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 10297,
+      "queries": 16
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts",
+      "operation": "reproject-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 9274591,
+        "min": 7797268,
+        "max": 10626740
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 2486290,
+          "max": 2486290
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 6070,
+          "max": 6070
+        }
+      },
+      "parses": 1,
+      "inventorySites": 10297,
+      "queries": 16
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts",
+      "operation": "eager-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 28171,
+        "min": 26033,
+        "max": 44073
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 10297,
+      "queries": 1316
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts",
+      "operation": "reproject-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 8991011,
+        "min": 7776564,
+        "max": 9802764
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 2486290,
+          "max": 2486290
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 6070,
+          "max": 6070
+        }
+      },
+      "parses": 1,
+      "inventorySites": 10297,
+      "queries": 1316
+    },
+    {
+      "file": "node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts",
+      "operation": "parse-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 106009915,
+        "min": 93015539,
+        "max": 107659653
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 33403298,
+          "max": 33403298
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 134220,
+          "max": 134220
+        }
+      },
+      "parses": 1,
+      "inventorySites": 203116,
+      "queries": 0
+    },
+    {
+      "file": "node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts",
+      "operation": "eager-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 199412801,
+        "min": 182191007,
+        "max": 200521838
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 46010309,
+          "max": 46010309
+        },
+        "retainedDeltaBytes": {
+          "min": 9264780,
+          "max": 9264780
+        },
+        "allocationCalls": {
+          "min": 134271,
+          "max": 134271
+        }
+      },
+      "parses": 1,
+      "inventorySites": 203116,
+      "queries": 0
+    },
+    {
+      "file": "node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts",
+      "operation": "reprojection-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 131030121,
+        "min": 124086016,
+        "max": 152895164
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 36640485,
+          "max": 36640485
+        },
+        "retainedDeltaBytes": {
+          "min": 327680,
+          "max": 327680
+        },
+        "allocationCalls": {
+          "min": 134255,
+          "max": 134255
+        }
+      },
+      "parses": 1,
+      "inventorySites": 203116,
+      "queries": 0
+    },
+    {
+      "file": "node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts",
+      "operation": "projection-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 51036521,
+        "min": 44788150,
+        "max": 56603390
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 9369824,
+          "max": 9369824
+        },
+        "retainedDeltaBytes": {
+          "min": 8937100,
+          "max": 8937100
+        },
+        "allocationCalls": {
+          "min": 16,
+          "max": 16
+        }
+      },
+      "parses": 0,
+      "inventorySites": 203116,
+      "queries": 0
+    },
+    {
+      "file": "node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts",
+      "operation": "eager-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 112,
+        "min": 68,
+        "max": 199
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 203116,
+      "queries": 1
+    },
+    {
+      "file": "node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts",
+      "operation": "reproject-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 181719848,
+        "min": 161775598,
+        "max": 193654103
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 46010309,
+          "max": 46010309
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 134271,
+          "max": 134271
+        }
+      },
+      "parses": 1,
+      "inventorySites": 203116,
+      "queries": 1
+    },
+    {
+      "file": "node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts",
+      "operation": "eager-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 352,
+        "min": 297,
+        "max": 403
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 203116,
+      "queries": 16
+    },
+    {
+      "file": "node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts",
+      "operation": "reproject-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 191364214,
+        "min": 172876989,
+        "max": 209751342
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 46010309,
+          "max": 46010309
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 134271,
+          "max": 134271
+        }
+      },
+      "parses": 1,
+      "inventorySites": 203116,
+      "queries": 16
+    },
+    {
+      "file": "node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts",
+      "operation": "eager-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 1079548,
+        "min": 407549,
+        "max": 1747559
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 203116,
+      "queries": 10978
+    },
+    {
+      "file": "node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts",
+      "operation": "reproject-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 184865334,
+        "min": 169626837,
+        "max": 200881790
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 46010309,
+          "max": 46010309
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 134271,
+          "max": 134271
+        }
+      },
+      "parses": 1,
+      "inventorySites": 203116,
+      "queries": 10978
+    },
+    {
+      "file": ".next/types/validator.ts",
+      "operation": "parse-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 4830793,
+        "min": 3944390,
+        "max": 5124440
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 2250668,
+          "max": 2250668
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 9637,
+          "max": 9637
+        }
+      },
+      "parses": 1,
+      "inventorySites": 10837,
+      "queries": 0
+    },
+    {
+      "file": ".next/types/validator.ts",
+      "operation": "eager-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 9651901,
+        "min": 5981521,
+        "max": 12196076
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 2250668,
+          "max": 2250668
+        },
+        "retainedDeltaBytes": {
+          "min": 476904,
+          "max": 476904
+        },
+        "allocationCalls": {
+          "min": 9663,
+          "max": 9663
+        }
+      },
+      "parses": 1,
+      "inventorySites": 10837,
+      "queries": 0
+    },
+    {
+      "file": ".next/types/validator.ts",
+      "operation": "reprojection-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 6582049,
+        "min": 4093828,
+        "max": 8142974
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 2250668,
+          "max": 2250668
+        },
+        "retainedDeltaBytes": {
+          "min": 80,
+          "max": 80
+        },
+        "allocationCalls": {
+          "min": 9655,
+          "max": 9655
+        }
+      },
+      "parses": 1,
+      "inventorySites": 10837,
+      "queries": 0
+    },
+    {
+      "file": ".next/types/validator.ts",
+      "operation": "projection-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 1436383,
+        "min": 1236692,
+        "max": 3174010
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 478280,
+          "max": 478280
+        },
+        "retainedDeltaBytes": {
+          "min": 476824,
+          "max": 476824
+        },
+        "allocationCalls": {
+          "min": 8,
+          "max": 8
+        }
+      },
+      "parses": 0,
+      "inventorySites": 10837,
+      "queries": 0
+    },
+    {
+      "file": ".next/types/validator.ts",
+      "operation": "eager-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 105,
+        "min": 84,
+        "max": 108
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 10837,
+      "queries": 1
+    },
+    {
+      "file": ".next/types/validator.ts",
+      "operation": "reproject-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 5188066,
+        "min": 5115162,
+        "max": 8768359
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 2250668,
+          "max": 2250668
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 9663,
+          "max": 9663
+        }
+      },
+      "parses": 1,
+      "inventorySites": 10837,
+      "queries": 1
+    },
+    {
+      "file": ".next/types/validator.ts",
+      "operation": "eager-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 130,
+        "min": 113,
+        "max": 178
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 10837,
+      "queries": 4
+    },
+    {
+      "file": ".next/types/validator.ts",
+      "operation": "reproject-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 10432413,
+        "min": 4934468,
+        "max": 11966774
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 2250668,
+          "max": 2250668
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 9663,
+          "max": 9663
+        }
+      },
+      "parses": 1,
+      "inventorySites": 10837,
+      "queries": 4
+    },
+    {
+      "file": ".next/types/validator.ts",
+      "operation": "eager-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 136,
+        "min": 96,
+        "max": 182
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 10837,
+      "queries": 4
+    },
+    {
+      "file": ".next/types/validator.ts",
+      "operation": "reproject-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 7916992,
+        "min": 5850407,
+        "max": 11503156
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 2250668,
+          "max": 2250668
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 9663,
+          "max": 9663
+        }
+      },
+      "parses": 1,
+      "inventorySites": 10837,
+      "queries": 4
+    },
+    {
+      "file": "synthetic-annotated.ts",
+      "operation": "parse-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 54363860,
+        "min": 52321005,
+        "max": 56462922
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 18594808,
+          "max": 18594808
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 85021,
+          "max": 85021
+        }
+      },
+      "parses": 1,
+      "inventorySites": 105002,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-annotated.ts",
+      "operation": "eager-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 86726235,
+        "min": 81580924,
+        "max": 90259888
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 25070956,
+          "max": 25070956
+        },
+        "retainedDeltaBytes": {
+          "min": 4947764,
+          "max": 4947764
+        },
+        "allocationCalls": {
+          "min": 85060,
+          "max": 85060
+        }
+      },
+      "parses": 1,
+      "inventorySites": 105002,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-annotated.ts",
+      "operation": "reprojection-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 66906069,
+        "min": 63819776,
+        "max": 70795525
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 20390876,
+          "max": 20390876
+        },
+        "retainedDeltaBytes": {
+          "min": 327680,
+          "max": 327680
+        },
+        "allocationCalls": {
+          "min": 85054,
+          "max": 85054
+        }
+      },
+      "parses": 1,
+      "inventorySites": 105002,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-annotated.ts",
+      "operation": "projection-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 21835493,
+        "min": 19824306,
+        "max": 22687374
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 4680080,
+          "max": 4680080
+        },
+        "retainedDeltaBytes": {
+          "min": 4620084,
+          "max": 4620084
+        },
+        "allocationCalls": {
+          "min": 6,
+          "max": 6
+        }
+      },
+      "parses": 0,
+      "inventorySites": 105002,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-annotated.ts",
+      "operation": "eager-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 125,
+        "min": 98,
+        "max": 209
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 105002,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-annotated.ts",
+      "operation": "reproject-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 88571638,
+        "min": 81868457,
+        "max": 94387057
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 25070956,
+          "max": 25070956
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 85060,
+          "max": 85060
+        }
+      },
+      "parses": 1,
+      "inventorySites": 105002,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-annotated.ts",
+      "operation": "eager-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 338,
+        "min": 316,
+        "max": 363
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 105002,
+      "queries": 16
+    },
+    {
+      "file": "synthetic-annotated.ts",
+      "operation": "reproject-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 85082134,
+        "min": 80640700,
+        "max": 95480130
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 25070956,
+          "max": 25070956
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 85060,
+          "max": 85060
+        }
+      },
+      "parses": 1,
+      "inventorySites": 105002,
+      "queries": 16
+    },
+    {
+      "file": "synthetic-annotated.ts",
+      "operation": "eager-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 457313,
+        "min": 357490,
+        "max": 2159864
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 105002,
+      "queries": 15000
+    },
+    {
+      "file": "synthetic-annotated.ts",
+      "operation": "reproject-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 91071413,
+        "min": 82648961,
+        "max": 97632611
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 25070956,
+          "max": 25070956
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 85060,
+          "max": 85060
+        }
+      },
+      "parses": 1,
+      "inventorySites": 105002,
+      "queries": 15000
+    },
+    {
+      "file": "synthetic-shallow.ts",
+      "operation": "parse-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 58551696,
+        "min": 52857290,
+        "max": 68264887
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 23233092,
+          "max": 23233092
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 100036,
+          "max": 100036
+        }
+      },
+      "parses": 1,
+      "inventorySites": 100017,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-shallow.ts",
+      "operation": "eager-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 84654196,
+        "min": 77659059,
+        "max": 86276105
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 29482382,
+          "max": 29482382
+        },
+        "retainedDeltaBytes": {
+          "min": 4400824,
+          "max": 4400824
+        },
+        "allocationCalls": {
+          "min": 100065,
+          "max": 100065
+        }
+      },
+      "parses": 1,
+      "inventorySites": 100017,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-shallow.ts",
+      "operation": "reprojection-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 62716156,
+        "min": 57765272,
+        "max": 68216000
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 25081498,
+          "max": 25081498
+        },
+        "retainedDeltaBytes": {
+          "min": 80,
+          "max": 80
+        },
+        "allocationCalls": {
+          "min": 100058,
+          "max": 100058
+        }
+      },
+      "parses": 1,
+      "inventorySites": 100017,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-shallow.ts",
+      "operation": "projection-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 16448120,
+        "min": 13637143,
+        "max": 18528365
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 4800760,
+          "max": 4800760
+        },
+        "retainedDeltaBytes": {
+          "min": 4400744,
+          "max": 4400744
+        },
+        "allocationCalls": {
+          "min": 7,
+          "max": 7
+        }
+      },
+      "parses": 0,
+      "inventorySites": 100017,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-shallow.ts",
+      "operation": "eager-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 108,
+        "min": 95,
+        "max": 206
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 100017,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-shallow.ts",
+      "operation": "reproject-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 84828644,
+        "min": 77882777,
+        "max": 93311416
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 29482382,
+          "max": 29482382
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 100065,
+          "max": 100065
+        }
+      },
+      "parses": 1,
+      "inventorySites": 100017,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-shallow.ts",
+      "operation": "eager-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 97,
+        "min": 86,
+        "max": 111
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 100017,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-shallow.ts",
+      "operation": "reproject-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 78547417,
+        "min": 76093393,
+        "max": 87311982
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 29482382,
+          "max": 29482382
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 100065,
+          "max": 100065
+        }
+      },
+      "parses": 1,
+      "inventorySites": 100017,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-shallow.ts",
+      "operation": "eager-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 98,
+        "min": 96,
+        "max": 132
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 100017,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-shallow.ts",
+      "operation": "reproject-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 83907185,
+        "min": 77125140,
+        "max": 96059510
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 29482382,
+          "max": 29482382
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 100065,
+          "max": 100065
+        }
+      },
+      "parses": 1,
+      "inventorySites": 100017,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-deep.ts",
+      "operation": "parse-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 64360,
+        "min": 63190,
+        "max": 65118
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 20158,
+          "max": 20158
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 146,
+          "max": 146
+        }
+      },
+      "parses": 1,
+      "inventorySites": 141,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-deep.ts",
+      "operation": "eager-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 77692,
+        "min": 76816,
+        "max": 82848
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 29323,
+          "max": 29323
+        },
+        "retainedDeltaBytes": {
+          "min": 6280,
+          "max": 6280
+        },
+        "allocationCalls": {
+          "min": 167,
+          "max": 167
+        }
+      },
+      "parses": 1,
+      "inventorySites": 141,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-deep.ts",
+      "operation": "reprojection-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 68686,
+        "min": 67450,
+        "max": 73427
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 22659,
+          "max": 22659
+        },
+        "retainedDeltaBytes": {
+          "min": 80,
+          "max": 80
+        },
+        "allocationCalls": {
+          "min": 158,
+          "max": 158
+        }
+      },
+      "parses": 1,
+      "inventorySites": 141,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-deep.ts",
+      "operation": "projection-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 9611,
+        "min": 9484,
+        "max": 10480
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 6664,
+          "max": 6664
+        },
+        "retainedDeltaBytes": {
+          "min": 6200,
+          "max": 6200
+        },
+        "allocationCalls": {
+          "min": 9,
+          "max": 9
+        }
+      },
+      "parses": 0,
+      "inventorySites": 141,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-deep.ts",
+      "operation": "eager-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 103,
+        "min": 78,
+        "max": 112
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 141,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-deep.ts",
+      "operation": "reproject-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 78045,
+        "min": 77568,
+        "max": 81043
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 29323,
+          "max": 29323
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 167,
+          "max": 167
+        }
+      },
+      "parses": 1,
+      "inventorySites": 141,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-deep.ts",
+      "operation": "eager-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 80,
+        "min": 78,
+        "max": 101
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 141,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-deep.ts",
+      "operation": "reproject-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 78413,
+        "min": 77906,
+        "max": 81425
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 29323,
+          "max": 29323
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 167,
+          "max": 167
+        }
+      },
+      "parses": 1,
+      "inventorySites": 141,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-deep.ts",
+      "operation": "eager-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 80,
+        "min": 79,
+        "max": 97
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 141,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-deep.ts",
+      "operation": "reproject-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 77966,
+        "min": 77478,
+        "max": 102008
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 29323,
+          "max": 29323
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 167,
+          "max": 167
+        }
+      },
+      "parses": 1,
+      "inventorySites": 141,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-roles.ts",
+      "operation": "parse-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 14801,
+        "min": 14620,
+        "max": 15401
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 9688,
+          "max": 9688
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 36,
+          "max": 36
+        }
+      },
+      "parses": 1,
+      "inventorySites": 37,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-roles.ts",
+      "operation": "eager-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 21418,
+        "min": 21216,
+        "max": 23866
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 9688,
+          "max": 9688
+        },
+        "retainedDeltaBytes": {
+          "min": 1784,
+          "max": 1784
+        },
+        "allocationCalls": {
+          "min": 54,
+          "max": 54
+        }
+      },
+      "parses": 1,
+      "inventorySites": 37,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-roles.ts",
+      "operation": "reprojection-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 18426,
+        "min": 17294,
+        "max": 19482
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 9688,
+          "max": 9688
+        },
+        "retainedDeltaBytes": {
+          "min": 160,
+          "max": 160
+        },
+        "allocationCalls": {
+          "min": 47,
+          "max": 47
+        }
+      },
+      "parses": 1,
+      "inventorySites": 37,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-roles.ts",
+      "operation": "projection-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 4097,
+        "min": 4073,
+        "max": 4323
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 1736,
+          "max": 1736
+        },
+        "retainedDeltaBytes": {
+          "min": 1624,
+          "max": 1624
+        },
+        "allocationCalls": {
+          "min": 7,
+          "max": 7
+        }
+      },
+      "parses": 0,
+      "inventorySites": 37,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-roles.ts",
+      "operation": "eager-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 99,
+        "min": 75,
+        "max": 114
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 37,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-roles.ts",
+      "operation": "reproject-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 21939,
+        "min": 21908,
+        "max": 23186
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 9688,
+          "max": 9688
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 54,
+          "max": 54
+        }
+      },
+      "parses": 1,
+      "inventorySites": 37,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-roles.ts",
+      "operation": "eager-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 118,
+        "min": 108,
+        "max": 176
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 37,
+      "queries": 5
+    },
+    {
+      "file": "synthetic-roles.ts",
+      "operation": "reproject-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 22245,
+        "min": 21951,
+        "max": 23181
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 9688,
+          "max": 9688
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 54,
+          "max": 54
+        }
+      },
+      "parses": 1,
+      "inventorySites": 37,
+      "queries": 5
+    },
+    {
+      "file": "synthetic-roles.ts",
+      "operation": "eager-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 125,
+        "min": 107,
+        "max": 144
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 37,
+      "queries": 5
+    },
+    {
+      "file": "synthetic-roles.ts",
+      "operation": "reproject-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 22052,
+        "min": 21956,
+        "max": 22782
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 9688,
+          "max": 9688
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 54,
+          "max": 54
+        }
+      },
+      "parses": 1,
+      "inventorySites": 37,
+      "queries": 5
+    },
+    {
+      "file": "synthetic-reparse.ts",
+      "operation": "parse-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 9092,
+        "min": 8022,
+        "max": 9628
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 3796,
+          "max": 3796
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 19,
+          "max": 19
+        }
+      },
+      "parses": 1,
+      "inventorySites": 15,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-reparse.ts",
+      "operation": "eager-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 11872,
+        "min": 11673,
+        "max": 12818
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 4554,
+          "max": 4554
+        },
+        "retainedDeltaBytes": {
+          "min": 736,
+          "max": 736
+        },
+        "allocationCalls": {
+          "min": 32,
+          "max": 32
+        }
+      },
+      "parses": 1,
+      "inventorySites": 15,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-reparse.ts",
+      "operation": "reprojection-ingest",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 10733,
+        "min": 10052,
+        "max": 11361
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 3890,
+          "max": 3890
+        },
+        "retainedDeltaBytes": {
+          "min": 80,
+          "max": 80
+        },
+        "allocationCalls": {
+          "min": 27,
+          "max": 27
+        }
+      },
+      "parses": 1,
+      "inventorySites": 15,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-reparse.ts",
+      "operation": "projection-only",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 1680,
+        "min": 1670,
+        "max": 1843
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 664,
+          "max": 664
+        },
+        "retainedDeltaBytes": {
+          "min": 656,
+          "max": 656
+        },
+        "allocationCalls": {
+          "min": 5,
+          "max": 5
+        }
+      },
+      "parses": 0,
+      "inventorySites": 15,
+      "queries": 0
+    },
+    {
+      "file": "synthetic-reparse.ts",
+      "operation": "eager-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 86,
+        "min": 63,
+        "max": 99
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 15,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-reparse.ts",
+      "operation": "reproject-single",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 12392,
+        "min": 12267,
+        "max": 13361
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 4554,
+          "max": 4554
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 32,
+          "max": 32
+        }
+      },
+      "parses": 1,
+      "inventorySites": 15,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-reparse.ts",
+      "operation": "eager-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 64,
+        "min": 62,
+        "max": 76
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 15,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-reparse.ts",
+      "operation": "reproject-batch16",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 12455,
+        "min": 12218,
+        "max": 13849
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 4554,
+          "max": 4554
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 32,
+          "max": 32
+        }
+      },
+      "parses": 1,
+      "inventorySites": 15,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-reparse.ts",
+      "operation": "eager-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 63,
+        "min": 63,
+        "max": 82
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 15,
+      "queries": 1
+    },
+    {
+      "file": "synthetic-reparse.ts",
+      "operation": "reproject-all-annotations",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 12344,
+        "min": 12216,
+        "max": 12903
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 4554,
+          "max": 4554
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 32,
+          "max": 32
+        }
+      },
+      "parses": 1,
+      "inventorySites": 15,
+      "queries": 1
+    },
+    {
+      "file": "ALL",
+      "operation": "eager-cross-file-double",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 17463,
+        "min": 14493,
+        "max": 17943
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "parses": 0,
+      "inventorySites": 662181,
+      "queries": 322
+    },
+    {
+      "file": "ALL",
+      "operation": "reproject-cross-file-double",
+      "timingRounds": 5,
+      "timingNanos": {
+        "median": 612290667,
+        "min": 564656960,
+        "max": 632406208
+      },
+      "accountedRounds": 2,
+      "accounted": {
+        "incrementalPeakBytes": {
+          "min": 56685037,
+          "max": 56685037
+        },
+        "retainedDeltaBytes": {
+          "min": 0,
+          "max": 0
+        },
+        "allocationCalls": {
+          "min": 481608,
+          "max": 481608
+        }
+      },
+      "parses": 16,
+      "inventorySites": 662181,
+      "queries": 322
+    }
+  ],
+  "interpretation": "Timing medians use tracking-disabled binary only; allocation ranges use a distinct instrumented binary. inventorySites in ALL rows includes two undemanded files; parses is the actual count. Source strings and reference descriptions predate incremental measurement."
+}

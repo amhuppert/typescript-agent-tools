@@ -34,6 +34,7 @@ impl Default for Depth {
 pub(crate) fn outline(outline: &Outline, depth: Depth) -> Delivery<'_> {
     Delivery {
         code: 0,
+        text_is_result: true,
         document: Box::new(move |writer, pretty| {
             let mut document = json!({
                 "operation": "outline",
@@ -58,6 +59,7 @@ pub(crate) fn outline(outline: &Outline, depth: Depth) -> Delivery<'_> {
 /// selection exits 1.
 pub(crate) fn show(show: &navigation::Show) -> Delivery<'_> {
     Delivery {
+        text_is_result: matches!(show.outcome, ShowOutcome::Found(_)),
         code: match show.outcome {
             ShowOutcome::Found(_) => 0,
             ShowOutcome::Ambiguous(_) | ShowOutcome::NotFound => super::delivery::UNSELECTED,

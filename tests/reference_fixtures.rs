@@ -42,6 +42,67 @@ fn every_marked_fixture_project_matches_its_markers() {
     );
 }
 
+#[test]
+fn canonical_members_stay_outside_the_legacy_lexical_projection() {
+    let source = r#"class /*@C:d*/C {
+  static /*@!*/unit = 1;
+  static /*@!*/method() {}
+  static get /*@!*/paired(): number { return 1; }
+  static set /*@!*/paired(value: number) {}
+  static accessor /*@!*/auto = 1;
+  static /*@!*/\u0078 = 1;
+}
+namespace /*@C:d*/C {
+  export const /*@label:de*/label = 1;
+  export interface /*@Type:de*/Type {}
+}
+/*@C:u*/C./*@!*/unit;
+/*@C:u*/C./*@!*/method();
+/*@C:u*/C./*@!*/paired;
+/*@C:u*/C./*@!*/auto;
+/*@C:u*/C./*@!*/\u0078;
+/*@C:u*/C./*@label:u*/label;
+let typed: /*@C:u*/C./*@Type:u*/Type;
+import /*@!*/Member = /*@C:u*/C./*@!*/unit;
+/*@!*/Member;
+enum /*@Color:d*/Color { /*@!*/Red, /*@!*/\u0042lue }
+namespace /*@Color:d*/Color {
+  export const /*@favorite:de*/favorite = 1;
+  export interface /*@ColorType:de*/Type {}
+}
+const enum /*@Flags:d*/Flags { /*@!*/None, /*@!*/All = 1 }
+/*@Color:u*/Color./*@!*/Red;
+/*@Color:u*/Color./*@!*/\u0042lue;
+/*@Flags:u*/Flags./*@!*/None;
+/*@Flags:u*/Flags./*@!*/All;
+/*@Color:u*/Color./*@favorite:u*/favorite;
+let red: /*@Color:u*/Color./*@!*/Red;
+let colorType: /*@Color:u*/Color./*@ColorType:u*/Type;
+import /*@!*/EnumMember = /*@Color:u*/Color./*@!*/Red;
+/*@!*/EnumMember;
+export {};
+"#;
+    for newline in ["\n", "\r", "\r\n", "\u{2028}", "\u{2029}"] {
+        for bom in ["", "\u{feff}"] {
+            let analyzed = source.replace('\n', newline);
+            let markers = parse_markers(&analyzed, "a.ts");
+            let source = format!("{bom}{analyzed}");
+            let fixture = Fixture::new(&[
+                (
+                    "tsconfig.json",
+                    r#"{"compilerOptions":{"noLib":true},"files":["a.ts"]}"#,
+                ),
+                ("a.ts", &source),
+            ]);
+            if let Err(panic) =
+                std::panic::catch_unwind(|| fixture.check_marker_set(&fixture.load(), &markers))
+            {
+                panic!("newline {newline:?}, BOM {bom:?}: {}", message(&*panic));
+            }
+        }
+    }
+}
+
 fn message(panic: &(dyn std::any::Any + Send)) -> String {
     panic
         .downcast_ref::<String>()

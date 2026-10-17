@@ -1,0 +1,22 @@
+[
+  {
+    "file": "input-manifest.json",
+    "sha256": "e48d09ec7f968b584048b265543f0b9b16fe72aea1925d4bb03e74c6311d10cb",
+    "bytes": 2549324
+  },
+  {
+    "file": "profile-provenance.json",
+    "sha256": "c552136ded448910560145343099a3d8273d322113938410596001c3364acf2c",
+    "bytes": 1092
+  },
+  {
+    "file": "member-observations.json",
+    "sha256": "c489675b283a0007b90dc535b627db89c8cd97ece4886cc0d6575ac1f9752c0a",
+    "bytes": 61749306
+  },
+  {
+    "file": "type-observations.json",
+    "sha256": "485d2b2bc9ff7bed40c62ed9595cceed2369066cc5de7451e6d6ed4a4129f50e",
+    "bytes": 73558217
+  }
+]

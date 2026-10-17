@@ -1,0 +1,174 @@
+[
+  {
+    "name": "scalar",
+    "summary": "(value: number) => Promise<number>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "direct",
+    "summary": "() => Promise<number>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "nested",
+    "summary": "() => Promise<number>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "structural",
+    "summary": "() => Promise<string>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "any",
+    "summary": "() => Promise<any>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "empty",
+    "summary": "() => Promise<void>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "bare",
+    "summary": "() => Promise<void>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "self",
+    "summary": "() => Promise<never>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "awaitSelf",
+    "summary": "() => Promise<never>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "arrow",
+    "summary": "() => Promise<number>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "literal",
+    "summary": "() => Promise<number>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "invalid",
+    "summary": "() => Promise<any>",
+    "errorType": false,
+    "before": [],
+    "after": [
+      1058
+    ]
+  },
+  {
+    "name": "invalidArrow",
+    "summary": "() => Promise<any>",
+    "errorType": false,
+    "before": [],
+    "after": [
+      1058
+    ]
+  },
+  {
+    "name": "missing",
+    "summary": "() => Promise<MissingReturnValue>",
+    "errorType": false,
+    "before": [],
+    "after": [
+      2304
+    ]
+  },
+  {
+    "name": "later",
+    "summary": "(condition: boolean) => Promise<any>",
+    "errorType": false,
+    "before": [],
+    "after": [
+      2304,
+      2304
+    ]
+  },
+  {
+    "name": "invalidLater",
+    "summary": "(condition: boolean) => Promise<any>",
+    "errorType": false,
+    "before": [],
+    "after": [
+      2304,
+      1058
+    ]
+  },
+  {
+    "name": "annotated",
+    "summary": "() => Promise<number>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "contextual",
+    "summary": "number",
+    "errorType": false,
+    "before": [
+      2318
+    ],
+    "after": [
+      2318
+    ]
+  },
+  {
+    "name": "contextualEmpty",
+    "summary": "unknown",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "nullWidening",
+    "summary": "() => { value: null; }",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "siblingWidening",
+    "summary": "(condition: boolean) => { first: null; second?: undefined; } | { first?: undefined; second: undefined; }",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "wideningLazy",
+    "summary": "() => { value: null; readonly tail: MissingLazyTail; }",
+    "errorType": false,
+    "before": [],
+    "after": [
+      2304
+    ]
+  }
+]

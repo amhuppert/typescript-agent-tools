@@ -1,0 +1,1 @@
+{"extends":"./strict.json","files":["../native-generated-literal-context/globals.d.ts","hidden.ts"]}

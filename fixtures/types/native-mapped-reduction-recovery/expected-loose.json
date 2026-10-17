@@ -1,0 +1,260 @@
+[
+  {
+    "name": "homomorphic",
+    "summary": "MissingMappedTemplate",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 480,
+        "end": 497
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 475,
+        "declarationEnd": 498,
+        "name": "tag"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 475,
+        "declarationEnd": 498,
+        "name": "tag"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "name": "tag"
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 434,
+        "end": 456
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "name": "value"
+      },
+      {
+        "operation": "checkExpressionEx",
+        "pos": 609,
+        "end": 622
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 579,
+        "declarationEnd": 622,
+        "name": "homomorphic"
+      }
+    ]
+  },
+  {
+    "name": "remapped",
+    "summary": "MissingRemappedTemplate",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 718,
+        "end": 740
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 713,
+        "declarationEnd": 741,
+        "name": "tag"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 713,
+        "declarationEnd": 741,
+        "name": "tag"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "name": "tag"
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 665,
+        "end": 689
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "name": "value"
+      },
+      {
+        "operation": "checkExpressionEx",
+        "pos": 861,
+        "end": 876
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 831,
+        "declarationEnd": 876,
+        "name": "remappedResult"
+      }
+    ]
+  },
+  {
+    "name": "optional",
+    "summary": "MissingOptionalTemplate",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 980,
+        "end": 1005
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 975,
+        "declarationEnd": 1006,
+        "name": "tag"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 975,
+        "declarationEnd": 1006,
+        "name": "tag"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "name": "tag"
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 924,
+        "end": 948
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "name": "value"
+      },
+      {
+        "operation": "checkExpressionEx",
+        "pos": 1129,
+        "end": 1144
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1099,
+        "declarationEnd": 1144,
+        "name": "optionalResult"
+      }
+    ]
+  },
+  {
+    "name": "union",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1236,
+        "end": 1258
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1231,
+        "declarationEnd": 1259,
+        "name": "tag"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1231,
+        "declarationEnd": 1259,
+        "name": "tag"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "name": "tag"
+      },
+      {
+        "operation": "getTypeFromTypeNode",
+        "pos": 1185,
+        "end": 1206
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "name": "value"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "name": "value"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "name": "value"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "name": "value"
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "name": "value"
+      },
+      {
+        "operation": "checkExpressionEx",
+        "pos": 1399,
+        "end": 1411
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1375,
+        "declarationEnd": 1411,
+        "name": "unionResult"
+      }
+    ]
+  },
+  {
+    "name": "never",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2339
+    ],
+    "demandFailures": [],
+    "errors": [
+      {
+        "operation": "checkExpressionEx",
+        "pos": 1657,
+        "end": 1675
+      },
+      {
+        "operation": "getTypeOfSymbol",
+        "declarationPos": 1633,
+        "declarationEnd": 1675,
+        "name": "neverResult"
+      }
+    ]
+  },
+  {
+    "name": "healthy",
+    "summary": "41",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "errors": []
+  }
+]

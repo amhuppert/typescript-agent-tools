@@ -1,0 +1,10 @@
+{
+  "astralVersusBMP": 1,
+  "exactOrder": [
+    "a.ts",
+    ".ts",
+    "𐀀.ts"
+  ],
+  "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "comparerHash": "532e42f123dbc846b8ef35b36feef12b8a1dd5d807ea8ce40f94d78eea44814a"
+}

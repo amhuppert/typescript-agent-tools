@@ -1,0 +1,198 @@
+[
+  {
+    "name": "concatTail",
+    "summary": "\"#field:suffix\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "concatRawPrefix",
+    "summary": "\"raw\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "rawHead",
+    "summary": "\"raw\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "replacementPrefix",
+    "summary": "\"replacement\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "upper",
+    "summary": "\"replacement:#FIELD\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "lower",
+    "summary": "\"replacement:#field\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "capitalize",
+    "summary": "\"replacement:#field\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "uncapitalize",
+    "summary": "\"replacement:#Field\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "capitalizeRawRemainder",
+    "summary": "\"raw\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "uncapitalizeRawRemainder",
+    "summary": "\"raw\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "upperExpansion",
+    "summary": "\"expanded\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "capitalizeExpansion",
+    "summary": "\"expanded\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "uncapitalizeExpansion",
+    "summary": "\"expanded\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "sigmaBeforeIdentity",
+    "summary": "\"sigma-boundary\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "sigmaMarksBesideIdentity",
+    "summary": "\"sigma-boundary\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "sigmaAfterIdentity",
+    "summary": "\"uncased-boundary\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "joinedSurrogate",
+    "summary": "\"#field:😀\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "joinedNestedSurrogate",
+    "summary": "\"#field:😀\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "loneHigh",
+    "summary": "\"high-preserved\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "loneLow",
+    "summary": "\"low-preserved\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "reversedSurrogates",
+    "summary": "\"order-preserved\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "mappedLoneSurrogate",
+    "summary": "\"sentinel-preserved\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "surrogatesSeparatedByIdentity",
+    "summary": "\"identity-separates\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "templateSpanCapture",
+    "summary": "\"captured\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "templateSpanMapping",
+    "summary": "\"mapped\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "sameIdentity",
+    "summary": "\"same\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "identityNondigit",
+    "summary": "\"nondigit\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "identityConcreteDigits",
+    "summary": "\"different\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  }
+]

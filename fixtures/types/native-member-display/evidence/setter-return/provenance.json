@@ -1,0 +1,62 @@
+{
+  "kind": "fresh same-checker scratch observation, not registered final product validation",
+  "compilerVersion": "7.0.2",
+  "compilerCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "artifactHashes": [
+    {
+      "file": "answers.json",
+      "sha256": "809993f6201238154c3edab88c1e91d88b8bb778e1dce18290a4310358a612bf",
+      "bytes": 19310
+    },
+    {
+      "file": "cases.ts",
+      "sha256": "a87b7b831ffa381a2c7f7d4675a86af6dd05e7ba458a14d04c8e50aaa7621e31",
+      "bytes": 219
+    },
+    {
+      "file": "checker-hook.go",
+      "sha256": "e2d5c10ae680c02f912cd1eff4d9b17dc922894559fea2028a82663d9a501419",
+      "bytes": 2773
+    },
+    {
+      "file": "loose.json",
+      "sha256": "88202bca6c6cf9cbade072cd6e0af9a691fbac33df0fe7ef5e486944b097997d",
+      "bytes": 171
+    },
+    {
+      "file": "ls-hook.go",
+      "sha256": "73c9a52f43914571bdf7f29e8817720d0ff98bdb0aeb7cad183fa8397a848dce",
+      "bytes": 5896
+    },
+    {
+      "file": "oracle-test.go",
+      "sha256": "ca4f51a46e11989a6893892a5133d3b862054582765f1509d6416eb1dbcb0dbc",
+      "bytes": 11811
+    },
+    {
+      "file": "oracle.mjs",
+      "sha256": "526605e2e8a95d1bf3fd75f834b99f7218495b9a1eba77dd8b8bb7aeb5a1b20c",
+      "bytes": 40200
+    },
+    {
+      "file": "probe.mjs",
+      "sha256": "f800a999b19a10711379f67e56aad1d61cc70f8e40d5950e4fd609de253ab47f",
+      "bytes": 876
+    },
+    {
+      "file": "setup.mjs",
+      "sha256": "30c8a3ef99d03fc89211d2fee03b2c7d27050cb79dd8b1b8ed45420e39e1c3f2",
+      "bytes": 2463
+    },
+    {
+      "file": "strict.json",
+      "sha256": "439876e79f1fbcf8d64c2bc98d844865dfa34a474e71d2162d8eb7a8d024ce17",
+      "bytes": 170
+    }
+  ],
+  "notes": [
+    "The original setup/probe used .cc/temp/types-setter-return relative layout. Restore that layout to reproduce; copied oracle imports retain original worktree absolute paths.",
+    "Hash rows describe exact captured artifacts, not a before/after concurrency assertion. Hook answers separately retain replay inputHashes.",
+    "The raw return-type question does not demand setter parameter types. Bodyless Any and implemented empty-body Void are distinct observed outcomes."
+  ]
+}

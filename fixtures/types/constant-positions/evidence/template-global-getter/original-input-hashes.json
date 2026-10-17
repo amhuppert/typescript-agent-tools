@@ -1,0 +1,1390 @@
+[
+  {
+    "file": "tools/type-native-global-this-missing-oracle.test.mjs",
+    "sha256": "b62e39b1e7a81ea1722e041fbe65e378c9b32691636161f800590d04193c3298"
+  },
+  {
+    "file": "tools/type-intersection-constraints-oracle.test.mjs",
+    "sha256": "072a58c5944c73255eeb778ff7d66d9de3b1144e90275790fcf7b8643e1dae6d"
+  },
+  {
+    "file": "tools/type-native-class-decorator-prefix-oracle.test.mjs",
+    "sha256": "b1d1f288098181a4610b569f9cd390ce79480478fdcb51190ed37806d6505816"
+  },
+  {
+    "file": "tools/type-native-mapped-oracle.mjs",
+    "sha256": "ca3de3fcde3238d0552376c077936cc9b3150356e0245edf5b53be1c67aa4a4e"
+  },
+  {
+    "file": "tools/type-native-contextual-recovery-oracle.test.mjs",
+    "sha256": "75255b63f40048e5fb6f7f4d0b328c9a4f235bf6c29349db456e07adfcf4ec5d"
+  },
+  {
+    "file": "tools/type-capture-boundaries-oracle.test.mjs",
+    "sha256": "d7204b451f625f4be7b4c116674995bfbe97daf0e6d7ce0d287a6d498531d439"
+  },
+  {
+    "file": "tools/type-native-construct-oracle.test.mjs",
+    "sha256": "251d573213032510c4960b45d7722000fa45a8f77f6c7a6942063e974a22e840"
+  },
+  {
+    "file": "tools/type-capture-flow-oracle.test.mjs",
+    "sha256": "667b9d423c5644b01d15ba874ace065777344fa67832934770ca74462ae24a58"
+  },
+  {
+    "file": "tools/type-native-expression-flow-admission-oracle.test.mjs",
+    "sha256": "f09de1296f99a29b861a5a2e7a2b3466c0ebcb7e2a6dc457f20ef7bb0a4eccff"
+  },
+  {
+    "file": "tools/type-native-overload-failure-signatures-oracle.test.mjs",
+    "sha256": "59e4db2df91b9aaaee94a3490706a28ed68f3a679fc4e977fc93a630f34daf21"
+  },
+  {
+    "file": "tools/type-native-property-name-display-oracle.test.mjs",
+    "sha256": "38e0b9a7ffea43fc051d841092ffeec3344c759b115a977c1b9245d62a6ebf75"
+  },
+  {
+    "file": "tools/type-native-object-rest-oracle.test.mjs",
+    "sha256": "f1a8db8c6eb1234883abce9f249920b0dbd071fdaeeed5c76167e17a852ac257"
+  },
+  {
+    "file": "tools/type-native-restrictive-unused-sibling-oracle.test.mjs",
+    "sha256": "53eb580f3323e78a90fe81526984b07aae9dcc973831adcaf0f28e0d29091e83"
+  },
+  {
+    "file": "tools/type-native-filter-origins-oracle.test.mjs",
+    "sha256": "541e375f9b22f8b68e6e9bc42ebe08d1420389bf92a9414e6cd6407ed06e689a"
+  },
+  {
+    "file": "tools/type-conditional-cache-evidence.test.mjs",
+    "sha256": "b50b0d807c0882fc2983699a6515946bdb6bb70671677bb2cb432c1c94cc120c"
+  },
+  {
+    "file": "tools/deprecated-jsdoc-oracle.mjs",
+    "sha256": "89d325b86efb30332d3d834e12368777b91fa283df1caef69f8ae2de9d6a4379"
+  },
+  {
+    "file": "tools/reference-combinations.mjs",
+    "sha256": "99c096e7adfb645bed25016b69d2b1bd1ee86b037acdcda2c644d4241e129418"
+  },
+  {
+    "file": "tools/type-native-recovery-cause-limit-oracle.test.mjs",
+    "sha256": "da90e882a6c433a601ae3244a3731799701c0d3cf4f8bc02c42c1215232f24c0"
+  },
+  {
+    "file": "tools/generate-compiler-schema.mjs",
+    "sha256": "c46763bb55c43a5ee90932e9fc41ca3c21b22803bd3fa608b6e2ba83268fe047"
+  },
+  {
+    "file": "tools/type-member-relations.test.mjs",
+    "sha256": "bfe91b8273fbabbf767ad59745b04f0c8b1e0aee8b827e28eac5a15e67797e1a"
+  },
+  {
+    "file": "tools/type-alias-conflicts-oracle.test.mjs",
+    "sha256": "7363950056dac2866f25f1f8fe35b169ec31624fbdf2682213b20c6a93af7e51"
+  },
+  {
+    "file": "tools/type-graph-counts-oracle.test.mjs",
+    "sha256": "784ce78310f16c2bbb4cfe64ae32c63e8a6aca663b95b5bc59d5c1e33f18d007"
+  },
+  {
+    "file": "tools/type-oracle.mjs",
+    "sha256": "8a7b8c3438c0450d1ad40f1567f554f31b71603686d7b7e2603236a74aa7ff50"
+  },
+  {
+    "file": "tools/type-destructuring-oracle.test.mjs",
+    "sha256": "9f4954940fbf0b46e40f821b8312cfb12545d61441b9d4bc577e182f5f9b155d"
+  },
+  {
+    "file": "tools/type-native-fixed-globals-oracle.test.mjs",
+    "sha256": "d00a06ce3ad16e2d6e796e92224d1573fba096120afb17da51b8e0dcf1be0678"
+  },
+  {
+    "file": "tools/type-native-parameter-names-oracle.test.mjs",
+    "sha256": "40af95e96f2bbc1924194a232ef959dc3bdfb2168d3b0fc0182918fa56585c3a"
+  },
+  {
+    "file": "tools/type-native-symbol-location-symbols-oracle.test.mjs",
+    "sha256": "cda6679f7d390d5ae78f59e1e6dce089748ba5d79d638ea12c33a47bff74ff36"
+  },
+  {
+    "file": "tools/type-narrowable-reference-oracle.test.mjs",
+    "sha256": "e1eb90ef98dd8d2c22f8c7ff39663222ed04cf4ba4473f6a48af6a05e7a13cd4"
+  },
+  {
+    "file": "tools/native-conformance.mjs",
+    "sha256": "35d4e5553484b141429f5a88b7a9f9185ce3f0dc28268763cdc3fa742dad5306"
+  },
+  {
+    "file": "tools/type-base-constraint-oracle.test.mjs",
+    "sha256": "9de68534b5212479a1fbcad3cfdf45ed4a7903026400c937c4ff178efb0ecf6a"
+  },
+  {
+    "file": "tools/type-anonymous-types-oracle.test.mjs",
+    "sha256": "91b06294b4308f7e6f7a15020b364484f8d15364837ab7992d51f958f12e9c5d"
+  },
+  {
+    "file": "tools/type-native-type-predicate-checks-oracle.test.mjs",
+    "sha256": "edabd7964e9768f9db744604e5a2e0b81145f15405f115f38ce71c662bded93d"
+  },
+  {
+    "file": "tools/editing-flows.mjs",
+    "sha256": "5685122e1a4430817712885d70a68d149c27e30e262480d382db13af287d7cda"
+  },
+  {
+    "file": "tools/type-native-expanded-parameters-oracle.test.mjs",
+    "sha256": "e2de3f656dd45b56acc916a446a5ccd3584736ba08bb08e59dcd43817c9b0788"
+  },
+  {
+    "file": "tools/corpus-selection.mjs",
+    "sha256": "132d08e26e251c0d55cb39ce8d15b59735524bdd4e03fe1d5c691643abc3afa5"
+  },
+  {
+    "file": "tools/type-native-non-null-assertions-oracle.test.mjs",
+    "sha256": "887c75eee9ba8f35545bf325a83ec49674ec72480745523ab243e5d0f05cf204"
+  },
+  {
+    "file": "tools/type-native-contextual-iteration-oracle.test.mjs",
+    "sha256": "2f8b7187a97bb354c95d2dde15ea540a497885def28329f56da3c08f1863708a"
+  },
+  {
+    "file": "tools/type-native-combined-alias-history-oracle.test.mjs",
+    "sha256": "bf8d971ce1bb70662fdcf177d5ba4d355c80b2d518cd0f14f4e3ada61b59e4b2"
+  },
+  {
+    "file": "tools/type-deprecated-jsdoc-exact-oracle.test.mjs",
+    "sha256": "f213099370a75bc6be9ec9d8642fb1b66e75c9aac3becb1a11878eecc19f10fc"
+  },
+  {
+    "file": "tools/type-native-mapped-limited-oracle.test.mjs",
+    "sha256": "3e5aa09d0c3cb9b35aff6816f3dc1ca8fbfc42c73c2daf3fd1aa24025e56bf06"
+  },
+  {
+    "file": "tools/type-native-union-resources-oracle.test.mjs",
+    "sha256": "23e0a6b7412206603e4314cbb2a6e768e5e269e45b6ea4df1cced270664c1c76"
+  },
+  {
+    "file": "tools/type-native-operator-recovery-oracle.test.mjs",
+    "sha256": "b3aec5200fa5f8a991a72fb78bc1cd4cdc79eef5677c80350df9ea3c54f74cae"
+  },
+  {
+    "file": "tools/type-native-json-initialization-properties-oracle.test.mjs",
+    "sha256": "4a4bac93005b13369e5e22cae520fe35c1f4729fd8ff2b56ea17dab37cc4d6ab"
+  },
+  {
+    "file": "tools/type-native-assertion-call-tail-oracle.test.mjs",
+    "sha256": "43faa6345ee55aa7d2237b045c1487b24f0958ef16e8ec9f29a35932714ceafe"
+  },
+  {
+    "file": "tools/type-native-inference-sessions-oracle.test.mjs",
+    "sha256": "f43eba111e7b088eafd68a232cee38ab8628c1ba625f523d4f49de925f4ca3b3"
+  },
+  {
+    "file": "tools/type-native-mapped-inference-oracle.test.mjs",
+    "sha256": "7d34fe91bc8e835fd44e6b71ab0f8d36b0f8604541131115fc37ccde5f19befc"
+  },
+  {
+    "file": "tools/navigation-conformance.mjs",
+    "sha256": "16f2f60203689e44cd699e7806e6a64477564a77a02a4e15136df679c457a23b"
+  },
+  {
+    "file": "tools/type-native-global-display-oracle.test.mjs",
+    "sha256": "7e557224424017802e7f4fe9eb155ca8a69b3b1c3b8e6269d1aa902a4296f82f"
+  },
+  {
+    "file": "tools/type-return-body-oracle.test.mjs",
+    "sha256": "44a926e53f0527bc1aa3e0380eb0da19b2d50208eae87745fc5f79abfc3ab440"
+  },
+  {
+    "file": "tools/type-native-object-literals-oracle.test.mjs",
+    "sha256": "8370a6ed6df0710c8a760d3a9557773af2004eb25027aa7ae9b45b6c2e21209b"
+  },
+  {
+    "file": "tools/type-native-mapped-cycles-oracle.test.mjs",
+    "sha256": "7d97079f0c7ba36e6da610623142d07ee096b03eef1de0ec7075f88cae048a20"
+  },
+  {
+    "file": "tools/type-native-variable-patterns-oracle.test.mjs",
+    "sha256": "e8dbd4c924542dad08c126440a4a23f0797c23df8eb3d3bcefc0ce49fc8385e1"
+  },
+  {
+    "file": "tools/reference-oracle.test.mjs",
+    "sha256": "a05b5f18da2ecf0df3cf7d8a1f31c6b25d39c84cc2e3887c68384fe88e0584e4"
+  },
+  {
+    "file": "tools/type-qualified-access-oracle.test.mjs",
+    "sha256": "0288d6702c15157a3e5e0c6d6cb15336e475bedb433230949dde15143ad43427"
+  },
+  {
+    "file": "tools/type-native-call-type-arguments-oracle.test.mjs",
+    "sha256": "e01f6bde8bb148e0935271143c372289bbaf68dfe3d945d295f85b897f1be017"
+  },
+  {
+    "file": "tools/type-native-recovery-calls-oracle.test.mjs",
+    "sha256": "d29ff1620e23950579733cf0f91b3d1a99a0ec7131ce6d7297f67edf780d84ee"
+  },
+  {
+    "file": "tools/type-native-property-clone-oracle.test.mjs",
+    "sha256": "50c56e529e1ff9bb364391bd5e53521849ab3fc2c3d79c4e94a5371c874a5c5b"
+  },
+  {
+    "file": "tools/type-native-late-symbol-tables-oracle.test.mjs",
+    "sha256": "7e1259177ab0a1de4093d4058652d48776eff07ad440276300879e3b861a3830"
+  },
+  {
+    "file": "tools/type-native-alias-selection-failures-oracle.test.mjs",
+    "sha256": "7d2cdc6c2508c0448f6d49d78181563524849524328d2591ae54517f92db3c9d"
+  },
+  {
+    "file": "tools/type-graph-inferred-constraint-oracle.test.mjs",
+    "sha256": "e199be3864f3523a1ef63a6c1cfc470010c2d8b1f764fd711f19cb41aeed757c"
+  },
+  {
+    "file": "tools/type-corpus-baseline.test.mjs",
+    "sha256": "ce24557f20b26ec939add22bb176746b73085204df3f561f64fb4efe70b9d7ce"
+  },
+  {
+    "file": "tools/type-native-class-heritage-variants-oracle.test.mjs",
+    "sha256": "4c6047f32762d9deb9c1d7b7f8a44220d2eed60547db9d84034d32327e0adbba"
+  },
+  {
+    "file": "tools/type-native-filter-resources-oracle.test.mjs",
+    "sha256": "f7f975da1fb1a3b704ce2b2771eec80955f49c6c34b52597bf525244fd0103df"
+  },
+  {
+    "file": "tools/type-predicate-eligibility-oracle.test.mjs",
+    "sha256": "54bd7311fc60f551e42336f4faa1b0dac873d02be6cbb69441c95d162e2a113c"
+  },
+  {
+    "file": "tools/type-oracle-review.test.mjs",
+    "sha256": "4c9932e9e4a3226ae68ca856eb122973b1d961277e100fc8ea7040a8e552aaff"
+  },
+  {
+    "file": "tools/type-native-commonjs-type-exports-oracle.test.mjs",
+    "sha256": "a2d6e75348e7d45ba665dc2933846ff6be6bb0a4a98cd97397d20fe283f4c343"
+  },
+  {
+    "file": "tools/type-native-diagnostic-acquisitions-oracle.test.mjs",
+    "sha256": "26d1d857dda841f02ca3221bb55013ebe0ae767db18734352e6de5513beb2ffa"
+  },
+  {
+    "file": "tools/type-literal-oracle.test.mjs",
+    "sha256": "1794b7d17718a63ddeff27a88d740de5b7f21be3408a946822677ffa796ddc8a"
+  },
+  {
+    "file": "tools/type-native-template-completion-oracle.test.mjs",
+    "sha256": "fa0986f97fedd7af32ee7e782e5eb36e7ac7a2cd4fa7fd3818d0df70317617f0"
+  },
+  {
+    "file": "tools/json-probes.test.mjs",
+    "sha256": "501df455709c06658c2c9dfcd7cbdd27d069ed62e25a3c7ab2ecf4d00f58f561"
+  },
+  {
+    "file": "tools/type-native-type-literal-checks-oracle.test.mjs",
+    "sha256": "50424dd16e0e3291ded5e17114f72aa0a0d862e26ac0d5acf8a9aaa56a0e6b52"
+  },
+  {
+    "file": "tools/type-contains-this-oracle.test.mjs",
+    "sha256": "292f66b93193b6c9747f47faf0e0a6c61dae7addfd49a2a032d78b5eedd718fc"
+  },
+  {
+    "file": "tools/type-native-private-names-oracle.test.mjs",
+    "sha256": "7c7a507eac1c89d07ecb8028c21794ea8c49f9f3b332f436d02c2c9f8b7f0e99"
+  },
+  {
+    "file": "tools/semantic-oracle.test.mjs",
+    "sha256": "3775f5f04d82c45d445955c318f391657b3d1c0941fcb5aad9a1cafbf62eecc7"
+  },
+  {
+    "file": "tools/type-native-nominal-relations-oracle.test.mjs",
+    "sha256": "5ed350556e62451b81a544e234aef923f068c10ed196667b4aef8d65ceb99734"
+  },
+  {
+    "file": "tools/unicode-corpus.mjs",
+    "sha256": "eaa8ebde397792ccfc06f85a4ad8a43c64c468a4bfe7797513817a8da3aa4e3f"
+  },
+  {
+    "file": "tools/type-native-reporting-relations-oracle.test.mjs",
+    "sha256": "ef434f03480c6f75fc771a31351295b3b8403200d8fc7ed0f636a65a9ea6ce5c"
+  },
+  {
+    "file": "tools/type-native-algebra-oracle.test.mjs",
+    "sha256": "77842167786876f100f9ef37bda0d910e2613c147304c0b31cb3828bcc60eb6a"
+  },
+  {
+    "file": "tools/type-union-subtypes-oracle.test.mjs",
+    "sha256": "495e5c20589d7a88bdb1dec1e2d8460aebc783e2972c3e1bb2afa6f99e498f84"
+  },
+  {
+    "file": "tools/type-template-types-oracle.test.mjs",
+    "sha256": "d29215cf8b6cecc6685e27e773324644e4ef82948dc7b306a2785623f2b0c1e9"
+  },
+  {
+    "file": "tools/type-native-interface-base-reduction-oracle.test.mjs",
+    "sha256": "1c36e997f14e4ad2b05fc7e2ade4ee0189bdde5e0a8686f879f294bee3620b4f"
+  },
+  {
+    "file": "tools/type-native-manifest-edges-oracle.test.mjs",
+    "sha256": "76427b923832551bfbd58761f95b89c62e5dce624fb45265a615cdcc4de05861"
+  },
+  {
+    "file": "tools/type-native-module-export-selection-oracle.test.mjs",
+    "sha256": "784a4468b7a93a5a835a75d475ba4da74a962397bf60939385ab9d1c8faecc79"
+  },
+  {
+    "file": "tools/type-graph-labels-oracle.test.mjs",
+    "sha256": "41083528d0972379ed1b917e674c97b5f572735b7bd935d55a348498a9722c6e"
+  },
+  {
+    "file": "tools/type-native-operator-display-oracle.test.mjs",
+    "sha256": "edbedfa83f878c694bac17d6bc8495a6b37846777274cf7a084f06f0ac0577ec"
+  },
+  {
+    "file": "tools/type-merge-publication-counterfactual.test.mjs",
+    "sha256": "1b7970b171772e2950aa174bbfa1e6623b6f64431662ab2a160a730298d06f82"
+  },
+  {
+    "file": "tools/type-native-late-symbol-metadata-oracle.test.mjs",
+    "sha256": "c9d450dc0d443a5fef1b4e1405c5a878b808276ba5877e784c65772fb3dacf38"
+  },
+  {
+    "file": "tools/type-native-map-resources-oracle.test.mjs",
+    "sha256": "5bff4414bdf0a8d4e0eeb71836d7c0bc9bb46cbae092de942cb7ff298052ca35"
+  },
+  {
+    "file": "tools/name-selection.mjs",
+    "sha256": "555b748fe7c3329ceea817a40233f6a7754a54efd44a30d22e204a620632ccb3"
+  },
+  {
+    "file": "tools/type-native-mapped-reduction-recovery-oracle.test.mjs",
+    "sha256": "4bbce833b78f23e507a6ca135f58db56ee948ce857fc4d326ead9ee12faaf620"
+  },
+  {
+    "file": "tools/type-native-constant-return-oracle.test.mjs",
+    "sha256": "6ddbebd316ad47594381840b15f04868259baf6fd48e2b70758f24f94c0c52a6"
+  },
+  {
+    "file": "tools/semantic-oracle.mjs",
+    "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+  },
+  {
+    "file": "tools/type-native-super-expression-oracle.test.mjs",
+    "sha256": "6451c991804ef034d97a774ce39d6d9eebc9101dc3552936dd664358086c87ca"
+  },
+  {
+    "file": "tools/type-native-module-scope-boundaries-oracle.test.mjs",
+    "sha256": "13aec8b5139386efbd11664c2ed683d776085be38805db207b5a331e4f25dd4a"
+  },
+  {
+    "file": "tools/type-presentation-flow-oracle.test.mjs",
+    "sha256": "30164512699a4bd322dbc1822ba0549d8ef319390f773f282f8fe42365aac18c"
+  },
+  {
+    "file": "tools/type-native-global-this-oracle.test.mjs",
+    "sha256": "cce71d3d94521e89840d8ae23b2fbbfa977ec3f75b20b604d28bc7d36a482751"
+  },
+  {
+    "file": "tools/type-native-conditional-completion-oracle.test.mjs",
+    "sha256": "f43104848502de6bdc185ea472e920146f963c91a8fd76af649e250f0e2b012d"
+  },
+  {
+    "file": "tools/ast-comparison.mjs",
+    "sha256": "0dd63d02b793cad639062be44f4d55e66638036747daa8f36a4ad29d81cf45e1"
+  },
+  {
+    "file": "tools/type-unknown-signature-derived-oracle.test.mjs",
+    "sha256": "bd7de0891e2212159b85ae7623950d8e809e33f1b7ae205d35f7f7ba74bb4e6f"
+  },
+  {
+    "file": "tools/upstream-native-corpus.mjs",
+    "sha256": "ebfa1a40388ac7dbca94f80afd0a013ea795e482d8cdb5ad24f8c803582b0ca5"
+  },
+  {
+    "file": "tools/type-corpus-provenance.test.mjs",
+    "sha256": "c082560601e91bc3df56eae802b28c218f7167dcbec84a6117ce5d0db1708108"
+  },
+  {
+    "file": "tools/type-deprecated-context-oracle.test.mjs",
+    "sha256": "3f43894d3ef8807d3394bf49c0b37fdbd39922695ee50f10491f64c4ac557a78"
+  },
+  {
+    "file": "tools/type-native-semantic-resources-oracle.test.mjs",
+    "sha256": "2676854e2bf3482ee57676f64bc8615956b0cf8eff19843ccd832857783783ce"
+  },
+  {
+    "file": "tools/type-native-const-tuples-oracle.test.mjs",
+    "sha256": "dd95b1f9e799efecb080a0c0be534aecc45bad34c2c4488eff4ade6ed3abedaf"
+  },
+  {
+    "file": "tools/type-composite-properties-oracle.test.mjs",
+    "sha256": "1754a4dce92855d53fbba2e5238ffd13a79dd82693a6f96e450c5527cdc0d638"
+  },
+  {
+    "file": "tools/type-oracle-filesystem.mjs",
+    "sha256": "c9fd4d034313fec931e8068548a80cc38b86ac84d429a7c7857dcf7d231997c8"
+  },
+  {
+    "file": "tools/type-flow-identity-oracle.test.mjs",
+    "sha256": "7d777a80197daad1909e991f4a357a8a1114e0435c31f89c583a26d8dd76c30e"
+  },
+  {
+    "file": "tools/type-native-binary-context-oracle.test.mjs",
+    "sha256": "dd626abbbcbfcfe7d6d22eab1e39edcb24ff463c06bb3289707561112aa23259"
+  },
+  {
+    "file": "tools/type-deprecated-jsdoc-loose-oracle.test.mjs",
+    "sha256": "96e180029c981c93193ddc276055a0c41573d802fe928a2c5766ff27d5d1ea09"
+  },
+  {
+    "file": "tools/type-parameter-selection-oracle.test.mjs",
+    "sha256": "f737dd5525a9ad2ce0afabea67d55a1bdec24a9bc77277ca8b8a162544c3130e"
+  },
+  {
+    "file": "tools/type-native-inference-lifecycle-oracle.test.mjs",
+    "sha256": "fd74aedc9edc0ac50b8f4eea688c3320dc5f806b09629df219a98ea81e54f6ee"
+  },
+  {
+    "file": "tools/type-template-limits-oracle.test.mjs",
+    "sha256": "1a2be1bbbfa9bb25263e19316fe245563f24042943e3de016927a3ebde5e91fe"
+  },
+  {
+    "file": "tools/type-facts-oracle.test.mjs",
+    "sha256": "c16bb5c5b654afacb6538f8462e0abedf94419e3c5e6268920930c0d30240905"
+  },
+  {
+    "file": "tools/type-native-access-oracle.test.mjs",
+    "sha256": "cf2728caec58d8639f2718c57329f5bbeb73539cf0786557f75225de80cadcc2"
+  },
+  {
+    "file": "tools/type-native-global-this-inventory-oracle.test.mjs",
+    "sha256": "636965bb5c5283a507ea721bbd97b2e64897af55f5fd069dad7fdcfb96e6e11a"
+  },
+  {
+    "file": "tools/type-native-recovery-display-oracle.test.mjs",
+    "sha256": "243e141c597c35c08b86201639480e379bb121706f76d0120743343bbab68753"
+  },
+  {
+    "file": "tools/type-equality-flow-oracle.test.mjs",
+    "sha256": "25ac9939574446a71f24389dd3787edb8fe40a2aedef490e54bc47784e1a08db"
+  },
+  {
+    "file": "tools/type-presentation-array-oracle.test.mjs",
+    "sha256": "9e090b95cc4d167459b0e538fa3188160ea1db185346de83b0230783f71e47bc"
+  },
+  {
+    "file": "tools/type-native-merge-publication-evidence.test.mjs",
+    "sha256": "bf71e72d7e485607c238bdfb634f63c614aadfd246a9cd753de64d02d0a17cfd"
+  },
+  {
+    "file": "tools/type-native-mixed-merge-publication-evidence.test.mjs",
+    "sha256": "e3c5930b8f5b0dacbdaaee55185c7bf6cf7a40732703652bbea007e64941a285"
+  },
+  {
+    "file": "tools/type-native-generated-literal-output-oracle.test.mjs",
+    "sha256": "c3ba74b6b63f6d1c2090a4e5e8823404a0aabb4004cd160d995130f2043c64da"
+  },
+  {
+    "file": "tools/type-native-combined-alias-oracle.test.mjs",
+    "sha256": "22662207fffa4e68bd2461b015bf3e838eb0a4cb754ca411c7c41c4807bd5933"
+  },
+  {
+    "file": "tools/robustness-corpus.mjs",
+    "sha256": "548eeaa081556f9fddcdf9c834351744ec89bb845a9d3922fb70d492f852aad5"
+  },
+  {
+    "file": "tools/type-qualified-alias-boundaries-oracle.test.mjs",
+    "sha256": "311e1cc30128daf5713c2cbdb7bd0cde19384326e5a3c661bda5b69e39838694"
+  },
+  {
+    "file": "tools/type-native-global-this-raw-oracle.test.mjs",
+    "sha256": "ccc12ddd8f2d659bfe5d72be18f1fa8941b6fb48345f054076a61719d0857498"
+  },
+  {
+    "file": "tools/type-native-tagged-calls-oracle.test.mjs",
+    "sha256": "863e5a6525b3f5db76c5d5fd110c513f52b54910a56d6bd0d7e1b8157f56378b"
+  },
+  {
+    "file": "tools/type-native-checked-promise-oracle.test.mjs",
+    "sha256": "f2c906f742f8097581dfeed5794a21b42449c7f163bd84655b770c841327f260"
+  },
+  {
+    "file": "tools/type-composite-signatures-oracle.test.mjs",
+    "sha256": "ab2264ae09d565603eeaecf4ed760fb87204e3bdd82598cf48ccea4cae344b57"
+  },
+  {
+    "file": "tools/navigation-flows.test.mjs",
+    "sha256": "d07ae98a16016d4c81dd6af55cccf1dbb95776407ef63e78bb8281c222fee49a"
+  },
+  {
+    "file": "tools/type-native-enum-types-oracle.test.mjs",
+    "sha256": "320cbfc5619ca614989db652df2027378c28c2b666f152be6f2868df70aa4277"
+  },
+  {
+    "file": "tools/type-template-intersections-oracle.test.mjs",
+    "sha256": "876a87b90c7ba474421c9765083c38c2f558454bf87c558c5d41e8d9d77b3dbf"
+  },
+  {
+    "file": "tools/type-native-string-names-oracle.test.mjs",
+    "sha256": "d348fa8ec6d98e3fddd992d207aeba935f4e4c52bea208d7f37a6e27e4252e68"
+  },
+  {
+    "file": "tools/vendor-typescript-libs.mjs",
+    "sha256": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d"
+  },
+  {
+    "file": "tools/type-member-inventory-oracle.test.mjs",
+    "sha256": "3957ef557f3016e00f011dfc7be5f0266ee1cad0609febbf8079d2b95fd81a0b"
+  },
+  {
+    "file": "tools/semantic-default-imports-oracle.test.mjs",
+    "sha256": "4cbccc0a0384d032b690a382a839c505e397a3aaeac1d4129a951b754bdada70"
+  },
+  {
+    "file": "tools/type-native-read-admission-oracle.test.mjs",
+    "sha256": "f8ee85e3be3206263f4e0ba8477ac3a1704a4744637dbf8d09ccbb5c9cc47410"
+  },
+  {
+    "file": "tools/type-try-flow-oracle.test.mjs",
+    "sha256": "10d86b292846255d3ee44c6ec436a093522f4d5293696f924e6329597dbcc5b9"
+  },
+  {
+    "file": "tools/ast-comparison.test.mjs",
+    "sha256": "a2b360873f16a037c99f74a01036d2e1ff3c55d0731d54129e08596ec6b1d3bb"
+  },
+  {
+    "file": "tools/type-native-json-initialization-oracle.test.mjs",
+    "sha256": "f94610620c352b699b20f6039ca4e1f447e30935db351143e76dd2efa515ae7c"
+  },
+  {
+    "file": "tools/type-switch-flow-oracle.test.mjs",
+    "sha256": "f25780ea3763233efdb896b5e63aa22b51c4fcf53617eb90ad5cb9eee735f082"
+  },
+  {
+    "file": "tools/type-native-unresolved-type-aliases-oracle.test.mjs",
+    "sha256": "cc0f6a06577dbd14808123af54481175389d4db8665e981c35e7687db9e357da"
+  },
+  {
+    "file": "tools/semantic-conformance.mjs",
+    "sha256": "b9d2b9e799c4d174a70533998886cdc73e58f19c8a9486d8c7a6684d3e07cabb"
+  },
+  {
+    "file": "tools/type-native-class-heritage-boundaries-oracle.test.mjs",
+    "sha256": "ab1decbf77d58b5e56a85b0c04d1083a8cb53aa5b35013808b24ec187463f9be"
+  },
+  {
+    "file": "tools/type-native-mapped-deferred-index-oracle.test.mjs",
+    "sha256": "18926b72281ec13210e51057640a6d4e14bc9393dbdf4b139d9f1a29e9b518b9"
+  },
+  {
+    "file": "tools/type-algebra-oracle.test.mjs",
+    "sha256": "6815f7b9914badfeee572ddaa6c7da147d7c6d63fef91234fde2792f4ad80456"
+  },
+  {
+    "file": "tools/navigation-conformance.test.mjs",
+    "sha256": "fd3612432405da4432b90f635b2d09164d93a2528a4969dd468d466037b0bb3c"
+  },
+  {
+    "file": "tools/type-native-conditional-diagnostic-oracle.test.mjs",
+    "sha256": "d51f6aec859d25c5aebd26b99ba2bc1a9fd19c57aaedcc2d5855364a7e42faad"
+  },
+  {
+    "file": "tools/type-native-operators-oracle.test.mjs",
+    "sha256": "57787633b91c05a29a01295af2cff93a76c774fd4c418505fd2219604892538b"
+  },
+  {
+    "file": "tools/type-native-void-deferred-oracle.test.mjs",
+    "sha256": "43a51ef4eaf5a6ab7b1bd7a9e55e3f9193184d9edc38afa03990ac0ea96b09a3"
+  },
+  {
+    "file": "tools/type-native-generic-calls-oracle.test.mjs",
+    "sha256": "52304db27b304bc34965929cf50e57bfefef9f86efd88120ee339c1f5c203fba"
+  },
+  {
+    "file": "tools/type-native-diagnostic-display-oracle.test.mjs",
+    "sha256": "64852db1ff81180d1266f3a6037f0b59238250e95c0bf18104a462bf51fe9405"
+  },
+  {
+    "file": "tools/type-special-expression-oracle.test.mjs",
+    "sha256": "e355ebe7ec4795310073e4c4474e39bb822b75d2b14241c39f418f1ee1fa12c1"
+  },
+  {
+    "file": "tools/type-native-module-specifier-metadata-oracle.test.mjs",
+    "sha256": "0d5e5bc17111d82ec7319d7e35f542e9a13d34b1727cdbbab037551009292a57"
+  },
+  {
+    "file": "tools/type-tuple-graph-demand-oracle.test.mjs",
+    "sha256": "ddbf32c180adf4460b63d6e2be3543bf43be7ca374bc7513842b9962ebe918fa"
+  },
+  {
+    "file": "tools/type-alias-contexts-oracle.test.mjs",
+    "sha256": "abad5580abefebcbd9431f1fb9d960fdb82481b630e222caa58f4c2bb0368fa5"
+  },
+  {
+    "file": "tools/type-native-string-jsdoc-oracle.test.mjs",
+    "sha256": "b4b4da262879e5bbc5bc375df4de527a7fea4e5d1341e265893dd54eb1a47241"
+  },
+  {
+    "file": "tools/type-native-reference-contexts-oracle.test.mjs",
+    "sha256": "389a1cf15f1e23e3f67ab890d724f34729fde55c30cd7ed1ceb3f834354a40ad"
+  },
+  {
+    "file": "tools/type-native-symbol-location-oracle.test.mjs",
+    "sha256": "e216118745eea14a0bd3bed1dbbc8f24860494be2a8478e8d91d9f51a416f6ce"
+  },
+  {
+    "file": "tools/type-native-call-rest-oracle.test.mjs",
+    "sha256": "57b765fc2db29b76af5eaee4ac66121a614e2c1b46192611fcd99bad8e415b82"
+  },
+  {
+    "file": "tools/harness-wrapper.test.mjs",
+    "sha256": "cb41c123fd4d017bfbfc259fa0fcb53fa5fda75cf0241831a77d42838c746269"
+  },
+  {
+    "file": "tools/type-basic-flow-oracle.test.mjs",
+    "sha256": "e1e07532a79eb975a13ff166ad42e852ef5bddb01c31d18aa1e38490d34b818d"
+  },
+  {
+    "file": "tools/type-native-late-symbol-meanings-oracle.test.mjs",
+    "sha256": "a020d7031fa3c8f31210c515319ba32f884b7172c9add60f7309f2e7820f8e20"
+  },
+  {
+    "file": "tools/type-native-iteration-oracle.test.mjs",
+    "sha256": "8108ddb21d884e5ff710e88ccc64d1b03bc63a529751ad6342b416cde040360e"
+  },
+  {
+    "file": "tools/type-deprecated-jsdoc-oracle.test.mjs",
+    "sha256": "7f2700d5c7751fc764416dceaaedb77da12960305a8683f42fcaacd212185849"
+  },
+  {
+    "file": "tools/type-native-recursive-types-oracle.test.mjs",
+    "sha256": "52809c0d869296ec083b60c568fa93bf7a1d502f7c540560e8e34cff41858ebb"
+  },
+  {
+    "file": "tools/type-command-center-capture.test.mjs",
+    "sha256": "163ab1a1d0565c90bd3dab011fcf942ef08ec9aeac1a7cf3ab0921c400917318"
+  },
+  {
+    "file": "tools/navigation-oracle.test.mjs",
+    "sha256": "a0d89fb29341037dd46f420a74ad47b55d7250b29b02e63774b9b1a364f65334"
+  },
+  {
+    "file": "tools/type-corpus-capture.mjs",
+    "sha256": "18bf979691eac86df3096e710c57f57fe93e2d60d08685e88b912ffa6818078b"
+  },
+  {
+    "file": "tools/navigation-flows.mjs",
+    "sha256": "15d28c0e8635b64b8337b3ee6e00260b377247e3c800de088dbee7be51bbc0fb"
+  },
+  {
+    "file": "tools/type-native-generated-literal-equality-oracle.test.mjs",
+    "sha256": "e52b3872412a0011846ce51c29af541efc0d359f3fd6f59c4869a6bf399da46e"
+  },
+  {
+    "file": "tools/type-nullable-oracle.test.mjs",
+    "sha256": "8cc97897dfdec0be43d63200f64985158dba875ce68e05dde92d0a7ce8932b6a"
+  },
+  {
+    "file": "tools/type-native-template-expression-completion-oracle.test.mjs",
+    "sha256": "94219f9f0bb15cceef1957020213ba8869e3322bb17c2b27d6214b04eb25b83f"
+  },
+  {
+    "file": "tools/type-native-synthetic-expressions-oracle.test.mjs",
+    "sha256": "443f88d70fb76515868d955cc2318151b86819879903815bad73e56cd739d6a3"
+  },
+  {
+    "file": "tools/type-native-switch-properties-oracle.test.mjs",
+    "sha256": "3b9e24738902efc670334773ac29d21d4bac22df1574c023c1b9a75c78eb9f36"
+  },
+  {
+    "file": "tools/type-before-use-syntax-oracle.test.mjs",
+    "sha256": "fdfe72d3deb552b2a7bc007e30f5a30e28255ca58b461e024919dd8661e4ddee"
+  },
+  {
+    "file": "tools/type-native-operator-completion-oracle.test.mjs",
+    "sha256": "4f43f80fc45f06f7c83781452be36f2e1cce27e86d7c8c0ec73358e9d3042b3a"
+  },
+  {
+    "file": "tools/type-native-generic-aliases-oracle.test.mjs",
+    "sha256": "a8767f945fd37d685b56d4d59a6456f09867e994c665bfbc3a41003ea00ddf6a"
+  },
+  {
+    "file": "tools/type-native-async-returns-oracle.test.mjs",
+    "sha256": "b61d3314ecb39487ea474b5758471a52be1a6fd78a59a92bde1adb9a6810df91"
+  },
+  {
+    "file": "tools/type-native-vertical-oracle.test.mjs",
+    "sha256": "3362db33afd869b3dd2e0532ad9614da79bc2917795d5b574276365202867bc7"
+  },
+  {
+    "file": "tools/type-member-tables-oracle.test.mjs",
+    "sha256": "358a4df36851d63912d6e913f2b4891c6e6c89e5dfb7c6cd8b05558a0ce7b9e1"
+  },
+  {
+    "file": "tools/type-native-class-heritage-oracle.test.mjs",
+    "sha256": "a01480463af30a10b32d699e7cffae298d382135e8d368688ac2aff069ab0447"
+  },
+  {
+    "file": "tools/type-native-pending-values-oracle.test.mjs",
+    "sha256": "3ff9690dc59894a90dae88f9160db1407095175518bb171a2dc9317b3abebe36"
+  },
+  {
+    "file": "tools/type-native-heritage-oracle.test.mjs",
+    "sha256": "c3feb1383e77f883d5214d9069b174a1938e23de335ff0a0e516a6ae1a7b08ea"
+  },
+  {
+    "file": "tools/type-native-alias-marking-oracle.test.mjs",
+    "sha256": "fcde8ef9e595dadc8b169bd33fddcad18a7c22e32927752826390fd6b7206473"
+  },
+  {
+    "file": "tools/type-native-string-switches-oracle.test.mjs",
+    "sha256": "785f39413aea6231aa5add7e37d3c20538becc034219e8f42e6317412efe7d3c"
+  },
+  {
+    "file": "tools/type-native-cloned-constraint-recovery-oracle.test.mjs",
+    "sha256": "620e267141d01c0b351561bbe1909bbaac33de31b8eecde221344514117ef623"
+  },
+  {
+    "file": "tools/type-native-generated-literal-ordering-oracle.test.mjs",
+    "sha256": "ecc1c26903f5065f3e7541f5ddc9befa4b3e1fbda6acabe6a1e94111f6d98758"
+  },
+  {
+    "file": "tools/type-before-use-oracle.test.mjs",
+    "sha256": "2a4650c48eecceb8ffae7d7ab759e9ce6ea7b513dff3bab06d8a72def99adb9d"
+  },
+  {
+    "file": "tools/editing-flows.test.mjs",
+    "sha256": "8aeaaaa938adcf65ef3e7b78500c078deac6b2cc1f30bde8261201242c5f4e0b"
+  },
+  {
+    "file": "tools/type-property-lookups-oracle.test.mjs",
+    "sha256": "4c0571af49769b0ffe8d38e9198268151de0724155ea35139fbc632789b83ca1"
+  },
+  {
+    "file": "tools/type-unknown-signature-oracle.test.mjs",
+    "sha256": "1777379d1a6384646ca8e733a1e87917a77e0fea65df689950665fa6bbb43a96"
+  },
+  {
+    "file": "tools/program-inputs.mjs",
+    "sha256": "cd81dd99c14d78f5f48257c8ba0565efa100af0cb61114f54a68c9a3e73ad7ff"
+  },
+  {
+    "file": "tools/type-native-intra-expression-methods-oracle.test.mjs",
+    "sha256": "ce33673eaa40087e0e045c0d80227fd94ab5d54e4b9eb6cd6f6141a78d9ca258"
+  },
+  {
+    "file": "tools/type-circular-alias-oracle.test.mjs",
+    "sha256": "b9b59fa56671daf74cabb75960d3acd8ca804d3db3e68594df9a0c800ad0bec7"
+  },
+  {
+    "file": "tools/type-oracle-filesystem.test.mjs",
+    "sha256": "45a7967e006119d1494e313211a83cddc5895f6771e5dc5059ea596a335779b4"
+  },
+  {
+    "file": "tools/generate-identifier-exclusions.mjs",
+    "sha256": "87cd65264a506b9084ab817529bad65aa3c8f4d9a79f008040f4ba501f00a40b"
+  },
+  {
+    "file": "tools/type-signature-mapper-oracle.test.mjs",
+    "sha256": "60262dcc0737081fc9fb28191aaddab38b1ac38fdeb628c360ea160c721ee4a0"
+  },
+  {
+    "file": "tools/type-composite-boundaries-oracle.test.mjs",
+    "sha256": "7c0139cc281c2e757ec369d6ce8d014eddcc2e7b22c49465898f6dc933d393f9"
+  },
+  {
+    "file": "tools/type-native-generated-literal-operations-oracle.test.mjs",
+    "sha256": "02fa56b79f5b9f0a12211025deb0cf92bd65da6a0ad2717097f824d98f4bc611"
+  },
+  {
+    "file": "tools/type-native-property-flags-oracle.test.mjs",
+    "sha256": "c2fa94f1bdaa4999bebef1b4551536626deee724d16c9b1f2e58e73bf61d17b6"
+  },
+  {
+    "file": "tools/type-native-diagnostic-bytes-oracle.test.mjs",
+    "sha256": "8917b2b351050b3067af09e7ad1d93c5d6a2fc74e7a5e67c2295c2040a226507"
+  },
+  {
+    "file": "tools/conformance.mjs",
+    "sha256": "5473154712240c6142277e98f2bfd0e2275dd1b0646449ba673e43f88d5a8bfc"
+  },
+  {
+    "file": "tools/type-native-structured-relations-oracle.test.mjs",
+    "sha256": "be15fe85c2390062ce5fffaaf6aa8e4b9d29f5e123ee6c5b86048eb3b1770d04"
+  },
+  {
+    "file": "tools/rust-test-wrapper.test.mjs",
+    "sha256": "6e0e41dc0f8791ecb9c157ec8d50dc1502b5dbde24f3fc8fb997e754691171d4"
+  },
+  {
+    "file": "tools/type-native-generated-literal-keys-oracle.test.mjs",
+    "sha256": "473decdc7907ba77c7ff30b2257c3defb20790865a58bd6239ed7db46f2df8c9"
+  },
+  {
+    "file": "tools/type-native-flow-continuation-oracle.test.mjs",
+    "sha256": "a7308d870da1dd5b92677081713401eea5a6e670651dbefb5a2a72a03251c641"
+  },
+  {
+    "file": "tools/type-member-imports-oracle.test.mjs",
+    "sha256": "7b06853ad21d80862e0c6ca8ec68256c7f77047f98255fffebee3dbc15ad3554"
+  },
+  {
+    "file": "tools/type-native-type-nodes-oracle.test.mjs",
+    "sha256": "6f8edd6efe3c80779814f5d0769a596b6a97318b67a889912ba5c3590050b7f5"
+  },
+  {
+    "file": "tools/type-native-string-values-oracle.test.mjs",
+    "sha256": "e57a14473b6dac272c1c95a6ce487c2e0a90d060f1c854c705d5a2fcfc9991bd"
+  },
+  {
+    "file": "tools/type-keyof-oracle.test.mjs",
+    "sha256": "428aeb42e942ed79c4fbc394f4db56e13ac617fd5190838d5cca0b3fb9cee70a"
+  },
+  {
+    "file": "tools/upstream-fixtures.mjs",
+    "sha256": "f2e11452ee9d9229d922ab021d3f7a6b9ab76dd92fed4e6ca5493deaeb464f2c"
+  },
+  {
+    "file": "tools/type-native-widening-context-oracle.test.mjs",
+    "sha256": "f606e748ac91f76c89e759e6c01cedb42f78ebbd92a2bb4f17eb1928d10727ce"
+  },
+  {
+    "file": "tools/type-oracle.test.mjs",
+    "sha256": "b5e1ddbf3559aec03a2214df18fff50d90120aa8e254597f7ff5f7ea9fa26d97"
+  },
+  {
+    "file": "tools/test-summary-reporter.mjs",
+    "sha256": "c59ce6501d0bd17569bb1b9e14103c8a25077ac4274b9f9ab7a040b96fba17ec"
+  },
+  {
+    "file": "tools/type-order-exports-oracle.test.mjs",
+    "sha256": "f4aa37edbab0d7b16e4728cd3d28f32e2f1ef77a4e44e8b8d05d889e627f54a6"
+  },
+  {
+    "file": "tools/type-flow-limits-oracle.test.mjs",
+    "sha256": "e28746606c5d4571a48e8c60e3fb1191455333bd953d88a4da883105e46c6c78"
+  },
+  {
+    "file": "tools/type-native-this-expressions-oracle.test.mjs",
+    "sha256": "d68bd17198ae5971b1abb738af8cd25774853d19fc719bb5bfc56e0fc93912c6"
+  },
+  {
+    "file": "tools/type-deprecated-recovery-oracle.test.mjs",
+    "sha256": "e7f40100c120ac36e1a0ea0fc3af4c92fb8b737e131cfbfd7891f3b28d4115a1"
+  },
+  {
+    "file": "tools/parser-process.test.mjs",
+    "sha256": "f62541820fb5a585ec83ff2cf23b0e0e1937b5c21e3751999730348d7653bd36"
+  },
+  {
+    "file": "tools/upstream-corpus.mjs",
+    "sha256": "170c6b7e1f146ce38b2541525fa1d6f57aaac82c0aff23910aa334ad4a21d68d"
+  },
+  {
+    "file": "tools/type-deprecated-signatures-oracle.test.mjs",
+    "sha256": "350efc9a5ec0113dc25fef909590c01e44728a5d475ed7de17f1841451d9181d"
+  },
+  {
+    "file": "tools/type-qualified-aliases-oracle.test.mjs",
+    "sha256": "639fde25bce4e535a42e77602146d76d6b97c79c2e3eded74afbe6600b239710"
+  },
+  {
+    "file": "tools/type-native-call-inference-oracle.test.mjs",
+    "sha256": "687233e08e9598cc16384d34ea61309e756f388e7910e66a7aea08940d9dd651"
+  },
+  {
+    "file": "tools/type-native-promise-inventories-oracle.test.mjs",
+    "sha256": "2395773e8c1d394ba7588709bb04c89c0e010bad39c85e2dc89c557253b771a7"
+  },
+  {
+    "file": "tools/type-native-overloads-oracle.test.mjs",
+    "sha256": "2efeec4c6d5d1e419fdc9d509b1cc64ab5b1d6cd458c638133a345d2822e3379"
+  },
+  {
+    "file": "tools/type-string-mappings-oracle.test.mjs",
+    "sha256": "1df00c86bcd3082069a8691c33bbe0b708158b2acf61c7738163277a85672ae8"
+  },
+  {
+    "file": "tools/type-native-annotations-oracle.test.mjs",
+    "sha256": "56cdb2558d90940793c3773f312ef9924312ce7068b8fc1c2cb9bb115cd72d60"
+  },
+  {
+    "file": "tools/type-json-generics-oracle.test.mjs",
+    "sha256": "b2c8d53da613351201ff9c970e20eb3b18b97a847a0632d2b33e5a53a843ce53"
+  },
+  {
+    "file": "tools/type-member-scope-oracle.test.mjs",
+    "sha256": "1d9521e555492097da12838512455ab4a3c5f02cc5eafaac21890e8ae7b85507"
+  },
+  {
+    "file": "tools/type-native-signatures-oracle.test.mjs",
+    "sha256": "188454dc92c241f82811f50f74b6478bcb1fb2aa9a3c7a1882d58fabbd78cf91"
+  },
+  {
+    "file": "tools/type-native-module-wrappers-oracle.test.mjs",
+    "sha256": "e8fd34680557400547b7ebc2743292b07cdfb116b8fdcbb628a518f7ed2ecace"
+  },
+  {
+    "file": "tools/type-native-enum-relations-oracle.test.mjs",
+    "sha256": "e98098a035646c156950fd5e4b81e4c738a010b73366e1bc7f746e9e6c891223"
+  },
+  {
+    "file": "tools/type-reference-cache-oracle.test.mjs",
+    "sha256": "6ba2d549e410ede6fce95ede135e320e94e75ed0988935d51fa5c7a5c7eac8ef"
+  },
+  {
+    "file": "tools/type-native-alias-selection-oracle.test.mjs",
+    "sha256": "e0159236ced6407a6a3fb8c032b24683b84eac9b2ab90136219b18336a4e97d5"
+  },
+  {
+    "file": "tools/type-import-helpers-oracle.test.mjs",
+    "sha256": "0b51b5f43641e0e9be21377c4f9508e765b6390277dd79cdf23684d3090a419e"
+  },
+  {
+    "file": "tools/type-native-program-inventory-oracle.test.mjs",
+    "sha256": "6e71c3fe28216b0fa665366ffbcd5cf481cbd131a9110e4ade5f8607f9590b0b"
+  },
+  {
+    "file": "tools/program-native-entry-paths.test.mjs",
+    "sha256": "94022186842b4f46f1ec178de0564880650e95d950676695ae84a921abbcb8bf"
+  },
+  {
+    "file": "tools/type-corpus-capture.test.mjs",
+    "sha256": "2d3b33cd9f571f6fca8cdd7394afd7a25a41a79d0abfb50896d5d603662ae576"
+  },
+  {
+    "file": "tools/type-loop-cache-oracle.test.mjs",
+    "sha256": "87b68950ec3a114c2167cda8ba5f5c3ebf590fc280f21a8a03e33c0f2ba86d37"
+  },
+  {
+    "file": "tools/type-access-anchors-oracle.test.mjs",
+    "sha256": "217935e23db385417b370fa4a00087e7b9763cad5d2b374633badb7886673911"
+  },
+  {
+    "file": "tools/type-native-type-query-parameters-oracle.test.mjs",
+    "sha256": "bdbf3a13e76dc972149de4fe833f366cacd1d20e90490ed987816d3887f69cd6"
+  },
+  {
+    "file": "tools/type-native-entity-recovery-spans-oracle.test.mjs",
+    "sha256": "47e41b9c645061603fb77d6f8aa6d1cc4bff3e7a426f7d8f580693f61e718c3a"
+  },
+  {
+    "file": "tools/type-optional-joins-oracle.test.mjs",
+    "sha256": "de2c03dd2cb2698faf5f0d83542b3491a359dc7b29866e1c70a932975945aa68"
+  },
+  {
+    "file": "tools/type-reference-shape-oracle.test.mjs",
+    "sha256": "157bd6ce948c43ac85821763a74a6574bfe1ea0d81fb764d2f35dc105fd908b2"
+  },
+  {
+    "file": "tools/type-native-module-spelling-oracle.test.mjs",
+    "sha256": "579970ce0b57d7b636e0ce3153e454eb4700b4ee7fb9dd6451a828f548b4a8e7"
+  },
+  {
+    "file": "tools/type-constant-oracle.test.mjs",
+    "sha256": "7a7f2f28dffaca7d7709569d3b6de8dc49c70baa34cb59f37aa4f0fb9887a7a2"
+  },
+  {
+    "file": "tools/type-member-values-oracle.test.mjs",
+    "sha256": "49ebc5cf9a74a51eac20e4e02c2272cf9ca02dfc4100b7d4b8ae0c1d8b0b3fd0"
+  },
+  {
+    "file": "tools/type-union-limits-oracle.test.mjs",
+    "sha256": "27381921fd1ed2eef2a02d4258d4f36d86cc98af2f1ded0ca8bea83115470cbb"
+  },
+  {
+    "file": "tools/type-optional-flow-oracle.test.mjs",
+    "sha256": "d26923aa7cfb644f025a8bbbc0c97aa9350fd9c8961a261fe9c004900947e791"
+  },
+  {
+    "file": "tools/type-native-mixed-alias-variables-oracle.test.mjs",
+    "sha256": "243ee563cb1687b272e3b89841a8ec984d320c4259696862edfe5af6e0796c98"
+  },
+  {
+    "file": "tools/type-function-expressions-oracle.test.mjs",
+    "sha256": "b8b1d5290bbad674781772de96df07e1d1400ffd9e36b7129334f9249ce37651"
+  },
+  {
+    "file": "tools/type-checking-prelude-oracle.test.mjs",
+    "sha256": "9041beb3f7f9e5eeb67c55ae208522d20acc6e1cdab1f3ec9f5007b6956014d1"
+  },
+  {
+    "file": "tools/type-native-diagnostic-cache-oracle.test.mjs",
+    "sha256": "1a679924ca59a1e87806f6a942aa75f072bc8bcc5ec705ebc3e2c3976b2e3ca6"
+  },
+  {
+    "file": "tools/type-native-super-calls-oracle.test.mjs",
+    "sha256": "35c29bd2df67b7d7ffecdda9acf6e4473c9737733dee0fd9fbde88d69f72982d"
+  },
+  {
+    "file": "tools/type-class-targets-oracle.test.mjs",
+    "sha256": "5910ea8c5e840196ba6bd5003aa5bf6b7b308a388f49088b3b695c212271d3fc"
+  },
+  {
+    "file": "tools/type-native-mapped-checks-oracle.test.mjs",
+    "sha256": "ccd576ce9aee1db6b78b8e0ddc8814d4b0499f4863f645a3eb6fe17285fb442e"
+  },
+  {
+    "file": "tools/type-json-oracle.test.mjs",
+    "sha256": "8b684cb43a531932b6bc2af515b77d3f4ca6114e1288c7ccde884a8c27e59c17"
+  },
+  {
+    "file": "tools/type-native-alias-conditions-oracle.test.mjs",
+    "sha256": "d8e045c337de2c4b6763e5eed18a7cc37020b16ebbbdc215a4b0b734495a3947"
+  },
+  {
+    "file": "tools/vendor-typescript-libs.test.mjs",
+    "sha256": "72d5b0229ee90fe9ab9d61611c6f8b07e9eec9ecadd7a960f325c2434beae82f"
+  },
+  {
+    "file": "tools/source-corpus.mjs",
+    "sha256": "c33157b206faff5eae55958ab739b34c5ffa19529bfdba3c55123e0e5ff2644e"
+  },
+  {
+    "file": "tools/type-native-generated-literal-context-oracle.test.mjs",
+    "sha256": "bca8d0321db276683b920b8b7ee1f75cc1eb75fd9f360a0f966ed311648ddf54"
+  },
+  {
+    "file": "tools/type-native-lazy-types-oracle.test.mjs",
+    "sha256": "db60964ea70dbf6829c1c997ca398fb8db193402c1a361917660dab41acb69c4"
+  },
+  {
+    "file": "tools/type-native-alias-diagnostics-oracle.test.mjs",
+    "sha256": "f6aa645d3a8f837c0de94edd6dd2d0bc2d904dd119a7ce1de294b4f07733a285"
+  },
+  {
+    "file": "tools/type-alias-recovery-oracle.test.mjs",
+    "sha256": "43f1575b523858f464020584373f6e1a1e041869a5d7f0c193c075a4882d0b91"
+  },
+  {
+    "file": "tools/json-probes.mjs",
+    "sha256": "1db18de24d11adb6f752960bbe456525c9573c52c3b2e627088b7c9990bf2edc"
+  },
+  {
+    "file": "tools/type-member-search-core-oracle.test.mjs",
+    "sha256": "15e889256ce31321df699826f007a6cec4e3be99652c1b78cb0cb749dbbe1379"
+  },
+  {
+    "file": "tools/type-function-symbol-oracle.test.mjs",
+    "sha256": "53ac041e1df2e1f6bf1db57645e02cb27b3178f4cc5369c588590d35852d40a1"
+  },
+  {
+    "file": "tools/type-native-assertion-completion-oracle.test.mjs",
+    "sha256": "953731db0af318c4402db172f2b0d004c0416416b1fde1ca2df272ee62314c7a"
+  },
+  {
+    "file": "tools/type-native-discriminant-maps-oracle.test.mjs",
+    "sha256": "f25285eb5e32d8cd690d5372bad6b8d266553df3b59e18b08f64a14148518931"
+  },
+  {
+    "file": "tools/type-native-mapped-shapes-oracle.test.mjs",
+    "sha256": "5718f32c21e32656b6416ac3ebd18ca1765f9c726a6e07fefd1c369ae58a3aa9"
+  },
+  {
+    "file": "tools/type-native-truthy-operators-oracle.test.mjs",
+    "sha256": "75a69d24d6aed7c5531fe71b10f0f8cd9500645dc577f0056639ba6fc5605b95"
+  },
+  {
+    "file": "tools/type-native-mapped-types-oracle.test.mjs",
+    "sha256": "f971277388c350240ec239b01ac9d309088c1fdd6b5c775a02789904646a759d"
+  },
+  {
+    "file": "tools/type-member-eligibility-oracle.test.mjs",
+    "sha256": "16d807f88dc1b45bb1e3bc4e7392c421fa5ce86598a918d14692521db1a71556"
+  },
+  {
+    "file": "tools/type-assignment-reduction-oracle.test.mjs",
+    "sha256": "2315af8c47a17384ee7fcceaa5ca7ecaef9e9838822b69a5bb4515200949a31b"
+  },
+  {
+    "file": "tools/type-native-source-check-recovery-oracle.test.mjs",
+    "sha256": "191bd03f0fd178fdb235636ce6287c68ab0aad7a9376f1cbb2322b73192bf9f4"
+  },
+  {
+    "file": "tools/type-native-template-matching-oracle.test.mjs",
+    "sha256": "6d8e4db747becd972e7aa3f45470efe471a60fa6befaf3df26af777bd6d86085"
+  },
+  {
+    "file": "tools/type-native-class-heritage-checks-oracle.test.mjs",
+    "sha256": "539727bf05dc837ed912b5564e5cfbac72ebb6d3c996eaeeb5ec7b90798d9b19"
+  },
+  {
+    "file": "tools/type-native-string-json-oracle.test.mjs",
+    "sha256": "ee30066a5bc693331e2a65ce8fa31ad98b9cc80fa595307eb7ba562d5ebdfc12"
+  },
+  {
+    "file": "tools/type-native-assignment-continuation-oracle.test.mjs",
+    "sha256": "9d9b77da53c7759f8150894d64a3fa6f651e5b59cdbfdeb4616a9edde1cd6a9d"
+  },
+  {
+    "file": "tools/type-native-inference-boundaries-oracle.test.mjs",
+    "sha256": "5eb1d22744042fffccdf18f6a4eabbea8c8059bb8399e1bde0e1965c5f1a5980"
+  },
+  {
+    "file": "tools/type-native-jsx-partial-oracle.test.mjs",
+    "sha256": "2100b62eaba52d26d6df928d2c75d1fd63119785d59302f25d8b78b4256d7b44"
+  },
+  {
+    "file": "tools/type-native-recovery-continuation-oracle.test.mjs",
+    "sha256": "cb2ea09e457f2504c7d99ded40482359ec62bbb9ac0e6f79007bb25c6ed87c4c"
+  },
+  {
+    "file": "tools/type-tuple-optionality-oracle.test.mjs",
+    "sha256": "4c8d2fb3c90bfcf5d381a414ea581048c48c191fb5a2fdb4e9c927ae01825e3b"
+  },
+  {
+    "file": "tools/type-symbol-order-identity-oracle.test.mjs",
+    "sha256": "d4975e6834a425fd8bc4a21ad802269662a85a4ff31b14e6ecad5facdb894485"
+  },
+  {
+    "file": "tools/type-native-json-initialization-members-oracle.test.mjs",
+    "sha256": "45f25669ad074df036951b8e232eb46fdce5a4fd8ffe404ab2f3ac697caa0fc8"
+  },
+  {
+    "file": "tools/type-member-ranges-oracle.test.mjs",
+    "sha256": "c0aef55b8e40f56f5b8ced697812006f670799e8ede5f7b7bffeae5740382183"
+  },
+  {
+    "file": "tools/semantic-wrapper.test.mjs",
+    "sha256": "eb9e939b75e0343ea3b428e01c573adb6431aaab2fe959e2850574d3051b0fd4"
+  },
+  {
+    "file": "tools/type-native-instantiation-expressions-oracle.test.mjs",
+    "sha256": "98dfc2bbf471fc6732f899b22bf3a271801ffa379dfca440ce650d4e955e3a3f"
+  },
+  {
+    "file": "tools/type-native-class-reference-nil-oracle.test.mjs",
+    "sha256": "abf5fe420d8c286fa225d641eeaa4303c79558b74cbce954878de23d11830881"
+  },
+  {
+    "file": "tools/type-parameter-reads-oracle.test.mjs",
+    "sha256": "9996d1610416ebd9a4ef1d117609e190d1b1d1cc321839b9bdde471e9f52ce65"
+  },
+  {
+    "file": "tools/type-native-deprecated-type-references-oracle.test.mjs",
+    "sha256": "8f51f6856272b9f5b49ccc543875d0d70a550e01d8b77579b5a61f7022f8f2eb"
+  },
+  {
+    "file": "tools/type-native-module-specifier-snapshot-oracle.test.mjs",
+    "sha256": "2854157ff3ac60e1d17b863d933a0607fb9900e1bd219402f6483353f3130c1c"
+  },
+  {
+    "file": "tools/type-native-identifier-completion-oracle.test.mjs",
+    "sha256": "1164fdc4f31976fe0a170e86c5095b90f6cbae2434f026b35967b9ac598ba230"
+  },
+  {
+    "file": "tools/type-native-string-enum-keys-oracle.test.mjs",
+    "sha256": "fe685bbb2f227d656c411eb4e8159445a375ed9538aba27298293641dd707c8f"
+  },
+  {
+    "file": "tools/type-native-module-specifiers-oracle.test.mjs",
+    "sha256": "d3eff65a5cd347920710bf5c60092d958179c484f990a8c4ba268e6e87493aa3"
+  },
+  {
+    "file": "tools/type-symbol-id-collision-oracle.test.mjs",
+    "sha256": "a8afb21b0fe83d79e6343ad0c0f71f6873f9a7cbe4f0ca68de374c82bc86655e"
+  },
+  {
+    "file": "tools/type-native-no-infer-index-oracle.test.mjs",
+    "sha256": "86d2f1b93869ec2e56c983ae147220e70b9719d4ac4fc33a996634ea22604781"
+  },
+  {
+    "file": "tools/type-native-quick-expressions-oracle.test.mjs",
+    "sha256": "92e9f0c9837a432e0d54708ce886c85388b754372b8a882419ee5d5f883695f7"
+  },
+  {
+    "file": "tools/type-native-type-query-oracle.test.mjs",
+    "sha256": "1726039f56d7bf2c995ba23f74fc68d8720d5f510b526562d1dc5cd9e293c9a3"
+  },
+  {
+    "file": "tools/type-native-relation-recovery-oracle.test.mjs",
+    "sha256": "0759f652960daadddc50620baf7da8b44b0071770ebb154f41db7f771baba607"
+  },
+  {
+    "file": "tools/type-native-modifier-access-oracle.test.mjs",
+    "sha256": "46136090a7d3cd4eb160a97aac6453df6042947b208c32b7e2a58345fd230379"
+  },
+  {
+    "file": "tools/navigation-oracle.mjs",
+    "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+  },
+  {
+    "file": "tools/type-member-display-oracle.test.mjs",
+    "sha256": "bb79af4f2c39543a8bc44e692698b3837968e553c92f461a50cbfec027f4eace"
+  },
+  {
+    "file": "tools/type-native-class-expression-checks-oracle.test.mjs",
+    "sha256": "bf6a9a74640b4f9887f6e417685ab413c303f62626d24bbe8c002d0af59fedbc"
+  },
+  {
+    "file": "tools/type-native-conditional-summary-oracle.test.mjs",
+    "sha256": "2fc33fc5ee5f3ec998b2205ba86f679b6cc64e7487903b69766fd964a5ac6119"
+  },
+  {
+    "file": "tools/type-order-oracle.test.mjs",
+    "sha256": "9fccc6233be26f8dd884dbfc7a67c06aa13d6311784b93dea7b5ccad31c84024"
+  },
+  {
+    "file": "tools/type-native-assertion-tail-predicate-oracle.test.mjs",
+    "sha256": "6dfa793cf45aecb085dcffa57a76a295e2643b7e43d50757489ed329c9f79f0b"
+  },
+  {
+    "file": "tools/type-native-module-scope-oracle.test.mjs",
+    "sha256": "eaecb20446272cea0d6c0958ffb14b668bf57165c90cb9559e996d0138359b47"
+  },
+  {
+    "file": "tools/type-native-expression-operators-oracle.test.mjs",
+    "sha256": "fb336a6f2a2549c0baa0e5c47d6d5fe2a00fc838649ab6ba0d469cdd4ae123c8"
+  },
+  {
+    "file": "tools/type-native-optional-call-oracle.test.mjs",
+    "sha256": "ed161d3d1050e48c583cd73a4e66df1e53d52bb264091e4e203d8e8faf6dffb7"
+  },
+  {
+    "file": "tools/type-native-structured-signatures-oracle.test.mjs",
+    "sha256": "6a4a2a1e7e8c3a2dbd11de490ecb0721e6861aea1f7f500b5db0141f32bb2b51"
+  },
+  {
+    "file": "tools/type-model-oracle.test.mjs",
+    "sha256": "325da25fecc7ec0f775d3d0f776ead006aaa34fa3a40d9084792a22b91f6b03f"
+  },
+  {
+    "file": "tools/type-native-conditional-relations-oracle.test.mjs",
+    "sha256": "46a46b57e80d21db7b3ff655a2016af0d7c0a073a6961fa6aac1add1e40b425f"
+  },
+  {
+    "file": "tools/reference-oracle.mjs",
+    "sha256": "25b2ce8c2e116540a0c638a9db3cd47bbea2d709f043815fcadec8705e6b01e4"
+  },
+  {
+    "file": "tools/type-array-expressions-oracle.test.mjs",
+    "sha256": "9f1c668a2f49e7ae05d65a834fceb8f52770ab230dce747827f3a227535cefb0"
+  },
+  {
+    "file": "tools/type-native-implicit-any-oracle.test.mjs",
+    "sha256": "0a866f3a40c89338a7a277e49fe15778e5b615d7e8bed3074ba080f279e4de33"
+  },
+  {
+    "file": "tools/type-intrinsic-undefined-oracle.test.mjs",
+    "sha256": "7c2071027f76d8f9c73cfe5ad9eb95a3848095386492b842085c4ce2f5733e0b"
+  },
+  {
+    "file": "tools/type-native-late-symbol-owners-oracle.test.mjs",
+    "sha256": "9fcc57cf6f0eb3f897686efc73c57417e4dc0f83a9a78d9966ad4937dfc6daef"
+  },
+  {
+    "file": "tools/type-native-template-indexes-oracle.test.mjs",
+    "sha256": "72acc43394dae7c56a33fcd2fea1f62afa28bb771ab232f1d60115dc4a9a84e6"
+  },
+  {
+    "file": "tools/type-native-private-access-oracle.test.mjs",
+    "sha256": "9d48c1dac91383d6663a02144d72b76732711ac61811e2e325fb474d1efc3fa8"
+  },
+  {
+    "file": "tools/type-native-conditional-types-oracle.test.mjs",
+    "sha256": "4154ee738195f8327be591acc4124874b0fb8938a8e689e4b26846fec28d62c8"
+  },
+  {
+    "file": "tools/type-intersection-limits-oracle.test.mjs",
+    "sha256": "0b493fc4f1a5863f7b7e6d7deaa17b5b3c61d4596074a365b2a6d7fd03a34f46"
+  },
+  {
+    "file": "tools/type-native-contextual-discriminants-oracle.test.mjs",
+    "sha256": "075ccdf4d22e8569c466bb677adee8e32fc400a162e931d5372b4ea84a9a6b9d"
+  },
+  {
+    "file": "tools/type-symbol-written-name-oracle.test.mjs",
+    "sha256": "6b4134eb8d8a86942de9b16d7f187e71d3d4c1f53194632b548a37f16e9adb91"
+  },
+  {
+    "file": "tools/type-native-missing-properties-oracle.test.mjs",
+    "sha256": "9ed8a14f8facdda47818f6ee7bd295e2ad2d7e1aae9ff0da382b2ec51087ce50"
+  },
+  {
+    "file": "tools/type-indexed-access-oracle.test.mjs",
+    "sha256": "556455642ae911167cb297cb778ff24bb53b190e4667cff68fd40be9a6198d78"
+  },
+  {
+    "file": "tools/type-native-calls-oracle.test.mjs",
+    "sha256": "9606b78fa821d21e7455b41a104d48513df83ce36b8f8ca937e046333d9f6529"
+  },
+  {
+    "file": "tools/type-apparent-oracle.test.mjs",
+    "sha256": "ff5d894773befea247c35f20a7b74df600885abf4bc6bf8def3c356a25208943"
+  },
+  {
+    "file": "tools/type-native-known-symbol-properties-oracle.test.mjs",
+    "sha256": "677f08cd28a4e6a17f1250e442d82130d882f1660e09dfaa4e90d15793bf4243"
+  },
+  {
+    "file": "tools/declaration-corpus.mjs",
+    "sha256": "c08d083098a313f9812dc3f2bfc8d93834165f036627fee380fd14116d0cab94"
+  },
+  {
+    "file": "tools/type-native-elaboration-oracle.test.mjs",
+    "sha256": "f1059c646e9ee1936589d9985aa59b74ea0c6522b061f6986bdeef6a431984ce"
+  },
+  {
+    "file": "tools/type-native-object-rest-dependencies-oracle.test.mjs",
+    "sha256": "30b45223b0ee07c9adc98901d448f275d5b1aef55e115179274f67f7bd06a6e8"
+  },
+  {
+    "file": "tools/type-native-symbol-display-oracle.test.mjs",
+    "sha256": "9f07f524db9cdebd00d033fb99dfb2dfd6942b766af95ca5d38ab6e60249ad3b"
+  },
+  {
+    "file": "tools/type-source-checks-oracle.test.mjs",
+    "sha256": "0ba42c9f368d956a5e7a85cf78830d53442598d9da8c679ae3f3de4eed6642c6"
+  },
+  {
+    "file": "tools/parser-process.mjs",
+    "sha256": "9dceab8b9642412ad968826cef8b0977adf65e958176139fe4322118b01b6765"
+  },
+  {
+    "file": "tools/type-native-promised-recovery-oracle.test.mjs",
+    "sha256": "e51f7c0817233bb9a081fa9d9259f7f6d98defd7d4df3dc819f02cca290f1fa7"
+  },
+  {
+    "file": "tools/type-native-template-expression-oracle.test.mjs",
+    "sha256": "6bb0b2202b686ceca1a021ec74dc07260defd7b13b455ee29726ba4f60dd5b51"
+  },
+  {
+    "file": "tools/type-native-call-arguments-oracle.test.mjs",
+    "sha256": "08f41193ab0f9a33a407c058844755d7b90855fc742b3aa1a7442a64a734469d"
+  },
+  {
+    "file": "tools/type-selection-oracle-review.test.mjs",
+    "sha256": "fe9cb5442ae2870e669b6830b220db1a4e660cdf70ea24a4844e2c2665592aa8"
+  },
+  {
+    "file": "tools/grammar-corpus.mjs",
+    "sha256": "e2daa5d4423967013561d5e89638e75b3c9b07cef4698320dc48bed731bc0e02"
+  },
+  {
+    "file": "tools/type-effects-review-oracle.test.mjs",
+    "sha256": "24655b4898bcdecbef370ed70f3f5e8e70899fff83b4084b7f879a10f900ec96"
+  },
+  {
+    "file": "tools/type-native-contextual-patterns-oracle.test.mjs",
+    "sha256": "62a6e7ec168a1e488d25558d2d300c2004bd5dfc0c07ffb31a2e7fdcbbe7675a"
+  },
+  {
+    "file": "tools/type-constant-positions-oracle.test.mjs",
+    "sha256": "7dfd3cc644ae610f0b5bfd37516057b257dd569eed151b422b2a03331290d0ec"
+  },
+  {
+    "file": "tools/type-native-declaration-initializers-oracle.test.mjs",
+    "sha256": "2e9f4abee944c768aeb4c5d67d89d6f0f72797ead38c437193c134a9f290efb8"
+  },
+  {
+    "file": "fixtures/types/compiler-hook/oracle-test.go",
+    "sha256": "3b5b5b153c010eed4828b936bebbe25944db58b354cfcb83628726ab6a273f24"
+  },
+  {
+    "file": "fixtures/types/compiler-hook/checker-hook.go",
+    "sha256": "581fc25188d3f24283c0da09c280fc413a72540ee5270de29a90d041b6a63fef"
+  },
+  {
+    "file": "fixtures/types/compiler-hook/ls-hook.go",
+    "sha256": "b9c73116cc961b3b94c0b32c3052bf9c47b3dbfd5fe991fddc917d54c2095b94"
+  }
+]

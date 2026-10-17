@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "preserve",
+    "noLib": true
+  },
+  "files": ["globals.d.ts", "model.tsx", "consumer.ts"]
+}

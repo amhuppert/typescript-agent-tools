@@ -5,9 +5,11 @@
 //! Scope discovery happens here; lookup waits until every file is collected.
 
 use super::ids::{
-    AliasId, AmbientId, DeclId, NameId, RefId, RequestId, ScopeId, TypeParameterListId,
+    AliasId, AmbientId, DeclId, ModuleDeclarationId, NameId, RefId, RequestId, ScopeId,
+    TypeParameterListId,
 };
 use super::instances::{Instance, Instances};
+use super::member::{MemberBinding, MemberKind, declaration_anchor, declaration_key};
 use super::text::{exact_text, is_text};
 use super::{ModuleRequest, RequestKind, ResolutionMode, meaning};
 use crate::analysis::{InputError, InputErrorKind};
@@ -27,12 +29,17 @@ pub(crate) const EXPORT: u8 = 8;
 /// An identifier token and what it denotes.
 #[derive(Debug)]
 pub(super) struct Name {
+    node: NodeId,
     pub(super) span: Span,
     pub(super) text: String,
     pub(super) roles: u8,
+    pub(super) call: bool,
     /// Declaration names, local import names, and exported alias names.
     pub(super) candidate: bool,
     pub(super) target: NameTarget,
+    pub(super) flow: Option<super::flow::Read>,
+    pub(super) lexical: bool,
+    pub(super) reference: Option<super::reference_tokens::CollectedReferenceToken>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -47,6 +54,8 @@ pub(super) enum NameTarget {
 
 #[derive(Debug)]
 pub(super) struct Scope {
+    /// Actual native node whose Locals field this logical scope contributes to.
+    pub(super) native_owner: Option<(SyntaxKind, Span)>,
     pub(super) kind: ScopeKind,
     pub(super) parent: Option<ScopeId>,
 }
@@ -119,10 +128,17 @@ pub(super) enum DeclKind {
     Function,
     Class,
     Interface,
+    /// `bindAnonymousDeclaration`: a TypeLiteral owns a native member table
+    /// but is inserted in neither a lexical nor an export name table.
+    TypeLiteral,
+    /// `bindAnonymousDeclaration` attaches the literal's actual node.Symbol.
+    /// Its direct members bind through the same declaring-container owner.
+    ObjectLiteral,
     TypeAlias,
     Enum {
         constant: bool,
     },
+    EnumMember,
     /// The instance state decides whether the namespace is a value
     /// (`Instance::NonInstantiated` is not) and, with the configuration,
     /// whether TypeScript's merge-order check applies to it.
@@ -130,6 +146,7 @@ pub(super) enum DeclKind {
         instance: Instance,
     },
     TypeParameter,
+    Member(MemberKind),
     /// An anonymous default or `export =` expression.
     Expression,
 }
@@ -187,12 +204,27 @@ pub(super) struct Decl {
     pub(super) name: String,
     /// The declaring name token, or the anchor of a synthetic declaration.
     pub(super) anchor: Span,
+    /// `getResolvedSymbol` can ask a parameter's actual declaring Name.
+    /// Its lexical question is separate from getSymbolOfDeclaration and uses
+    /// the same token without introducing a navigation occurrence.
+    pub(super) name_reference: Option<RefId>,
+    pub(super) flow: Option<super::flow::Read>,
+    /// Final `bindContainer` interface ContainsThis fact. None is a different
+    /// declaration role, not an unproved false flag.
+    pub(super) contains_this: Option<bool>,
     pub(super) kind: DeclKind,
+    /// Actual native declaration-kind comparison for SetValueDeclaration.
+    pub(super) native_kind: SyntaxKind,
+    /// Actual declaration Loc, distinct from the declaring name anchor.
+    pub(super) native_span: Option<Span>,
+    /// Native member-table attachment, absent for ordinary lexical roles.
+    pub(super) member: Option<Box<MemberBinding>>,
     /// The scope in which the name is lexically bound, if any.
     pub(super) lexical: Option<ScopeId>,
+    /// `declareModuleMember` creates a raw local even where navigation resolves
+    /// namespace names through exports instead of a projected lexical binding.
+    pub(super) native_export_local: Option<ScopeId>,
     pub(super) export: Option<(Host, String)>,
-    /// Enum member names, which enum initializers see as members.
-    pub(super) members: Vec<String>,
     /// A function declaration with a body.
     pub(super) implementation: bool,
     /// Declared in an ambient context.
@@ -203,9 +235,10 @@ pub(super) struct Decl {
     /// Blocks a `var` is hoisted out of, whose block-scoped bindings it may
     /// not share a name with.
     pub(super) hoisted: Vec<ScopeId>,
-    /// A class or interface's type parameter names and whether each has a
-    /// default, which merged declarations must agree on.
-    pub(super) type_parameters: Option<Vec<(String, bool)>>,
+    /// Actual class/interface/alias parameter names, default presence and
+    /// declaration anchors. Names/defaults serve merge checks; anchors retain
+    /// getSymbolOfDeclaration identity for native local parameter acquisition.
+    pub(super) type_parameters: Option<Vec<(String, bool, Span)>>,
     /// The members of an interface that may be a JSON value's apparent type
     /// (`super::APPARENT_INTERFACES`); other declarations record none.
     pub(super) interface_members: Option<Box<InterfaceMembers>>,
@@ -224,10 +257,16 @@ impl Default for Decl {
         Self {
             name: String::new(),
             anchor: Span { start: 0, end: 0 },
+            name_reference: None,
+            flow: None,
+            contains_this: None,
             kind: DeclKind::Var,
+            native_kind: SyntaxKind::VariableDeclaration,
+            native_span: None,
+            member: None,
             lexical: None,
+            native_export_local: None,
             export: None,
-            members: Vec::new(),
             implementation: false,
             ambient: false,
             list: None,
@@ -262,14 +301,24 @@ pub(super) enum RefBase {
 #[derive(Debug)]
 pub(super) struct Alias {
     pub(super) kind: AliasKind,
+    /// The actual native alias declaration, distinct from its diagnostic/name anchor.
+    pub(super) native_kind: SyntaxKind,
+    pub(super) native_span: Span,
+    /// Actual target syntax for getTargetOfAliasDeclaration, separate from
+    /// the exported name token used as the public/navigation anchor.
+    pub(super) target_name: Option<(SyntaxKind, Span)>,
     pub(super) bind: AliasBind,
     pub(super) type_only: bool,
     /// Where diagnostics point: the alias's own name token, or for the
     /// entity alias of `export =` or `export default`, that keyword.
     pub(super) span: Span,
+    /// `checkAliasSymbol` reports on the actual declaration through
+    /// `GetErrorRangeForNode`, a distinct question from the alias name anchor.
+    pub(super) conflict_span: Span,
     /// An export specifier, `export * as`, or export assignment, which is not
     /// a lexical name even inside the namespace whose exports hold it.
     pub(super) export_only: bool,
+    pub(super) flow: Option<super::flow::Read>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -309,6 +358,7 @@ pub(super) enum AliasBind {
 
 #[derive(Debug)]
 pub(super) struct Star {
+    pub(super) declaration_span: Span,
     pub(super) host: Host,
     pub(super) request: RequestId,
     pub(super) type_only: bool,
@@ -323,12 +373,40 @@ pub(super) struct AmbientModule {
     pub(super) shorthand: bool,
 }
 
+/// Native ambient/module-augmentation declaration attachment. Navigation's
+/// module request and ambient-host records do not stand in for node.Symbol or
+/// Symbol.Declarations, so the binder consumes this actual event in order.
+#[derive(Debug)]
+pub(super) struct ModuleDeclaration {
+    pub(super) shorthand: bool,
+    pub(super) scope: ScopeId,
+    pub(super) host: Option<Host>,
+    pub(super) span: Span,
+    pub(super) name: String,
+    pub(super) global: bool,
+    pub(super) value: bool,
+}
+
 /// Captured facts for one file, with file-local indices.
 #[derive(Debug, Default)]
 pub(super) struct Facts {
+    pub(super) module_declarations: Vec<ModuleDeclaration>,
+    /// The existing lexical traversal's exact lookup location, for checker
+    /// resolveName questions whose text is synthesized instead of in source.
+    pub(super) lookup_scopes: super::site_map::SiteMap<ScopeId>,
+    /// Native ConditionalType.Locals, retained separately from source names.
+    pub(super) conditional_scopes: HashMap<Span, ScopeId>,
+    pub(super) flow: Option<super::flow::Graph>,
     pub(super) names: Vec<Name>,
     pub(super) scopes: Vec<Scope>,
     pub(super) decls: Vec<Decl>,
+    /// Binder visitation order across declarations and aliases. Native class
+    /// prototype installation observes earlier export aliases before children.
+    pub(super) binding_order: Vec<BindingEntry>,
+    /// Transient `bindFunctionOrConstructorType` role pairs. The linker
+    /// allocates the reserved Signature before the final TypeLiteral owner;
+    /// completed canonical associations replace this sparse capture map.
+    pub(super) anonymous_signatures: HashMap<DeclId, DeclId>,
     pub(super) refs: Vec<Ref>,
     pub(super) aliases: Vec<Alias>,
     pub(super) stars: Vec<Star>,
@@ -342,6 +420,21 @@ pub(super) struct Facts {
     /// Module augmentations whose bodies create values, which TypeScript
     /// marks `ValueModule` (`getModuleInstanceState`).
     pub(super) instantiated_augmentations: Vec<RequestId>,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub(super) enum BindingEntry {
+    Declaration(DeclId),
+    Alias(AliasId),
+    Module(ModuleDeclarationId),
+    /// `bindContainer` calls `bindCommonJSTypeExports` after all children;
+    /// None identifies this external source file, Some an ambient module node.
+    CommonJsTypeExports(Option<ModuleDeclarationId>),
+}
+
+enum CollectWork {
+    Visit(NodeId, Cx),
+    FinishAmbientModule(ModuleDeclarationId),
 }
 
 /// The meanings an entity name such as `A.B.C` asks for: a lone name, the
@@ -428,6 +521,12 @@ struct Cx {
     container: Option<Container>,
     infer: Option<ScopeId>,
     type_context: bool,
+    /// Actual named class/interface member container, independent of lexical
+    /// scope. Entering another binder container resets it.
+    member_owner: Option<DeclId>,
+    /// `GetContainingClass` crosses ordinary function/type containers. A new
+    /// class replaces it, independently of lexical and member-table scope.
+    private_class: Option<DeclId>,
 }
 
 impl Cx {
@@ -436,6 +535,7 @@ impl Cx {
         Self {
             scope,
             container: None,
+            member_owner: None,
             ..self
         }
     }
@@ -453,9 +553,13 @@ pub(super) struct Collector<'a, 's> {
     source: &'a SourceText,
     module: bool,
     facts: Facts,
+    // Scope capture mixes overwrite and first-write-only rules. Keep that
+    // builder behavior intact, then compact its final associations once.
+    scope_sites: HashMap<(SyntaxKind, Span), ScopeId>,
     requests: Vec<ModuleRequest>,
-    work: Vec<(NodeId, Cx)>,
+    work: Vec<CollectWork>,
     named: HashSet<NodeId>,
+    call_targets: HashSet<NodeId>,
     /// Type parameter lists seen so far.
     lists: usize,
     /// The declarations of each name per container scope, for TS2395 and
@@ -492,9 +596,14 @@ impl<'a, 's> Collector<'a, 's> {
             source,
             module,
             facts: Facts::default(),
+            scope_sites: HashMap::new(),
             requests: Vec::new(),
             work: Vec::new(),
             named: HashSet::new(),
+            call_targets: ast
+                .walk()
+                .filter_map(|node| crate::syntax::call_target(ast, node))
+                .collect(),
             lists: 0,
             container_names: HashMap::new(),
             instances: Instances::default(),
@@ -503,7 +612,7 @@ impl<'a, 's> Collector<'a, 's> {
 
     pub(super) fn run(mut self) -> Result<(Facts, Vec<ModuleRequest>)> {
         let root = self.ast.root();
-        let scope = self.scope(ScopeKind::Root, None);
+        let scope = self.native_scope(ScopeKind::Root, None, root);
         let statements = ids(root, "statements");
         let container = Container {
             host: self.module.then_some(Host::File),
@@ -518,13 +627,41 @@ impl<'a, 's> Collector<'a, 's> {
             container: Some(container),
             infer: None,
             type_context: false,
+            member_owner: None,
+            private_class: None,
         };
         self.push_statements(statements, cx);
-        while let Some((id, cx)) = self.work.pop() {
-            self.node(id, cx)?;
+        while let Some(work) = self.work.pop() {
+            match work {
+                CollectWork::Visit(id, cx) => self.node(id, cx)?,
+                CollectWork::FinishAmbientModule(module) => self
+                    .facts
+                    .binding_order
+                    .push(BindingEntry::CommonJsTypeExports(Some(module))),
+            }
+        }
+        if self.module {
+            self.facts
+                .binding_order
+                .push(BindingEntry::CommonJsTypeExports(None));
         }
         self.check_coverage()?;
+        self.capture_reference_tokens();
         self.facts.mixed_exports = self.mixed_exports();
+        let capture = super::flow::Graph::capture(self.ast);
+        for name in &mut self.facts.names {
+            name.flow = capture.read(name.span);
+        }
+        for declaration in &mut self.facts.decls {
+            declaration.flow = capture.read(declaration.anchor);
+            declaration.contains_this = capture.interface_contains_this(declaration.anchor);
+        }
+        for alias in &mut self.facts.aliases {
+            alias.flow = capture.read(alias.span);
+        }
+        self.facts.flow = Some(capture.graph);
+        self.facts.lookup_scopes =
+            super::site_map::SiteMap::from_entries(self.scope_sites.into_iter().collect());
         Ok((self.facts, self.requests))
     }
 
@@ -596,22 +733,65 @@ impl<'a, 's> Collector<'a, 's> {
             container: None,
             ..cx
         };
-        self.work.extend(ids.iter().rev().map(|&id| (id, cx)));
+        self.work
+            .extend(ids.iter().rev().map(|&id| CollectWork::Visit(id, cx)));
     }
     fn push_field(&mut self, node: &Node<'s>, key: &str, cx: Cx) {
         self.push(field(node, key), cx);
     }
     fn push_list(&mut self, node: &Node<'s>, key: &str, cx: Cx) {
-        self.push_all(ids(node, key), cx);
+        if key == "statements"
+            && matches!(
+                node.syntax_kind,
+                SyntaxKind::SourceFile | SyntaxKind::Block | SyntaxKind::ModuleBlock
+            )
+        {
+            self.push_statements(
+                ids(node, key),
+                Cx {
+                    container: None,
+                    ..cx
+                },
+            );
+        } else {
+            self.push_all(ids(node, key), cx);
+        }
     }
     /// Visit the statements of `cx.container`.
     fn push_statements(&mut self, ids: &[NodeId], cx: Cx) {
-        self.work.extend(ids.iter().rev().map(|&id| (id, cx)));
+        self.work.extend(
+            crate::syntax::statement_bind_order(self.ast, ids)
+                .rev()
+                .map(|id| CollectWork::Visit(id, cx)),
+        );
     }
 
     fn scope(&mut self, kind: ScopeKind, parent: Option<ScopeId>) -> ScopeId {
-        self.facts.scopes.push(Scope { kind, parent });
+        self.facts.scopes.push(Scope {
+            kind,
+            parent,
+            native_owner: None,
+        });
         ScopeId::new(self.facts.scopes.len() - 1)
+    }
+
+    /// `bindContainer`: retain the actual Locals owner independently from
+    /// lookup-only scope partitions (notably function signature versus body).
+    fn native_scope(
+        &mut self,
+        kind: ScopeKind,
+        parent: Option<ScopeId>,
+        node: &Node<'s>,
+    ) -> ScopeId {
+        let scope = self.scope(kind, parent);
+        self.facts.scopes[scope.index()].native_owner = Some((node.syntax_kind, node.span));
+        // Conditional locals apply only while entering its true child. The
+        // declaration node itself keeps the outer context captured by node().
+        if kind != ScopeKind::Infer {
+            self.scope_sites
+                .insert((node.syntax_kind, node.span), scope);
+        }
+        scope
     }
 
     /// The containing project supplies the file path.
@@ -630,10 +810,12 @@ impl<'a, 's> Collector<'a, 's> {
     /// exact Rust form; replacing the surrogate would merge it with other
     /// names, so it is unsupported instead.
     fn semantic_name(&self, node: &Node<'s>) -> Result<String> {
-        exact_text(node).map(str::to_string).map_err(|display| {
-            let what = format!("name \"{display}\" with an unpaired UTF-16 surrogate");
-            self.unsupported(node, &what)
-        })
+        exact_text(self.ast, node)
+            .map(|text| text.to_owned())
+            .map_err(|display| {
+                let what = format!("name \"{display}\" with an unpaired UTF-16 surrogate");
+                self.unsupported(node, &what)
+            })
     }
 
     /// The exact token of a node.
@@ -648,13 +830,64 @@ impl<'a, 's> Collector<'a, 's> {
         let first = self.named.insert(id);
         debug_assert!(first, "identifier {id:?} recorded twice");
         self.facts.names.push(Name {
+            node: id,
             span: self.token(id),
             text: self.decoded(id),
             roles,
+            call: self.call_targets.contains(&id),
             candidate,
             target,
+            flow: None,
+            lexical: true,
+            reference: None,
         });
         NameId::new(self.facts.names.len() - 1)
+    }
+
+    /// Complete the same name inventory with literal keys and semantic role
+    /// anchors after lexical capture. Existing names keep their lexical target.
+    fn capture_reference_tokens(&mut self) {
+        let mut parents = vec![None; self.ast.nodes().len()];
+        for id in self.ast.walk() {
+            for child in self.ast.children(id) {
+                parents[child.index()] = Some(id);
+            }
+        }
+        let mut captured: HashMap<_, _> = self
+            .facts
+            .names
+            .iter()
+            .enumerate()
+            .map(|(index, name)| (name.node, index))
+            .collect();
+        for id in self.ast.walk() {
+            let Some(reference) = super::reference_tokens::capture(self.ast, &parents, id) else {
+                continue;
+            };
+            if let Some(&index) = captured.get(&id) {
+                self.facts.names[index].reference = Some(reference);
+            } else {
+                // Lexical projection never observes this administrative name;
+                // an unavailable exact key remains retained in `reference`.
+                let text = match &reference.key {
+                    Ok(text) => text.clone(),
+                    Err(_) => String::new(),
+                };
+                captured.insert(id, self.facts.names.len());
+                self.facts.names.push(Name {
+                    node: id,
+                    span: self.token(id),
+                    text,
+                    roles: 0,
+                    call: self.call_targets.contains(&id),
+                    candidate: false,
+                    target: NameTarget::NotReference("semantic reference anchor"),
+                    flow: None,
+                    lexical: false,
+                    reference: Some(reference),
+                });
+            }
+        }
     }
 
     fn not_reference(&mut self, id: Option<NodeId>, why: &'static str) {
@@ -669,6 +902,11 @@ impl<'a, 's> Collector<'a, 's> {
     }
 
     fn reference(&mut self, id: NodeId, base: RefBase, meaning: u8, cx: Cx, roles: u8) -> RefId {
+        if let RefBase::Lexical(scope) = base {
+            let node = self.ast.node(id);
+            self.scope_sites
+                .insert((node.syntax_kind, node.span), scope);
+        }
         let reference = RefId::new(self.facts.refs.len());
         let token = self.name(id, NameTarget::Ref(reference), roles, false);
         self.facts.refs.push(Ref {
@@ -703,13 +941,19 @@ impl<'a, 's> Collector<'a, 's> {
                 .then(|| resolution_mode(self.ast, owner))
                 .flatten(),
             span: self.ast.token_span_of(specifier),
+            implicit: None,
+            emit_mode: None,
+            resolution_mode: None,
+            resolved_path: None,
         });
         Ok(RequestId::new(self.requests.len() - 1))
     }
 
     fn declare(&mut self, decl: Decl) -> DeclId {
         self.facts.decls.push(decl);
-        DeclId::new(self.facts.decls.len() - 1)
+        let id = DeclId::new(self.facts.decls.len() - 1);
+        self.facts.binding_order.push(BindingEntry::Declaration(id));
+        id
     }
 
     /// Declare a named statement-level declaration according to its container.
@@ -722,6 +966,9 @@ impl<'a, 's> Collector<'a, 's> {
         cx: Cx,
         scope: ScopeId,
     ) -> DeclId {
+        self.scope_sites
+            .entry((node.syntax_kind, node.span))
+            .or_insert(scope);
         // The inner names of `namespace A.B` are exported from their parents.
         let exported = has_modifier(self.ast, node, SyntaxKind::ExportKeyword)
             || node.syntax_kind == SyntaxKind::ModuleDeclaration
@@ -742,6 +989,7 @@ impl<'a, 's> Collector<'a, 's> {
             },
             None => (None, Some(scope)),
         };
+        let native_export_local = (export.is_some() && name.is_some()).then_some(scope);
         let decl = DeclId::new(self.facts.decls.len());
         let token = name.map(|name| {
             let roles = DECLARATION | if exported { EXPORT } else { 0 };
@@ -775,24 +1023,46 @@ impl<'a, 's> Collector<'a, 's> {
         let interface_members = (kind == DeclKind::Interface
             && super::APPARENT_INTERFACES.contains(&name.as_str()))
         .then(|| Box::new(self.interface_members(node)));
+        let name_reference = token.filter(|_| kind == DeclKind::Parameter).map(|token| {
+            let reference = RefId::new(self.facts.refs.len());
+            self.facts.refs.push(Ref {
+                token,
+                base: RefBase::Lexical(scope),
+                meaning: meaning::VALUE,
+                property: false,
+                type_context: false,
+            });
+            reference
+        });
         self.declare(Decl {
             name,
             anchor,
+            name_reference,
+            native_span: Some(node.span),
+            flow: None,
+            contains_this: None,
             kind,
-            lexical,
-            export,
-            members: match kind {
-                DeclKind::Enum { .. } => self.enum_member_names(node),
-                _ => Vec::new(),
+            native_kind: match kind {
+                _ if node.syntax_kind == SyntaxKind::BindingElement => SyntaxKind::BindingElement,
+                DeclKind::Var | DeclKind::Let => SyntaxKind::VariableDeclaration,
+                DeclKind::Parameter => SyntaxKind::Parameter,
+                _ => node.syntax_kind,
             },
+            member: None,
+            lexical,
+            native_export_local,
+            export,
             implementation: node.syntax_kind == SyntaxKind::FunctionDeclaration
                 && field(node, "body").is_some(),
             ambient: node.flags & node_flags::AMBIENT != 0
                 || has_modifier(self.ast, node, SyntaxKind::DeclareKeyword),
             list: None,
             hoisted: self.hoisted(cx.scope, scope),
-            type_parameters: matches!(kind, DeclKind::Class | DeclKind::Interface)
-                .then(|| self.type_parameter_names(node)),
+            type_parameters: matches!(
+                kind,
+                DeclKind::Class | DeclKind::Interface | DeclKind::TypeAlias
+            )
+            .then(|| self.type_parameter_names(node)),
             interface_members,
         })
     }
@@ -821,9 +1091,9 @@ impl<'a, 's> Collector<'a, 's> {
                     SyntaxKind::Identifier => Some(self.decoded(name)),
                     SyntaxKind::StringLiteral
                     | SyntaxKind::NoSubstitutionTemplateLiteral
-                    | SyntaxKind::NumericLiteral => {
-                        exact_text(self.ast.node(name)).ok().map(str::to_string)
-                    }
+                    | SyntaxKind::NumericLiteral => exact_text(self.ast, self.ast.node(name))
+                        .ok()
+                        .map(|text| text.to_owned()),
                     _ => None,
                 }
             })
@@ -838,19 +1108,37 @@ impl<'a, 's> Collector<'a, 's> {
     /// type parameter of `list`.
     fn declare_local(
         &mut self,
+        declaration: &Node<'s>,
         name: NodeId,
         kind: DeclKind,
         scope: ScopeId,
         list: Option<TypeParameterListId>,
     ) -> DeclId {
+        self.scope_sites
+            .insert((declaration.syntax_kind, declaration.span), scope);
+        let name_node = self.ast.node(name);
+        self.scope_sites
+            .insert((name_node.syntax_kind, name_node.span), scope);
         let decl = DeclId::new(self.facts.decls.len());
         let token = self.name(name, NameTarget::Decl(decl), DECLARATION, true);
         self.declare(Decl {
             name: self.decoded(name),
+            native_span: Some(declaration.span),
             anchor: self.facts.names[token.index()].span,
             kind,
+            native_kind: match kind {
+                DeclKind::TypeParameter => SyntaxKind::TypeParameter,
+                DeclKind::Class => SyntaxKind::ClassExpression,
+                DeclKind::Function => SyntaxKind::FunctionExpression,
+                _ => unreachable!("declare_local has a native own-name/type-parameter role"),
+            },
             lexical: Some(scope),
             list,
+            // `getLocalTypeParametersOfClassOrInterfaceOrTypeAlias` asks the
+            // same declaration-owned list for a class expression and a class
+            // declaration. An empty list is established data, not absence.
+            type_parameters: (kind == DeclKind::Class)
+                .then(|| self.type_parameter_names(declaration)),
             ..Decl::default()
         })
     }
@@ -867,25 +1155,6 @@ impl<'a, 's> Collector<'a, 's> {
         hoisted
     }
 
-    /// Member names an enum's initializers see as members. Only identifiers
-    /// refer to members, so a string name with an unpaired surrogate, which
-    /// no identifier can spell, is left out.
-    fn enum_member_names(&self, node: &Node<'s>) -> Vec<String> {
-        ids(node, "members")
-            .iter()
-            .filter_map(|&member| {
-                let name = field(self.ast.node(member), "name")?;
-                match self.ast.node(name).syntax_kind {
-                    SyntaxKind::Identifier => Some(self.decoded(name)),
-                    SyntaxKind::StringLiteral => {
-                        exact_text(self.ast.node(name)).ok().map(str::to_string)
-                    }
-                    _ => None,
-                }
-            })
-            .collect()
-    }
-
     /// The name of an identifier.
     fn decoded(&self, id: NodeId) -> String {
         self.ast
@@ -899,20 +1168,42 @@ impl<'a, 's> Collector<'a, 's> {
     fn binding(
         &mut self,
         statement: &Node<'s>,
+        native_declaration: &Node<'s>,
         name: Option<NodeId>,
         kind: DeclKind,
         cx: Cx,
         lexical: ScopeId,
     ) -> Result<()> {
-        let mut stack: Vec<NodeId> = name.into_iter().collect();
-        while let Some(id) = stack.pop() {
+        self.scope_sites.insert(
+            (native_declaration.syntax_kind, native_declaration.span),
+            cx.scope,
+        );
+        let mut stack: Vec<_> = name
+            .into_iter()
+            .map(|id| (id, native_declaration))
+            .collect();
+        while let Some((id, declaration)) = stack.pop() {
             let node = self.ast.node(id);
+            self.scope_sites
+                .insert((node.syntax_kind, node.span), cx.scope);
+            self.scope_sites
+                .insert((declaration.syntax_kind, declaration.span), cx.scope);
             match node.syntax_kind {
                 SyntaxKind::Identifier => {
-                    self.declare_statement(statement, Some(id), kind, cx, lexical);
+                    let own = self.declare_statement(statement, Some(id), kind, cx, lexical);
+                    // Binding retains the statement's export/modifier policy,
+                    // but the symbol owns the actual Variable/BindingElement
+                    // declaration, not that enclosing statement's Loc.
+                    self.facts.decls[own.index()].native_span = Some(declaration.span);
+                    self.facts.decls[own.index()].native_kind = declaration.syntax_kind;
                 }
                 SyntaxKind::ObjectBindingPattern | SyntaxKind::ArrayBindingPattern => {
-                    stack.extend(ids(node, "elements").iter().rev());
+                    stack.extend(
+                        ids(node, "elements")
+                            .iter()
+                            .rev()
+                            .map(|&id| (id, declaration)),
+                    );
                 }
                 SyntaxKind::BindingElement => {
                     match child(self.ast, node, "propertyName").map(|p| p.syntax_kind) {
@@ -924,7 +1215,7 @@ impl<'a, 's> Collector<'a, 's> {
                     }
                     self.push_field(node, "initializer", cx);
                     if let Some(name) = field(node, "name") {
-                        stack.push(name);
+                        stack.push((name, node));
                     }
                 }
                 SyntaxKind::OmittedExpression => {}
@@ -934,9 +1225,20 @@ impl<'a, 's> Collector<'a, 's> {
         Ok(())
     }
 
-    fn node(&mut self, id: NodeId, cx: Cx) -> Result<()> {
+    fn node(&mut self, id: NodeId, mut cx: Cx) -> Result<()> {
         let ast = self.ast;
         let node = ast.node(id);
+        self.scope_sites
+            .entry((node.syntax_kind, node.span))
+            .or_insert(cx.scope);
+        // `IsExpression`: expression subtrees use value-reference rules even
+        // inside a type (computed names and declaration initializers). Entity
+        // names of TypeReference/TypeQuery are captured by those branches,
+        // without visiting their identifiers here, so their explicit type
+        // context remains intact. Binding names likewise have their own owner.
+        if crate::syntax::is_expression(ast, id) {
+            cx.type_context = false;
+        }
         match node.syntax_kind {
             SyntaxKind::Identifier => {
                 self.reference(id, RefBase::Lexical(cx.scope), meaning::VALUE, cx, USE);
@@ -945,18 +1247,18 @@ impl<'a, 's> Collector<'a, 's> {
 
             // Statements
             SyntaxKind::Block => {
-                let scope = self.scope(ScopeKind::Block, Some(cx.scope));
+                let scope = self.native_scope(ScopeKind::Block, Some(cx.scope), node);
                 self.push_list(node, "statements", cx.enter(scope));
             }
             SyntaxKind::VariableStatement => {
-                self.modifiers(node, cx.scope);
+                self.modifiers(node, cx);
                 let list = child(ast, node, "declarationList")
                     .ok_or_else(|| self.unsupported(node, "variable statement"))?;
                 self.variable_list(node, list, cx)?;
             }
             SyntaxKind::VariableDeclarationList => self.variable_list(node, node, cx)?,
             SyntaxKind::FunctionDeclaration => {
-                self.modifiers(node, cx.scope);
+                self.modifiers(node, cx);
                 if field(node, "name").is_some()
                     || has_modifier(ast, node, SyntaxKind::DefaultKeyword)
                 {
@@ -972,7 +1274,7 @@ impl<'a, 's> Collector<'a, 's> {
             }
             SyntaxKind::ClassDeclaration | SyntaxKind::ClassExpression => self.class(node, cx),
             SyntaxKind::InterfaceDeclaration => {
-                self.modifiers(node, cx.scope);
+                self.modifiers(node, cx);
                 let decl = self.declare_statement(
                     node,
                     field(node, "name"),
@@ -981,13 +1283,18 @@ impl<'a, 's> Collector<'a, 's> {
                     cx.scope,
                 );
                 let scope = self.scope(ScopeKind::Members { decl }, Some(cx.scope));
-                let inner = cx.enter(scope).types();
+                self.scope_sites
+                    .insert((node.syntax_kind, node.span), scope);
+                let inner = Cx {
+                    member_owner: Some(decl),
+                    ..cx.enter(scope).types()
+                };
                 self.type_parameters(node, inner);
                 self.heritage(node, inner, false);
                 self.push_list(node, "members", inner);
             }
             SyntaxKind::TypeAliasDeclaration => {
-                self.modifiers(node, cx.scope);
+                self.modifiers(node, cx);
                 self.declare_statement(
                     node,
                     field(node, "name"),
@@ -995,13 +1302,13 @@ impl<'a, 's> Collector<'a, 's> {
                     cx,
                     cx.scope,
                 );
-                let scope = self.scope(ScopeKind::TypeParameters, Some(cx.scope));
+                let scope = self.native_scope(ScopeKind::TypeParameters, Some(cx.scope), node);
                 let inner = cx.enter(scope).types();
                 self.type_parameters(node, inner);
                 self.push_field(node, "type", inner);
             }
             SyntaxKind::EnumDeclaration => {
-                self.modifiers(node, cx.scope);
+                self.modifiers(node, cx);
                 let constant = has_modifier(ast, node, SyntaxKind::ConstKeyword);
                 let decl = self.declare_statement(
                     node,
@@ -1010,8 +1317,12 @@ impl<'a, 's> Collector<'a, 's> {
                     cx,
                     cx.scope,
                 );
-                let inner = cx.enter(self.scope(ScopeKind::Enum { decl }, Some(cx.scope)));
+                let inner = Cx {
+                    member_owner: Some(decl),
+                    ..cx.enter(self.scope(ScopeKind::Enum { decl }, Some(cx.scope)))
+                };
                 for &member in ids(node, "members") {
+                    self.capture_member_kind(member, inner, DeclKind::EnumMember);
                     let member = ast.node(member);
                     match child(ast, member, "name").map(|name| name.syntax_kind) {
                         Some(SyntaxKind::Identifier | SyntaxKind::PrivateIdentifier) => {
@@ -1044,7 +1355,7 @@ impl<'a, 's> Collector<'a, 's> {
                 self.push_field(node, "statement", cx);
             }
             SyntaxKind::ForStatement | SyntaxKind::ForInStatement | SyntaxKind::ForOfStatement => {
-                let scope = self.scope(ScopeKind::Block, Some(cx.scope));
+                let scope = self.native_scope(ScopeKind::Block, Some(cx.scope), node);
                 let inner = cx.enter(scope);
                 for field in [
                     "initializer",
@@ -1058,8 +1369,9 @@ impl<'a, 's> Collector<'a, 's> {
             }
             SyntaxKind::SwitchStatement => {
                 self.push_field(node, "expression", cx);
-                let inner = cx.enter(self.scope(ScopeKind::Block, Some(cx.scope)));
                 if let Some(block) = child(ast, node, "caseBlock") {
+                    let inner =
+                        cx.enter(self.native_scope(ScopeKind::Block, Some(cx.scope), block));
                     for &clause in ids(block, "clauses") {
                         let clause = ast.node(clause);
                         self.push_field(clause, "expression", inner);
@@ -1079,10 +1391,11 @@ impl<'a, 's> Collector<'a, 's> {
             SyntaxKind::TryStatement => {
                 self.push_field(node, "tryBlock", cx);
                 if let Some(clause) = child(ast, node, "catchClause") {
-                    let scope = self.scope(ScopeKind::Catch, Some(cx.scope));
+                    let scope = self.native_scope(ScopeKind::Catch, Some(cx.scope), clause);
                     let catch = cx.enter(scope);
                     if let Some(declaration) = child(ast, clause, "variableDeclaration") {
                         self.binding(
+                            declaration,
                             declaration,
                             field(declaration, "name"),
                             DeclKind::Let,
@@ -1175,17 +1488,9 @@ impl<'a, 's> Collector<'a, 's> {
             | SyntaxKind::TypeAssertionExpression => {
                 self.push_field(node, "expression", cx);
                 // `as const` spells the keyword as a type reference.
-                let constant = child(ast, node, "type")
-                    .filter(|ty| {
-                        node.syntax_kind != SyntaxKind::SatisfiesExpression
-                            && ty.syntax_kind == SyntaxKind::TypeReference
-                    })
-                    .filter(|ty| ids(ty, "typeArguments").is_empty())
-                    .and_then(|ty| field(ty, "typeName"))
-                    .filter(|&name| {
-                        let name = ast.node(name);
-                        name.syntax_kind == SyntaxKind::Identifier && is_text(name, "const")
-                    });
+                let constant = crate::syntax::id(node, "type")
+                    .filter(|_| crate::syntax::is_const_assertion(ast, id))
+                    .and_then(|ty| crate::syntax::id(ast.node(ty), "typeName"));
                 match constant {
                     Some(name) => self.not_reference(Some(name), "const assertion"),
                     None => self.push_field(node, "type", cx.types()),
@@ -1196,23 +1501,53 @@ impl<'a, 's> Collector<'a, 's> {
                 self.push_list(node, "typeArguments", cx.types());
             }
             SyntaxKind::ArrayLiteralExpression => self.push_list(node, "elements", cx),
-            SyntaxKind::ObjectLiteralExpression => self.push_list(node, "properties", cx),
+            SyntaxKind::ObjectLiteralExpression => {
+                let declaration = self.declare(Decl {
+                    anchor: declaration_anchor(ast, id),
+                    native_span: Some(node.span),
+                    kind: DeclKind::ObjectLiteral,
+                    native_kind: SyntaxKind::ObjectLiteralExpression,
+                    ..Decl::default()
+                });
+                self.push_list(
+                    node,
+                    "properties",
+                    Cx {
+                        member_owner: Some(declaration),
+                        ..cx
+                    },
+                );
+            }
             SyntaxKind::PropertyAssignment => {
+                self.capture_member(id, cx, MemberKind::Property);
                 self.member_name(node, cx);
+                self.push_field(node, "type", cx.types());
                 self.push_field(node, "initializer", cx);
             }
             SyntaxKind::ShorthandPropertyAssignment => {
+                self.capture_member(id, cx, MemberKind::Property);
                 let name = field(node, "name").unwrap();
                 self.reference(name, RefBase::Lexical(cx.scope), meaning::VALUE, cx, USE);
+                self.push_field(node, "type", cx.types());
                 self.push_field(node, "objectAssignmentInitializer", cx);
             }
             SyntaxKind::FunctionExpression | SyntaxKind::ArrowFunction => {
                 let mut scope = cx.scope;
                 if let Some(name) = field(node, "name") {
                     scope = self.scope(ScopeKind::ExpressionName, Some(cx.scope));
-                    self.declare_local(name, DeclKind::Function, scope, None);
+                    self.declare_local(node, name, DeclKind::Function, scope, None);
+                } else {
+                    // `bindFunctionExpression` binds one anonymous Function
+                    // symbol even for an arrow or nameless expression.
+                    self.declare(Decl {
+                        anchor: declaration_anchor(ast, id),
+                        native_span: Some(node.span),
+                        kind: DeclKind::Function,
+                        native_kind: node.syntax_kind,
+                        ..Decl::default()
+                    });
                 }
-                self.modifiers(node, cx.scope);
+                self.modifiers(node, cx);
                 self.function(
                     node,
                     cx,
@@ -1262,7 +1597,16 @@ impl<'a, 's> Collector<'a, 's> {
 
             // Class and object members
             SyntaxKind::PropertyDeclaration | SyntaxKind::PropertySignature => {
-                self.modifiers(node, cx.scope);
+                self.capture_member(
+                    id,
+                    cx,
+                    if has_modifier(ast, node, SyntaxKind::AccessorKeyword) {
+                        MemberKind::AutoAccessor
+                    } else {
+                        MemberKind::Property
+                    },
+                );
+                self.modifiers(node, cx);
                 self.member_name(node, cx);
                 self.push_field(node, "type", cx.types());
                 self.push_field(node, "initializer", cx);
@@ -1272,7 +1616,17 @@ impl<'a, 's> Collector<'a, 's> {
             | SyntaxKind::SetAccessor
             | SyntaxKind::Constructor
             | SyntaxKind::MethodSignature => {
-                self.modifiers(node, cx.scope);
+                self.capture_member(
+                    id,
+                    cx,
+                    match node.syntax_kind {
+                        SyntaxKind::GetAccessor => MemberKind::Getter,
+                        SyntaxKind::SetAccessor => MemberKind::Setter,
+                        SyntaxKind::Constructor => MemberKind::Constructor,
+                        _ => MemberKind::Method,
+                    },
+                );
+                self.modifiers(node, cx);
                 self.member_name(node, cx);
                 self.function(
                     node,
@@ -1286,12 +1640,52 @@ impl<'a, 's> Collector<'a, 's> {
             | SyntaxKind::IndexSignature
             | SyntaxKind::FunctionType
             | SyntaxKind::ConstructorType => {
-                self.modifiers(node, cx.scope);
+                if matches!(
+                    node.syntax_kind,
+                    SyntaxKind::FunctionType | SyntaxKind::ConstructorType
+                ) {
+                    let owner = self.declare(Decl {
+                        name: "__type".into(),
+                        native_span: Some(node.span),
+                        anchor: declaration_anchor(ast, id),
+                        kind: DeclKind::TypeLiteral,
+                        native_kind: node.syntax_kind,
+                        ..Decl::default()
+                    });
+                    let signature = self.declare(Decl {
+                        native_span: Some(node.span),
+                        anchor: declaration_anchor(ast, id),
+                        kind: DeclKind::Member(if node.syntax_kind == SyntaxKind::FunctionType {
+                            MemberKind::Call
+                        } else {
+                            MemberKind::Construct
+                        }),
+                        native_kind: node.syntax_kind,
+                        member: Some(Box::new(MemberBinding {
+                            owner,
+                            private_class: None,
+                            static_member: false,
+                            key: declaration_key(ast, node),
+                            optional: false,
+                        })),
+                        ..Decl::default()
+                    });
+                    self.facts.anonymous_signatures.insert(owner, signature);
+                }
+                if let Some(kind) = match node.syntax_kind {
+                    SyntaxKind::CallSignature => Some(MemberKind::Call),
+                    SyntaxKind::ConstructSignature => Some(MemberKind::Construct),
+                    SyntaxKind::IndexSignature => Some(MemberKind::Index),
+                    _ => None,
+                } {
+                    self.capture_member(id, cx, kind);
+                }
+                self.modifiers(node, cx);
                 self.function(node, cx.types(), cx.scope, false)?;
             }
             SyntaxKind::ClassStaticBlockDeclaration => {
-                self.modifiers(node, cx.scope);
-                let scope = self.scope(ScopeKind::Body, Some(cx.scope));
+                self.modifiers(node, cx);
+                let scope = self.native_scope(ScopeKind::Body, Some(cx.scope), node);
                 let inner = Cx {
                     var_scope: scope,
                     ..cx.enter(scope)
@@ -1322,13 +1716,41 @@ impl<'a, 's> Collector<'a, 's> {
                 }
                 self.push_field(node, "type", cx.types());
             }
-            SyntaxKind::TypeLiteral => self.push_list(node, "members", cx.types()),
+            SyntaxKind::TypeLiteral => {
+                let declaration = self.declare(Decl {
+                    name: "__type".into(),
+                    native_span: Some(node.span),
+                    anchor: declaration_anchor(ast, id),
+                    kind: DeclKind::TypeLiteral,
+                    native_kind: SyntaxKind::TypeLiteral,
+                    ..Decl::default()
+                });
+                let scope = self.scope(ScopeKind::Members { decl: declaration }, Some(cx.scope));
+                self.push_list(
+                    node,
+                    "members",
+                    Cx {
+                        member_owner: Some(declaration),
+                        ..cx.enter(scope).types()
+                    },
+                );
+            }
             SyntaxKind::NamedTupleMember => {
                 self.not_reference(field(node, "name"), "tuple member label");
                 self.push_field(node, "type", cx.types());
             }
             SyntaxKind::MappedType => {
-                let scope = self.scope(ScopeKind::TypeParameters, Some(cx.scope));
+                // bindAnonymousDeclaration(TypeLiteral): the mapped object owns
+                // an actual symbol even though its members are checker-created.
+                self.declare(Decl {
+                    name: "__type".into(),
+                    native_span: Some(node.span),
+                    anchor: declaration_anchor(ast, id),
+                    kind: DeclKind::TypeLiteral,
+                    native_kind: SyntaxKind::MappedType,
+                    ..Decl::default()
+                });
+                let scope = self.native_scope(ScopeKind::TypeParameters, Some(cx.scope), node);
                 let inner = cx.enter(scope).types();
                 if let Some(parameter) = field(node, "typeParameter") {
                     self.lists += 1;
@@ -1340,7 +1762,8 @@ impl<'a, 's> Collector<'a, 's> {
             }
             SyntaxKind::ConditionalType => {
                 let types = cx.types();
-                let infer = self.scope(ScopeKind::Infer, Some(cx.scope));
+                let infer = self.native_scope(ScopeKind::Infer, Some(cx.scope), node);
+                self.facts.conditional_scopes.insert(node.span, infer);
                 self.push_field(node, "checkType", types);
                 self.push_field(
                     node,
@@ -1373,6 +1796,8 @@ impl<'a, 's> Collector<'a, 's> {
                     let decl = DeclId::new(self.facts.decls.len());
                     let constraint =
                         self.scope(ScopeKind::InferConstraint { decl }, Some(cx.scope));
+                    self.scope_sites
+                        .insert((node.syntax_kind, node.span), constraint);
                     self.type_parameter_in(parameter, cx.types(), scope, constraint);
                 }
             }
@@ -1404,7 +1829,8 @@ impl<'a, 's> Collector<'a, 's> {
 
     /// Visit decorators in `scope`: where a class is declared, or the class
     /// body for members and parameters.
-    fn modifiers(&mut self, node: &Node<'s>, scope: ScopeId) {
+    fn modifiers(&mut self, node: &Node<'s>, outer: Cx) {
+        let scope = outer.scope;
         let decorators: Vec<NodeId> = ids(node, "modifiers")
             .iter()
             .copied()
@@ -1416,6 +1842,8 @@ impl<'a, 's> Collector<'a, 's> {
             container: None,
             infer: None,
             type_context: false,
+            member_owner: None,
+            private_class: outer.private_class,
         };
         self.push_all(&decorators, cx);
     }
@@ -1430,7 +1858,7 @@ impl<'a, 's> Collector<'a, 's> {
         for &declaration in ids(list, "declarations") {
             let declaration = self.ast.node(declaration);
             let name = field(declaration, "name");
-            self.binding(statement, name, kind, cx, lexical)?;
+            self.binding(statement, declaration, name, kind, cx, lexical)?;
             self.push_field(declaration, "type", cx.types());
             self.push_field(declaration, "initializer", cx);
         }
@@ -1440,39 +1868,89 @@ impl<'a, 's> Collector<'a, 's> {
     /// Parameters, type parameters, return type, and body of a function-like
     /// node. `outer` is the scope enclosing its signature.
     fn function(&mut self, node: &Node<'s>, cx: Cx, outer: ScopeId, arguments: bool) -> Result<()> {
-        let signature = self.scope(
+        let signature = self.native_scope(
             ScopeKind::Signature {
                 arguments: arguments && node.syntax_kind != SyntaxKind::ArrowFunction,
             },
             Some(outer),
+            node,
         );
         let inner = cx.enter(signature);
         self.type_parameters(node, inner.types());
-        for &parameter in ids(node, "parameters") {
-            let parameter = self.ast.node(parameter);
-            self.modifiers(parameter, outer);
+        for (index, &parameter_id) in ids(node, "parameters").iter().enumerate() {
+            let parameter = self.ast.node(parameter_id);
+            self.modifiers(parameter, Cx { scope: outer, ..cx });
             let name = field(parameter, "name");
             let this = name.is_some_and(|name| {
                 let name = self.ast.node(name);
-                name.syntax_kind == SyntaxKind::Identifier && is_text(name, "this")
+                name.syntax_kind == SyntaxKind::Identifier && is_text(self.ast, name, "this")
             });
             if this {
+                // `bindParameter` also declares the explicit-this parameter.
+                // Its token remains excluded from lexical navigation.
+                self.scope_sites
+                    .insert((parameter.syntax_kind, parameter.span), signature);
+                let name_node = self.ast.node(name.expect("explicit this has a name"));
+                self.scope_sites
+                    .insert((name_node.syntax_kind, name_node.span), signature);
+                self.declare(Decl {
+                    name: "this".into(),
+                    anchor: self.ast.token_span(name.expect("explicit this has a name")),
+                    native_span: Some(parameter.span),
+                    kind: DeclKind::Parameter,
+                    native_kind: SyntaxKind::Parameter,
+                    lexical: Some(signature),
+                    ..Decl::default()
+                });
                 self.not_reference(name, "this parameter");
             } else {
-                self.binding(parameter, name, DeclKind::Parameter, inner, signature)?;
+                // `bindParameter` gives a binding-pattern parameter its own
+                // anonymous symbol before binding the named elements. It is
+                // neither a lexical entry nor an extra name occurrence.
+                if name.is_some_and(|name| {
+                    matches!(
+                        self.ast.node(name).syntax_kind,
+                        SyntaxKind::ObjectBindingPattern | SyntaxKind::ArrayBindingPattern
+                    )
+                }) {
+                    self.declare(Decl {
+                        name: format!("__{index}"),
+                        anchor: declaration_anchor(self.ast, parameter_id),
+                        native_span: Some(parameter.span),
+                        kind: DeclKind::Parameter,
+                        native_kind: SyntaxKind::Parameter,
+                        ..Decl::default()
+                    });
+                }
+                self.binding(
+                    parameter,
+                    parameter,
+                    name,
+                    DeclKind::Parameter,
+                    inner,
+                    signature,
+                )?;
+                if name
+                    .is_some_and(|name| self.ast.node(name).syntax_kind == SyntaxKind::Identifier)
+                    && crate::syntax::is_parameter_property_declaration(self.ast, parameter, node)
+                {
+                    self.capture_member(parameter_id, cx, MemberKind::ParameterProperty);
+                }
             }
             self.push_field(parameter, "type", inner.types());
             self.push_field(parameter, "initializer", inner);
         }
         self.push_field(node, "type", inner.types());
         if let Some(body) = child(self.ast, node, "body") {
-            let scope = self.scope(ScopeKind::Body, Some(signature));
+            let scope = self.native_scope(ScopeKind::Body, Some(signature), node);
             let body_cx = Cx {
                 var_scope: scope,
                 type_context: false,
                 ..cx.enter(scope)
             };
             if body.syntax_kind == SyntaxKind::Block {
+                self.scope_sites
+                    .insert((body.syntax_kind, body.span), scope);
                 self.push_list(body, "statements", body_cx);
             } else {
                 self.push(field(node, "body"), body_cx);
@@ -1488,13 +1966,17 @@ impl<'a, 's> Collector<'a, 's> {
         }
     }
 
-    fn type_parameter_names(&self, node: &Node<'s>) -> Vec<(String, bool)> {
+    fn type_parameter_names(&self, node: &Node<'s>) -> Vec<(String, bool, Span)> {
         ids(node, "typeParameters")
             .iter()
             .map(|&parameter| self.ast.node(parameter))
             .filter_map(|parameter| {
-                let name = self.decoded(field(parameter, "name")?);
-                Some((name, field(parameter, "default").is_some()))
+                let name = field(parameter, "name")?;
+                Some((
+                    self.decoded(name),
+                    field(parameter, "default").is_some(),
+                    self.ast.token_span(name),
+                ))
             })
             .collect()
     }
@@ -1510,7 +1992,15 @@ impl<'a, 's> Collector<'a, 's> {
         let node = self.ast.node(id);
         if let Some(name) = field(node, "name") {
             let list = Some(TypeParameterListId(self.lists));
-            self.declare_local(name, DeclKind::TypeParameter, scope, list);
+            self.declare_local(node, name, DeclKind::TypeParameter, scope, list);
+            // `NameResolver.Resolve` reaches an infer's own parameter before
+            // rejecting the conditional's locals outside its true branch.
+            // Binding ownership remains the shared infer declaration table.
+            self.scope_sites
+                .insert((node.syntax_kind, node.span), constraints);
+            let name_node = self.ast.node(name);
+            self.scope_sites
+                .insert((name_node.syntax_kind, name_node.span), constraints);
         }
         // Constraints see the parameters of their own list.
         let inner = cx.enter(constraints).types();
@@ -1519,26 +2009,41 @@ impl<'a, 's> Collector<'a, 's> {
     }
 
     fn class(&mut self, node: &Node<'s>, cx: Cx) {
-        self.modifiers(node, cx.scope);
         let name = field(node, "name");
         let mut outer = cx.scope;
         let decl = if node.syntax_kind == SyntaxKind::ClassDeclaration
             && (name.is_some() || has_modifier(self.ast, node, SyntaxKind::DefaultKeyword))
         {
-            Some(self.declare_statement(node, name, DeclKind::Class, cx, cx.scope))
+            self.declare_statement(node, name, DeclKind::Class, cx, cx.scope)
         } else if let Some(name) = name {
             outer = self.scope(ScopeKind::ExpressionName, Some(cx.scope));
-            Some(self.declare_local(name, DeclKind::Class, outer, None))
+            self.declare_local(node, name, DeclKind::Class, outer, None)
         } else {
-            None
+            // `bindClassLikeDeclaration` gives an unnamed class expression
+            // its own Class header before binding private names and members.
+            self.declare(Decl {
+                native_span: Some(node.span),
+                anchor: node.span,
+                kind: DeclKind::Class,
+                native_kind: node.syntax_kind,
+                type_parameters: Some(self.type_parameter_names(node)),
+                ..Decl::default()
+            })
         };
-        let kind = match decl {
-            Some(decl) => ScopeKind::Members { decl },
-            None => ScopeKind::TypeParameters,
-        };
-        let scope = self.scope(kind, Some(outer));
+        self.modifiers(
+            node,
+            Cx {
+                private_class: Some(decl),
+                ..cx
+            },
+        );
+        let scope = self.scope(ScopeKind::Members { decl }, Some(outer));
+        self.scope_sites
+            .insert((node.syntax_kind, node.span), scope);
         let inner = Cx {
             type_context: false,
+            member_owner: Some(decl),
+            private_class: Some(decl),
             ..cx.enter(scope)
         };
         self.type_parameters(node, inner.types());
@@ -1564,6 +2069,46 @@ impl<'a, 's> Collector<'a, 's> {
                 self.push_list(ty, "typeArguments", cx.types());
             }
         }
+    }
+
+    /// A member name is not a lexical reference; a computed key is evaluated.
+    /// `bindPropertyOrMethodOrAccessor`: capture this native declaring
+    /// container independently of lexical scope. A container without a
+    /// retained native symbol never attaches its members to an outer owner.
+    fn capture_member(&mut self, id: NodeId, cx: Cx, kind: MemberKind) {
+        self.capture_member_kind(id, cx, DeclKind::Member(kind));
+    }
+
+    fn capture_member_kind(&mut self, id: NodeId, cx: Cx, kind: DeclKind) {
+        let Some(owner) = cx.member_owner else {
+            return;
+        };
+        let node = self.ast.node(id);
+        let key = declaration_key(self.ast, node);
+        let name = match &key {
+            super::member::MemberKey::Text(name) | super::member::MemberKey::Private(name) => {
+                name.clone()
+            }
+            _ => String::new(),
+        };
+        self.declare(Decl {
+            name,
+            native_span: Some(node.span),
+            anchor: declaration_anchor(self.ast, id),
+            kind,
+            native_kind: node.syntax_kind,
+            member: Some(Box::new(MemberBinding {
+                owner,
+                private_class: matches!(key, super::member::MemberKey::Private(_))
+                    .then_some(cx.private_class)
+                    .flatten(),
+                static_member: kind == DeclKind::EnumMember
+                    || has_modifier(self.ast, node, SyntaxKind::StaticKeyword),
+                key,
+                optional: field(node, "questionToken").is_some(),
+            })),
+            ..Decl::default()
+        });
     }
 
     /// A member name is not a lexical reference; a computed key is evaluated.
@@ -1718,8 +2263,9 @@ impl<'a, 's> Collector<'a, 's> {
         bind: AliasBind,
         type_only: bool,
         anchor: Span,
+        declaration: &Node<'s>,
     ) -> AliasId {
-        self.add_alias(kind, bind, type_only, anchor, false)
+        self.add_alias(kind, bind, type_only, anchor, false, declaration)
     }
 
     /// Record an export specifier, `export * as`, or export assignment alias,
@@ -1731,8 +2277,9 @@ impl<'a, 's> Collector<'a, 's> {
         bind: AliasBind,
         type_only: bool,
         anchor: Span,
+        declaration: &Node<'s>,
     ) -> AliasId {
-        self.add_alias(kind, bind, type_only, anchor, true)
+        self.add_alias(kind, bind, type_only, anchor, true, declaration)
     }
 
     fn add_alias(
@@ -1742,15 +2289,40 @@ impl<'a, 's> Collector<'a, 's> {
         type_only: bool,
         span: Span,
         export_only: bool,
+        declaration: &Node<'s>,
     ) -> AliasId {
+        // `GetErrorRangeForNode`'s complete alias-declaration branch: only
+        // NamespaceImport selects its Name; all other alias declarations use
+        // their own non-trivia range (including ImportEquals' `import`).
+        let conflict_node = if declaration.syntax_kind == SyntaxKind::NamespaceImport {
+            child(self.ast, declaration, "name").expect("namespace import alias has a name")
+        } else {
+            declaration
+        };
+        let conflict_span = self.ast.token_span_of(conflict_node);
         self.facts.aliases.push(Alias {
             kind,
+            native_kind: declaration.syntax_kind,
+            native_span: declaration.span,
+            target_name: match declaration.syntax_kind {
+                SyntaxKind::ExportAssignment => child(self.ast, declaration, "expression"),
+                SyntaxKind::ImportEqualsDeclaration => {
+                    child(self.ast, declaration, "moduleReference")
+                }
+                _ => child(self.ast, declaration, "propertyName")
+                    .or_else(|| child(self.ast, declaration, "name")),
+            }
+            .map(|name| (name.syntax_kind, self.ast.token_span_of(name))),
             bind,
             type_only,
             span,
+            conflict_span,
             export_only,
+            flow: None,
         });
-        AliasId::new(self.facts.aliases.len() - 1)
+        let id = AliasId::new(self.facts.aliases.len() - 1);
+        self.facts.binding_order.push(BindingEntry::Alias(id));
+        id
     }
 
     /// Record a name token of an alias; a string-literal name is no token.
@@ -1762,7 +2334,7 @@ impl<'a, 's> Collector<'a, 's> {
     }
 
     fn import_declaration(&mut self, node: &Node<'s>, cx: Cx) -> Result<()> {
-        self.modifiers(node, cx.scope);
+        self.modifiers(node, cx);
         let specifier = self.module_specifier(node)?;
         let clause = child(self.ast, node, "importClause");
         let request = self.request(
@@ -1787,6 +2359,7 @@ impl<'a, 's> Collector<'a, 's> {
                 },
                 type_only,
                 self.token(name),
+                clause,
             );
             self.alias_name(Some(name), alias, IMPORT, true);
         }
@@ -1803,6 +2376,7 @@ impl<'a, 's> Collector<'a, 's> {
                 },
                 type_only,
                 self.token(name),
+                bindings,
             );
             self.alias_name(Some(name), alias, IMPORT, true);
             return Ok(());
@@ -1823,6 +2397,7 @@ impl<'a, 's> Collector<'a, 's> {
                 },
                 type_only || flag(element, "isTypeOnly"),
                 self.token(name),
+                element,
             );
             self.alias_name(property, alias, IMPORT, false);
             self.alias_name(Some(name), alias, IMPORT, true);
@@ -1849,7 +2424,7 @@ impl<'a, 's> Collector<'a, 's> {
     }
 
     fn import_equals(&mut self, node: &Node<'s>, cx: Cx) -> Result<()> {
-        self.modifiers(node, cx.scope);
+        self.modifiers(node, cx);
         let name = field(node, "name").unwrap();
         let type_only = flag(node, "isTypeOnly");
         let reference = child(self.ast, node, "moduleReference")
@@ -1884,7 +2459,7 @@ impl<'a, 's> Collector<'a, 's> {
                 name: local,
             },
         };
-        let alias = self.alias(kind, bind, type_only, self.token(name));
+        let alias = self.alias(kind, bind, type_only, self.token(name), node);
         self.alias_name(
             Some(name),
             alias,
@@ -1901,7 +2476,7 @@ impl<'a, 's> Collector<'a, 's> {
     }
 
     fn export_declaration(&mut self, node: &Node<'s>, cx: Cx) -> Result<()> {
-        self.modifiers(node, cx.scope);
+        self.modifiers(node, cx);
         let host = self.export_host(node, cx)?;
         let type_only = flag(node, "isTypeOnly");
         let request = if field(node, "moduleSpecifier").is_some() {
@@ -1915,6 +2490,7 @@ impl<'a, 's> Collector<'a, 's> {
             let request =
                 request.ok_or_else(|| self.unsupported(node, "export without a clause"))?;
             self.facts.stars.push(Star {
+                declaration_span: node.span,
                 host,
                 request,
                 type_only,
@@ -1933,6 +2509,7 @@ impl<'a, 's> Collector<'a, 's> {
                 },
                 type_only,
                 self.token(name),
+                clause,
             );
             self.alias_name(Some(name), alias, EXPORT, true);
             return Ok(());
@@ -1960,6 +2537,7 @@ impl<'a, 's> Collector<'a, 's> {
                 },
                 type_only || flag(element, "isTypeOnly"),
                 self.token(name),
+                element,
             );
             self.alias_name(property, alias, EXPORT, false);
             self.alias_name(Some(name), alias, EXPORT, true);
@@ -1968,7 +2546,7 @@ impl<'a, 's> Collector<'a, 's> {
     }
 
     fn export_assignment(&mut self, node: &Node<'s>, cx: Cx) -> Result<()> {
-        self.modifiers(node, cx.scope);
+        self.modifiers(node, cx);
         let host = self.export_host(node, cx)?;
         let name = if flag(node, "isExportEquals") {
             "export="
@@ -1986,7 +2564,7 @@ impl<'a, 's> Collector<'a, 's> {
                     scope: cx.scope,
                     name: self.decoded(expression),
                 };
-                let alias = self.export_alias(kind, bind, false, self.token(expression));
+                let alias = self.export_alias(kind, bind, false, self.token(expression), node);
                 self.alias_name(Some(expression), alias, EXPORT, false);
             }
             Some(expression) => {
@@ -2000,13 +2578,15 @@ impl<'a, 's> Collector<'a, 's> {
                     expand: false,
                 };
                 let anchor = default_keyword(self.ast, node);
-                self.export_alias(kind, bind, false, anchor);
+                self.export_alias(kind, bind, false, anchor, node);
             }
             None => {
                 self.declare(Decl {
                     name: name.into(),
+                    native_span: Some(node.span),
                     anchor: default_keyword(self.ast, node),
                     kind: DeclKind::Expression,
+                    native_kind: SyntaxKind::ExportAssignment,
                     lexical: None,
                     export: Some((host, name.into())),
                     ..Decl::default()
@@ -2053,6 +2633,7 @@ impl<'a, 's> Collector<'a, 's> {
             },
             false,
             self.token(name),
+            node,
         );
         self.alias_name(Some(name), alias, EXPORT, true);
     }
@@ -2085,7 +2666,7 @@ impl<'a, 's> Collector<'a, 's> {
 
     fn module_declaration(&mut self, id: NodeId, cx: Cx) -> Result<()> {
         let node = self.ast.node(id);
-        self.modifiers(node, cx.scope);
+        self.modifiers(node, cx);
         let name = child(self.ast, node, "name").unwrap();
         let ambient = node.flags & node_flags::AMBIENT != 0;
         let body = child(self.ast, node, "body");
@@ -2155,7 +2736,20 @@ impl<'a, 's> Collector<'a, 's> {
                     (ScopeKind::Unmerged, None)
                 }
             };
-            let scope = self.scope(scope_kind, Some(cx.scope));
+            let native_name = self.semantic_name(name)?;
+            let value = context != ModuleContext::External
+                || self.instances.namespace(self.ast, id) != Instance::NonInstantiated;
+            let module = self.capture_module_declaration(ModuleDeclaration {
+                shorthand: body.is_none(),
+                scope: cx.scope,
+                host,
+                span: node.span,
+                name: native_name,
+                global: false,
+                value,
+            });
+            self.work.push(CollectWork::FinishAmbientModule(module));
+            let scope = self.native_scope(scope_kind, Some(cx.scope), node);
             let inner = match host {
                 Some(host) => Cx {
                     scope,
@@ -2177,6 +2771,18 @@ impl<'a, 's> Collector<'a, 's> {
         }
         if node.flags & node_flags::GLOBAL_AUGMENTATION != 0 {
             self.not_reference(field(node, "name"), "global augmentation");
+            let value = context != ModuleContext::External
+                || self.instances.namespace(self.ast, id) != Instance::NonInstantiated;
+            let module = self.capture_module_declaration(ModuleDeclaration {
+                shorthand: body.is_none(),
+                scope: cx.scope,
+                host: (context == ModuleContext::External).then_some(Host::Global),
+                span: node.span,
+                name: "global".into(),
+                global: true,
+                value,
+            });
+            self.work.push(CollectWork::FinishAmbientModule(module));
             if context != ModuleContext::External {
                 self.facts
                     .misplaced_modules
@@ -2189,7 +2795,7 @@ impl<'a, 's> Collector<'a, 's> {
                 } else {
                     ScopeKind::Unmerged
                 };
-                let scope = self.scope(kind, Some(cx.scope));
+                let scope = self.native_scope(kind, Some(cx.scope), node);
                 let inner = Cx {
                     var_scope: scope,
                     ..cx.enter(scope)
@@ -2199,7 +2805,7 @@ impl<'a, 's> Collector<'a, 's> {
             }
             // The file's global augmentation exports what the block declares,
             // as an ambient module does.
-            let scope = self.scope(ScopeKind::Global, Some(cx.scope));
+            let scope = self.native_scope(ScopeKind::Global, Some(cx.scope), node);
             let inner = Cx {
                 scope,
                 var_scope: scope,
@@ -2221,7 +2827,7 @@ impl<'a, 's> Collector<'a, 's> {
             cx,
             cx.scope,
         );
-        let scope = self.scope(ScopeKind::Namespace { decl }, Some(cx.scope));
+        let scope = self.native_scope(ScopeKind::Namespace { decl }, Some(cx.scope), node);
         let inner = Cx {
             scope,
             var_scope: scope,
@@ -2241,6 +2847,16 @@ impl<'a, 's> Collector<'a, 's> {
             _ => self.push_statements(statements, inner),
         }
         Ok(())
+    }
+
+    fn capture_module_declaration(
+        &mut self,
+        declaration: ModuleDeclaration,
+    ) -> ModuleDeclarationId {
+        let id = ModuleDeclarationId::new(self.facts.module_declarations.len());
+        self.facts.module_declarations.push(declaration);
+        self.facts.binding_order.push(BindingEntry::Module(id));
+        id
     }
 }
 
@@ -2292,10 +2908,7 @@ fn default_keyword<'s>(ast: &Ast<'s>, node: &Node<'s>) -> Span {
     {
         return ast.token_span(modifier);
     }
-    let mut lexer = crate::lexer::Lexer {
-        src: ast.source(),
-        pos: node.span.start,
-    };
+    let mut lexer = crate::lexer::Lexer::new(ast.source(), node.span.start);
     let mut token = lexer.next();
     while token.raw != "export" && token.end < node.span.end {
         token = lexer.next();
@@ -2313,10 +2926,10 @@ fn resolution_mode<'s>(ast: &Ast<'s>, node: &Node<'s>) -> Option<ResolutionMode>
     ids(attributes, "elements").iter().find_map(|&id| {
         let attribute = ast.node(id);
         let name = child(ast, attribute, "name")?;
-        if !is_text(name, "resolution-mode") {
+        if !is_text(ast, name, "resolution-mode") {
             return None;
         }
-        match exact_text(child(ast, attribute, "value")?) {
+        match exact_text(ast, child(ast, attribute, "value")?).as_deref() {
             Ok("import") => Some(ResolutionMode::Import),
             Ok("require") => Some(ResolutionMode::Require),
             _ => None,

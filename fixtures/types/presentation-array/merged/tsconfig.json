@@ -1,0 +1,1 @@
+{ "compilerOptions": { "strict": true, "noLib": true, "resolveJsonModule": true, "module": "esnext", "moduleResolution": "bundler" }, "files": ["globals.ts", "consumer.ts"] }

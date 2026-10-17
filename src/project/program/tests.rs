@@ -21,9 +21,10 @@
 //!   `classic`, `module` `amd`/`umd`/`system`, `target` `es5`,
 //!   `noResolve`, `noDtsResolution`, non-empty `references`, and JavaScript
 //!   inputs. JSON files are inputs under `resolveJsonModule`.
-//! - Every other option is ignored: none affects the program graph, binding,
-//!   or which failures loading tolerates. A new option is read in
-//!   `config::convert`, listed here, and documented in docs/references.md.
+//! - The pinned option catalog validates every option's input type and exact
+//!   key; unknown non-null options and removed settings are configuration
+//!   errors. Effective strict-family inputs are retained in the snapshot.
+//!   `docs/types-options.md` classifies the remaining accepted options.
 
 use super::*;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -412,8 +413,8 @@ fn supported_combinations_and_irrelevant_options_load() {
         (
             "tsconfig.json",
             r#"{ "compilerOptions": { "noLib": true, "module": "node18", "moduleResolution": "nodenext", "lib": [],
-               "noLib": false, "strict": true, "target": "ESNext", "outFile": "x.js", "sourceMap": true, "declaration": true,
-               "plugins": [{ "name": "x" }], "unknownOption": 1, "allowImportingTsExtensions": true, "esModuleInterop": false },
+               "noLib": false, "strict": true, "target": "ESNext", "sourceMap": true, "declaration": true,
+               "plugins": [{ "name": "x" }], "allowImportingTsExtensions": true, "esModuleInterop": true },
                "watchOptions": {}, "compileOnSave": true }"#,
         ),
         (
@@ -2350,6 +2351,50 @@ fn imports_chains_beyond_the_limit_fail_the_load() {
 }
 
 #[test]
+fn module_specifier_capture_does_not_visit_every_importer_target_pair() {
+    // 1,200 importers in 120 directories and 300 `index` modules, all
+    // imported by one file. Capturing module-specifier probes is quadratic in
+    // importer directories and index targets by design, never per importer
+    // file times every target.
+    let mut files: Vec<(String, String)> = vec![(
+        "tsconfig.json".into(),
+        r#"{ "compilerOptions": { "noLib": true }, "include": ["src"] }"#.into(),
+    )];
+    let mut imports = String::new();
+    for i in 0..300 {
+        files.push((
+            format!("src/lib{i}/index.ts"),
+            format!("export const v{i} = {i};\n"),
+        ));
+        imports.push_str(&format!("import \"./lib{i}\";\n"));
+    }
+    files.push(("src/main.ts".into(), imports));
+    for d in 0..120 {
+        for f in 0..10 {
+            files.push((
+                format!("src/d{d}/f{f}.ts"),
+                format!("export const f{d}_{f} = 1;\n"),
+            ));
+        }
+    }
+    let files: Vec<(&str, &str)> = files
+        .iter()
+        .map(|(a, b)| (a.as_str(), b.as_str()))
+        .collect();
+    let project = Project::new(&files);
+    let config = project.root.join("tsconfig.json");
+    let (send, receive) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        let program = load_on_parsing_thread(&config).unwrap();
+        send.send(program.sources.ids().count()).unwrap();
+    });
+    let count = receive
+        .recv_timeout(std::time::Duration::from_secs(20))
+        .expect("loading should finish");
+    assert_eq!(count, 1501);
+}
+
+#[test]
 fn long_extends_chains_load_in_linear_time() {
     let count = 10_000;
     let mut files: Vec<(String, String)> = vec![
@@ -3429,7 +3474,7 @@ fn compiler_probe_projects_load_and_answer_as_recorded() {
                 };
                 match loaded {
                     Ok(_) => failures.push(format!("{name}: loaded; expected {kind} at {place}")),
-                    Err(error) => {
+                    Err(crate::analysis::AnalysisError::Input(error)) => {
                         let actual = format!(
                             "{:?} {}:{}:{}",
                             error.kind,
@@ -3448,6 +3493,9 @@ fn compiler_probe_projects_load_and_answer_as_recorded() {
                             ));
                         }
                     }
+                    Err(error) => failures.push(format!(
+                        "{name}: non-input failure {error:?}; expected {kind} at {place}"
+                    )),
                 }
                 continue;
             }
@@ -3595,4 +3643,190 @@ fn list_configured_program() {
         .collect();
     let listing = serde_json::json!({ "config": program.config, "files": files });
     std::fs::write(&output, serde_json::to_vec_pretty(&listing).unwrap()).unwrap();
+}
+
+/// Compare exact diagnostic spellings after loading the native fixture. Public
+/// Q4 queries assert error-type admission separately in type_module_spelling;
+/// diagnostic wording is intentionally absent from that public result.
+#[test]
+fn fresh_module_spelling_matches_native_loaded_inputs() {
+    use super::specifiers::{ImportingFile, WrittenImport, module_specifiers};
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/types/native-module-spelling");
+    let cases: Vec<serde_json::Value> =
+        serde_json::from_str(&std::fs::read_to_string(root.join("cases.json")).unwrap()).unwrap();
+    let native: Vec<serde_json::Value> = serde_json::from_str(
+        &std::fs::read_to_string(root.join("expected-workspace.json")).unwrap(),
+    )
+    .unwrap();
+    let globals = std::fs::read_to_string(root.join("globals.d.ts")).unwrap();
+    assert_eq!(cases.len(), native.len());
+    for (case, expected) in cases.iter().zip(native) {
+        let name = case["name"].as_str().unwrap();
+        assert_eq!(expected["name"], name);
+        let files = case["files"].as_object().unwrap();
+        let mut inputs: Vec<_> = files
+            .iter()
+            .map(|(path, text)| (path.as_str(), text.as_str().unwrap()))
+            .collect();
+        inputs.push(("globals.d.ts", &globals));
+        let fixture = Project::new(&inputs);
+        let config = case["config"].as_str().unwrap();
+        let program = fixture.load(config);
+        let source_path =
+            std::fs::canonicalize(fixture.root.join(case["source"].as_str().unwrap())).unwrap();
+        let id = program
+            .sources
+            .ids()
+            .find(|&id| program.sources.get(id).path == source_path)
+            .unwrap();
+        let file = &program.files[id.index()];
+        let imports: Vec<_> = file
+            .facts
+            .requests
+            .iter()
+            .filter(|request| request.implicit.is_none())
+            .map(|request| WrittenImport {
+                text: request.specifier.clone(),
+                resolved_file_name: request.resolved_path.clone(),
+                mode: request.resolution_mode,
+            })
+            .collect();
+        let target = imports
+            .first()
+            .unwrap()
+            .resolved_file_name
+            .as_deref()
+            .unwrap();
+        let mode = file.module_semantics.default_resolution_mode;
+        assert_ne!(
+            imports.first().unwrap().mode,
+            mode,
+            "{name}: must generate a fresh spelling"
+        );
+        let actual = module_specifiers(
+            &program.specifier_environment,
+            ImportingFile {
+                file_name: source_path.to_str().unwrap(),
+                default_mode: mode,
+                imports: &imports,
+            },
+            target,
+            mode,
+            None,
+        )
+        .unwrap_or_else(|error| panic!("{name}: {error:?}"));
+        let spelling: String = serde_json::from_str(expected["display"].as_str().unwrap()).unwrap();
+        assert_eq!(actual.first(), Some(&spelling), "{name}: {actual:?}");
+    }
+}
+
+/// Native root/subpath resolution and reverse spelling ask different questions
+/// of the same ordered manifest values. Public Q4 tests assert the selected
+/// values and error-type boundary; this checks loaded files and exact strings.
+#[test]
+fn manifest_edges_match_native_loaded_files_and_fresh_spellings() {
+    use super::specifiers::{ImportingFile, WrittenImport, module_specifiers};
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/types/native-manifest-edges");
+    let cases: Vec<serde_json::Value> =
+        serde_json::from_str(&std::fs::read_to_string(root.join("cases.json")).unwrap()).unwrap();
+    let native: Vec<serde_json::Value> = serde_json::from_str(
+        &std::fs::read_to_string(root.join("expected-workspace.json")).unwrap(),
+    )
+    .unwrap();
+    let template = std::fs::read_to_string(root.join("main.cts")).unwrap();
+    let globals = std::fs::read_to_string(root.join("globals.d.ts")).unwrap();
+    assert_eq!(cases.len(), native.len());
+    for (case, expected) in cases.iter().zip(native) {
+        let name = case["name"].as_str().unwrap();
+        assert_eq!(expected["name"], name);
+        let source = template.replace(
+            "from \"pkg\"",
+            &format!(
+                "from {}",
+                serde_json::to_string(case["specifier"].as_str().unwrap_or("pkg")).unwrap()
+            ),
+        );
+        let fixture = Project::new(&[
+            (
+                "tsconfig.json",
+                r#"{"compilerOptions":{"strict":true,"noLib":true,"types":[],"module":"NodeNext","moduleResolution":"NodeNext"},"files":["globals.d.ts","main.cts"]}"#,
+            ),
+            ("package.json", r#"{"type":"commonjs"}"#),
+            ("globals.d.ts", &globals),
+            ("main.cts", &source),
+            (
+                "node_modules/pkg/package.json",
+                case["manifest"].as_str().unwrap(),
+            ),
+            (
+                "node_modules/pkg/index.d.ts",
+                "export declare const present: \"base\";\n",
+            ),
+            (
+                "node_modules/pkg/first.d.ts",
+                "export declare const present: \"first\";\n",
+            ),
+            (
+                "node_modules/pkg/second.d.ts",
+                "export declare const present: \"second\";\n",
+            ),
+        ]);
+        let program = fixture.load("tsconfig.json");
+        let mut loaded: Vec<_> = program
+            .sources
+            .ids()
+            .map(|id| fixture.display(&program.sources.get(id).path))
+            .filter(|path| path.starts_with("node_modules/pkg/"))
+            .collect();
+        loaded.sort();
+        assert_eq!(
+            serde_json::to_value(loaded).unwrap(),
+            expected["selected"]["loaded"],
+            "{name}: final loaded files"
+        );
+        let source_path = std::fs::canonicalize(fixture.root.join("main.cts")).unwrap();
+        let id = program
+            .sources
+            .ids()
+            .find(|&id| program.sources.get(id).path == source_path)
+            .unwrap();
+        let file = &program.files[id.index()];
+        let imports: Vec<_> = file
+            .facts
+            .requests
+            .iter()
+            .filter(|request| request.implicit.is_none())
+            .map(|request| WrittenImport {
+                text: request.specifier.clone(),
+                resolved_file_name: request.resolved_path.clone(),
+                mode: request.resolution_mode,
+            })
+            .collect();
+        let target = imports
+            .first()
+            .unwrap()
+            .resolved_file_name
+            .as_deref()
+            .unwrap();
+        let mode = file.module_semantics.default_resolution_mode;
+        assert_ne!(
+            imports.first().unwrap().mode,
+            mode,
+            "{name}: must generate a fresh spelling"
+        );
+        let actual = module_specifiers(
+            &program.specifier_environment,
+            ImportingFile {
+                file_name: source_path.to_str().unwrap(),
+                default_mode: mode,
+                imports: &imports,
+            },
+            target,
+            mode,
+            None,
+        )
+        .unwrap_or_else(|error| panic!("{name}: {error:?}"));
+        let spelling: String = serde_json::from_str(expected["display"].as_str().unwrap()).unwrap();
+        assert_eq!(actual.first(), Some(&spelling), "{name}: {actual:?}");
+    }
 }

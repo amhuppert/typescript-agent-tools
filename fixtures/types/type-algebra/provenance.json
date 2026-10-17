@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "compiler": "7.0.2",
+  "kind": "exploratory public API observations",
+  "note": "Historical raw answers and exact tooling. Only listed local inputs/tooling are hashed; not a full consumed-resolver-input manifest, graph proof or native implementation. Unique-symbol internal display IDs are observations, not stable identity. The historical probe retains scratch paths.",
+  "apiPackageSha256": "3722b30210616a13a3213ded11575ba6b2dbab10c32a5ef67afca8513e27017e",
+  "nativeBinarySha256": "76e4987d060ef8207875a53a73619ce665ff16fb2800c0d57a452e21c829bd7b",
+  "files": {
+    "fixtures/types/type-algebra/captured-tooling/probe.mjs": "8f9c739221518573d42df3c07a70019c780554cb6982ae605cbd2b33156e3598",
+    "fixtures/types/type-algebra/captured-tooling/semantic-oracle.mjs": "bc969538c077b64b4bf65e87be063ed5903f7d2cca739676b3780c13565f565a",
+    "fixtures/types/type-algebra/captured-tooling/type-oracle.mjs": "bb106616c1897eed4c8007aaedb1bc695f366441280c78dc2937d9842166364e",
+    "fixtures/types/type-algebra/captured-tooling/vendor-typescript-libs.mjs": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d",
+    "fixtures/types/type-algebra/cases.ts": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7",
+    "fixtures/types/type-algebra/loose.json": "e438052060556a9b54539b9f57dd788ed7d9988ffb15667f5b64b869792b9369",
+    "fixtures/types/type-algebra/observations.json": "3de54ea2746caecb3b0449b10a8f49b042bef3fb6278d6a5187d3c459b7fd131",
+    "fixtures/types/type-algebra/tsconfig.json": "8a77b692b7a1d7446027a8635200aeff4e48aa483f7ad48e4c286271caa8c4a6",
+    "tools/type-algebra-oracle.test.mjs": "6815f7b9914badfeee572ddaa6c7da147d7c6d63fef91234fde2792f4ad80456"
+  }
+}

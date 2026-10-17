@@ -1,0 +1,12 @@
+declare const crossValue: number | string;
+declare const crossOther: number;
+declare const crossError: MissingCross;
+const crossCondition = typeof crossValue === "number";
+const crossIrrelevant = crossOther > 0;
+const crossRecovery = crossValue === /*@crossRecovery*/crossError;
+declare const crossObject: {kind: "a", value: number} | {kind: "b", value: string};
+const crossTag = crossObject.kind;
+const crossDiscriminant = crossTag === "a";
+declare function crossPredicate(value: number | string): value is number;
+const crossCall = crossPredicate(crossValue);
+const crossCallUnrelated = crossPredicate(crossOther);

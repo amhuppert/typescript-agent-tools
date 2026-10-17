@@ -1,0 +1,1471 @@
+{
+  "source": "export {};\nlet uninitialized: number;\n/*#uninitialized*/uninitialized;\ntype UninitializedType = typeof /*#typeQuery*/uninitialized;\n/*#nonNull*/uninitialized!;\nlet count: number = 1;\nif (typeof Missing === 'string') { /*#unrelatedMissing*/count; }\ninterface OnlyType {}\nif (typeof OnlyType === 'string') { /*#unrelatedType*/count; }\ndeclare const neverValue: never;\nif (typeof Missing === 'string') { /*#neverMissing*/neverValue; }\n",
+  "rows": [
+    {
+      "strict": false,
+      "marker": "uninitialized",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 3,
+          "column": 19
+        },
+        "properties": false
+      },
+      "api": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "expression",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 3,
+            "column": 19
+          },
+          "end": {
+            "line": 3,
+            "column": 32
+          }
+        },
+        "sourceHash": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 2,
+                "column": 5
+              },
+              "end": {
+                "line": 2,
+                "column": 18
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": false,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json"
+        }
+      },
+      "hook": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+            "sha256": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json",
+            "sha256": "02204b1ce608340d0dc5797710cb7238fe76436dbbe0ed14d7952ebdd990739b"
+          }
+        ],
+        "kind": "expression",
+        "symbolFlags": 2,
+        "symbolMode": "",
+        "summary": "number",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": false,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json"
+        }
+      }
+    },
+    {
+      "strict": false,
+      "marker": "typeQuery",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 4,
+          "column": 47
+        },
+        "properties": false
+      },
+      "api": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "value",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 4,
+            "column": 47
+          },
+          "end": {
+            "line": 4,
+            "column": 60
+          }
+        },
+        "sourceHash": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 2,
+                "column": 5
+              },
+              "end": {
+                "line": 2,
+                "column": 18
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": false,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json"
+        }
+      },
+      "hook": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+            "sha256": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json",
+            "sha256": "02204b1ce608340d0dc5797710cb7238fe76436dbbe0ed14d7952ebdd990739b"
+          }
+        ],
+        "kind": "value",
+        "symbolFlags": 2,
+        "symbolMode": "",
+        "summary": "number",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": false,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json"
+        }
+      }
+    },
+    {
+      "strict": false,
+      "marker": "nonNull",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 5,
+          "column": 13
+        },
+        "properties": false
+      },
+      "api": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "expression",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 5,
+            "column": 13
+          },
+          "end": {
+            "line": 5,
+            "column": 26
+          }
+        },
+        "sourceHash": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 2,
+                "column": 5
+              },
+              "end": {
+                "line": 2,
+                "column": 18
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": false,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json"
+        }
+      },
+      "hook": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+            "sha256": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json",
+            "sha256": "02204b1ce608340d0dc5797710cb7238fe76436dbbe0ed14d7952ebdd990739b"
+          }
+        ],
+        "kind": "expression",
+        "symbolFlags": 2,
+        "symbolMode": "",
+        "summary": "number",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": false,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json"
+        }
+      }
+    },
+    {
+      "strict": false,
+      "marker": "unrelatedMissing",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 7,
+          "column": 57
+        },
+        "properties": false
+      },
+      "api": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "expression",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 7,
+            "column": 57
+          },
+          "end": {
+            "line": 7,
+            "column": 62
+          }
+        },
+        "sourceHash": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 6,
+                "column": 5
+              },
+              "end": {
+                "line": 6,
+                "column": 10
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": false,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json"
+        }
+      },
+      "hook": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+            "sha256": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json",
+            "sha256": "02204b1ce608340d0dc5797710cb7238fe76436dbbe0ed14d7952ebdd990739b"
+          }
+        ],
+        "kind": "expression",
+        "symbolFlags": 2,
+        "symbolMode": "",
+        "summary": "number",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2304
+          ]
+        },
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2304
+        ],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": false,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json"
+        }
+      }
+    },
+    {
+      "strict": false,
+      "marker": "unrelatedType",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 9,
+          "column": 55
+        },
+        "properties": false
+      },
+      "api": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "expression",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 9,
+            "column": 55
+          },
+          "end": {
+            "line": 9,
+            "column": 60
+          }
+        },
+        "sourceHash": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 6,
+                "column": 5
+              },
+              "end": {
+                "line": 6,
+                "column": 10
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": false,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json"
+        }
+      },
+      "hook": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+            "sha256": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json",
+            "sha256": "02204b1ce608340d0dc5797710cb7238fe76436dbbe0ed14d7952ebdd990739b"
+          }
+        ],
+        "kind": "expression",
+        "symbolFlags": 2,
+        "symbolMode": "",
+        "summary": "number",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2304,
+            2693
+          ]
+        },
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2304,
+          2693
+        ],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": false,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json"
+        }
+      }
+    },
+    {
+      "strict": false,
+      "marker": "neverMissing",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 11,
+          "column": 53
+        },
+        "properties": false
+      },
+      "api": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "expression",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 11,
+            "column": 53
+          },
+          "end": {
+            "line": 11,
+            "column": 63
+          }
+        },
+        "sourceHash": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304",
+        "summary": "never",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 10,
+                "column": 15
+              },
+              "end": {
+                "line": 10,
+                "column": 25
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": false,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json"
+        }
+      },
+      "hook": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+            "sha256": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json",
+            "sha256": "02204b1ce608340d0dc5797710cb7238fe76436dbbe0ed14d7952ebdd990739b"
+          }
+        ],
+        "kind": "expression",
+        "symbolFlags": 2,
+        "symbolMode": "",
+        "summary": "never",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": false,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/false.json"
+        }
+      }
+    },
+    {
+      "strict": true,
+      "marker": "uninitialized",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 3,
+          "column": 19
+        },
+        "properties": false
+      },
+      "api": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "expression",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 3,
+            "column": 19
+          },
+          "end": {
+            "line": 3,
+            "column": 32
+          }
+        },
+        "sourceHash": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 2,
+                "column": 5
+              },
+              "end": {
+                "line": 2,
+                "column": 18
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json"
+        }
+      },
+      "hook": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+            "sha256": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json",
+            "sha256": "6dad958bac4e017ec56096735a29730c0a73ce65ce238e634a825dce8d6d41d1"
+          }
+        ],
+        "kind": "expression",
+        "symbolFlags": 2,
+        "symbolMode": "",
+        "summary": "number",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2454
+          ]
+        },
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2454
+        ],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json"
+        }
+      }
+    },
+    {
+      "strict": true,
+      "marker": "typeQuery",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 4,
+          "column": 47
+        },
+        "properties": false
+      },
+      "api": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "value",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 4,
+            "column": 47
+          },
+          "end": {
+            "line": 4,
+            "column": 60
+          }
+        },
+        "sourceHash": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 2,
+                "column": 5
+              },
+              "end": {
+                "line": 2,
+                "column": 18
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json"
+        }
+      },
+      "hook": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+            "sha256": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json",
+            "sha256": "6dad958bac4e017ec56096735a29730c0a73ce65ce238e634a825dce8d6d41d1"
+          }
+        ],
+        "kind": "value",
+        "symbolFlags": 2,
+        "symbolMode": "",
+        "summary": "number",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json"
+        }
+      }
+    },
+    {
+      "strict": true,
+      "marker": "nonNull",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 5,
+          "column": 13
+        },
+        "properties": false
+      },
+      "api": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "expression",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 5,
+            "column": 13
+          },
+          "end": {
+            "line": 5,
+            "column": 26
+          }
+        },
+        "sourceHash": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 2,
+                "column": 5
+              },
+              "end": {
+                "line": 2,
+                "column": 18
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json"
+        }
+      },
+      "hook": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+            "sha256": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json",
+            "sha256": "6dad958bac4e017ec56096735a29730c0a73ce65ce238e634a825dce8d6d41d1"
+          }
+        ],
+        "kind": "expression",
+        "symbolFlags": 2,
+        "symbolMode": "",
+        "summary": "number",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json"
+        }
+      }
+    },
+    {
+      "strict": true,
+      "marker": "unrelatedMissing",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 7,
+          "column": 57
+        },
+        "properties": false
+      },
+      "api": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "expression",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 7,
+            "column": 57
+          },
+          "end": {
+            "line": 7,
+            "column": 62
+          }
+        },
+        "sourceHash": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 6,
+                "column": 5
+              },
+              "end": {
+                "line": 6,
+                "column": 10
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json"
+        }
+      },
+      "hook": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+            "sha256": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json",
+            "sha256": "6dad958bac4e017ec56096735a29730c0a73ce65ce238e634a825dce8d6d41d1"
+          }
+        ],
+        "kind": "expression",
+        "symbolFlags": 2,
+        "symbolMode": "",
+        "summary": "number",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2304
+          ]
+        },
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2304
+        ],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json"
+        }
+      }
+    },
+    {
+      "strict": true,
+      "marker": "unrelatedType",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 9,
+          "column": 55
+        },
+        "properties": false
+      },
+      "api": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "expression",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 9,
+            "column": 55
+          },
+          "end": {
+            "line": 9,
+            "column": 60
+          }
+        },
+        "sourceHash": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 6,
+                "column": 5
+              },
+              "end": {
+                "line": 6,
+                "column": 10
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json"
+        }
+      },
+      "hook": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+            "sha256": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json",
+            "sha256": "6dad958bac4e017ec56096735a29730c0a73ce65ce238e634a825dce8d6d41d1"
+          }
+        ],
+        "kind": "expression",
+        "symbolFlags": 2,
+        "symbolMode": "",
+        "summary": "number",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2304,
+            2693
+          ]
+        },
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2304,
+          2693
+        ],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json"
+        }
+      }
+    },
+    {
+      "strict": true,
+      "marker": "neverMissing",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 11,
+          "column": 53
+        },
+        "properties": false
+      },
+      "api": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "expression",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 11,
+            "column": 53
+          },
+          "end": {
+            "line": 11,
+            "column": 63
+          }
+        },
+        "sourceHash": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304",
+        "summary": "never",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 10,
+                "column": 15
+              },
+              "end": {
+                "line": 10,
+                "column": 25
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json"
+        }
+      },
+      "hook": {
+        "compiler": "7.0.2",
+        "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+        "history": "baseline",
+        "status": "observed",
+        "inputFiles": [
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+          "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json"
+        ],
+        "inputHashes": [
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/cases.ts",
+            "sha256": "2af07fda057cd18dfd0b45d57e36e1fc8b3d33d0580fe68589b55197dc2b6304"
+          },
+          {
+            "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json",
+            "sha256": "6dad958bac4e017ec56096735a29730c0a73ce65ce238e634a825dce8d6d41d1"
+          }
+        ],
+        "kind": "expression",
+        "symbolFlags": 2,
+        "symbolMode": "",
+        "summary": "never",
+        "errorType": false,
+        "beforeSummary": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "compilerOptions": {
+          "module": 99,
+          "noEmit": true,
+          "noLib": true,
+          "strict": true,
+          "target": 99,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-reader-review/true.json"
+        }
+      }
+    }
+  ]
+}

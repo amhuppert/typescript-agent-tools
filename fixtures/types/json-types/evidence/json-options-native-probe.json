@@ -1,0 +1,1020 @@
+{
+  "rows": [
+    {
+      "strict": 0,
+      "exact": 0,
+      "unchecked": 0,
+      "marker": "nil",
+      "summary": "any",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 0,
+      "exact": 0,
+      "unchecked": 0,
+      "marker": "empty",
+      "summary": "any[]",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 0,
+      "exact": 0,
+      "unchecked": 0,
+      "marker": "empty0",
+      "summary": "any",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 0,
+      "exact": 0,
+      "unchecked": 0,
+      "marker": "numbers0",
+      "summary": "number",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 0,
+      "exact": 0,
+      "unchecked": 0,
+      "marker": "mixed0",
+      "summary": "string | number",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 0,
+      "exact": 0,
+      "unchecked": 0,
+      "marker": "shapes",
+      "summary": "({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 0,
+      "exact": 0,
+      "unchecked": 0,
+      "marker": "shapeA",
+      "summary": "number",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 0,
+      "exact": 0,
+      "unchecked": 0,
+      "marker": "rootNull",
+      "summary": "any",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 0,
+      "exact": 0,
+      "unchecked": 0,
+      "marker": "rootEmpty",
+      "summary": "any[]",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 0,
+      "exact": 0,
+      "unchecked": 1,
+      "marker": "nil",
+      "summary": "any",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 0,
+      "exact": 0,
+      "unchecked": 1,
+      "marker": "empty",
+      "summary": "any[]",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 0,
+      "exact": 0,
+      "unchecked": 1,
+      "marker": "empty0",
+      "summary": "any",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 0,
+      "exact": 0,
+      "unchecked": 1,
+      "marker": "numbers0",
+      "summary": "number",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 0,
+      "exact": 0,
+      "unchecked": 1,
+      "marker": "mixed0",
+      "summary": "string | number",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 0,
+      "exact": 0,
+      "unchecked": 1,
+      "marker": "shapes",
+      "summary": "({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 0,
+      "exact": 0,
+      "unchecked": 1,
+      "marker": "shapeA",
+      "summary": "number",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 0,
+      "exact": 0,
+      "unchecked": 1,
+      "marker": "rootNull",
+      "summary": "any",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 0,
+      "exact": 0,
+      "unchecked": 1,
+      "marker": "rootEmpty",
+      "summary": "any[]",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 0,
+      "exact": 1,
+      "unchecked": 0,
+      "marker": "nil",
+      "summary": "any",
+      "errorType": false,
+      "programDiagnostics": [
+        5052
+      ]
+    },
+    {
+      "strict": 0,
+      "exact": 1,
+      "unchecked": 0,
+      "marker": "empty",
+      "summary": "any[]",
+      "errorType": false,
+      "programDiagnostics": [
+        5052
+      ]
+    },
+    {
+      "strict": 0,
+      "exact": 1,
+      "unchecked": 0,
+      "marker": "empty0",
+      "summary": "any",
+      "errorType": false,
+      "programDiagnostics": [
+        5052
+      ]
+    },
+    {
+      "strict": 0,
+      "exact": 1,
+      "unchecked": 0,
+      "marker": "numbers0",
+      "summary": "number",
+      "errorType": false,
+      "programDiagnostics": [
+        5052
+      ]
+    },
+    {
+      "strict": 0,
+      "exact": 1,
+      "unchecked": 0,
+      "marker": "mixed0",
+      "summary": "string | number",
+      "errorType": false,
+      "programDiagnostics": [
+        5052
+      ]
+    },
+    {
+      "strict": 0,
+      "exact": 1,
+      "unchecked": 0,
+      "marker": "shapes",
+      "summary": "({ a: number; b?: never; } | { a?: never; b: string; })[]",
+      "errorType": false,
+      "programDiagnostics": [
+        5052
+      ]
+    },
+    {
+      "strict": 0,
+      "exact": 1,
+      "unchecked": 0,
+      "marker": "shapeA",
+      "summary": "number",
+      "errorType": false,
+      "programDiagnostics": [
+        5052
+      ]
+    },
+    {
+      "strict": 0,
+      "exact": 1,
+      "unchecked": 0,
+      "marker": "rootNull",
+      "summary": "any",
+      "errorType": false,
+      "programDiagnostics": [
+        5052
+      ]
+    },
+    {
+      "strict": 0,
+      "exact": 1,
+      "unchecked": 0,
+      "marker": "rootEmpty",
+      "summary": "any[]",
+      "errorType": false,
+      "programDiagnostics": [
+        5052
+      ]
+    },
+    {
+      "strict": 0,
+      "exact": 1,
+      "unchecked": 1,
+      "marker": "nil",
+      "summary": "any",
+      "errorType": false,
+      "programDiagnostics": [
+        5052
+      ]
+    },
+    {
+      "strict": 0,
+      "exact": 1,
+      "unchecked": 1,
+      "marker": "empty",
+      "summary": "any[]",
+      "errorType": false,
+      "programDiagnostics": [
+        5052
+      ]
+    },
+    {
+      "strict": 0,
+      "exact": 1,
+      "unchecked": 1,
+      "marker": "empty0",
+      "summary": "any",
+      "errorType": false,
+      "programDiagnostics": [
+        5052
+      ]
+    },
+    {
+      "strict": 0,
+      "exact": 1,
+      "unchecked": 1,
+      "marker": "numbers0",
+      "summary": "number",
+      "errorType": false,
+      "programDiagnostics": [
+        5052
+      ]
+    },
+    {
+      "strict": 0,
+      "exact": 1,
+      "unchecked": 1,
+      "marker": "mixed0",
+      "summary": "string | number",
+      "errorType": false,
+      "programDiagnostics": [
+        5052
+      ]
+    },
+    {
+      "strict": 0,
+      "exact": 1,
+      "unchecked": 1,
+      "marker": "shapes",
+      "summary": "({ a: number; b?: never; } | { a?: never; b: string; })[]",
+      "errorType": false,
+      "programDiagnostics": [
+        5052
+      ]
+    },
+    {
+      "strict": 0,
+      "exact": 1,
+      "unchecked": 1,
+      "marker": "shapeA",
+      "summary": "number",
+      "errorType": false,
+      "programDiagnostics": [
+        5052
+      ]
+    },
+    {
+      "strict": 0,
+      "exact": 1,
+      "unchecked": 1,
+      "marker": "rootNull",
+      "summary": "any",
+      "errorType": false,
+      "programDiagnostics": [
+        5052
+      ]
+    },
+    {
+      "strict": 0,
+      "exact": 1,
+      "unchecked": 1,
+      "marker": "rootEmpty",
+      "summary": "any[]",
+      "errorType": false,
+      "programDiagnostics": [
+        5052
+      ]
+    },
+    {
+      "strict": 1,
+      "exact": 0,
+      "unchecked": 0,
+      "marker": "nil",
+      "summary": "null",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 0,
+      "unchecked": 0,
+      "marker": "empty",
+      "summary": "never[]",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 0,
+      "unchecked": 0,
+      "marker": "empty0",
+      "summary": "never",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 0,
+      "unchecked": 0,
+      "marker": "numbers0",
+      "summary": "number",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 0,
+      "unchecked": 0,
+      "marker": "mixed0",
+      "summary": "string | number | null",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 0,
+      "unchecked": 0,
+      "marker": "shapes",
+      "summary": "({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 0,
+      "unchecked": 0,
+      "marker": "shapeA",
+      "summary": "number | undefined",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 0,
+      "unchecked": 0,
+      "marker": "rootNull",
+      "summary": "null",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 0,
+      "unchecked": 0,
+      "marker": "rootEmpty",
+      "summary": "never[]",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 0,
+      "unchecked": 1,
+      "marker": "nil",
+      "summary": "null",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 0,
+      "unchecked": 1,
+      "marker": "empty",
+      "summary": "never[]",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 0,
+      "unchecked": 1,
+      "marker": "empty0",
+      "summary": "undefined",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 0,
+      "unchecked": 1,
+      "marker": "numbers0",
+      "summary": "number | undefined",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 0,
+      "unchecked": 1,
+      "marker": "mixed0",
+      "summary": "string | number | null | undefined",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 0,
+      "unchecked": 1,
+      "marker": "shapes",
+      "summary": "({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 0,
+      "unchecked": 1,
+      "marker": "shapeA",
+      "summary": "number | undefined",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 0,
+      "unchecked": 1,
+      "marker": "rootNull",
+      "summary": "null",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 0,
+      "unchecked": 1,
+      "marker": "rootEmpty",
+      "summary": "never[]",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 1,
+      "unchecked": 0,
+      "marker": "nil",
+      "summary": "null",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 1,
+      "unchecked": 0,
+      "marker": "empty",
+      "summary": "never[]",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 1,
+      "unchecked": 0,
+      "marker": "empty0",
+      "summary": "never",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 1,
+      "unchecked": 0,
+      "marker": "numbers0",
+      "summary": "number",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 1,
+      "unchecked": 0,
+      "marker": "mixed0",
+      "summary": "string | number | null",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 1,
+      "unchecked": 0,
+      "marker": "shapes",
+      "summary": "({ a: number; b?: never; } | { a?: never; b: string; })[]",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 1,
+      "unchecked": 0,
+      "marker": "shapeA",
+      "summary": "number | undefined",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 1,
+      "unchecked": 0,
+      "marker": "rootNull",
+      "summary": "null",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 1,
+      "unchecked": 0,
+      "marker": "rootEmpty",
+      "summary": "never[]",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 1,
+      "unchecked": 1,
+      "marker": "nil",
+      "summary": "null",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 1,
+      "unchecked": 1,
+      "marker": "empty",
+      "summary": "never[]",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 1,
+      "unchecked": 1,
+      "marker": "empty0",
+      "summary": "undefined",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 1,
+      "unchecked": 1,
+      "marker": "numbers0",
+      "summary": "number | undefined",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 1,
+      "unchecked": 1,
+      "marker": "mixed0",
+      "summary": "string | number | null | undefined",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 1,
+      "unchecked": 1,
+      "marker": "shapes",
+      "summary": "({ a: number; b?: never; } | { a?: never; b: string; })[]",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 1,
+      "unchecked": 1,
+      "marker": "shapeA",
+      "summary": "number | undefined",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 1,
+      "unchecked": 1,
+      "marker": "rootNull",
+      "summary": "null",
+      "errorType": false,
+      "programDiagnostics": []
+    },
+    {
+      "strict": 1,
+      "exact": 1,
+      "unchecked": 1,
+      "marker": "rootEmpty",
+      "summary": "never[]",
+      "errorType": false,
+      "programDiagnostics": []
+    }
+  ],
+  "keys": [
+    {
+      "spelling": "\"dup\"",
+      "nth": 0,
+      "name": "dup",
+      "symbolFlags": 4,
+      "summary": "{ old: number; }",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "PropertyAssignment",
+          "start": {
+            "line": 10,
+            "column": 29
+          },
+          "end": {
+            "line": 10,
+            "column": 34
+          },
+          "raw": "\"dup\""
+        },
+        {
+          "kind": "PropertyAssignment",
+          "start": {
+            "line": 10,
+            "column": 48
+          },
+          "end": {
+            "line": 10,
+            "column": 53
+          },
+          "raw": "\"dup\""
+        }
+      ]
+    },
+    {
+      "spelling": "\"dup\"",
+      "nth": 1,
+      "name": "dup",
+      "symbolFlags": 4,
+      "summary": "{ old: number; }",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "PropertyAssignment",
+          "start": {
+            "line": 10,
+            "column": 29
+          },
+          "end": {
+            "line": 10,
+            "column": 34
+          },
+          "raw": "\"dup\""
+        },
+        {
+          "kind": "PropertyAssignment",
+          "start": {
+            "line": 10,
+            "column": 48
+          },
+          "end": {
+            "line": 10,
+            "column": 53
+          },
+          "raw": "\"dup\""
+        }
+      ]
+    },
+    {
+      "spelling": "\"dup\"",
+      "nth": 2,
+      "name": "dup",
+      "symbolFlags": 4,
+      "summary": "string",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "PropertyAssignment",
+          "start": {
+            "line": 11,
+            "column": 3
+          },
+          "end": {
+            "line": 11,
+            "column": 8
+          },
+          "raw": "\"dup\""
+        },
+        {
+          "kind": "PropertyAssignment",
+          "start": {
+            "line": 12,
+            "column": 3
+          },
+          "end": {
+            "line": 12,
+            "column": 8
+          },
+          "raw": "\"dup\""
+        }
+      ]
+    },
+    {
+      "spelling": "\"dup\"",
+      "nth": 3,
+      "name": "dup",
+      "symbolFlags": 4,
+      "summary": "string",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "PropertyAssignment",
+          "start": {
+            "line": 11,
+            "column": 3
+          },
+          "end": {
+            "line": 11,
+            "column": 8
+          },
+          "raw": "\"dup\""
+        },
+        {
+          "kind": "PropertyAssignment",
+          "start": {
+            "line": 12,
+            "column": 3
+          },
+          "end": {
+            "line": 12,
+            "column": 8
+          },
+          "raw": "\"dup\""
+        }
+      ]
+    },
+    {
+      "spelling": "\"a\"",
+      "nth": 1,
+      "name": "a",
+      "symbolFlags": 4,
+      "summary": "string",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "PropertyAssignment",
+          "start": {
+            "line": 13,
+            "column": 3
+          },
+          "end": {
+            "line": 13,
+            "column": 6
+          },
+          "raw": "\"a\""
+        },
+        {
+          "kind": "PropertyAssignment",
+          "start": {
+            "line": 14,
+            "column": 3
+          },
+          "end": {
+            "line": 14,
+            "column": 11
+          },
+          "raw": "\"\\u0061\""
+        }
+      ]
+    },
+    {
+      "spelling": "\"\\u0061\"",
+      "nth": 0,
+      "name": "a",
+      "symbolFlags": 4,
+      "summary": "string",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "PropertyAssignment",
+          "start": {
+            "line": 13,
+            "column": 3
+          },
+          "end": {
+            "line": 13,
+            "column": 6
+          },
+          "raw": "\"a\""
+        },
+        {
+          "kind": "PropertyAssignment",
+          "start": {
+            "line": 14,
+            "column": 3
+          },
+          "end": {
+            "line": 14,
+            "column": 11
+          },
+          "raw": "\"\\u0061\""
+        }
+      ]
+    },
+    {
+      "spelling": "\"\"",
+      "nth": 0,
+      "name": "",
+      "symbolFlags": 4,
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "PropertyAssignment",
+          "start": {
+            "line": 15,
+            "column": 3
+          },
+          "end": {
+            "line": 15,
+            "column": 5
+          },
+          "raw": "\"\""
+        }
+      ]
+    },
+    {
+      "spelling": "\"01\"",
+      "nth": 0,
+      "name": "01",
+      "symbolFlags": 4,
+      "summary": "string",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "PropertyAssignment",
+          "start": {
+            "line": 16,
+            "column": 3
+          },
+          "end": {
+            "line": 16,
+            "column": 7
+          },
+          "raw": "\"01\""
+        }
+      ]
+    },
+    {
+      "spelling": "\"1\"",
+      "nth": 0,
+      "name": "1",
+      "symbolFlags": 4,
+      "summary": "boolean",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "PropertyAssignment",
+          "start": {
+            "line": 17,
+            "column": 3
+          },
+          "end": {
+            "line": 17,
+            "column": 6
+          },
+          "raw": "\"1\""
+        }
+      ]
+    },
+    {
+      "spelling": "\"😀\"",
+      "nth": 0,
+      "name": "😀",
+      "symbolFlags": 4,
+      "summary": "boolean",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "PropertyAssignment",
+          "start": {
+            "line": 18,
+            "column": 3
+          },
+          "end": {
+            "line": 18,
+            "column": 7
+          },
+          "raw": "\"😀\""
+        }
+      ]
+    }
+  ],
+  "uses": [
+    {
+      "marker": "memberDup",
+      "name": "dup",
+      "symbolFlags": 33554436
+    },
+    {
+      "marker": "memberEscaped",
+      "name": "a",
+      "symbolFlags": 33554436
+    },
+    {
+      "marker": "memberEmpty",
+      "name": "",
+      "symbolFlags": 33554436
+    },
+    {
+      "marker": "memberNumber",
+      "name": "1",
+      "symbolFlags": 33554436
+    }
+  ],
+  "recoveryControl": [
+    {
+      "unchecked": 0,
+      "summary": "number | undefined",
+      "errorType": false,
+      "diagnostics": []
+    },
+    {
+      "unchecked": 1,
+      "summary": "number | undefined",
+      "errorType": false,
+      "diagnostics": [
+        2532
+      ]
+    }
+  ]
+}

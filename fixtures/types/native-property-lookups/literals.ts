@@ -1,0 +1,14 @@
+export const numeric0 = 2.98023223876953125e-8;
+export const numeric1 = 2.109808898695963e16;
+export const numeric2 = 0;
+export const numeric3 = 0.0;
+export const numeric4 = 5e-324;
+export const numeric5 = 1e-400;
+export const numeric6 = 1e-7;
+export const numeric7 = 1e-6;
+export const numeric8 = 1e20;
+export const numeric9 = 1e21;
+export const numeric10 = 9007199254740991;
+export const numeric11 = 9007199254740993;
+export const numeric12 = 1.7976931348623157e308;
+export const numeric13 = 1e309;

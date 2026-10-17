@@ -1,0 +1,17 @@
+export {};
+declare function /*#empty*/empty(...args: []): void;
+declare function /*#plain*/plain(...args: [number, string]): void;
+declare function /*#labeled*/labeled(...args: [left: number, right: string]): void;
+declare function /*#optional*/optional(...args: [left: number, right?: string]): void;
+declare function /*#rest*/rest(...args: [head: number, ...tail: string[]]): void;
+declare function /*#array*/array(...args: number[]): void;
+declare function /*#union*/union(...args: [number] | [string, boolean]): void;
+declare function /*#duplicate*/duplicate(...args: [x: number, x: string]): void;
+declare function /*#collision*/collision(...args: [x: number, x: string, x_1: boolean]): void;
+declare function /*#repeated*/repeated(...args: [x: number, x: string, x: boolean]): void;
+const /*#binding*/binding = (...[value]: [number]) => value;
+const /*#omitted*/omitted = (...[, value]: [number, string]) => value;
+const /*#nested*/nested = (...[{ value }]: [{ value: number }]) => value;
+declare function /*#prefix*/prefix(before: boolean, ...args: [value: number]): void;
+declare function /*#variadicEnd*/variadicEnd<T extends unknown[]>(...args: [number, ...T]): void;
+declare function /*#variadicMiddle*/variadicMiddle<T extends unknown[]>(...args: [...T, number]): void;

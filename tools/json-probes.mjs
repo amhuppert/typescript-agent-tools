@@ -43,6 +43,7 @@ import { spawnSync } from 'node:child_process';
 import { isDeepStrictEqual } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { loadSemanticApi, lineStarts, position } from './semantic-oracle.mjs';
+import { sourceText } from './navigation-oracle.mjs';
 
 export const FIXTURES = fileURLToPath(new URL('../fixtures/json-probes/', import.meta.url));
 
@@ -94,7 +95,7 @@ function probe(semantic, api, root, spec, config) {
     const at = (fileName, offset) => {
       let starts = lines.get(fileName);
       if (!starts) {
-        const text = fs.readFileSync(fileName, 'utf8').replace(/^\uFEFF/, '');
+        const text = sourceText(fileName);
         lines.set(fileName, starts = lineStarts(text));
       }
       const { line, column } = position(starts, offset);

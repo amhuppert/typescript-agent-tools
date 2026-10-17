@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noLib": true,
+    "noCheck": true
+  },
+  "files": [
+    "cases.ts"
+  ]
+}

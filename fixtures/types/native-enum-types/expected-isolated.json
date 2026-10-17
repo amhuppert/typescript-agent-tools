@@ -1,0 +1,326 @@
+[
+  {
+    "name": "numericDeclaration",
+    "kind": "declared",
+    "summary": "Numeric",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "numericConst",
+    "kind": "value",
+    "summary": "Numeric.One",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "numericLet",
+    "kind": "value",
+    "summary": "Numeric",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "numericObject",
+    "kind": "value",
+    "summary": "typeof Numeric",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "oneMember",
+    "kind": "value",
+    "summary": "One.Only",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "oneDeclaration",
+    "kind": "declared",
+    "summary": "OneNamed",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "duplicateValues",
+    "kind": "declared",
+    "summary": "Duplicate",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "stringDeclaration",
+    "kind": "declared",
+    "summary": "Words",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "stringMember",
+    "kind": "value",
+    "summary": "Words.First",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "quotedMember",
+    "kind": "value",
+    "summary": "(typeof Quoted)[\"not-key\"]",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "emptyDeclaration",
+    "kind": "declared",
+    "summary": "Empty",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "emptyObject",
+    "kind": "value",
+    "summary": "typeof Empty",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "computedDeclaration",
+    "kind": "declared",
+    "summary": "Computed",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "computedFresh",
+    "kind": "value",
+    "summary": "Computed.First",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "computedWidened",
+    "kind": "value",
+    "summary": "Computed",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "afterComputed",
+    "kind": "declared",
+    "summary": "AfterComputed",
+    "errorType": false,
+    "codes": [
+      1061
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "ambientDeclaration",
+    "kind": "declared",
+    "summary": "Ambient",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "ambientConst",
+    "kind": "declared",
+    "summary": "AmbientConst",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "constValues",
+    "kind": "declared",
+    "summary": "ConstValues",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "localReferences",
+    "kind": "declared",
+    "summary": "Local",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "laterReference",
+    "kind": "declared",
+    "summary": "Later",
+    "errorType": false,
+    "codes": [
+      2651
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "selfReference",
+    "kind": "declared",
+    "summary": "Self",
+    "errorType": false,
+    "codes": [
+      2565
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "foreignReference",
+    "kind": "declared",
+    "summary": "ForeignReference",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "externalConstants",
+    "kind": "declared",
+    "summary": "ExternalConstants",
+    "errorType": false,
+    "codes": [
+      18056,
+      18055
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "constantArithmetic",
+    "kind": "declared",
+    "summary": "Arithmetic",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "specialNumbers",
+    "kind": "declared",
+    "summary": "SpecialNumbers",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "computedBadType",
+    "kind": "declared",
+    "summary": "BadComputed",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "constSkipsBadType",
+    "kind": "declared",
+    "summary": "ConstSkipped",
+    "errorType": false,
+    "codes": [
+      2474
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "ambientSkipsBadType",
+    "kind": "declared",
+    "summary": "AmbientSkipped",
+    "errorType": false,
+    "codes": [
+      1066
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "badThenLater",
+    "kind": "declared",
+    "summary": "BadThenLater",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "mergedFirst",
+    "kind": "declared",
+    "summary": "Merged",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "namespaceMerge",
+    "kind": "declared",
+    "summary": "Augmented",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "augmentedObject",
+    "kind": "value",
+    "summary": "typeof Augmented",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "arrayWidening",
+    "kind": "value",
+    "summary": "(Numeric | Words)[]",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "objectWidening",
+    "kind": "value",
+    "summary": "{ number: Numeric; text: Words; }",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "readonlyPreserves",
+    "kind": "value",
+    "summary": "{ readonly member: Numeric.One; }",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "literalAssignable",
+    "kind": "value",
+    "summary": "\"enum\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "literalMismatch",
+    "kind": "value",
+    "summary": "never",
+    "errorType": false,
+    "codes": [
+      2769
+    ],
+    "demandFailures": []
+  }
+]

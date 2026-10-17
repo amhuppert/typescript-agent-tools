@@ -1,0 +1,115 @@
+[
+  {
+    "name": "manyDisplays",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "first"
+    }
+  },
+  {
+    "name": "accessorDisplays",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304,
+      2304,
+      2367
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "p"
+    }
+  },
+  {
+    "name": "healthyAccessor",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2367
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "anyAccessor",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2367
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "missingRead",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304,
+      2367
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "p"
+    }
+  },
+  {
+    "name": "missingWrite",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304,
+      2367
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "q"
+    }
+  },
+  {
+    "name": "ordinary",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304,
+      2367
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "p"
+    }
+  },
+  {
+    "name": "healthyAfter",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  }
+]

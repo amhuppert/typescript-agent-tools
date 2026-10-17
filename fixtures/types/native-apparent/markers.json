@@ -1,0 +1,12 @@
+[
+  "string",
+  "number",
+  "boolean",
+  "bigint",
+  "symbol",
+  "stringLiteral",
+  "numberLiteral",
+  "booleanLiteral",
+  "bigintLiteral",
+  "constrained"
+]

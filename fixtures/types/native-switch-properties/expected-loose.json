@@ -1,0 +1,479 @@
+[
+  {
+    "name": "smallAll",
+    "summary": "Small",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "smallCase",
+    "summary": "{ kind: \"a\"; value: number; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "smallDefault",
+    "summary": "{ kind: \"b\"; value: string; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "smallDefaultGrouped",
+    "summary": "Small",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "smallJoined",
+    "summary": "Small",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "smallImplicit",
+    "summary": "{ kind: \"b\"; value: string; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "nineAll",
+    "summary": "Nine",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "nineCase",
+    "summary": "{ kind: \"k0\"; value: 0; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "tenAll",
+    "summary": "{ kind: \"k0\"; value: 0; } | { kind: \"k1\"; value: 1; } | { kind: \"k2\"; value: 2; } | { kind: \"k3\"; value: 3; } | { kind: \"k4\"; value: 4; } | { kind: \"k5\"; value: 5; } | { kind: \"k6\"; value: 6; } | { kind: \"k7\"; value: 7; } | { ...; } | { ...; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "tenCase",
+    "summary": "{ kind: \"k0\"; value: 0; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "elevenAll",
+    "summary": "{ kind: \"k0\"; value: 0; } | { kind: \"k1\"; value: 1; } | { kind: \"k2\"; value: 2; } | { kind: \"k3\"; value: 3; } | { kind: \"k4\"; value: 4; } | { kind: \"k5\"; value: 5; } | { kind: \"k6\"; value: 6; } | { kind: \"k7\"; value: 7; } | { ...; } | { ...; } | { ...; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "elevenCase",
+    "summary": "{ kind: \"k0\"; value: 0; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "tenGroup",
+    "summary": "{ kind: \"k0\"; value: 0; } | { kind: \"k1\"; value: 1; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "tenAbsent",
+    "summary": "never",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "tenDefault",
+    "summary": "{ kind: \"k1\"; value: 1; } | { kind: \"k2\"; value: 2; } | { kind: \"k3\"; value: 3; } | { kind: \"k4\"; value: 4; } | { kind: \"k5\"; value: 5; } | { kind: \"k6\"; value: 6; } | { kind: \"k7\"; value: 7; } | { kind: \"k8\"; value: 8; } | { ...; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "tenGroupedDefault",
+    "summary": "Ten",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "otherKey",
+    "summary": "OtherKey",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "duplicateKey",
+    "summary": "{ kind: \"k0\"; value: 0; } | { kind: \"k0\"; value: \"duplicate\"; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "unionKey",
+    "summary": "{ kind: \"k0\" | \"z0\"; value: 0; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "emptyName",
+    "summary": "EmptyKey",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "bracket",
+    "summary": "{ kind: \"k0\"; value: 0; } | { kind: \"k1\"; value: 1; } | { kind: \"k2\"; value: 2; } | { kind: \"k3\"; value: 3; } | { kind: \"k4\"; value: 4; } | { kind: \"k5\"; value: 5; } | { kind: \"k6\"; value: 6; } | { kind: \"k7\"; value: 7; } | { ...; } | { ...; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "escapedName",
+    "summary": "{ kind: \"k0\"; value: 0; } | { kind: \"k1\"; value: 1; } | { kind: \"k2\"; value: 2; } | { kind: \"k3\"; value: 3; } | { kind: \"k4\"; value: 4; } | { kind: \"k5\"; value: 5; } | { kind: \"k6\"; value: 6; } | { kind: \"k7\"; value: 7; } | { ...; } | { ...; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "constantName",
+    "summary": "{ kind: \"k0\"; value: 0; } | { kind: \"k1\"; value: 1; } | { kind: \"k2\"; value: 2; } | { kind: \"k3\"; value: 3; } | { kind: \"k4\"; value: 4; } | { kind: \"k5\"; value: 5; } | { kind: \"k6\"; value: 6; } | { kind: \"k7\"; value: 7; } | { ...; } | { ...; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "optionalAll",
+    "summary": "{ kind: \"k0\"; value: 0; } | { kind: \"k1\"; value: 1; } | { kind: \"k2\"; value: 2; } | { kind: \"k3\"; value: 3; } | { kind: \"k4\"; value: 4; } | { kind: \"k5\"; value: 5; } | { kind: \"k6\"; value: 6; } | { kind: \"k7\"; value: 7; } | { ...; } | { ...; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "optionalDefault",
+    "summary": "Ten",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "optionalUndefined",
+    "summary": "Ten",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "alreadyNarrowed",
+    "summary": "{ kind: \"k0\"; value: 0; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "genericProperty",
+    "summary": "{ kind: T; value: number; } | { kind: \"b\"; value: string; }",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "caseRecovery",
+    "summary": "{ kind: \"k0\"; value: 0; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [
+      {
+        "name": "caseFirst",
+        "errorType": true
+      },
+      {
+        "name": "caseSecond",
+        "errorType": true
+      }
+    ],
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "groupRecovery",
+    "summary": "Ten",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [
+      {
+        "name": "groupFirst",
+        "errorType": true
+      },
+      {
+        "name": "groupSecond",
+        "errorType": true
+      }
+    ],
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "defaultRecovery",
+    "summary": "Ten",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [
+      {
+        "name": "defaultFirst",
+        "errorType": true
+      },
+      {
+        "name": "defaultSecond",
+        "errorType": true
+      }
+    ],
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "smallRecovery",
+    "summary": "Small",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [
+      {
+        "name": "smallFirst",
+        "errorType": true
+      },
+      {
+        "name": "smallSecond",
+        "errorType": true
+      }
+    ],
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "unrelatedSkips",
+    "summary": "Small",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "dynamicNameSkips",
+    "summary": "Ten",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "emptyNameRecovery",
+    "summary": "EmptyKey",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [
+      {
+        "name": "emptyFirst",
+        "errorType": true
+      },
+      {
+        "name": "emptySecond",
+        "errorType": true
+      }
+    ],
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "noiseNine",
+    "summary": "NoiseNine",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "noiseTen",
+    "summary": "Noise0 | Noise1 | Noise2 | Noise3 | Noise4 | Noise5 | Noise6 | Noise7 | Noise8 | Noise9",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "noiseEleven",
+    "summary": "Noise0 | Noise1 | Noise10 | Noise2 | Noise3 | Noise4 | Noise5 | Noise6 | Noise7 | Noise8 | Noise9",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "keyBeforeCases",
+    "summary": "Noise0",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [
+      {
+        "name": "keyFirst",
+        "errorType": true
+      },
+      {
+        "name": "keySecond",
+        "errorType": true
+      }
+    ],
+    "codes": [
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "emptyNameSkipsMap",
+    "summary": "EmptyTenNoise",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  }
+]

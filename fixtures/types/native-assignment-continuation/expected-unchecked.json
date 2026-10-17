@@ -1,0 +1,772 @@
+[
+  {
+    "name": "propertyHealthy",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "assignments": []
+  },
+  {
+    "name": "propertyRecovery",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "end": 825,
+        "event": "defaultEnter",
+        "inputAny": true,
+        "inputError": false,
+        "pos": 813
+      },
+      {
+        "end": 825,
+        "errorType": true,
+        "event": "defaultExit",
+        "pos": 813,
+        "resultAny": true,
+        "sameInput": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": false,
+        "sameDeclared": true
+      }
+    ]
+  },
+  {
+    "name": "indexRecovery",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "end": 970,
+        "event": "defaultEnter",
+        "inputAny": true,
+        "inputError": true,
+        "pos": 958
+      },
+      {
+        "end": 970,
+        "errorType": true,
+        "event": "defaultExit",
+        "pos": 958,
+        "resultAny": true,
+        "sameInput": true
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": false,
+        "sameDeclared": true
+      }
+    ]
+  },
+  {
+    "name": "absentRecovery",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "end": 1112,
+        "event": "defaultEnter",
+        "inputAny": true,
+        "inputError": true,
+        "pos": 1100
+      },
+      {
+        "end": 1112,
+        "errorType": true,
+        "event": "defaultExit",
+        "pos": 1100,
+        "resultAny": true,
+        "sameInput": true
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": false,
+        "sameDeclared": true
+      }
+    ]
+  },
+  {
+    "name": "unusableKeyRecovery",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [
+      2304,
+      2464
+    ],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "end": 1261,
+        "event": "defaultEnter",
+        "inputAny": true,
+        "inputError": true,
+        "pos": 1249
+      },
+      {
+        "end": 1261,
+        "errorType": true,
+        "event": "defaultExit",
+        "pos": 1249,
+        "resultAny": true,
+        "sameInput": true
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": false,
+        "sameDeclared": true
+      }
+    ]
+  },
+  {
+    "name": "shorthandRecovery",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "end": 1406,
+        "event": "defaultEnter",
+        "inputAny": true,
+        "inputError": false,
+        "pos": 1394
+      },
+      {
+        "end": 1406,
+        "errorType": true,
+        "event": "defaultExit",
+        "pos": 1394,
+        "resultAny": true,
+        "sameInput": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": false,
+        "sameDeclared": true
+      }
+    ]
+  },
+  {
+    "name": "tupleHealthy",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "assignments": []
+  },
+  {
+    "name": "tupleRecovery",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "end": 1659,
+        "event": "defaultEnter",
+        "inputAny": true,
+        "inputError": true,
+        "pos": 1647
+      },
+      {
+        "end": 1659,
+        "errorType": true,
+        "event": "defaultExit",
+        "pos": 1647,
+        "resultAny": true,
+        "sameInput": true
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": false,
+        "sameDeclared": true
+      }
+    ]
+  },
+  {
+    "name": "nestedRecovery",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": false,
+        "sameDeclared": true
+      }
+    ]
+  },
+  {
+    "name": "tupleDefaultHealthy",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "end": 1936,
+        "event": "defaultEnter",
+        "inputAny": false,
+        "inputError": false,
+        "pos": 1928
+      },
+      {
+        "end": 1936,
+        "errorType": false,
+        "event": "defaultExit",
+        "pos": 1928,
+        "resultAny": false,
+        "sameInput": true
+      }
+    ]
+  },
+  {
+    "name": "tupleOutOfBounds",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "end": 2077,
+        "event": "defaultEnter",
+        "inputAny": false,
+        "inputError": false,
+        "pos": 2065
+      },
+      {
+        "end": 2077,
+        "errorType": true,
+        "event": "defaultExit",
+        "pos": 2065,
+        "resultAny": true,
+        "sameInput": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": false,
+        "sameDeclared": true
+      }
+    ]
+  },
+  {
+    "name": "tupleRestElement",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": false,
+        "sameDeclared": true
+      }
+    ]
+  },
+  {
+    "name": "arrayLikeProperty",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "assignments": []
+  },
+  {
+    "name": "iterationRecovery",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "end": 2644,
+        "event": "defaultEnter",
+        "inputAny": true,
+        "inputError": true,
+        "pos": 2632
+      },
+      {
+        "end": 2644,
+        "errorType": true,
+        "event": "defaultExit",
+        "pos": 2632,
+        "resultAny": true,
+        "sameInput": true
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": false,
+        "sameDeclared": true
+      }
+    ]
+  },
+  {
+    "name": "actualAny",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": false,
+        "sameDeclared": true
+      }
+    ]
+  },
+  {
+    "name": "assignedNever",
+    "kind": "expression",
+    "summary": "never",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "assignments": []
+  },
+  {
+    "name": "assignedIdentity",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "assignments": []
+  },
+  {
+    "name": "incompatibleAssignment",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": false,
+        "sameDeclared": true
+      }
+    ]
+  },
+  {
+    "name": "freshBoolean",
+    "kind": "expression",
+    "summary": "true",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": true,
+        "sameDeclared": false
+      }
+    ]
+  },
+  {
+    "name": "regularBoolean",
+    "kind": "expression",
+    "summary": "true",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": true,
+        "sameDeclared": false
+      }
+    ]
+  },
+  {
+    "name": "scalarSkipsAssignment",
+    "kind": "expression",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "assignments": []
+  },
+  {
+    "name": "forInAssignment",
+    "kind": "expression",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": true,
+        "sameDeclared": false
+      }
+    ]
+  },
+  {
+    "name": "forOfAssignment",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "assignments": []
+  },
+  {
+    "name": "bindingInitialHealthy",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "assignments": []
+  },
+  {
+    "name": "bindingInitialRecovery",
+    "kind": "expression",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "end": 3974,
+        "event": "defaultEnter",
+        "inputAny": true,
+        "inputError": true,
+        "pos": 3962
+      },
+      {
+        "end": 3974,
+        "errorType": true,
+        "event": "defaultExit",
+        "pos": 3962,
+        "resultAny": true,
+        "sameInput": true
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": false,
+        "sameDeclared": true
+      }
+    ]
+  },
+  {
+    "name": "reductionCold",
+    "kind": "expression",
+    "summary": "Left | Right",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": false,
+        "sameDeclared": true
+      }
+    ]
+  },
+  {
+    "name": "reductionWarm",
+    "kind": "value",
+    "summary": "Left | Right",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304,
+      2695
+    ],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": false,
+        "sameDeclared": true
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": true
+      }
+    ]
+  },
+  {
+    "name": "reductionWarmReverse",
+    "kind": "value",
+    "summary": "Left | Right",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304,
+      2695
+    ],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": false,
+        "sameDeclared": true
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": true
+      }
+    ]
+  },
+  {
+    "name": "healthyReductionWarm",
+    "kind": "value",
+    "summary": "HealthyLeft | HealthyRight",
+    "errorType": false,
+    "codes": [
+      2695
+    ],
+    "demandFailures": [],
+    "assignments": [
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": false
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "errorType": false,
+        "event": "installed",
+        "sameAssigned": false,
+        "sameDeclared": true
+      },
+      {
+        "assigned": 2,
+        "declared": 1,
+        "event": "lookup",
+        "hit": true
+      }
+    ]
+  }
+]

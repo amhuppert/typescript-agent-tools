@@ -1,0 +1,4 @@
+{
+  "compilerOptions": { "noLib": true, "strict": true },
+  "files": ["types.ts"]
+}

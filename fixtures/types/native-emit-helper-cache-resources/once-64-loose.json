@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "strict": false,
+    "strictNullChecks": false,
+    "noCheck": false,
+    "noLib": true,
+    "types": [],
+    "target": "ES2015",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "importHelpers": true
+  },
+  "files": [
+    "globals.d.ts",
+    "helpers.d.ts",
+    "once-64-main.ts"
+  ]
+}

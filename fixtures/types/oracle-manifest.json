@@ -1,0 +1,2804 @@
+{
+  "schema": 1,
+  "checkpoint1": "open",
+  "compiler": {
+    "version": "7.0.2",
+    "upstream": {
+      "repository": "https://github.com/microsoft/typescript-go",
+      "tag": "typescript/v7.0.2",
+      "commit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "libraries": "internal/bundled/libs",
+      "catalog": "internal/tsoptions/enummaps.go",
+      "catalogSha256": "c6180edebdce2a483ea399891c6a6efcc30ad75c63137a7d695353f8033eaf48"
+    },
+    "nativeBinarySha256": "76e4987d060ef8207875a53a73619ce665ff16fb2800c0d57a452e21c829bd7b",
+    "nativePackageManifestSha256": "fb2abc0b67bb0f4e51867175eda95e87cdc464b253d405e2be55bc92a100a35d",
+    "apiPackageManifestSha256": "3722b30210616a13a3213ded11575ba6b2dbab10c32a5ef67afca8513e27017e",
+    "goModuleLocks": [
+      {
+        "file": "go.mod",
+        "bytes": 788,
+        "sha256": "8b2c958ea48d9e64a9f2cc960625085e6f220c6679570db78db9cf5114c368c2"
+      },
+      {
+        "file": "go.sum",
+        "bytes": 2871,
+        "sha256": "f56e1eb56cc1f61c3801f862a4afa26f4b43295436eb405228bedb0f7e707468"
+      }
+    ],
+    "libraryProvenance": {
+      "file": "vendor/typescript-7.0.2-lib/provenance.json",
+      "bytes": 17135,
+      "sha256": "5ae396490672e400b746175d7194a2b1b04df32511cab76b78849791cae96273"
+    }
+  },
+  "configurations": [
+    {
+      "file": "fixtures/types/call-targets/tsconfig.json",
+      "sourceSha256": "bebed0980bdc96ea952af047248fc1d66e3bf9d7d791ce621e8c5b1a70b0148d",
+      "compilerOptions": {
+        "experimentalDecorators": true,
+        "module": 99,
+        "noEmit": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/call-targets/tsconfig.json"
+      }
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/tsconfig.json",
+      "sourceSha256": "e6585adb664bcb54e75feb77a3bd801f4b4d3982d7926f071e628fc3bcc2e233",
+      "compilerOptions": {
+        "jsx": 1,
+        "module": 99,
+        "moduleResolution": 100,
+        "noEmit": true,
+        "resolveJsonModule": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/candidate-inventory/tsconfig.json"
+      }
+    },
+    {
+      "file": "fixtures/types/compiler-limits/tsconfig.json",
+      "sourceSha256": "8a77b692b7a1d7446027a8635200aeff4e48aa483f7ad48e4c286271caa8c4a6",
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/compiler-limits/tsconfig.json"
+      }
+    },
+    {
+      "file": "fixtures/types/input-replay/base.json",
+      "sourceSha256": "aa27eb3901c19d4a4218abb9fabd8914289036459b58ff1c41bda2b55fcf0539",
+      "compilerOptions": {
+        "module": 199,
+        "moduleResolution": 99,
+        "noEmit": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/input-replay/base.json"
+      }
+    },
+    {
+      "file": "fixtures/types/input-replay/tsconfig.json",
+      "sourceSha256": "261f8a1f54c1f792e9c275217ce858c27bfc198c1446825b12cbdaf0f59d9580",
+      "compilerOptions": {
+        "module": 199,
+        "moduleResolution": 99,
+        "noEmit": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/input-replay/tsconfig.json"
+      }
+    },
+    {
+      "file": "fixtures/types/json-types/strict-0-exact-0-unchecked-0.json",
+      "sourceSha256": "c5f00e00664834a2c64e60a50d66f6811e2ab2237b345e68167dbd7d507d3b9e",
+      "compilerOptions": {
+        "exactOptionalPropertyTypes": false,
+        "module": 99,
+        "moduleResolution": 100,
+        "noEmit": true,
+        "noUncheckedIndexedAccess": false,
+        "resolveJsonModule": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "target": 99,
+        "esModuleInterop": true,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-types/strict-0-exact-0-unchecked-0.json"
+      }
+    },
+    {
+      "file": "fixtures/types/json-types/strict-0-exact-0-unchecked-1.json",
+      "sourceSha256": "e5e905574fea7ed1d1008ed06677d0addf4832ef6b805e17ac5a525c3aefdf48",
+      "compilerOptions": {
+        "exactOptionalPropertyTypes": false,
+        "module": 99,
+        "moduleResolution": 100,
+        "noEmit": true,
+        "noUncheckedIndexedAccess": true,
+        "resolveJsonModule": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "target": 99,
+        "esModuleInterop": true,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-types/strict-0-exact-0-unchecked-1.json"
+      }
+    },
+    {
+      "file": "fixtures/types/json-types/strict-0-exact-1-unchecked-0.json",
+      "sourceSha256": "3e327522a479711e6e2963ba8c3a539ece52fbd98856e473100672ea90312ec4",
+      "compilerOptions": {
+        "exactOptionalPropertyTypes": true,
+        "module": 99,
+        "moduleResolution": 100,
+        "noEmit": true,
+        "noUncheckedIndexedAccess": false,
+        "resolveJsonModule": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "target": 99,
+        "esModuleInterop": true,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-types/strict-0-exact-1-unchecked-0.json"
+      }
+    },
+    {
+      "file": "fixtures/types/json-types/strict-0-exact-1-unchecked-1.json",
+      "sourceSha256": "0c8fe39ce486c5c5f241be482d8df54e29baedc477279a71eb6b7067ee3d6bf1",
+      "compilerOptions": {
+        "exactOptionalPropertyTypes": true,
+        "module": 99,
+        "moduleResolution": 100,
+        "noEmit": true,
+        "noUncheckedIndexedAccess": true,
+        "resolveJsonModule": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "target": 99,
+        "esModuleInterop": true,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-types/strict-0-exact-1-unchecked-1.json"
+      }
+    },
+    {
+      "file": "fixtures/types/json-types/strict-1-exact-0-unchecked-0.json",
+      "sourceSha256": "b8d2e9f6f4f5198191fb7ebe59fc22d759e587491294ee3948282a53a9c365cc",
+      "compilerOptions": {
+        "exactOptionalPropertyTypes": false,
+        "module": 99,
+        "moduleResolution": 100,
+        "noEmit": true,
+        "noUncheckedIndexedAccess": false,
+        "resolveJsonModule": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "target": 99,
+        "esModuleInterop": true,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-types/strict-1-exact-0-unchecked-0.json"
+      }
+    },
+    {
+      "file": "fixtures/types/json-types/strict-1-exact-0-unchecked-1.json",
+      "sourceSha256": "ba7110c5a2f6be2967f66349b0260d3e522aad02476c38c2e7c572998f97aaec",
+      "compilerOptions": {
+        "exactOptionalPropertyTypes": false,
+        "module": 99,
+        "moduleResolution": 100,
+        "noEmit": true,
+        "noUncheckedIndexedAccess": true,
+        "resolveJsonModule": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "target": 99,
+        "esModuleInterop": true,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-types/strict-1-exact-0-unchecked-1.json"
+      }
+    },
+    {
+      "file": "fixtures/types/json-types/strict-1-exact-1-unchecked-0.json",
+      "sourceSha256": "41cbe1ebbae50b744974ef36b3bad96d7c7579c17e5d7471ead50b2bebb7fb70",
+      "compilerOptions": {
+        "exactOptionalPropertyTypes": true,
+        "module": 99,
+        "moduleResolution": 100,
+        "noEmit": true,
+        "noUncheckedIndexedAccess": false,
+        "resolveJsonModule": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "target": 99,
+        "esModuleInterop": true,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-types/strict-1-exact-1-unchecked-0.json"
+      }
+    },
+    {
+      "file": "fixtures/types/json-types/strict-1-exact-1-unchecked-1.json",
+      "sourceSha256": "719d2f1ae3c4b815cd78027cdc386d45ae8e4156949ac8f9fc394cb07cef627e",
+      "compilerOptions": {
+        "exactOptionalPropertyTypes": true,
+        "module": 99,
+        "moduleResolution": 100,
+        "noEmit": true,
+        "noUncheckedIndexedAccess": true,
+        "resolveJsonModule": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "target": 99,
+        "esModuleInterop": true,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-types/strict-1-exact-1-unchecked-1.json"
+      }
+    },
+    {
+      "file": "fixtures/types/json-types/tsconfig.json",
+      "sourceSha256": "73ee26adc1d16c8444811c67b5bf62ecd420531a89f735fbccb195fba0a4032a",
+      "compilerOptions": {
+        "module": 99,
+        "moduleResolution": 100,
+        "noEmit": true,
+        "resolveJsonModule": true,
+        "strict": true,
+        "target": 99,
+        "esModuleInterop": true,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-types/tsconfig.json"
+      }
+    },
+    {
+      "file": "fixtures/types/late-members/tsconfig.json",
+      "sourceSha256": "8a77b692b7a1d7446027a8635200aeff4e48aa483f7ad48e4c286271caa8c4a6",
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/late-members/tsconfig.json"
+      }
+    },
+    {
+      "file": "fixtures/types/member-relations/tsconfig.json",
+      "sourceSha256": "8a77b692b7a1d7446027a8635200aeff4e48aa483f7ad48e4c286271caa8c4a6",
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/member-relations/tsconfig.json"
+      }
+    },
+    {
+      "file": "fixtures/types/native-vertical/tsconfig.json",
+      "sourceSha256": "53181dfc5e1e56502155f667271ba2db8d272e591ea03ef359225a2bc3c7b559",
+      "compilerOptions": {
+        "strict": true,
+        "target": 99,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-vertical/tsconfig.json"
+      }
+    },
+    {
+      "file": "fixtures/types/overload-context/tsconfig.json",
+      "sourceSha256": "8a77b692b7a1d7446027a8635200aeff4e48aa483f7ad48e4c286271caa8c4a6",
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/overload-context/tsconfig.json"
+      }
+    },
+    {
+      "file": "fixtures/types/parameter-properties/tsconfig.json",
+      "sourceSha256": "8a77b692b7a1d7446027a8635200aeff4e48aa483f7ad48e4c286271caa8c4a6",
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/parameter-properties/tsconfig.json"
+      }
+    },
+    {
+      "file": "fixtures/types/selection-review/tsconfig.json",
+      "sourceSha256": "cebbeef805f018043a0087e3292c60b07999ac553235d00ea99352b5d65a0b6f",
+      "compilerOptions": {
+        "module": 199,
+        "noEmit": true,
+        "resolveJsonModule": true,
+        "strict": true,
+        "target": 9,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/selection-review/tsconfig.json"
+      }
+    },
+    {
+      "file": "fixtures/types/selection/tsconfig.json",
+      "sourceSha256": "8a77b692b7a1d7446027a8635200aeff4e48aa483f7ad48e4c286271caa8c4a6",
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/selection/tsconfig.json"
+      }
+    },
+    {
+      "file": "fixtures/types/type-algebra/loose.json",
+      "sourceSha256": "e438052060556a9b54539b9f57dd788ed7d9988ffb15667f5b64b869792b9369",
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/type-algebra/loose.json"
+      }
+    },
+    {
+      "file": "fixtures/types/type-algebra/tsconfig.json",
+      "sourceSha256": "8a77b692b7a1d7446027a8635200aeff4e48aa483f7ad48e4c286271caa8c4a6",
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/type-algebra/tsconfig.json"
+      }
+    }
+  ],
+  "anchors": [
+    {
+      "file": "fixtures/types/call-targets/cases.ts",
+      "marker": "declaration",
+      "line": 2,
+      "column": 31,
+      "sourceSha256": "80243d61fb5e5a64f19f5b3a0b374751af323b6891bb7f1dde3f97b32583b1e8"
+    },
+    {
+      "file": "fixtures/types/call-targets/cases.ts",
+      "marker": "paren",
+      "line": 3,
+      "column": 12,
+      "sourceSha256": "80243d61fb5e5a64f19f5b3a0b374751af323b6891bb7f1dde3f97b32583b1e8"
+    },
+    {
+      "file": "fixtures/types/call-targets/cases.ts",
+      "marker": "nonNull",
+      "line": 4,
+      "column": 14,
+      "sourceSha256": "80243d61fb5e5a64f19f5b3a0b374751af323b6891bb7f1dde3f97b32583b1e8"
+    },
+    {
+      "file": "fixtures/types/call-targets/cases.ts",
+      "marker": "angle",
+      "line": 5,
+      "column": 23,
+      "sourceSha256": "80243d61fb5e5a64f19f5b3a0b374751af323b6891bb7f1dde3f97b32583b1e8"
+    },
+    {
+      "file": "fixtures/types/call-targets/cases.ts",
+      "marker": "as",
+      "line": 6,
+      "column": 9,
+      "sourceSha256": "80243d61fb5e5a64f19f5b3a0b374751af323b6891bb7f1dde3f97b32583b1e8"
+    },
+    {
+      "file": "fixtures/types/call-targets/cases.ts",
+      "marker": "satisfies",
+      "line": 7,
+      "column": 16,
+      "sourceSha256": "80243d61fb5e5a64f19f5b3a0b374751af323b6891bb7f1dde3f97b32583b1e8"
+    },
+    {
+      "file": "fixtures/types/call-targets/cases.ts",
+      "marker": "optional",
+      "line": 8,
+      "column": 14,
+      "sourceSha256": "80243d61fb5e5a64f19f5b3a0b374751af323b6891bb7f1dde3f97b32583b1e8"
+    },
+    {
+      "file": "fixtures/types/call-targets/cases.ts",
+      "marker": "constructor",
+      "line": 9,
+      "column": 21,
+      "sourceSha256": "80243d61fb5e5a64f19f5b3a0b374751af323b6891bb7f1dde3f97b32583b1e8"
+    },
+    {
+      "file": "fixtures/types/call-targets/cases.ts",
+      "marker": "tag",
+      "line": 10,
+      "column": 9,
+      "sourceSha256": "80243d61fb5e5a64f19f5b3a0b374751af323b6891bb7f1dde3f97b32583b1e8"
+    },
+    {
+      "file": "fixtures/types/call-targets/cases.ts",
+      "marker": "argument",
+      "line": 12,
+      "column": 22,
+      "sourceSha256": "80243d61fb5e5a64f19f5b3a0b374751af323b6891bb7f1dde3f97b32583b1e8"
+    },
+    {
+      "file": "fixtures/types/call-targets/cases.ts",
+      "marker": "read",
+      "line": 13,
+      "column": 23,
+      "sourceSha256": "80243d61fb5e5a64f19f5b3a0b374751af323b6891bb7f1dde3f97b32583b1e8"
+    },
+    {
+      "file": "fixtures/types/call-targets/cases.ts",
+      "marker": "callProperty",
+      "line": 14,
+      "column": 18,
+      "sourceSha256": "80243d61fb5e5a64f19f5b3a0b374751af323b6891bb7f1dde3f97b32583b1e8"
+    },
+    {
+      "file": "fixtures/types/call-targets/cases.ts",
+      "marker": "implicitDecorator",
+      "line": 15,
+      "column": 24,
+      "sourceSha256": "80243d61fb5e5a64f19f5b3a0b374751af323b6891bb7f1dde3f97b32583b1e8"
+    },
+    {
+      "file": "fixtures/types/call-targets/cases.ts",
+      "marker": "explicitDecorator",
+      "line": 16,
+      "column": 24,
+      "sourceSha256": "80243d61fb5e5a64f19f5b3a0b374751af323b6891bb7f1dde3f97b32583b1e8"
+    },
+    {
+      "file": "fixtures/types/call-targets/cases.ts",
+      "marker": "namespaceReceiver",
+      "line": 18,
+      "column": 23,
+      "sourceSha256": "80243d61fb5e5a64f19f5b3a0b374751af323b6891bb7f1dde3f97b32583b1e8"
+    },
+    {
+      "file": "fixtures/types/call-targets/cases.ts",
+      "marker": "namespaceMember",
+      "line": 18,
+      "column": 46,
+      "sourceSha256": "80243d61fb5e5a64f19f5b3a0b374751af323b6891bb7f1dde3f97b32583b1e8"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "fooSeed",
+      "line": 2,
+      "column": 15,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "decodedSeed",
+      "line": 3,
+      "column": 19,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "numericSeed",
+      "line": 4,
+      "column": 19,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "emptySeed",
+      "line": 5,
+      "column": 17,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "fooLocal",
+      "line": 8,
+      "column": 20,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "fooAssignment",
+      "line": 9,
+      "column": 35,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "fooShorthand",
+      "line": 10,
+      "column": 38,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "fooModifier",
+      "line": 12,
+      "column": 31,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "fooParameter",
+      "line": 12,
+      "column": 55,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "fooParameterUse",
+      "line": 13,
+      "column": 44,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "fooComputedLiteral",
+      "line": 16,
+      "column": 27,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "fooComputedVariable",
+      "line": 17,
+      "column": 28,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "fooElement",
+      "line": 19,
+      "column": 21,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "fooComputedArgument",
+      "line": 20,
+      "column": 30,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "fooEscaped",
+      "line": 21,
+      "column": 21,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "decodedAssignment",
+      "line": 22,
+      "column": 41,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "decodedElement",
+      "line": 23,
+      "column": 25,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "numericAssignment",
+      "line": 24,
+      "column": 41,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "numericElement",
+      "line": 25,
+      "column": 25,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "emptyAssignment",
+      "line": 26,
+      "column": 37,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "emptyElement",
+      "line": 27,
+      "column": 23,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "fooProps",
+      "line": 28,
+      "column": 46,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "fooTagDeclaration",
+      "line": 29,
+      "column": 38,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "privateSeed",
+      "line": 33,
+      "column": 19,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "privateUse",
+      "line": 34,
+      "column": 39,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "marker": "namespacedSeed",
+      "line": 36,
+      "column": 48,
+      "sourceSha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/compiler-limits/cases.ts",
+      "marker": "tailUnder",
+      "line": 3,
+      "column": 20,
+      "sourceSha256": "5922ac6f3f89d021dfa0814fec89f204cac5630ff1b78a89f91cd4bb7820f511"
+    },
+    {
+      "file": "fixtures/types/compiler-limits/cases.ts",
+      "marker": "tailAt",
+      "line": 4,
+      "column": 17,
+      "sourceSha256": "5922ac6f3f89d021dfa0814fec89f204cac5630ff1b78a89f91cd4bb7820f511"
+    },
+    {
+      "file": "fixtures/types/compiler-limits/cases.ts",
+      "marker": "tailOver",
+      "line": 5,
+      "column": 19,
+      "sourceSha256": "5922ac6f3f89d021dfa0814fec89f204cac5630ff1b78a89f91cd4bb7820f511"
+    },
+    {
+      "file": "fixtures/types/input-replay/cases.mts",
+      "marker": "query",
+      "line": 2,
+      "column": 24,
+      "sourceSha256": "fa4311d0edac06267fd8f599cc5c9de416ded270a984bfefb0923c798404eeea"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "importRoot",
+      "line": 1,
+      "column": 23,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "syntheticDefault",
+      "line": 2,
+      "column": 42,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "namedDup",
+      "line": 2,
+      "column": 80,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "root",
+      "line": 4,
+      "column": 23,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "text",
+      "line": 5,
+      "column": 23,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "number",
+      "line": 6,
+      "column": 25,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "boolean",
+      "line": 7,
+      "column": 26,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "nil",
+      "line": 8,
+      "column": 22,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "empty",
+      "line": 9,
+      "column": 24,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "numbers",
+      "line": 10,
+      "column": 26,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "numbers0",
+      "line": 11,
+      "column": 27,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "empty0",
+      "line": 12,
+      "column": 25,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "mixed",
+      "line": 13,
+      "column": 24,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "mixed0",
+      "line": 14,
+      "column": 25,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "shapes",
+      "line": 15,
+      "column": 25,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "shape0",
+      "line": 16,
+      "column": 25,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "shapeA",
+      "line": 17,
+      "column": 25,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "duplicate",
+      "line": 18,
+      "column": 28,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "memberDup",
+      "line": 18,
+      "column": 59,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "nestedDuplicate",
+      "line": 19,
+      "column": 34,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "escaped",
+      "line": 20,
+      "column": 26,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "memberEscaped",
+      "line": 20,
+      "column": 59,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "emptyKey",
+      "line": 21,
+      "column": 27,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "memberEmpty",
+      "line": 21,
+      "column": 59,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "numericCanonical",
+      "line": 22,
+      "column": 35,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "memberNumber",
+      "line": 22,
+      "column": 76,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "numericNonCanonical",
+      "line": 23,
+      "column": 38,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "memberNumericText",
+      "line": 23,
+      "column": 87,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "astral",
+      "line": 24,
+      "column": 25,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "memberAstral",
+      "line": 24,
+      "column": 56,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "defaultKey",
+      "line": 25,
+      "column": 29,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "namespaceWhole",
+      "line": 26,
+      "column": 33,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "syntheticCopy",
+      "line": 27,
+      "column": 32,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "namedCopy",
+      "line": 28,
+      "column": 28,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "missing",
+      "line": 29,
+      "column": 26,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "unknown",
+      "line": 31,
+      "column": 26,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "unknownRead",
+      "line": 32,
+      "column": 30,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "genuineAny",
+      "line": 34,
+      "column": 29,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "recursive",
+      "line": 35,
+      "column": 28,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "rootNull",
+      "line": 39,
+      "column": 27,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "rootEmpty",
+      "line": 40,
+      "column": 28,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "marker": "rootNumber",
+      "line": 41,
+      "column": 29,
+      "sourceSha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/late-members/cases.ts",
+      "marker": "named",
+      "line": 4,
+      "column": 28,
+      "sourceSha256": "68b96be9a48f617a6d3d1835337b3e0f407f8c38fd9400244cacc229727e83e2"
+    },
+    {
+      "file": "fixtures/types/late-members/cases.ts",
+      "marker": "use",
+      "line": 5,
+      "column": 40,
+      "sourceSha256": "68b96be9a48f617a6d3d1835337b3e0f407f8c38fd9400244cacc229727e83e2"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "generic",
+      "line": 2,
+      "column": 32,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "stringUse",
+      "line": 5,
+      "column": 23,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "numberUse",
+      "line": 6,
+      "column": 23,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "partial",
+      "line": 8,
+      "column": 21,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "readonly",
+      "line": 10,
+      "column": 23,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "picked",
+      "line": 12,
+      "column": 19,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "omitted",
+      "line": 14,
+      "column": 21,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "remapped",
+      "line": 16,
+      "column": 23,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "ordinarySpread",
+      "line": 18,
+      "column": 35,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "overlapSpread",
+      "line": 20,
+      "column": 33,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "getOnly",
+      "line": 21,
+      "column": 35,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "getSpread",
+      "line": 23,
+      "column": 25,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "setOnly",
+      "line": 24,
+      "column": 35,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "setSpread",
+      "line": 26,
+      "column": 25,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "readonlySpread",
+      "line": 29,
+      "column": 35,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "host",
+      "line": 30,
+      "column": 27,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "annotated",
+      "line": 31,
+      "column": 41,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "satisfied",
+      "line": 32,
+      "column": 35,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "unrelated",
+      "line": 33,
+      "column": 35,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "annotatedUse",
+      "line": 34,
+      "column": 28,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "satisfiedUse",
+      "line": 35,
+      "column": 28,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "unrelatedUse",
+      "line": 36,
+      "column": 28,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "base",
+      "line": 37,
+      "column": 23,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "override",
+      "line": 38,
+      "column": 52,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "interface",
+      "line": 39,
+      "column": 34,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "implements",
+      "line": 40,
+      "column": 57,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "baseUse",
+      "line": 41,
+      "column": 24,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "overrideUse",
+      "line": 42,
+      "column": 31,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "implementsUse",
+      "line": 43,
+      "column": 40,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "inlineLeft",
+      "line": 44,
+      "column": 32,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "inlineRight",
+      "line": 44,
+      "column": 67,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "inlineUse",
+      "line": 46,
+      "column": 22,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "missing",
+      "line": 47,
+      "column": 30,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "interfaceLeft",
+      "line": 48,
+      "column": 36,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "interfaceRight",
+      "line": 49,
+      "column": 38,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "interfaceUnionUse",
+      "line": 51,
+      "column": 38,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "static",
+      "line": 52,
+      "column": 33,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "instance",
+      "line": 52,
+      "column": 62,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "staticUse",
+      "line": 53,
+      "column": 21,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "instanceUse",
+      "line": 54,
+      "column": 29,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "privateFirst",
+      "line": 55,
+      "column": 39,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "privateFirstUse",
+      "line": 55,
+      "column": 90,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "privateSecond",
+      "line": 56,
+      "column": 41,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "privateSecondUse",
+      "line": 56,
+      "column": 93,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "getter",
+      "line": 57,
+      "column": 34,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "setter",
+      "line": 57,
+      "column": 80,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "marker": "accessorUse",
+      "line": 58,
+      "column": 33,
+      "sourceSha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/overload-context/cases.ts",
+      "marker": "result",
+      "line": 4,
+      "column": 18,
+      "sourceSha256": "8f4735089cb7caa29b66c4f66003f0c0be2e6076ce2d25a24bbcc79a814ae04c"
+    },
+    {
+      "file": "fixtures/types/overload-context/cases.ts",
+      "marker": "parameter",
+      "line": 4,
+      "column": 43,
+      "sourceSha256": "8f4735089cb7caa29b66c4f66003f0c0be2e6076ce2d25a24bbcc79a814ae04c"
+    },
+    {
+      "file": "fixtures/types/overload-context/cases.ts",
+      "marker": "body",
+      "line": 4,
+      "column": 57,
+      "sourceSha256": "8f4735089cb7caa29b66c4f66003f0c0be2e6076ce2d25a24bbcc79a814ae04c"
+    },
+    {
+      "file": "fixtures/types/overload-context/cases.ts",
+      "marker": "origin",
+      "line": 5,
+      "column": 30,
+      "sourceSha256": "8f4735089cb7caa29b66c4f66003f0c0be2e6076ce2d25a24bbcc79a814ae04c"
+    },
+    {
+      "file": "fixtures/types/overload-context/cases.ts",
+      "marker": "memberResult",
+      "line": 8,
+      "column": 24,
+      "sourceSha256": "8f4735089cb7caa29b66c4f66003f0c0be2e6076ce2d25a24bbcc79a814ae04c"
+    },
+    {
+      "file": "fixtures/types/overload-context/cases.ts",
+      "marker": "memberParameter",
+      "line": 8,
+      "column": 51,
+      "sourceSha256": "8f4735089cb7caa29b66c4f66003f0c0be2e6076ce2d25a24bbcc79a814ae04c"
+    },
+    {
+      "file": "fixtures/types/overload-context/cases.ts",
+      "marker": "member",
+      "line": 8,
+      "column": 69,
+      "sourceSha256": "8f4735089cb7caa29b66c4f66003f0c0be2e6076ce2d25a24bbcc79a814ae04c"
+    },
+    {
+      "file": "fixtures/types/parameter-properties/cases.ts",
+      "marker": "public",
+      "line": 1,
+      "column": 46,
+      "sourceSha256": "a885271782a46788751bfc0621846e95640b2c936c05d77b6c1ce0316783fbb5"
+    },
+    {
+      "file": "fixtures/types/parameter-properties/cases.ts",
+      "marker": "publicName",
+      "line": 1,
+      "column": 68,
+      "sourceSha256": "a885271782a46788751bfc0621846e95640b2c936c05d77b6c1ce0316783fbb5"
+    },
+    {
+      "file": "fixtures/types/parameter-properties/cases.ts",
+      "marker": "private",
+      "line": 2,
+      "column": 41,
+      "sourceSha256": "a885271782a46788751bfc0621846e95640b2c936c05d77b6c1ce0316783fbb5"
+    },
+    {
+      "file": "fixtures/types/parameter-properties/cases.ts",
+      "marker": "privateName",
+      "line": 2,
+      "column": 65,
+      "sourceSha256": "a885271782a46788751bfc0621846e95640b2c936c05d77b6c1ce0316783fbb5"
+    },
+    {
+      "file": "fixtures/types/parameter-properties/cases.ts",
+      "marker": "protected",
+      "line": 3,
+      "column": 45,
+      "sourceSha256": "a885271782a46788751bfc0621846e95640b2c936c05d77b6c1ce0316783fbb5"
+    },
+    {
+      "file": "fixtures/types/parameter-properties/cases.ts",
+      "marker": "protectedName",
+      "line": 3,
+      "column": 73,
+      "sourceSha256": "a885271782a46788751bfc0621846e95640b2c936c05d77b6c1ce0316783fbb5"
+    },
+    {
+      "file": "fixtures/types/parameter-properties/cases.ts",
+      "marker": "readonly",
+      "line": 4,
+      "column": 43,
+      "sourceSha256": "a885271782a46788751bfc0621846e95640b2c936c05d77b6c1ce0316783fbb5"
+    },
+    {
+      "file": "fixtures/types/parameter-properties/cases.ts",
+      "marker": "readonlyName",
+      "line": 4,
+      "column": 69,
+      "sourceSha256": "a885271782a46788751bfc0621846e95640b2c936c05d77b6c1ce0316783fbb5"
+    },
+    {
+      "file": "fixtures/types/parameter-properties/cases.ts",
+      "marker": "override",
+      "line": 6,
+      "column": 56,
+      "sourceSha256": "a885271782a46788751bfc0621846e95640b2c936c05d77b6c1ce0316783fbb5"
+    },
+    {
+      "file": "fixtures/types/parameter-properties/cases.ts",
+      "marker": "overrideName",
+      "line": 6,
+      "column": 82,
+      "sourceSha256": "a885271782a46788751bfc0621846e95640b2c936c05d77b6c1ce0316783fbb5"
+    },
+    {
+      "file": "fixtures/types/parameter-properties/cases.ts",
+      "marker": "mixed",
+      "line": 7,
+      "column": 37,
+      "sourceSha256": "a885271782a46788751bfc0621846e95640b2c936c05d77b6c1ce0316783fbb5"
+    },
+    {
+      "file": "fixtures/types/parameter-properties/cases.ts",
+      "marker": "secondary",
+      "line": 7,
+      "column": 58,
+      "sourceSha256": "a885271782a46788751bfc0621846e95640b2c936c05d77b6c1ce0316783fbb5"
+    },
+    {
+      "file": "fixtures/types/parameter-properties/cases.ts",
+      "marker": "mixedName",
+      "line": 7,
+      "column": 81,
+      "sourceSha256": "a885271782a46788751bfc0621846e95640b2c936c05d77b6c1ce0316783fbb5"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "classImportLeft",
+      "line": 1,
+      "column": 30,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "classImportRight",
+      "line": 1,
+      "column": 61,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "typeClassLeft",
+      "line": 2,
+      "column": 33,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "typeClassRight",
+      "line": 2,
+      "column": 62,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "specifierTypeLeft",
+      "line": 3,
+      "column": 37,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "specifierTypeRight",
+      "line": 3,
+      "column": 70,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "interfaceLeft",
+      "line": 4,
+      "column": 28,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "interfaceRight",
+      "line": 4,
+      "column": 56,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "typeFunctionLeft",
+      "line": 5,
+      "column": 36,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "typeFunctionRight",
+      "line": 5,
+      "column": 64,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "typeVariableLeft",
+      "line": 5,
+      "column": 99,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "typeVariableRight",
+      "line": 5,
+      "column": 133,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "defaultOrdinary",
+      "line": 6,
+      "column": 28,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "defaultType",
+      "line": 7,
+      "column": 29,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "namespaceImport",
+      "line": 8,
+      "column": 33,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "typeNamespaceImport",
+      "line": 9,
+      "column": 42,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "importEquals",
+      "line": 10,
+      "column": 25,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "exportLeft",
+      "line": 12,
+      "column": 25,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "exportRight",
+      "line": 12,
+      "column": 51,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "typeExportLeft",
+      "line": 13,
+      "column": 34,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "typeExportRight",
+      "line": 13,
+      "column": 64,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "specifierExportLeft",
+      "line": 14,
+      "column": 39,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "specifierExportRight",
+      "line": 14,
+      "column": 74,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "functionExportLeft",
+      "line": 15,
+      "column": 38,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "functionExportRight",
+      "line": 15,
+      "column": 68,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "variableExportLeft",
+      "line": 15,
+      "column": 113,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "variableExportRight",
+      "line": 15,
+      "column": 149,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "classDeclaration",
+      "line": 16,
+      "column": 28,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "classValue",
+      "line": 17,
+      "column": 41,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "enumDeclaration",
+      "line": 18,
+      "column": 26,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "enumMember",
+      "line": 18,
+      "column": 54,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "enumValue",
+      "line": 19,
+      "column": 33,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "activeNamespace",
+      "line": 20,
+      "column": 31,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "passiveNamespace",
+      "line": 21,
+      "column": 32,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "internalEquals",
+      "line": 22,
+      "column": 27,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "typeQuery",
+      "line": 23,
+      "column": 35,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "qualifiedTypeQuery",
+      "line": 24,
+      "column": 60,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "typeReference",
+      "line": 25,
+      "column": 46,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "earlierNamespace",
+      "line": 26,
+      "column": 37,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "unresolvedType",
+      "line": 27,
+      "column": 35,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "shorthand",
+      "line": 29,
+      "column": 35,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "parameterModifier",
+      "line": 31,
+      "column": 37,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "parameterName",
+      "line": 31,
+      "column": 62,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "getter",
+      "line": 32,
+      "column": 18,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "setter",
+      "line": 33,
+      "column": 18,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "elementKey",
+      "line": 36,
+      "column": 23,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "elementClose",
+      "line": 36,
+      "column": 43,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "callee",
+      "line": 38,
+      "column": 12,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "callClose",
+      "line": 38,
+      "column": 32,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "tagClose",
+      "line": 40,
+      "column": 22,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "newKeyword",
+      "line": 41,
+      "column": 16,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "callSignature",
+      "line": 42,
+      "column": 38,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "constructSignature",
+      "line": 42,
+      "column": 82,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "indexSignature",
+      "line": 42,
+      "column": 125,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "constructorKeyword",
+      "line": 43,
+      "column": 48,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "moduleBlock",
+      "line": 44,
+      "column": 37,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "defaultExpression",
+      "line": 45,
+      "column": 38,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "marker": "equalsExpression",
+      "line": 46,
+      "column": 31,
+      "sourceSha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/history.ts",
+      "marker": "historyResult",
+      "line": 5,
+      "column": 25,
+      "sourceSha256": "78b179944e5b4b3368434b6e1ef8ce0d3f94b2213af43cb2bd41ab6e066d97b7"
+    },
+    {
+      "file": "fixtures/types/selection-review/history.ts",
+      "marker": "historyParameter",
+      "line": 5,
+      "column": 65,
+      "sourceSha256": "78b179944e5b4b3368434b6e1ef8ce0d3f94b2213af43cb2bd41ab6e066d97b7"
+    },
+    {
+      "file": "fixtures/types/selection/cases.ts",
+      "marker": "class",
+      "line": 2,
+      "column": 17,
+      "sourceSha256": "5f7d3430912b0b81ba18126d93a9a68150ac21d83115ba2a965d93475b85662f"
+    },
+    {
+      "file": "fixtures/types/selection/cases.ts",
+      "marker": "classUse",
+      "line": 3,
+      "column": 34,
+      "sourceSha256": "5f7d3430912b0b81ba18126d93a9a68150ac21d83115ba2a965d93475b85662f"
+    },
+    {
+      "file": "fixtures/types/selection/cases.ts",
+      "marker": "access",
+      "line": 5,
+      "column": 21,
+      "sourceSha256": "5f7d3430912b0b81ba18126d93a9a68150ac21d83115ba2a965d93475b85662f"
+    },
+    {
+      "file": "fixtures/types/selection/cases.ts",
+      "marker": "key",
+      "line": 6,
+      "column": 18,
+      "sourceSha256": "5f7d3430912b0b81ba18126d93a9a68150ac21d83115ba2a965d93475b85662f"
+    },
+    {
+      "file": "fixtures/types/selection/cases.ts",
+      "marker": "alias",
+      "line": 8,
+      "column": 16,
+      "sourceSha256": "5f7d3430912b0b81ba18126d93a9a68150ac21d83115ba2a965d93475b85662f"
+    },
+    {
+      "file": "fixtures/types/selection/cases.ts",
+      "marker": "type",
+      "line": 9,
+      "column": 31,
+      "sourceSha256": "5f7d3430912b0b81ba18126d93a9a68150ac21d83115ba2a965d93475b85662f"
+    },
+    {
+      "file": "fixtures/types/selection/cases.ts",
+      "marker": "contextParameter",
+      "line": 10,
+      "column": 62,
+      "sourceSha256": "5f7d3430912b0b81ba18126d93a9a68150ac21d83115ba2a965d93475b85662f"
+    },
+    {
+      "file": "fixtures/types/selection/cases.ts",
+      "marker": "satisfiesParameter",
+      "line": 11,
+      "column": 47,
+      "sourceSha256": "5f7d3430912b0b81ba18126d93a9a68150ac21d83115ba2a965d93475b85662f"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "keyof",
+      "line": 2,
+      "column": 16,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "indexed",
+      "line": 3,
+      "column": 18,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "distributed",
+      "line": 4,
+      "column": 22,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "distribution",
+      "line": 5,
+      "column": 32,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "infer",
+      "line": 7,
+      "column": 25,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "modifiers",
+      "line": 9,
+      "column": 29,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "remap",
+      "line": 11,
+      "column": 25,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "template",
+      "line": 12,
+      "column": 28,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "uppercase",
+      "line": 13,
+      "column": 29,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "lowercase",
+      "line": 14,
+      "column": 29,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "capitalize",
+      "line": 15,
+      "column": 30,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "uncapitalize",
+      "line": 16,
+      "column": 32,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "awaited",
+      "line": 17,
+      "column": 27,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "builtin",
+      "line": 18,
+      "column": 27,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "noInfer",
+      "line": 20,
+      "column": 19,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "noInferRecovery",
+      "line": 21,
+      "column": 27,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "tuple",
+      "line": 22,
+      "column": 25,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "variadic",
+      "line": 24,
+      "column": 28,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "thisType",
+      "line": 25,
+      "column": 28,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "symbol",
+      "line": 26,
+      "column": 26,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "symbolKey",
+      "line": 27,
+      "column": 20,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "enumValue",
+      "line": 29,
+      "column": 29,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "freshObject",
+      "line": 30,
+      "column": 23,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "constant",
+      "line": 31,
+      "column": 20,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "factory",
+      "line": 33,
+      "column": 19,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "callback",
+      "line": 34,
+      "column": 20,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "genericClass",
+      "line": 35,
+      "column": 24,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "recursive",
+      "line": 37,
+      "column": 29,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "growing",
+      "line": 39,
+      "column": 27,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "any",
+      "line": 40,
+      "column": 23,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "unknown",
+      "line": 41,
+      "column": 27,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "missing",
+      "line": 42,
+      "column": 27,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "marker": "unknownConditional",
+      "line": 43,
+      "column": 38,
+      "sourceSha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    }
+  ],
+  "generated": [
+    {
+      "family": "OuterHead",
+      "length": 47,
+      "bytes": 233,
+      "sha256": "5f7d2ac25447c41c64d4c8fe984754e12b97f4a6771bc6c2c5eadf1d862a8ec4",
+      "anchor": {
+        "line": 4,
+        "column": 16
+      }
+    },
+    {
+      "family": "OuterHead",
+      "length": 48,
+      "bytes": 233,
+      "sha256": "04e22fe19286d33b33b76d80715ce2fd9ab4b91fdf32a057e9bc32a2859ad9e6",
+      "anchor": {
+        "line": 4,
+        "column": 16
+      }
+    },
+    {
+      "family": "OuterHead",
+      "length": 49,
+      "bytes": 233,
+      "sha256": "182436b48a5bc2309f464f014e48c3776e63a96e50cd2277cac72bfbc42c8720",
+      "anchor": {
+        "line": 4,
+        "column": 16
+      }
+    },
+    {
+      "family": "instantiationCount",
+      "identityAliases": 2,
+      "bytes": 320,
+      "sha256": "f7326b751f480b88ed2b7cdaec7e41c670691e3c6e62239831244b60e48ad136",
+      "anchor": {
+        "line": 6,
+        "column": 16
+      }
+    },
+    {
+      "family": "instantiationCount",
+      "identityAliases": 3,
+      "bytes": 342,
+      "sha256": "f5718f6c48664c77e64d2d846605421422213ba01fe31bae31673d45ef4ca055",
+      "anchor": {
+        "line": 7,
+        "column": 16
+      }
+    },
+    {
+      "family": "instantiationCount",
+      "identityAliases": 4,
+      "bytes": 364,
+      "sha256": "1956e2fc04117ee48b08a4de26bd4f34745368bf99dbf2709a53279016f8d003",
+      "anchor": {
+        "line": 8,
+        "column": 16
+      }
+    },
+    {
+      "family": "crossProduct",
+      "left": 3,
+      "right": 33333,
+      "bytes": 355651,
+      "sha256": "80d6b3ab4a68e54e0017d6c9c6cbba9a34805515d6606d4e5d20ac54f324635c",
+      "anchor": {
+        "line": 4,
+        "column": 16
+      }
+    },
+    {
+      "family": "crossProduct",
+      "left": 100,
+      "right": 1000,
+      "bytes": 9757,
+      "sha256": "500905010176d6f22793a5a3ded611ea02ecb2997cb21fa665af0037b6018911",
+      "anchor": {
+        "line": 4,
+        "column": 16
+      }
+    },
+    {
+      "family": "crossProduct",
+      "left": 11,
+      "right": 9091,
+      "bytes": 89955,
+      "sha256": "2efec6fb46e57aa5a702a97ea5ebae1a97aa54de104a8b75220b0a3adb7ceeba",
+      "anchor": {
+        "line": 4,
+        "column": 16
+      }
+    },
+    {
+      "family": "relationDepth",
+      "depth": 99,
+      "leaf": "same",
+      "bytes": 2131,
+      "sha256": "7e9bdb63caeafddc7ceb22188defe88a009e6386c1519d82d4b0d9598c13d7a9",
+      "anchor": {
+        "line": 4,
+        "column": 25
+      }
+    },
+    {
+      "family": "relationDepth",
+      "depth": 100,
+      "leaf": "same",
+      "bytes": 2151,
+      "sha256": "91f59d384552286bb348ecdc814467d57091ca5743c69248216e96e056b266d5",
+      "anchor": {
+        "line": 4,
+        "column": 25
+      }
+    },
+    {
+      "family": "relationDepth",
+      "depth": 101,
+      "leaf": "same",
+      "bytes": 2171,
+      "sha256": "ee236a63fb569853338a30abb087ea658c7663de69241b3f20a50e8fa5b274b6",
+      "anchor": {
+        "line": 4,
+        "column": 25
+      }
+    },
+    {
+      "family": "relationDepth",
+      "depth": 99,
+      "leaf": "different",
+      "bytes": 2131,
+      "sha256": "f39b5442ef86e92f21d0dd9b9da282c03db3e6185fb613f10171ba5f4893d10a",
+      "anchor": {
+        "line": 4,
+        "column": 25
+      }
+    },
+    {
+      "family": "subtypeRemoval",
+      "length": 1250,
+      "removals": 43,
+      "bytes": 54812,
+      "sha256": "78dfee41fea66ef3aa7a1e358ea4b284b122d899c868687faeed7a5cb0a9e43b",
+      "anchor": {
+        "line": 1251,
+        "column": 17
+      }
+    },
+    {
+      "family": "subtypeRemoval",
+      "length": 1250,
+      "removals": 42,
+      "bytes": 54797,
+      "sha256": "a3eb6c7bd2330a72b4b33446b84d891048125c36d993084c3b7edda1d4485f7b",
+      "anchor": {
+        "line": 1251,
+        "column": 17
+      }
+    },
+    {
+      "family": "subtypeRemoval",
+      "length": 1250,
+      "removals": 41,
+      "bytes": 54782,
+      "sha256": "ca9eb9eb94eb6b53a524ebfb7728ed3e9629f518d61adf9fb0597ac6c3e6a60b",
+      "anchor": {
+        "line": 1251,
+        "column": 17
+      }
+    },
+    {
+      "family": "relationMaybe",
+      "mode": "active",
+      "bytes": 153,
+      "sha256": "01dde3343d4fdc2fbd55f45761eb7e098e94cdc76f62660d3145235e7a97d0e8",
+      "anchor": {
+        "line": 4,
+        "column": 25
+      }
+    },
+    {
+      "family": "relationMaybe",
+      "mode": "active-false",
+      "bytes": 183,
+      "sha256": "ddf692907da955a495e0d6b9e183e8e6ad2f08f641cd52e79c9410fec1ed2f82",
+      "anchor": {
+        "line": 4,
+        "column": 25
+      }
+    },
+    {
+      "family": "relationMaybe",
+      "mode": "deep",
+      "bytes": 193,
+      "sha256": "4f792465dd1db19bd8f299625c8e7ebcb01499ebbecc0797375ca65fc64e3860",
+      "anchor": {
+        "line": 4,
+        "column": 25
+      }
+    },
+    {
+      "family": "relationAllowance",
+      "length": 1998,
+      "bytes": 117779,
+      "sha256": "3b0c676de3e8ee87b7def15a07ddd7943983cc9f97565081587c05fa02325594",
+      "anchor": {
+        "line": 4,
+        "column": 25
+      }
+    },
+    {
+      "family": "relationAllowance",
+      "length": 1999,
+      "bytes": 117839,
+      "sha256": "a8a2d4545f7129e7c61eeebc651feeeb27fc9a2842296e8fa93fa0ee2740d82a",
+      "anchor": {
+        "line": 4,
+        "column": 25
+      }
+    },
+    {
+      "family": "relationAllowance",
+      "length": 2000,
+      "bytes": 117899,
+      "sha256": "34505a91a7d45b5ba57767ad18eda4147840f583640cf51254b09fcf8ff2c678",
+      "anchor": {
+        "line": 4,
+        "column": 25
+      }
+    }
+  ],
+  "inventory": [
+    {
+      "file": "fixtures/types/call-targets/cases.ts",
+      "bytes": 542,
+      "sha256": "80243d61fb5e5a64f19f5b3a0b374751af323b6891bb7f1dde3f97b32583b1e8"
+    },
+    {
+      "file": "fixtures/types/call-targets/tsconfig.json",
+      "bytes": 157,
+      "sha256": "bebed0980bdc96ea952af047248fc1d66e3bf9d7d791ce621e8c5b1a70b0148d"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/cases.tsx",
+      "bytes": 1291,
+      "sha256": "9c18c4c20bf05f94e3f7d33d4bed964339cf03969d91ae84339a430ee6a91099"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/keys.json",
+      "bytes": 43,
+      "sha256": "1bf9ffb2ee01c6116792e6e26b4b6f3f2741d6f750eb58889cd26ce40d0c2e75"
+    },
+    {
+      "file": "fixtures/types/candidate-inventory/tsconfig.json",
+      "bytes": 246,
+      "sha256": "e6585adb664bcb54e75feb77a3bd801f4b4d3982d7926f071e628fc3bcc2e233"
+    },
+    {
+      "file": "fixtures/types/compiler-hook/checker-hook.go",
+      "bytes": 2773,
+      "sha256": "e2d5c10ae680c02f912cd1eff4d9b17dc922894559fea2028a82663d9a501419"
+    },
+    {
+      "file": "fixtures/types/compiler-hook/ls-hook.go",
+      "bytes": 5896,
+      "sha256": "73c9a52f43914571bdf7f29e8817720d0ff98bdb0aeb7cad183fa8397a848dce"
+    },
+    {
+      "file": "fixtures/types/compiler-hook/oracle-test.go",
+      "bytes": 11035,
+      "sha256": "ad384a32324fe19b79dd4b55d2d0a45a21079d8f5c588fbf3b8685b58f1faec6"
+    },
+    {
+      "file": "fixtures/types/compiler-limits/cases.ts",
+      "bytes": 246,
+      "sha256": "5922ac6f3f89d021dfa0814fec89f204cac5630ff1b78a89f91cd4bb7820f511"
+    },
+    {
+      "file": "fixtures/types/compiler-limits/generate.mjs",
+      "bytes": 3925,
+      "sha256": "f756fdc549ac6b661da5e6c9230df9c66b612f2b2303b0df2ccfbb2747d0366b"
+    },
+    {
+      "file": "fixtures/types/compiler-limits/tsconfig.json",
+      "bytes": 125,
+      "sha256": "8a77b692b7a1d7446027a8635200aeff4e48aa483f7ad48e4c286271caa8c4a6"
+    },
+    {
+      "file": "fixtures/types/freeze-oracle-manifest.mjs",
+      "bytes": 6248,
+      "sha256": "542ad55942d56b355fdaccd02b5c0cc31802e192ea8c9e63b74948fe7ec23d5a"
+    },
+    {
+      "file": "fixtures/types/input-replay/base.json",
+      "bytes": 140,
+      "sha256": "aa27eb3901c19d4a4218abb9fabd8914289036459b58ff1c41bda2b55fcf0539"
+    },
+    {
+      "file": "fixtures/types/input-replay/cases.mts",
+      "bytes": 69,
+      "sha256": "fa4311d0edac06267fd8f599cc5c9de416ded270a984bfefb0923c798404eeea"
+    },
+    {
+      "file": "fixtures/types/input-replay/dual/index.d.cts",
+      "bytes": 31,
+      "sha256": "9198068bf5397b6cc93ca28706dbc667d1e58b314ace2334bbaf713d6f947b0e"
+    },
+    {
+      "file": "fixtures/types/input-replay/dual/index.d.mts",
+      "bytes": 30,
+      "sha256": "f614937e26e90586fe877717e87a7ca17b7111e1be7a4c6d0891a297a873da96"
+    },
+    {
+      "file": "fixtures/types/input-replay/dual/package.json",
+      "bytes": 101,
+      "sha256": "52ff51f3e0038f867e2d2f222eb45e413e6dec21334f25a6a5a3979cea767cf8"
+    },
+    {
+      "file": "fixtures/types/input-replay/tsconfig.json",
+      "bytes": 26,
+      "sha256": "261f8a1f54c1f792e9c275217ce858c27bfc198c1446825b12cbdaf0f59d9580"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "bytes": 2183,
+      "sha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/data.json",
+      "bytes": 427,
+      "sha256": "c4a840597560c2a2d59c23a10b3b6e6afd5e469bf912900512f362301c7ac4bf"
+    },
+    {
+      "file": "fixtures/types/json-types/empty-array.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "file": "fixtures/types/json-types/evidence/README.md",
+      "bytes": 1940,
+      "sha256": "308cca49747742266d769745288fedaa24cd23bf977fbf6ce23ca9d450c89419"
+    },
+    {
+      "file": "fixtures/types/json-types/evidence/json-options-native-probe.json",
+      "bytes": 20634,
+      "sha256": "1b4456652cdbeda6526b8524a0e20ed38dad6d59f3b13e7fe31a8041dbedd754"
+    },
+    {
+      "file": "fixtures/types/json-types/evidence/json-options-native-probe.mjs",
+      "bytes": 5126,
+      "sha256": "0f253b98a305a8024919efc075b82081498ae0d4b5e993c223f605b2ab4668e1"
+    },
+    {
+      "file": "fixtures/types/json-types/evidence/json-options-native-probe.stdout.json",
+      "bytes": 20635,
+      "sha256": "a523584b08e0363f5a6f214565c4a041b81970229b8ed061f3d67e6b0c09ad71"
+    },
+    {
+      "file": "fixtures/types/json-types/evidence/json-type-go-controls.json",
+      "bytes": 257343,
+      "sha256": "393ca27b2aee8442cfcfdf6bb32d8ef887592e5de0c75d7f2a7b9dea5d422d78"
+    },
+    {
+      "file": "fixtures/types/json-types/evidence/json-type-native-probe.json",
+      "bytes": 14703,
+      "sha256": "2fe35e44680d755b29c0e08d5dc1b39aa7aa99276d5b9356f737b25aef508045"
+    },
+    {
+      "file": "fixtures/types/json-types/evidence/json-type-native-probe.mjs",
+      "bytes": 2520,
+      "sha256": "5c5a13b082387d8cccd340f5e5ee445858dd286a9106f1a85b18a7f39ca8c2a0"
+    },
+    {
+      "file": "fixtures/types/json-types/evidence/json-type-native-probe.stdout.json",
+      "bytes": 4704,
+      "sha256": "a37ffd02b6dce5e727b0748efa5d14764a72e7aaa8c5ccef2de27d0100dc9ca9"
+    },
+    {
+      "file": "fixtures/types/json-types/evidence/manifest.json",
+      "bytes": 4997,
+      "sha256": "0b4759370d030dc1f5716ff592d5ac75f36f6e35b60088169507ca424150d175"
+    },
+    {
+      "file": "fixtures/types/json-types/null.json",
+      "bytes": 5,
+      "sha256": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed"
+    },
+    {
+      "file": "fixtures/types/json-types/scalar.json",
+      "bytes": 3,
+      "sha256": "084c799cd551dd1d8d5c5f9a5d593b2e931f5e36122ee5c793c1d08a19839cc0"
+    },
+    {
+      "file": "fixtures/types/json-types/strict-0-exact-0-unchecked-0.json",
+      "bytes": 173,
+      "sha256": "c5f00e00664834a2c64e60a50d66f6811e2ab2237b345e68167dbd7d507d3b9e"
+    },
+    {
+      "file": "fixtures/types/json-types/strict-0-exact-0-unchecked-1.json",
+      "bytes": 172,
+      "sha256": "e5e905574fea7ed1d1008ed06677d0addf4832ef6b805e17ac5a525c3aefdf48"
+    },
+    {
+      "file": "fixtures/types/json-types/strict-0-exact-1-unchecked-0.json",
+      "bytes": 172,
+      "sha256": "3e327522a479711e6e2963ba8c3a539ece52fbd98856e473100672ea90312ec4"
+    },
+    {
+      "file": "fixtures/types/json-types/strict-0-exact-1-unchecked-1.json",
+      "bytes": 171,
+      "sha256": "0c8fe39ce486c5c5f241be482d8df54e29baedc477279a71eb6b7067ee3d6bf1"
+    },
+    {
+      "file": "fixtures/types/json-types/strict-1-exact-0-unchecked-0.json",
+      "bytes": 172,
+      "sha256": "b8d2e9f6f4f5198191fb7ebe59fc22d759e587491294ee3948282a53a9c365cc"
+    },
+    {
+      "file": "fixtures/types/json-types/strict-1-exact-0-unchecked-1.json",
+      "bytes": 171,
+      "sha256": "ba7110c5a2f6be2967f66349b0260d3e522aad02476c38c2e7c572998f97aaec"
+    },
+    {
+      "file": "fixtures/types/json-types/strict-1-exact-1-unchecked-0.json",
+      "bytes": 171,
+      "sha256": "41cbe1ebbae50b744974ef36b3bad96d7c7579c17e5d7471ead50b2bebb7fb70"
+    },
+    {
+      "file": "fixtures/types/json-types/strict-1-exact-1-unchecked-1.json",
+      "bytes": 170,
+      "sha256": "719d2f1ae3c4b815cd78027cdc386d45ae8e4156949ac8f9fc394cb07cef627e"
+    },
+    {
+      "file": "fixtures/types/json-types/tsconfig.json",
+      "bytes": 238,
+      "sha256": "73ee26adc1d16c8444811c67b5bf62ecd420531a89f735fbccb195fba0a4032a"
+    },
+    {
+      "file": "fixtures/types/late-members/cases.ts",
+      "bytes": 163,
+      "sha256": "68b96be9a48f617a6d3d1835337b3e0f407f8c38fd9400244cacc229727e83e2"
+    },
+    {
+      "file": "fixtures/types/late-members/tsconfig.json",
+      "bytes": 125,
+      "sha256": "8a77b692b7a1d7446027a8635200aeff4e48aa483f7ad48e4c286271caa8c4a6"
+    },
+    {
+      "file": "fixtures/types/member-relations/cases.ts",
+      "bytes": 2742,
+      "sha256": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f"
+    },
+    {
+      "file": "fixtures/types/member-relations/observations.json",
+      "bytes": 1488984,
+      "sha256": "409227992dc24184c48bcdce7fef35edb932b6a38164a92509d7b0c2f88b6dcc"
+    },
+    {
+      "file": "fixtures/types/member-relations/provenance.json",
+      "bytes": 1744,
+      "sha256": "73c6812a9ba76245537be44c71f4f9832a1345ee99b5827f1a883d20da649160"
+    },
+    {
+      "file": "fixtures/types/member-relations/tsconfig.json",
+      "bytes": 125,
+      "sha256": "8a77b692b7a1d7446027a8635200aeff4e48aa483f7ad48e4c286271caa8c4a6"
+    },
+    {
+      "file": "fixtures/types/native-vertical/.gitignore",
+      "bytes": 199,
+      "sha256": "37288dd5a491371991919d6c1c504438cbaf2e79b6a640511cce129b37acb580"
+    },
+    {
+      "file": "fixtures/types/native-vertical/barrel.ts",
+      "bytes": 60,
+      "sha256": "55993cdc8c898c9973d60f765b5ad676a305147f754ac198d57efff96d0bd6ed"
+    },
+    {
+      "file": "fixtures/types/native-vertical/consumer.ts",
+      "bytes": 199,
+      "sha256": "60e2bae20000722548e944f8db2ed32627a6dfc511a0b9ef9f779ddd44b32766"
+    },
+    {
+      "file": "fixtures/types/native-vertical/model.ts",
+      "bytes": 112,
+      "sha256": "2d11a4751fc78482e3ff5ecb90fb3c2993a5d29890b2d647d68d44bec46e715b"
+    },
+    {
+      "file": "fixtures/types/native-vertical/node_modules/native-fixture/index.ts",
+      "bytes": 55,
+      "sha256": "5506ba72ce436bf133b94ef8f3e6ba4ee69a5a82b42774634f6d6da9fbb09149"
+    },
+    {
+      "file": "fixtures/types/native-vertical/node_modules/native-fixture/package.json",
+      "bytes": 45,
+      "sha256": "f1678c35a93c27d45da604d35a3222006f656ca31d04d95b90fcd6ab31117da9"
+    },
+    {
+      "file": "fixtures/types/native-vertical/tsconfig.json",
+      "bytes": 119,
+      "sha256": "53181dfc5e1e56502155f667271ba2db8d272e591ea03ef359225a2bc3c7b559"
+    },
+    {
+      "file": "fixtures/types/overload-context/cases.ts",
+      "bytes": 429,
+      "sha256": "8f4735089cb7caa29b66c4f66003f0c0be2e6076ce2d25a24bbcc79a814ae04c"
+    },
+    {
+      "file": "fixtures/types/overload-context/tsconfig.json",
+      "bytes": 125,
+      "sha256": "8a77b692b7a1d7446027a8635200aeff4e48aa483f7ad48e4c286271caa8c4a6"
+    },
+    {
+      "file": "fixtures/types/parameter-properties/cases.ts",
+      "bytes": 574,
+      "sha256": "a885271782a46788751bfc0621846e95640b2c936c05d77b6c1ce0316783fbb5"
+    },
+    {
+      "file": "fixtures/types/parameter-properties/tsconfig.json",
+      "bytes": 125,
+      "sha256": "8a77b692b7a1d7446027a8635200aeff4e48aa483f7ad48e4c286271caa8c4a6"
+    },
+    {
+      "file": "fixtures/types/selection-review/cases.ts",
+      "bytes": 3005,
+      "sha256": "c3610fad6def6383d18292a1dd7dbffb4f68cfb634cdfe48697b8997fdd820a0"
+    },
+    {
+      "file": "fixtures/types/selection-review/equals.cts",
+      "bytes": 53,
+      "sha256": "eceedf7e34c639ff92f5c06177239773b96a095261103e9c4e12861391b7faad"
+    },
+    {
+      "file": "fixtures/types/selection-review/exports.ts",
+      "bytes": 266,
+      "sha256": "76e9bfe03ee0a76c3a885e2db8a9683f5d94a4e57db21addccf222efe34a3c07"
+    },
+    {
+      "file": "fixtures/types/selection-review/history.ts",
+      "bytes": 251,
+      "sha256": "78b179944e5b4b3368434b6e1ef8ce0d3f94b2213af43cb2bd41ab6e066d97b7"
+    },
+    {
+      "file": "fixtures/types/selection-review/keys.json",
+      "bytes": 11,
+      "sha256": "67c40a161889b2de243cab979e3f5b7d08df73ba5c6c4ab271f6d4b173f0964e"
+    },
+    {
+      "file": "fixtures/types/selection-review/tsconfig.json",
+      "bytes": 276,
+      "sha256": "cebbeef805f018043a0087e3292c60b07999ac553235d00ea99352b5d65a0b6f"
+    },
+    {
+      "file": "fixtures/types/selection-review/types-only.ts",
+      "bytes": 39,
+      "sha256": "d314097d92b594d4304b3b89439e7a8448fb90fe2e675a027d04dc77a0f692fb"
+    },
+    {
+      "file": "fixtures/types/selection/cases.ts",
+      "bytes": 495,
+      "sha256": "5f7d3430912b0b81ba18126d93a9a68150ac21d83115ba2a965d93475b85662f"
+    },
+    {
+      "file": "fixtures/types/selection/tsconfig.json",
+      "bytes": 125,
+      "sha256": "8a77b692b7a1d7446027a8635200aeff4e48aa483f7ad48e4c286271caa8c4a6"
+    },
+    {
+      "file": "fixtures/types/type-algebra/cases.ts",
+      "bytes": 2711,
+      "sha256": "563002793030acbae45b42efd842231a12edb7663d26f5f62611287d2d4bd0e7"
+    },
+    {
+      "file": "fixtures/types/type-algebra/loose.json",
+      "bytes": 77,
+      "sha256": "e438052060556a9b54539b9f57dd788ed7d9988ffb15667f5b64b869792b9369"
+    },
+    {
+      "file": "fixtures/types/type-algebra/observations.json",
+      "bytes": 56072,
+      "sha256": "3de54ea2746caecb3b0449b10a8f49b042bef3fb6278d6a5187d3c459b7fd131"
+    },
+    {
+      "file": "fixtures/types/type-algebra/provenance.json",
+      "bytes": 1717,
+      "sha256": "72ec53cd9deb669eeab0fa2cb471d5be187af82944d3ee01a9a73e987e088a45"
+    },
+    {
+      "file": "fixtures/types/type-algebra/tsconfig.json",
+      "bytes": 125,
+      "sha256": "8a77b692b7a1d7446027a8635200aeff4e48aa483f7ad48e4c286271caa8c4a6"
+    },
+    {
+      "file": "tools/navigation-oracle.mjs",
+      "bytes": 15291,
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+    },
+    {
+      "file": "tools/semantic-oracle.mjs",
+      "bytes": 48985,
+      "sha256": "bc969538c077b64b4bf65e87be063ed5903f7d2cca739676b3780c13565f565a"
+    },
+    {
+      "file": "tools/type-algebra-oracle.test.mjs",
+      "bytes": 7193,
+      "sha256": "6815f7b9914badfeee572ddaa6c7da147d7c6d63fef91234fde2792f4ad80456"
+    },
+    {
+      "file": "tools/type-json-oracle.test.mjs",
+      "bytes": 10705,
+      "sha256": "8b684cb43a531932b6bc2af515b77d3f4ca6114e1288c7ccde884a8c27e59c17"
+    },
+    {
+      "file": "tools/type-member-relations.test.mjs",
+      "bytes": 6578,
+      "sha256": "bfe91b8273fbabbf767ad59745b04f0c8b1e0aee8b827e28eac5a15e67797e1a"
+    },
+    {
+      "file": "tools/type-native-vertical-oracle.test.mjs",
+      "bytes": 3234,
+      "sha256": "3362db33afd869b3dd2e0532ad9614da79bc2917795d5b574276365202867bc7"
+    },
+    {
+      "file": "tools/type-oracle-review.test.mjs",
+      "bytes": 9703,
+      "sha256": "11ea93329f929c6436e52e0ad2bdb9689d8a10cac0d6ab4ff946bc4015a3b014"
+    },
+    {
+      "file": "tools/type-oracle.mjs",
+      "bytes": 37996,
+      "sha256": "7caa3182d73c92937caa4bb2f5b232fd0db6f563cdcda73f8077a99cbb15d2aa"
+    },
+    {
+      "file": "tools/type-oracle.test.mjs",
+      "bytes": 28629,
+      "sha256": "921bb2ff94b172dd8ac64178ea331419e825ed130a794a75452c3cbf8779b8be"
+    },
+    {
+      "file": "tools/type-selection-oracle-review.test.mjs",
+      "bytes": 13317,
+      "sha256": "fe9cb5442ae2870e669b6830b220db1a4e660cdf70ea24a4844e2c2665592aa8"
+    }
+  ],
+  "setups": {
+    "inputReplay": "Copy input-replay to a temporary project; move dual to node_modules/dual; prepend UTF-8 BOM to cases.mts and append the member controls exactly as tools/type-oracle.test.mjs does."
+  },
+  "expectations": "Behavior-level pinned assertions in the inventoried oracle suites; complete design graph/counter/candidate coverage remains open.",
+  "corpusManifest": "fixtures/types/command-center/input-manifest.json"
+}

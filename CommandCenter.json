@@ -2,6 +2,15 @@
   "initScriptPath": null,
   "validation": {
     "commands": {
+      "storage-benchmark-build": {
+        "command": {
+          "full": "scripts/validate/storage-benchmark-build-full.sh"
+        },
+        "cost": 2,
+        "timeoutMs": 1800000,
+        "description": "Build the release CLI and reference storage benchmark with two jobs, without a release test harness",
+        "pathArgs": "forbid"
+      },
       "benchmark-build": {
         "command": {
           "full": "scripts/validate/benchmark-build-full.sh"
@@ -35,7 +44,7 @@
         },
         "cost": 2,
         "timeoutMs": 900000,
-        "description": "Run Rust tests or explicit integration-test files with two build jobs and two test threads",
+        "description": "Run Rust tests, explicit library/binary/integration roots, or one resource-test module file with two build jobs and two test threads",
         "pathArgs": "paths"
       },
       "harness-test": {
@@ -56,8 +65,32 @@
         "timeoutMs": 900000,
         "description": "Check fixtures/references against the pinned TypeScript 7.0.2 semantic oracle and fixtures/navigation against its document symbols; exit 2 means the compilers were not found",
         "pathArgs": "forbid"
+      },
+      "native-corpus-journeys": {
+        "command": {
+          "full": "scripts/validate/native-corpus-journeys-full.sh"
+        },
+        "cost": 2,
+        "timeoutMs": 1800000,
+        "description": "Build the release CLI and compare eight frozen Command Center corpus journeys twice per path, recording CLI peak RSS and samples from one service generation",
+        "pathArgs": "forbid"
+      },
+      "native-corpus-load-baseline": {
+        "command": {
+          "full": "scripts/validate/native-corpus-load-baseline-full.sh"
+        },
+        "cost": 1,
+        "timeoutMs": 600000,
+        "description": "Measure two direct and two service lexical requests on the source-bound release corpus binary, including normal checker initialization but no member/type demand",
+        "pathArgs": "forbid"
       }
     },
-    "preMerge": ["format", "lint", "test", "harness-test", "semantic"]
+    "preMerge": [
+      "format",
+      "lint",
+      "test",
+      "harness-test",
+      "semantic"
+    ]
   }
 }

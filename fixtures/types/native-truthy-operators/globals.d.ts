@@ -1,0 +1,13 @@
+interface Array<T> { length: number; [index: number]: T }
+interface ReadonlyArray<T> { readonly length: number; readonly [index: number]: T }
+interface Object {}
+interface Function {}
+interface CallableFunction {}
+interface NewableFunction {}
+interface IArguments { length: number; [index: number]: any }
+interface String {}
+interface Number {}
+interface Boolean {}
+interface RegExp {}
+declare const NaN: number;
+declare const Infinity: number;

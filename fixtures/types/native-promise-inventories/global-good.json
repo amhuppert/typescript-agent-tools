@@ -1,0 +1,1 @@
+{"extends": "./tsconfig.json", "files": ["globals.d.ts", "awaited-good.d.ts", "global.ts"]}

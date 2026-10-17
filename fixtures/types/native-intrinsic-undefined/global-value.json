@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "files": [
+    "globals.d.ts",
+    "global-value.ts"
+  ]
+}

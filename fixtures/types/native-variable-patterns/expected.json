@@ -1,0 +1,410 @@
+[
+  {
+    "config": "tsconfig",
+    "name": "object",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "renamed",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "nested",
+    "summary": "boolean",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "defaultInferred",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "defaultAnnotated",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "arrayHead",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "arrayOptional",
+    "summary": "boolean | undefined",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "arrayRest",
+    "summary": "[number, (boolean | undefined)?]",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "anyParent",
+    "summary": "any",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "caught",
+    "summary": "unknown",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "forIn",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "forOf",
+    "summary": "string | number | boolean | undefined",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "classNil",
+    "summary": "any",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "parameter",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "restParameter",
+    "summary": "string[]",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "nestedDefault",
+    "summary": "boolean",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "optionalAnnotation",
+    "summary": "number | undefined",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "object",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "renamed",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "nested",
+    "summary": "boolean",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "defaultInferred",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "defaultAnnotated",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "arrayHead",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "arrayOptional",
+    "summary": "boolean",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "arrayRest",
+    "summary": "[number, boolean?]",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "anyParent",
+    "summary": "any",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "caught",
+    "summary": "any",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "forIn",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "forOf",
+    "summary": "string | number | boolean",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "classNil",
+    "summary": "any",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "parameter",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "restParameter",
+    "summary": "string[]",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "nestedDefault",
+    "summary": "boolean",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "optionalAnnotation",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "object",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "renamed",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "nested",
+    "summary": "boolean",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "defaultInferred",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "defaultAnnotated",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "arrayHead",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "arrayOptional",
+    "summary": "boolean | undefined",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "arrayRest",
+    "summary": "[number, boolean?]",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "anyParent",
+    "summary": "any",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "caught",
+    "summary": "unknown",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "forIn",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "forOf",
+    "summary": "string | number | boolean | undefined",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "classNil",
+    "summary": "any",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "parameter",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "restParameter",
+    "summary": "string[]",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "nestedDefault",
+    "summary": "boolean",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "optionalAnnotation",
+    "summary": "number | undefined",
+    "errorType": false
+  },
+  {
+    "config": "unchecked",
+    "name": "object",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "config": "unchecked",
+    "name": "renamed",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "config": "unchecked",
+    "name": "nested",
+    "summary": "boolean",
+    "errorType": false
+  },
+  {
+    "config": "unchecked",
+    "name": "defaultInferred",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "config": "unchecked",
+    "name": "defaultAnnotated",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "config": "unchecked",
+    "name": "arrayHead",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "config": "unchecked",
+    "name": "arrayOptional",
+    "summary": "boolean | undefined",
+    "errorType": false
+  },
+  {
+    "config": "unchecked",
+    "name": "arrayRest",
+    "summary": "[number, (boolean | undefined)?]",
+    "errorType": false
+  },
+  {
+    "config": "unchecked",
+    "name": "anyParent",
+    "summary": "any",
+    "errorType": false
+  },
+  {
+    "config": "unchecked",
+    "name": "caught",
+    "summary": "unknown",
+    "errorType": false
+  },
+  {
+    "config": "unchecked",
+    "name": "forIn",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "config": "unchecked",
+    "name": "forOf",
+    "summary": "string | number | boolean | undefined",
+    "errorType": false
+  },
+  {
+    "config": "unchecked",
+    "name": "classNil",
+    "summary": "any",
+    "errorType": false
+  },
+  {
+    "config": "unchecked",
+    "name": "parameter",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "config": "unchecked",
+    "name": "restParameter",
+    "summary": "string[]",
+    "errorType": false
+  },
+  {
+    "config": "unchecked",
+    "name": "nestedDefault",
+    "summary": "boolean",
+    "errorType": false
+  },
+  {
+    "config": "unchecked",
+    "name": "optionalAnnotation",
+    "summary": "number | undefined",
+    "errorType": false
+  }
+]

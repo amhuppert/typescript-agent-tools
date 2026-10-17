@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2022",
+    "module": "ESNext",
+    "noLib": true,
+    "types": [],
+    "importHelpers": true
+  },
+  "files": [
+    "globals.d.ts",
+    "helpers-alias.d.ts",
+    "helpers.ts"
+  ]
+}

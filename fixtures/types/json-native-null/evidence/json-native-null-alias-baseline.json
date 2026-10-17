@@ -1,0 +1,1414 @@
+[
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "nullValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nil",
+    "summary": "any",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "nestedNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nested",
+    "summary": "{ nil: any; }",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 3,
+          "column": 3
+        },
+        "end": {
+          "line": 3,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [
+      {
+        "name": "nil",
+        "summary": "any",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 3,
+              "column": 14
+            },
+            "end": {
+              "line": 3,
+              "column": 19
+            }
+          }
+        ],
+        "children": []
+      }
+    ],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "toNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "toNull",
+    "summary": "any",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 4,
+          "column": 3
+        },
+        "end": {
+          "line": 4,
+          "column": 11
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 5,
+          "column": 3
+        },
+        "end": {
+          "line": 5,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "fromNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "fromNull",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 6,
+          "column": 3
+        },
+        "end": {
+          "line": 6,
+          "column": 13
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 7,
+          "column": 3
+        },
+        "end": {
+          "line": 7,
+          "column": 13
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "typeOnlyNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nil",
+    "summary": "any",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "nullValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nil",
+    "summary": "any",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "nestedNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nested",
+    "summary": "{ nil: any; }",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 3,
+          "column": 3
+        },
+        "end": {
+          "line": 3,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [
+      {
+        "name": "nil",
+        "summary": "any",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 3,
+              "column": 14
+            },
+            "end": {
+              "line": 3,
+              "column": 19
+            }
+          }
+        ],
+        "children": []
+      }
+    ],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "toNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "toNull",
+    "summary": "any",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 4,
+          "column": 3
+        },
+        "end": {
+          "line": 4,
+          "column": 11
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 5,
+          "column": 3
+        },
+        "end": {
+          "line": 5,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "fromNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "fromNull",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 6,
+          "column": 3
+        },
+        "end": {
+          "line": 6,
+          "column": 13
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 7,
+          "column": 3
+        },
+        "end": {
+          "line": 7,
+          "column": 13
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "typeOnlyNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nil",
+    "summary": "any",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "nullValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nil",
+    "summary": "any",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "nestedNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nested",
+    "summary": "{ nil: any; }",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 3,
+          "column": 3
+        },
+        "end": {
+          "line": 3,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [
+      {
+        "name": "nil",
+        "summary": "any",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 3,
+              "column": 14
+            },
+            "end": {
+              "line": 3,
+              "column": 19
+            }
+          }
+        ],
+        "children": []
+      }
+    ],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "toNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "toNull",
+    "summary": "any",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 4,
+          "column": 3
+        },
+        "end": {
+          "line": 4,
+          "column": 11
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 5,
+          "column": 3
+        },
+        "end": {
+          "line": 5,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "fromNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "fromNull",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 6,
+          "column": 3
+        },
+        "end": {
+          "line": 6,
+          "column": 13
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 7,
+          "column": 3
+        },
+        "end": {
+          "line": 7,
+          "column": 13
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "typeOnlyNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nil",
+    "summary": "any",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "nullValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nil",
+    "summary": "any",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "nestedNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nested",
+    "summary": "{ nil: any; }",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 3,
+          "column": 3
+        },
+        "end": {
+          "line": 3,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [
+      {
+        "name": "nil",
+        "summary": "any",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 3,
+              "column": 14
+            },
+            "end": {
+              "line": 3,
+              "column": 19
+            }
+          }
+        ],
+        "children": []
+      }
+    ],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "toNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "toNull",
+    "summary": "any",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 4,
+          "column": 3
+        },
+        "end": {
+          "line": 4,
+          "column": 11
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 5,
+          "column": 3
+        },
+        "end": {
+          "line": 5,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "fromNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "fromNull",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 6,
+          "column": 3
+        },
+        "end": {
+          "line": 6,
+          "column": 13
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 7,
+          "column": 3
+        },
+        "end": {
+          "line": 7,
+          "column": 13
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 0,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "typeOnlyNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nil",
+    "summary": "any",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": [
+      5052
+    ]
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "nullValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nil",
+    "summary": "null",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "nestedNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nested",
+    "summary": "{ nil: null; }",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 3,
+          "column": 3
+        },
+        "end": {
+          "line": 3,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [
+      {
+        "name": "nil",
+        "summary": "null",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 3,
+              "column": 14
+            },
+            "end": {
+              "line": 3,
+              "column": 19
+            }
+          }
+        ],
+        "children": []
+      }
+    ],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "toNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "toNull",
+    "summary": "null",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 4,
+          "column": 3
+        },
+        "end": {
+          "line": 4,
+          "column": 11
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 5,
+          "column": 3
+        },
+        "end": {
+          "line": 5,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "fromNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "fromNull",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 6,
+          "column": 3
+        },
+        "end": {
+          "line": 6,
+          "column": 13
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 7,
+          "column": 3
+        },
+        "end": {
+          "line": 7,
+          "column": 13
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 0,
+    "marker": "typeOnlyNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nil",
+    "summary": "null",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "nullValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nil",
+    "summary": "null",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "nestedNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nested",
+    "summary": "{ nil: null; }",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 3,
+          "column": 3
+        },
+        "end": {
+          "line": 3,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [
+      {
+        "name": "nil",
+        "summary": "null",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 3,
+              "column": 14
+            },
+            "end": {
+              "line": 3,
+              "column": 19
+            }
+          }
+        ],
+        "children": []
+      }
+    ],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "toNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "toNull",
+    "summary": "null",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 4,
+          "column": 3
+        },
+        "end": {
+          "line": 4,
+          "column": 11
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 5,
+          "column": 3
+        },
+        "end": {
+          "line": 5,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "fromNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "fromNull",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 6,
+          "column": 3
+        },
+        "end": {
+          "line": 6,
+          "column": 13
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 7,
+          "column": 3
+        },
+        "end": {
+          "line": 7,
+          "column": 13
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 0,
+    "unchecked": 1,
+    "marker": "typeOnlyNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nil",
+    "summary": "null",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "nullValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nil",
+    "summary": "null",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "nestedNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nested",
+    "summary": "{ nil: null; }",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 3,
+          "column": 3
+        },
+        "end": {
+          "line": 3,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [
+      {
+        "name": "nil",
+        "summary": "null",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 3,
+              "column": 14
+            },
+            "end": {
+              "line": 3,
+              "column": 19
+            }
+          }
+        ],
+        "children": []
+      }
+    ],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "toNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "toNull",
+    "summary": "null",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 4,
+          "column": 3
+        },
+        "end": {
+          "line": 4,
+          "column": 11
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 5,
+          "column": 3
+        },
+        "end": {
+          "line": 5,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "fromNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "fromNull",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 6,
+          "column": 3
+        },
+        "end": {
+          "line": 6,
+          "column": 13
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 7,
+          "column": 3
+        },
+        "end": {
+          "line": 7,
+          "column": 13
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 0,
+    "marker": "typeOnlyNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nil",
+    "summary": "null",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "nullValue",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nil",
+    "summary": "null",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "nestedNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nested",
+    "summary": "{ nil: null; }",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 3,
+          "column": 3
+        },
+        "end": {
+          "line": 3,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [
+      {
+        "name": "nil",
+        "summary": "null",
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "file": "data.json",
+            "start": {
+              "line": 3,
+              "column": 14
+            },
+            "end": {
+              "line": 3,
+              "column": 19
+            }
+          }
+        ],
+        "children": []
+      }
+    ],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "toNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "toNull",
+    "summary": "null",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 4,
+          "column": 3
+        },
+        "end": {
+          "line": 4,
+          "column": 11
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 5,
+          "column": 3
+        },
+        "end": {
+          "line": 5,
+          "column": 11
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "fromNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "fromNull",
+    "summary": "number",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 6,
+          "column": 3
+        },
+        "end": {
+          "line": 6,
+          "column": 13
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 7,
+          "column": 3
+        },
+        "end": {
+          "line": 7,
+          "column": 13
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  },
+  {
+    "strict": 1,
+    "exact": 1,
+    "unchecked": 1,
+    "marker": "typeOnlyNull",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol",
+    "name": "nil",
+    "summary": "null",
+    "errorType": false,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "file": "data.json",
+        "start": {
+          "line": 2,
+          "column": 3
+        },
+        "end": {
+          "line": 2,
+          "column": 8
+        }
+      }
+    ],
+    "properties": [],
+    "fatalDiagnostics": []
+  }
+]

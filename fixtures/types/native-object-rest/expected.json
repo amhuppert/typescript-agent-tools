@@ -1,0 +1,404 @@
+[
+  {
+    "config": "tsconfig",
+    "name": "record",
+    "summary": "{ kept: string; optional?: number | undefined; method(): boolean; get pair(): number; set pair(value: string); setter: undefined; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "class",
+    "summary": "{ data: string; copied: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "union",
+    "summary": "{ left: \"left\"; } | { right: \"right\"; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "nullable",
+    "summary": "{ keep: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "any",
+    "summary": "any",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "empty",
+    "summary": "{}",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "index",
+    "summary": "{ readonly [key: string]: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "excluded",
+    "summary": "{ kept: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "copiedFailure",
+    "summary": "{ broken: Missing_copied; }",
+    "errorType": false,
+    "codes": [
+      2304
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "unknown",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2700
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "number",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2700
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "falsy",
+    "summary": "{} | {} | {} | { keep: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "truthy",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2700
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "noKeys",
+    "summary": "T",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "generic",
+    "summary": "Omit<T, \"drop\">",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "parameter",
+    "summary": "{ kept: T; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "instantiated",
+    "summary": "{ kept: string; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "assignment",
+    "summary": "{ drop: number; kept: string; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "loose",
+    "name": "record",
+    "summary": "{ kept: string; optional?: number; method(): boolean; get pair(): number; set pair(value: string); setter: undefined; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "loose",
+    "name": "class",
+    "summary": "{ data: string; copied: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "loose",
+    "name": "union",
+    "summary": "{ left: \"left\"; } | { right: \"right\"; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "loose",
+    "name": "nullable",
+    "summary": "{ keep: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "loose",
+    "name": "any",
+    "summary": "any",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "loose",
+    "name": "empty",
+    "summary": "{}",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "loose",
+    "name": "index",
+    "summary": "{ readonly [key: string]: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "loose",
+    "name": "excluded",
+    "summary": "{ kept: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "loose",
+    "name": "copiedFailure",
+    "summary": "{ broken: Missing_copied; }",
+    "errorType": false,
+    "codes": [
+      2304
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "unknown",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2700
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "number",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2700
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "falsy",
+    "summary": "{} | {} | {} | { keep: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "loose",
+    "name": "truthy",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2700
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "noKeys",
+    "summary": "T",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "loose",
+    "name": "generic",
+    "summary": "Omit<T, \"drop\">",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "loose",
+    "name": "parameter",
+    "summary": "{ kept: T; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "loose",
+    "name": "instantiated",
+    "summary": "{ kept: string; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "loose",
+    "name": "assignment",
+    "summary": "{ drop: number; kept: string; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "exact",
+    "name": "record",
+    "summary": "{ kept: string; optional?: number; method(): boolean; get pair(): number; set pair(value: string); setter: undefined; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "exact",
+    "name": "class",
+    "summary": "{ data: string; copied: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "exact",
+    "name": "union",
+    "summary": "{ left: \"left\"; } | { right: \"right\"; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "exact",
+    "name": "nullable",
+    "summary": "{ keep: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "exact",
+    "name": "any",
+    "summary": "any",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "exact",
+    "name": "empty",
+    "summary": "{}",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "exact",
+    "name": "index",
+    "summary": "{ readonly [key: string]: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "exact",
+    "name": "excluded",
+    "summary": "{ kept: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "exact",
+    "name": "copiedFailure",
+    "summary": "{ broken: Missing_copied; }",
+    "errorType": false,
+    "codes": [
+      2304
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "unknown",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2700
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "number",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2700
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "falsy",
+    "summary": "{} | {} | {} | { keep: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "exact",
+    "name": "truthy",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2700
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "noKeys",
+    "summary": "T",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "exact",
+    "name": "generic",
+    "summary": "Omit<T, \"drop\">",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "exact",
+    "name": "parameter",
+    "summary": "{ kept: T; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "exact",
+    "name": "instantiated",
+    "summary": "{ kept: string; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "exact",
+    "name": "assignment",
+    "summary": "{ drop: number; kept: string; }",
+    "errorType": false,
+    "codes": []
+  }
+]

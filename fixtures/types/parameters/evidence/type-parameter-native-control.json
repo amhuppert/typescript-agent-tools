@@ -1,0 +1,292 @@
+[
+  {
+    "name": "any",
+    "operation": "root",
+    "inputCodes": [],
+    "root": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "canonicalParameter": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    }
+  },
+  {
+    "name": "any",
+    "operation": "constraint",
+    "inputCodes": [],
+    "root": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "canonicalParameter": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "constraint": {
+      "id": 9,
+      "summary": "unknown",
+      "flags": 2,
+      "errorType": false
+    }
+  },
+  {
+    "name": "any",
+    "operation": "defaultNode",
+    "inputCodes": [],
+    "root": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "canonicalParameter": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "defaultNode": null
+  },
+  {
+    "name": "unknown",
+    "operation": "root",
+    "inputCodes": [],
+    "root": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "canonicalParameter": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    }
+  },
+  {
+    "name": "unknown",
+    "operation": "constraint",
+    "inputCodes": [],
+    "root": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "canonicalParameter": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "constraint": {
+      "id": 9,
+      "summary": "unknown",
+      "flags": 2,
+      "errorType": false
+    }
+  },
+  {
+    "name": "unknown",
+    "operation": "defaultNode",
+    "inputCodes": [],
+    "root": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "canonicalParameter": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "defaultNode": null
+  },
+  {
+    "name": "default",
+    "operation": "root",
+    "inputCodes": [],
+    "root": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "canonicalParameter": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    }
+  },
+  {
+    "name": "default",
+    "operation": "constraint",
+    "inputCodes": [],
+    "root": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "canonicalParameter": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "constraint": null
+  },
+  {
+    "name": "default",
+    "operation": "defaultNode",
+    "inputCodes": [],
+    "root": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "canonicalParameter": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "defaultNode": {
+      "id": 66,
+      "summary": "\"ready\"",
+      "flags": 1024,
+      "errorType": false
+    }
+  },
+  {
+    "name": "missingConstraint",
+    "operation": "root",
+    "inputCodes": [],
+    "root": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "canonicalParameter": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    }
+  },
+  {
+    "name": "missingConstraint",
+    "operation": "constraint",
+    "inputCodes": [],
+    "root": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "canonicalParameter": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "constraint": {
+      "id": 66,
+      "summary": "MissingConstraint",
+      "flags": 1,
+      "errorType": true
+    }
+  },
+  {
+    "name": "missingConstraint",
+    "operation": "defaultNode",
+    "inputCodes": [],
+    "root": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "canonicalParameter": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "defaultNode": null
+  },
+  {
+    "name": "missingDefault",
+    "operation": "root",
+    "inputCodes": [],
+    "root": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "canonicalParameter": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    }
+  },
+  {
+    "name": "missingDefault",
+    "operation": "constraint",
+    "inputCodes": [],
+    "root": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "canonicalParameter": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "constraint": null
+  },
+  {
+    "name": "missingDefault",
+    "operation": "defaultNode",
+    "inputCodes": [],
+    "root": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "canonicalParameter": {
+      "id": 65,
+      "summary": "T",
+      "flags": 524288,
+      "errorType": false
+    },
+    "defaultNode": {
+      "id": 66,
+      "summary": "MissingDefault",
+      "flags": 1,
+      "errorType": true
+    }
+  }
+]

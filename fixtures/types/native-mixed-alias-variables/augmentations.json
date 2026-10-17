@@ -1,0 +1,1 @@
+{"extends":"./tsconfig.json","files":["globals.d.ts","augmentation-first.ts","augmentation-second.ts","augmentation-cases.ts"]}

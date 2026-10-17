@@ -1,0 +1,322 @@
+[
+  {
+    "layout": "plain",
+    "width": 16,
+    "profile": "strict",
+    "file": "plain-16.ts",
+    "config": "plain-16-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "plain-16.ts"
+      ]
+    }
+  },
+  {
+    "layout": "plain",
+    "width": 16,
+    "profile": "nocheck",
+    "file": "plain-16.ts",
+    "config": "plain-16-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "plain-16.ts"
+      ]
+    }
+  },
+  {
+    "layout": "plain",
+    "width": 16,
+    "profile": "loose",
+    "file": "plain-16.ts",
+    "config": "plain-16-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "plain-16.ts"
+      ]
+    }
+  },
+  {
+    "layout": "plain",
+    "width": 16,
+    "profile": "loose-nocheck",
+    "file": "plain-16.ts",
+    "config": "plain-16-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "plain-16.ts"
+      ]
+    }
+  },
+  {
+    "layout": "plain",
+    "width": 64,
+    "profile": "strict",
+    "file": "plain-64.ts",
+    "config": "plain-64-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "plain-64.ts"
+      ]
+    }
+  },
+  {
+    "layout": "plain",
+    "width": 64,
+    "profile": "nocheck",
+    "file": "plain-64.ts",
+    "config": "plain-64-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "plain-64.ts"
+      ]
+    }
+  },
+  {
+    "layout": "plain",
+    "width": 64,
+    "profile": "loose",
+    "file": "plain-64.ts",
+    "config": "plain-64-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "plain-64.ts"
+      ]
+    }
+  },
+  {
+    "layout": "plain",
+    "width": 64,
+    "profile": "loose-nocheck",
+    "file": "plain-64.ts",
+    "config": "plain-64-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "plain-64.ts"
+      ]
+    }
+  },
+  {
+    "layout": "late",
+    "width": 16,
+    "profile": "strict",
+    "file": "late-16.ts",
+    "config": "late-16-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "late-16.ts"
+      ]
+    }
+  },
+  {
+    "layout": "late",
+    "width": 16,
+    "profile": "nocheck",
+    "file": "late-16.ts",
+    "config": "late-16-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "late-16.ts"
+      ]
+    }
+  },
+  {
+    "layout": "late",
+    "width": 16,
+    "profile": "loose",
+    "file": "late-16.ts",
+    "config": "late-16-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "late-16.ts"
+      ]
+    }
+  },
+  {
+    "layout": "late",
+    "width": 16,
+    "profile": "loose-nocheck",
+    "file": "late-16.ts",
+    "config": "late-16-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "late-16.ts"
+      ]
+    }
+  },
+  {
+    "layout": "late",
+    "width": 64,
+    "profile": "strict",
+    "file": "late-64.ts",
+    "config": "late-64-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "late-64.ts"
+      ]
+    }
+  },
+  {
+    "layout": "late",
+    "width": 64,
+    "profile": "nocheck",
+    "file": "late-64.ts",
+    "config": "late-64-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "late-64.ts"
+      ]
+    }
+  },
+  {
+    "layout": "late",
+    "width": 64,
+    "profile": "loose",
+    "file": "late-64.ts",
+    "config": "late-64-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "late-64.ts"
+      ]
+    }
+  },
+  {
+    "layout": "late",
+    "width": 64,
+    "profile": "loose-nocheck",
+    "file": "late-64.ts",
+    "config": "late-64-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "late-64.ts"
+      ]
+    }
+  }
+]

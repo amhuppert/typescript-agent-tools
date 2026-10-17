@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "strict": true,
+    "strictNullChecks": true,
+    "noCheck": false,
+    "noLib": true
+  },
+  "files": [
+    "globals.d.ts",
+    "cjk-16.ts"
+  ]
+}

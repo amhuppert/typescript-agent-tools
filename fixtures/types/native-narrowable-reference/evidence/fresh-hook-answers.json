@@ -1,0 +1,3410 @@
+[
+  {
+    "config": "tsconfig.json",
+    "marker": "unconstrained",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 1,
+        "column": 64
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "normal"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 65,
+        "rawFlags": 524288,
+        "rawId": 65,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "unconstrained",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 1,
+        "column": 64
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "inferential"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 65,
+        "rawFlags": 524288,
+        "rawId": 65,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "primitiveMissingContext",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 9,
+        "column": 123
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "normal"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 65,
+        "rawFlags": 524288,
+        "rawId": 65,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "primitiveMissingContext",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 9,
+        "column": 123
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "inferential"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 65,
+        "rawFlags": 524288,
+        "rawId": 65,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "unionStatement",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 3,
+        "column": 90
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "normal"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 65,
+        "rawFlags": 524288,
+        "rawId": 65,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "unionStatement",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 3,
+        "column": 90
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "inferential"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 65,
+        "rawFlags": 524288,
+        "rawId": 65,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "primitiveContext",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 5,
+        "column": 126
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "normal"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 134217728,
+        "narrowedId": 29,
+        "rawFlags": 524288,
+        "rawId": 65,
+        "sameIdentity": false,
+        "summary": "string | number"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "primitiveContext",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 5,
+        "column": 126
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "inferential"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 65,
+        "rawFlags": 524288,
+        "rawId": 65,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "genericContext",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 7,
+        "column": 108
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "normal"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 65,
+        "rawFlags": 524288,
+        "rawId": 65,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "genericContext",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 7,
+        "column": 108
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "inferential"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 65,
+        "rawFlags": 524288,
+        "rawId": 65,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "missingConstraint",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 10,
+        "column": 88
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "normal"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2304
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2304
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 65,
+        "rawFlags": 524288,
+        "rawId": 65,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2304
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "missingConstraint",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 10,
+        "column": 88
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "inferential"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 65,
+        "rawFlags": 524288,
+        "rawId": 65,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "genericElementReceiver",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 13,
+        "column": 135
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "normal"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 65,
+        "rawFlags": 524288,
+        "rawId": 65,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "genericElementReceiver",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 13,
+        "column": 135
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "inferential"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 65,
+        "rawFlags": 524288,
+        "rawId": 65,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "unconstrained",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 1,
+        "column": 64
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "normal"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+          "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 66,
+        "rawFlags": 524288,
+        "rawId": 66,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "unconstrained",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 1,
+        "column": 64
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "inferential"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+          "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 66,
+        "rawFlags": 524288,
+        "rawId": 66,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "primitiveMissingContext",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 9,
+        "column": 123
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "normal"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+          "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 66,
+        "rawFlags": 524288,
+        "rawId": 66,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "primitiveMissingContext",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 9,
+        "column": 123
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "inferential"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+          "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 66,
+        "rawFlags": 524288,
+        "rawId": 66,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "unionStatement",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 3,
+        "column": 90
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "normal"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+          "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 66,
+        "rawFlags": 524288,
+        "rawId": 66,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "unionStatement",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 3,
+        "column": 90
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "inferential"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+          "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 66,
+        "rawFlags": 524288,
+        "rawId": 66,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "primitiveContext",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 5,
+        "column": 126
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "normal"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+          "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 134217728,
+        "narrowedId": 31,
+        "rawFlags": 524288,
+        "rawId": 66,
+        "sameIdentity": false,
+        "summary": "string | number"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "primitiveContext",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 5,
+        "column": 126
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "inferential"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+          "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 66,
+        "rawFlags": 524288,
+        "rawId": 66,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "genericContext",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 7,
+        "column": 108
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "normal"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+          "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 66,
+        "rawFlags": 524288,
+        "rawId": 66,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "genericContext",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 7,
+        "column": 108
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "inferential"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+          "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 66,
+        "rawFlags": 524288,
+        "rawId": 66,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "missingConstraint",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 10,
+        "column": 88
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "normal"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+          "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2304
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2304
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 66,
+        "rawFlags": 524288,
+        "rawId": 66,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2304
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "missingConstraint",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 10,
+        "column": 88
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "inferential"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+          "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 66,
+        "rawFlags": 524288,
+        "rawId": 66,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "genericElementReceiver",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 13,
+        "column": 135
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "normal"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+          "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 66,
+        "rawFlags": 524288,
+        "rawId": 66,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "genericElementReceiver",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 13,
+        "column": 135
+      },
+      "operation": "type",
+      "question": "value",
+      "history": "cold",
+      "narrowMode": "inferential"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "cold",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/cases.ts",
+          "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json",
+          "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/tsconfig.json",
+          "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "T",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "narrowable": {
+        "after": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "before": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "narrowedFlags": 524288,
+        "narrowedId": 66,
+        "rawFlags": 524288,
+        "rawId": 66,
+        "sameIdentity": true,
+        "summary": "T"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-narrowable-reference/loose.json"
+      }
+    }
+  }
+]

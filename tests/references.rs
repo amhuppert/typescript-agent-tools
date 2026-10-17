@@ -391,7 +391,9 @@ fn alias_cycles_resolve_through_local_declarations_whichever_file_loads_first() 
     for order in [r#"["a.ts", "b.ts"]"#, r#"["b.ts", "a.ts"]"#] {
         let config = format!(r#"{{ "compilerOptions": {{ "noLib": true }}, "files": {order} }}"#);
         let fixture = Fixture::new(&[("tsconfig.json", &config), ("a.ts", a), ("b.ts", b)]);
-        let error = Project::load(&fixture.path("tsconfig.json")).unwrap_err();
+        let error = Project::load(&fixture.path("tsconfig.json"))
+            .map_err(support::input_error)
+            .unwrap_err();
         assert_eq!(error.kind, InputErrorKind::Binding, "{order}: {error}");
         assert!(error.path.unwrap().ends_with("a.ts"));
         assert_eq!(error.position, Some(at(1, 10)), "{order}");
@@ -450,6 +452,78 @@ fn exporting_a_merged_local_declaration_is_not_a_conflict() {
     // An import that resolves back to its own module's local is TS2440.
     let error = load_error(&[("a.ts", "import { x } from \"./a\";\nexport const x = 1;\n")]);
     assert_eq!(error.kind, InputErrorKind::Binding, "{error}");
+    assert_eq!(error.position, Some(at(1, 10)));
+}
+
+#[test]
+fn alias_conflicts_use_the_alias_location_and_suppression_in_either_order() {
+    for (statement, column) in [
+        ("import { x } from \"./lib\";", 10),
+        ("import { original as x } from \"./lib\";", 10),
+        ("import x from \"./lib\";", 8),
+        ("import * as x from \"./lib\";", 13),
+        ("import x = require(\"./eq\");", 1),
+    ] {
+        for alias_first in [true, false] {
+            for suppressed in ["none", "alias", "local"] {
+                let alias = format!(
+                    "{}{statement}",
+                    if suppressed == "alias" {
+                        "// @ts-ignore\n"
+                    } else {
+                        ""
+                    }
+                );
+                let local = format!(
+                    "{}const x = 1;",
+                    if suppressed == "local" {
+                        "// @ts-ignore\n"
+                    } else {
+                        ""
+                    }
+                );
+                let source = if alias_first {
+                    format!("{alias}\n{local}\n")
+                } else {
+                    format!("{local}\n{alias}\n")
+                };
+                let line = source[..source.find(statement).unwrap()]
+                    .bytes()
+                    .filter(|&byte| byte == b'\n')
+                    .count()
+                    + 1;
+                let fixture = project(&[
+                    (
+                        "lib.ts",
+                        "export const x = 1; export { x as original }; export default x;\n",
+                    ),
+                    (
+                        "eq.ts",
+                        "declare namespace target { const q: number; } export = target;\n",
+                    ),
+                    ("app.ts", &source),
+                ]);
+                let result =
+                    Project::load(&fixture.path("tsconfig.json")).map_err(support::input_error);
+                if suppressed == "alias" {
+                    assert!(result.is_ok(), "{source}: {result:?}");
+                } else {
+                    let error = result.unwrap_err();
+                    assert_eq!(error.kind, InputErrorKind::Binding, "{source}: {error}");
+                    assert_eq!(error.position, Some(at(line, column)), "{source}");
+                    assert!(error.path.unwrap().ends_with("app.ts"));
+                }
+            }
+        }
+    }
+    let error = load_error(&[
+        ("lib.ts", "export const x = 1;\n"),
+        (
+            "app.ts",
+            "import { x as a, x as b } from \"./lib\";\nconst b = 1;\nconst a = 1;\n",
+        ),
+    ]);
+    assert_eq!(error.kind, InputErrorKind::Binding);
     assert_eq!(error.position, Some(at(1, 10)));
 }
 
@@ -780,7 +854,7 @@ fn failed_explicit_default_exports_stay_unresolved() {
         ("lib.d.ts", "export { /*@?*/missing as /*@?*/default };\n"),
         (
             "app.ts",
-            "import /*@?*/D from \"./lib\";\n/*@?*/D./*@!*/x;\nexport {};\n",
+            "import /*@?*/D from \"./lib\";\n/*@?*/D./*@!*/x;\n/*@?*/D./*@!*/x./*@!*/more;\ntype /*@Qualified:d*/Qualified = /*@?*/D./*@?*/x;\nexport {};\n",
         ),
     ]);
     fixture.check_markers(&fixture.load());
@@ -852,7 +926,9 @@ fn automatic_jsx_runtimes_enter_the_program() {
     ]);
     missing.load();
     std::fs::write(missing.path("view.tsx"), "export const v = <div />;\n").unwrap();
-    let error = Project::load(&missing.path("tsconfig.json")).unwrap_err();
+    let error = Project::load(&missing.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_err();
     assert_eq!(error.kind, InputErrorKind::UnresolvedImport);
 }
 
@@ -956,7 +1032,7 @@ fn input_extensions_follow_the_file_system_case_policy() {
     let configure = |files: &str| {
         let config = format!(r#"{{ "compilerOptions": {{ "noLib": true }}, "files": {files} }}"#);
         std::fs::write(fixture.path("tsconfig.json"), config).unwrap();
-        Project::load(&fixture.path("tsconfig.json"))
+        Project::load(&fixture.path("tsconfig.json")).map_err(support::input_error)
     };
     let error = configure(r#"["SCRIPT.JS"]"#).unwrap_err();
     assert_eq!(error.kind, InputErrorKind::Unsupported, "{error}");
@@ -1043,7 +1119,9 @@ fn equally_specific_pattern_ambient_modules_resolve_to_the_first() {
         ("client.d.ts", client),
         ("app.ts", "import { twoStars } from \"aZb*c\";\ntwoStars;\n"),
     ]);
-    let error = Project::load(&fixture.path("tsconfig.json")).unwrap_err();
+    let error = Project::load(&fixture.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_err();
     assert_eq!(error.kind, InputErrorKind::UnresolvedImport, "{error}");
 }
 
@@ -1113,7 +1191,7 @@ fn exported_and_local_declarations_conflict_by_declaration_space() {
     // namespace but not with a local instantiated one.
     let load = |source: &str| {
         let fixture = project(&[("a.ts", source)]);
-        Project::load(&fixture.path("tsconfig.json"))
+        Project::load(&fixture.path("tsconfig.json")).map_err(support::input_error)
     };
     for source in [
         "export enum Color { Red }\nnamespace Color { export type Name = keyof typeof Color; }\n",
@@ -1139,7 +1217,7 @@ fn a_const_enum_namespace_precedes_a_function_unless_const_enums_are_kept() {
     let load = |options: &str| {
         let config = format!(r#"{{ "compilerOptions": {{ "noLib": true{options} }} }}"#);
         let fixture = Fixture::new(&[("tsconfig.json", config.as_str()), ("a.ts", source)]);
-        Project::load(&fixture.path("tsconfig.json"))
+        Project::load(&fixture.path("tsconfig.json")).map_err(support::input_error)
     };
     load("").unwrap_or_else(|error| panic!("{error}"));
     for option in [
@@ -1152,7 +1230,9 @@ fn a_const_enum_namespace_precedes_a_function_unless_const_enums_are_kept() {
     }
     let instantiated = "namespace f { export const x = 1; }\nfunction f() {}\nexport {};\n";
     let fixture = project(&[("a.ts", instantiated)]);
-    let error = Project::load(&fixture.path("tsconfig.json")).unwrap_err();
+    let error = Project::load(&fixture.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_err();
     assert_eq!(error.kind, InputErrorKind::Binding, "{error}");
 }
 
@@ -1222,7 +1302,9 @@ fn reference_directives_in_selected_package_files_must_resolve() {
             "/// <reference path=\"./absent.d.ts\" />\ninterface G {}\n",
         ),
     ]);
-    let error = Project::load(&fixture.path("tsconfig.json")).unwrap_err();
+    let error = Project::load(&fixture.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_err();
     assert_eq!(error.kind, InputErrorKind::UnresolvedImport);
 }
 
@@ -1358,7 +1440,8 @@ fn unresolved_inputs_fail_only_where_reported() {
                         .map(|(path, text)| (path.as_str(), text.as_str())),
                 );
                 let fixture = Fixture::new(&all);
-                let result = Project::load(&fixture.path("tsconfig.json"));
+                let result =
+                    Project::load(&fixture.path("tsconfig.json")).map_err(support::input_error);
                 let tolerated = !local || skip && file.ends_with(".d.ts");
                 match result {
                     Ok(_) => assert!(tolerated, "{name} {file} local={local} skip={skip} loaded"),
@@ -1384,7 +1467,9 @@ fn missing_jsx_runtimes_are_reported_at_the_first_jsx_tag() {
     };
     let load = |checked: bool, source: &str| {
         let fixture = Fixture::new(&[("tsconfig.json", &config(checked)), ("app.tsx", source)]);
-        Project::load(&fixture.path("tsconfig.json")).map(|_| ())
+        Project::load(&fixture.path("tsconfig.json"))
+            .map_err(support::input_error)
+            .map(|_| ())
     };
     // Unchecked side-effect imports do not include the runtime.
     let error = load(false, "export const y = <div />;\n").unwrap_err();
@@ -1418,7 +1503,9 @@ fn jsx_pragmas_are_read_from_block_comments() {
             ),
             ("app.tsx", source),
         ]);
-        Project::load(&fixture.path("tsconfig.json")).map(|_| ())
+        Project::load(&fixture.path("tsconfig.json"))
+            .map_err(support::input_error)
+            .map(|_| ())
     };
     load("// @jsxImportSource preact\nexport const e = <div />;\n").unwrap();
     for pragma in [

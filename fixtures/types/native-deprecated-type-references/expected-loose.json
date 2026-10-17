@@ -1,0 +1,195 @@
+[
+  {
+    "name": "quick",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "deprecation": {}
+  },
+  {
+    "name": "checked",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "deprecation": {
+      "deprecatedConfirmation:10:48": {
+        "deprecated": true,
+        "end": 48,
+        "kind": 266,
+        "pos": 10
+      },
+      "deprecatedSuggestion:10:48": {
+        "end": 48,
+        "hasTag": true,
+        "kind": 266,
+        "pos": 10
+      }
+    }
+  },
+  {
+    "name": "quickGeneric",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "deprecation": {}
+  },
+  {
+    "name": "checkedGeneric",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "deprecation": {
+      "deprecatedConfirmation:48:96": {
+        "deprecated": true,
+        "end": 96,
+        "kind": 266,
+        "pos": 48
+      },
+      "deprecatedSuggestion:48:96": {
+        "end": 96,
+        "hasTag": true,
+        "kind": 266,
+        "pos": 48
+      }
+    }
+  },
+  {
+    "name": "rejectedConstraint",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2344
+    ],
+    "demandFailures": [],
+    "deprecation": {
+      "deprecatedConfirmation:96:160": {
+        "deprecated": true,
+        "end": 160,
+        "kind": 266,
+        "pos": 96
+      },
+      "deprecatedSuggestion:96:160": {
+        "end": 160,
+        "hasTag": true,
+        "kind": 266,
+        "pos": 96
+      }
+    }
+  },
+  {
+    "name": "badArity",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2315
+    ],
+    "demandFailures": [],
+    "deprecation": {}
+  },
+  {
+    "name": "missing",
+    "summary": "MissingReference",
+    "errorType": true,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "deprecation": {}
+  },
+  {
+    "name": "ordinary",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "deprecation": {
+      "deprecatedConfirmation:160:214": {
+        "deprecated": false,
+        "end": 214,
+        "kind": 266,
+        "pos": 160
+      }
+    }
+  },
+  {
+    "name": "hintOnly",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "deprecation": {
+      "deprecatedConfirmation:214:285": {
+        "deprecated": false,
+        "end": 285,
+        "kind": 266,
+        "pos": 214
+      }
+    }
+  },
+  {
+    "name": "mergedLater",
+    "summary": "Joined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "deprecation": {
+      "deprecatedConfirmation:285:321": {
+        "deprecated": false,
+        "end": 321,
+        "kind": 265,
+        "pos": 285
+      },
+      "deprecatedConfirmation:321:376": {
+        "deprecated": true,
+        "end": 376,
+        "kind": 265,
+        "pos": 321
+      },
+      "deprecatedSuggestion:285:321": {
+        "end": 321,
+        "hasTag": false,
+        "kind": 265,
+        "pos": 285
+      },
+      "deprecatedSuggestion:321:376": {
+        "end": 376,
+        "hasTag": true,
+        "kind": 265,
+        "pos": 321
+      }
+    }
+  },
+  {
+    "name": "mergedFirst",
+    "summary": "FirstDeprecated",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "deprecation": {
+      "deprecatedConfirmation:376:440": {
+        "deprecated": true,
+        "end": 440,
+        "kind": 265,
+        "pos": 376
+      },
+      "deprecatedSuggestion:376:440": {
+        "end": 440,
+        "hasTag": true,
+        "kind": 265,
+        "pos": 376
+      }
+    }
+  },
+  {
+    "name": "healthyAfter",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "deprecation": {}
+  }
+]

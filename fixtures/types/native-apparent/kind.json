@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "files": [
+    "kind.d.ts",
+    "cases.ts"
+  ]
+}

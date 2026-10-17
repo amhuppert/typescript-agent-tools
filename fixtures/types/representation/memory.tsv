@@ -1,0 +1,400 @@
+build	requested_heap_accounting	true
+inventory	src/lib/specs/execution-service.ts	101599	9649	9648	142	9664	40
+oracle	src/lib/specs/execution-service.ts	277	294	3583	string
+oracle	src/lib/specs/execution-service.ts	295	297	3600	string
+oracle	src/lib/specs/execution-service.ts	300	302	3801	string
+metric	src/lib/specs/execution-service.ts	parse-only	0	7642196	1668381	0	5728	1	9649	0
+metric	src/lib/specs/execution-service.ts	eager-ingest	0	9488927	2284617	429672	5762	1	9649	0
+metric	src/lib/specs/execution-service.ts	reprojection-ingest	0	6272537	1842337	5120	5752	1	9649	0
+metric	src/lib/specs/execution-service.ts	projection-only	0	1133145	442280	424552	10	0	9649	0
+metric	src/lib/specs/execution-service.ts	eager-single	0	92	0	0	0	0	9649	1
+metric	src/lib/specs/execution-service.ts	reproject-single	0	9857549	2284617	0	5762	1	9649	1
+metric	src/lib/specs/execution-service.ts	eager-batch16	0	549	0	0	0	0	9649	16
+metric	src/lib/specs/execution-service.ts	reproject-batch16	0	7137359	2284617	0	5762	1	9649	16
+metric	src/lib/specs/execution-service.ts	eager-all-annotations	0	1922	0	0	0	0	9649	142
+metric	src/lib/specs/execution-service.ts	reproject-all-annotations	0	6914651	2284617	0	5762	1	9649	142
+metric	src/lib/specs/execution-service.ts	parse-only	1	4027513	1668381	0	5728	1	9649	0
+metric	src/lib/specs/execution-service.ts	reprojection-ingest	1	4073681	1842337	5120	5752	1	9649	0
+metric	src/lib/specs/execution-service.ts	eager-ingest	1	11003617	2284617	429672	5762	1	9649	0
+metric	src/lib/specs/execution-service.ts	projection-only	1	4500197	442280	424552	10	0	9649	0
+metric	src/lib/specs/execution-service.ts	eager-single	1	106	0	0	0	0	9649	1
+metric	src/lib/specs/execution-service.ts	reproject-single	1	5157559	2284617	0	5762	1	9649	1
+metric	src/lib/specs/execution-service.ts	eager-batch16	1	263	0	0	0	0	9649	16
+metric	src/lib/specs/execution-service.ts	reproject-batch16	1	7066206	2284617	0	5762	1	9649	16
+metric	src/lib/specs/execution-service.ts	eager-all-annotations	1	1894	0	0	0	0	9649	142
+metric	src/lib/specs/execution-service.ts	reproject-all-annotations	1	8908629	2284617	0	5762	1	9649	142
+inventory	src/lib/specs/workflow-cleanup-port.ts	1891	108	107	0	108	40
+metric	src/lib/specs/workflow-cleanup-port.ts	parse-only	0	35367	17328	0	74	1	108	0
+metric	src/lib/specs/workflow-cleanup-port.ts	eager-ingest	0	55455	23544	4748	93	1	108	0
+metric	src/lib/specs/workflow-cleanup-port.ts	reprojection-ingest	0	43433	18712	0	85	1	108	0
+metric	src/lib/specs/workflow-cleanup-port.ts	projection-only	0	13608	4832	4748	8	0	108	0
+metric	src/lib/specs/workflow-cleanup-port.ts	parse-only	1	35974	17328	0	74	1	108	0
+metric	src/lib/specs/workflow-cleanup-port.ts	reprojection-ingest	1	40360	18712	0	85	1	108	0
+metric	src/lib/specs/workflow-cleanup-port.ts	eager-ingest	1	52431	23544	4748	93	1	108	0
+metric	src/lib/specs/workflow-cleanup-port.ts	projection-only	1	13019	4832	4748	8	0	108	0
+inventory	src/lib/agent-gateway/route-handlers.ts	4130	403	402	4	403	40
+oracle	src/lib/agent-gateway/route-handlers.ts	64	67	1210	string
+oracle	src/lib/agent-gateway/route-handlers.ts	68	71	1244	string
+oracle	src/lib/agent-gateway/route-handlers.ts	79	82	1361	string
+metric	src/lib/agent-gateway/route-handlers.ts	parse-only	0	139500	68834	0	247	1	403	0
+metric	src/lib/agent-gateway/route-handlers.ts	eager-ingest	0	213682	92461	17808	268	1	403	0
+metric	src/lib/agent-gateway/route-handlers.ts	reprojection-ingest	0	163680	74549	80	260	1	403	0
+metric	src/lib/agent-gateway/route-handlers.ts	projection-only	0	51241	17912	17728	8	0	403	0
+metric	src/lib/agent-gateway/route-handlers.ts	eager-single	0	86	0	0	0	0	403	1
+metric	src/lib/agent-gateway/route-handlers.ts	reproject-single	0	213701	92461	0	268	1	403	1
+metric	src/lib/agent-gateway/route-handlers.ts	eager-batch16	0	149	0	0	0	0	403	4
+metric	src/lib/agent-gateway/route-handlers.ts	reproject-batch16	0	221032	92461	0	268	1	403	4
+metric	src/lib/agent-gateway/route-handlers.ts	eager-all-annotations	0	128	0	0	0	0	403	4
+metric	src/lib/agent-gateway/route-handlers.ts	reproject-all-annotations	0	211346	92461	0	268	1	403	4
+metric	src/lib/agent-gateway/route-handlers.ts	parse-only	1	143422	68834	0	247	1	403	0
+metric	src/lib/agent-gateway/route-handlers.ts	reprojection-ingest	1	157869	74549	80	260	1	403	0
+metric	src/lib/agent-gateway/route-handlers.ts	eager-ingest	1	203556	92461	17808	268	1	403	0
+metric	src/lib/agent-gateway/route-handlers.ts	projection-only	1	48494	17912	17728	8	0	403	0
+metric	src/lib/agent-gateway/route-handlers.ts	eager-single	1	93	0	0	0	0	403	1
+metric	src/lib/agent-gateway/route-handlers.ts	reproject-single	1	210029	92461	0	268	1	403	1
+metric	src/lib/agent-gateway/route-handlers.ts	eager-batch16	1	114	0	0	0	0	403	4
+metric	src/lib/agent-gateway/route-handlers.ts	reproject-batch16	1	214710	92461	0	268	1	403	4
+metric	src/lib/agent-gateway/route-handlers.ts	eager-all-annotations	1	132	0	0	0	0	403	4
+metric	src/lib/agent-gateway/route-handlers.ts	reproject-all-annotations	1	206293	92461	0	268	1	403	4
+inventory	src/components/CollapsibleText.tsx	1902	254	253	1	254	40
+oracle	src/components/CollapsibleText.tsx	23	26	172	number
+metric	src/components/CollapsibleText.tsx	parse-only	0	83728	58752	0	176	1	254	0
+metric	src/components/CollapsibleText.tsx	eager-ingest	0	123167	58752	11252	198	1	254	0
+metric	src/components/CollapsibleText.tsx	reprojection-ingest	0	99616	58752	80	189	1	254	0
+metric	src/components/CollapsibleText.tsx	projection-only	0	28333	11440	11172	9	0	254	0
+metric	src/components/CollapsibleText.tsx	eager-single	0	83	0	0	0	0	254	1
+metric	src/components/CollapsibleText.tsx	reproject-single	0	124719	58752	0	198	1	254	1
+metric	src/components/CollapsibleText.tsx	eager-batch16	0	64	0	0	0	0	254	1
+metric	src/components/CollapsibleText.tsx	reproject-batch16	0	125410	58752	0	198	1	254	1
+metric	src/components/CollapsibleText.tsx	eager-all-annotations	0	66	0	0	0	0	254	1
+metric	src/components/CollapsibleText.tsx	reproject-all-annotations	0	121779	58752	0	198	1	254	1
+metric	src/components/CollapsibleText.tsx	parse-only	1	82865	58752	0	176	1	254	0
+metric	src/components/CollapsibleText.tsx	reprojection-ingest	1	94959	58752	80	189	1	254	0
+metric	src/components/CollapsibleText.tsx	eager-ingest	1	125365	58752	11252	198	1	254	0
+metric	src/components/CollapsibleText.tsx	projection-only	1	27397	11440	11172	9	0	254	0
+metric	src/components/CollapsibleText.tsx	eager-single	1	59	0	0	0	0	254	1
+metric	src/components/CollapsibleText.tsx	reproject-single	1	123394	58752	0	198	1	254	1
+metric	src/components/CollapsibleText.tsx	eager-batch16	1	66	0	0	0	0	254	1
+metric	src/components/CollapsibleText.tsx	reproject-batch16	1	122191	58752	0	198	1	254	1
+metric	src/components/CollapsibleText.tsx	eager-all-annotations	1	57	0	0	0	0	254	1
+metric	src/components/CollapsibleText.tsx	reproject-all-annotations	1	122135	58752	0	198	1	254	1
+inventory	src/lib/notepads/service.ts	31656	3388	3387	63	3403	40
+oracle	src/lib/notepads/service.ts	102	104	1347	string
+oracle	src/lib/notepads/service.ts	105	107	1366	string
+oracle	src/lib/notepads/service.ts	117	119	1673	string
+metric	src/lib/notepads/service.ts	parse-only	0	1007719	531806	0	1898	1	3388	0
+metric	src/lib/notepads/service.ts	eager-ingest	0	1486316	733177	150348	1928	1	3388	0
+metric	src/lib/notepads/service.ts	reprojection-ingest	0	1136124	578713	1280	1918	1	3388	0
+metric	src/lib/notepads/service.ts	projection-only	0	592797	154464	149068	10	0	3388	0
+metric	src/lib/notepads/service.ts	eager-single	0	143	0	0	0	0	3388	1
+metric	src/lib/notepads/service.ts	reproject-single	0	2895080	733177	0	1928	1	3388	1
+metric	src/lib/notepads/service.ts	eager-batch16	0	223	0	0	0	0	3388	16
+metric	src/lib/notepads/service.ts	reproject-batch16	0	2326121	733177	0	1928	1	3388	16
+metric	src/lib/notepads/service.ts	eager-all-annotations	0	830	0	0	0	0	3388	63
+metric	src/lib/notepads/service.ts	reproject-all-annotations	0	2108787	733177	0	1928	1	3388	63
+metric	src/lib/notepads/service.ts	parse-only	1	1694952	531806	0	1898	1	3388	0
+metric	src/lib/notepads/service.ts	reprojection-ingest	1	1258763	578713	1280	1918	1	3388	0
+metric	src/lib/notepads/service.ts	eager-ingest	1	1496529	733177	150348	1928	1	3388	0
+metric	src/lib/notepads/service.ts	projection-only	1	467913	154464	149068	10	0	3388	0
+metric	src/lib/notepads/service.ts	eager-single	1	72	0	0	0	0	3388	1
+metric	src/lib/notepads/service.ts	reproject-single	1	3040513	733177	0	1928	1	3388	1
+metric	src/lib/notepads/service.ts	eager-batch16	1	564	0	0	0	0	3388	16
+metric	src/lib/notepads/service.ts	reproject-batch16	1	2258217	733177	0	1928	1	3388	16
+metric	src/lib/notepads/service.ts	eager-all-annotations	1	1134	0	0	0	0	3388	63
+metric	src/lib/notepads/service.ts	reproject-all-annotations	1	1860625	733177	0	1928	1	3388	63
+inventory	src/lib/workflow-graph/workflow-manager.test.ts	342467	34466	34465	53	34470	40
+oracle	src/lib/workflow-graph/workflow-manager.test.ts	1546	1548	14867	string
+oracle	src/lib/workflow-graph/workflow-manager.test.ts	1754	1756	16972	string
+oracle	src/lib/workflow-graph/workflow-manager.test.ts	1899	1901	18103	string
+metric	src/lib/workflow-graph/workflow-manager.test.ts	parse-only	0	19935042	8029339	0	22266	1	34466	0
+metric	src/lib/workflow-graph/workflow-manager.test.ts	eager-ingest	0	28518157	8029339	1517780	22304	1	34466	0
+metric	src/lib/workflow-graph/workflow-manager.test.ts	reprojection-ingest	0	21938926	8029339	1280	22291	1	34466	0
+metric	src/lib/workflow-graph/workflow-manager.test.ts	projection-only	0	9996062	1567056	1516500	13	0	34466	0
+metric	src/lib/workflow-graph/workflow-manager.test.ts	eager-single	0	86	0	0	0	0	34466	1
+metric	src/lib/workflow-graph/workflow-manager.test.ts	reproject-single	0	30064474	8029339	0	22304	1	34466	1
+metric	src/lib/workflow-graph/workflow-manager.test.ts	eager-batch16	0	272	0	0	0	0	34466	16
+metric	src/lib/workflow-graph/workflow-manager.test.ts	reproject-batch16	0	31413787	8029339	0	22304	1	34466	16
+metric	src/lib/workflow-graph/workflow-manager.test.ts	eager-all-annotations	0	816	0	0	0	0	34466	53
+metric	src/lib/workflow-graph/workflow-manager.test.ts	reproject-all-annotations	0	29239625	8029339	0	22304	1	34466	53
+metric	src/lib/workflow-graph/workflow-manager.test.ts	parse-only	1	22797962	8029339	0	22266	1	34466	0
+metric	src/lib/workflow-graph/workflow-manager.test.ts	reprojection-ingest	1	23362427	8029339	1280	22291	1	34466	0
+metric	src/lib/workflow-graph/workflow-manager.test.ts	eager-ingest	1	32221939	8029339	1517780	22304	1	34466	0
+metric	src/lib/workflow-graph/workflow-manager.test.ts	projection-only	1	6236223	1567056	1516500	13	0	34466	0
+metric	src/lib/workflow-graph/workflow-manager.test.ts	eager-single	1	71	0	0	0	0	34466	1
+metric	src/lib/workflow-graph/workflow-manager.test.ts	reproject-single	1	29613179	8029339	0	22304	1	34466	1
+metric	src/lib/workflow-graph/workflow-manager.test.ts	eager-batch16	1	268	0	0	0	0	34466	16
+metric	src/lib/workflow-graph/workflow-manager.test.ts	reproject-batch16	1	28643453	8029339	0	22304	1	34466	16
+metric	src/lib/workflow-graph/workflow-manager.test.ts	eager-all-annotations	1	817	0	0	0	0	34466	53
+metric	src/lib/workflow-graph/workflow-manager.test.ts	reproject-all-annotations	1	27935054	8029339	0	22304	1	34466	53
+inventory	src/lib/workflow-graph/execution-loop.test.ts	318517	38251	38250	50	38306	40
+oracle	src/lib/workflow-graph/execution-loop.test.ts	241	243	3049	number
+oracle	src/lib/workflow-graph/execution-loop.test.ts	659	661	6821	string
+oracle	src/lib/workflow-graph/execution-loop.test.ts	733	735	7446	string
+metric	src/lib/workflow-graph/execution-loop.test.ts	parse-only	0	18567144	8218394	0	24325	1	38251	0
+metric	src/lib/workflow-graph/execution-loop.test.ts	eager-ingest	0	32104755	8218394	1684320	24362	1	38251	0
+metric	src/lib/workflow-graph/execution-loop.test.ts	reprojection-ingest	0	23510137	8218394	1280	24349	1	38251	0
+metric	src/lib/workflow-graph/execution-loop.test.ts	projection-only	0	7056940	1755320	1683040	13	0	38251	0
+metric	src/lib/workflow-graph/execution-loop.test.ts	eager-single	0	114	0	0	0	0	38251	1
+metric	src/lib/workflow-graph/execution-loop.test.ts	reproject-single	0	36140127	8218394	0	24362	1	38251	1
+metric	src/lib/workflow-graph/execution-loop.test.ts	eager-batch16	0	293	0	0	0	0	38251	16
+metric	src/lib/workflow-graph/execution-loop.test.ts	reproject-batch16	0	34081864	8218394	0	24362	1	38251	16
+metric	src/lib/workflow-graph/execution-loop.test.ts	eager-all-annotations	0	859	0	0	0	0	38251	50
+metric	src/lib/workflow-graph/execution-loop.test.ts	reproject-all-annotations	0	28970083	8218394	0	24362	1	38251	50
+metric	src/lib/workflow-graph/execution-loop.test.ts	parse-only	1	21836383	8218394	0	24325	1	38251	0
+metric	src/lib/workflow-graph/execution-loop.test.ts	reprojection-ingest	1	24675697	8218394	1280	24349	1	38251	0
+metric	src/lib/workflow-graph/execution-loop.test.ts	eager-ingest	1	31357256	8218394	1684320	24362	1	38251	0
+metric	src/lib/workflow-graph/execution-loop.test.ts	projection-only	1	4931515	1755320	1683040	13	0	38251	0
+metric	src/lib/workflow-graph/execution-loop.test.ts	eager-single	1	95	0	0	0	0	38251	1
+metric	src/lib/workflow-graph/execution-loop.test.ts	reproject-single	1	37365729	8218394	0	24362	1	38251	1
+metric	src/lib/workflow-graph/execution-loop.test.ts	eager-batch16	1	293	0	0	0	0	38251	16
+metric	src/lib/workflow-graph/execution-loop.test.ts	reproject-batch16	1	35712820	8218394	0	24362	1	38251	16
+metric	src/lib/workflow-graph/execution-loop.test.ts	eager-all-annotations	1	762	0	0	0	0	38251	50
+metric	src/lib/workflow-graph/execution-loop.test.ts	reproject-all-annotations	1	32166305	8218394	0	24362	1	38251	50
+inventory	src/lib/workflow-graph/iteration-orchestrator.test.ts	315399	36280	36279	159	36287	40
+oracle	src/lib/workflow-graph/iteration-orchestrator.test.ts	294	296	3837	string
+oracle	src/lib/workflow-graph/iteration-orchestrator.test.ts	297	299	3862	string
+oracle	src/lib/workflow-graph/iteration-orchestrator.test.ts	315	317	3979	string
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	parse-only	0	24689294	8095694	0	23142	1	36280	0
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	eager-ingest	0	37540089	8095694	1601436	23181	1	36280	0
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	reprojection-ingest	0	27262078	8095694	5120	23168	1	36280	0
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	projection-only	0	5418726	1721536	1596316	13	0	36280	0
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	eager-single	0	73	0	0	0	0	36280	1
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	reproject-single	0	30042063	8095694	0	23181	1	36280	1
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	eager-batch16	0	263	0	0	0	0	36280	16
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	reproject-batch16	0	30902727	8095694	0	23181	1	36280	16
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	eager-all-annotations	0	2290	0	0	0	0	36280	159
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	reproject-all-annotations	0	32956750	8095694	0	23181	1	36280	159
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	parse-only	1	20445987	8095694	0	23142	1	36280	0
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	reprojection-ingest	1	26544025	8095694	5120	23168	1	36280	0
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	eager-ingest	1	32480164	8095694	1601436	23181	1	36280	0
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	projection-only	1	10775943	1721536	1596316	13	0	36280	0
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	eager-single	1	87	0	0	0	0	36280	1
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	reproject-single	1	35259924	8095694	0	23181	1	36280	1
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	eager-batch16	1	266	0	0	0	0	36280	16
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	reproject-batch16	1	31346751	8095694	0	23181	1	36280	16
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	eager-all-annotations	1	2120	0	0	0	0	36280	159
+metric	src/lib/workflow-graph/iteration-orchestrator.test.ts	reproject-all-annotations	1	35999885	8095694	0	23181	1	36280	159
+inventory	src/features/tickets/components/TicketChildSummary.tsx	2052	315	314	0	316	40
+metric	src/features/tickets/components/TicketChildSummary.tsx	parse-only	0	111756	69072	0	239	1	315	0
+metric	src/features/tickets/components/TicketChildSummary.tsx	eager-ingest	0	163148	69128	13856	262	1	315	0
+metric	src/features/tickets/components/TicketChildSummary.tsx	reprojection-ingest	0	131294	69072	0	253	1	315	0
+metric	src/features/tickets/components/TicketChildSummary.tsx	projection-only	0	33104	13880	13856	9	0	315	0
+metric	src/features/tickets/components/TicketChildSummary.tsx	parse-only	1	100991	69072	0	239	1	315	0
+metric	src/features/tickets/components/TicketChildSummary.tsx	reprojection-ingest	1	113688	69072	0	253	1	315	0
+metric	src/features/tickets/components/TicketChildSummary.tsx	eager-ingest	1	144639	69128	13856	262	1	315	0
+metric	src/features/tickets/components/TicketChildSummary.tsx	projection-only	1	32572	13880	13856	9	0	315	0
+inventory	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	2349483	109605	109604	6781	109605	40
+oracle	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	13	16	1109	boolean
+oracle	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	17	20	1132	boolean
+oracle	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	28	31	1214	string
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	parse-only	0	65346140	17424722	0	68178	1	109605	0
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	eager-ingest	0	110802495	24162856	4986456	68219	1	109605	0
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	reprojection-ingest	0	76269080	19060576	163840	68210	1	109605	0
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	projection-only	0	31980468	5102280	4822616	9	0	109605	0
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	eager-single	0	108	0	0	0	0	109605	1
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	reproject-single	0	113865628	24162856	0	68219	1	109605	1
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	eager-batch16	0	304	0	0	0	0	109605	16
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	reproject-batch16	0	114070185	24162856	0	68219	1	109605	16
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	eager-all-annotations	0	218182	0	0	0	0	109605	6781
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	reproject-all-annotations	0	113419901	24162856	0	68219	1	109605	6781
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	parse-only	1	69180167	17424722	0	68178	1	109605	0
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	reprojection-ingest	1	85775411	19060576	163840	68210	1	109605	0
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	eager-ingest	1	124929198	24162856	4986456	68219	1	109605	0
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	projection-only	1	29392787	5102280	4822616	9	0	109605	0
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	eager-single	1	83	0	0	0	0	109605	1
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	reproject-single	1	118094202	24162856	0	68219	1	109605	1
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	eager-batch16	1	347	0	0	0	0	109605	16
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	reproject-batch16	1	121910548	24162856	0	68219	1	109605	16
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	eager-all-annotations	1	1065740	0	0	0	0	109605	6781
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts	reproject-all-annotations	1	114000749	24162856	0	68219	1	109605	6781
+inventory	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	218947	10297	10296	1316	10297	40
+oracle	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	3	5	990	number
+oracle	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	9	11	1020	number
+oracle	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	13	18	1181	any
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	parse-only	0	5220224	1786192	0	6033	1	10297	0
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	eager-ingest	0	9763240	2486290	494024	6070	1	10297	0
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	reprojection-ingest	0	5487905	1999146	40960	6060	1	10297	0
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	projection-only	0	1354540	487144	453064	10	0	10297	0
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	eager-single	0	98	0	0	0	0	10297	1
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	reproject-single	0	10387416	2486290	0	6070	1	10297	1
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	eager-batch16	0	796	0	0	0	0	10297	16
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	reproject-batch16	0	8853726	2486290	0	6070	1	10297	16
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	eager-all-annotations	0	17816	0	0	0	0	10297	1316
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	reproject-all-annotations	0	5686020	2486290	0	6070	1	10297	1316
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	parse-only	1	4113690	1786192	0	6033	1	10297	0
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	reprojection-ingest	1	8117876	1999146	40960	6060	1	10297	0
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	eager-ingest	1	9000167	2486290	494024	6070	1	10297	0
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	projection-only	1	1320071	487144	453064	10	0	10297	0
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	eager-single	1	85	0	0	0	0	10297	1
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	reproject-single	1	11646707	2486290	0	6070	1	10297	1
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	eager-batch16	1	407	0	0	0	0	10297	16
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	reproject-batch16	1	8945186	2486290	0	6070	1	10297	16
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	eager-all-annotations	1	19026	0	0	0	0	10297	1316
+metric	../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts	reproject-all-annotations	1	5882258	2486290	0	6070	1	10297	1316
+inventory	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	1860055	203116	203115	10978	203116	40
+oracle	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	41	43	206	string
+oracle	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	49	51	253	string
+oracle	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	139	141	723	string
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	parse-only	0	114276931	33403298	0	134220	1	203116	0
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	eager-ingest	0	193323611	46010309	9264780	134271	1	203116	0
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	reprojection-ingest	0	136178546	36640485	327680	134255	1	203116	0
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	projection-only	0	49009708	9369824	8937100	16	0	203116	0
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	eager-single	0	95	0	0	0	0	203116	1
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	reproject-single	0	189162017	46010309	0	134271	1	203116	1
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	eager-batch16	0	357	0	0	0	0	203116	16
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	reproject-batch16	0	197590868	46010309	0	134271	1	203116	16
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	eager-all-annotations	0	677384	0	0	0	0	203116	10978
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	reproject-all-annotations	0	189581986	46010309	0	134271	1	203116	10978
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	parse-only	1	111915770	33403298	0	134220	1	203116	0
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	reprojection-ingest	1	139855284	36640485	327680	134255	1	203116	0
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	eager-ingest	1	195296738	46010309	9264780	134271	1	203116	0
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	projection-only	1	48492142	9369824	8937100	16	0	203116	0
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	eager-single	1	98	0	0	0	0	203116	1
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	reproject-single	1	181636442	46010309	0	134271	1	203116	1
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	eager-batch16	1	312	0	0	0	0	203116	16
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	reproject-batch16	1	177166011	46010309	0	134271	1	203116	16
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	eager-all-annotations	1	1615488	0	0	0	0	203116	10978
+metric	node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts	reproject-all-annotations	1	175572160	46010309	0	134271	1	203116	10978
+inventory	.next/types/validator.ts	146385	10837	10836	4	10837	40
+oracle	.next/types/validator.ts	162	165	1015	any
+oracle	.next/types/validator.ts	166	169	1032	any
+oracle	.next/types/validator.ts	289	292	1633	any
+metric	.next/types/validator.ts	parse-only	0	3896524	2250668	0	9637	1	10837	0
+metric	.next/types/validator.ts	eager-ingest	0	10444882	2250668	476904	9663	1	10837	0
+metric	.next/types/validator.ts	reprojection-ingest	0	5207079	2250668	80	9655	1	10837	0
+metric	.next/types/validator.ts	projection-only	0	1272332	478280	476824	8	0	10837	0
+metric	.next/types/validator.ts	eager-single	0	87	0	0	0	0	10837	1
+metric	.next/types/validator.ts	reproject-single	0	5127944	2250668	0	9663	1	10837	1
+metric	.next/types/validator.ts	eager-batch16	0	112	0	0	0	0	10837	4
+metric	.next/types/validator.ts	reproject-batch16	0	10335872	2250668	0	9663	1	10837	4
+metric	.next/types/validator.ts	eager-all-annotations	0	237	0	0	0	0	10837	4
+metric	.next/types/validator.ts	reproject-all-annotations	0	6268667	2250668	0	9663	1	10837	4
+metric	.next/types/validator.ts	parse-only	1	4794311	2250668	0	9637	1	10837	0
+metric	.next/types/validator.ts	reprojection-ingest	1	4936963	2250668	80	9655	1	10837	0
+metric	.next/types/validator.ts	eager-ingest	1	6392906	2250668	476904	9663	1	10837	0
+metric	.next/types/validator.ts	projection-only	1	2255261	478280	476824	8	0	10837	0
+metric	.next/types/validator.ts	eager-single	1	69	0	0	0	0	10837	1
+metric	.next/types/validator.ts	reproject-single	1	6509351	2250668	0	9663	1	10837	1
+metric	.next/types/validator.ts	eager-batch16	1	131	0	0	0	0	10837	4
+metric	.next/types/validator.ts	reproject-batch16	1	4995397	2250668	0	9663	1	10837	4
+metric	.next/types/validator.ts	eager-all-annotations	1	124	0	0	0	0	10837	4
+metric	.next/types/validator.ts	reproject-all-annotations	1	9152976	2250668	0	9663	1	10837	4
+inventory	synthetic-annotated.ts	520560	105002	105001	15000	105002	40
+oracle	synthetic-annotated.ts	3	5	17	number
+oracle	synthetic-annotated.ts	10	12	46	string
+oracle	synthetic-annotated.ts	17	19	77	boolean
+metric	synthetic-annotated.ts	parse-only	0	51601885	18594808	0	85021	1	105002	0
+metric	synthetic-annotated.ts	eager-ingest	0	78205330	25070956	4947764	85060	1	105002	0
+metric	synthetic-annotated.ts	reprojection-ingest	0	58825339	20390876	327680	85054	1	105002	0
+metric	synthetic-annotated.ts	projection-only	0	15135550	4680080	4620084	6	0	105002	0
+metric	synthetic-annotated.ts	eager-single	0	85	0	0	0	0	105002	1
+metric	synthetic-annotated.ts	reproject-single	0	78317277	25070956	0	85060	1	105002	1
+metric	synthetic-annotated.ts	eager-batch16	0	276	0	0	0	0	105002	16
+metric	synthetic-annotated.ts	reproject-batch16	0	78255577	25070956	0	85060	1	105002	16
+metric	synthetic-annotated.ts	eager-all-annotations	0	517019	0	0	0	0	105002	15000
+metric	synthetic-annotated.ts	reproject-all-annotations	0	78739324	25070956	0	85060	1	105002	15000
+metric	synthetic-annotated.ts	parse-only	1	53320031	18594808	0	85021	1	105002	0
+metric	synthetic-annotated.ts	reprojection-ingest	1	59659167	20390876	327680	85054	1	105002	0
+metric	synthetic-annotated.ts	eager-ingest	1	73329923	25070956	4947764	85060	1	105002	0
+metric	synthetic-annotated.ts	projection-only	1	14908975	4680080	4620084	6	0	105002	0
+metric	synthetic-annotated.ts	eager-single	1	101	0	0	0	0	105002	1
+metric	synthetic-annotated.ts	reproject-single	1	79362541	25070956	0	85060	1	105002	1
+metric	synthetic-annotated.ts	eager-batch16	1	320	0	0	0	0	105002	16
+metric	synthetic-annotated.ts	reproject-batch16	1	77794372	25070956	0	85060	1	105002	16
+metric	synthetic-annotated.ts	eager-all-annotations	1	1466864	0	0	0	0	105002	15000
+metric	synthetic-annotated.ts	reproject-all-annotations	1	77588006	25070956	0	85060	1	105002	15000
+inventory	synthetic-shallow.ts	588961	100017	100016	1	100017	40
+oracle	synthetic-shallow.ts	100011	100013	588944	number
+metric	synthetic-shallow.ts	parse-only	0	58296000	23233092	0	100036	1	100017	0
+metric	synthetic-shallow.ts	eager-ingest	0	81375630	29482382	4400824	100065	1	100017	0
+metric	synthetic-shallow.ts	reprojection-ingest	0	61854009	25081498	80	100058	1	100017	0
+metric	synthetic-shallow.ts	projection-only	0	13541873	4800760	4400744	7	0	100017	0
+metric	synthetic-shallow.ts	eager-single	0	87	0	0	0	0	100017	1
+metric	synthetic-shallow.ts	reproject-single	0	80298613	29482382	0	100065	1	100017	1
+metric	synthetic-shallow.ts	eager-batch16	0	103	0	0	0	0	100017	1
+metric	synthetic-shallow.ts	reproject-batch16	0	77105898	29482382	0	100065	1	100017	1
+metric	synthetic-shallow.ts	eager-all-annotations	0	93	0	0	0	0	100017	1
+metric	synthetic-shallow.ts	reproject-all-annotations	0	76376196	29482382	0	100065	1	100017	1
+metric	synthetic-shallow.ts	parse-only	1	60604482	23233092	0	100036	1	100017	0
+metric	synthetic-shallow.ts	reprojection-ingest	1	61913157	25081498	80	100058	1	100017	0
+metric	synthetic-shallow.ts	eager-ingest	1	76093730	29482382	4400824	100065	1	100017	0
+metric	synthetic-shallow.ts	projection-only	1	10577145	4800760	4400744	7	0	100017	0
+metric	synthetic-shallow.ts	eager-single	1	77	0	0	0	0	100017	1
+metric	synthetic-shallow.ts	reproject-single	1	78558122	29482382	0	100065	1	100017	1
+metric	synthetic-shallow.ts	eager-batch16	1	98	0	0	0	0	100017	1
+metric	synthetic-shallow.ts	reproject-batch16	1	79395464	29482382	0	100065	1	100017	1
+metric	synthetic-shallow.ts	eager-all-annotations	1	69	0	0	0	0	100017	1
+metric	synthetic-shallow.ts	reproject-all-annotations	1	82894608	29482382	0	100065	1	100017	1
+inventory	synthetic-deep.ts	317	141	140	1	141	40
+oracle	synthetic-deep.ts	135	137	303	number
+metric	synthetic-deep.ts	parse-only	0	65557	20158	0	146	1	141	0
+metric	synthetic-deep.ts	eager-ingest	0	89519	29323	6280	167	1	141	0
+metric	synthetic-deep.ts	reprojection-ingest	0	69300	22659	80	158	1	141	0
+metric	synthetic-deep.ts	projection-only	0	8298	6664	6200	9	0	141	0
+metric	synthetic-deep.ts	eager-single	0	69	0	0	0	0	141	1
+metric	synthetic-deep.ts	reproject-single	0	74031	29323	0	167	1	141	1
+metric	synthetic-deep.ts	eager-batch16	0	69	0	0	0	0	141	1
+metric	synthetic-deep.ts	reproject-batch16	0	71285	29323	0	167	1	141	1
+metric	synthetic-deep.ts	eager-all-annotations	0	68	0	0	0	0	141	1
+metric	synthetic-deep.ts	reproject-all-annotations	0	72332	29323	0	167	1	141	1
+metric	synthetic-deep.ts	parse-only	1	60984	20158	0	146	1	141	0
+metric	synthetic-deep.ts	reprojection-ingest	1	63756	22659	80	158	1	141	0
+metric	synthetic-deep.ts	eager-ingest	1	72660	29323	6280	167	1	141	0
+metric	synthetic-deep.ts	projection-only	1	8085	6664	6200	9	0	141	0
+metric	synthetic-deep.ts	eager-single	1	86	0	0	0	0	141	1
+metric	synthetic-deep.ts	reproject-single	1	72984	29323	0	167	1	141	1
+metric	synthetic-deep.ts	eager-batch16	1	62	0	0	0	0	141	1
+metric	synthetic-deep.ts	reproject-batch16	1	78762	29323	0	167	1	141	1
+metric	synthetic-deep.ts	eager-all-annotations	1	90	0	0	0	0	141	1
+metric	synthetic-deep.ts	reproject-all-annotations	1	73340	29323	0	167	1	141	1
+inventory	synthetic-roles.ts	152	37	36	5	37	40
+oracle	synthetic-roles.ts	3	5	33	number
+oracle	synthetic-roles.ts	10	12	63	string
+oracle	synthetic-roles.ts	17	19	95	boolean
+metric	synthetic-roles.ts	parse-only	0	12082	9688	0	36	1	37	0
+metric	synthetic-roles.ts	eager-ingest	0	19877	9688	1784	54	1	37	0
+metric	synthetic-roles.ts	reprojection-ingest	0	17752	9688	160	47	1	37	0
+metric	synthetic-roles.ts	projection-only	0	3658	1736	1624	7	0	37	0
+metric	synthetic-roles.ts	eager-single	0	74	0	0	0	0	37	1
+metric	synthetic-roles.ts	reproject-single	0	20396	9688	0	54	1	37	1
+metric	synthetic-roles.ts	eager-batch16	0	178	0	0	0	0	37	5
+metric	synthetic-roles.ts	reproject-batch16	0	19838	9688	0	54	1	37	5
+metric	synthetic-roles.ts	eager-all-annotations	0	154	0	0	0	0	37	5
+metric	synthetic-roles.ts	reproject-all-annotations	0	19423	9688	0	54	1	37	5
+metric	synthetic-roles.ts	parse-only	1	12939	9688	0	36	1	37	0
+metric	synthetic-roles.ts	reprojection-ingest	1	15851	9688	160	47	1	37	0
+metric	synthetic-roles.ts	eager-ingest	1	19401	9688	1784	54	1	37	0
+metric	synthetic-roles.ts	projection-only	1	3584	1736	1624	7	0	37	0
+metric	synthetic-roles.ts	eager-single	1	71	0	0	0	0	37	1
+metric	synthetic-roles.ts	reproject-single	1	20302	9688	0	54	1	37	1
+metric	synthetic-roles.ts	eager-batch16	1	139	0	0	0	0	37	5
+metric	synthetic-roles.ts	reproject-batch16	1	19565	9688	0	54	1	37	5
+metric	synthetic-roles.ts	eager-all-annotations	1	107	0	0	0	0	37	5
+metric	synthetic-roles.ts	reproject-all-annotations	1	19777	9688	0	54	1	37	5
+inventory	synthetic-reparse.ts	51	15	14	1	20	40
+oracle	synthetic-reparse.ts	9	11	39	number
+metric	synthetic-reparse.ts	parse-only	0	7295	3796	0	19	1	15	0
+metric	synthetic-reparse.ts	eager-ingest	0	12124	4554	736	32	1	15	0
+metric	synthetic-reparse.ts	reprojection-ingest	0	10741	3890	80	27	1	15	0
+metric	synthetic-reparse.ts	projection-only	0	1666	664	656	5	0	15	0
+metric	synthetic-reparse.ts	eager-single	0	89	0	0	0	0	15	1
+metric	synthetic-reparse.ts	reproject-single	0	12047	4554	0	32	1	15	1
+metric	synthetic-reparse.ts	eager-batch16	0	62	0	0	0	0	15	1
+metric	synthetic-reparse.ts	reproject-batch16	0	13264	4554	0	32	1	15	1
+metric	synthetic-reparse.ts	eager-all-annotations	0	90	0	0	0	0	15	1
+metric	synthetic-reparse.ts	reproject-all-annotations	0	11966	4554	0	32	1	15	1
+metric	synthetic-reparse.ts	parse-only	1	9997	3796	0	19	1	15	0
+metric	synthetic-reparse.ts	reprojection-ingest	1	11779	3890	80	27	1	15	0
+metric	synthetic-reparse.ts	eager-ingest	1	11852	4554	736	32	1	15	0
+metric	synthetic-reparse.ts	projection-only	1	1548	664	656	5	0	15	0
+metric	synthetic-reparse.ts	eager-single	1	79	0	0	0	0	15	1
+metric	synthetic-reparse.ts	reproject-single	1	11924	4554	0	32	1	15	1
+metric	synthetic-reparse.ts	eager-batch16	1	63	0	0	0	0	15	1
+metric	synthetic-reparse.ts	reproject-batch16	1	11909	4554	0	32	1	15	1
+metric	synthetic-reparse.ts	eager-all-annotations	1	62	0	0	0	0	15	1
+metric	synthetic-reparse.ts	reproject-all-annotations	1	11840	4554	0	32	1	15	1
+metric	ALL	eager-cross-file-double	0	13674	0	0	0	0	662181	322
+metric	ALL	reproject-cross-file-double	0	617961421	56685037	0	481608	16	662181	322
+metric	ALL	eager-cross-file-double	1	18580	0	0	0	0	662181	322
+metric	ALL	reproject-cross-file-double	1	579793296	56685037	0	481608	16	662181	322
+summary	18	29135892	29136916

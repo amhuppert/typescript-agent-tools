@@ -1,0 +1,186 @@
+{
+  "tsconfig/under": [
+    2304,
+    2411
+  ],
+  "tsconfig/at": [
+    2304,
+    2411
+  ],
+  "tsconfig/over": [
+    2411
+  ],
+  "tsconfig/utf8At": [
+    2304,
+    2411
+  ],
+  "tsconfig/utf8Over": [
+    2411
+  ],
+  "tsconfig/first": [
+    2304,
+    2411
+  ],
+  "tsconfig/last": [
+    2304,
+    2411
+  ],
+  "tsconfig/alias": [
+    2411
+  ],
+  "tsconfig/healthyAfter": [],
+  "true/under": [
+    2304,
+    2411
+  ],
+  "true/at": [
+    2304,
+    2411
+  ],
+  "true/over": [
+    2304,
+    2411
+  ],
+  "true/utf8At": [
+    2304,
+    2411
+  ],
+  "true/utf8Over": [
+    2304,
+    2411
+  ],
+  "true/first": [
+    2304,
+    2411
+  ],
+  "true/last": [
+    2304,
+    2411
+  ],
+  "true/alias": [
+    2411
+  ],
+  "true/healthyAfter": [],
+  "false/under": [
+    2304,
+    2411
+  ],
+  "false/at": [
+    2304,
+    2411
+  ],
+  "false/over": [
+    2411
+  ],
+  "false/utf8At": [
+    2304,
+    2411
+  ],
+  "false/utf8Over": [
+    2411
+  ],
+  "false/first": [
+    2304,
+    2411
+  ],
+  "false/last": [
+    2304,
+    2411
+  ],
+  "false/alias": [
+    2411
+  ],
+  "false/healthyAfter": [],
+  "inherited/under": [
+    2304,
+    2411
+  ],
+  "inherited/at": [
+    2304,
+    2411
+  ],
+  "inherited/over": [
+    2304,
+    2411
+  ],
+  "inherited/utf8At": [
+    2304,
+    2411
+  ],
+  "inherited/utf8Over": [
+    2304,
+    2411
+  ],
+  "inherited/first": [
+    2304,
+    2411
+  ],
+  "inherited/last": [
+    2304,
+    2411
+  ],
+  "inherited/alias": [
+    2411
+  ],
+  "inherited/healthyAfter": [],
+  "override/under": [
+    2304,
+    2411
+  ],
+  "override/at": [
+    2304,
+    2411
+  ],
+  "override/over": [
+    2411
+  ],
+  "override/utf8At": [
+    2304,
+    2411
+  ],
+  "override/utf8Over": [
+    2411
+  ],
+  "override/first": [
+    2304,
+    2411
+  ],
+  "override/last": [
+    2304,
+    2411
+  ],
+  "override/alias": [
+    2411
+  ],
+  "override/healthyAfter": [],
+  "reset/under": [
+    2304,
+    2411
+  ],
+  "reset/at": [
+    2304,
+    2411
+  ],
+  "reset/over": [
+    2411
+  ],
+  "reset/utf8At": [
+    2304,
+    2411
+  ],
+  "reset/utf8Over": [
+    2411
+  ],
+  "reset/first": [
+    2304,
+    2411
+  ],
+  "reset/last": [
+    2304,
+    2411
+  ],
+  "reset/alias": [
+    2411
+  ],
+  "reset/healthyAfter": []
+}

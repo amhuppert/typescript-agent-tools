@@ -1,0 +1,114 @@
+[
+  {
+    "name": "empty",
+    "summary": "() => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "plain",
+    "summary": "(args_0: number, args_1: string) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "labeled",
+    "summary": "(left: number, right: string) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "optional",
+    "summary": "(left: number, right?: string) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "rest",
+    "summary": "(head: number, ...tail: string[]) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "array",
+    "summary": "(...args: number[]) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "union",
+    "summary": "(...args: [number] | [string, boolean]) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "duplicate",
+    "summary": "(x: number, x_1: string) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "collision",
+    "summary": "(x: number, x_2: string, x_1: boolean) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "repeated",
+    "summary": "(x: number, x_1: string, x_2: boolean) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "binding",
+    "summary": "(value: number) => number",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "omitted",
+    "summary": "(arg_0: number, value: string) => string",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "nested",
+    "summary": "(arg_0: { value: number; }) => number",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "prefix",
+    "summary": "(before: boolean, value: number) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "variadicEnd",
+    "summary": "<T extends unknown[]>(args_0: number, ...args: T) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "variadicMiddle",
+    "summary": "<T extends unknown[]>(...args: [...T, number]) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  }
+]

@@ -1,0 +1,83 @@
+[
+  {
+    "config": "merged-forward-loose.json",
+    "file": "merged-b.d.ts",
+    "name": "mergedType",
+    "summary": "41",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "config": "merged-forward-loose.json",
+    "file": "merged-b.d.ts",
+    "name": "mergedValue",
+    "summary": "81",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "config": "merged-forward-loose.json",
+    "file": "merged-b.d.ts",
+    "name": "mergedPure",
+    "summary": "78",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "config": "merged-reverse-loose.json",
+    "file": "merged-b.d.ts",
+    "name": "mergedType",
+    "summary": "41",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "config": "merged-reverse-loose.json",
+    "file": "merged-b.d.ts",
+    "name": "mergedValue",
+    "summary": "81",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "config": "merged-reverse-loose.json",
+    "file": "merged-b.d.ts",
+    "name": "mergedPure",
+    "summary": "78",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "config": "name-failure-loose.json",
+    "file": "name-failure.ts",
+    "name": "nameFailure",
+    "summary": "91",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "config": "name-control-loose.json",
+    "file": "name-control.ts",
+    "name": "nameControl",
+    "summary": "91",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "config": "name-unobserved-loose.json",
+    "file": "name-unobserved.ts",
+    "name": "nameUnobserved",
+    "summary": "91",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  }
+]

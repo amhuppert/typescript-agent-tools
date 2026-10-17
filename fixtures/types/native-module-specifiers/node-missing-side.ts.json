@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noLib": true,
+    "types": [],
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "noUncheckedSideEffectImports": false
+  },
+  "files": [
+    "globals.d.ts",
+    "missing-side.ts",
+    "target.d.ts"
+  ]
+}

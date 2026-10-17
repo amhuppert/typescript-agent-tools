@@ -1,0 +1,135 @@
+[
+  {
+    "name": "versions-control",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"typesVersions\":{\"*\":{\"index.d.ts\":[\"first.d.ts\"]}}}"
+  },
+  {
+    "name": "versions-empty-range",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"typesVersions\":{\"\":{\"index.d.ts\":[\"first.d.ts\"]},\"*\":{\"index.d.ts\":[\"second.d.ts\"]}}}"
+  },
+  {
+    "name": "versions-first-matching-invalid",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"typesVersions\":{\"*\":42,\">=7\":{\"index.d.ts\":[\"first.d.ts\"]}}}"
+  },
+  {
+    "name": "versions-first-matching-empty",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"typesVersions\":{\"*\":{},\">=7\":{\"index.d.ts\":[\"first.d.ts\"]}}}"
+  },
+  {
+    "name": "versions-invalid-range-skipped",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"typesVersions\":{\"not a range\":{\"index.d.ts\":[\"second.d.ts\"]},\"*\":{\"index.d.ts\":[\"first.d.ts\"]}}}"
+  },
+  {
+    "name": "versions-nonarray-target-skipped",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"typesVersions\":{\"*\":{\"index.d.ts\":42,\"*\":[\"first.d.ts\"]}}}"
+  },
+  {
+    "name": "versions-empty-target-array",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"typesVersions\":{\"*\":{\"index.d.ts\":[],\"*\":[\"first.d.ts\"]}}}"
+  },
+  {
+    "name": "versions-nonstring-first",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"typesVersions\":{\"*\":{\"index.d.ts\":[42,\"first.d.ts\"]}}}"
+  },
+  {
+    "name": "versions-null-first",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"typesVersions\":{\"*\":{\"index.d.ts\":[null,\"first.d.ts\"]}}}"
+  },
+  {
+    "name": "versions-empty-string-first",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"typesVersions\":{\"*\":{\"index.d.ts\":[\"\",\"first.d.ts\"]}}}"
+  },
+  {
+    "name": "versions-nonstring-after-miss",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"typesVersions\":{\"*\":{\"index.d.ts\":[\"missing.d.ts\",{},\"first.d.ts\"]}}}"
+  },
+  {
+    "name": "versions-duplicate-mapping",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"typesVersions\":{\"*\":{\"index.d.ts\":[\"first.d.ts\"],\"index.d.ts\":[\"second.d.ts\"]}}}"
+  },
+  {
+    "name": "versions-duplicate-range",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"typesVersions\":{\"*\":{\"index.d.ts\":[\"first.d.ts\"]},\">=7\":{\"index.d.ts\":[\"first.d.ts\"]},\"*\":{\"index.d.ts\":[\"second.d.ts\"]}}}"
+  },
+  {
+    "name": "exports-subpath-control",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{\".\":\"./first.d.ts\"}}"
+  },
+  {
+    "name": "exports-dot-hash",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{\".\":\"./first.d.ts\",\"#hidden\":\"./second.d.ts\"}}"
+  },
+  {
+    "name": "exports-hash-dot",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{\"#hidden\":\"./second.d.ts\",\".\":\"./first.d.ts\"}}"
+  },
+  {
+    "name": "exports-empty-dot",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{\"\":\"./second.d.ts\",\".\":\"./first.d.ts\"}}"
+  },
+  {
+    "name": "exports-empty-conditions",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{\"\":\"./second.d.ts\",\"types\":\"./first.d.ts\",\"default\":\"./second.d.ts\"}}"
+  },
+  {
+    "name": "exports-empty-default",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{\"\":\"./first.d.ts\",\"default\":\"./second.d.ts\"}}"
+  },
+  {
+    "name": "exports-empty-only",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{\"\":\"./first.d.ts\"}}"
+  },
+  {
+    "name": "exports-empty-object",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{}}"
+  },
+  {
+    "name": "exports-hash-only",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{\"#hidden\":\"./first.d.ts\"}}"
+  },
+  {
+    "name": "exports-dot-condition-invalid",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{\".\":\"./first.d.ts\",\"default\":\"./second.d.ts\"}}"
+  },
+  {
+    "name": "exports-hash-condition-invalid",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{\"#hidden\":\"./first.d.ts\",\"default\":\"./second.d.ts\"}}"
+  },
+  {
+    "name": "exports-dot-hash-condition-invalid",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{\".\":\"./first.d.ts\",\"#hidden\":\"./first.d.ts\",\"default\":\"./second.d.ts\"}}"
+  },
+  {
+    "name": "exports-duplicate-subpath",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{\".\":\"./first.d.ts\",\".\":\"./second.d.ts\"}}"
+  },
+  {
+    "name": "exports-duplicate-condition",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{\"types\":\"./second.d.ts\",\"default\":\"./first.d.ts\",\"types\":\"./first.d.ts\"}}"
+  },
+  {
+    "name": "exports-entry-dot-hash",
+    "specifier": "pkg/entry",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{\"./entry\":\"./first.d.ts\",\"#hidden\":\"./second.d.ts\"}}"
+  },
+  {
+    "name": "exports-entry-hash-dot",
+    "specifier": "pkg/entry",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{\"#hidden\":\"./second.d.ts\",\"./entry\":\"./first.d.ts\"}}"
+  },
+  {
+    "name": "exports-entry-empty-dot",
+    "specifier": "pkg/entry",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{\"\":\"./second.d.ts\",\"./entry\":\"./first.d.ts\"}}"
+  },
+  {
+    "name": "exports-entry-dot-condition-invalid",
+    "specifier": "pkg/entry",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{\"./entry\":\"./first.d.ts\",\"default\":\"./second.d.ts\"}}"
+  },
+  {
+    "name": "exports-entry-empty-conditions",
+    "specifier": "pkg/entry",
+    "manifest": "{\"name\":\"pkg\",\"types\":\"index.d.ts\",\"exports\":{\"\":\"./second.d.ts\",\"types\":\"./first.d.ts\"}}"
+  }
+]

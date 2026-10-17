@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noLib": true,
+    "types": [],
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
+    "resolvePackageJsonExports": false,
+    "resolvePackageJsonImports": false,
+    "noUncheckedSideEffectImports": false
+  },
+  "files": [
+    "globals.d.ts",
+    "unadmitted-tsx.ts",
+    "target.d.ts"
+  ]
+}

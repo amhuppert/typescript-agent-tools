@@ -1,0 +1,30 @@
+[
+  {
+    "name": "duplicateGetter",
+    "rejected": "TypeScript rejected the project: TS2300 Duplicate identifier 'value'.; TS2300 Duplicate identifier 'value'."
+  },
+  {
+    "name": "duplicateSetter",
+    "rejected": "TypeScript rejected the project: TS2300 Duplicate identifier 'value'.; TS2300 Duplicate identifier 'value'."
+  },
+  {
+    "name": "propertyAccessor",
+    "summary": "{ [x: string]: number | boolean; readonly value: number; }",
+    "errorType": false,
+    "codes": [
+      1119
+    ]
+  },
+  {
+    "name": "accessorProperty",
+    "summary": "{ [x: string]: number | boolean; readonly value: number; }",
+    "errorType": false,
+    "codes": [
+      1119
+    ]
+  },
+  {
+    "name": "methodProperty",
+    "rejected": "TypeScript rejected the project: TS2300 Duplicate identifier 'value'.; TS2300 Duplicate identifier 'value'."
+  }
+]

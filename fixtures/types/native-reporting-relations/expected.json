@@ -1,0 +1,184 @@
+[
+  {
+    "name": "weakCallSilent",
+    "summary": "\"fallback\"",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "weakCallReport",
+    "summary": "{ <T extends Weak>(): \"matched\"; (): \"fallback\"; }",
+    "errorType": false,
+    "codes": [
+      2304,
+      2560
+    ]
+  },
+  {
+    "name": "weakConstructSilent",
+    "summary": "\"fallback\"",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "weakConstructReport",
+    "summary": "{ <T extends Weak>(): \"matched\"; (): \"fallback\"; }",
+    "errorType": false,
+    "codes": [
+      2304,
+      2560
+    ]
+  },
+  {
+    "name": "weakBothSilent",
+    "summary": "\"fallback\"",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "weakBothReport",
+    "summary": "{ <T extends Weak>(): \"matched\"; (): \"fallback\"; }",
+    "errorType": false,
+    "codes": [
+      2560
+    ]
+  },
+  {
+    "name": "weakSecondSilent",
+    "summary": "\"fallback\"",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "weakSecondReport",
+    "summary": "{ <T extends Weak>(): \"matched\"; (): \"fallback\"; }",
+    "errorType": false,
+    "codes": [
+      2304,
+      2560
+    ]
+  },
+  {
+    "name": "overloadSilent",
+    "summary": "\"matched\"",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "overloadReport",
+    "summary": "() => \"matched\"",
+    "errorType": false,
+    "codes": [
+      2304
+    ]
+  },
+  {
+    "name": "cacheSilent",
+    "summary": "\"fallback\"",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "cacheReport",
+    "summary": "{ <T extends L | R>(): \"matched\"; (): \"fallback\"; }",
+    "errorType": false,
+    "codes": [
+      2304,
+      2344
+    ]
+  },
+  {
+    "name": "rejected",
+    "summary": "<T extends string>() => \"matched\"",
+    "errorType": false,
+    "codes": [
+      2344
+    ]
+  },
+  {
+    "name": "accepted",
+    "summary": "() => \"matched\"",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "tupleReadonly",
+    "summary": "<T extends [number, string]>() => \"matched\"",
+    "errorType": false,
+    "codes": [
+      4104
+    ]
+  },
+  {
+    "name": "tupleShort",
+    "summary": "<T extends [number, string]>() => \"matched\"",
+    "errorType": false,
+    "codes": [
+      2344
+    ]
+  },
+  {
+    "name": "tupleLong",
+    "summary": "<T extends [number, string]>() => \"matched\"",
+    "errorType": false,
+    "codes": [
+      2344
+    ]
+  },
+  {
+    "name": "indexProperty",
+    "summary": "<T extends { [key: string]: number; }>() => \"matched\"",
+    "errorType": false,
+    "codes": [
+      2344
+    ]
+  },
+  {
+    "name": "indexKey",
+    "summary": "<T extends { [key: string]: number; }>() => \"matched\"",
+    "errorType": false,
+    "codes": [
+      2344
+    ]
+  },
+  {
+    "name": "optional",
+    "summary": "<T extends { value: string; }>() => \"matched\"",
+    "errorType": false,
+    "codes": [
+      2344
+    ]
+  },
+  {
+    "name": "missingOne",
+    "summary": "<T extends { a: number; }>() => \"matched\"",
+    "errorType": false,
+    "codes": [
+      2741
+    ]
+  },
+  {
+    "name": "missingFive",
+    "summary": "<T extends { a: number; b: number; c: number; d: number; e: number; }>() => \"matched\"",
+    "errorType": false,
+    "codes": [
+      2739
+    ]
+  },
+  {
+    "name": "missingSix",
+    "summary": "<T extends { a: number; b: number; c: number; d: number; e: number; f: number; }>() => \"matched\"",
+    "errorType": false,
+    "codes": [
+      2740
+    ]
+  },
+  {
+    "name": "private",
+    "summary": "<T extends Base>() => \"matched\"",
+    "errorType": false,
+    "codes": [
+      2344
+    ]
+  }
+]

@@ -91,11 +91,19 @@ find_semantic_compilers() {
 # the superuser, passes after printing a `SKIP name: reason` line. Failure
 # replays the complete output; success prints one line naming any skips.
 run_rust_tests() {
-  local workers="$1" output status=0 skips count
+  local workers="$1" output status=0 skips count require_executed=0
   shift
+  if [[ "${1:-}" == --require-executed ]]; then
+    require_executed=1
+    shift
+  fi
   output="$(mktemp)"
   cargo test --offline --jobs "$workers" "$@" -- --test-threads="$workers" --show-output \
     >"$output" 2>&1 || status=$?
+  if (( status == 0 && require_executed )) && ! awk '/^test result: ok\. [1-9][0-9]* passed;/ { found=1 } END { exit !found }' "$output"; then
+    printf 'validation: no tests executed in the selected Rust module\n' >&2
+    status=1
+  fi
   if (( status != 0 )); then
     cat "$output" >&2
     rm -f "$output"

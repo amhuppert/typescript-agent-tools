@@ -22,7 +22,7 @@ const DATA: &str =
     r#"{ "greeting": "hi", "value": 1, "a-b": 2, "1": 3, "default": 4, "nested": { "x": 1 } }"#;
 
 fn load(fixture: &Fixture) -> Result<Project, InputError> {
-    Project::load(&fixture.path("tsconfig.json"))
+    Project::load(&fixture.path("tsconfig.json")).map_err(support::input_error)
 }
 
 #[test]
@@ -426,10 +426,21 @@ fn configuration_text_follows_the_compilers_grammar() {
         "{\"compilerOptions\":{\"noLib\"!:true}}",
         "{\"compilerOptions\":{public \"noLib\":true}}",
         "[{\"compilerOptions\":{\"noLib\":true}}]",
-        "{\"compilerOptions\":{\"noLib\":true,\"\\ud800\":1}}",
     ] {
         load_config(config).unwrap_or_else(|error| panic!("{config:?}: {error}"));
     }
+    // Case cfg-lone-surrogate-key: TypeScript reports TS5023. Keeping the
+    // exact option identity here requires an Unsupported refusal.
+    let config = "{\"compilerOptions\":{\"noLib\":true,\"\\ud800\":1}}";
+    let error = load_config(config).unwrap_err();
+    assert_eq!(
+        (error.kind, error.position),
+        (
+            InputErrorKind::Unsupported,
+            Some(position(config, config.find("\"\\ud800\"").unwrap()))
+        ),
+        "{config:?}: {error}"
+    );
     // Each error is reported where TypeScript reports its first diagnostic.
     for (config, at) in [
         (

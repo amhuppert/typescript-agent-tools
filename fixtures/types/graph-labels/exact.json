@@ -1,0 +1,1 @@
+{"compilerOptions":{"strict":true,"exactOptionalPropertyTypes":true,"noLib":true},"files":["globals.d.ts","cases.ts","a.ts","b.ts"]}

@@ -2,9 +2,9 @@
 //! name node, and the labels TypeScript gives unnamed sites. Labels are
 //! presentation; only `Name::key` is an identity.
 
-use crate::syntax;
 use crate::syntax_kind::SyntaxKind;
 use crate::{Ast, NodeId, Value};
+use crate::{printer::quoted, syntax};
 
 /// A declared name's label and its key, if the name has an exact one.
 pub(super) struct Name {
@@ -170,75 +170,5 @@ fn name_text<'a>(ast: &'a Ast<'_>, id: NodeId) -> &'a str {
             ast.identifier_name(id).unwrap_or_default()
         }
         _ => "",
-    }
-}
-
-/// `quote` + TypeScript's `printer.EscapeString(text, quote)` + `quote`, with
-/// the language service's `NeverAsciiEscape`: backslashes, the quote,
-/// control characters, CR, U+2028, U+2029, and U+0085 are escaped, LF too
-/// except in a template, and each unpaired surrogate as `\uXXXX`, so distinct
-/// names keep distinct labels. Other characters stay as written.
-fn quoted(chars: &[Result<char, u16>], quote: char) -> String {
-    let mut out = String::with_capacity(chars.len() + 2);
-    out.push(quote);
-    for (index, &c) in chars.iter().enumerate() {
-        let next = chars.get(index + 1).and_then(|next| next.ok());
-        let c = match c {
-            Ok(c) => c,
-            Err(unit) => {
-                out.push_str(&format!("\\u{unit:04X}"));
-                continue;
-            }
-        };
-        match c {
-            '\\' => out.push_str("\\\\"),
-            '$' if quote == '`' && next == Some('{') => out.push_str("\\$"),
-            '\r' if quote == '`' && next == Some('\n') => out.push_str("\\r\\n"),
-            '\n' if quote == '`' && index > 0 && chars[index - 1] == Ok('\r') => {}
-            '\n' if quote == '`' => out.push('\n'),
-            c if c == quote => {
-                out.push('\\');
-                out.push(c);
-            }
-            '\t' => out.push_str("\\t"),
-            '\u{000B}' => out.push_str("\\v"),
-            '\u{000C}' => out.push_str("\\f"),
-            '\u{0008}' => out.push_str("\\b"),
-            '\r' => out.push_str("\\r"),
-            '\n' => out.push_str("\\n"),
-            '\0' if next.is_some_and(|next| next.is_ascii_digit()) => out.push_str("\\x00"),
-            '\0' => out.push_str("\\0"),
-            '\u{2028}' | '\u{2029}' | '\u{0085}' => out.push_str(&format!("\\u{:04X}", c as u32)),
-            c if c <= '\u{001F}' => out.push_str(&format!("\\u{:04X}", c as u32)),
-            c => out.push(c),
-        }
-    }
-    out.push(quote);
-    out
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn escape(text: &str, quote: char) -> String {
-        quoted(&text.chars().map(Ok).collect::<Vec<_>>(), quote)
-    }
-
-    #[test]
-    fn escapes_follow_the_compilers_never_ascii_escape_printer() {
-        assert_eq!(escape("a\"b'c\\", '"'), r#""a\"b'c\\""#);
-        assert_eq!(
-            escape("\t\u{b}\u{c}\u{8}\r\n\u{1}", '"'),
-            r#""\t\v\f\b\r\n\u0001""#
-        );
-        assert_eq!(escape("\0x\u{0}1", '"'), r#""\0x\x001""#);
-        assert_eq!(
-            escape("\u{2028}\u{2029}\u{85}é😀", '"'),
-            "\"\\u2028\\u2029\\u0085é😀\""
-        );
-        assert_eq!(escape("${a}`\n\r\n\r", '`'), "`\\${a}\\`\n\\r\\n\\r`");
-        let lone = quoted(&[Err(0xD800), Ok('a'), Err(0xDC00)], '"');
-        assert_eq!(lone, r#""\uD800a\uDC00""#);
     }
 }

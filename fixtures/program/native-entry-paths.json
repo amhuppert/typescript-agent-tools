@@ -1,0 +1,242 @@
+[
+  {
+    "directory": "A:",
+    "access": "real",
+    "selection": "wildcard",
+    "program": [
+      "real/A:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "A:",
+    "access": "real",
+    "selection": "literal",
+    "program": [
+      "real/A:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "A:",
+    "access": "link",
+    "selection": "wildcard",
+    "program": [
+      "link/A:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "A:",
+    "access": "link",
+    "selection": "literal",
+    "program": [
+      "link/A:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "z:",
+    "access": "real",
+    "selection": "wildcard",
+    "program": [
+      "real/z:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "z:",
+    "access": "real",
+    "selection": "literal",
+    "program": [
+      "real/z:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "z:",
+    "access": "link",
+    "selection": "wildcard",
+    "program": [
+      "link/z:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "z:",
+    "access": "link",
+    "selection": "literal",
+    "program": [
+      "link/z:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "1:",
+    "access": "real",
+    "selection": "wildcard",
+    "program": [
+      "real/1:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "1:",
+    "access": "real",
+    "selection": "literal",
+    "program": [
+      "real/1:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "1:",
+    "access": "link",
+    "selection": "wildcard",
+    "program": [
+      "link/1:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "1:",
+    "access": "link",
+    "selection": "literal",
+    "program": [
+      "link/1:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "AA:",
+    "access": "real",
+    "selection": "wildcard",
+    "program": [
+      "real/AA:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "AA:",
+    "access": "real",
+    "selection": "literal",
+    "program": [
+      "real/AA:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "AA:",
+    "access": "link",
+    "selection": "wildcard",
+    "program": [
+      "link/AA:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "AA:",
+    "access": "link",
+    "selection": "literal",
+    "program": [
+      "link/AA:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "A:child",
+    "access": "real",
+    "selection": "wildcard",
+    "program": [
+      "real/A:child/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "A:child",
+    "access": "real",
+    "selection": "literal",
+    "program": [
+      "real/A:child/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "A:child",
+    "access": "link",
+    "selection": "wildcard",
+    "program": [
+      "link/A:child/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "A:child",
+    "access": "link",
+    "selection": "literal",
+    "program": [
+      "link/A:child/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "é:",
+    "access": "real",
+    "selection": "wildcard",
+    "program": [
+      "real/é:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "é:",
+    "access": "real",
+    "selection": "literal",
+    "program": [
+      "real/é:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "é:",
+    "access": "link",
+    "selection": "wildcard",
+    "program": [
+      "link/é:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  },
+  {
+    "directory": "é:",
+    "access": "link",
+    "selection": "literal",
+    "program": [
+      "link/é:/x.ts"
+    ],
+    "diagnostics": [],
+    "selected": "1"
+  }
+]

@@ -1,0 +1,573 @@
+{
+  "version": "7.0.2",
+  "answers": [
+    {
+      "id": "nodes-1996",
+      "strict": false,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "(1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | ... 1952 more ... | 1996)[]",
+        "errorType": false
+      },
+      "isArray": true,
+      "argumentCount": 1,
+      "argumentError": false,
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "adc3654036d4b80a5684e270538da1dde64f8fd4af71803da12fcc92ec23fa83"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "79f5d002dfd69863771820f052060bffd650df04f43ccea22431dec525407707"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+        }
+      ],
+      "constituents": 1996
+    },
+    {
+      "id": "nodes-1996",
+      "strict": true,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "(1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | ... 1952 more ... | 1996)[]",
+        "errorType": false
+      },
+      "isArray": true,
+      "argumentCount": 1,
+      "argumentError": false,
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "adc3654036d4b80a5684e270538da1dde64f8fd4af71803da12fcc92ec23fa83"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "79f5d002dfd69863771820f052060bffd650df04f43ccea22431dec525407707"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+        }
+      ],
+      "constituents": 1996
+    },
+    {
+      "id": "nodes-1997",
+      "strict": false,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "(1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | ... 1953 more ... | 1997)[]",
+        "errorType": false
+      },
+      "isArray": true,
+      "argumentCount": 1,
+      "argumentError": false,
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "adc3654036d4b80a5684e270538da1dde64f8fd4af71803da12fcc92ec23fa83"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "0e1c3869b9b55dc5d3e977e465591a1dfd594b7f63102e3a41a1706f5faf8390"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+        }
+      ],
+      "constituents": 1997
+    },
+    {
+      "id": "nodes-1997",
+      "strict": true,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "(1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | ... 1953 more ... | 1997)[]",
+        "errorType": false
+      },
+      "isArray": true,
+      "argumentCount": 1,
+      "argumentError": false,
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "adc3654036d4b80a5684e270538da1dde64f8fd4af71803da12fcc92ec23fa83"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "0e1c3869b9b55dc5d3e977e465591a1dfd594b7f63102e3a41a1706f5faf8390"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+        }
+      ],
+      "constituents": 1997
+    },
+    {
+      "id": "nodes-1998",
+      "strict": false,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "(1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | ... 1954 more ... | 1998)[]",
+        "errorType": false
+      },
+      "isArray": true,
+      "argumentCount": 1,
+      "argumentError": false,
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "adc3654036d4b80a5684e270538da1dde64f8fd4af71803da12fcc92ec23fa83"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "2a47b070ff5a9072fa5fe0c91b4ade3bf70a91f0043736d8b96f6b4ea8c1d8bf"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+        }
+      ],
+      "constituents": 1998
+    },
+    {
+      "id": "nodes-1998",
+      "strict": true,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "(1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | ... 1954 more ... | 1998)[]",
+        "errorType": false
+      },
+      "isArray": true,
+      "argumentCount": 1,
+      "argumentError": false,
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "adc3654036d4b80a5684e270538da1dde64f8fd4af71803da12fcc92ec23fa83"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "2a47b070ff5a9072fa5fe0c91b4ade3bf70a91f0043736d8b96f6b4ea8c1d8bf"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+        }
+      ],
+      "constituents": 1998
+    },
+    {
+      "id": "bytes-261225",
+      "strict": false,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "number[]",
+        "errorType": false
+      },
+      "isArray": true,
+      "argumentCount": 1,
+      "argumentError": false,
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "6b4269687ad35a3717035e34217d65d9b9c9817cd7309ac34a71c2ae7db72172"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "88eaa5e06f118b0391bc7e92f0ce12856942c3861f691367d469389f95484a19"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+        }
+      ],
+      "propertyKeyBytes": 261225,
+      "property": {
+        "summary": "number",
+        "errorType": false
+      },
+      "annotationSpan": {
+        "start": 261249,
+        "end": 261288
+      }
+    },
+    {
+      "id": "bytes-261225",
+      "strict": true,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "number[]",
+        "errorType": false
+      },
+      "isArray": true,
+      "argumentCount": 1,
+      "argumentError": false,
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "6b4269687ad35a3717035e34217d65d9b9c9817cd7309ac34a71c2ae7db72172"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "88eaa5e06f118b0391bc7e92f0ce12856942c3861f691367d469389f95484a19"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+        }
+      ],
+      "propertyKeyBytes": 261225,
+      "property": {
+        "summary": "number",
+        "errorType": false
+      },
+      "annotationSpan": {
+        "start": 261249,
+        "end": 261288
+      }
+    },
+    {
+      "id": "bytes-261226",
+      "strict": false,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "number[]",
+        "errorType": false
+      },
+      "isArray": true,
+      "argumentCount": 1,
+      "argumentError": false,
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "c3db942437912c3855de18bd71afe00cc297260fd725d486b6a18072cf03453b"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "88eaa5e06f118b0391bc7e92f0ce12856942c3861f691367d469389f95484a19"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+        }
+      ],
+      "propertyKeyBytes": 261226,
+      "property": {
+        "summary": "number",
+        "errorType": false
+      },
+      "annotationSpan": {
+        "start": 261250,
+        "end": 261289
+      }
+    },
+    {
+      "id": "bytes-261226",
+      "strict": true,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "number[]",
+        "errorType": false
+      },
+      "isArray": true,
+      "argumentCount": 1,
+      "argumentError": false,
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "c3db942437912c3855de18bd71afe00cc297260fd725d486b6a18072cf03453b"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "88eaa5e06f118b0391bc7e92f0ce12856942c3861f691367d469389f95484a19"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+        }
+      ],
+      "propertyKeyBytes": 261226,
+      "property": {
+        "summary": "number",
+        "errorType": false
+      },
+      "annotationSpan": {
+        "start": 261250,
+        "end": 261289
+      }
+    },
+    {
+      "id": "bytes-261227",
+      "strict": false,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "number[]",
+        "errorType": false
+      },
+      "isArray": true,
+      "argumentCount": 1,
+      "argumentError": false,
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "41702da8b81da71f4d60045958db497265cd6a33907faa9a37afd186d1d3e347"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "88eaa5e06f118b0391bc7e92f0ce12856942c3861f691367d469389f95484a19"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+        }
+      ],
+      "propertyKeyBytes": 261227,
+      "property": {
+        "summary": "number",
+        "errorType": false
+      },
+      "annotationSpan": {
+        "start": 261251,
+        "end": 261290
+      }
+    },
+    {
+      "id": "bytes-261227",
+      "strict": true,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "number[]",
+        "errorType": false
+      },
+      "isArray": true,
+      "argumentCount": 1,
+      "argumentError": false,
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "41702da8b81da71f4d60045958db497265cd6a33907faa9a37afd186d1d3e347"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "88eaa5e06f118b0391bc7e92f0ce12856942c3861f691367d469389f95484a19"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+        }
+      ],
+      "propertyKeyBytes": 261227,
+      "property": {
+        "summary": "number",
+        "errorType": false
+      },
+      "annotationSpan": {
+        "start": 261251,
+        "end": 261290
+      }
+    },
+    {
+      "id": "metadata-invalid",
+      "strict": false,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "number[]",
+        "errorType": false
+      },
+      "isArray": true,
+      "argumentCount": 1,
+      "argumentError": false,
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "1d3a4e0a00f3e01aba5940d9f7487994421e38383ff0e0d4eff2006a70448a6e"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "88eaa5e06f118b0391bc7e92f0ce12856942c3861f691367d469389f95484a19"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+        }
+      ],
+      "propertyKeyBytes": 263000,
+      "property": {
+        "summary": "MissingType",
+        "errorType": true
+      },
+      "annotationSpan": {
+        "start": 263024,
+        "end": 263035
+      }
+    },
+    {
+      "id": "metadata-invalid",
+      "strict": true,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "number[]",
+        "errorType": false
+      },
+      "isArray": true,
+      "argumentCount": 1,
+      "argumentError": false,
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "1d3a4e0a00f3e01aba5940d9f7487994421e38383ff0e0d4eff2006a70448a6e"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "88eaa5e06f118b0391bc7e92f0ce12856942c3861f691367d469389f95484a19"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+        }
+      ],
+      "propertyKeyBytes": 263000,
+      "property": {
+        "summary": "MissingType",
+        "errorType": true
+      },
+      "annotationSpan": {
+        "start": 263024,
+        "end": 263035
+      }
+    }
+  ]
+}

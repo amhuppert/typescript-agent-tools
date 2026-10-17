@@ -185,6 +185,49 @@ pub(crate) fn simple_lowercase(c: char) -> char {
     }
 }
 
+/// Canonical representative of Go `unicode.SimpleFold` / `strings.EqualFold`.
+/// Unlike filename lowercase, this joins final sigma and the nontrivial simple
+/// fold orbits, and keeps dotted/dotless I distinct. The exception orbits are
+/// from Go Unicode 17.0; ordinary one/two-element orbits share simple lowercase.
+pub(crate) fn simple_case_fold(c: char) -> char {
+    match c {
+        '\u{4b}' | '\u{6b}' | '\u{212a}' => '\u{4b}',
+        '\u{53}' | '\u{73}' | '\u{17f}' => '\u{53}',
+        '\u{b5}' | '\u{39c}' | '\u{3bc}' => '\u{b5}',
+        '\u{c5}' | '\u{e5}' | '\u{212b}' => '\u{c5}',
+        '\u{df}' | '\u{1e9e}' => '\u{df}',
+        '\u{130}' => '\u{130}',
+        '\u{131}' => '\u{131}',
+        '\u{1c4}' | '\u{1c5}' | '\u{1c6}' => '\u{1c4}',
+        '\u{1c7}' | '\u{1c8}' | '\u{1c9}' => '\u{1c7}',
+        '\u{1ca}' | '\u{1cb}' | '\u{1cc}' => '\u{1ca}',
+        '\u{1f1}' | '\u{1f2}' | '\u{1f3}' => '\u{1f1}',
+        '\u{345}' | '\u{399}' | '\u{3b9}' | '\u{1fbe}' => '\u{345}',
+        '\u{390}' | '\u{1fd3}' => '\u{390}',
+        '\u{392}' | '\u{3b2}' | '\u{3d0}' => '\u{392}',
+        '\u{395}' | '\u{3b5}' | '\u{3f5}' => '\u{395}',
+        '\u{398}' | '\u{3b8}' | '\u{3d1}' | '\u{3f4}' => '\u{398}',
+        '\u{39a}' | '\u{3ba}' | '\u{3f0}' => '\u{39a}',
+        '\u{3a0}' | '\u{3c0}' | '\u{3d6}' => '\u{3a0}',
+        '\u{3a1}' | '\u{3c1}' | '\u{3f1}' => '\u{3a1}',
+        '\u{3a3}' | '\u{3c2}' | '\u{3c3}' => '\u{3a3}',
+        '\u{3a6}' | '\u{3c6}' | '\u{3d5}' => '\u{3a6}',
+        '\u{3a9}' | '\u{3c9}' | '\u{2126}' => '\u{3a9}',
+        '\u{3b0}' | '\u{1fe3}' => '\u{3b0}',
+        '\u{412}' | '\u{432}' | '\u{1c80}' => '\u{412}',
+        '\u{414}' | '\u{434}' | '\u{1c81}' => '\u{414}',
+        '\u{41e}' | '\u{43e}' | '\u{1c82}' => '\u{41e}',
+        '\u{421}' | '\u{441}' | '\u{1c83}' => '\u{421}',
+        '\u{422}' | '\u{442}' | '\u{1c84}' | '\u{1c85}' => '\u{422}',
+        '\u{42a}' | '\u{44a}' | '\u{1c86}' => '\u{42a}',
+        '\u{462}' | '\u{463}' | '\u{1c87}' => '\u{462}',
+        '\u{1c88}' | '\u{a64a}' | '\u{a64b}' => '\u{1c88}',
+        '\u{1e60}' | '\u{1e61}' | '\u{1e9b}' => '\u{1e60}',
+        '\u{fb05}' | '\u{fb06}' => '\u{fb05}',
+        _ => simple_lowercase(c),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

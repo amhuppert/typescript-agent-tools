@@ -8,6 +8,7 @@ pub(crate) mod editing;
 pub(crate) mod navigation;
 pub(crate) mod query;
 pub(crate) mod request;
+pub(crate) mod types;
 
 /// A failed command: its exit code and stderr diagnostic. An empty message
 /// writes nothing, for outcomes already delivered as a JSON document.

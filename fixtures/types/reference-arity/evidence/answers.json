@@ -1,0 +1,86 @@
+[
+  {
+    "name": "missing",
+    "source": "interface Box<T> { value: T; }\ndeclare const result: /*#query*/Box;\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "any",
+    "flags": 1,
+    "errorType": true,
+    "arguments": []
+  },
+  {
+    "name": "partial",
+    "source": "interface Box<T, U> { left: T; right: U; }\ndeclare const result: /*#query*/Box<string>;\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "any",
+    "flags": 1,
+    "errorType": true,
+    "arguments": []
+  },
+  {
+    "name": "extra",
+    "source": "interface Box<T> { value: T; }\ndeclare const result: /*#query*/Box<string, number>;\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "any",
+    "flags": 1,
+    "errorType": true,
+    "arguments": []
+  },
+  {
+    "name": "default",
+    "source": "interface Box<T = number> { value: T; }\ndeclare const result: /*#query*/Box;\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "Box<number>",
+    "flags": 1048576,
+    "errorType": false,
+    "arguments": [
+      {
+        "summary": "number",
+        "flags": 64,
+        "errorType": false
+      }
+    ]
+  },
+  {
+    "name": "merged-default",
+    "source": "interface Box<T> { value: T; }\ninterface Box<T = number> {}\ndeclare const result: /*#query*/Box;\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "Box<number>",
+    "flags": 1048576,
+    "errorType": false,
+    "arguments": [
+      {
+        "summary": "number",
+        "flags": 64,
+        "errorType": false
+      }
+    ]
+  },
+  {
+    "name": "invalid-default",
+    "source": "interface Box<T = MissingDefault> { value: T; }\ndeclare const result: /*#query*/Box;\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "Box<MissingDefault>",
+    "flags": 1048576,
+    "errorType": false,
+    "arguments": [
+      {
+        "summary": "MissingDefault",
+        "flags": 1,
+        "errorType": true
+      }
+    ]
+  }
+]

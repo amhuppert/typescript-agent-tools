@@ -1,0 +1,1 @@
+{"extends": "./loose.json", "files": ["globals.d.ts", "name-control.ts"]}

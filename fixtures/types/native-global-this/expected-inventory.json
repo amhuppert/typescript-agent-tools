@@ -1,0 +1,272 @@
+[
+  {
+    "scenario": "clean",
+    "summary": "typeof globalThis",
+    "symbolFlags": 33555968,
+    "declarationCount": 0,
+    "properties": [
+      {
+        "name": "globalThis",
+        "summary": "typeof globalThis",
+        "errorType": false,
+        "graphOrigin": null
+      },
+      {
+        "name": "undefined",
+        "summary": "undefined",
+        "errorType": false,
+        "graphOrigin": null
+      },
+      {
+        "name": "visible",
+        "summary": "number",
+        "errorType": false,
+        "graphOrigin": null
+      },
+      {
+        "name": "visibleNamespace",
+        "summary": "typeof visibleNamespace",
+        "errorType": false,
+        "graphOrigin": {
+          "file": "clean.ts",
+          "line": 1,
+          "column": 87
+        }
+      }
+    ],
+    "calls": [],
+    "constructors": [],
+    "indexes": []
+  },
+  {
+    "scenario": "variable",
+    "summary": "typeof globalThis",
+    "symbolFlags": 33555968,
+    "declarationCount": 0,
+    "properties": [
+      {
+        "name": "globalThis",
+        "summary": "typeof globalThis",
+        "errorType": false,
+        "graphOrigin": null
+      },
+      {
+        "name": "undefined",
+        "summary": "undefined",
+        "errorType": false,
+        "graphOrigin": null
+      }
+    ],
+    "calls": [],
+    "constructors": [],
+    "indexes": []
+  },
+  {
+    "scenario": "block",
+    "summary": "typeof globalThis",
+    "symbolFlags": 33555968,
+    "declarationCount": 0,
+    "properties": [
+      {
+        "name": "globalThis",
+        "summary": "typeof globalThis",
+        "errorType": false,
+        "graphOrigin": null
+      },
+      {
+        "name": "undefined",
+        "summary": "undefined",
+        "errorType": false,
+        "graphOrigin": null
+      }
+    ],
+    "calls": [],
+    "constructors": [],
+    "indexes": []
+  },
+  {
+    "scenario": "function",
+    "summary": "typeof globalThis",
+    "symbolFlags": 33555984,
+    "declarationCount": 1,
+    "properties": [
+      {
+        "name": "globalThis",
+        "summary": "typeof globalThis",
+        "errorType": false,
+        "graphOrigin": {
+          "file": "function.ts",
+          "line": 1,
+          "column": 10
+        }
+      },
+      {
+        "name": "undefined",
+        "summary": "undefined",
+        "errorType": false,
+        "graphOrigin": null
+      }
+    ],
+    "calls": [
+      {
+        "parameters": [],
+        "returns": {
+          "summary": "number",
+          "errorType": false,
+          "graphOrigin": null
+        }
+      }
+    ],
+    "constructors": [],
+    "indexes": []
+  },
+  {
+    "scenario": "namespace",
+    "summary": "typeof globalThis",
+    "symbolFlags": 33555968,
+    "declarationCount": 1,
+    "properties": [
+      {
+        "name": "globalThis",
+        "summary": "typeof globalThis",
+        "errorType": false,
+        "graphOrigin": {
+          "file": "namespace.ts",
+          "line": 1,
+          "column": 11
+        }
+      },
+      {
+        "name": "undefined",
+        "summary": "undefined",
+        "errorType": false,
+        "graphOrigin": null
+      }
+    ],
+    "calls": [],
+    "constructors": [],
+    "indexes": []
+  },
+  {
+    "scenario": "interface",
+    "summary": "typeof globalThis",
+    "symbolFlags": 33556032,
+    "declarationCount": 1,
+    "properties": [
+      {
+        "name": "globalThis",
+        "summary": "typeof globalThis",
+        "errorType": false,
+        "graphOrigin": {
+          "file": "interface.ts",
+          "line": 1,
+          "column": 11
+        }
+      },
+      {
+        "name": "undefined",
+        "summary": "undefined",
+        "errorType": false,
+        "graphOrigin": null
+      }
+    ],
+    "calls": [],
+    "constructors": [],
+    "indexes": []
+  },
+  {
+    "scenario": "class",
+    "summary": "typeof globalThis",
+    "symbolFlags": 33556000,
+    "declarationCount": 1,
+    "properties": [
+      {
+        "name": "prototype",
+        "summary": "globalThis",
+        "errorType": false,
+        "graphOrigin": {
+          "file": "class.ts",
+          "line": 1,
+          "column": 7
+        }
+      },
+      {
+        "name": "undefined",
+        "summary": "undefined",
+        "errorType": false,
+        "graphOrigin": null
+      }
+    ],
+    "calls": [],
+    "constructors": [
+      {
+        "parameters": [],
+        "returns": {
+          "summary": "globalThis",
+          "errorType": false,
+          "graphOrigin": {
+            "file": "class.ts",
+            "line": 1,
+            "column": 7
+          }
+        }
+      }
+    ],
+    "indexes": []
+  },
+  {
+    "scenario": "enum",
+    "summary": "typeof globalThis",
+    "symbolFlags": 33556224,
+    "declarationCount": 1,
+    "properties": [
+      {
+        "name": "member",
+        "summary": "globalThis.member",
+        "errorType": false,
+        "graphOrigin": null
+      },
+      {
+        "name": "undefined",
+        "summary": "undefined",
+        "errorType": false,
+        "graphOrigin": null
+      }
+    ],
+    "calls": [],
+    "constructors": [],
+    "indexes": [
+      {
+        "key": "number",
+        "value": "string"
+      }
+    ]
+  },
+  {
+    "scenario": "ambient",
+    "summary": "typeof globalThis",
+    "symbolFlags": 33555968,
+    "declarationCount": 1,
+    "properties": [
+      {
+        "name": "globalThis",
+        "summary": "typeof globalThis",
+        "errorType": false,
+        "graphOrigin": {
+          "file": "ambient.ts",
+          "line": 1,
+          "column": 19
+        }
+      },
+      {
+        "name": "undefined",
+        "summary": "undefined",
+        "errorType": false,
+        "graphOrigin": null
+      }
+    ],
+    "calls": [],
+    "constructors": [],
+    "indexes": []
+  }
+]

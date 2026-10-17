@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "noLib": true,
+    "strict": true,
+    "noCheck": true
+  },
+  "files": [
+    "globals.d.ts",
+    "augment.d.ts",
+    "main.ts"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noLib": true,
+    "types": [],
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleResolution": "Bundler"
+  },
+  "files": [
+    "globals.d.ts",
+    "factory.cts",
+    "namespace.cts",
+    "cases.ts",
+    "same-a.ts",
+    "same-b.ts"
+  ]
+}

@@ -1,0 +1,158 @@
+[
+  {
+    "config": "generic-missing",
+    "name": "noKeys",
+    "summary": "T",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "generic-missing",
+    "name": "omit",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2318
+    ]
+  },
+  {
+    "config": "generic-arity",
+    "name": "noKeys",
+    "summary": "T",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "generic-arity",
+    "name": "omit",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2317
+    ]
+  },
+  {
+    "config": "generic-kind",
+    "name": "noKeys",
+    "summary": "T",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "generic-kind",
+    "name": "omit",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2318
+    ]
+  },
+  {
+    "config": "generic-broken",
+    "name": "noKeys",
+    "summary": "T",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "generic-broken",
+    "name": "omit",
+    "summary": "Missing_Omit",
+    "errorType": true,
+    "codes": [
+      2304
+    ]
+  },
+  {
+    "config": "generic-mapped",
+    "name": "noKeys",
+    "summary": "T",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "generic-mapped",
+    "name": "omit",
+    "summary": "Omit<T, \"drop\">",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "helpers/missing",
+    "name": "assignment",
+    "summary": "{ drop: number; kept: string; }",
+    "errorType": false,
+    "codes": [
+      2354
+    ]
+  },
+  {
+    "config": "helpers/exact",
+    "name": "assignment",
+    "summary": "{ drop: number; kept: string; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "helpers/wildcard",
+    "name": "assignment",
+    "summary": "{ drop: number; kept: string; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "helpers/type-only",
+    "name": "assignment",
+    "summary": "{ drop: number; kept: string; }",
+    "errorType": false,
+    "codes": [
+      2343
+    ]
+  },
+  {
+    "config": "helpers/broken",
+    "name": "assignment",
+    "summary": "{ drop: number; kept: string; }",
+    "errorType": false,
+    "codes": [
+      2307
+    ]
+  },
+  {
+    "config": "helpers/script",
+    "name": "assignment",
+    "summary": "{ drop: number; kept: string; }",
+    "errorType": false,
+    "codes": [
+      2306
+    ]
+  },
+  {
+    "config": "helpers/disabled",
+    "name": "assignment",
+    "summary": "{ drop: number; kept: string; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "helpers/newer",
+    "name": "assignment",
+    "summary": "{ drop: number; kept: string; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "helpers/script-source",
+    "name": "assignment",
+    "summary": "{ drop: number; kept: string; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "config": "helpers/isolated",
+    "name": "assignment",
+    "summary": "{ drop: number; kept: string; }",
+    "errorType": false,
+    "codes": []
+  }
+]

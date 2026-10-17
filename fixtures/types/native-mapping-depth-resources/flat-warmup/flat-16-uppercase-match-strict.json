@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "strictNullChecks": true,
+    "noCheck": false,
+    "noLib": true,
+    "types": [],
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler"
+  },
+  "files": [
+    "globals.d.ts",
+    "flat-16-uppercase-match.ts"
+  ]
+}

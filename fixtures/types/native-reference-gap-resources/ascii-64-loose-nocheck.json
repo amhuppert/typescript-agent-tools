@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "strict": true,
+    "strictNullChecks": false,
+    "noCheck": true,
+    "noLib": true
+  },
+  "files": [
+    "globals.d.ts",
+    "ascii-64.ts"
+  ]
+}

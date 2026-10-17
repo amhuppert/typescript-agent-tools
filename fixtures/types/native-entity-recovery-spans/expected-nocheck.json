@@ -1,0 +1,1490 @@
+[
+  {
+    "file": "cases.ts",
+    "name": "single",
+    "summary": "290",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 173,
+        "declarationPos": 140,
+        "depth": 0,
+        "event": "enter",
+        "name": "single",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 133,
+        "declarationPos": 64,
+        "depth": 1,
+        "event": "enter",
+        "name": "Single",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 133,
+        "declarationPos": 73,
+        "depth": 2,
+        "event": "enter",
+        "name": "�class",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 133,
+        "declarationPos": 73,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "�class",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 104,
+        "event": "enter",
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 90
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 104,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 90,
+        "type": 86
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 104,
+        "event": "enter",
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 90
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 104,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 90,
+        "type": 86
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 133,
+        "declarationPos": 73,
+        "depth": 2,
+        "event": "enter",
+        "name": "�class",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 133,
+        "declarationPos": 73,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "�class",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 133,
+        "declarationPos": 64,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Single",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 131,
+        "declarationPos": 106,
+        "depth": 1,
+        "event": "enter",
+        "name": "value",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 124,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 120
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 124,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 120,
+        "type": 88
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 131,
+        "declarationPos": 106,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "value",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 173,
+        "declarationPos": 140,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "single",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "head",
+    "summary": "291",
+    "errorType": false,
+    "codes": [
+      2503
+    ],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 290,
+        "declarationPos": 263,
+        "depth": 0,
+        "event": "enter",
+        "name": "head",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 256,
+        "declarationPos": 180,
+        "depth": 1,
+        "event": "enter",
+        "name": "Head",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 256,
+        "declarationPos": 187,
+        "depth": 2,
+        "event": "enter",
+        "name": "�class",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 256,
+        "declarationPos": 187,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "�class",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 227,
+        "event": "enter",
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 204
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 227,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 204,
+        "type": 86
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 227,
+        "event": "enter",
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 204
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 227,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 204,
+        "type": 86
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 256,
+        "declarationPos": 187,
+        "depth": 2,
+        "event": "enter",
+        "name": "�class",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 256,
+        "declarationPos": 187,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "�class",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 256,
+        "declarationPos": 180,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Head",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 254,
+        "declarationPos": 229,
+        "depth": 1,
+        "event": "enter",
+        "name": "value",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 247,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 243
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 247,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 243,
+        "type": 88
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 254,
+        "declarationPos": 229,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "value",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 290,
+        "declarationPos": 263,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "head",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "middle",
+    "summary": "292",
+    "errorType": false,
+    "codes": [
+      2694
+    ],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 417,
+        "declarationPos": 384,
+        "depth": 0,
+        "event": "enter",
+        "name": "middle",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 377,
+        "declarationPos": 297,
+        "depth": 1,
+        "event": "enter",
+        "name": "Middle",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 377,
+        "declarationPos": 306,
+        "depth": 2,
+        "event": "enter",
+        "name": "�class",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 377,
+        "declarationPos": 306,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "�class",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 348,
+        "event": "enter",
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 323
+      },
+      {
+        "cacheEvents": 1,
+        "depth": 2,
+        "end": 348,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 323,
+        "type": 86
+      },
+      {
+        "cacheEvents": 1,
+        "depth": 2,
+        "end": 348,
+        "event": "enter",
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 323
+      },
+      {
+        "cacheEvents": 1,
+        "depth": 2,
+        "end": 348,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 323,
+        "type": 86
+      },
+      {
+        "cacheEvents": 1,
+        "declarationEnd": 377,
+        "declarationPos": 306,
+        "depth": 2,
+        "event": "enter",
+        "name": "�class",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 1,
+        "declarationEnd": 377,
+        "declarationPos": 306,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "�class",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 1,
+        "declarationEnd": 377,
+        "declarationPos": 297,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Middle",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 1,
+        "declarationEnd": 375,
+        "declarationPos": 350,
+        "depth": 1,
+        "event": "enter",
+        "name": "value",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 1,
+        "depth": 2,
+        "end": 368,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 364
+      },
+      {
+        "cacheEvents": 1,
+        "depth": 2,
+        "end": 368,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 364,
+        "type": 88
+      },
+      {
+        "cacheEvents": 1,
+        "declarationEnd": 375,
+        "declarationPos": 350,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "value",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      },
+      {
+        "cacheEvents": 1,
+        "declarationEnd": 417,
+        "declarationPos": 384,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "middle",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "terminal",
+    "summary": "293",
+    "errorType": false,
+    "codes": [
+      2694
+    ],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 557,
+        "declarationPos": 518,
+        "depth": 0,
+        "event": "enter",
+        "name": "terminal",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 511,
+        "declarationPos": 424,
+        "depth": 1,
+        "event": "enter",
+        "name": "Terminal",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 511,
+        "declarationPos": 435,
+        "depth": 2,
+        "event": "enter",
+        "name": "�class",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 511,
+        "declarationPos": 435,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "�class",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 482,
+        "event": "enter",
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 452
+      },
+      {
+        "cacheEvents": 2,
+        "depth": 2,
+        "end": 482,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 452,
+        "type": 86
+      },
+      {
+        "cacheEvents": 2,
+        "depth": 2,
+        "end": 482,
+        "event": "enter",
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 452
+      },
+      {
+        "cacheEvents": 2,
+        "depth": 2,
+        "end": 482,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 452,
+        "type": 86
+      },
+      {
+        "cacheEvents": 2,
+        "declarationEnd": 511,
+        "declarationPos": 435,
+        "depth": 2,
+        "event": "enter",
+        "name": "�class",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 2,
+        "declarationEnd": 511,
+        "declarationPos": 435,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "�class",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 2,
+        "declarationEnd": 511,
+        "declarationPos": 424,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Terminal",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 2,
+        "declarationEnd": 509,
+        "declarationPos": 484,
+        "depth": 1,
+        "event": "enter",
+        "name": "value",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 2,
+        "depth": 2,
+        "end": 502,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 498
+      },
+      {
+        "cacheEvents": 2,
+        "depth": 2,
+        "end": 502,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 498,
+        "type": 88
+      },
+      {
+        "cacheEvents": 2,
+        "declarationEnd": 509,
+        "declarationPos": 484,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "value",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      },
+      {
+        "cacheEvents": 2,
+        "declarationEnd": 557,
+        "declarationPos": 518,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "terminal",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "optionalHead",
+    "summary": "294",
+    "errorType": false,
+    "codes": [
+      2503,
+      2500
+    ],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 704,
+        "declarationPos": 653,
+        "depth": 0,
+        "event": "enter",
+        "name": "optionalHead",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 646,
+        "declarationPos": 564,
+        "depth": 1,
+        "event": "enter",
+        "name": "OptionalHead",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 646,
+        "declarationPos": 579,
+        "depth": 2,
+        "event": "enter",
+        "name": "�class",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 646,
+        "declarationPos": 579,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "�class",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 617,
+        "event": "enter",
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 596
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 617,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 596,
+        "type": 86
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 617,
+        "event": "enter",
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 596
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 617,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 596,
+        "type": 86
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 646,
+        "declarationPos": 579,
+        "depth": 2,
+        "event": "enter",
+        "name": "�class",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 646,
+        "declarationPos": 579,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "�class",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 646,
+        "declarationPos": 564,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "OptionalHead",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 644,
+        "declarationPos": 619,
+        "depth": 1,
+        "event": "enter",
+        "name": "value",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 637,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 633
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 637,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 633,
+        "type": 88
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 644,
+        "declarationPos": 619,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "value",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 704,
+        "declarationPos": 653,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "optionalHead",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "optionalMiddle",
+    "summary": "295",
+    "errorType": false,
+    "codes": [
+      2500,
+      2694
+    ],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 872,
+        "declarationPos": 815,
+        "depth": 0,
+        "event": "enter",
+        "name": "optionalMiddle",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 808,
+        "declarationPos": 711,
+        "depth": 1,
+        "event": "enter",
+        "name": "OptionalMiddle",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 808,
+        "declarationPos": 728,
+        "depth": 2,
+        "event": "enter",
+        "name": "�class",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 808,
+        "declarationPos": 728,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "�class",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 779,
+        "event": "enter",
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 745
+      },
+      {
+        "cacheEvents": 1,
+        "depth": 2,
+        "end": 779,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 745,
+        "type": 86
+      },
+      {
+        "cacheEvents": 1,
+        "depth": 2,
+        "end": 779,
+        "event": "enter",
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 745
+      },
+      {
+        "cacheEvents": 1,
+        "depth": 2,
+        "end": 779,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 745,
+        "type": 86
+      },
+      {
+        "cacheEvents": 1,
+        "declarationEnd": 808,
+        "declarationPos": 728,
+        "depth": 2,
+        "event": "enter",
+        "name": "�class",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 1,
+        "declarationEnd": 808,
+        "declarationPos": 728,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "�class",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 1,
+        "declarationEnd": 808,
+        "declarationPos": 711,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "OptionalMiddle",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 1,
+        "declarationEnd": 806,
+        "declarationPos": 781,
+        "depth": 1,
+        "event": "enter",
+        "name": "value",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 1,
+        "depth": 2,
+        "end": 799,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 795
+      },
+      {
+        "cacheEvents": 1,
+        "depth": 2,
+        "end": 799,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 795,
+        "type": 88
+      },
+      {
+        "cacheEvents": 1,
+        "declarationEnd": 806,
+        "declarationPos": 781,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "value",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      },
+      {
+        "cacheEvents": 1,
+        "declarationEnd": 872,
+        "declarationPos": 815,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "optionalMiddle",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "optionalTerminal",
+    "summary": "296",
+    "errorType": false,
+    "codes": [
+      2500,
+      2694
+    ],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 1053,
+        "declarationPos": 990,
+        "depth": 0,
+        "event": "enter",
+        "name": "optionalTerminal",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 983,
+        "declarationPos": 879,
+        "depth": 1,
+        "event": "enter",
+        "name": "OptionalTerminal",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 983,
+        "declarationPos": 898,
+        "depth": 2,
+        "event": "enter",
+        "name": "�class",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 983,
+        "declarationPos": 898,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "�class",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 954,
+        "event": "enter",
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 915
+      },
+      {
+        "cacheEvents": 2,
+        "depth": 2,
+        "end": 954,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 915,
+        "type": 86
+      },
+      {
+        "cacheEvents": 2,
+        "depth": 2,
+        "end": 954,
+        "event": "enter",
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 915
+      },
+      {
+        "cacheEvents": 2,
+        "depth": 2,
+        "end": 954,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 234,
+        "operation": "getTypeFromTypeNode",
+        "pos": 915,
+        "type": 86
+      },
+      {
+        "cacheEvents": 2,
+        "declarationEnd": 983,
+        "declarationPos": 898,
+        "depth": 2,
+        "event": "enter",
+        "name": "�class",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 2,
+        "declarationEnd": 983,
+        "declarationPos": 898,
+        "depth": 2,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "�class",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 2,
+        "declarationEnd": 983,
+        "declarationPos": 879,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "OptionalTerminal",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 2,
+        "declarationEnd": 981,
+        "declarationPos": 956,
+        "depth": 1,
+        "event": "enter",
+        "name": "value",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 2,
+        "depth": 2,
+        "end": 974,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 970
+      },
+      {
+        "cacheEvents": 2,
+        "depth": 2,
+        "end": 974,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 970,
+        "type": 88
+      },
+      {
+        "cacheEvents": 2,
+        "declarationEnd": 981,
+        "declarationPos": 956,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "value",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      },
+      {
+        "cacheEvents": 2,
+        "declarationEnd": 1053,
+        "declarationPos": 990,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "optionalTerminal",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "typeHead",
+    "summary": "MissingTypeHead.Nested",
+    "errorType": true,
+    "codes": [
+      2503
+    ],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 1140,
+        "declarationPos": 1108,
+        "depth": 0,
+        "event": "enter",
+        "name": "typeHead",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 1140,
+        "event": "enter",
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 1131
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 1093,
+        "event": "enter",
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 1070
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 1093,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 1070,
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 1140,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 1131,
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 1140,
+        "declarationPos": 1108,
+        "depth": 0,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "name": "typeHead",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "typeMiddle",
+    "summary": "Holder.MissingTypeMiddle.End",
+    "errorType": true,
+    "codes": [
+      2694
+    ],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 1241,
+        "declarationPos": 1203,
+        "depth": 0,
+        "event": "enter",
+        "name": "typeMiddle",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 1241,
+        "event": "enter",
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 1230
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 1188,
+        "event": "enter",
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 1159
+      },
+      {
+        "cacheEvents": 1,
+        "depth": 2,
+        "end": 1188,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 1159,
+        "type": 82
+      },
+      {
+        "cacheEvents": 1,
+        "depth": 1,
+        "end": 1241,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 1230,
+        "type": 82
+      },
+      {
+        "cacheEvents": 1,
+        "declarationEnd": 1241,
+        "declarationPos": 1203,
+        "depth": 0,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "name": "typeMiddle",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "typeTerminal",
+    "summary": "Holder.Nested.MissingTypeTerminal",
+    "errorType": true,
+    "codes": [
+      2694
+    ],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 1355,
+        "declarationPos": 1311,
+        "depth": 0,
+        "event": "enter",
+        "name": "typeTerminal",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 1355,
+        "event": "enter",
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 1342
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 1296,
+        "event": "enter",
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 1262
+      },
+      {
+        "cacheEvents": 2,
+        "depth": 2,
+        "end": 1296,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 1262,
+        "type": 82
+      },
+      {
+        "cacheEvents": 2,
+        "depth": 1,
+        "end": 1355,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 1342,
+        "type": 82
+      },
+      {
+        "cacheEvents": 2,
+        "declarationEnd": 1355,
+        "declarationPos": 1311,
+        "depth": 0,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "name": "typeTerminal",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      }
+    ]
+  }
+]

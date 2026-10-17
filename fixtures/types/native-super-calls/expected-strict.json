@@ -1,0 +1,156 @@
+[
+  {
+    "name": "plain",
+    "summary": "void",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "generic",
+    "summary": "void",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "defaulted",
+    "summary": "void",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "defaultOverride",
+    "summary": "void",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "overload",
+    "summary": "void",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "classLike",
+    "summary": "void",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "anyHealthy",
+    "summary": "void",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "lazyReturn",
+    "summary": "void",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "argumentRecovery",
+    "summary": "void",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "anyRecovery",
+    "summary": "void",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "noBase",
+    "summary": "void",
+    "errorType": false,
+    "codes": [
+      2335,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "nullBase",
+    "summary": "void",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "appliedRecovery",
+    "summary": "void",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "pairRecovery",
+    "summary": "void",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "wrongArity",
+    "summary": "void",
+    "errorType": false,
+    "codes": [
+      2314,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "wrongFunctionArity",
+    "summary": "void",
+    "errorType": false,
+    "codes": [
+      2508,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "overloadRecovery",
+    "summary": "void",
+    "errorType": false,
+    "codes": [
+      2345
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "baseRecovery",
+    "summary": "void",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": []
+  }
+]

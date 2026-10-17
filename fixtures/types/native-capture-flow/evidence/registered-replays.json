@@ -1,0 +1,20 @@
+[
+  {
+    "suite": "tools/type-capture-flow-oracle.test.mjs",
+    "started": "2026-10-11T01:06:19.613Z",
+    "finished": "2026-10-11T01:06:22.709Z",
+    "status": 0,
+    "signal": null,
+    "stdout": "effect: applied\nrecovery: {\"kind\":\"reported\",\"references\":[{\"kind\":\"validation-run\",\"id\":\"vrun-3ae4586b-04c6-432d-93db-652d2e4082f7\"}]}\nValidation harness-test: vrun-3ae4586b-04c6-432d-93db-652d2e4082f7; scope changed → changed\nValidation passed (1 files matched).\nharness tests: 2 total, 2 executed, 2 passed, 0 skipped\n",
+    "stderr": ""
+  },
+  {
+    "suite": "tools/type-capture-boundaries-oracle.test.mjs",
+    "started": "2026-10-11T01:06:22.710Z",
+    "finished": "2026-10-11T01:06:29.603Z",
+    "status": 0,
+    "signal": null,
+    "stdout": "effect: applied\nrecovery: {\"kind\":\"reported\",\"references\":[{\"kind\":\"validation-run\",\"id\":\"vrun-98a39d74-dfa2-4363-b123-1355e4d27fb8\"}]}\nValidation harness-test: vrun-98a39d74-dfa2-4363-b123-1355e4d27fb8; scope changed → changed\nValidation passed (1 files matched).\nharness tests: 2 total, 2 executed, 2 passed, 0 skipped\n",
+    "stderr": ""
+  }
+]

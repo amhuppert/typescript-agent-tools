@@ -1,0 +1,196 @@
+[
+  {
+    "name": "required-after-default",
+    "source": "interface Box<T = string, U> { left:T; right:U; }\ndeclare const result: /*#query*/Box;\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "any",
+    "flags": 1,
+    "errorType": true,
+    "arguments": []
+  },
+  {
+    "name": "earlier-default-reference",
+    "source": "interface Box<T = string, U = T> { left:T; right:U; }\ndeclare const result: /*#query*/Box;\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "Box<string, string>",
+    "flags": 1048576,
+    "errorType": false,
+    "arguments": [
+      {
+        "summary": "string",
+        "flags": 32,
+        "errorType": false
+      },
+      {
+        "summary": "string",
+        "flags": 32,
+        "errorType": false
+      }
+    ]
+  },
+  {
+    "name": "explicit-default-reference",
+    "source": "interface Box<T, U = T> { left:T; right:U; }\ndeclare const result: /*#query*/Box<number>;\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "Box<number, number>",
+    "flags": 1048576,
+    "errorType": false,
+    "arguments": [
+      {
+        "summary": "number",
+        "flags": 64,
+        "errorType": false
+      },
+      {
+        "summary": "number",
+        "flags": 64,
+        "errorType": false
+      }
+    ]
+  },
+  {
+    "name": "forward-default-reference",
+    "source": "interface Box<T = U, U = string> { left:T; right:U; }\ndeclare const result: /*#query*/Box;\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "Box<any, string>",
+    "flags": 1048576,
+    "errorType": false,
+    "arguments": [
+      {
+        "summary": "any",
+        "flags": 1,
+        "errorType": true
+      },
+      {
+        "summary": "string",
+        "flags": 32,
+        "errorType": false
+      }
+    ]
+  },
+  {
+    "name": "self-default-reference",
+    "source": "interface Box<T = T> { value:T; }\ndeclare const result: /*#query*/Box;\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "Box<any>",
+    "flags": 1048576,
+    "errorType": false,
+    "arguments": [
+      {
+        "summary": "any",
+        "flags": 1,
+        "errorType": true
+      }
+    ]
+  },
+  {
+    "name": "circular-default-reference",
+    "source": "interface Box<T = U, U = T> { left:T; right:U; }\ndeclare const result: /*#query*/Box;\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "Box<any, any>",
+    "flags": 1048576,
+    "errorType": false,
+    "arguments": [
+      {
+        "summary": "any",
+        "flags": 1,
+        "errorType": true
+      },
+      {
+        "summary": "any",
+        "flags": 1,
+        "errorType": true
+      }
+    ]
+  },
+  {
+    "name": "unused-invalid-default",
+    "source": "interface Box<T = MissingDefault> { value:T; }\ndeclare const result: /*#query*/Box<number>;\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "Box<number>",
+    "flags": 1048576,
+    "errorType": false,
+    "arguments": [
+      {
+        "summary": "number",
+        "flags": 64,
+        "errorType": false
+      }
+    ]
+  },
+  {
+    "name": "invalid-constraint-unused",
+    "source": "interface Box<T extends MissingConstraint> { value:T; }\ndeclare const result: /*#query*/Box<number>;\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "Box<number>",
+    "flags": 1048576,
+    "errorType": false,
+    "arguments": [
+      {
+        "summary": "number",
+        "flags": 64,
+        "errorType": false
+      }
+    ]
+  },
+  {
+    "name": "wrongarity-invalid-argument",
+    "source": "interface Box<T> { value:T; }\ndeclare const result: /*#query*/Box<MissingArgument, string>;\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "any",
+    "flags": 1,
+    "errorType": true,
+    "arguments": []
+  },
+  {
+    "name": "wrongarity-invalid-default",
+    "source": "interface Box<T = MissingDefault, U> { left:T; right:U; }\ndeclare const result: /*#query*/Box;\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "any",
+    "flags": 1,
+    "errorType": true,
+    "arguments": []
+  },
+  {
+    "name": "parameter-extra",
+    "source": "interface Box<T> { value: /*#query*/T<number>; }\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "any",
+    "flags": 1,
+    "errorType": true,
+    "arguments": []
+  },
+  {
+    "name": "nongeneric-extra",
+    "source": "interface Box { value:string; }\ndeclare const result: /*#query*/Box<number>;\n",
+    "question": "GetTypeAtLocation(actual TypeReference)",
+    "nodeKind": 184,
+    "inputDiagnostics": [],
+    "summary": "any",
+    "flags": 1,
+    "errorType": true,
+    "arguments": []
+  }
+]

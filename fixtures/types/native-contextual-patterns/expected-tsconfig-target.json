@@ -1,0 +1,38 @@
+[
+  {
+    "name": "targetEmptyObject",
+    "kind": "value",
+    "summary": "void",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "targetEmptyArray",
+    "kind": "value",
+    "summary": "void",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "targetSoleRest",
+    "kind": "expression",
+    "summary": "any[]",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "targetFixedAndRest",
+    "kind": "expression",
+    "summary": "any[]",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  }
+]

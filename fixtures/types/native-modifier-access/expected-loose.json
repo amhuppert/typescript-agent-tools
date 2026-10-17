@@ -1,0 +1,774 @@
+[
+  {
+    "name": "privateOwn",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "privatePeer",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "privateNested",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "privateStaticOwn",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "protectedOwn",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "abstractPropertyMethod",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "abstractPropertyConstructor",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2715,
+      2715
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "required",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 4,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "required",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 4,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      }
+    ]
+  },
+  {
+    "name": "privateDerived",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2341,
+      2341
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "own",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 4,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "own",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 4,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      }
+    ]
+  },
+  {
+    "name": "protectedPeerDerived",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "protectedThroughBase",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2446,
+      2446
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "item",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 4,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Derived",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 3,
+        "symbolFlags": 32,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "item",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 4,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Derived",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 3,
+        "symbolFlags": 32,
+        "tracked": 0
+      }
+    ]
+  },
+  {
+    "name": "protectedNested",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "protectedStaticDerived",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "superProtectedMethod",
+    "summary": "() => number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "superPublicField",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2855,
+      2855
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "field",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 4,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "field",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 4,
+        "tracked": 0
+      }
+    ]
+  },
+  {
+    "name": "superAbstractMethod",
+    "summary": "() => number",
+    "errorType": false,
+    "codes": [
+      2513,
+      2513
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "missingMethod",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 8192,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "missingMethod",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 8192,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      }
+    ]
+  },
+  {
+    "name": "protectedThisType",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "compositeBoth",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "compositeOneWrong",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2445,
+      2445
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "item",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 33554436,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Other",
+        "scope": 0,
+        "symbol": 3,
+        "symbolFlags": 32,
+        "tracked": 1
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "item",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 33554436,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Other",
+        "scope": 0,
+        "symbol": 3,
+        "symbolFlags": 32,
+        "tracked": 1
+      }
+    ]
+  },
+  {
+    "name": "privateOutside",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2341,
+      2341
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "own",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 4,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "own",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 4,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      }
+    ]
+  },
+  {
+    "name": "privateStaticOutside",
+    "summary": "string",
+    "errorType": false,
+    "codes": [
+      2341,
+      2341
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "hidden",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 4,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "hidden",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 4,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      }
+    ]
+  },
+  {
+    "name": "protectedOutside",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2445,
+      2445
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "item",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 4,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "item",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 4,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      }
+    ]
+  },
+  {
+    "name": "protectedStaticOutside",
+    "summary": "string",
+    "errorType": false,
+    "codes": [
+      2445,
+      2445
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "token",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 4,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "token",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 4,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      }
+    ]
+  },
+  {
+    "name": "getter",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "setter",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2445,
+      2445
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "paired",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 33652736,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "paired",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 33652736,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      }
+    ]
+  },
+  {
+    "name": "explicitThis",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "explicitThisGeneric",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "contextualThis",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "explicitThisStatic",
+    "summary": "string",
+    "errorType": false,
+    "codes": [
+      2445,
+      2445
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "token",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 4,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 1073741823,
+        "name": "token",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 4,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 788968,
+        "name": "Base",
+        "scope": 0,
+        "symbol": 2,
+        "symbolFlags": 32,
+        "tracked": 0
+      }
+    ]
+  }
+]

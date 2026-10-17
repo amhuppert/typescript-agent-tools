@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "strict": false,
+    "strictNullChecks": false,
+    "noCheck": true,
+    "noLib": true,
+    "types": [],
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "importHelpers": true
+  },
+  "files": [
+    "globals.d.ts",
+    "bad-good.ts"
+  ]
+}

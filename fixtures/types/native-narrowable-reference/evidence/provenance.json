@@ -1,0 +1,137 @@
+{
+  "compiler": "7.0.2",
+  "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "capture": "fresh exact-input replay; historical captures remain historical",
+  "receipts": {
+    "native": "vrun-6b3eb7ac-505a-4675-8dbe-57de8aad730b",
+    "product": "vrun-fdd13747-eed1-45a4-b1a1-756150e0c963",
+    "red": "vrun-5246a92f-11b6-436f-a16a-d0f4871f2dae"
+  },
+  "files": [
+    {
+      "file": "README.md",
+      "bytes": 2661,
+      "sha256": "7ab8d4a7a901fb173a3cdb252774f72fd3cc85b60109d71b7cd1764f527535cb"
+    },
+    {
+      "file": "captured-tooling/navigation-oracle.mjs",
+      "bytes": 15291,
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+    },
+    {
+      "file": "captured-tooling/semantic-oracle.mjs",
+      "bytes": 49378,
+      "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+    },
+    {
+      "file": "captured-tooling/type-oracle.mjs",
+      "bytes": 39604,
+      "sha256": "2b88ee398209e24c9b3b28a6c39e9d6fbcb3c463f6902638c797e02ae3560b2e"
+    },
+    {
+      "file": "captured-tooling/vendor-typescript-libs.mjs",
+      "bytes": 8387,
+      "sha256": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d"
+    },
+    {
+      "file": "checker-hook.go",
+      "bytes": 3088,
+      "sha256": "a7a6dbb056040bdc51a386e5b77ba80746bea001dc5088fb45a897a55e4c1a25"
+    },
+    {
+      "file": "checker.go.anchors.txt",
+      "bytes": 16887,
+      "sha256": "032c0ee9e28d36b24b1a433edf8ad8027fdd8e19bbfc64ed67782ce2bfa1d9d7"
+    },
+    {
+      "file": "flow.go.anchors.txt",
+      "bytes": 9812,
+      "sha256": "62a2d46da938f205a1223e672dc1501f27f67671db1392f32eb279c610f16f52"
+    },
+    {
+      "file": "fresh-api-answers.json",
+      "bytes": 58855,
+      "sha256": "241887dd6985ba0850da5848785d4f4394a4aca76a711406eec933be1fa5e839"
+    },
+    {
+      "file": "fresh-hook-answers.json",
+      "bytes": 104291,
+      "sha256": "f93d3c3fd7b1311174290d9eacc2c6d027d223a4e2fa87e37f3b40235f020d10"
+    },
+    {
+      "file": "historical-api-answers.json",
+      "bytes": 58855,
+      "sha256": "241887dd6985ba0850da5848785d4f4394a4aca76a711406eec933be1fa5e839"
+    },
+    {
+      "file": "historical-hook-answers.json",
+      "bytes": 104291,
+      "sha256": "f93d3c3fd7b1311174290d9eacc2c6d027d223a4e2fa87e37f3b40235f020d10"
+    },
+    {
+      "file": "inputs/cases.ts",
+      "bytes": 2424,
+      "sha256": "1db7fb5d9741d9402370d83872a091a4b9b0ebd2d1fd63bb5286fbe55972f851"
+    },
+    {
+      "file": "inputs/loose.json",
+      "bytes": 65,
+      "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+    },
+    {
+      "file": "inputs/tsconfig.json",
+      "bytes": 120,
+      "sha256": "92b77fce9b62ef6c8792ccb390035e586d290567bcca4365fb9cbfbe1d287aff"
+    },
+    {
+      "file": "installed-api-inventory.json",
+      "bytes": 69074,
+      "sha256": "d02f36ec003935a11e1fc15cb7beb5567d62b8472367081c769dbc577c75151c"
+    },
+    {
+      "file": "ls-hook.go",
+      "bytes": 5896,
+      "sha256": "73c9a52f43914571bdf7f29e8817720d0ff98bdb0aeb7cad183fa8397a848dce"
+    },
+    {
+      "file": "native-identity.json",
+      "bytes": 1669,
+      "sha256": "3dc32067f3a48ce8df88769ed1a7cc49c58e85c03808716137cd947b04492fe4"
+    },
+    {
+      "file": "oracle-test.go",
+      "bytes": 11810,
+      "sha256": "33d3131ea44e9a4c4447195cc968c919de17bba31847a7b1fb44e5c9d1adb88c"
+    },
+    {
+      "file": "oracle.mjs",
+      "bytes": 40235,
+      "sha256": "bfb4adb1ce3e490dac9f908f630d70fd99d72dccfbe22c6ad993402d62f3aeb5"
+    },
+    {
+      "file": "replay-after.json",
+      "bytes": 893,
+      "sha256": "ad7486142dc19e084d90e83b2005066b8dd1e7c424eb80d0e3c8e2256d7b753a"
+    },
+    {
+      "file": "replay-before.json",
+      "bytes": 893,
+      "sha256": "ad7486142dc19e084d90e83b2005066b8dd1e7c424eb80d0e3c8e2256d7b753a"
+    },
+    {
+      "file": "types-narrowable-reference-probe.mjs",
+      "bytes": 1800,
+      "sha256": "9eb748e4266e954f034c9ce295397cb74732a464267b57dc3e89426a71e2f4b7"
+    },
+    {
+      "file": "types-narrowable-reference-setup.mjs",
+      "bytes": 2678,
+      "sha256": "5d18c0770e16ce2937bcf721c6ac155e9095202833a0c8afea27b68a5d073d5e"
+    },
+    {
+      "file": "types.go.anchors.txt",
+      "bytes": 5845,
+      "sha256": "6d0d360e8da2fd6160393029560cc2c101041d1417dba5260cfe8a358c202334"
+    }
+  ]
+}

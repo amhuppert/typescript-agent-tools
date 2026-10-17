@@ -1,0 +1,1001 @@
+[
+  {
+    "name": "property-high",
+    "file": "property-high.ts",
+    "family": "property",
+    "variant": "high",
+    "admitted": false,
+    "summary": "false",
+    "location": {
+      "file": "property-high.ts",
+      "start": {
+        "line": 3,
+        "column": 26
+      },
+      "end": {
+        "line": 3,
+        "column": 38
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "property-high.ts",
+          "start": {
+            "line": 3,
+            "column": 26
+          },
+          "end": {
+            "line": 3,
+            "column": 38
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "export-high",
+    "file": "export-high.ts",
+    "family": "export",
+    "variant": "high",
+    "admitted": false,
+    "summary": "false",
+    "location": {
+      "file": "export-high.ts",
+      "start": {
+        "line": 3,
+        "column": 26
+      },
+      "end": {
+        "line": 3,
+        "column": 38
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "export-high.ts",
+          "start": {
+            "line": 3,
+            "column": 26
+          },
+          "end": {
+            "line": 3,
+            "column": 38
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "module-high",
+    "file": "module-high.ts",
+    "family": "module",
+    "variant": "high",
+    "admitted": false,
+    "summary": "1",
+    "location": {
+      "file": "module-high.ts",
+      "start": {
+        "line": 2,
+        "column": 18
+      },
+      "end": {
+        "line": 2,
+        "column": 26
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "module-high.ts",
+          "start": {
+            "line": 2,
+            "column": 18
+          },
+          "end": {
+            "line": 2,
+            "column": 26
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "property-low",
+    "file": "property-low.ts",
+    "family": "property",
+    "variant": "low",
+    "admitted": false,
+    "summary": "false",
+    "location": {
+      "file": "property-low.ts",
+      "start": {
+        "line": 3,
+        "column": 26
+      },
+      "end": {
+        "line": 3,
+        "column": 38
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "property-low.ts",
+          "start": {
+            "line": 3,
+            "column": 26
+          },
+          "end": {
+            "line": 3,
+            "column": 38
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "export-low",
+    "file": "export-low.ts",
+    "family": "export",
+    "variant": "low",
+    "admitted": false,
+    "summary": "false",
+    "location": {
+      "file": "export-low.ts",
+      "start": {
+        "line": 3,
+        "column": 26
+      },
+      "end": {
+        "line": 3,
+        "column": 38
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "export-low.ts",
+          "start": {
+            "line": 3,
+            "column": 26
+          },
+          "end": {
+            "line": 3,
+            "column": 38
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "module-low",
+    "file": "module-low.ts",
+    "family": "module",
+    "variant": "low",
+    "admitted": false,
+    "summary": "1",
+    "location": {
+      "file": "module-low.ts",
+      "start": {
+        "line": 2,
+        "column": 18
+      },
+      "end": {
+        "line": 2,
+        "column": 26
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "module-low.ts",
+          "start": {
+            "line": 2,
+            "column": 18
+          },
+          "end": {
+            "line": 2,
+            "column": 26
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "property-lf",
+    "file": "property-lf.ts",
+    "family": "property",
+    "variant": "lf",
+    "admitted": false,
+    "summary": "false",
+    "location": {
+      "file": "property-lf.ts",
+      "start": {
+        "line": 4,
+        "column": 26
+      },
+      "end": {
+        "line": 4,
+        "column": 38
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "property-lf.ts",
+          "start": {
+            "line": 4,
+            "column": 26
+          },
+          "end": {
+            "line": 4,
+            "column": 38
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "export-lf",
+    "file": "export-lf.ts",
+    "family": "export",
+    "variant": "lf",
+    "admitted": false,
+    "summary": "false",
+    "location": {
+      "file": "export-lf.ts",
+      "start": {
+        "line": 4,
+        "column": 26
+      },
+      "end": {
+        "line": 4,
+        "column": 38
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "export-lf.ts",
+          "start": {
+            "line": 4,
+            "column": 26
+          },
+          "end": {
+            "line": 4,
+            "column": 38
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "module-lf",
+    "file": "module-lf.ts",
+    "family": "module",
+    "variant": "lf",
+    "admitted": false,
+    "summary": "1",
+    "location": {
+      "file": "module-lf.ts",
+      "start": {
+        "line": 3,
+        "column": 18
+      },
+      "end": {
+        "line": 3,
+        "column": 26
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "module-lf.ts",
+          "start": {
+            "line": 3,
+            "column": 18
+          },
+          "end": {
+            "line": 3,
+            "column": 26
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "property-cr",
+    "file": "property-cr.ts",
+    "family": "property",
+    "variant": "cr",
+    "admitted": false,
+    "summary": "false",
+    "location": {
+      "file": "property-cr.ts",
+      "start": {
+        "line": 4,
+        "column": 26
+      },
+      "end": {
+        "line": 4,
+        "column": 38
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "property-cr.ts",
+          "start": {
+            "line": 4,
+            "column": 26
+          },
+          "end": {
+            "line": 4,
+            "column": 38
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "export-cr",
+    "file": "export-cr.ts",
+    "family": "export",
+    "variant": "cr",
+    "admitted": false,
+    "summary": "false",
+    "location": {
+      "file": "export-cr.ts",
+      "start": {
+        "line": 4,
+        "column": 26
+      },
+      "end": {
+        "line": 4,
+        "column": 38
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "export-cr.ts",
+          "start": {
+            "line": 4,
+            "column": 26
+          },
+          "end": {
+            "line": 4,
+            "column": 38
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "module-cr",
+    "file": "module-cr.ts",
+    "family": "module",
+    "variant": "cr",
+    "admitted": false,
+    "summary": "1",
+    "location": {
+      "file": "module-cr.ts",
+      "start": {
+        "line": 3,
+        "column": 18
+      },
+      "end": {
+        "line": 3,
+        "column": 26
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "module-cr.ts",
+          "start": {
+            "line": 3,
+            "column": 18
+          },
+          "end": {
+            "line": 3,
+            "column": 26
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "property-crlf",
+    "file": "property-crlf.ts",
+    "family": "property",
+    "variant": "crlf",
+    "admitted": false,
+    "summary": "false",
+    "location": {
+      "file": "property-crlf.ts",
+      "start": {
+        "line": 4,
+        "column": 26
+      },
+      "end": {
+        "line": 4,
+        "column": 38
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "property-crlf.ts",
+          "start": {
+            "line": 4,
+            "column": 26
+          },
+          "end": {
+            "line": 4,
+            "column": 38
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "export-crlf",
+    "file": "export-crlf.ts",
+    "family": "export",
+    "variant": "crlf",
+    "admitted": false,
+    "summary": "false",
+    "location": {
+      "file": "export-crlf.ts",
+      "start": {
+        "line": 4,
+        "column": 26
+      },
+      "end": {
+        "line": 4,
+        "column": 38
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "export-crlf.ts",
+          "start": {
+            "line": 4,
+            "column": 26
+          },
+          "end": {
+            "line": 4,
+            "column": 38
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "module-crlf",
+    "file": "module-crlf.ts",
+    "family": "module",
+    "variant": "crlf",
+    "admitted": false,
+    "summary": "1",
+    "location": {
+      "file": "module-crlf.ts",
+      "start": {
+        "line": 3,
+        "column": 18
+      },
+      "end": {
+        "line": 3,
+        "column": 26
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "module-crlf.ts",
+          "start": {
+            "line": 3,
+            "column": 18
+          },
+          "end": {
+            "line": 3,
+            "column": 26
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "property-ls",
+    "file": "property-ls.ts",
+    "family": "property",
+    "variant": "ls",
+    "admitted": false,
+    "summary": "false",
+    "location": {
+      "file": "property-ls.ts",
+      "start": {
+        "line": 4,
+        "column": 26
+      },
+      "end": {
+        "line": 4,
+        "column": 38
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "property-ls.ts",
+          "start": {
+            "line": 4,
+            "column": 26
+          },
+          "end": {
+            "line": 4,
+            "column": 38
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "export-ls",
+    "file": "export-ls.ts",
+    "family": "export",
+    "variant": "ls",
+    "admitted": false,
+    "summary": "false",
+    "location": {
+      "file": "export-ls.ts",
+      "start": {
+        "line": 4,
+        "column": 26
+      },
+      "end": {
+        "line": 4,
+        "column": 38
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "export-ls.ts",
+          "start": {
+            "line": 4,
+            "column": 26
+          },
+          "end": {
+            "line": 4,
+            "column": 38
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "module-ls",
+    "file": "module-ls.ts",
+    "family": "module",
+    "variant": "ls",
+    "admitted": false,
+    "summary": "1",
+    "location": {
+      "file": "module-ls.ts",
+      "start": {
+        "line": 3,
+        "column": 18
+      },
+      "end": {
+        "line": 3,
+        "column": 26
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "module-ls.ts",
+          "start": {
+            "line": 3,
+            "column": 18
+          },
+          "end": {
+            "line": 3,
+            "column": 26
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "property-ps",
+    "file": "property-ps.ts",
+    "family": "property",
+    "variant": "ps",
+    "admitted": false,
+    "summary": "false",
+    "location": {
+      "file": "property-ps.ts",
+      "start": {
+        "line": 4,
+        "column": 26
+      },
+      "end": {
+        "line": 4,
+        "column": 38
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "property-ps.ts",
+          "start": {
+            "line": 4,
+            "column": 26
+          },
+          "end": {
+            "line": 4,
+            "column": 38
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "export-ps",
+    "file": "export-ps.ts",
+    "family": "export",
+    "variant": "ps",
+    "admitted": false,
+    "summary": "false",
+    "location": {
+      "file": "export-ps.ts",
+      "start": {
+        "line": 4,
+        "column": 26
+      },
+      "end": {
+        "line": 4,
+        "column": 38
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "export-ps.ts",
+          "start": {
+            "line": 4,
+            "column": 26
+          },
+          "end": {
+            "line": 4,
+            "column": 38
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "module-ps",
+    "file": "module-ps.ts",
+    "family": "module",
+    "variant": "ps",
+    "admitted": false,
+    "summary": "1",
+    "location": {
+      "file": "module-ps.ts",
+      "start": {
+        "line": 3,
+        "column": 18
+      },
+      "end": {
+        "line": 3,
+        "column": 26
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "module-ps.ts",
+          "start": {
+            "line": 3,
+            "column": 18
+          },
+          "end": {
+            "line": 3,
+            "column": 26
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "property-pair",
+    "file": "property-pair.ts",
+    "family": "property",
+    "variant": "pair",
+    "admitted": true,
+    "summary": "true",
+    "location": {
+      "file": "property-pair.ts",
+      "start": {
+        "line": 3,
+        "column": 26
+      },
+      "end": {
+        "line": 3,
+        "column": 38
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "property-pair.ts",
+          "start": {
+            "line": 3,
+            "column": 26
+          },
+          "end": {
+            "line": 3,
+            "column": 38
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "export-pair",
+    "file": "export-pair.ts",
+    "family": "export",
+    "variant": "pair",
+    "admitted": true,
+    "summary": "true",
+    "location": {
+      "file": "export-pair.ts",
+      "start": {
+        "line": 3,
+        "column": 26
+      },
+      "end": {
+        "line": 3,
+        "column": 38
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "export-pair.ts",
+          "start": {
+            "line": 3,
+            "column": 26
+          },
+          "end": {
+            "line": 3,
+            "column": 38
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "module-pair",
+    "file": "module-pair.ts",
+    "family": "module",
+    "variant": "pair",
+    "admitted": true,
+    "summary": "1",
+    "location": {
+      "file": "module-pair.ts",
+      "start": {
+        "line": 2,
+        "column": 18
+      },
+      "end": {
+        "line": 2,
+        "column": 26
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "module-pair.ts",
+          "start": {
+            "line": 2,
+            "column": 18
+          },
+          "end": {
+            "line": 2,
+            "column": 26
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "property-scalar",
+    "file": "property-scalar.ts",
+    "family": "property",
+    "variant": "scalar",
+    "admitted": true,
+    "summary": "true",
+    "location": {
+      "file": "property-scalar.ts",
+      "start": {
+        "line": 3,
+        "column": 26
+      },
+      "end": {
+        "line": 3,
+        "column": 38
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "property-scalar.ts",
+          "start": {
+            "line": 3,
+            "column": 26
+          },
+          "end": {
+            "line": 3,
+            "column": 38
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "export-scalar",
+    "file": "export-scalar.ts",
+    "family": "export",
+    "variant": "scalar",
+    "admitted": true,
+    "summary": "true",
+    "location": {
+      "file": "export-scalar.ts",
+      "start": {
+        "line": 3,
+        "column": 26
+      },
+      "end": {
+        "line": 3,
+        "column": 38
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "export-scalar.ts",
+          "start": {
+            "line": 3,
+            "column": 26
+          },
+          "end": {
+            "line": 3,
+            "column": 38
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "module-scalar",
+    "file": "module-scalar.ts",
+    "family": "module",
+    "variant": "scalar",
+    "admitted": true,
+    "summary": "1",
+    "location": {
+      "file": "module-scalar.ts",
+      "start": {
+        "line": 2,
+        "column": 18
+      },
+      "end": {
+        "line": 2,
+        "column": 26
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "module-scalar.ts",
+          "start": {
+            "line": 2,
+            "column": 18
+          },
+          "end": {
+            "line": 2,
+            "column": 26
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  }
+]

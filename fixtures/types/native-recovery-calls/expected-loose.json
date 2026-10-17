@@ -1,0 +1,135 @@
+[
+  {
+    "name": "untypedMany",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "errorCallee",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2365,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "uncallableDisplay",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304,
+      2349
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "hidden"
+    }
+  },
+  {
+    "name": "returnedThenOperand",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "newAny",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "newError",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2365,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "taggedAny",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "taggedError",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304,
+      2349
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "hidden"
+    }
+  },
+  {
+    "name": "healthyAny",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "healthyAfter",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  }
+]

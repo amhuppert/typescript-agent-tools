@@ -1,0 +1,182 @@
+[
+  {
+    "marker": "root",
+    "summary": "{ text: string; number: number; boolean: boolean; nil: null; empty: never[]; numbers: number[]; mixed: (string | number | null)[]; shapes: ({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]; nested: { kept: boolean; dup: { ...; }; }; ... 7 more ...; recursive: (number[] | (string | null)[])[]; }",
+    "errorType": false
+  },
+  {
+    "marker": "text",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "marker": "number",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "marker": "boolean",
+    "summary": "boolean",
+    "errorType": false
+  },
+  {
+    "marker": "nil",
+    "summary": "null",
+    "errorType": false
+  },
+  {
+    "marker": "empty",
+    "summary": "never[]",
+    "errorType": false
+  },
+  {
+    "marker": "numbers",
+    "summary": "number[]",
+    "errorType": false
+  },
+  {
+    "marker": "numbers0",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "marker": "empty0",
+    "summary": "never",
+    "errorType": false
+  },
+  {
+    "marker": "mixed",
+    "summary": "(string | number | null)[]",
+    "errorType": false
+  },
+  {
+    "marker": "mixed0",
+    "summary": "string | number | null",
+    "errorType": false
+  },
+  {
+    "marker": "shapes",
+    "summary": "({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]",
+    "errorType": false
+  },
+  {
+    "marker": "shape0",
+    "summary": "{ a: number; b?: undefined; } | { a?: undefined; b: string; }",
+    "errorType": false
+  },
+  {
+    "marker": "shapeA",
+    "summary": "number | undefined",
+    "errorType": false
+  },
+  {
+    "marker": "duplicate",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "marker": "nestedDuplicate",
+    "summary": "{ last: string; }",
+    "errorType": false
+  },
+  {
+    "marker": "escaped",
+    "summary": "boolean",
+    "errorType": false
+  },
+  {
+    "marker": "emptyKey",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "marker": "numericCanonical",
+    "summary": "boolean",
+    "errorType": false
+  },
+  {
+    "marker": "numericNonCanonical",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "marker": "astral",
+    "summary": "boolean",
+    "errorType": false
+  },
+  {
+    "marker": "defaultKey",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "marker": "namespaceWhole",
+    "summary": "{ text: string; number: number; boolean: boolean; nil: null; empty: never[]; numbers: number[]; mixed: (string | number | null)[]; shapes: ({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]; nested: { kept: boolean; dup: { ...; }; }; ... 7 more ...; default: { ...; }; }",
+    "errorType": false
+  },
+  {
+    "marker": "syntheticCopy",
+    "summary": "{ text: string; number: number; boolean: boolean; nil: null; empty: never[]; numbers: number[]; mixed: (string | number | null)[]; shapes: ({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]; nested: { kept: boolean; dup: { ...; }; }; ... 7 more ...; recursive: (number[] | (string | null)[])[]; }",
+    "errorType": false
+  },
+  {
+    "marker": "namedCopy",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "marker": "missing",
+    "summary": "any",
+    "errorType": true
+  },
+  {
+    "marker": "unknown",
+    "summary": "unknown",
+    "errorType": false
+  },
+  {
+    "marker": "unknownRead",
+    "summary": "any",
+    "errorType": true
+  },
+  {
+    "marker": "genuineAny",
+    "summary": "any",
+    "errorType": false
+  },
+  {
+    "marker": "recursive",
+    "summary": "(number[] | (string | null)[])[]",
+    "errorType": false
+  },
+  {
+    "marker": "rootNull",
+    "summary": "null",
+    "errorType": false
+  },
+  {
+    "marker": "rootEmpty",
+    "summary": "never[]",
+    "errorType": false
+  },
+  {
+    "marker": "rootNumber",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "marker": "importRoot",
+    "summary": "{ text: string; number: number; boolean: boolean; nil: null; empty: never[]; numbers: number[]; mixed: (string | number | null)[]; shapes: ({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]; nested: { kept: boolean; dup: { ...; }; }; ... 7 more ...; recursive: (number[] | (string | null)[])[]; }",
+    "errorType": false
+  },
+  {
+    "marker": "syntheticDefault",
+    "summary": "{ text: string; number: number; boolean: boolean; nil: null; empty: never[]; numbers: number[]; mixed: (string | number | null)[]; shapes: ({ a: number; b?: undefined; } | { a?: undefined; b: string; })[]; nested: { kept: boolean; dup: { ...; }; }; ... 7 more ...; recursive: (number[] | (string | null)[])[]; }",
+    "errorType": false
+  },
+  {
+    "marker": "namedDup",
+    "summary": "number",
+    "errorType": false
+  }
+]

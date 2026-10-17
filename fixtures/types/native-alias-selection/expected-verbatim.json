@@ -1,0 +1,266 @@
+[
+  {
+    "name": "classLeft",
+    "kind": "value",
+    "summary": "typeof Widget",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "classRight",
+    "kind": "value",
+    "summary": "typeof Widget",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "typeClassLeft",
+    "kind": "declared",
+    "summary": "Widget",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "typeClassRight",
+    "kind": "declared",
+    "summary": "Widget",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "specifierLeft",
+    "kind": "declared",
+    "summary": "Widget",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "specifierRight",
+    "kind": "declared",
+    "summary": "Widget",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "interfaceLeft",
+    "kind": "declared",
+    "summary": "Shape",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "interfaceRight",
+    "kind": "declared",
+    "summary": "Shape",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "functionLeft",
+    "kind": "value",
+    "summary": "() => 17",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "functionRight",
+    "kind": "value",
+    "summary": "() => 17",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "variableLeft",
+    "kind": "value",
+    "summary": "\"fixed\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "variableRight",
+    "kind": "value",
+    "summary": "\"fixed\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "defaultValue",
+    "kind": "value",
+    "summary": "typeof DefaultClass",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "defaultType",
+    "kind": "declared",
+    "summary": "DefaultClass",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "namespaceValue",
+    "kind": "value",
+    "summary": "typeof import(\"<fixture>/exports\")",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "namespaceType",
+    "kind": "value",
+    "summary": "typeof import(\"<fixture>/types-only\")",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "requireValue",
+    "kind": "value",
+    "summary": "{ amount: number; }",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "exportProperty",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "jsonArray",
+    "kind": "value",
+    "summary": "number[]",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "jsonScalar",
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "jsonType",
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "exportLeft",
+    "kind": "value",
+    "summary": "typeof Widget",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "exportRight",
+    "kind": "value",
+    "summary": "typeof Widget",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "exportTypeLeft",
+    "kind": "declared",
+    "summary": "Widget",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "exportTypeRight",
+    "kind": "declared",
+    "summary": "Widget",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "namespaceExport",
+    "kind": "value",
+    "summary": "typeof import(\"<fixture>/types-only\")",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "internalEquals",
+    "kind": "value",
+    "summary": "typeof Local",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "quotedImportLeft",
+    "kind": "value",
+    "summary": "23",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "quotedImportRight",
+    "kind": "value",
+    "summary": "23",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "emptyImportLeft",
+    "kind": "value",
+    "summary": "23",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "emptyImportRight",
+    "kind": "value",
+    "summary": "23",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "quotedExportLeft",
+    "kind": "value",
+    "summary": "23",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "quotedExportRight",
+    "kind": "value",
+    "summary": "23",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  }
+]

@@ -1,0 +1,218 @@
+[
+  {
+    "name": "property-high",
+    "file": "property-high.ts",
+    "family": "property",
+    "variant": "high",
+    "admitted": false,
+    "summary": "false"
+  },
+  {
+    "name": "export-high",
+    "file": "export-high.ts",
+    "family": "export",
+    "variant": "high",
+    "admitted": false,
+    "summary": "false"
+  },
+  {
+    "name": "module-high",
+    "file": "module-high.ts",
+    "family": "module",
+    "variant": "high",
+    "admitted": false,
+    "summary": "1"
+  },
+  {
+    "name": "property-low",
+    "file": "property-low.ts",
+    "family": "property",
+    "variant": "low",
+    "admitted": false,
+    "summary": "false"
+  },
+  {
+    "name": "export-low",
+    "file": "export-low.ts",
+    "family": "export",
+    "variant": "low",
+    "admitted": false,
+    "summary": "false"
+  },
+  {
+    "name": "module-low",
+    "file": "module-low.ts",
+    "family": "module",
+    "variant": "low",
+    "admitted": false,
+    "summary": "1"
+  },
+  {
+    "name": "property-lf",
+    "file": "property-lf.ts",
+    "family": "property",
+    "variant": "lf",
+    "admitted": false,
+    "summary": "false"
+  },
+  {
+    "name": "export-lf",
+    "file": "export-lf.ts",
+    "family": "export",
+    "variant": "lf",
+    "admitted": false,
+    "summary": "false"
+  },
+  {
+    "name": "module-lf",
+    "file": "module-lf.ts",
+    "family": "module",
+    "variant": "lf",
+    "admitted": false,
+    "summary": "1"
+  },
+  {
+    "name": "property-cr",
+    "file": "property-cr.ts",
+    "family": "property",
+    "variant": "cr",
+    "admitted": false,
+    "summary": "false"
+  },
+  {
+    "name": "export-cr",
+    "file": "export-cr.ts",
+    "family": "export",
+    "variant": "cr",
+    "admitted": false,
+    "summary": "false"
+  },
+  {
+    "name": "module-cr",
+    "file": "module-cr.ts",
+    "family": "module",
+    "variant": "cr",
+    "admitted": false,
+    "summary": "1"
+  },
+  {
+    "name": "property-crlf",
+    "file": "property-crlf.ts",
+    "family": "property",
+    "variant": "crlf",
+    "admitted": false,
+    "summary": "false"
+  },
+  {
+    "name": "export-crlf",
+    "file": "export-crlf.ts",
+    "family": "export",
+    "variant": "crlf",
+    "admitted": false,
+    "summary": "false"
+  },
+  {
+    "name": "module-crlf",
+    "file": "module-crlf.ts",
+    "family": "module",
+    "variant": "crlf",
+    "admitted": false,
+    "summary": "1"
+  },
+  {
+    "name": "property-ls",
+    "file": "property-ls.ts",
+    "family": "property",
+    "variant": "ls",
+    "admitted": false,
+    "summary": "false"
+  },
+  {
+    "name": "export-ls",
+    "file": "export-ls.ts",
+    "family": "export",
+    "variant": "ls",
+    "admitted": false,
+    "summary": "false"
+  },
+  {
+    "name": "module-ls",
+    "file": "module-ls.ts",
+    "family": "module",
+    "variant": "ls",
+    "admitted": false,
+    "summary": "1"
+  },
+  {
+    "name": "property-ps",
+    "file": "property-ps.ts",
+    "family": "property",
+    "variant": "ps",
+    "admitted": false,
+    "summary": "false"
+  },
+  {
+    "name": "export-ps",
+    "file": "export-ps.ts",
+    "family": "export",
+    "variant": "ps",
+    "admitted": false,
+    "summary": "false"
+  },
+  {
+    "name": "module-ps",
+    "file": "module-ps.ts",
+    "family": "module",
+    "variant": "ps",
+    "admitted": false,
+    "summary": "1"
+  },
+  {
+    "name": "property-pair",
+    "file": "property-pair.ts",
+    "family": "property",
+    "variant": "pair",
+    "admitted": true,
+    "summary": "true"
+  },
+  {
+    "name": "export-pair",
+    "file": "export-pair.ts",
+    "family": "export",
+    "variant": "pair",
+    "admitted": true,
+    "summary": "true"
+  },
+  {
+    "name": "module-pair",
+    "file": "module-pair.ts",
+    "family": "module",
+    "variant": "pair",
+    "admitted": true,
+    "summary": "1"
+  },
+  {
+    "name": "property-scalar",
+    "file": "property-scalar.ts",
+    "family": "property",
+    "variant": "scalar",
+    "admitted": true,
+    "summary": "true"
+  },
+  {
+    "name": "export-scalar",
+    "file": "export-scalar.ts",
+    "family": "export",
+    "variant": "scalar",
+    "admitted": true,
+    "summary": "true"
+  },
+  {
+    "name": "module-scalar",
+    "file": "module-scalar.ts",
+    "family": "module",
+    "variant": "scalar",
+    "admitted": true,
+    "summary": "1"
+  }
+]

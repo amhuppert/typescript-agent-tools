@@ -367,7 +367,8 @@ struct Matcher {
 }
 
 impl Matcher {
-    /// Files under the include base directories, in TypeScript's order:
+    /// `vfsmatch.globVisitor.visit`: files under the include base directories,
+    /// in TypeScript's order:
     /// grouped by the first include entry that matches, and within a group
     /// by a depth-first walk visiting a directory's sorted files before its
     /// sorted subdirectories. Each real directory is visited once.
@@ -393,6 +394,13 @@ impl Matcher {
                     continue;
                 }
                 let (files, directories) = entries(&directory, disk)?;
+                // Native appends directory entries to an ensured trailing
+                // slash. They are names, not standalone paths: CombinePaths
+                // would reinterpret a Unix entry such as `A:` as a drive root.
+                let mut prefix = directory.clone();
+                if !prefix.is_empty() && !prefix.ends_with('/') {
+                    prefix.push('/');
+                }
                 for name in files {
                     let name = match name {
                         Ok(name) => name,
@@ -401,7 +409,7 @@ impl Matcher {
                         }
                         Err(_) => continue,
                     };
-                    let path = paths::combine(&directory, &name);
+                    let path = format!("{prefix}{name}");
                     if !paths::has_extension(&path, extensions) {
                         continue;
                     }
@@ -419,7 +427,7 @@ impl Matcher {
                 }
                 for name in directories.into_iter().rev() {
                     let (Ok(text) | Err(text)) = &name;
-                    let path = paths::combine(&directory, text);
+                    let path = format!("{prefix}{text}");
                     let components: Vec<&str> = path.split('/').collect();
                     if self
                         .include

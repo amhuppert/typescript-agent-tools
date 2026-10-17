@@ -4,26 +4,57 @@
 //! ancestor `node_modules` (TypeScript and declarations first, including
 //! `@types`, then JavaScript), and finally explicit `typeRoots`.
 //!
-//! Lookups return the path as found; callers decide file identity. Results
-//! are cached per directory, specifier, and resolution mode for one load.
+//! Lookups retain native ResolvedFileName and OriginalPath separately from
+//! the loader's input identity. Results are cached per directory, specifier,
+//! and resolution mode for one load.
 
-use super::config::{Config, Module, Options, Resolution};
-use super::manifest::{self, Kind, Value};
+use super::config::{Config, Options, Resolution};
+use super::manifest::{Kind, PackageInfo, Value};
 use super::paths;
 use super::{disk, io_error, version};
-use crate::analysis::{InputError, InputErrorKind};
+use crate::analysis::InputError;
 use crate::input::{self, Case};
-use crate::project::binding::{RequestKind, ResolutionMode};
-use crate::source::SourceText;
+use crate::project::binding::ResolutionMode;
 use std::collections::{HashMap, HashSet};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::rc::Rc;
+use std::sync::Arc;
 
 /// Extension families a lookup may produce.
 const TS: u8 = 1;
 const DTS: u8 = 2;
 const JS: u8 = 4;
 const JSON: u8 = 8;
+
+/// Native `GetConditions` for the admitted resolution modes. NoDtsResolution
+/// is not an admitted compiler option, so the native types condition is set.
+pub(super) fn resolution_conditions(
+    resolution: Resolution,
+    custom_conditions: &[String],
+    mode: Option<ResolutionMode>,
+) -> Vec<String> {
+    let import =
+        mode == Some(ResolutionMode::Import) || mode.is_none() && resolution == Resolution::Bundler;
+    let mut conditions = vec![
+        if import { "import" } else { "require" }.to_owned(),
+        "types".to_owned(),
+    ];
+    if resolution != Resolution::Bundler {
+        conditions.push("node".to_owned());
+    }
+    conditions.extend_from_slice(custom_conditions);
+    conditions
+}
+
+/// Native condition selection and `IsApplicableVersionedTypesKey`, shared
+/// wherever resolution or reverse module naming asks the same question.
+pub(super) fn package_condition_applies(condition: &str, conditions: &[String]) -> bool {
+    condition == "default"
+        || conditions.iter().any(|value| value == condition)
+        || condition.strip_prefix("types@").is_some_and(|range| {
+            conditions.iter().any(|value| value == "types") && version::matches_typescript(range)
+        })
+}
 
 /// How many `imports` targets may name further lookups in one chain. Real
 /// chains are a few lookups; a longer one is reported as unsupported rather
@@ -42,14 +73,30 @@ pub(super) enum Resolved {
     /// is a separate question (`admission`).
     File {
         path: String,
+        original_path: Option<String>,
         external: bool,
         extension: Extension,
     },
     /// JavaScript found without TypeScript declarations.
-    JavaScript(String),
+    JavaScript(ResolvedPath),
     Missing,
     /// A package `imports` chain longer than `MAX_IMPORTS_CHAIN`.
     TooDeep,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(super) struct ResolvedPath {
+    pub(super) path: String,
+    pub(super) original_path: Option<String>,
+    pub(super) external: bool,
+}
+
+impl ResolvedPath {
+    /// Preserve the spelling through which this input was reached. The
+    /// loader's canonical identity is independent of native resolution text.
+    pub(super) fn reached_path(&self) -> &str {
+        self.original_path.as_deref().unwrap_or(&self.path)
+    }
 }
 
 /// The extension TypeScript records for a resolved module
@@ -179,7 +226,7 @@ struct PackageJson {
     subpaths: Option<Table>,
     has_exports: bool,
     imports: Option<Table>,
-    types_versions: Option<Value>,
+    info: Arc<PackageInfo>,
 }
 
 /// An `exports` subpath or `imports` table, indexed once so a chain of
@@ -215,28 +262,22 @@ impl Table {
 }
 
 impl PackageJson {
-    /// An unparsable manifest, like TypeScript's, still establishes a
-    /// package scope. One nested past the reader's limit is not unparsable
-    /// but beyond this tool, so it is an error.
-    fn parse(dir: &str, text: &str) -> Result<Self, manifest::SyntaxError> {
-        let parsed = match manifest::parse(text) {
-            Err(error) if error.failure == manifest::Failure::TooDeep => return Err(error),
-            parsed => parsed.ok(),
-        };
-        let Some(value) = parsed.filter(|v| v.entries().is_some()) else {
-            return Ok(Self {
-                dir: dir.to_owned(),
+    fn from_info(info: Arc<PackageInfo>) -> Self {
+        let Some(value) = info.contents.as_ref() else {
+            return Self {
+                dir: info.directory.clone(),
+                info,
                 ..Self::default()
-            });
+            };
         };
         let string = |name: &str| value.get(name).and_then(Value::as_str).map(str::to_owned);
         let exports = value.field("exports");
         let subpaths = exports
+            .filter(|value| value.is_exports_subpaths())
             .and_then(Value::entries)
-            .filter(|entries| entries.iter().all(|(key, _)| key.starts_with('.')))
             .map(Table::new);
-        Ok(Self {
-            dir: dir.to_owned(),
+        Self {
+            dir: info.directory.clone(),
             name: string("name"),
             kind: string("type"),
             types: string("types"),
@@ -251,41 +292,22 @@ impl PackageJson {
                 .field("imports")
                 .and_then(Value::entries)
                 .map(Table::new),
-            types_versions: value.field("typesVersions").cloned(),
-        })
+            info,
+        }
     }
 
-    /// The `typesVersions` path map of the first range admitting the
-    /// reference compiler.
     fn version_paths(&self) -> Option<Vec<(String, Vec<String>)>> {
-        let ranges = self.types_versions.as_ref()?.entries()?;
-        let (_, paths) = ranges
-            .iter()
-            .find(|(range, _)| version::matches_typescript(range))?;
-        Some(
-            paths
-                .entries()?
-                .iter()
-                .map(|(pattern, targets)| {
-                    let targets = targets
-                        .as_array()
-                        .unwrap_or_default()
-                        .iter()
-                        .filter_map(|target| target.as_str().map(str::to_owned))
-                        .collect();
-                    (pattern.clone(), targets)
-                })
-                .collect(),
-        )
+        self.info.version_paths()
     }
 }
 
 /// Cached file system queries.
 struct Host<'a> {
     disk: &'a disk::Disk,
-    files: HashMap<String, bool>,
-    directories: HashMap<String, bool>,
-    packages: HashMap<String, Option<Rc<PackageJson>>>,
+    case: Case,
+    files: HashMap<String, Result<bool, InputError>>,
+    directories: HashMap<String, Result<bool, InputError>>,
+    packages: HashMap<String, Result<Option<Rc<PackageJson>>, InputError>>,
     /// The first input that lookups could not use: an existing file or
     /// directory that could not be read, or a manifest beyond the JSON
     /// reader's limit. A lookup continues as if it were absent, but loading
@@ -303,66 +325,82 @@ impl Host<'_> {
     }
 
     fn file_exists(&mut self, path: &str) -> bool {
-        if let Some(&exists) = self.files.get(path) {
-            return exists;
-        }
-        let exists = self.probe(path, self.disk.is_file(path));
-        self.files.insert(path.to_owned(), exists);
-        exists
+        let result = self
+            .files
+            .entry(path.to_owned())
+            .or_insert_with(|| {
+                self.disk
+                    .file_exists(path)
+                    .map_err(|error| io_error(Path::new(path), &error))
+            })
+            .clone();
+        self.admit(result).unwrap_or(false)
     }
 
     fn directory_exists(&mut self, path: &str) -> bool {
-        if let Some(&exists) = self.directories.get(path) {
-            return exists;
-        }
-        let exists = self.probe(path, self.disk.is_dir(path));
-        self.directories.insert(path.to_owned(), exists);
-        exists
+        let result = self
+            .directories
+            .entry(path.to_owned())
+            .or_insert_with(|| {
+                self.disk
+                    .is_dir(path)
+                    .map_err(|error| io_error(Path::new(path), &error))
+            })
+            .clone();
+        self.admit(result).unwrap_or(false)
     }
 
-    /// A probe's answer; a failed probe is recorded and answers absent.
-    fn probe(&mut self, path: &str, result: std::io::Result<bool>) -> bool {
-        result.unwrap_or_else(|error| {
-            self.unreadable(path, error);
-            false
-        })
+    /// Resolution continues through absent candidates, then check_reads reports
+    /// the first failed observation. Snapshot capture reads the same cached
+    /// Result directly so anticipatory failures stay deferred until demanded.
+    fn admit<T>(&mut self, result: Result<T, InputError>) -> Option<T> {
+        match result {
+            Ok(value) => Some(value),
+            Err(error) => {
+                self.fail(error);
+                None
+            }
+        }
+    }
+
+    fn package_observation(&mut self, dir: &str) -> Result<Option<Rc<PackageJson>>, InputError> {
+        let dir = paths::directory(dir.to_owned());
+        // `InfoCache.Get/Set` uses the canonical absolute path, while
+        // getPackageJsonInfo projects PackageDirectory back to this caller.
+        let package = self
+            .packages
+            .entry(self.case.key(&dir))
+            .or_insert_with(|| {
+                PackageInfo::read(&dir, self.disk)
+                    .map(|info| info.map(|info| Rc::new(PackageJson::from_info(info))))
+            })
+            .clone()?;
+        Ok(
+            package.map(|package| match package.info.with_directory(&dir) {
+                std::borrow::Cow::Borrowed(_) => package.clone(),
+                std::borrow::Cow::Owned(info) => Rc::new(PackageJson::from_info(Arc::new(info))),
+            }),
+        )
     }
 
     fn package(&mut self, dir: &str) -> Option<Rc<PackageJson>> {
-        // Candidate directories may end with a separator.
-        let dir = &paths::directory(dir.to_owned());
-        if let Some(package) = self.packages.get(dir) {
-            return package.clone();
-        }
-        let path = paths::combine(dir, "package.json");
-        let package = self.file_exists(&path).then(|| {
-            // Content that is not UTF-8 is unparsable, as in TypeScript, not
-            // unreadable.
-            let bytes = self.disk.read(&path).unwrap_or_else(|error| {
-                self.unreadable(&path, error);
-                Vec::new().into()
-            });
-            let text = crate::source::decode(&bytes).unwrap_or("");
-            Rc::new(PackageJson::parse(dir, text).unwrap_or_else(|error| {
-                self.fail(InputError {
-                    kind: InputErrorKind::Unsupported,
-                    message: error.message,
-                    path: Some(PathBuf::from(&path)),
-                    position: Some(SourceText::new(text.to_owned()).position(error.offset)),
-                });
-                PackageJson {
-                    dir: dir.to_owned(),
-                    ..PackageJson::default()
-                }
-            }))
-        });
-        self.packages.insert(dir.to_owned(), package.clone());
-        package
+        let result = self.package_observation(dir);
+        self.admit(result).flatten()
     }
 
     /// The nearest `package.json` at or above `dir`.
     fn scope(&mut self, dir: &str) -> Option<Rc<PackageJson>> {
-        paths::ancestors(dir).find_map(|ancestor| self.package(ancestor))
+        let result = self.scope_observation(dir);
+        self.admit(result).flatten()
+    }
+
+    fn scope_observation(&mut self, dir: &str) -> Result<Option<Rc<PackageJson>>, InputError> {
+        for ancestor in paths::ancestors(dir) {
+            if let Some(package) = self.package_observation(ancestor)? {
+                return Ok(Some(package));
+            }
+        }
+        Ok(None)
     }
 }
 
@@ -379,6 +417,7 @@ struct State {
     imports_root: bool,
     conditions: Rc<[String]>,
     config_lookup: bool,
+    package_directory_only: bool,
 }
 
 impl State {
@@ -390,11 +429,7 @@ impl State {
     }
 
     fn applies(&self, condition: &str) -> bool {
-        condition == "default"
-            || self.conditions.iter().any(|c| c == condition)
-            || condition.strip_prefix("types@").is_some_and(|range| {
-                self.conditions.iter().any(|c| c == "types") && version::matches_typescript(range)
-            })
+        package_condition_applies(condition, &self.conditions)
     }
 }
 
@@ -424,7 +459,7 @@ pub(super) struct Resolver<'a> {
     config_file: &'a str,
     case: Case,
     host: Host<'a>,
-    modules: HashMap<(String, String, bool), Resolved>,
+    modules: HashMap<(String, String, Option<ResolutionMode>), Resolved>,
     /// Results of `imports` hops during one module resolution, so branches
     /// that share a lookup evaluate it once.
     hops: HashMap<Hop, Option<String>>,
@@ -434,6 +469,7 @@ pub(super) struct Resolver<'a> {
     /// declaration form (`Extension::Arbitrary`).
     arbitrary: HashSet<String>,
     too_deep: bool,
+    symlink_resolutions: Vec<(String, String)>,
 }
 
 impl<'a> Resolver<'a> {
@@ -455,6 +491,7 @@ impl<'a> Resolver<'a> {
             case,
             host: Host {
                 disk,
+                case,
                 files: HashMap::new(),
                 directories: HashMap::new(),
                 packages: HashMap::new(),
@@ -465,24 +502,20 @@ impl<'a> Resolver<'a> {
             active: HashSet::new(),
             arbitrary: HashSet::new(),
             too_deep: false,
+            symlink_resolutions: Vec::new(),
         }
     }
 
+    /// `GetConditions` preserves native mode-less resolution: Bundler supplies
+    /// import conditions, while Node modes supply require conditions. The
+    /// separate ES-module feature gate still requires an explicit import mode.
     fn state(&self, mode: Option<ResolutionMode>, extensions: u8) -> State {
         let node = self.options.resolution != Resolution::Bundler;
-        let import = match mode {
-            Some(ResolutionMode::Import) => true,
-            Some(ResolutionMode::Require) => false,
-            None => !node,
-        };
-        let mut conditions = vec![
-            if import { "import" } else { "require" }.to_owned(),
-            "types".to_owned(),
-        ];
-        if node {
-            conditions.push("node".into());
-        }
-        conditions.extend(self.options.custom_conditions.iter().cloned());
+        let conditions = resolution_conditions(
+            self.options.resolution,
+            &self.options.custom_conditions,
+            mode,
+        );
         State {
             extensions,
             esm: node && mode == Some(ResolutionMode::Import),
@@ -491,17 +524,19 @@ impl<'a> Resolver<'a> {
             imports_root: self.options.resolution != Resolution::Node16,
             conditions: conditions.into(),
             config_lookup: false,
+            package_directory_only: false,
         }
     }
 
     /// Resolves a module specifier written in `file`.
-    pub(super) fn module(&mut self, specifier: &str, file: &str, mode: ResolutionMode) -> Resolved {
+    pub(super) fn module(
+        &mut self,
+        specifier: &str,
+        file: &str,
+        mode: Option<ResolutionMode>,
+    ) -> Resolved {
         let directory = paths::parent(file).to_owned();
-        let key = (
-            directory.clone(),
-            specifier.to_owned(),
-            mode == ResolutionMode::Import,
-        );
+        let key = (directory.clone(), specifier.to_owned(), mode);
         if let Some(resolved) = self.modules.get(&key) {
             return resolved.clone();
         }
@@ -509,7 +544,7 @@ impl<'a> Resolver<'a> {
         if self.options.resolve_json_module {
             extensions |= JSON;
         }
-        let state = self.state(Some(mode), extensions);
+        let state = self.state(mode, extensions);
         self.hops.clear();
         self.arbitrary.clear();
         self.too_deep = false;
@@ -517,10 +552,9 @@ impl<'a> Resolver<'a> {
         let resolved = match found {
             _ if self.too_deep => Resolved::TooDeep,
             None => Resolved::Missing,
-            Some((path, _)) if input::is_javascript(&path) => Resolved::JavaScript(path),
-            Some((path, package)) => Resolved::File {
-                external: package || paths::has_node_modules(&path),
-                extension: if self.arbitrary.contains(&path) {
+            Some((path, _)) => {
+                let javascript = input::is_javascript(&path);
+                let extension = if self.arbitrary.contains(&path) {
                     Extension::Arbitrary
                 } else if path.ends_with(".tsx") {
                     Extension::Tsx
@@ -528,9 +562,24 @@ impl<'a> Resolver<'a> {
                     Extension::Json
                 } else {
                     Extension::TypeScript
-                },
-                path,
-            },
+                };
+                let external = paths::has_node_modules(&path);
+                let resolved = self.original_and_resolved(
+                    path,
+                    external && !is_relative_name(specifier),
+                    external,
+                );
+                if javascript {
+                    Resolved::JavaScript(resolved)
+                } else {
+                    Resolved::File {
+                        path: resolved.path,
+                        original_path: resolved.original_path,
+                        external,
+                        extension,
+                    }
+                }
+            }
         };
         self.modules.insert(key, resolved.clone());
         resolved
@@ -544,7 +593,7 @@ impl<'a> Resolver<'a> {
         name: &str,
         directory: &str,
         mode: Option<ResolutionMode>,
-    ) -> Option<String> {
+    ) -> Option<ResolvedPath> {
         let state = self.state(mode, DTS);
         for root in self.type_roots() {
             if !self.host.directory_exists(&root) {
@@ -553,7 +602,8 @@ impl<'a> Resolver<'a> {
             let candidate = type_root_candidate(&root, name);
             if let Some(found) = self.load_from_directory(&state, &candidate, true) {
                 if input::is_typescript(&found) {
-                    return Some(found);
+                    let external = paths::has_node_modules(&found);
+                    return Some(self.original_and_resolved(found, true, external));
                 }
             }
         }
@@ -565,7 +615,106 @@ impl<'a> Resolver<'a> {
         } else {
             self.node_modules(&state, name, directory)
         };
-        found.filter(|found| input::is_typescript(found))
+        found
+            .filter(|found| input::is_typescript(found))
+            .map(|found| {
+                let external = paths::has_node_modules(&found);
+                self.original_and_resolved(found, true, external)
+            })
+    }
+
+    /// `getOriginalAndResolvedFileName`, called at the native module/type
+    /// reference gates. A case-only realpath difference keeps the original
+    /// spelling; other failures remain active resolution input failures.
+    fn original_and_resolved(
+        &mut self,
+        path: String,
+        resolve_symlink: bool,
+        external: bool,
+    ) -> ResolvedPath {
+        if !resolve_symlink || self.options.preserve_symlinks {
+            return ResolvedPath {
+                path,
+                original_path: None,
+                external,
+            };
+        }
+        let real = self
+            .host
+            .disk
+            .canonicalize(&path)
+            .map_err(|error| io_error(Path::new(&path), &error))
+            .and_then(|path| paths::from_path(&path));
+        let real = match real {
+            Ok(real) => real,
+            Err(error) => {
+                self.host.fail(error);
+                return ResolvedPath {
+                    path,
+                    original_path: None,
+                    external,
+                };
+            }
+        };
+        if paths::compare(&path, &real, self.config_dir, self.case).is_eq() {
+            ResolvedPath {
+                path,
+                original_path: None,
+                external,
+            }
+        } else {
+            self.symlink_resolutions.push((path.clone(), real.clone()));
+            ResolvedPath {
+                path: real,
+                original_path: Some(path),
+                external,
+            }
+        }
+    }
+
+    pub(super) fn symlink_resolutions(&self) -> &[(String, String)] {
+        &self.symlink_resolutions
+    }
+
+    /// Typed snapshot acquisition shares the resolver's parsed package owner
+    /// without latching an anticipatory failure as an active load failure.
+    pub(super) fn package_observation(
+        &mut self,
+        directory: &str,
+    ) -> Result<Option<Arc<PackageInfo>>, InputError> {
+        self.host
+            .package_observation(directory)
+            .map(|package| package.map(|package| package.info.clone()))
+    }
+
+    /// `loadSourceFileMetaData` asks for package scope independently of the
+    /// extension and of the narrower package-type-to-module-format gate.
+    pub(super) fn source_package_scope(
+        &mut self,
+        file: &str,
+    ) -> Result<Option<Arc<PackageInfo>>, InputError> {
+        self.host
+            .scope_observation(paths::parent(file))
+            .map(|package| package.map(|package| package.info.clone()))
+    }
+
+    /// `ResolvePackageDirectory` shares nearest-node_modules and @types
+    /// traversal with resolution, but stops at an existing package directory.
+    pub(super) fn package_directory(
+        &mut self,
+        name: &str,
+        from: &str,
+    ) -> Result<Option<ResolvedPath>, InputError> {
+        let mut state = self.state(Some(ResolutionMode::Require), TS | DTS | JS);
+        state.package_directory_only = true;
+        let result = self
+            .node_modules(&state, name, paths::parent(from))
+            .map(|path| {
+                let external = paths::has_node_modules(&path);
+                self.original_and_resolved(path, external && !is_relative_name(name), external)
+            });
+        self.check_reads()?;
+        Ok(result)
     }
 
     /// The package names `"types": ["*"]` selects: each type root's
@@ -646,51 +795,51 @@ impl<'a> Resolver<'a> {
         }
     }
 
+    /// `GetImpliedNodeFormatForEmitWorker` / `GetEmitModuleFormatOfFileWorker`
+    /// use the same captured extension/package facts as module resolution.
+    /// JSON has no implied node format; resolution's CommonJS default does not
+    /// turn that absence into an emit-format fact.
+    pub(super) fn module_semantics(
+        &self,
+        format: FileFormat,
+        json: bool,
+    ) -> super::FileModuleSemantics {
+        use super::ModuleKind;
+        let configured = self.options.semantic.module_kind;
+        let implied = if json {
+            None
+        } else if configured.is_node() {
+            Some(format.implied)
+        } else {
+            format.declared
+        };
+        // `importSyntaxAffectsModuleResolution` and
+        // `getDefaultResolutionModeForFile` share the captured format facts.
+        let import_syntax_affects_resolution = matches!(
+            self.options.resolution,
+            Resolution::Node16 | Resolution::NodeNext
+        ) || self.options.package_exports
+            || self.options.package_imports;
+        super::FileModuleSemantics {
+            implied_node_format: implied.map(Format::mode),
+            default_resolution_mode: import_syntax_affects_resolution
+                .then_some(implied)
+                .flatten()
+                .map(Format::mode),
+            import_syntax_affects_resolution,
+            emit_module_kind: match implied {
+                Some(Format::CommonJs) => ModuleKind::CommonJs,
+                Some(Format::Esm) => ModuleKind::EsNext,
+                None => configured,
+            },
+        }
+    }
+
     /// Fail if a lookup met a file or directory it could not read.
     pub(super) fn check_reads(&mut self) -> Result<(), InputError> {
         match self.host.failure.take() {
             Some(error) => Err(error),
             None => Ok(()),
-        }
-    }
-
-    /// TypeScript's resolution mode for one request written in a file of
-    /// `format`. In Node.js modes static imports follow the importing file's
-    /// format; in bundler mode they follow its emitted syntax, which `module`
-    /// decides unless the file's extension (or, in `node_modules`, its
-    /// package) fixes the format. An explicit `resolution-mode` is honored
-    /// wherever the binder records one; the compiler honors it only on
-    /// type-only imports and exports and on import types, and rejects it
-    /// elsewhere.
-    pub(super) fn request_mode(
-        &self,
-        format: FileFormat,
-        kind: RequestKind,
-        explicit: Option<ResolutionMode>,
-    ) -> ResolutionMode {
-        let options = self.options;
-        let syntax = match options.resolution {
-            Resolution::Node16 | Resolution::NodeNext => format.implied,
-            Resolution::Bundler => {
-                format
-                    .declared
-                    .unwrap_or(if options.module == Module::CommonJs {
-                        Format::CommonJs
-                    } else {
-                        Format::Esm
-                    })
-            }
-        };
-        match kind {
-            RequestKind::Require => ResolutionMode::Require,
-            RequestKind::Dynamic => match options.resolution {
-                Resolution::Bundler if options.module != Module::Preserve => syntax.mode(),
-                _ => ResolutionMode::Import,
-            },
-            RequestKind::Import { .. }
-            | RequestKind::ReExport
-            | RequestKind::ImportType
-            | RequestKind::Augmentation { .. } => explicit.unwrap_or(syntax.mode()),
         }
     }
 
@@ -1124,6 +1273,12 @@ impl<'a> Resolver<'a> {
         let candidate = paths::resolve(modules, name);
         let (package_name, rest) = split_package_name(name);
         let package_dir = paths::combine(modules, package_name);
+        if state.package_directory_only {
+            return self
+                .host
+                .directory_exists(&package_dir)
+                .then_some(package_dir);
+        }
         let nested = self.host.package(&candidate);
         let mut root = None;
         if !rest.is_empty() && nested.is_some() {
@@ -1184,9 +1339,7 @@ impl<'a> Resolver<'a> {
         if subpath == "." {
             let main = match &exports.kind {
                 Kind::String(_) | Kind::Array(_) => Some(exports),
-                Kind::Object(entries) if entries.iter().all(|(key, _)| !key.starts_with('.')) => {
-                    Some(exports)
-                }
+                Kind::Object(_) if exports.is_exports_conditions() => Some(exports),
                 Kind::Object(_) => exports.get("."),
                 _ => None,
             };
@@ -1542,6 +1695,12 @@ fn mangle_scoped(name: &str) -> String {
     }
 }
 
+/// Native `GetTypesPackageName`, preserving the resolver's scoped-package
+/// mangling owner for symlink-cache runtime dependency probes too.
+pub(super) fn types_package_name(name: &str) -> String {
+    format!("@types/{}", mangle_scoped(name))
+}
+
 /// `@scope/name/rest` or `name/rest`, split after the package name.
 fn split_package_name(name: &str) -> (&str, &str) {
     let mut slash = name.find('/');
@@ -1557,7 +1716,10 @@ fn split_package_name(name: &str) -> (&str, &str) {
 
 /// TypeScript's `matchPatternOrExact`: an exact key, else the best pattern
 /// (`pattern::best_match`), with the text matched by `*`.
-fn best_pattern(patterns: &[(String, Vec<String>)], name: &str) -> Option<(usize, Option<String>)> {
+pub(super) fn best_pattern(
+    patterns: &[(String, Vec<String>)],
+    name: &str,
+) -> Option<(usize, Option<String>)> {
     if let Some(index) = patterns
         .iter()
         .position(|(key, _)| !key.contains('*') && key == name)

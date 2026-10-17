@@ -1,0 +1,205 @@
+{
+  "kind": "fresh hash-frozen API observations and registered single-file replays; historical observations have separate weaker provenance",
+  "compiler": "7.0.2",
+  "commit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "nativeSourceStatus": "pristine including untracked files",
+  "before": [
+    {
+      "file": "tools/type-capture-flow-oracle.test.mjs",
+      "bytes": 2972,
+      "sha256": "667b9d423c5644b01d15ba874ace065777344fa67832934770ca74462ae24a58"
+    },
+    {
+      "file": "tools/type-capture-boundaries-oracle.test.mjs",
+      "bytes": 2929,
+      "sha256": "d7204b451f625f4be7b4c116674995bfbe97daf0e6d7ce0d287a6d498531d439"
+    },
+    {
+      "file": "tools/type-oracle.mjs",
+      "bytes": 39604,
+      "sha256": "2b88ee398209e24c9b3b28a6c39e9d6fbcb3c463f6902638c797e02ae3560b2e"
+    },
+    {
+      "file": "tools/semantic-oracle.mjs",
+      "bytes": 49378,
+      "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+    },
+    {
+      "file": "tools/navigation-oracle.mjs",
+      "bytes": 15291,
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+    },
+    {
+      "file": "tools/corpus-selection.mjs",
+      "bytes": 2003,
+      "sha256": "132d08e26e251c0d55cb39ce8d15b59735524bdd4e03fe1d5c691643abc3afa5"
+    },
+    {
+      "file": "tools/vendor-typescript-libs.mjs",
+      "bytes": 8387,
+      "sha256": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d"
+    },
+    {
+      "file": "fixtures/types/native-capture-flow/flow.ts",
+      "bytes": 3387,
+      "sha256": "c7baa62e1326c191dfd4781d60eb189f5effbd6784242fccac26cb3dad3f8d21"
+    },
+    {
+      "file": "fixtures/types/native-capture-flow/tsconfig.json",
+      "bytes": 69,
+      "sha256": "a6efcc72f6eb38b71cc582f29ad693140e43b6c9ba65c179b84796135638771b"
+    },
+    {
+      "file": "fixtures/types/native-capture-flow/loose.json",
+      "bytes": 65,
+      "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+    },
+    {
+      "file": "fixtures/types/native-capture-boundaries/boundaries.ts",
+      "bytes": 3249,
+      "sha256": "9fb888f427e17bb76253abb6ead7fd39e58de0d9ae6e834a97e5f484b5cd6e55"
+    },
+    {
+      "file": "fixtures/types/native-capture-boundaries/tsconfig.json",
+      "bytes": 93,
+      "sha256": "a471dd69ec9f6382d044dc046a5a1298c082a7cde6f8be7bf004dc731e8ea7ea"
+    },
+    {
+      "file": "fixtures/types/native-capture-boundaries/loose.json",
+      "bytes": 65,
+      "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+    }
+  ],
+  "after": [
+    {
+      "file": "tools/type-capture-flow-oracle.test.mjs",
+      "bytes": 2972,
+      "sha256": "667b9d423c5644b01d15ba874ace065777344fa67832934770ca74462ae24a58"
+    },
+    {
+      "file": "tools/type-capture-boundaries-oracle.test.mjs",
+      "bytes": 2929,
+      "sha256": "d7204b451f625f4be7b4c116674995bfbe97daf0e6d7ce0d287a6d498531d439"
+    },
+    {
+      "file": "tools/type-oracle.mjs",
+      "bytes": 39604,
+      "sha256": "2b88ee398209e24c9b3b28a6c39e9d6fbcb3c463f6902638c797e02ae3560b2e"
+    },
+    {
+      "file": "tools/semantic-oracle.mjs",
+      "bytes": 49378,
+      "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+    },
+    {
+      "file": "tools/navigation-oracle.mjs",
+      "bytes": 15291,
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+    },
+    {
+      "file": "tools/corpus-selection.mjs",
+      "bytes": 2003,
+      "sha256": "132d08e26e251c0d55cb39ce8d15b59735524bdd4e03fe1d5c691643abc3afa5"
+    },
+    {
+      "file": "tools/vendor-typescript-libs.mjs",
+      "bytes": 8387,
+      "sha256": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d"
+    },
+    {
+      "file": "fixtures/types/native-capture-flow/flow.ts",
+      "bytes": 3387,
+      "sha256": "c7baa62e1326c191dfd4781d60eb189f5effbd6784242fccac26cb3dad3f8d21"
+    },
+    {
+      "file": "fixtures/types/native-capture-flow/tsconfig.json",
+      "bytes": 69,
+      "sha256": "a6efcc72f6eb38b71cc582f29ad693140e43b6c9ba65c179b84796135638771b"
+    },
+    {
+      "file": "fixtures/types/native-capture-flow/loose.json",
+      "bytes": 65,
+      "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+    },
+    {
+      "file": "fixtures/types/native-capture-boundaries/boundaries.ts",
+      "bytes": 3249,
+      "sha256": "9fb888f427e17bb76253abb6ead7fd39e58de0d9ae6e834a97e5f484b5cd6e55"
+    },
+    {
+      "file": "fixtures/types/native-capture-boundaries/tsconfig.json",
+      "bytes": 93,
+      "sha256": "a471dd69ec9f6382d044dc046a5a1298c082a7cde6f8be7bf004dc731e8ea7ea"
+    },
+    {
+      "file": "fixtures/types/native-capture-boundaries/loose.json",
+      "bytes": 65,
+      "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+    }
+  ],
+  "nativeBefore": [
+    {
+      "file": "internal/checker/flow.go",
+      "bytes": 113988,
+      "sha256": "8ed1ee4e3b34a479376c94180ec3acf579ce521e0f42b4ae2a6cfc93a6eaae64"
+    },
+    {
+      "file": "internal/checker/checker.go",
+      "bytes": 1417177,
+      "sha256": "32384dde486c33c59c5695505f4c951c3009c6d7e50589cb5b18d0ea92cbf161"
+    },
+    {
+      "file": "internal/ast/utilities.go",
+      "bytes": 148061,
+      "sha256": "c28220655fca1911ae9580c8fd43a78796ed18a95e0df9c73ce52dad31483d13"
+    }
+  ],
+  "nativeAfter": [
+    {
+      "file": "internal/checker/flow.go",
+      "bytes": 113988,
+      "sha256": "8ed1ee4e3b34a479376c94180ec3acf579ce521e0f42b4ae2a6cfc93a6eaae64"
+    },
+    {
+      "file": "internal/checker/checker.go",
+      "bytes": 1417177,
+      "sha256": "32384dde486c33c59c5695505f4c951c3009c6d7e50589cb5b18d0ea92cbf161"
+    },
+    {
+      "file": "internal/ast/utilities.go",
+      "bytes": 148061,
+      "sha256": "c28220655fca1911ae9580c8fd43a78796ed18a95e0df9c73ce52dad31483d13"
+    }
+  ],
+  "binaryBefore": {
+    "file": "tsc",
+    "bytes": 24971184,
+    "sha256": "76e4987d060ef8207875a53a73619ce665ff16fb2800c0d57a452e21c829bd7b"
+  },
+  "binaryAfter": {
+    "file": "tsc",
+    "bytes": 24971184,
+    "sha256": "76e4987d060ef8207875a53a73619ce665ff16fb2800c0d57a452e21c829bd7b"
+  },
+  "installedApi": "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-7.0.2/package",
+  "installedApiInventory": "installed-api-inventory.json",
+  "captureBefore": {
+    "file": "fixtures/types/native-capture-flow/evidence/capture.mjs",
+    "bytes": 10314,
+    "sha256": "5d6b7965cb326819951e1ed7465a851c1c703a439923a7b6b7f0fae0ed768107"
+  },
+  "captureAfter": {
+    "file": "fixtures/types/native-capture-flow/evidence/capture.mjs",
+    "bytes": 10314,
+    "sha256": "5d6b7965cb326819951e1ed7465a851c1c703a439923a7b6b7f0fae0ed768107"
+  },
+  "installedApiAfterEqualsBefore": true,
+  "observations": 268,
+  "phases": {
+    "flowDemandOnly": 66,
+    "flowPostDemandDiagnostics": 8,
+    "boundaryDemandOnly": 54,
+    "textVariantsDemandOnly": 140
+  },
+  "provenanceBoundary": "API answer sourceHash is accepted compiler text; variant diskSha256 preserves BOM bytes. Installed API inventory is separate from per-request compiler-read metadata. No historical metadata manifest or before/after hashes are retroactively asserted."
+}

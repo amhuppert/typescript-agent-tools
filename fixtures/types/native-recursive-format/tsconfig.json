@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "types": []
+  },
+  "files": [
+    "cases.ts",
+    "variants.ts"
+  ]
+}

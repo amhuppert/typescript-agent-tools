@@ -1,0 +1,86 @@
+{
+  "scope": "historical exploratory observations plus separately hash-frozen registered native API replay",
+  "registeredRun": "vrun-75bc6c27-e290-48db-aaad-a833c35170f8",
+  "files": [
+    {
+      "file": "README.md",
+      "bytes": 1851,
+      "sha256": "503715200e7742bdda2989ff70ab6c52fc14925c209bcd871b2188712259f781"
+    },
+    {
+      "file": "capture.mjs",
+      "bytes": 4727,
+      "sha256": "a798aea2ad605ea3235a17364cab61d9bf46ceb39fd475b04f455f747804de32"
+    },
+    {
+      "file": "captured-tooling/corpus-selection.mjs",
+      "bytes": 2003,
+      "sha256": "132d08e26e251c0d55cb39ce8d15b59735524bdd4e03fe1d5c691643abc3afa5"
+    },
+    {
+      "file": "captured-tooling/navigation-oracle.mjs",
+      "bytes": 15291,
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+    },
+    {
+      "file": "captured-tooling/semantic-oracle.mjs",
+      "bytes": 49378,
+      "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+    },
+    {
+      "file": "captured-tooling/type-oracle.mjs",
+      "bytes": 39604,
+      "sha256": "2b88ee398209e24c9b3b28a6c39e9d6fbcb3c463f6902638c797e02ae3560b2e"
+    },
+    {
+      "file": "captured-tooling/type-switch-flow-oracle.test.mjs",
+      "bytes": 2308,
+      "sha256": "f25780ea3763233efdb896b5e63aa22b51c4fcf53617eb90ad5cb9eee735f082"
+    },
+    {
+      "file": "captured-tooling/vendor-typescript-libs.mjs",
+      "bytes": 8387,
+      "sha256": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d"
+    },
+    {
+      "file": "installed-api-inventory.json",
+      "bytes": 64790,
+      "sha256": "c7f6d89a69537450d80fb48b9689c51600e6dd7b827b6a74cf096ff7bdf3c49b"
+    },
+    {
+      "file": "registered-replay.json",
+      "bytes": 493,
+      "sha256": "2dbf192cce82d0fca7ca423f5fbac9f96481209177298523e0c674ea9065e792"
+    },
+    {
+      "file": "replay-provenance.json",
+      "bytes": 4734,
+      "sha256": "bf6b94b5b4b5e2dd7be84d667cf1f75508b135725c5d9018486d76d7138c096a"
+    },
+    {
+      "file": "research-answers.json",
+      "bytes": 116163,
+      "sha256": "014f961f0062ac267e3affe1909cab59b00aa5f9d8bfe5608023ddaaa2414778"
+    },
+    {
+      "file": "research-cases.ts",
+      "bytes": 3947,
+      "sha256": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992"
+    },
+    {
+      "file": "research-loose.json",
+      "bytes": 63,
+      "sha256": "5f5c7428bf48303d614f62882e5914cb478a31817d56d1082f0cfb44f35034bf"
+    },
+    {
+      "file": "research-probe.mjs",
+      "bytes": 1021,
+      "sha256": "dff3e76de40236008c977d2a8f36b7159b59d22ce5555c07d9cbf8e89dd35164"
+    },
+    {
+      "file": "research-strict.json",
+      "bytes": 106,
+      "sha256": "3dc9a1054e9d8bade49316ddf66212c359fb66f40856c00cf7ba4ab93c5a66ac"
+    }
+  ]
+}

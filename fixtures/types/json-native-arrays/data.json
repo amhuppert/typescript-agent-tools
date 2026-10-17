@@ -1,0 +1,21 @@
+{
+  "text": "literal",
+  "number": 42,
+  "boolean": true,
+  "nil": null,
+  "empty": [],
+  "numbers": [1, 2],
+  "mixed": [1, "s", null],
+  "shapes": [{"a": 1}, {"b": "s"}],
+  "nested": {"kept": false, "dup": {"old": 1}, "dup": {"last": "s"}},
+  "dup": "before",
+  "dup": 9,
+  "a": "first",
+  "\u0061": false,
+  "": 0,
+  "01": "zero",
+  "1": false,
+  "😀": true,
+  "default": "ordinaryKey",
+  "recursive": [[1], ["s", null]]
+}

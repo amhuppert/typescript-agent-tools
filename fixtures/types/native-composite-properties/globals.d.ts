@@ -1,0 +1,9 @@
+interface Object {}
+interface Function {}
+interface CallableFunction {}
+interface NewableFunction {}
+interface String {}
+interface Number {}
+interface Boolean {}
+interface BigInt {}
+interface Symbol {}

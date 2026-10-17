@@ -1,0 +1,10 @@
+export declare let /*#function*/ func: (x: string) => number;
+export declare let /*#constructor*/ ctor: new (x: number) => { value: string };
+export declare let /*#generic*/ generic: <T>(x: T) => T;
+export declare let /*#abstract*/ abstractCtor: abstract new (x: number) => { value: string };
+export type \u0046n = (x: string) => number;
+export type \u0043tor = new (x: number) => { value: string };
+export type \u004citeral = { value: string };
+export declare let /*#functionAlias*/ functionAlias: \u0046n;
+export declare let /*#constructorAlias*/ constructorAlias: \u0043tor;
+export declare let /*#literalAlias*/ literalAlias: \u004citeral;

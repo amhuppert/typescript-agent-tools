@@ -1,0 +1,240 @@
+{
+  "generatedInputs": [
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261225-false/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261225-false/globals.ts",
+      "sha256": "6b4269687ad35a3717035e34217d65d9b9c9817cd7309ac34a71c2ae7db72172"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261225-false/tsconfig.json",
+      "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261225-false/value.ts",
+      "sha256": "88eaa5e06f118b0391bc7e92f0ce12856942c3861f691367d469389f95484a19"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261225-true/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261225-true/globals.ts",
+      "sha256": "6b4269687ad35a3717035e34217d65d9b9c9817cd7309ac34a71c2ae7db72172"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261225-true/tsconfig.json",
+      "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261225-true/value.ts",
+      "sha256": "88eaa5e06f118b0391bc7e92f0ce12856942c3861f691367d469389f95484a19"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261226-false/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261226-false/globals.ts",
+      "sha256": "c3db942437912c3855de18bd71afe00cc297260fd725d486b6a18072cf03453b"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261226-false/tsconfig.json",
+      "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261226-false/value.ts",
+      "sha256": "88eaa5e06f118b0391bc7e92f0ce12856942c3861f691367d469389f95484a19"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261226-true/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261226-true/globals.ts",
+      "sha256": "c3db942437912c3855de18bd71afe00cc297260fd725d486b6a18072cf03453b"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261226-true/tsconfig.json",
+      "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261226-true/value.ts",
+      "sha256": "88eaa5e06f118b0391bc7e92f0ce12856942c3861f691367d469389f95484a19"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261227-false/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261227-false/globals.ts",
+      "sha256": "41702da8b81da71f4d60045958db497265cd6a33907faa9a37afd186d1d3e347"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261227-false/tsconfig.json",
+      "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261227-false/value.ts",
+      "sha256": "88eaa5e06f118b0391bc7e92f0ce12856942c3861f691367d469389f95484a19"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261227-true/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261227-true/globals.ts",
+      "sha256": "41702da8b81da71f4d60045958db497265cd6a33907faa9a37afd186d1d3e347"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261227-true/tsconfig.json",
+      "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/bytes-261227-true/value.ts",
+      "sha256": "88eaa5e06f118b0391bc7e92f0ce12856942c3861f691367d469389f95484a19"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/metadata-invalid-false/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/metadata-invalid-false/globals.ts",
+      "sha256": "1d3a4e0a00f3e01aba5940d9f7487994421e38383ff0e0d4eff2006a70448a6e"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/metadata-invalid-false/tsconfig.json",
+      "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/metadata-invalid-false/value.ts",
+      "sha256": "88eaa5e06f118b0391bc7e92f0ce12856942c3861f691367d469389f95484a19"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/metadata-invalid-true/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/metadata-invalid-true/globals.ts",
+      "sha256": "1d3a4e0a00f3e01aba5940d9f7487994421e38383ff0e0d4eff2006a70448a6e"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/metadata-invalid-true/tsconfig.json",
+      "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/metadata-invalid-true/value.ts",
+      "sha256": "88eaa5e06f118b0391bc7e92f0ce12856942c3861f691367d469389f95484a19"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1996-false/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1996-false/globals.ts",
+      "sha256": "adc3654036d4b80a5684e270538da1dde64f8fd4af71803da12fcc92ec23fa83"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1996-false/tsconfig.json",
+      "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1996-false/value.ts",
+      "sha256": "79f5d002dfd69863771820f052060bffd650df04f43ccea22431dec525407707"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1996-true/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1996-true/globals.ts",
+      "sha256": "adc3654036d4b80a5684e270538da1dde64f8fd4af71803da12fcc92ec23fa83"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1996-true/tsconfig.json",
+      "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1996-true/value.ts",
+      "sha256": "79f5d002dfd69863771820f052060bffd650df04f43ccea22431dec525407707"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1997-false/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1997-false/globals.ts",
+      "sha256": "adc3654036d4b80a5684e270538da1dde64f8fd4af71803da12fcc92ec23fa83"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1997-false/tsconfig.json",
+      "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1997-false/value.ts",
+      "sha256": "0e1c3869b9b55dc5d3e977e465591a1dfd594b7f63102e3a41a1706f5faf8390"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1997-true/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1997-true/globals.ts",
+      "sha256": "adc3654036d4b80a5684e270538da1dde64f8fd4af71803da12fcc92ec23fa83"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1997-true/tsconfig.json",
+      "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1997-true/value.ts",
+      "sha256": "0e1c3869b9b55dc5d3e977e465591a1dfd594b7f63102e3a41a1706f5faf8390"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1998-false/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1998-false/globals.ts",
+      "sha256": "adc3654036d4b80a5684e270538da1dde64f8fd4af71803da12fcc92ec23fa83"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1998-false/tsconfig.json",
+      "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1998-false/value.ts",
+      "sha256": "2a47b070ff5a9072fa5fe0c91b4ade3bf70a91f0043736d8b96f6b4ea8c1d8bf"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1998-true/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1998-true/globals.ts",
+      "sha256": "adc3654036d4b80a5684e270538da1dde64f8fd4af71803da12fcc92ec23fa83"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1998-true/tsconfig.json",
+      "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+    },
+    {
+      "file": ".cc/temp/type-array-limits/nodes-1998-true/value.ts",
+      "sha256": "2a47b070ff5a9072fa5fe0c91b4ade3bf70a91f0043736d8b96f6b4ea8c1d8bf"
+    }
+  ],
+  "archivedFiles": [
+    {
+      "file": "fixtures/types/presentation-array/evidence/captured-tooling/limits-probe.mjs",
+      "sha256": "312dc6ad5cc978a95c78bc3d5292e8892143d40c3e440b7488b05865e814c6bf"
+    },
+    {
+      "file": "fixtures/types/presentation-array/evidence/limit-observations.json",
+      "sha256": "507cf3830404daf0017c38ea9ef0f66ae76aaf9cd4e6968d9e7385292362aad8"
+    }
+  ],
+  "nativeVersion": "7.0.2",
+  "limits": "Fourteen fresh API controls only; generated source inputs reproduce from historical probe. Native typeToString uses its own display elision; product graph node/byte outcomes require final Project tests."
+}

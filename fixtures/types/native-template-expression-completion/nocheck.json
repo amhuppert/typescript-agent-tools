@@ -1,0 +1,4 @@
+{
+  "extends": "./strict.json",
+  "compilerOptions": { "noCheck": true }
+}

@@ -1,0 +1,1 @@
+{"extends":"./tsconfig.json","files":["../native-variable-patterns/globals.d.ts","accessorProperty.ts"]}

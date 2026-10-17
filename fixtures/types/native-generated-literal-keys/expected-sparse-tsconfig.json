@@ -1,0 +1,287 @@
+[
+  {
+    "name": "recoveryNumber",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2339
+    ],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 107,
+        "declarationPos": 61,
+        "depth": 0,
+        "event": "enter",
+        "name": "v",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 107,
+        "event": "enter",
+        "kind": 193,
+        "operation": "getTypeFromTypeNode",
+        "pos": 63
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 69,
+        "event": "enter",
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 63
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 69,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 63,
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 107,
+        "event": "enter",
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 71
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 107,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 71,
+        "type": 84
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 107,
+        "errorType": false,
+        "event": "exit",
+        "flags": 134217728,
+        "kind": 193,
+        "operation": "getTypeFromTypeNode",
+        "pos": 63,
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 107,
+        "declarationPos": 61,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 134217728,
+        "name": "v",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "end": 106,
+        "event": "enter",
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 87
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "end": 106,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 87,
+        "type": 86
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "end": 85,
+        "event": "enter",
+        "kind": 150,
+        "operation": "getTypeFromTypeNode",
+        "pos": 78
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "end": 85,
+        "errorType": false,
+        "event": "exit",
+        "flags": 64,
+        "kind": 150,
+        "operation": "getTypeFromTypeNode",
+        "pos": 78,
+        "type": 15
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 41,
+        "declarationPos": 24,
+        "depth": 0,
+        "event": "enter",
+        "name": "�#1@#field1",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 41,
+        "declarationPos": 24,
+        "depth": 1,
+        "event": "enter",
+        "name": "�#1@#field1",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 41,
+        "declarationPos": 24,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 64,
+        "name": "�#1@#field1",
+        "operation": "getTypeOfSymbol",
+        "type": 15
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 41,
+        "declarationPos": 24,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 64,
+        "name": "�#1@#field1",
+        "operation": "getTypeOfSymbol",
+        "type": 15
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 41,
+        "declarationPos": 24,
+        "depth": 0,
+        "event": "enter",
+        "name": "�#1@#field1",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 41,
+        "declarationPos": 24,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 64,
+        "name": "�#1@#field1",
+        "operation": "getTypeOfSymbol",
+        "type": 15
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 161,
+        "declarationPos": 41,
+        "depth": 0,
+        "event": "enter",
+        "name": "recoveryNumber",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 161,
+        "declarationPos": 41,
+        "depth": 1,
+        "event": "enter",
+        "name": "recoveryNumber",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 161,
+        "declarationPos": 41,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "recoveryNumber",
+        "operation": "getTypeOfSymbol",
+        "type": 91
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 161,
+        "declarationPos": 41,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "recoveryNumber",
+        "operation": "getTypeOfSymbol",
+        "type": 92
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 161,
+        "declarationPos": 41,
+        "depth": 0,
+        "event": "enter",
+        "name": "recoveryNumber",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 161,
+        "declarationPos": 41,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "recoveryNumber",
+        "operation": "getTypeOfSymbol",
+        "type": 92
+      },
+      {
+        "cacheEvents": 6,
+        "declarationEnd": 107,
+        "declarationPos": 61,
+        "depth": 0,
+        "event": "enter",
+        "name": "v",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 6,
+        "declarationEnd": 107,
+        "declarationPos": 61,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 134217728,
+        "name": "v",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      }
+    ]
+  }
+]

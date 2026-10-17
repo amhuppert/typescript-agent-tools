@@ -1,0 +1,11 @@
+declare function constMiddle<const T extends readonly unknown[]>(...args: [head: number, ...T]): T;
+declare function constTail<const T extends readonly unknown[]>(...args: [...T, tail: number]): T;
+declare function constMiddleMutable<const T extends unknown[]>(...args: [head: number, ...T]): T;
+declare function constOptional<const T extends readonly unknown[]>(...args: [...T, tail?: number]): T;
+declare function constCallback<const T extends readonly unknown[]>(fn: (...args: [head: number, ...T]) => void): T;
+declare const callback: (head: number, first: "one", last: 2) => void;
+const /*#middle*/middle = constMiddle(0, "one", 2);
+const /*#tail*/tail = constTail("one", 2, 0);
+const /*#mutable*/mutable = constMiddleMutable(0, "one", 2);
+const /*#optional*/optional = constOptional("one", 2, 0);
+const /*#callback*/callbackResult = constCallback(callback);

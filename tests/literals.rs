@@ -55,6 +55,24 @@ fn numeric_literals_keep_compiler_text_flags_and_spans_for_both_cases() {
 }
 
 #[test]
+fn binary64_literal_text_uses_the_native_shortest_roundtrip_and_exponent_windows() {
+    let rows: Vec<serde_json::Value> = serde_json::from_str(include_str!(
+        "../fixtures/types/native-property-lookups/literals.json"
+    ))
+    .unwrap();
+    for row in rows {
+        let raw = row["raw"].as_str().unwrap();
+        let source = format!("const x = {raw};");
+        let value = json(&source);
+        let literal = &value["statements"][0]["declarationList"]["declarations"][0]["initializer"];
+        assert_eq!(literal["kind"], 9, "{raw}");
+        assert_eq!(literal["text"], row["text"], "{raw}");
+        assert_eq!(literal["pos"], 9, "{raw}");
+        assert_eq!(literal["end"], 10 + raw.len(), "{raw}");
+    }
+}
+
+#[test]
 fn hexadecimal_escapes_require_ascii_hex_digits() {
     for escape in [
         r"\u+041",
@@ -129,4 +147,122 @@ fn tagged_invalid_escapes_preserve_unpaired_utf16_surrogates() {
     let mut output = Vec::new();
     ast.write_json(&mut output, false).unwrap();
     assert!(String::from_utf8(output).unwrap().contains("\\ud800"));
+}
+
+#[test]
+fn public_literal_projection_keeps_utf16_across_native_scanner_pairing_boundaries() {
+    // Native scanner token bytes distinguish continued halves; the public AST
+    // keeps its established UTF-16 projection for every string/template token.
+    for raw in [
+        r"\uD800\uDC00".to_owned(),
+        r"\uD800\u{DC00}".to_owned(),
+        r"\u{D800}\uDC00".to_owned(),
+        r"\u{D800}\u{DC00}".to_owned(),
+    ]
+    .into_iter()
+    .chain(
+        ["\n", "\r", "\r\n", "\u{2028}", "\u{2029}"].map(|line| format!("\\uD800\\{line}\\uDC00")),
+    ) {
+        for source in [
+            format!("const value = \"{raw}\";"),
+            format!("`{raw}`;"),
+            format!("`{raw}${{0}}{raw}${{1}}{raw}`;"),
+        ] {
+            let ast = parse(&source).unwrap();
+            let texts: Vec<_> = ast
+                .walk()
+                .filter_map(|id| match ast.node(id).field("text") {
+                    Some(Value::Text(text)) if text.as_ref() == "𐀀" => Some(text),
+                    _ => None,
+                })
+                .collect();
+            assert_eq!(
+                texts.len(),
+                if source.contains("${0}") { 3 } else { 1 },
+                "{source:?}"
+            );
+        }
+    }
+    for (raw, units) in [
+        (r"\uD800", vec![0xD800]),
+        (r"\uDC00", vec![0xDC00]),
+        (r"\uDC00\uD800", vec![0xDC00, 0xD800]),
+    ] {
+        for source in [format!("\"{raw}\";"), format!("`{raw}`;")] {
+            let ast = parse(&source).unwrap();
+            assert!(
+                ast.walk().any(|id| matches!(ast.node(id).field("text"),
+                Some(Value::Utf16(value)) if value == &units)),
+                "{source}"
+            );
+        }
+    }
+}
+
+#[test]
+fn ordinary_and_jsx_string_literals_keep_their_native_scanner_dialects() {
+    let source = include_str!("../fixtures/types/native-string-values/dialects.tsx");
+    let ast = typescript_parser::parse_with_options(
+        source,
+        typescript_parser::ParseOptions::for_file("dialects.tsx"),
+    )
+    .unwrap();
+    let texts: Vec<_> = ast
+        .walk()
+        .filter_map(|id| {
+            let node = ast.node(id);
+            if node.kind != "StringLiteral" {
+                return None;
+            }
+            match node.field("text") {
+                Some(Value::Text(text)) => Some(text.as_ref()),
+                other => panic!("unexpected literal projection: {other:?}"),
+            }
+        })
+        .collect();
+    // Native AST text leaves JSX entities and backslashes for the JSX owner.
+    assert_eq!(texts, ["A\n&amp;", r"\u0041\n&amp;"]);
+}
+
+#[test]
+fn unterminated_tokens_fail_before_literal_delimiter_projection() {
+    for source in ["\"", "'", "`", "\"\\", "`\\", "`${0", "`${0}", "`${0}a${1"] {
+        assert!(
+            parse(source).is_err(),
+            "accepted unterminated token: {source:?}"
+        );
+    }
+}
+
+#[test]
+fn jsdoc_recovery_accepts_unterminated_literals_without_corrupting_the_final_ast() {
+    let rows: Vec<serde_json::Value> = serde_json::from_str(include_str!(
+        "../fixtures/types/native-string-values/jsdoc-malformed.json"
+    ))
+    .unwrap();
+    assert_eq!(rows.len(), 38);
+    for row in rows {
+        let source = row["source"].as_str().unwrap();
+        let ast = parse(source).unwrap_or_else(|error| panic!("{}: {error}", row["name"]));
+        let mut output = Vec::new();
+        ast.write_json(&mut output, false).unwrap();
+        let ast: serde_json::Value = serde_json::from_slice(&output).unwrap();
+        assert_eq!(
+            ast["statements"].as_array().unwrap().len(),
+            1,
+            "{}",
+            row["name"]
+        );
+        let declaration = &ast["statements"][0]["declarationList"]["declarations"][0];
+        assert_eq!(
+            declaration["name"]["escapedText"], row["nameText"],
+            "{}",
+            row["name"]
+        );
+        assert_eq!(
+            declaration["initializer"]["text"], row["literalText"],
+            "{}",
+            row["name"]
+        );
+    }
 }

@@ -1,0 +1,111 @@
+{
+  "compiler": "TypeScript 7.0.2",
+  "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "provenance": "Post-observation source/tool hashes; not atomic compiler input capture. Exact observed globals.ts text is embedded in rows.",
+  "files": [
+    {
+      "file": "fixtures/types/native-class-targets/escaped-first/globals.ts",
+      "sha256": "162335c1348a4ff7a36a5c215bbe80933148eb214021881ac16b52a95a2e8aa6"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/escaped-first/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/evidence/answers-first8.json",
+      "sha256": "332248eb32e369052b511b98b7083e5e11d1873e5bbebbc2159713f5c1b3da9d"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/evidence/answers-merge-diagnostics.json",
+      "sha256": "5ca2cf24cd0dfadf95bbc6a0b83dc23f818c4b7934adb6bc4a48e9813fa7dee0"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/evidence/answers.json",
+      "sha256": "1ae409d1acbdc7be7987cc40cdecf87d8f7502eed5693d7b1e508d8bb6b3590c"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/evidence/probe-admission.mjs",
+      "sha256": "42a7464a2f7c225f3dc52949910d55f6866bb27b4803f53bc6d71d532d76e79b"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/evidence/probe-merge-diagnostics.mjs",
+      "sha256": "2192dc27cd044053837f136636372ad7f2ca5cca46c486d18af0536631a89813"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/evidence/probe.mjs",
+      "sha256": "3914c73d1245380275383aad4b3da06f4d534195b4450564d44dbeb65ef982bb"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/generic/globals.ts",
+      "sha256": "bd0b92409dda5620884017c63ea9edf0826814734f940350b7ee1e0c6aa3c377"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/generic/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/interface-first/globals.ts",
+      "sha256": "9591db3bed7766e04a4d7353ea4c15ed1b5f0150b22bb4bb50469c3dfeee6744"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/interface-first/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/merged-default/globals.ts",
+      "sha256": "2215db434c34f54e6c12f55749036efaef1b50a190b39c25fce3274f9648d01c"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/merged-default/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/namespace-first/globals.ts",
+      "sha256": "d7eaec00f938ccd2cf5d0e81aad561e72dbd84e029a9d21eb62088703ba5c484"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/namespace-first/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/namespace-first-types/globals.ts",
+      "sha256": "9c2dbd54a9b937dcee1b109919e2ee33ae7febc08909122f38621f303a2ac2dd"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/namespace-first-types/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/nongeneric/globals.ts",
+      "sha256": "39eeadef5fc450d08ba1ef3370d2909f459f0855e7da910029f830e8db6eeec9"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/nongeneric/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/overridden-default/globals.ts",
+      "sha256": "a8ce379e21b4b428d93df00557a178ac2e2bda2679264f57ae37d8865b95cdb9"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/overridden-default/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/unused-constraint/globals.ts",
+      "sha256": "193018fff6e27ac093117beccd09e246472e66c5b1a66d7f52df2e3d34df9749"
+    },
+    {
+      "file": "fixtures/types/native-class-targets/unused-constraint/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967"
+    },
+    {
+      "file": "tools/type-class-targets-oracle.test.mjs",
+      "sha256": "5910ea8c5e840196ba6bd5003aa5bf6b7b308a388f49088b3b695c212271d3fc"
+    },
+    {
+      "file": "tools/semantic-oracle.mjs",
+      "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+    }
+  ]
+}

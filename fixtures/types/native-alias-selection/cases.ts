@@ -1,0 +1,20 @@
+import { /*#classLeft*/Widget as /*#classRight*/ImportedWidget } from './exports';
+import type { /*#typeClassLeft*/Widget as /*#typeClassRight*/TypeWidget } from './exports';
+import { type /*#specifierLeft*/Widget as /*#specifierRight*/SpecifierWidget } from './exports';
+import { /*#interfaceLeft*/Shape as /*#interfaceRight*/ImportedShape } from './exports';
+import type { /*#functionLeft*/fn as /*#functionRight*/TypeFunction, /*#variableLeft*/constant as /*#variableRight*/TypeVariable } from './exports';
+import /*#defaultValue*/DefaultValue from './exports';
+import type /*#defaultType*/DefaultType from './exports';
+import * as /*#namespaceValue*/NamespaceValue from './exports';
+import type * as /*#namespaceType*/NamespaceType from './types-only';
+import /*#requireValue*/Required = require('./equals.cjs');
+import { /*#exportProperty*/amount } from './equals.cjs';
+import { /*#jsonArray*/values, /*#jsonScalar*/name } from './data.json';
+import type { /*#jsonType*/name as TypeName } from './data.json';
+export { /*#exportLeft*/Widget as /*#exportRight*/ExportedWidget } from './exports';
+export type { /*#exportTypeLeft*/Widget as /*#exportTypeRight*/ExportedTypeWidget } from './exports';
+export * as /*#namespaceExport*/ExportedNamespace from './types-only';
+namespace Local { export const amount = 7; }
+import /*#internalEquals*/InternalEqual = Local;
+import { /*#quotedImportLeft*/"odd-name" as /*#quotedImportRight*/QuotedImport, /*#emptyImportLeft*/"" as /*#emptyImportRight*/EmptyImport } from './quoted';
+export { /*#quotedExportLeft*/"odd-name" as /*#quotedExportRight*/"renamed-name" } from './quoted';

@@ -1,0 +1,283 @@
+[
+  {
+    "name": "plain",
+    "summary": "Missing",
+    "errorType": true,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "escaped",
+    "summary": "Missing",
+    "errorType": true,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "qualified",
+    "summary": "Outer.Missing",
+    "errorType": true,
+    "codes": [
+      2503
+    ],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "deepQualified",
+    "summary": "Outer.Inner.Missing",
+    "errorType": true,
+    "codes": [
+      2503
+    ],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "existingNamespace",
+    "summary": "Available.Missing",
+    "errorType": true,
+    "codes": [
+      2694
+    ],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "arguments",
+    "summary": "Missing<Left, Right>",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "nestedArguments",
+    "summary": "Missing<Nested<Leaf>, Sibling>",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "sameArguments",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "sameName",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "differentParents",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2503,
+      2503
+    ],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "knownArguments",
+    "summary": "KnownArguments",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "discardedArguments",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "defaults",
+    "summary": "Defaulted",
+    "errorType": false,
+    "codes": [
+      2552,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": {
+      "hasSymbol": true,
+      "parameter": "A"
+    }
+  },
+  {
+    "name": "discardedDefaults",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2552,
+      2552
+    ],
+    "demandFailures": [],
+    "defaultError": {
+      "hasSymbol": true,
+      "parameter": "A"
+    }
+  },
+  {
+    "name": "partialDefaults",
+    "summary": "PartialDefaults",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": {
+      "hasSymbol": true,
+      "parameter": "B"
+    }
+  },
+  {
+    "name": "suppliedDefaults",
+    "summary": "SuppliedDefaults",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "suppliedDiscardedDefaults",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "wrongNonGeneric",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2315
+    ],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "wrongFew",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2314
+    ],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "wrongMany",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2314
+    ],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "union",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "intersection",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2552,
+      2552
+    ],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "genuineAny",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "healthyPair",
+    "summary": "HealthyPair",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "healthyIgnoredAny",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "healthyNamespace",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null
+  },
+  {
+    "name": "healthyAfter",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null
+  }
+]

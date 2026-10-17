@@ -1,0 +1,22 @@
+export {};
+namespace Holder { export namespace Nested {} }
+const Single = class implements MissingSingle { static value: 290 = 290; };
+const /*#single*/single = Single.value;
+const Head = class implements MissingHead.Middle.End { static value: 291 = 291; };
+const /*#head*/head = Head.value;
+const Middle = class implements Holder.MissingMiddle.End { static value: 292 = 292; };
+const /*#middle*/middle = Middle.value;
+const Terminal = class implements Holder.Nested.MissingTerminal { static value: 293 = 293; };
+const /*#terminal*/terminal = Terminal.value;
+const OptionalHead = class implements MissingOptional?.End { static value: 294 = 294; };
+const /*#optionalHead*/optionalHead = OptionalHead.value;
+const OptionalMiddle = class implements Holder?.MissingOptionalMiddle.End { static value: 295 = 295; };
+const /*#optionalMiddle*/optionalMiddle = OptionalMiddle.value;
+const OptionalTerminal = class implements Holder.Nested?.MissingOptionalTerminal { static value: 296 = 296; };
+const /*#optionalTerminal*/optionalTerminal = OptionalTerminal.value;
+type TypeHead = MissingTypeHead.Nested;
+declare const /*#typeHead*/typeHead: TypeHead;
+type TypeMiddle = Holder.MissingTypeMiddle.End;
+declare const /*#typeMiddle*/typeMiddle: TypeMiddle;
+type TypeTerminal = Holder.Nested.MissingTypeTerminal;
+declare const /*#typeTerminal*/typeTerminal: TypeTerminal;

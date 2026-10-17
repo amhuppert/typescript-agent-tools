@@ -290,6 +290,36 @@ fn a_removed_working_directory_fails_every_operand_alike_in_both_entries() {
         &expected,
         "served, without an operand",
     );
+    // Absolute operands also avoid cwd, in every lexical operation and both
+    // output formats. Keep the relative-operand failures above distinct.
+    let absolute = service.fixture.path("src/a.ts");
+    let absolute = absolute.to_str().unwrap();
+    for args in [
+        &["--outline", absolute][..],
+        &["--outline", "--json", absolute],
+        &["--show", "--at", "5:14", absolute],
+        &["--show", "--json", "--name", "run", absolute],
+        &["--references", "--at", "5:21", absolute],
+        &["--references", "--json", "--name", "run", absolute],
+    ] {
+        let expected = service.run(args);
+        // Overloaded --show names are Ambiguous (1); their answer must still
+        // be identical, rather than becoming a cwd I/O failure (2).
+        assert!(
+            matches!(expected.status.code(), Some(0 | 1)),
+            "{args:?} {expected:?}"
+        );
+        same(
+            &run_in_removed(&[args, &["--direct"]].concat()),
+            &expected,
+            &format!("direct absolute operand: {args:?}"),
+        );
+        same(
+            &run_in_removed(args),
+            &expected,
+            &format!("served absolute operand: {args:?}"),
+        );
+    }
 }
 
 #[test]

@@ -1,0 +1,1 @@
+{"compilerOptions": {"strict": true, "noLib": true, "target": "ES2022", "importHelpers": true, "experimentalDecorators": true}, "files": ["../native-class-heritage-checks/globals.d.ts", "cases.ts", "ambient.d.ts"]}

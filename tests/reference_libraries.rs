@@ -145,7 +145,9 @@ fn project_declarations_that_conflict_with_library_globals_fail_where_they_are_w
             ),
             ("a.ts", source),
         ]);
-        let error = Project::load(&fixture.path("tsconfig.json")).unwrap_err();
+        let error = Project::load(&fixture.path("tsconfig.json"))
+            .map_err(support::input_error)
+            .unwrap_err();
         assert_eq!(
             (error.kind, error.position, error.path.as_deref()),
             (

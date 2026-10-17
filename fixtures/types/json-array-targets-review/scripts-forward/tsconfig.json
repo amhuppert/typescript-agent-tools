@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ESNext",
+    "strict": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "noLib": true
+  },
+  "files": [
+    "consumer.ts",
+    "globals-first.ts",
+    "globals-second.ts"
+  ]
+}

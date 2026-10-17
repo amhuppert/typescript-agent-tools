@@ -1,0 +1,270 @@
+[
+  {
+    "name": "functionCondition",
+    "kind": "value",
+    "summary": "1 | 2",
+    "errorType": false,
+    "codes": [
+      2774
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "functionBareUse",
+    "kind": "value",
+    "summary": "() => 1",
+    "errorType": false,
+    "codes": [
+      2774
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "functionCallUse",
+    "kind": "value",
+    "summary": "1",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "functionVoidUse",
+    "kind": "value",
+    "summary": "undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "methodCondition",
+    "kind": "value",
+    "summary": "1 | 2",
+    "errorType": false,
+    "codes": [
+      2774
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "methodCallUse",
+    "kind": "value",
+    "summary": "1",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "castMethod",
+    "kind": "value",
+    "summary": "1 | 2",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "optionalFunction",
+    "kind": "value",
+    "summary": "1 | 2",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "plainObject",
+    "kind": "value",
+    "summary": "1 | 2",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "promiseCondition",
+    "kind": "value",
+    "summary": "1 | 2",
+    "errorType": false,
+    "codes": [
+      2304,
+      2801
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "hidden"
+    }
+  },
+  {
+    "name": "promiseVoidUse",
+    "kind": "value",
+    "summary": "undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "promiseOtherUse",
+    "kind": "value",
+    "summary": "undefined",
+    "errorType": false,
+    "codes": [
+      2304,
+      2801
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "hidden"
+    }
+  },
+  {
+    "name": "cleanPromiseCondition",
+    "kind": "value",
+    "summary": "1 | 2",
+    "errorType": false,
+    "codes": [
+      2801
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "cleanPromiseBare",
+    "kind": "value",
+    "summary": "Promise<1>",
+    "errorType": false,
+    "codes": [
+      2801
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "chainUse",
+    "kind": "value",
+    "summary": "undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "coalescedCondition",
+    "kind": "value",
+    "summary": "1 | 2",
+    "errorType": false,
+    "codes": [
+      2774,
+      2774
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "conditionalBodyUse",
+    "kind": "value",
+    "summary": "1 | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "conditionalBareUse",
+    "kind": "value",
+    "summary": "1 | (Promise<1> & { hidden?: any; })",
+    "errorType": false,
+    "codes": [
+      2304,
+      2801
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "hidden"
+    }
+  },
+  {
+    "name": "propertySameReceiver",
+    "kind": "value",
+    "summary": "1 | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "propertyOtherReceiver",
+    "kind": "value",
+    "summary": "1 | undefined",
+    "errorType": false,
+    "codes": [
+      2304,
+      2801
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "hidden"
+    }
+  },
+  {
+    "name": "propertyCallReceiver",
+    "kind": "value",
+    "summary": "1 | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "propertyParenthesizedReceiver",
+    "kind": "value",
+    "summary": "1 | undefined",
+    "errorType": false,
+    "codes": [
+      2304,
+      2801
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "hidden"
+    }
+  },
+  {
+    "name": "moduleExportsDot",
+    "kind": "value",
+    "summary": "1 | 2",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "moduleExportsElement",
+    "kind": "value",
+    "summary": "1 | 2",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "moduleExportsWrapped",
+    "kind": "value",
+    "summary": "1 | 2",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  }
+]

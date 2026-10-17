@@ -1,0 +1,197 @@
+{
+  "compiler": "7.0.2",
+  "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "capture": "fresh exact-input replay; historical captures remain historical",
+  "receipts": {
+    "native": "vrun-55ae3d8e-7c4d-4976-b9b2-de3c7c8d99d0",
+    "product": "vrun-fcb92525-32e3-4d8b-8b6a-6e8f1a122317",
+    "boundary": "vrun-d704e5fc-3cb6-4f20-b5fc-889846b2ca25"
+  },
+  "files": [
+    {
+      "file": "README.md",
+      "bytes": 3974,
+      "sha256": "2f0ef8da90ff2c349e576b9e1dbda92b63c35aa79c1ed0ccbdbe17b270b1350b"
+    },
+    {
+      "file": "addition-inputs/loops.ts",
+      "bytes": 4086,
+      "sha256": "4d4acb9cf46f348c4518445674591a81e8950007f89615458d54a3784e6808ab"
+    },
+    {
+      "file": "addition-inputs/loose.json",
+      "bytes": 65,
+      "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+    },
+    {
+      "file": "addition-inputs/tsconfig.json",
+      "bytes": 120,
+      "sha256": "1f7086cd0defe0ba0895912ef9db020fcabc9f416125cacb00e3922fb58a4a7e"
+    },
+    {
+      "file": "addition-v2-inputs/loops.ts",
+      "bytes": 4270,
+      "sha256": "662ccd578f60c35275e61740df8619881a57a3f1c46fdc020312495b45d8a318"
+    },
+    {
+      "file": "addition-v2-inputs/loose.json",
+      "bytes": 65,
+      "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+    },
+    {
+      "file": "addition-v2-inputs/tsconfig.json",
+      "bytes": 120,
+      "sha256": "1f7086cd0defe0ba0895912ef9db020fcabc9f416125cacb00e3922fb58a4a7e"
+    },
+    {
+      "file": "captured-tooling/navigation-oracle.mjs",
+      "bytes": 15291,
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+    },
+    {
+      "file": "captured-tooling/semantic-oracle.mjs",
+      "bytes": 49378,
+      "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+    },
+    {
+      "file": "captured-tooling/type-oracle.mjs",
+      "bytes": 39604,
+      "sha256": "2b88ee398209e24c9b3b28a6c39e9d6fbcb3c463f6902638c797e02ae3560b2e"
+    },
+    {
+      "file": "captured-tooling/vendor-typescript-libs.mjs",
+      "bytes": 8387,
+      "sha256": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d"
+    },
+    {
+      "file": "checker-hook.go",
+      "bytes": 2773,
+      "sha256": "e2d5c10ae680c02f912cd1eff4d9b17dc922894559fea2028a82663d9a501419"
+    },
+    {
+      "file": "checker.go.anchors.txt",
+      "bytes": 4862,
+      "sha256": "0f0678a309dccaedb385888f7d564d26a20916da3f052fb56bc78c0d46a2b0e2"
+    },
+    {
+      "file": "flow.go.anchors.txt",
+      "bytes": 9812,
+      "sha256": "62a2d46da938f205a1223e672dc1501f27f67671db1392f32eb279c610f16f52"
+    },
+    {
+      "file": "fresh-api-answers.json",
+      "bytes": 61497,
+      "sha256": "689e24dbaf61510f2aeafdc9bf109f9f95815c1a27a3332dc8d54fe06260ad00"
+    },
+    {
+      "file": "fresh-hook-additions.json",
+      "bytes": 52865,
+      "sha256": "060eaf69293e95a9fc4f6fd8663982d6b05031de0b44674540d395c0e1d42dd3"
+    },
+    {
+      "file": "fresh-hook-answers.json",
+      "bytes": 50217,
+      "sha256": "362de75b17c1a6711f1799dcf1c22ae8b44e039b8e9336f975da48b7b881c66c"
+    },
+    {
+      "file": "fresh-hook-unrelated-call.json",
+      "bytes": 6856,
+      "sha256": "decda717c2fa3799a42db322c76e89254704a6edb8fbf8bbde4a547bbaba438a"
+    },
+    {
+      "file": "historical-hook-additions.json",
+      "bytes": 52865,
+      "sha256": "060eaf69293e95a9fc4f6fd8663982d6b05031de0b44674540d395c0e1d42dd3"
+    },
+    {
+      "file": "historical-hook-answers.json",
+      "bytes": 50217,
+      "sha256": "362de75b17c1a6711f1799dcf1c22ae8b44e039b8e9336f975da48b7b881c66c"
+    },
+    {
+      "file": "inputs/loops.ts",
+      "bytes": 2471,
+      "sha256": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6"
+    },
+    {
+      "file": "inputs/loose.json",
+      "bytes": 65,
+      "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+    },
+    {
+      "file": "inputs/tsconfig.json",
+      "bytes": 120,
+      "sha256": "1f7086cd0defe0ba0895912ef9db020fcabc9f416125cacb00e3922fb58a4a7e"
+    },
+    {
+      "file": "installed-api-inventory.json",
+      "bytes": 69074,
+      "sha256": "d02f36ec003935a11e1fc15cb7beb5567d62b8472367081c769dbc577c75151c"
+    },
+    {
+      "file": "ls-hook.go",
+      "bytes": 5896,
+      "sha256": "73c9a52f43914571bdf7f29e8817720d0ff98bdb0aeb7cad183fa8397a848dce"
+    },
+    {
+      "file": "native-identity.json",
+      "bytes": 1557,
+      "sha256": "6f269995700e9b7d14cbbd3ed33b3262ee53b726879380699a59750a93342eda"
+    },
+    {
+      "file": "oracle-test.go",
+      "bytes": 11423,
+      "sha256": "737453c86a9f6a35bcdbcdb40831bf3e6e039492d7467d2c5b7be4074964b88b"
+    },
+    {
+      "file": "oracle.mjs",
+      "bytes": 42606,
+      "sha256": "9bd6ccc2101a00daff8d79f914817d69f24c36cf2bb72f92f2203ca4eb90e87c"
+    },
+    {
+      "file": "replay-after.json",
+      "bytes": 853,
+      "sha256": "8673fa76536d3cca085426bc3a522153736121e73281d6cc213ef056f305c133"
+    },
+    {
+      "file": "replay-before.json",
+      "bytes": 853,
+      "sha256": "8673fa76536d3cca085426bc3a522153736121e73281d6cc213ef056f305c133"
+    },
+    {
+      "file": "types-loop-cache-additions-hook-probe.mjs",
+      "bytes": 1110,
+      "sha256": "81dc512812b53217c56647cc59ddf75b0fa780bbf010e4855554b7b3976d4c68"
+    },
+    {
+      "file": "types-loop-cache-api-probe.mjs",
+      "bytes": 1946,
+      "sha256": "3e0c7c2b483d54bdede9b7ab5577d899ef5d57152db18d285a0a462c8abb035e"
+    },
+    {
+      "file": "types-loop-cache-hook-probe.mjs",
+      "bytes": 1055,
+      "sha256": "7cb7d6f7e0c27cf7b5d4d91ab1d5b3152613650262f2982ac6a40490cdb89357"
+    },
+    {
+      "file": "types-loop-cache-probe.mjs",
+      "bytes": 1946,
+      "sha256": "3e0c7c2b483d54bdede9b7ab5577d899ef5d57152db18d285a0a462c8abb035e"
+    },
+    {
+      "file": "types-loop-cache-setup.mjs",
+      "bytes": 4519,
+      "sha256": "d5146436a6c772b1b02d4fd3ca488d13123f6d6ac5d13346ca3bbe9c147d3120"
+    },
+    {
+      "file": "types-loop-cache-unrelated-call-hook-probe.mjs",
+      "bytes": 970,
+      "sha256": "c1759c0c8691ac7481c80e829b8a365396f5f8e10ffbdc453e1bdfcce19e2bc0"
+    },
+    {
+      "file": "types.go.anchors.txt",
+      "bytes": 5845,
+      "sha256": "6d0d360e8da2fd6160393029560cc2c101041d1417dba5260cfe8a358c202334"
+    }
+  ]
+}

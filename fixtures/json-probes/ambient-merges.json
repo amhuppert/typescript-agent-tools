@@ -44,9 +44,8 @@
       "tool": {
         "error": [
           "Binding",
-          "one.d.ts:1:36"
-        ],
-        "note": "Reported at the alias's name; TypeScript reports TS2440 at the whole `import =` declaration."
+          "TS2440"
+        ]
       },
       "native": {
         "program": [
@@ -80,9 +79,8 @@
       "tool": {
         "error": [
           "Binding",
-          "two.d.ts:1:36"
-        ],
-        "note": "Reported at the alias's name; TypeScript reports TS2440 at the whole `import =` declaration."
+          "TS2440"
+        ]
       },
       "native": {
         "program": [
@@ -116,9 +114,8 @@
       "tool": {
         "error": [
           "Binding",
-          "one.d.ts:2:36"
-        ],
-        "note": "Reported at the alias's name; TypeScript reports TS2440 at the whole `import =` declaration."
+          "TS2440"
+        ]
       },
       "native": {
         "program": [
@@ -330,9 +327,8 @@
       "tool": {
         "error": [
           "Binding",
-          "b.d.ts:2:38"
-        ],
-        "note": "Reported at the alias's name; TypeScript reports TS2440 at the whole `import =` declaration."
+          "TS2440"
+        ]
       },
       "native": {
         "program": [

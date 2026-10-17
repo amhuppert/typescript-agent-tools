@@ -8,6 +8,7 @@ use std::sync::Arc;
 /// project; only `Sources` creates one.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub(super) struct FileId(u32);
+// Hash/Eq observes one captured file index, never its path spelling.
 
 impl FileId {
     pub(super) fn index(self) -> usize {

@@ -1,0 +1,134 @@
+{
+  "parserCheckoutHead": "ea23d8bbbb34d5609aa9ba7057b479805c61ca7b",
+  "parserSourceTreeSha256AtReportTime": "6ef06cf6c1939273539c5cdc3ca084daa2dd1a5632469f86da2b70f8d36a054d",
+  "sourceHashLimitation": "Current source tree digest at report time; not a build-time capture. Exact measured release rlib/binary hashes are recorded below. Release library came from registered benchmark-build vrun-c702098b-9e69-406f-bb59-490f615d021d. Workspace contains uncommitted authorized production changes.",
+  "captureRevision": "92fe6ab06fbea2c4b6a305689f8cf336173eef81",
+  "commands": {
+    "capture": [
+      "python3",
+      ".cc/temp/types-representation/capture.py"
+    ],
+    "timing": [
+      ".cc/temp/types-representation/spike-time",
+      ".cc/temp/types-representation/inputs.tsv",
+      "5"
+    ],
+    "requestedHeap": [
+      ".cc/temp/types-representation/spike-memory",
+      ".cc/temp/types-representation/inputs.tsv",
+      "2"
+    ],
+    "summary": [
+      "python3",
+      ".cc/temp/types-representation/summarize.py"
+    ],
+    "nativeAnnotation": "bash -c: source scripts/validate/common.sh; find_semantic_compilers; node .cc/temp/types-representation/native-annotations.mjs"
+  },
+  "artifacts": [
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/capture.py",
+      "bytes": 4044,
+      "sha256": "be5b28cfa577f963ba72f2aafd9559fa4892db22e3c372986bd7497d5e934fae"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/spike.rs",
+      "bytes": 13454,
+      "sha256": "d1547ff03b2335e0a94117bbec0fd5af3741d7a3a13ebd06de970054d8a6e945"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/summarize.py",
+      "bytes": 3683,
+      "sha256": "ed70e9457595564c28b0a479a263ecdcee97ca8400f6785f34f6f26e6ecc95e7"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/native-annotations.mjs",
+      "bytes": 4030,
+      "sha256": "6719eafb23436c5ccfcbfd30aa7d308b956137ad0865c2e082d2a440fe2a8569"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/inputs.tsv",
+      "bytes": 6117,
+      "sha256": "c296a53066ae9b891944757e2eee74fcc31b53d4d3e0e0decbaef7282d8a39d3"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/capture-manifest.json",
+      "bytes": 11260,
+      "sha256": "31c56d95ae07810d7bdb8a76ebe2e1a550b3249ff186ffd9701af44df56b9108"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/time.tsv",
+      "bytes": 82343,
+      "sha256": "a3a1f082931c72191429a2aac08de0b157e323ec68e030aa9c1a7baa8b7e8635"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/memory.tsv",
+      "bytes": 37937,
+      "sha256": "c78d9fb60e30c0f1facc681ad746bfde9091f691456e69beef299649ee617628"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/summary.json",
+      "bytes": 110671,
+      "sha256": "102533c814e8961051b52f353ecf2139ac92c71b5cd8cab1417ded16fb679d43"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/native-annotations.json",
+      "bytes": 21529,
+      "sha256": "e817bce4e96de6785ba1ceb84e5a0835ecf8d496c9e651cc506315651ceb9b73"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/limit-control.json",
+      "bytes": 1324,
+      "sha256": "fe1cd5f1e56c9b8fac100191d7b4c50af380e78703b347826a2a80913e44eab1"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/machine.json",
+      "bytes": 181,
+      "sha256": "93eb2c65095dae8026516419217be1f159b6a869b236cddbc5b0bf51314b9e28"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/build-commands.json",
+      "bytes": 817,
+      "sha256": "de5115db80f12dcdf04b48c6242ec9dce82695859c37d140a6edb7d0b2948936"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/spike-time",
+      "bytes": 949984,
+      "sha256": "6ca5388de818f34f61c50a674d61db1fdf06f39d3982836a217215f06b499136"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/spike-memory",
+      "bytes": 979552,
+      "sha256": "01259c8a3bb939d43bb3ce6595cf260d7ca8e45d2472348775f59a26c2cb7a7d"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/target/release/deps/libtypescript_parser-4e647b3bc63d4aa4.rlib",
+      "bytes": 11832720,
+      "sha256": "f0a34963655ffd15f10f6abbf94ffeeda33d4f17eeac312cbcf20a1f949463bd"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-baseline/command-center-manifest.json",
+      "bytes": 2090750,
+      "sha256": "e6370e07a190fd12c682d8600836b6e8d25896f496bff02a48805ab187c88bc1"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-7.0.2/package/package.json",
+      "bytes": 3087,
+      "sha256": "3722b30210616a13a3213ded11575ba6b2dbab10c32a5ef67afca8513e27017e"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/tsc",
+      "bytes": 24971184,
+      "sha256": "76e4987d060ef8207875a53a73619ce665ff16fb2800c0d57a452e21c829bd7b"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/tsconfig.json",
+      "bytes": 1094,
+      "sha256": "cbfae06d004d41cf297e30b714e6310bf58c393f1716f3826907ca745ae60960"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/excluded-input.tsv",
+      "bytes": 401,
+      "sha256": "6ed2bdd794bb09bd0ff7bbc7b35fade0dfb884b529bd7b075ab2540460ff31b1"
+    }
+  ]
+}

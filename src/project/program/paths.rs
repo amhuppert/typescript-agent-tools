@@ -8,12 +8,12 @@ use crate::project::sources::FileId;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
-/// Captured spellings of searched files. Both construction and queries use
+/// Captured input spellings and query membership. Construction and queries use
 /// the loader's normalization and case policy; lookup reads no files.
 #[derive(Debug)]
 pub(crate) struct FileLookup {
     case: Case,
-    files: HashMap<String, FileId>,
+    files: HashMap<String, (FileId, bool)>,
 }
 
 impl FileLookup {
@@ -25,8 +25,8 @@ impl FileLookup {
     }
 
     /// Record `path`, an absolute spelling of `file`.
-    pub(super) fn insert(&mut self, path: &str, file: FileId) {
-        self.files.insert(self.case.key(path), file);
+    pub(super) fn insert(&mut self, path: &str, file: FileId, searched: bool) {
+        self.files.insert(self.case.key(path), (file, searched));
     }
 
     /// The searched file a query path names, matched lexically once made
@@ -35,6 +35,12 @@ impl FileLookup {
     /// Unicode, which a lossy conversion could turn into another file's
     /// name, is `Unsupported` (`input::exact_path`), not any file.
     pub(crate) fn find(&self, path: &Path) -> Result<Option<FileId>, InputError> {
+        Ok(self
+            .entry(path)?
+            .and_then(|(file, searched)| searched.then_some(file)))
+    }
+
+    fn entry(&self, path: &Path) -> Result<Option<(FileId, bool)>, InputError> {
         if path.as_os_str().is_empty() {
             return Ok(None);
         }
@@ -64,7 +70,11 @@ impl FileLookup {
 impl Case {
     /// A normalized absolute identity key.
     pub(super) fn key(self, path: &str) -> String {
-        self.fold(&normalize(path)).into_owned()
+        let path = normalize(path);
+        match self.fold(&path) {
+            std::borrow::Cow::Borrowed(_) => path,
+            std::borrow::Cow::Owned(folded) => folded,
+        }
     }
 }
 
@@ -90,7 +100,7 @@ pub(super) fn inexact_name(directory: &str, lossy: &str) -> InputError {
 /// A native path as loader text: its exact text (`input::exact_path`), so a
 /// path that is not Unicode names no input, with `\\` written as `/` on
 /// Windows.
-pub(super) fn from_path(path: &Path) -> Result<String, InputError> {
+pub(in crate::project) fn from_path(path: &Path) -> Result<String, InputError> {
     crate::input::exact_path(path).map(native_text)
 }
 
@@ -103,31 +113,93 @@ pub(super) fn native_text(text: &str) -> String {
     }
 }
 
-/// The length of a root prefix: `/`, or a drive such as `C:/`, with either
-/// separator, as TypeScript's `getEncodedRootLength` reads one.
-fn root_length(path: &str) -> usize {
+/// `GetEncodedRootLength`: disk and URL roots retain separate identities.
+/// A negative result encodes a URL root by bitwise complement, as in native.
+fn encoded_root_length(path: &str) -> isize {
     let bytes = path.as_bytes();
-    let separator = |byte: u8| byte == b'/' || byte == b'\\';
-    if bytes.first().copied().is_some_and(separator) {
-        1
-    } else if bytes.len() >= 3
-        && bytes[0].is_ascii_alphabetic()
-        && bytes[1] == b':'
-        && separator(bytes[2])
-    {
-        3
+    let Some(&first) = bytes.first() else {
+        return 0;
+    };
+    if matches!(first, b'/' | b'\\') {
+        if bytes.get(1) != Some(&first) {
+            return 1;
+        }
+        return bytes[2..]
+            .iter()
+            .position(|&byte| byte == first)
+            .map_or(bytes.len(), |at| at + 3) as isize;
+    }
+    if first.is_ascii_alphabetic() && bytes.get(1) == Some(&b':') {
+        if bytes.len() == 2 {
+            return 2;
+        }
+        if matches!(bytes.get(2), Some(b'/' | b'\\')) {
+            return 3;
+        }
+    }
+    if path.starts_with("^/") {
+        return 2;
+    }
+    if let Some(scheme_end) = path.find("://") {
+        let authority_start = scheme_end + 3;
+        if let Some(length) = path[authority_start..].find('/') {
+            let authority_end = authority_start + length;
+            let authority = &path[authority_start..authority_end];
+            if &path[..scheme_end] == "file"
+                && matches!(authority, "" | "localhost")
+                && bytes
+                    .get(authority_end + 1)
+                    .is_some_and(u8::is_ascii_alphabetic)
+            {
+                let separator = authority_end + 2;
+                let end = if bytes.get(separator) == Some(&b':') {
+                    Some(separator + 1)
+                } else if path
+                    .get(separator..separator + 3)
+                    .is_some_and(|text| text == "%3a" || text == "%3A")
+                {
+                    Some(separator + 3)
+                } else {
+                    None
+                };
+                if let Some(end) = end {
+                    if end == bytes.len() {
+                        return !(end as isize);
+                    }
+                    if bytes.get(end) == Some(&b'/') {
+                        return !((end + 1) as isize);
+                    }
+                }
+            }
+            return !((authority_end + 1) as isize);
+        }
+        return !(bytes.len() as isize);
+    }
+    0
+}
+
+fn root_length(path: &str) -> usize {
+    let length = encoded_root_length(path);
+    if length < 0 {
+        (!length) as usize
     } else {
-        0
+        length as usize
     }
 }
 
+/// Native `PathIsAbsolute`, including URL roots.
 pub(super) fn is_rooted(path: &str) -> bool {
-    root_length(path) > 0
+    encoded_root_length(path) != 0
+}
+
+/// Native `IsRootedDiskPath`, excluding URL roots.
+pub(super) fn is_rooted_disk(path: &str) -> bool {
+    encoded_root_length(path) > 0
 }
 
 /// `./x`, `../x`, `.`, or `..`, with either separator: TypeScript's
 /// `pathIsRelative`.
-pub(super) fn is_relative(path: &str) -> bool {
+pub(in crate::project) fn is_relative(path: &str) -> bool {
     let rest = path
         .strip_prefix("..")
         .or_else(|| path.strip_prefix('.'))
@@ -151,11 +223,14 @@ pub(super) fn directory(mut path: String) -> String {
     path
 }
 
-/// Resolves `.` and `..` segments and repeated separators, keeping a
-/// trailing separator.
+/// TypeScript's `NormalizePath` / `simpleNormalizePath`: resolves `.` and
+/// `..` segments and repeated separators, keeping a trailing separator.
 pub(super) fn normalize(path: &str) -> String {
-    let path = &separators(path);
-    let root = root_length(path);
+    let path = separators(path);
+    if !has_relative_path_segment(&path) {
+        return path;
+    }
+    let root = root_length(&path);
     let mut parts: Vec<&str> = Vec::new();
     for part in path[root..].split('/') {
         match part {
@@ -195,6 +270,9 @@ pub(super) fn resolve(base: &str, relative: &str) -> String {
 }
 
 pub(super) fn parent(path: &str) -> &str {
+    if root_length(path) == path.len() {
+        return path;
+    }
     let trimmed = path.strip_suffix('/').unwrap_or(path);
     match trimmed.rfind('/') {
         Some(index) if index < root_length(trimmed) => &trimmed[..index + 1],
@@ -204,6 +282,9 @@ pub(super) fn parent(path: &str) -> &str {
 }
 
 pub(super) fn basename(path: &str) -> &str {
+    if root_length(path) == path.len() {
+        return "";
+    }
     let trimmed = path.strip_suffix('/').unwrap_or(path);
     trimmed.rsplit('/').next().unwrap_or(trimmed)
 }
@@ -226,23 +307,169 @@ pub(super) fn ancestors(path: &str) -> impl Iterator<Item = &str> {
 /// A `/`-separated relative path from directory `from` to `to`, using `../`
 /// where needed; `to` itself when the roots differ.
 pub(super) fn relative(from: &str, to: &str) -> String {
-    let (from_root, to_root) = (root_length(from), root_length(to));
-    if from[..from_root] != to[..to_root] {
-        return to.to_owned();
+    relative_with_case(from, to, "", Case::Sensitive)
+}
+
+/// `GetPathComponentsRelativeTo` / `GetRelativePathFromDirectory`. Roots
+/// always use EqualFold; non-root components use the host's equality policy.
+/// The operation also serves GetRelativePathToDirectoryOrUrl with a cwd.
+pub(super) fn relative_with_case(from: &str, to: &str, cwd: &str, case: Case) -> String {
+    let (from, to) = (resolve(cwd, from), resolve(cwd, to));
+    let (from_root, to_root) = (root_length(&from), root_length(&to));
+    if !text_equal(&from[..from_root], &to[..to_root], Case::Insensitive) {
+        return if to_root == to.len() {
+            if to.ends_with('/') {
+                to
+            } else {
+                format!("{to}/")
+            }
+        } else {
+            to.trim_end_matches('/').to_owned()
+        };
     }
-    let from: Vec<&str> = from[from_root..]
+    let from: Vec<_> = from[from_root..]
         .split('/')
         .filter(|p| !p.is_empty())
         .collect();
-    let to_parts: Vec<&str> = to[to_root..].split('/').filter(|p| !p.is_empty()).collect();
+    let target: Vec<_> = to[to_root..].split('/').filter(|p| !p.is_empty()).collect();
     let common = from
         .iter()
-        .zip(&to_parts)
-        .take_while(|(a, b)| a == b)
+        .zip(&target)
+        .take_while(|(a, b)| text_equal(a, b, case))
         .count();
-    let mut parts: Vec<&str> = vec![".."; from.len() - common];
-    parts.extend(&to_parts[common..]);
-    parts.join("/")
+    let mut components = vec![".."; from.len() - common];
+    components.extend(&target[common..]);
+    components.join("/")
+}
+
+/// Native `ContainsPath`, distinct from canonical Path.ContainsPath and
+/// StartsWithDirectory. Components are reduced; roots always ignore case.
+pub(super) fn contains(parent: &str, child: &str, cwd: &str, case: Case) -> bool {
+    let (parent, child) = (combine(cwd, parent), combine(cwd, child));
+    if parent.is_empty() || child.is_empty() {
+        return false;
+    }
+    if parent == child {
+        return true;
+    }
+    let (parent, child) = (normalize(&parent), normalize(&child));
+    let (a, b) = (root_length(&parent), root_length(&child));
+    if !text_equal(&parent[..a], &child[..b], Case::Insensitive) {
+        return false;
+    }
+    let mut children = child[b..].split('/').filter(|part| !part.is_empty());
+    parent[a..]
+        .split('/')
+        .filter(|part| !part.is_empty())
+        .all(|part| {
+            children
+                .next()
+                .is_some_and(|child| text_equal(part, child, case))
+        })
+}
+
+/// Native `StartsWithDirectory`: strict directory ancestry on canonical
+/// filename text, without lexical reduction or EqualFold comparison.
+pub(super) fn starts_with_directory(file: &str, directory: &str, case: Case) -> bool {
+    if directory.is_empty() {
+        return false;
+    }
+    let file = case.fold(file);
+    let directory = case.fold(directory);
+    let directory = directory.strip_suffix('/').unwrap_or(&directory);
+    let directory = directory.strip_suffix('\\').unwrap_or(directory);
+    file.starts_with(&format!("{directory}/")) || file.starts_with(&format!("{directory}\\"))
+}
+
+/// `ComparePaths` uses a simple-lowercase ordering, which is deliberately
+/// different from EqualFold and from canonical filename equality.
+pub(super) fn compare(a: &str, b: &str, cwd: &str, case: Case) -> std::cmp::Ordering {
+    let (a, b) = (combine(cwd, a), combine(cwd, b));
+    if a == b {
+        return std::cmp::Ordering::Equal;
+    }
+    if a.is_empty() || b.is_empty() {
+        return a.cmp(&b);
+    }
+    let (ar, br) = (root_length(&a), root_length(&b));
+    let root = text_compare(&a[..ar], &b[..br], Case::Insensitive);
+    if !root.is_eq() {
+        return root;
+    }
+    let (arest, brest) = (&a[ar..], &b[br..]);
+    if !has_relative_path_segment(arest) && !has_relative_path_segment(brest) {
+        return text_compare(arest, brest, case);
+    }
+    let (a, b) = (normalize(&a), normalize(&b));
+    let mut aa = a[root_length(&a)..]
+        .split('/')
+        .filter(|part| !part.is_empty());
+    let mut bb = b[root_length(&b)..]
+        .split('/')
+        .filter(|part| !part.is_empty());
+    loop {
+        match (aa.next(), bb.next()) {
+            (None, None) => return std::cmp::Ordering::Equal,
+            (None, Some(_)) => return std::cmp::Ordering::Less,
+            (Some(_), None) => return std::cmp::Ordering::Greater,
+            (Some(a), Some(b)) => {
+                let order = text_compare(a, b, case);
+                if !order.is_eq() {
+                    return order;
+                }
+            }
+        }
+    }
+}
+
+/// Native `hasRelativePathSegment`. A single trailing separator does not
+/// enter normalization or ComparePaths' reduction branch; a duplicate does.
+fn has_relative_path_segment(path: &str) -> bool {
+    matches!(path, "." | "..")
+        || path.starts_with("./")
+        || path.starts_with("../")
+        || path.ends_with("/.")
+        || path.ends_with("/..")
+        || path.contains("//")
+        || path.contains("/./")
+        || path.contains("/../")
+}
+
+fn text_compare(a: &str, b: &str, case: Case) -> std::cmp::Ordering {
+    match case {
+        Case::Sensitive => a.cmp(b),
+        Case::Insensitive => a
+            .chars()
+            .map(crate::input::simple_lowercase)
+            .cmp(b.chars().map(crate::input::simple_lowercase)),
+    }
+}
+
+/// `stringutil.HasPrefix` / `HasSuffix` compare exact byte windows with
+/// EqualFold. A window splitting a UTF-8 scalar cannot match valid text.
+pub(super) fn has_prefix(text: &str, prefix: &str, case: Case) -> bool {
+    text.get(..prefix.len())
+        .is_some_and(|part| text_equal(part, prefix, case))
+}
+pub(super) fn has_suffix(text: &str, suffix: &str, case: Case) -> bool {
+    text.len()
+        .checked_sub(suffix.len())
+        .and_then(|at| text.get(at..))
+        .is_some_and(|part| text_equal(part, suffix, case))
+}
+pub(super) fn matches_edges(text: &str, prefix: &str, suffix: &str, case: Case) -> bool {
+    prefix.len() + suffix.len() <= text.len()
+        && has_prefix(text, prefix, case)
+        && has_suffix(text, suffix, case)
+}
+
+/// `stringutil.EquateStringCaseInsensitive` delegates to Go EqualFold.
+fn text_equal(a: &str, b: &str, case: Case) -> bool {
+    a == b
+        || case == Case::Insensitive
+            && a.chars()
+                .map(crate::input::simple_case_fold)
+                .eq(b.chars().map(crate::input::simple_case_fold))
 }
 
 pub(super) fn has_node_modules(path: &str) -> bool {
@@ -262,16 +489,115 @@ pub(super) fn known_extension(path: &str) -> Option<&'static str> {
         .find(|extension| path.ends_with(extension))
 }
 
+/// `tspath.RemoveFileExtension` removes the first recognized exact suffix,
+/// including the complete declaration extension, and preserves unknown ones.
+pub(in crate::project) fn remove_file_extension(path: &str) -> &str {
+    known_extension(path).map_or(path, |extension| &path[..path.len() - extension.len()])
+}
+
 /// Replaces a known extension; paths without one are unchanged.
 pub(super) fn change_extension(path: &str, extension: &str) -> String {
-    match known_extension(path) {
-        Some(old) => format!("{}{extension}", &path[..path.len() - old.len()]),
+    let trimmed = path.strip_suffix(['/', '\\']).unwrap_or(path);
+    match known_extension(trimmed) {
+        Some(old) => {
+            let prefix = &path[..path.len() - old.len()];
+            if extension.is_empty() || extension.starts_with('.') {
+                format!("{prefix}{extension}")
+            } else {
+                format!("{prefix}.{extension}")
+            }
+        }
         None => path.to_owned(),
     }
 }
 
 pub(super) fn has_extension(path: &str, extensions: &[&str]) -> bool {
-    extensions.iter().any(|extension| path.ends_with(extension))
+    extensions
+        .iter()
+        .any(|extension| path.len() > extension.len() && path.ends_with(extension))
+}
+
+/// `TryGetExtensionFromPath` applies FileExtensionIs's nonempty stem gate;
+/// RemoveFileExtension intentionally uses the broader suffix-only operation.
+pub(super) fn try_extension(path: &str) -> Option<&'static str> {
+    KNOWN_EXTENSIONS
+        .into_iter()
+        .find(|ext| has_extension(path, &[*ext]))
+}
+
+pub(super) const REQUIRED_EXTENSIONS: &[&str] =
+    &[".mts", ".d.mts", ".mjs", ".cts", ".d.cts", ".cjs"];
+
+/// Native `HasTSFileExtension` / `HasJSFileExtension` (not input kind,
+/// whose case policy and extension question belong to input::InputKind).
+pub(super) fn has_ts_extension(path: &str) -> bool {
+    has_extension(
+        path,
+        &[".ts", ".tsx", ".d.ts", ".cts", ".d.cts", ".mts", ".d.mts"],
+    )
+}
+pub(super) fn has_js_extension(path: &str) -> bool {
+    has_extension(path, &[".js", ".jsx", ".mjs", ".cjs"])
+}
+
+/// `module.TryGetJSExtensionForFile`: JSX source output depends on exactly
+/// JsxEmitPreserve; a .jsx input retains its extension in every JSX mode.
+pub(super) fn js_extension(path: &str, jsx_preserve: bool) -> Option<&'static str> {
+    match try_extension(path)? {
+        ".ts" | ".d.ts" => Some(".js"),
+        ".tsx" => Some(if jsx_preserve { ".jsx" } else { ".js" }),
+        ext @ (".js" | ".jsx" | ".json") => Some(ext),
+        ".mts" | ".d.mts" | ".mjs" => Some(".mjs"),
+        ".cts" | ".d.cts" | ".cjs" => Some(".cjs"),
+        _ => None,
+    }
+}
+
+/// `outputpaths.GetOutputExtension` is an emit-path question, separate from
+/// module resolution's TryGetJSExtensionForFile (.jsx differs).
+pub(super) fn output_extension(path: &str, jsx_preserve: bool) -> &'static str {
+    if has_extension(path, &[".json"]) {
+        ".json"
+    } else if jsx_preserve && has_extension(path, &[".jsx", ".tsx"]) {
+        ".jsx"
+    } else if has_extension(path, &[".mts", ".mjs"]) {
+        ".mjs"
+    } else if has_extension(path, &[".cts", ".cjs"]) {
+        ".cjs"
+    } else {
+        ".js"
+    }
+}
+
+/// `GetDeclarationEmitExtensionForPath`, including arbitrary-extension
+/// declaration forms. Unknown extensionless files use .d.ts.
+pub(super) fn declaration_emit_extension(path: &str) -> String {
+    if has_extension(path, &[".mjs", ".mts"]) {
+        return ".d.mts".into();
+    }
+    if has_extension(path, &[".cjs", ".cts"]) {
+        return ".d.cts".into();
+    }
+    if has_extension(path, &[".ts", ".tsx", ".js", ".jsx"]) {
+        return ".d.ts".into();
+    }
+    let base = basename(path);
+    match base.rfind('.') {
+        Some(dot) => format!(".d{}.ts", &base[dot..]),
+        None => ".d.ts".into(),
+    }
+}
+
+/// `ChangeFullExtension` recognizes the declaration suffix from `.d`.
+pub(super) fn change_full_extension(path: &str, extension: &str) -> String {
+    match crate::declaration_file_extension(path) {
+        Some(old) => format!(
+            "{}{}{extension}",
+            &path[..path.len() - old.len()],
+            if extension.starts_with('.') { "" } else { "." }
+        ),
+        None => change_extension(path, extension),
+    }
 }
 
 /// The parser's rule, so loading and parsing agree on declaration files.
@@ -279,9 +605,64 @@ pub(super) fn is_declaration(path: &str) -> bool {
     crate::declaration_file_name(path)
 }
 
+/// Native `modulespecifiers.CountPathComponents`: only forward slashes count;
+/// the initial `./` is excluded without otherwise normalizing the specifier.
+pub(in crate::project) fn count_path_components(path: &str) -> usize {
+    path.strip_prefix("./")
+        .unwrap_or(path)
+        .bytes()
+        .filter(|&byte| byte == b'/')
+        .count()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn normalized_fast_paths_keep_native_root_separator_and_case_results() {
+        // Pinned tspath/path_test.go ResolvePath rows and NormalizePath's
+        // simpleNormalizePath shortcut. UNC/URL spellings keep the reducer.
+        for (input, expected) in [
+            ("", ""),
+            (".", ""),
+            ("./", ""),
+            ("..", ".."),
+            ("../", "../"),
+            (".//a", "a"),
+            ("/", "/"),
+            ("/a/", "/a/"),
+            (".a", ".a"),
+            ("..a", "..a"),
+            ("a.", "a."),
+            ("a..", "a.."),
+            ("C:", "C:"),
+            (r"C:\", "C:/"),
+            ("C:child", "C:child"),
+            ("^/", "^/"),
+            (r"a\b", "a/b"),
+            (r"a\\b", "a/b"),
+            ("a//b", "a/b"),
+            ("/a//", "/a/"),
+            ("/a/./b/", "/a/b/"),
+            ("/a/../b/", "/b/"),
+            ("//server/share/", "//server/share/"),
+            ("http://server/path/", "http://server/path/"),
+            ("file:///c%3A/path/", "file:///c%3A/path/"),
+        ] {
+            assert_eq!(normalize(input), expected, "{input:?}");
+        }
+        for (input, sensitive, insensitive) in [
+            ("", "", ""),
+            ("/a/b.ts", "/a/b.ts", "/a/b.ts"),
+            (r"C:\A\B.ts", "C:/A/B.ts", "c:/a/b.ts"),
+            ("/A/../B/", "/B/", "/b/"),
+            ("/İ/K/Σ.ts", "/İ/K/Σ.ts", "/İ/k/σ.ts"),
+        ] {
+            assert_eq!(Case::Sensitive.key(input), sensitive);
+            assert_eq!(Case::Insensitive.key(input), insensitive);
+        }
+    }
 
     #[test]
     fn normalizes_and_relates_paths_lexically() {

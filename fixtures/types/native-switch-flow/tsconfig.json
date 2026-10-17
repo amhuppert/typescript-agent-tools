@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noLib": true,
+    "target": "esnext",
+    "module": "esnext"
+  },
+  "files": [
+    "flow.ts"
+  ]
+}

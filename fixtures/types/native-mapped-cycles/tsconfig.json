@@ -1,0 +1,1 @@
+{"compilerOptions":{"strict":true,"noLib":true,"target":"ESNext"},"files":["../native-variable-patterns/globals.d.ts","cases.ts"]}

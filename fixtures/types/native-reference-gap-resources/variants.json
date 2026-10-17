@@ -1,0 +1,706 @@
+[
+  {
+    "tag": "ascii",
+    "unit": "a",
+    "width": 16,
+    "name": "missing_aaaaaaaaaaaaaaaa",
+    "file": "ascii-16.ts",
+    "profile": "strict",
+    "config": "ascii-16-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "ascii-16.ts"
+      ]
+    }
+  },
+  {
+    "tag": "ascii",
+    "unit": "a",
+    "width": 16,
+    "name": "missing_aaaaaaaaaaaaaaaa",
+    "file": "ascii-16.ts",
+    "profile": "nocheck",
+    "config": "ascii-16-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "ascii-16.ts"
+      ]
+    }
+  },
+  {
+    "tag": "ascii",
+    "unit": "a",
+    "width": 16,
+    "name": "missing_aaaaaaaaaaaaaaaa",
+    "file": "ascii-16.ts",
+    "profile": "loose",
+    "config": "ascii-16-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "ascii-16.ts"
+      ]
+    }
+  },
+  {
+    "tag": "ascii",
+    "unit": "a",
+    "width": 16,
+    "name": "missing_aaaaaaaaaaaaaaaa",
+    "file": "ascii-16.ts",
+    "profile": "loose-nocheck",
+    "config": "ascii-16-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "ascii-16.ts"
+      ]
+    }
+  },
+  {
+    "tag": "ascii",
+    "unit": "a",
+    "width": 64,
+    "name": "missing_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "file": "ascii-64.ts",
+    "profile": "strict",
+    "config": "ascii-64-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "ascii-64.ts"
+      ]
+    }
+  },
+  {
+    "tag": "ascii",
+    "unit": "a",
+    "width": 64,
+    "name": "missing_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "file": "ascii-64.ts",
+    "profile": "nocheck",
+    "config": "ascii-64-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "ascii-64.ts"
+      ]
+    }
+  },
+  {
+    "tag": "ascii",
+    "unit": "a",
+    "width": 64,
+    "name": "missing_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "file": "ascii-64.ts",
+    "profile": "loose",
+    "config": "ascii-64-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "ascii-64.ts"
+      ]
+    }
+  },
+  {
+    "tag": "ascii",
+    "unit": "a",
+    "width": 64,
+    "name": "missing_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "file": "ascii-64.ts",
+    "profile": "loose-nocheck",
+    "config": "ascii-64-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "ascii-64.ts"
+      ]
+    }
+  },
+  {
+    "tag": "greek",
+    "unit": "Ω",
+    "width": 16,
+    "name": "missing_ΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩ",
+    "file": "greek-16.ts",
+    "profile": "strict",
+    "config": "greek-16-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "greek-16.ts"
+      ]
+    }
+  },
+  {
+    "tag": "greek",
+    "unit": "Ω",
+    "width": 16,
+    "name": "missing_ΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩ",
+    "file": "greek-16.ts",
+    "profile": "nocheck",
+    "config": "greek-16-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "greek-16.ts"
+      ]
+    }
+  },
+  {
+    "tag": "greek",
+    "unit": "Ω",
+    "width": 16,
+    "name": "missing_ΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩ",
+    "file": "greek-16.ts",
+    "profile": "loose",
+    "config": "greek-16-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "greek-16.ts"
+      ]
+    }
+  },
+  {
+    "tag": "greek",
+    "unit": "Ω",
+    "width": 16,
+    "name": "missing_ΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩ",
+    "file": "greek-16.ts",
+    "profile": "loose-nocheck",
+    "config": "greek-16-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "greek-16.ts"
+      ]
+    }
+  },
+  {
+    "tag": "greek",
+    "unit": "Ω",
+    "width": 64,
+    "name": "missing_ΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩ",
+    "file": "greek-64.ts",
+    "profile": "strict",
+    "config": "greek-64-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "greek-64.ts"
+      ]
+    }
+  },
+  {
+    "tag": "greek",
+    "unit": "Ω",
+    "width": 64,
+    "name": "missing_ΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩ",
+    "file": "greek-64.ts",
+    "profile": "nocheck",
+    "config": "greek-64-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "greek-64.ts"
+      ]
+    }
+  },
+  {
+    "tag": "greek",
+    "unit": "Ω",
+    "width": 64,
+    "name": "missing_ΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩ",
+    "file": "greek-64.ts",
+    "profile": "loose",
+    "config": "greek-64-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "greek-64.ts"
+      ]
+    }
+  },
+  {
+    "tag": "greek",
+    "unit": "Ω",
+    "width": 64,
+    "name": "missing_ΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩΩ",
+    "file": "greek-64.ts",
+    "profile": "loose-nocheck",
+    "config": "greek-64-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "greek-64.ts"
+      ]
+    }
+  },
+  {
+    "tag": "cjk",
+    "unit": "中",
+    "width": 16,
+    "name": "missing_中中中中中中中中中中中中中中中中",
+    "file": "cjk-16.ts",
+    "profile": "strict",
+    "config": "cjk-16-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "cjk-16.ts"
+      ]
+    }
+  },
+  {
+    "tag": "cjk",
+    "unit": "中",
+    "width": 16,
+    "name": "missing_中中中中中中中中中中中中中中中中",
+    "file": "cjk-16.ts",
+    "profile": "nocheck",
+    "config": "cjk-16-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "cjk-16.ts"
+      ]
+    }
+  },
+  {
+    "tag": "cjk",
+    "unit": "中",
+    "width": 16,
+    "name": "missing_中中中中中中中中中中中中中中中中",
+    "file": "cjk-16.ts",
+    "profile": "loose",
+    "config": "cjk-16-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "cjk-16.ts"
+      ]
+    }
+  },
+  {
+    "tag": "cjk",
+    "unit": "中",
+    "width": 16,
+    "name": "missing_中中中中中中中中中中中中中中中中",
+    "file": "cjk-16.ts",
+    "profile": "loose-nocheck",
+    "config": "cjk-16-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "cjk-16.ts"
+      ]
+    }
+  },
+  {
+    "tag": "cjk",
+    "unit": "中",
+    "width": 64,
+    "name": "missing_中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中",
+    "file": "cjk-64.ts",
+    "profile": "strict",
+    "config": "cjk-64-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "cjk-64.ts"
+      ]
+    }
+  },
+  {
+    "tag": "cjk",
+    "unit": "中",
+    "width": 64,
+    "name": "missing_中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中",
+    "file": "cjk-64.ts",
+    "profile": "nocheck",
+    "config": "cjk-64-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "cjk-64.ts"
+      ]
+    }
+  },
+  {
+    "tag": "cjk",
+    "unit": "中",
+    "width": 64,
+    "name": "missing_中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中",
+    "file": "cjk-64.ts",
+    "profile": "loose",
+    "config": "cjk-64-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "cjk-64.ts"
+      ]
+    }
+  },
+  {
+    "tag": "cjk",
+    "unit": "中",
+    "width": 64,
+    "name": "missing_中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中中",
+    "file": "cjk-64.ts",
+    "profile": "loose-nocheck",
+    "config": "cjk-64-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "cjk-64.ts"
+      ]
+    }
+  },
+  {
+    "tag": "supplementary",
+    "unit": "𐐀",
+    "width": 16,
+    "name": "missing_𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀",
+    "file": "supplementary-16.ts",
+    "profile": "strict",
+    "config": "supplementary-16-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "supplementary-16.ts"
+      ]
+    }
+  },
+  {
+    "tag": "supplementary",
+    "unit": "𐐀",
+    "width": 16,
+    "name": "missing_𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀",
+    "file": "supplementary-16.ts",
+    "profile": "nocheck",
+    "config": "supplementary-16-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "supplementary-16.ts"
+      ]
+    }
+  },
+  {
+    "tag": "supplementary",
+    "unit": "𐐀",
+    "width": 16,
+    "name": "missing_𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀",
+    "file": "supplementary-16.ts",
+    "profile": "loose",
+    "config": "supplementary-16-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "supplementary-16.ts"
+      ]
+    }
+  },
+  {
+    "tag": "supplementary",
+    "unit": "𐐀",
+    "width": 16,
+    "name": "missing_𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀",
+    "file": "supplementary-16.ts",
+    "profile": "loose-nocheck",
+    "config": "supplementary-16-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "supplementary-16.ts"
+      ]
+    }
+  },
+  {
+    "tag": "supplementary",
+    "unit": "𐐀",
+    "width": 64,
+    "name": "missing_𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀",
+    "file": "supplementary-64.ts",
+    "profile": "strict",
+    "config": "supplementary-64-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "supplementary-64.ts"
+      ]
+    }
+  },
+  {
+    "tag": "supplementary",
+    "unit": "𐐀",
+    "width": 64,
+    "name": "missing_𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀",
+    "file": "supplementary-64.ts",
+    "profile": "nocheck",
+    "config": "supplementary-64-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "supplementary-64.ts"
+      ]
+    }
+  },
+  {
+    "tag": "supplementary",
+    "unit": "𐐀",
+    "width": 64,
+    "name": "missing_𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀",
+    "file": "supplementary-64.ts",
+    "profile": "loose",
+    "config": "supplementary-64-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "supplementary-64.ts"
+      ]
+    }
+  },
+  {
+    "tag": "supplementary",
+    "unit": "𐐀",
+    "width": 64,
+    "name": "missing_𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀𐐀",
+    "file": "supplementary-64.ts",
+    "profile": "loose-nocheck",
+    "config": "supplementary-64-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "strict": true,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true
+      },
+      "files": [
+        "globals.d.ts",
+        "supplementary-64.ts"
+      ]
+    }
+  }
+]

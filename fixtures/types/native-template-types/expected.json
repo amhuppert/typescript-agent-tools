@@ -1,0 +1,608 @@
+{
+  "tsconfig.json": [
+    {
+      "marker": "literal",
+      "summary": "\"hello\"",
+      "errorType": false
+    },
+    {
+      "marker": "product",
+      "summary": "\"a-1\" | \"a-2\" | \"b-1\" | \"b-2\"",
+      "errorType": false
+    },
+    {
+      "marker": "boolean",
+      "summary": "\"is-false\" | \"is-true\"",
+      "errorType": false
+    },
+    {
+      "marker": "nullable",
+      "summary": "\"xnully\" | \"xundefinedy\"",
+      "errorType": false
+    },
+    {
+      "marker": "bigint",
+      "summary": "\"x-34\" | \"x12\"",
+      "errorType": false
+    },
+    {
+      "marker": "number",
+      "summary": "\"x0\" | \"x1.5\" | \"x1e+21\"",
+      "errorType": false
+    },
+    {
+      "marker": "string",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "pattern",
+      "summary": "`pre-${number}-post`",
+      "errorType": false
+    },
+    {
+      "marker": "any",
+      "summary": "`${any}`",
+      "errorType": false
+    },
+    {
+      "marker": "unknown",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "never",
+      "summary": "never",
+      "errorType": false
+    },
+    {
+      "marker": "nested",
+      "summary": "`pre-in-${number}-out`",
+      "errorType": false
+    },
+    {
+      "marker": "branded",
+      "summary": "`pre-${number & { tag: true; }}`",
+      "errorType": false
+    },
+    {
+      "marker": "object",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "generic",
+      "summary": "`pre-${T}`",
+      "errorType": false
+    },
+    {
+      "marker": "substituted",
+      "summary": "\"pre-x\" | \"pre-y\"",
+      "errorType": false
+    },
+    {
+      "marker": "escaped",
+      "summary": "\"a\\n${x}\\t\" | \"a\\n`\\t\"",
+      "errorType": false
+    },
+    {
+      "marker": "unicode",
+      "summary": "\"é😀\\u2028\" | \"é😀中\"",
+      "errorType": false
+    },
+    {
+      "marker": "missing",
+      "summary": "`pre${Missing}`",
+      "errorType": false
+    },
+    {
+      "marker": "checked",
+      "summary": "1",
+      "errorType": false
+    },
+    {
+      "marker": "checkedError",
+      "summary": "1",
+      "errorType": false
+    },
+    {
+      "marker": "joined",
+      "summary": "\"😀\"",
+      "errorType": false
+    },
+    {
+      "marker": "joinedNested",
+      "summary": "\"😀\"",
+      "errorType": false
+    },
+    {
+      "marker": "neverSurrogate",
+      "summary": "never",
+      "errorType": false
+    },
+    {
+      "marker": "invalidPlaceholder",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "separated",
+      "summary": "`\\uD83D${any}\\uDE00`",
+      "errorType": false
+    },
+    {
+      "marker": "reversed",
+      "summary": "\"\\uDE00\\uD83D\"",
+      "errorType": false
+    },
+    {
+      "marker": "doubleHigh",
+      "summary": "\"\\uD83D\\uD83D\"",
+      "errorType": false
+    },
+    {
+      "marker": "missingFirst",
+      "summary": "`${Missing}${string}\\uD800`",
+      "errorType": false
+    },
+    {
+      "marker": "joinedUnion",
+      "summary": "\"\\uD83Dx\\uDE00\" | \"😀\"",
+      "errorType": false
+    },
+    {
+      "marker": "unionString",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "unionPattern",
+      "summary": "UnionPattern",
+      "errorType": false
+    },
+    {
+      "marker": "patternOrder",
+      "summary": "PatternOrder",
+      "errorType": false
+    },
+    {
+      "marker": "patternMembers",
+      "summary": "\"xfoo\" | `x${number}`",
+      "errorType": false
+    },
+    {
+      "marker": "orderedMembers",
+      "summary": "`a${string}` | `a${number}` | `b${number}`",
+      "errorType": false
+    },
+    {
+      "marker": "lateInvalid",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "lateAnyInvalid",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "lateNestedInvalid",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "lateGenericInvalid",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "neverMissing",
+      "summary": "never",
+      "errorType": false
+    }
+  ],
+  "loose.json": [
+    {
+      "marker": "literal",
+      "summary": "\"hello\"",
+      "errorType": false
+    },
+    {
+      "marker": "product",
+      "summary": "\"a-1\" | \"a-2\" | \"b-1\" | \"b-2\"",
+      "errorType": false
+    },
+    {
+      "marker": "boolean",
+      "summary": "\"is-false\" | \"is-true\"",
+      "errorType": false
+    },
+    {
+      "marker": "nullable",
+      "summary": "\"xnully\"",
+      "errorType": false
+    },
+    {
+      "marker": "bigint",
+      "summary": "\"x-34\" | \"x12\"",
+      "errorType": false
+    },
+    {
+      "marker": "number",
+      "summary": "\"x0\" | \"x1.5\" | \"x1e+21\"",
+      "errorType": false
+    },
+    {
+      "marker": "string",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "pattern",
+      "summary": "`pre-${number}-post`",
+      "errorType": false
+    },
+    {
+      "marker": "any",
+      "summary": "`${any}`",
+      "errorType": false
+    },
+    {
+      "marker": "unknown",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "never",
+      "summary": "never",
+      "errorType": false
+    },
+    {
+      "marker": "nested",
+      "summary": "`pre-in-${number}-out`",
+      "errorType": false
+    },
+    {
+      "marker": "branded",
+      "summary": "`pre-${number & { tag: true; }}`",
+      "errorType": false
+    },
+    {
+      "marker": "object",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "generic",
+      "summary": "`pre-${T}`",
+      "errorType": false
+    },
+    {
+      "marker": "substituted",
+      "summary": "\"pre-x\" | \"pre-y\"",
+      "errorType": false
+    },
+    {
+      "marker": "escaped",
+      "summary": "\"a\\n${x}\\t\" | \"a\\n`\\t\"",
+      "errorType": false
+    },
+    {
+      "marker": "unicode",
+      "summary": "\"é😀\\u2028\" | \"é😀中\"",
+      "errorType": false
+    },
+    {
+      "marker": "missing",
+      "summary": "`pre${Missing}`",
+      "errorType": false
+    },
+    {
+      "marker": "checked",
+      "summary": "1",
+      "errorType": false
+    },
+    {
+      "marker": "checkedError",
+      "summary": "1",
+      "errorType": false
+    },
+    {
+      "marker": "joined",
+      "summary": "\"😀\"",
+      "errorType": false
+    },
+    {
+      "marker": "joinedNested",
+      "summary": "\"😀\"",
+      "errorType": false
+    },
+    {
+      "marker": "neverSurrogate",
+      "summary": "never",
+      "errorType": false
+    },
+    {
+      "marker": "invalidPlaceholder",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "separated",
+      "summary": "`\\uD83D${any}\\uDE00`",
+      "errorType": false
+    },
+    {
+      "marker": "reversed",
+      "summary": "\"\\uDE00\\uD83D\"",
+      "errorType": false
+    },
+    {
+      "marker": "doubleHigh",
+      "summary": "\"\\uD83D\\uD83D\"",
+      "errorType": false
+    },
+    {
+      "marker": "missingFirst",
+      "summary": "`${Missing}${string}\\uD800`",
+      "errorType": false
+    },
+    {
+      "marker": "joinedUnion",
+      "summary": "\"\\uD83Dx\\uDE00\" | \"😀\"",
+      "errorType": false
+    },
+    {
+      "marker": "unionString",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "unionPattern",
+      "summary": "UnionPattern",
+      "errorType": false
+    },
+    {
+      "marker": "patternOrder",
+      "summary": "PatternOrder",
+      "errorType": false
+    },
+    {
+      "marker": "patternMembers",
+      "summary": "\"xfoo\" | `x${number}`",
+      "errorType": false
+    },
+    {
+      "marker": "orderedMembers",
+      "summary": "`a${string}` | `a${number}` | `b${number}`",
+      "errorType": false
+    },
+    {
+      "marker": "lateInvalid",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "lateAnyInvalid",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "lateNestedInvalid",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "lateGenericInvalid",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "neverMissing",
+      "summary": "never",
+      "errorType": false
+    }
+  ],
+  "exact.json": [
+    {
+      "marker": "literal",
+      "summary": "\"hello\"",
+      "errorType": false
+    },
+    {
+      "marker": "product",
+      "summary": "\"a-1\" | \"a-2\" | \"b-1\" | \"b-2\"",
+      "errorType": false
+    },
+    {
+      "marker": "boolean",
+      "summary": "\"is-false\" | \"is-true\"",
+      "errorType": false
+    },
+    {
+      "marker": "nullable",
+      "summary": "\"xnully\" | \"xundefinedy\"",
+      "errorType": false
+    },
+    {
+      "marker": "bigint",
+      "summary": "\"x-34\" | \"x12\"",
+      "errorType": false
+    },
+    {
+      "marker": "number",
+      "summary": "\"x0\" | \"x1.5\" | \"x1e+21\"",
+      "errorType": false
+    },
+    {
+      "marker": "string",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "pattern",
+      "summary": "`pre-${number}-post`",
+      "errorType": false
+    },
+    {
+      "marker": "any",
+      "summary": "`${any}`",
+      "errorType": false
+    },
+    {
+      "marker": "unknown",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "never",
+      "summary": "never",
+      "errorType": false
+    },
+    {
+      "marker": "nested",
+      "summary": "`pre-in-${number}-out`",
+      "errorType": false
+    },
+    {
+      "marker": "branded",
+      "summary": "`pre-${number & { tag: true; }}`",
+      "errorType": false
+    },
+    {
+      "marker": "object",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "generic",
+      "summary": "`pre-${T}`",
+      "errorType": false
+    },
+    {
+      "marker": "substituted",
+      "summary": "\"pre-x\" | \"pre-y\"",
+      "errorType": false
+    },
+    {
+      "marker": "escaped",
+      "summary": "\"a\\n${x}\\t\" | \"a\\n`\\t\"",
+      "errorType": false
+    },
+    {
+      "marker": "unicode",
+      "summary": "\"é😀\\u2028\" | \"é😀中\"",
+      "errorType": false
+    },
+    {
+      "marker": "missing",
+      "summary": "`pre${Missing}`",
+      "errorType": false
+    },
+    {
+      "marker": "checked",
+      "summary": "1",
+      "errorType": false
+    },
+    {
+      "marker": "checkedError",
+      "summary": "1",
+      "errorType": false
+    },
+    {
+      "marker": "joined",
+      "summary": "\"😀\"",
+      "errorType": false
+    },
+    {
+      "marker": "joinedNested",
+      "summary": "\"😀\"",
+      "errorType": false
+    },
+    {
+      "marker": "neverSurrogate",
+      "summary": "never",
+      "errorType": false
+    },
+    {
+      "marker": "invalidPlaceholder",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "separated",
+      "summary": "`\\uD83D${any}\\uDE00`",
+      "errorType": false
+    },
+    {
+      "marker": "reversed",
+      "summary": "\"\\uDE00\\uD83D\"",
+      "errorType": false
+    },
+    {
+      "marker": "doubleHigh",
+      "summary": "\"\\uD83D\\uD83D\"",
+      "errorType": false
+    },
+    {
+      "marker": "missingFirst",
+      "summary": "`${Missing}${string}\\uD800`",
+      "errorType": false
+    },
+    {
+      "marker": "joinedUnion",
+      "summary": "\"\\uD83Dx\\uDE00\" | \"😀\"",
+      "errorType": false
+    },
+    {
+      "marker": "unionString",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "unionPattern",
+      "summary": "UnionPattern",
+      "errorType": false
+    },
+    {
+      "marker": "patternOrder",
+      "summary": "PatternOrder",
+      "errorType": false
+    },
+    {
+      "marker": "patternMembers",
+      "summary": "\"xfoo\" | `x${number}`",
+      "errorType": false
+    },
+    {
+      "marker": "orderedMembers",
+      "summary": "`a${string}` | `a${number}` | `b${number}`",
+      "errorType": false
+    },
+    {
+      "marker": "lateInvalid",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "lateAnyInvalid",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "lateNestedInvalid",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "lateGenericInvalid",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "neverMissing",
+      "summary": "never",
+      "errorType": false
+    }
+  ]
+}

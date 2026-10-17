@@ -2,6 +2,52 @@
 
 Validation uses TypeScript compiler API 6.0.3 for the JSON syntax projection and the native TypeScript 7.0.2 compiler for language acceptance. No differences remain in the checked corpora. The harnesses and authored fixtures are included; compiler installations and external source trees are not distributed with this repository.
 
+The in-progress T/Q3/Q4 delivery adds a separate fresh-request oracle; it does
+not broaden the existing lexical comparison. See
+[oracle evidence](types-oracle-evidence.md) for its measured cases and open gates.
+Its tests also require Go and a pristine TypeScript Go release checkout at
+`typescript/v7.0.2`, commit `2bd066d87f5bafd315be9f40889d0a60b9e58e0b`.
+Set `TYPE_SCRIPT_GO_SOURCE` to that checkout, or place it at
+`.cache/typescript-go-7.0.2` in the canonical repository. The hook uses a temporary
+`go test -overlay`; it never edits the compiler source or adds a production
+compiler dependency. Missing or changed source, version mismatch, failed replay,
+and missing hook output fail validation.
+
+Frozen isolated resource fixtures replay through `tools/type-oracle-fixture.mjs`.
+It rebases only the six captured input-path metadata fields to the explicitly
+supplied physical fixture root; semantic identities, source text, ranges,
+diagnostics, hashes and external paths remain exact. The original raw goldens
+stay unchanged. `tools/type-oracle-fixture.test.mjs` runs real relocated compiler
+queries and rejects semantic, source, case, root and external-path drift.
+
+Run the focused oracle suites through the registered command:
+
+```sh
+cctl validate run harness-test --queue-if-busy --require-match -- tools/type-oracle.test.mjs
+cctl validate run harness-test --queue-if-busy --require-match -- tools/type-oracle-review.test.mjs
+```
+
+For request-resource regressions, the registered Rust wrapper accepts the
+resource test module or one of its child modules as a single explicit path:
+
+```sh
+cctl validate run test --queue-if-busy --require-match -- src/project/semantic/resources_tests.rs
+cctl validate run test --queue-if-busy --require-match -- src/project/semantic/resources_tests/literal_cache.rs
+```
+
+This runs only that library module with the same two build jobs and two test
+threads. It rejects mixed paths and zero executed tests. Use `src/lib.rs` for
+the complete library, explicit `tests/<target>.rs` paths for integrations, and
+`--scope full` for the complete Rust suite. Narrow resource checks do not replace
+the full delivery check.
+
+The fixed Command Center corpus inventory and exact query anchors are in
+[manifest-summary.json](../fixtures/types/command-center/manifest-summary.json).
+Its inherited/configuration values are distinguished from operation defaults.
+[API observations](../fixtures/types/command-center/api-observations.json) are
+demand-only compiler observations; their exploratory timings include project
+load and do not establish native performance or profile admission.
+
 | Check | Result and scope |
 | --- | --- |
 | Rust tests | 421 tests pass on Rust 1.96 (2026-10-08, after the final review's fixes, registered `test` run `vrun-e21adb40`; two platform skips), with one ignored test, `list_configured_program`, which writes a real project's program for `tools/program-inputs.mjs` and `tools/name-selection.mjs` ([Command Center checkpoint](#command-center-checkpoint)). The probe test now loads 926 maintained compiler probes, 374 of them added for comment directives (see [JSON and configuration probes](#json-and-configuration-probes)); before the fix 179 of them loaded where `tsc` reports TS2307 or TS2451. The five tests added cover keys of imports and exports (a project-wide name of a function that three files import or re-export without renaming is found; renamed and namespace imports keep their names; a default import and a non-renaming import narrowed to their file are `not_found` while `--at` shows their declarations), one text line per import declaration, `--at FILE:LINE:COLUMN` (relative, absolute, and a Windows-style path read from the right, and the usage errors around it), a dotted reference name as a usage error, and an over-long service socket path. Existing tests now also check the selectors on text ambiguity lines and their pasted locations through show and references in both entries, and the service test of failed refreshes adds a directive cut off by a no-break-space line and by an empty line that U+2028 ends, which answer no operation until repaired. `comment_directives_follow_only_spaces_and_tabs` replaces a test whose premise, ASCII `\s` after `//`, was not TypeScript 7.0.2's. 416 tests passed on 2026-10-08 at plan step 6 (`dfc65e2`, registered `test` run `vrun-b1feb2e5`; two platform skips). Step 6 added a case to `program_order_lists_each_file_after_its_subtasks`: dynamic imports and import types in an `else if` chain, a call's callee and arguments, a variable's type and initializer, a conditional's branches, an operator's operands, and a function type's parameter and return type, in the compiler's source order. 416 tests passed earlier that day, after the round-6 review fixes to merging and reporting (two platform skips), including the 552 maintained compiler probes of `fixtures/json-probes`, 167 of them added: ambient modules declared in several files, JSON values and library members met by module augmentations, when a pattern-matched specifier gets a module of its own, augmentation targets that are not program inputs, and the reporting decision crossed with each diagnostic family (see [JSON and configuration probes](#json-and-configuration-probes)); the `@ts-check` and `@ts-nocheck` pragma rule; and a missing reference directive in a package or library, now not reported, beside one in a project file. 415 tests passed earlier on 2026-10-08, after the round-5 review fixes to project integration (two platform skips). The seven added cover a 600,000-access member chain whose callback must neither abort nor stall reference loading (a process test that fails on `8edbc1f`: stack overflow in an unoptimized build, over 200 seconds in an optimized one), callback labels of bounded chains, every callee form, and decoded names, in file and project outlines and shows, 5,000 flat callbacks and constants, signatures of 250 nested sites over a 200,000-element array (19 seconds on `8edbc1f`, under one second now, unoptimized), qualified names through dotted and nested namespaces, ambient modules, and global augmentations in a project and narrowed to a file, query paths that are not Unicode beside a real `bad\uFFFD.ts` for every query kind, and a removed working directory answered alike by direct and service entries. 378 passed earlier on 2026-10-08, after the fourth implementation review's fixes to JSON modules, including the 385 maintained compiler probes of `fixtures/json-probes` (see [JSON and configuration probes](#json-and-configuration-probes)), each loaded as a project whose program and watched names must answer as TypeScript 7.0.2 recorded them, the binder's coverage check on a decorator after a modifier, and an object literal member's single `?` or `!` marker after a byte order mark and each line break. 374 passed on 2026-10-07, after the second rework of module augmentation identity, including the global table built by TypeScript's checker merge with UMD globals and `declare global` blocks, program order against `tsc --listFilesOnly` for import chains, diamonds, reference directives, dynamic imports and import types, type packages, the JSX runtime, and augmentation targets, and the documented differences in `fixtures/reference-exceptions`. The breakdown below is from 217 tests on Rust 1.96 and the minimum supported Rust 1.85 (2026-10-06, after the second design review's fixes; on macOS, Rust 1.85 needs `SDKROOT=$(xcrun --show-sdk-path)` to link): 58 library unit tests (the exhaustive identifier test, pragma, JSON dialect, pattern, path, configuration, source, and resolution tests), 34 parser tests, 13 parser regressions, four literal tests, eight parse-mode CLI tests, 59 reference API tests, 28 reference loading tests, six reference CLI tests, three fixture and marker-grammar tests, two binding-error tests, and two doc tests. Parser coverage includes nested `for` declaration and expression contexts, committed syntax/depth diagnostics, depth exhaustion during speculative parsing, flat comparison lists of 35, 36, and 400 items and a 40,000-item list within a time limit, type-argument closers joined to `=` or `>`, module indicators, `@deprecated` collection after a `#!` line and each line break, file-name rules for JSX and declaration context, malformed hexadecimal escapes, tagged-template cooking and flags, unpaired surrogate preservation, closed stdout for help/version output, deep syntax on ordinary worker-thread stacks and on the deep budget's documented stack, final-tree walking, token spans, UTF-16 offsets, and iterative serialization of a 10,000-operator chain. Reference loading covers uninspectable packages and directory entries, reference directives after every line terminator and with each whitespace character in each position, TypeScript 7's directive attribute rules, a byte order mark before `#!`, JSX pragma whitespace, strict package manifests, `tsconfig.json` comments and escapes, JSON nesting just under, at, and over the limit, package `imports` chains at and past the limit in a dependency, names with a NUL character, and unsupported literal inputs. A test that cannot run on the current platform prints a `SKIP` line that the test gate reports. |
@@ -30,6 +76,15 @@ The four API runners (`conformance`, `grammar-corpus`, `source-corpus`, and `ups
 - The grammar, source, and upstream runners pass an eligible invalid input when the parser rejects it.
 
 The native runners compare native diagnostics rather than syntax trees, so they do not use this comparison. Comparisons omit the compiler's binding data, reference/pragma metadata, JSDoc trees, and lazy caches; see [the JSON contract](ast-json.md) and [normalization code](../tools/ast-comparison.mjs). The API runners reject any option they do not read, so a misspelled `--positions`, `--flags`, or `--scanner-hints` fails instead of comparing less, and each summary line and JSON report names the compared settings, for example `compared: positions, flags, scanner-hints`, `structure only`, or, under upstream `--check-only`, `acceptance only`.
+
+## Focused Rust targets
+
+The registered `test` command accepts explicit Cargo test roots. Use
+`cctl validate run test --queue-if-busy --require-match -- src/lib.rs` for the
+library tests, or `tests/<target>.rs` for integration tests; the two can be
+combined. Other source paths are rejected before Cargo starts. With no explicit
+paths, the command retains the full suite. Both modes retain two build jobs and
+two test threads; merge validation still runs the full suite.
 
 ## Harness tests
 

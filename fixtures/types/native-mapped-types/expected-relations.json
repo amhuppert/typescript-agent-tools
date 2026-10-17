@@ -1,0 +1,236 @@
+[
+  {
+    "config": "tsconfig",
+    "name": "sourceToMapped",
+    "summary": "T",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "mappedToSource",
+    "summary": "Identity<T>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "requiredToOptional",
+    "summary": "Required<T>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "optionalToRequired",
+    "summary": "Optional<T>",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "mappedToIndex",
+    "summary": "Identity<T>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "sameNames",
+    "summary": "{ [P in keyof T as P]: T[P]; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "differentNames",
+    "summary": "{ [P in keyof T as P]: T[P]; }",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "indexedConstraint",
+    "summary": "{ [P in K]: T[P]; }[K]",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "remappedKeys",
+    "summary": "string | number | symbol",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "sourceToMapped",
+    "summary": "T",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "mappedToSource",
+    "summary": "Identity<T>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "requiredToOptional",
+    "summary": "Required<T>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "optionalToRequired",
+    "summary": "Optional<T>",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "mappedToIndex",
+    "summary": "Identity<T>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "sameNames",
+    "summary": "{ [P in keyof T as P]: T[P]; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "differentNames",
+    "summary": "{ [P in keyof T as P]: T[P]; }",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "indexedConstraint",
+    "summary": "{ [P in K]: T[P]; }[K]",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "remappedKeys",
+    "summary": "string | number | symbol",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "sourceToMapped",
+    "summary": "T",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "mappedToSource",
+    "summary": "Identity<T>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "requiredToOptional",
+    "summary": "Required<T>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "optionalToRequired",
+    "summary": "Optional<T>",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "mappedToIndex",
+    "summary": "Identity<T>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "sameNames",
+    "summary": "{ [P in keyof T as P]: T[P]; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "differentNames",
+    "summary": "{ [P in keyof T as P]: T[P]; }",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "indexedConstraint",
+    "summary": "{ [P in K]: T[P]; }[K]",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "remappedKeys",
+    "summary": "string | number | symbol",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "properties": []
+  }
+]

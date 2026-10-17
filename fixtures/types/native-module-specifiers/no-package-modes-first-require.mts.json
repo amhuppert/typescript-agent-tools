@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noLib": true,
+    "types": [],
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
+    "resolvePackageJsonExports": false,
+    "resolvePackageJsonImports": false
+  },
+  "files": [
+    "globals.d.ts",
+    "first-require.mts",
+    "target.d.ts"
+  ]
+}

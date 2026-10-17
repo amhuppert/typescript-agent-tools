@@ -1,0 +1,4 @@
+{
+  "compilerOptions": { "strict": true, "noLib": true },
+  "files": ["../native-template-matching/globals.d.ts", "cases.ts"]
+}

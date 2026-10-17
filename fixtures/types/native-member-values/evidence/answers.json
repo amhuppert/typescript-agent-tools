@@ -1,0 +1,5665 @@
+[
+  {
+    "config": "tsconfig.json",
+    "variable": "plain",
+    "memberName": "optional",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 33,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "optional"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Plain",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 78,
+            "kind": "KindPropertySignature",
+            "pos": 67,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 4,
+                  "id": 10,
+                  "missing": false,
+                  "summary": "undefined"
+                },
+                {
+                  "errorType": false,
+                  "flags": 32,
+                  "id": 14,
+                  "missing": false,
+                  "summary": "string"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 134217728,
+              "id": 66,
+              "summary": "string | undefined"
+            }
+          }
+        ],
+        "flags": 16777220,
+        "modifierFlags": 0,
+        "name": "optional",
+        "names": [
+          "fixed",
+          "plain",
+          "optional",
+          "getterOnly",
+          "setterOnly",
+          "paired",
+          "fromSetter",
+          "ignoredBadSetter",
+          "lazyRead",
+          "method",
+          "overloaded",
+          "optionalMethod"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 4,
+              "id": 10,
+              "missing": false,
+              "summary": "undefined"
+            },
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 134217728,
+          "id": 66,
+          "summary": "string | undefined"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 4,
+              "id": 10,
+              "missing": false,
+              "summary": "undefined"
+            },
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 134217728,
+          "id": 66,
+          "summary": "string | undefined"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 4,
+              "id": 10,
+              "missing": false,
+              "summary": "undefined"
+            },
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 134217728,
+          "id": 66,
+          "summary": "string | undefined"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "exact.json",
+    "variable": "plain",
+    "memberName": "optional",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 33,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "optional"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/exact.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/exact.json",
+          "sha256": "9656561e46a1b1209afea30b456835daca2ed7b80434961d0b95910221799fea"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Plain",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 78,
+            "kind": "KindPropertySignature",
+            "pos": 67,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 32,
+                  "id": 14,
+                  "missing": false,
+                  "summary": "string"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "summary": "string"
+            }
+          }
+        ],
+        "flags": 16777220,
+        "modifierFlags": 0,
+        "name": "optional",
+        "names": [
+          "fixed",
+          "plain",
+          "optional",
+          "getterOnly",
+          "setterOnly",
+          "paired",
+          "fromSetter",
+          "ignoredBadSetter",
+          "lazyRead",
+          "method",
+          "overloaded",
+          "optionalMethod"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 4,
+              "id": 11,
+              "missing": true,
+              "summary": "undefined"
+            },
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": true,
+          "errorType": false,
+          "flags": 134217728,
+          "id": 66,
+          "summary": "string | undefined"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "exactOptionalPropertyTypes": true,
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/exact.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "variable": "plain",
+    "memberName": "optional",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 33,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "optional"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose.json",
+          "sha256": "41156ed0d344408f7cd9be939b86f360225945353589c28ec51bb0499ff94a7e"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Plain",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 78,
+            "kind": "KindPropertySignature",
+            "pos": 67,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 32,
+                  "id": 16,
+                  "missing": false,
+                  "summary": "string"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 32,
+              "id": 16,
+              "summary": "string"
+            }
+          }
+        ],
+        "flags": 16777220,
+        "modifierFlags": 0,
+        "name": "optional",
+        "names": [
+          "fixed",
+          "plain",
+          "optional",
+          "getterOnly",
+          "setterOnly",
+          "paired",
+          "fromSetter",
+          "ignoredBadSetter",
+          "lazyRead",
+          "method",
+          "overloaded",
+          "optionalMethod"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 16,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 16,
+          "summary": "string"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 16,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 16,
+          "summary": "string"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 16,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 16,
+          "summary": "string"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose-exact.json",
+    "variable": "plain",
+    "memberName": "optional",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 33,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "optional"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose-exact.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose-exact.json",
+          "sha256": "2afab1c41085327eb0ebb9ae3d7c8027e49d350f0423da5624c1861438f88136"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose.json",
+          "sha256": "41156ed0d344408f7cd9be939b86f360225945353589c28ec51bb0499ff94a7e"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [
+        {
+          "fileName": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose-exact.json",
+          "pos": 54,
+          "end": 82,
+          "code": 5052,
+          "category": 1,
+          "text": "Option 'exactOptionalPropertyTypes' cannot be specified without specifying option 'strictNullChecks'."
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Plain",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 78,
+            "kind": "KindPropertySignature",
+            "pos": 67,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 32,
+                  "id": 16,
+                  "missing": false,
+                  "summary": "string"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 32,
+              "id": 16,
+              "summary": "string"
+            }
+          }
+        ],
+        "flags": 16777220,
+        "modifierFlags": 0,
+        "name": "optional",
+        "names": [
+          "fixed",
+          "plain",
+          "optional",
+          "getterOnly",
+          "setterOnly",
+          "paired",
+          "fromSetter",
+          "ignoredBadSetter",
+          "lazyRead",
+          "method",
+          "overloaded",
+          "optionalMethod"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 16,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 16,
+          "summary": "string"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 16,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 16,
+          "summary": "string"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 16,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 16,
+          "summary": "string"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [
+        5052
+      ],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "exactOptionalPropertyTypes": true,
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose-exact.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "variable": "plain",
+    "memberName": "fixed",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 33,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "fixed"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Plain",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 41,
+            "kind": "KindPropertySignature",
+            "pos": 35,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 32,
+                  "id": 14,
+                  "missing": false,
+                  "summary": "string"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "summary": "string"
+            }
+          }
+        ],
+        "flags": 4,
+        "modifierFlags": 8,
+        "name": "fixed",
+        "names": [
+          "fixed",
+          "plain",
+          "optional",
+          "getterOnly",
+          "setterOnly",
+          "paired",
+          "fromSetter",
+          "ignoredBadSetter",
+          "lazyRead",
+          "method",
+          "overloaded",
+          "optionalMethod"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        },
+        "readonly": true,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "variable": "plain",
+    "memberName": "plain",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 33,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "plain"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Plain",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 58,
+            "kind": "KindPropertySignature",
+            "pos": 50,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 64,
+                  "id": 15,
+                  "missing": false,
+                  "summary": "number"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "summary": "number"
+            }
+          }
+        ],
+        "flags": 4,
+        "modifierFlags": 0,
+        "name": "plain",
+        "names": [
+          "fixed",
+          "plain",
+          "optional",
+          "getterOnly",
+          "setterOnly",
+          "paired",
+          "fromSetter",
+          "ignoredBadSetter",
+          "lazyRead",
+          "method",
+          "overloaded",
+          "optionalMethod"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "missing": false,
+              "summary": "number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 64,
+          "id": 15,
+          "summary": "number"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "missing": false,
+              "summary": "number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 64,
+          "id": 15,
+          "summary": "number"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "missing": false,
+              "summary": "number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 64,
+          "id": 15,
+          "summary": "number"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "variable": "plain",
+    "memberName": "getterOnly",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 33,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "getterOnly"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Plain",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 105,
+            "kind": "KindGetAccessor",
+            "pos": 94,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 32,
+                  "id": 14,
+                  "missing": false,
+                  "summary": "string"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "summary": "string"
+            }
+          }
+        ],
+        "flags": 32768,
+        "modifierFlags": 0,
+        "name": "getterOnly",
+        "names": [
+          "fixed",
+          "plain",
+          "optional",
+          "getterOnly",
+          "setterOnly",
+          "paired",
+          "fromSetter",
+          "ignoredBadSetter",
+          "lazyRead",
+          "method",
+          "overloaded",
+          "optionalMethod"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        },
+        "readonly": true,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "variable": "plain",
+    "memberName": "setterOnly",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 33,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "setterOnly"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Plain",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 133,
+            "kind": "KindSetAccessor",
+            "pos": 122,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 64,
+                  "id": 15,
+                  "missing": false,
+                  "summary": "number"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "summary": "number"
+            }
+          }
+        ],
+        "flags": 65536,
+        "modifierFlags": 0,
+        "name": "setterOnly",
+        "names": [
+          "fixed",
+          "plain",
+          "optional",
+          "getterOnly",
+          "setterOnly",
+          "paired",
+          "fromSetter",
+          "ignoredBadSetter",
+          "lazyRead",
+          "method",
+          "overloaded",
+          "optionalMethod"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "missing": false,
+              "summary": "number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 64,
+          "id": 15,
+          "summary": "number"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "missing": false,
+              "summary": "number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 64,
+          "id": 15,
+          "summary": "number"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "missing": false,
+              "summary": "number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 64,
+          "id": 15,
+          "summary": "number"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "variable": "plain",
+    "memberName": "paired",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 33,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "paired"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Plain",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 162,
+            "kind": "KindGetAccessor",
+            "pos": 155,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 32,
+                  "id": 14,
+                  "missing": false,
+                  "summary": "string"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "summary": "string"
+            }
+          },
+          {
+            "end": 186,
+            "kind": "KindSetAccessor",
+            "pos": 179,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 64,
+                  "id": 15,
+                  "missing": false,
+                  "summary": "number"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "summary": "number"
+            }
+          }
+        ],
+        "flags": 98304,
+        "modifierFlags": 0,
+        "name": "paired",
+        "names": [
+          "fixed",
+          "plain",
+          "optional",
+          "getterOnly",
+          "setterOnly",
+          "paired",
+          "fromSetter",
+          "ignoredBadSetter",
+          "lazyRead",
+          "method",
+          "overloaded",
+          "optionalMethod"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "missing": false,
+              "summary": "number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 64,
+          "id": 15,
+          "summary": "number"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "variable": "plain",
+    "memberName": "fromSetter",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 33,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "fromSetter"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Plain",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 219,
+            "kind": "KindGetAccessor",
+            "pos": 208,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 8192,
+                  "id": 17,
+                  "missing": false,
+                  "summary": "false"
+                },
+                {
+                  "errorType": false,
+                  "flags": 8192,
+                  "id": 19,
+                  "missing": false,
+                  "summary": "true"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 134217984,
+              "id": 21,
+              "summary": "boolean"
+            }
+          },
+          {
+            "end": 239,
+            "kind": "KindSetAccessor",
+            "pos": 228,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 8192,
+                  "id": 17,
+                  "missing": false,
+                  "summary": "false"
+                },
+                {
+                  "errorType": false,
+                  "flags": 8192,
+                  "id": 19,
+                  "missing": false,
+                  "summary": "true"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 134217984,
+              "id": 21,
+              "summary": "boolean"
+            }
+          }
+        ],
+        "flags": 98304,
+        "modifierFlags": 0,
+        "name": "fromSetter",
+        "names": [
+          "fixed",
+          "plain",
+          "optional",
+          "getterOnly",
+          "setterOnly",
+          "paired",
+          "fromSetter",
+          "ignoredBadSetter",
+          "lazyRead",
+          "method",
+          "overloaded",
+          "optionalMethod"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 8192,
+              "id": 17,
+              "missing": false,
+              "summary": "false"
+            },
+            {
+              "errorType": false,
+              "flags": 8192,
+              "id": 19,
+              "missing": false,
+              "summary": "true"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 134217984,
+          "id": 21,
+          "summary": "boolean"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 8192,
+              "id": 17,
+              "missing": false,
+              "summary": "false"
+            },
+            {
+              "errorType": false,
+              "flags": 8192,
+              "id": 19,
+              "missing": false,
+              "summary": "true"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 134217984,
+          "id": 21,
+          "summary": "boolean"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 8192,
+              "id": 17,
+              "missing": false,
+              "summary": "false"
+            },
+            {
+              "errorType": false,
+              "flags": 8192,
+              "id": 19,
+              "missing": false,
+              "summary": "true"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 134217984,
+          "id": 21,
+          "summary": "boolean"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "variable": "plain",
+    "memberName": "ignoredBadSetter",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 33,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "ignoredBadSetter"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Plain",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2304
+        ],
+        "declarations": [
+          {
+            "end": 279,
+            "kind": "KindGetAccessor",
+            "pos": 262,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 32,
+                  "id": 14,
+                  "missing": false,
+                  "summary": "string"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "summary": "string"
+            }
+          },
+          {
+            "end": 313,
+            "kind": "KindSetAccessor",
+            "pos": 296,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": true,
+                  "flags": 1,
+                  "id": 66,
+                  "missing": false,
+                  "summary": "MissingWrite"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": true,
+              "flags": 1,
+              "id": 66,
+              "summary": "MissingWrite"
+            }
+          }
+        ],
+        "flags": 98304,
+        "modifierFlags": 0,
+        "name": "ignoredBadSetter",
+        "names": [
+          "fixed",
+          "plain",
+          "optional",
+          "getterOnly",
+          "setterOnly",
+          "paired",
+          "fromSetter",
+          "ignoredBadSetter",
+          "lazyRead",
+          "method",
+          "overloaded",
+          "optionalMethod"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": true,
+              "flags": 1,
+              "id": 66,
+              "missing": false,
+              "summary": "MissingWrite"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": true,
+          "flags": 1,
+          "id": 66,
+          "summary": "MissingWrite"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2304
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2304
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "variable": "plain",
+    "memberName": "lazyRead",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 33,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "lazyRead"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Plain",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2304
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2304
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2304
+        ],
+        "declarations": [
+          {
+            "end": 350,
+            "kind": "KindGetAccessor",
+            "pos": 341,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": true,
+                  "flags": 1,
+                  "id": 66,
+                  "missing": false,
+                  "summary": "MissingRead"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": true,
+              "flags": 1,
+              "id": 66,
+              "summary": "MissingRead"
+            }
+          },
+          {
+            "end": 381,
+            "kind": "KindSetAccessor",
+            "pos": 372,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 64,
+                  "id": 15,
+                  "missing": false,
+                  "summary": "number"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "summary": "number"
+            }
+          }
+        ],
+        "flags": 98304,
+        "modifierFlags": 0,
+        "name": "lazyRead",
+        "names": [
+          "fixed",
+          "plain",
+          "optional",
+          "getterOnly",
+          "setterOnly",
+          "paired",
+          "fromSetter",
+          "ignoredBadSetter",
+          "lazyRead",
+          "method",
+          "overloaded",
+          "optionalMethod"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": true,
+              "flags": 1,
+              "id": 66,
+              "missing": false,
+              "summary": "MissingRead"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": true,
+          "flags": 1,
+          "id": 66,
+          "summary": "MissingRead"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": true,
+              "flags": 1,
+              "id": 66,
+              "missing": false,
+              "summary": "MissingRead"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": true,
+          "flags": 1,
+          "id": 66,
+          "summary": "MissingRead"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "missing": false,
+              "summary": "number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 64,
+          "id": 15,
+          "summary": "number"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2304
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2304
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "variable": "plain",
+    "memberName": "method",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 33,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "method"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Plain",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 406,
+            "kind": "KindMethodSignature",
+            "pos": 397,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 1048576,
+                  "id": 66,
+                  "missing": false,
+                  "summary": "(value: string) => number"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 1048576,
+              "id": 66,
+              "summary": "(value: string) => number"
+            }
+          }
+        ],
+        "flags": 8192,
+        "modifierFlags": 0,
+        "name": "method",
+        "names": [
+          "fixed",
+          "plain",
+          "optional",
+          "getterOnly",
+          "setterOnly",
+          "paired",
+          "fromSetter",
+          "ignoredBadSetter",
+          "lazyRead",
+          "method",
+          "overloaded",
+          "optionalMethod"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 66,
+              "missing": false,
+              "summary": "(value: string) => number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 66,
+          "summary": "(value: string) => number"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 66,
+              "missing": false,
+              "summary": "(value: string) => number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 66,
+          "summary": "(value: string) => number"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 66,
+              "missing": false,
+              "summary": "(value: string) => number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 66,
+          "summary": "(value: string) => number"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "variable": "plain",
+    "memberName": "overloaded",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 33,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "overloaded"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Plain",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 443,
+            "kind": "KindMethodSignature",
+            "pos": 430,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 1048576,
+                  "id": 66,
+                  "missing": false,
+                  "summary": "{ (value: string): string; (value: number): number; }"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 1048576,
+              "id": 66,
+              "summary": "{ (value: string): string; (value: number): number; }"
+            }
+          },
+          {
+            "end": 480,
+            "kind": "KindMethodSignature",
+            "pos": 467,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 1048576,
+                  "id": 66,
+                  "missing": false,
+                  "summary": "{ (value: string): string; (value: number): number; }"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 1048576,
+              "id": 66,
+              "summary": "{ (value: string): string; (value: number): number; }"
+            }
+          }
+        ],
+        "flags": 8192,
+        "modifierFlags": 0,
+        "name": "overloaded",
+        "names": [
+          "fixed",
+          "plain",
+          "optional",
+          "getterOnly",
+          "setterOnly",
+          "paired",
+          "fromSetter",
+          "ignoredBadSetter",
+          "lazyRead",
+          "method",
+          "overloaded",
+          "optionalMethod"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 66,
+              "missing": false,
+              "summary": "{ (value: string): string; (value: number): number; }"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 66,
+          "summary": "{ (value: string): string; (value: number): number; }"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 66,
+              "missing": false,
+              "summary": "{ (value: string): string; (value: number): number; }"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 66,
+          "summary": "{ (value: string): string; (value: number): number; }"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 66,
+              "missing": false,
+              "summary": "{ (value: string): string; (value: number): number; }"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 66,
+          "summary": "{ (value: string): string; (value: number): number; }"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "variable": "plain",
+    "memberName": "optionalMethod",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 33,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "optionalMethod"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Plain",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 521,
+            "kind": "KindMethodSignature",
+            "pos": 504,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 4,
+                  "id": 10,
+                  "missing": false,
+                  "summary": "undefined"
+                },
+                {
+                  "errorType": false,
+                  "flags": 1048576,
+                  "id": 66,
+                  "missing": false,
+                  "summary": "(value: number) => string"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 134217728,
+              "id": 67,
+              "summary": "((value: number) => string) | undefined"
+            }
+          }
+        ],
+        "flags": 16785408,
+        "modifierFlags": 0,
+        "name": "optionalMethod",
+        "names": [
+          "fixed",
+          "plain",
+          "optional",
+          "getterOnly",
+          "setterOnly",
+          "paired",
+          "fromSetter",
+          "ignoredBadSetter",
+          "lazyRead",
+          "method",
+          "overloaded",
+          "optionalMethod"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 4,
+              "id": 10,
+              "missing": false,
+              "summary": "undefined"
+            },
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 66,
+              "missing": false,
+              "summary": "(value: number) => string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 134217728,
+          "id": 67,
+          "summary": "((value: number) => string) | undefined"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 4,
+              "id": 10,
+              "missing": false,
+              "summary": "undefined"
+            },
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 66,
+              "missing": false,
+              "summary": "(value: number) => string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 134217728,
+          "id": 67,
+          "summary": "((value: number) => string) | undefined"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 4,
+              "id": 10,
+              "missing": false,
+              "summary": "undefined"
+            },
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 66,
+              "missing": false,
+              "summary": "(value: number) => string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 134217728,
+          "id": 67,
+          "summary": "((value: number) => string) | undefined"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "variable": "generic",
+    "memberName": "method",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 34,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "method"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Generic<string>",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 587,
+            "kind": "KindMethodSignature",
+            "pos": 578,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 1048576,
+                  "id": 70,
+                  "missing": false,
+                  "summary": "(input: string) => string"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 1048576,
+              "id": 70,
+              "summary": "(input: string) => string"
+            }
+          }
+        ],
+        "flags": 33562624,
+        "modifierFlags": 0,
+        "name": "method",
+        "names": [
+          "method",
+          "value"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 70,
+              "missing": false,
+              "summary": "(input: string) => string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 70,
+          "summary": "(input: string) => string"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 70,
+              "missing": false,
+              "summary": "(input: string) => string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 70,
+          "summary": "(input: string) => string"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 70,
+              "missing": false,
+              "summary": "(input: string) => string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 70,
+          "summary": "(input: string) => string"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {
+          "instantiationCount": 2,
+          "instantiationDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {
+        "instantiationCount": 2,
+        "instantiationDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "variable": "generic",
+    "memberName": "value",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 34,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "value"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Generic<string>",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 613,
+            "kind": "KindGetAccessor",
+            "pos": 607,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 32,
+                  "id": 14,
+                  "missing": false,
+                  "summary": "string"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "summary": "string"
+            }
+          },
+          {
+            "end": 631,
+            "kind": "KindSetAccessor",
+            "pos": 625,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 64,
+                  "id": 15,
+                  "missing": false,
+                  "summary": "number"
+                },
+                {
+                  "errorType": false,
+                  "flags": 524288,
+                  "id": 66,
+                  "missing": false,
+                  "summary": "T"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 134217728,
+              "id": 69,
+              "summary": "number | T"
+            }
+          }
+        ],
+        "flags": 33652736,
+        "modifierFlags": 0,
+        "name": "value",
+        "names": [
+          "method",
+          "value"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            },
+            {
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "missing": false,
+              "summary": "number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 134217728,
+          "id": 29,
+          "summary": "string | number"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {
+          "instantiationCount": 2,
+          "instantiationDepth": 1
+        },
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {
+        "instantiationCount": 2,
+        "instantiationDepth": 1
+      },
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "variable": "declared",
+    "memberName": "protectedValue",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 35,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "protectedValue"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Declared",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 712,
+            "kind": "KindPropertyDeclaration",
+            "pos": 697,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 64,
+                  "id": 15,
+                  "missing": false,
+                  "summary": "number"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "summary": "number"
+            }
+          }
+        ],
+        "flags": 4,
+        "modifierFlags": 4,
+        "name": "protectedValue",
+        "names": [
+          "protectedValue",
+          "hiddenValue",
+          "paired",
+          "method"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "missing": false,
+              "summary": "number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 64,
+          "id": 15,
+          "summary": "number"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "missing": false,
+              "summary": "number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 64,
+          "id": 15,
+          "summary": "number"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "missing": false,
+              "summary": "number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 64,
+          "id": 15,
+          "summary": "number"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "variable": "declared",
+    "memberName": "hiddenValue",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 35,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "hiddenValue"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Declared",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 743,
+            "kind": "KindPropertyDeclaration",
+            "pos": 731,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 32,
+                  "id": 14,
+                  "missing": false,
+                  "summary": "string"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "summary": "string"
+            }
+          }
+        ],
+        "flags": 4,
+        "modifierFlags": 2,
+        "name": "hiddenValue",
+        "names": [
+          "protectedValue",
+          "hiddenValue",
+          "paired",
+          "method"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "variable": "declared",
+    "memberName": "paired",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 35,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "paired"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Declared",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 791,
+            "kind": "KindGetAccessor",
+            "pos": 784,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 32,
+                  "id": 14,
+                  "missing": false,
+                  "summary": "string"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "summary": "string"
+            }
+          },
+          {
+            "end": 815,
+            "kind": "KindSetAccessor",
+            "pos": 808,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 64,
+                  "id": 15,
+                  "missing": false,
+                  "summary": "number"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "summary": "number"
+            }
+          }
+        ],
+        "flags": 33652736,
+        "modifierFlags": 0,
+        "name": "paired",
+        "names": [
+          "protectedValue",
+          "hiddenValue",
+          "paired",
+          "method"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 32,
+              "id": 14,
+              "missing": false,
+              "summary": "string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "summary": "string"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 64,
+              "id": 15,
+              "missing": false,
+              "summary": "number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 64,
+          "id": 15,
+          "summary": "number"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "variable": "declared",
+    "memberName": "method",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 35,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "method"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Declared",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 840,
+            "kind": "KindMethodDeclaration",
+            "pos": 831,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 1048576,
+                  "id": 67,
+                  "missing": false,
+                  "summary": "(input: string) => number"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 1048576,
+              "id": 67,
+              "summary": "(input: string) => number"
+            }
+          }
+        ],
+        "flags": 8192,
+        "modifierFlags": 0,
+        "name": "method",
+        "names": [
+          "protectedValue",
+          "hiddenValue",
+          "paired",
+          "method"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 67,
+              "missing": false,
+              "summary": "(input: string) => number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 67,
+          "summary": "(input: string) => number"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 67,
+              "missing": false,
+              "summary": "(input: string) => number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 67,
+          "summary": "(input: string) => number"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 67,
+              "missing": false,
+              "summary": "(input: string) => number"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 67,
+          "summary": "(input: string) => number"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "exact.json",
+    "variable": "plain",
+    "memberName": "optionalMethod",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 33,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "optionalMethod"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/exact.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/exact.json",
+          "sha256": "9656561e46a1b1209afea30b456835daca2ed7b80434961d0b95910221799fea"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Plain",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 521,
+            "kind": "KindMethodSignature",
+            "pos": 504,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 1048576,
+                  "id": 66,
+                  "missing": false,
+                  "summary": "(value: number) => string"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 1048576,
+              "id": 66,
+              "summary": "(value: number) => string"
+            }
+          }
+        ],
+        "flags": 16785408,
+        "modifierFlags": 0,
+        "name": "optionalMethod",
+        "names": [
+          "fixed",
+          "plain",
+          "optional",
+          "getterOnly",
+          "setterOnly",
+          "paired",
+          "fromSetter",
+          "ignoredBadSetter",
+          "lazyRead",
+          "method",
+          "overloaded",
+          "optionalMethod"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 66,
+              "missing": false,
+              "summary": "(value: number) => string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 66,
+          "summary": "(value: number) => string"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 4,
+              "id": 11,
+              "missing": true,
+              "summary": "undefined"
+            },
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 66,
+              "missing": false,
+              "summary": "(value: number) => string"
+            }
+          ],
+          "containsMissing": true,
+          "errorType": false,
+          "flags": 134217728,
+          "id": 67,
+          "summary": "((value: number) => string) | undefined"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 4,
+              "id": 11,
+              "missing": true,
+              "summary": "undefined"
+            },
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 66,
+              "missing": false,
+              "summary": "(value: number) => string"
+            }
+          ],
+          "containsMissing": true,
+          "errorType": false,
+          "flags": 134217728,
+          "id": 67,
+          "summary": "((value: number) => string) | undefined"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "exactOptionalPropertyTypes": true,
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/exact.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "variable": "plain",
+    "memberName": "optionalMethod",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 33,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "optionalMethod"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose.json",
+          "sha256": "41156ed0d344408f7cd9be939b86f360225945353589c28ec51bb0499ff94a7e"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Plain",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 521,
+            "kind": "KindMethodSignature",
+            "pos": 504,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 1048576,
+                  "id": 67,
+                  "missing": false,
+                  "summary": "(value: number) => string"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 1048576,
+              "id": 67,
+              "summary": "(value: number) => string"
+            }
+          }
+        ],
+        "flags": 16785408,
+        "modifierFlags": 0,
+        "name": "optionalMethod",
+        "names": [
+          "fixed",
+          "plain",
+          "optional",
+          "getterOnly",
+          "setterOnly",
+          "paired",
+          "fromSetter",
+          "ignoredBadSetter",
+          "lazyRead",
+          "method",
+          "overloaded",
+          "optionalMethod"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 67,
+              "missing": false,
+              "summary": "(value: number) => string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 67,
+          "summary": "(value: number) => string"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 67,
+              "missing": false,
+              "summary": "(value: number) => string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 67,
+          "summary": "(value: number) => string"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 67,
+              "missing": false,
+              "summary": "(value: number) => string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 67,
+          "summary": "(value: number) => string"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose-exact.json",
+    "variable": "plain",
+    "memberName": "optionalMethod",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 33,
+        "column": 20
+      },
+      "properties": false,
+      "memberName": "optionalMethod"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose-exact.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/cases.ts",
+          "sha256": "623fbd5bd480378cfb39d0f253406a4371aea06bc324809644e9d29ca7728703"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose-exact.json",
+          "sha256": "2afab1c41085327eb0ebb9ae3d7c8027e49d350f0423da5624c1861438f88136"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose.json",
+          "sha256": "41156ed0d344408f7cd9be939b86f360225945353589c28ec51bb0499ff94a7e"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "observedPreflightDiagnostics": [
+        {
+          "fileName": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose-exact.json",
+          "pos": 54,
+          "end": 82,
+          "code": 5052,
+          "category": 1,
+          "text": "Option 'exactOptionalPropertyTypes' cannot be specified without specifying option 'strictNullChecks'."
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Plain",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "memberValue": {
+        "afterNonMissingReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterReadDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "afterWriteDiagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ],
+        "declarations": [
+          {
+            "end": 521,
+            "kind": "KindMethodSignature",
+            "pos": 504,
+            "type": {
+              "alternatives": [
+                {
+                  "errorType": false,
+                  "flags": 1048576,
+                  "id": 67,
+                  "missing": false,
+                  "summary": "(value: number) => string"
+                }
+              ],
+              "containsMissing": false,
+              "errorType": false,
+              "flags": 1048576,
+              "id": 67,
+              "summary": "(value: number) => string"
+            }
+          }
+        ],
+        "flags": 16785408,
+        "modifierFlags": 0,
+        "name": "optionalMethod",
+        "names": [
+          "fixed",
+          "plain",
+          "optional",
+          "getterOnly",
+          "setterOnly",
+          "paired",
+          "fromSetter",
+          "ignoredBadSetter",
+          "lazyRead",
+          "method",
+          "overloaded",
+          "optionalMethod"
+        ],
+        "nonMissingRead": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 67,
+              "missing": false,
+              "summary": "(value: number) => string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 67,
+          "summary": "(value: number) => string"
+        },
+        "read": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 67,
+              "missing": false,
+              "summary": "(value: number) => string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 67,
+          "summary": "(value: number) => string"
+        },
+        "readonly": false,
+        "write": {
+          "alternatives": [
+            {
+              "errorType": false,
+              "flags": 1048576,
+              "id": 67,
+              "missing": false,
+              "summary": "(value: number) => string"
+            }
+          ],
+          "containsMissing": false,
+          "errorType": false,
+          "flags": 1048576,
+          "id": 67,
+          "summary": "(value: number) => string"
+        }
+      },
+      "afterMemberValue": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "nativeProgramDiagnosticCodes": [
+        5052
+      ],
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "exactOptionalPropertyTypes": true,
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-member-values/loose-exact.json"
+      }
+    }
+  }
+]

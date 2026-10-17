@@ -1,0 +1,122 @@
+{
+  "version": "Version 7.0.2",
+  "binary": "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/tsc",
+  "rows": [
+    {
+      "name": "depth-99-same",
+      "sourceSha256": "7e9bdb63caeafddc7ceb22188defe88a009e6386c1519d82d4b0d9598c13d7a9",
+      "status": 0,
+      "codes": [],
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "depth-100-same",
+      "sourceSha256": "91f59d384552286bb348ecdc814467d57091ca5743c69248216e96e056b266d5",
+      "status": 1,
+      "codes": [
+        2321
+      ],
+      "stdout": ".cc/temp/types-relation-limits/depth-100-same/cases.ts(4,32): error TS2321: Excessive stack depth comparing types 'Source' and 'Target'.\n",
+      "stderr": ""
+    },
+    {
+      "name": "depth-101-same",
+      "sourceSha256": "ee236a63fb569853338a30abb087ea658c7663de69241b3f20a50e8fa5b274b6",
+      "status": 1,
+      "codes": [
+        2321
+      ],
+      "stdout": ".cc/temp/types-relation-limits/depth-101-same/cases.ts(4,32): error TS2321: Excessive stack depth comparing types 'Source' and 'Target'.\n",
+      "stderr": ""
+    },
+    {
+      "name": "depth-99-different",
+      "sourceSha256": "f39b5442ef86e92f21d0dd9b9da282c03db3e6185fb613f10171ba5f4893d10a",
+      "status": 0,
+      "codes": [],
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "removal-1250-43",
+      "sourceSha256": "78dfee41fea66ef3aa7a1e358ea4b284b122d899c868687faeed7a5cb0a9e43b",
+      "status": 0,
+      "codes": [],
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "removal-1250-42",
+      "sourceSha256": "a3eb6c7bd2330a72b4b33446b84d891048125c36d993084c3b7edda1d4485f7b",
+      "status": 0,
+      "codes": [],
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "removal-1250-41",
+      "sourceSha256": "ca9eb9eb94eb6b53a524ebfb7728ed3e9629f518d61adf9fb0597ac6c3e6a60b",
+      "status": 1,
+      "codes": [
+        2590
+      ],
+      "stdout": ".cc/temp/types-relation-limits/removal-1250-41/cases.ts(1251,25): error TS2590: Expression produces a union type that is too complex to represent.\n",
+      "stderr": ""
+    },
+    {
+      "name": "maybe-active",
+      "sourceSha256": "01dde3343d4fdc2fbd55f45761eb7e098e94cdc76f62660d3145235e7a97d0e8",
+      "status": 0,
+      "codes": [],
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "maybe-active-false",
+      "sourceSha256": "ddf692907da955a495e0d6b9e183e8e6ad2f08f641cd52e79c9410fec1ed2f82",
+      "status": 0,
+      "codes": [],
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "maybe-deep",
+      "sourceSha256": "4f792465dd1db19bd8f299625c8e7ebcb01499ebbecc0797375ca65fc64e3860",
+      "status": 0,
+      "codes": [],
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "allowance-1998-all",
+      "sourceSha256": "3b0c676de3e8ee87b7def15a07ddd7943983cc9f97565081587c05fa02325594",
+      "status": 1,
+      "codes": [
+        2859
+      ],
+      "stdout": ".cc/temp/types-relation-limits/allowance-1998-all/cases.ts(4,32): error TS2859: Excessive complexity comparing types 'Source' and 'Target'.\n",
+      "stderr": ""
+    },
+    {
+      "name": "allowance-1999-all",
+      "sourceSha256": "a8a2d4545f7129e7c61eeebc651feeeb27fc9a2842296e8fa93fa0ee2740d82a",
+      "status": 1,
+      "codes": [
+        2859
+      ],
+      "stdout": ".cc/temp/types-relation-limits/allowance-1999-all/cases.ts(4,32): error TS2859: Excessive complexity comparing types 'Source' and 'Target'.\n",
+      "stderr": ""
+    },
+    {
+      "name": "allowance-2000-all",
+      "sourceSha256": "34505a91a7d45b5ba57767ad18eda4147840f583640cf51254b09fcf8ff2c678",
+      "status": 1,
+      "codes": [
+        2859
+      ],
+      "stdout": ".cc/temp/types-relation-limits/allowance-2000-all/cases.ts(4,32): error TS2859: Excessive complexity comparing types 'Source' and 'Target'.\n",
+      "stderr": ""
+    }
+  ]
+}

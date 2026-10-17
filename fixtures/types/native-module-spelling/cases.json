@@ -1,0 +1,332 @@
+[
+  {
+    "name": "relative-minimal",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "target.d.ts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"./target\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./target\" with { \"resolution-mode\": \"require\" };\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"target.d.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "relative-js",
+    "config": "tsconfig.json",
+    "source": "use.mts",
+    "files": {
+      "target.d.ts": "export declare const present: number;\n",
+      "use.mts": "import type { present } from \"./target.js\" with { \"resolution-mode\": \"require\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./target.js\" with { \"resolution-mode\": \"import\" };\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.mts\",\n    \"target.d.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "relative-ts",
+    "config": "tsconfig.json",
+    "source": "use.mts",
+    "files": {
+      "target.ts": "export declare const present: number;\n",
+      "use.mts": "import type { present } from \"./target\" with { \"resolution-mode\": \"require\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./target\" with { \"resolution-mode\": \"import\" };\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"allowImportingTsExtensions\": true,\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.mts\",\n    \"target.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "rewrite-relative",
+    "config": "tsconfig.json",
+    "source": "use.mts",
+    "files": {
+      "target.ts": "export declare const present: number;\n",
+      "use.mts": "import type { present } from \"./target\" with { \"resolution-mode\": \"require\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./target\" with { \"resolution-mode\": \"import\" };\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"rewriteRelativeImportExtensions\": true,\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.mts\",\n    \"target.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "declaration-importer",
+    "config": "tsconfig.json",
+    "source": "use.d.cts",
+    "files": {
+      "target.d.ts": "export declare const present: number;\n",
+      "use.d.cts": "import type { present } from \"./target\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./target\" with { \"resolution-mode\": \"require\" };\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.d.cts\",\n    \"target.d.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "index-minimal",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "dir/index.ts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"./dir/index\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./dir/index\" with { \"resolution-mode\": \"require\" };\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"dir/index.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "index-collision",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "dir/index.ts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"./dir/index\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./dir/index\" with { \"resolution-mode\": \"require\" };\n",
+      "dir.ts": "export const unrelated = 1;\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"dir/index.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "index-empty-directory",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "dir/index.ts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"./dir/index\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./dir/index\" with { \"resolution-mode\": \"require\" };\n",
+      "dir.ts/.keep": "",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"dir/index.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "index-tsx-collision",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "dir/index.ts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"./dir/index\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./dir/index\" with { \"resolution-mode\": \"require\" };\n",
+      "dir.tsx": "export const unrelated = 1;\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"dir/index.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "index-js-collision",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "dir/index.ts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"./dir/index\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./dir/index\" with { \"resolution-mode\": \"require\" };\n",
+      "dir.js": "exports.unrelated = 1;\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"dir/index.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "required-target-mts",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "target.mts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"./target.mjs\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./target.mjs\" with { \"resolution-mode\": \"require\" };\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"target.mts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "required-target-cts",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "target.cts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"./target.cjs\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./target.cjs\" with { \"resolution-mode\": \"require\" };\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"target.cts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "required-target-d-mts",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "target.d.mts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"./target.mjs\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./target.mjs\" with { \"resolution-mode\": \"require\" };\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"target.d.mts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "required-target-d-cts",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "target.d.cts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"./target.cjs\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./target.cjs\" with { \"resolution-mode\": \"require\" };\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"target.d.cts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "jsx-preserve",
+    "config": "tsconfig.json",
+    "source": "use.mts",
+    "files": {
+      "target.tsx": "export declare const present: number;\n",
+      "use.mts": "import type { present } from \"./target.js\" with { \"resolution-mode\": \"require\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./target.js\" with { \"resolution-mode\": \"import\" };\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"jsx\": \"preserve\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.mts\",\n    \"target.tsx\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "jsx-react",
+    "config": "tsconfig.json",
+    "source": "use.mts",
+    "files": {
+      "target.tsx": "export declare const present: number;\n",
+      "use.mts": "import type { present } from \"./target.js\" with { \"resolution-mode\": \"require\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./target.js\" with { \"resolution-mode\": \"import\" };\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"jsx\": \"react\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.mts\",\n    \"target.tsx\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "arbitrary-css",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "style.d.css.ts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"./style.css\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./style.css\" with { \"resolution-mode\": \"require\" };\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"allowArbitraryExtensions\": true,\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"style.d.css.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "root-dirs",
+    "config": "tsconfig.json",
+    "source": "src/use.cts",
+    "files": {
+      "generated/sub/index.ts": "export declare const present: number;\n",
+      "src/use.cts": "import type { present } from \"../generated/sub/index\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"../generated/sub/index\" with { \"resolution-mode\": \"require\" };\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"rootDirs\": [\n      \"src\",\n      \"generated\"\n    ],\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"src/use.cts\",\n    \"generated/sub/index.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "paths-in-project",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "lib/target.d.ts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"./lib/target.js\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./lib/target.js\" with { \"resolution-mode\": \"require\" };\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"paths\": {\n      \"mapped\": [\n        \"./lib/target.d.ts\"\n      ]\n    },\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"lib/target.d.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "paths-cross-project",
+    "config": "src/tsconfig.json",
+    "source": "src/use.cts",
+    "files": {
+      "lib/target.d.ts": "export declare const present: number;\n",
+      "src/use.cts": "import type { present } from \"../lib/target.js\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"../lib/target.js\" with { \"resolution-mode\": \"require\" };\n",
+      "src/tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"paths\": {\n      \"mapped\": [\n        \"../lib/target.d.ts\"\n      ]\n    },\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"../globals.d.ts\",\n    \"use.cts\",\n    \"../lib/target.d.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "paths-empty-key",
+    "config": "src/tsconfig.json",
+    "source": "src/use.cts",
+    "files": {
+      "lib/target.d.ts": "export declare const present: number;\n",
+      "src/use.cts": "import type { present } from \"../lib/target.js\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"../lib/target.js\" with { \"resolution-mode\": \"require\" };\n",
+      "src/tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"paths\": {\n      \"\": [\n        \"../lib/target.d.ts\"\n      ]\n    },\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"../globals.d.ts\",\n    \"use.cts\",\n    \"../lib/target.d.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "paths-star-ts",
+    "config": "src/tsconfig.json",
+    "source": "src/use.cts",
+    "files": {
+      "lib/target.d.ts": "export declare const present: number;\n",
+      "src/use.cts": "import type { present } from \"../lib/target.js\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"../lib/target.js\" with { \"resolution-mode\": \"require\" };\n",
+      "src/tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"paths\": {\n      \"mapped/*\": [\n        \"../lib/*.d.ts\"\n      ]\n    },\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"../globals.d.ts\",\n    \"use.cts\",\n    \"../lib/target.d.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "paths-star-noext",
+    "config": "src/tsconfig.json",
+    "source": "src/use.cts",
+    "files": {
+      "lib/target.d.ts": "export declare const present: number;\n",
+      "src/use.cts": "import type { present } from \"../lib/target.js\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"../lib/target.js\" with { \"resolution-mode\": \"require\" };\n",
+      "src/tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"paths\": {\n      \"mapped/*\": [\n        \"../lib/*\"\n      ]\n    },\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"../globals.d.ts\",\n    \"use.cts\",\n    \"../lib/target.d.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "package-single-file",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "node_modules/pkg.ts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"pkg\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"pkg\" with { \"resolution-mode\": \"require\" };\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"node_modules/pkg.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "package-index-no-manifest",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "node_modules/pkg/index.d.ts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"pkg\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"pkg\" with { \"resolution-mode\": \"require\" };\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"node_modules/pkg/index.d.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "package-types",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "node_modules/pkg/types/main.d.ts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"pkg\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"pkg\" with { \"resolution-mode\": \"require\" };\n",
+      "node_modules/pkg/package.json": "{\"name\": \"different-name\", \"types\": \"types/main.d.ts\"}",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"node_modules/pkg/types/main.d.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "package-exports-exact",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "node_modules/pkg/types/main.d.ts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"pkg\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"pkg\" with { \"resolution-mode\": \"require\" };\n",
+      "node_modules/pkg/package.json": "{\"exports\": {\".\": \"./types/main.js\"}}",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"node_modules/pkg/types/main.d.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "package-exports-pattern",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "node_modules/pkg/types/main.d.ts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"pkg/main\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"pkg/main\" with { \"resolution-mode\": \"require\" };\n",
+      "node_modules/pkg/package.json": "{\"exports\": {\"./*\": {\"types\": \"./types/*.d.ts\"}}}",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"node_modules/pkg/types/main.d.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "package-types-versions",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "node_modules/pkg/v7/main.d.ts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"pkg/main\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"pkg/main\" with { \"resolution-mode\": \"require\" };\n",
+      "node_modules/pkg/package.json": "{\"typesVersions\": {\"*\": {\"*\": [\"v7/*\"]}}}",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"node_modules/pkg/v7/main.d.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "package-types-names",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "node_modules/@types/scope__pkg/index.d.ts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"@scope/pkg\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"@scope/pkg\" with { \"resolution-mode\": \"require\" };\n",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"node_modules/@types/scope__pkg/index.d.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "package-imports",
+    "config": "tsconfig.json",
+    "source": "use.cts",
+    "files": {
+      "src/target.ts": "export declare const present: number;\n",
+      "use.cts": "import type { present } from \"#target\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"#target\" with { \"resolution-mode\": \"require\" };\n",
+      "package.json": "{\"imports\": {\"#target\": \"./src/target.js\"}}",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"use.cts\",\n    \"src/target.ts\"\n  ]\n}\n"
+    }
+  },
+  {
+    "name": "package-imports-output",
+    "config": "tsconfig.json",
+    "source": "src/use.cts",
+    "files": {
+      "src/target.ts": "export declare const present: number;\n",
+      "package.json": "{\"imports\": {\"#target\": \"./dist/target.js\"}}",
+      "tsconfig.json": "{\n  \"compilerOptions\": {\n    \"strict\": true,\n    \"noLib\": true,\n    \"types\": [],\n    \"target\": \"ESNext\",\n    \"module\": \"Preserve\",\n    \"moduleResolution\": \"Bundler\",\n    \"rootDir\": \"src\",\n    \"outDir\": \"dist\",\n    \"noEmit\": true\n  },\n  \"files\": [\n    \"globals.d.ts\",\n    \"src/use.cts\",\n    \"src/target.ts\"\n  ]\n}\n",
+      "src/use.cts": "import type { present } from \"./target.js\" with { \"resolution-mode\": \"import\" };\nimport type { Missing as /*#missing*/Missing } from /*#module*/\"./target.js\" with { \"resolution-mode\": \"require\" };\n"
+    }
+  }
+]

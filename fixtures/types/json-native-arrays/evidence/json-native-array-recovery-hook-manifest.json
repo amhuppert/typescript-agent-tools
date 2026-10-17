@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "compiler": "7.0.2",
+  "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "question": "value / GetTypeOfSymbol",
+  "diagnosticObservation": "already accumulated same-checker diagnostics, no whole-file pass",
+  "inputHashes": [
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-native-arrays/consumer.ts",
+      "sha256": "f92da2294c636002706decc80524e2018fcc10e8425f234ea48d0b3cb79f3c2e"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-native-arrays/data.json",
+      "sha256": "c4a840597560c2a2d59c23a10b3b6e6afd5e469bf912900512f362301c7ac4bf"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-native-arrays/strict-1-exact-0-unchecked-0.json",
+      "sha256": "b8d2e9f6f4f5198191fb7ebe59fc22d759e587491294ee3948282a53a9c365cc"
+    },
+    {
+      "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-native-arrays/tsconfig.json",
+      "sha256": "c50757eb59e6a0ba3a09d6f13ef52a58ad2d2a37cfbbd695e9e42d6b3b01002c"
+    }
+  ],
+  "sources": [
+    {
+      "file": "tools/type-oracle.mjs",
+      "sha256": "7caa3182d73c92937caa4bb2f5b232fd0db6f563cdcda73f8077a99cbb15d2aa"
+    },
+    {
+      "file": "tools/semantic-oracle.mjs",
+      "sha256": "bc969538c077b64b4bf65e87be063ed5903f7d2cca739676b3780c13565f565a"
+    },
+    {
+      "file": "tools/navigation-oracle.mjs",
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+    },
+    {
+      "file": "tools/vendor-typescript-libs.mjs",
+      "sha256": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d"
+    },
+    {
+      "file": "fixtures/types/compiler-hook/checker-hook.go",
+      "sha256": "e2d5c10ae680c02f912cd1eff4d9b17dc922894559fea2028a82663d9a501419"
+    },
+    {
+      "file": "fixtures/types/compiler-hook/ls-hook.go",
+      "sha256": "73c9a52f43914571bdf7f29e8817720d0ff98bdb0aeb7cad183fa8397a848dce"
+    },
+    {
+      "file": "fixtures/types/compiler-hook/oracle-test.go",
+      "sha256": "ad384a32324fe19b79dd4b55d2d0a45a21079d8f5c588fbf3b8685b58f1faec6"
+    }
+  ],
+  "controls": [
+    {
+      "file": "fixtures/types/json-native-arrays/evidence/json-native-array-recovery-hook.mjs",
+      "sha256": "0691dcf464a8b730943ebf1f63cbaf227dac152dd9d25aa8cbe349770d85b356"
+    },
+    {
+      "file": "fixtures/types/json-native-arrays/evidence/json-native-array-recovery-hook.json",
+      "sha256": "ec64d1597464b238280f8af84ac08c20cc51b686affa55f92cb3ebbb2be0767c"
+    }
+  ],
+  "toolingSnapshot": "hook-tooling",
+  "limitations": [
+    "A false root flag and TS2318 inventory alone do not identify causal dependencies. The exact pinned getGlobalType/array factory source establishes consumed missing-global Array provenance.",
+    "Frozen replay input hashes are retained; post-probe tool hashes are inspection provenance, not transactional external compiler-read capture.",
+    "No full native Rust array/checker gate is completed."
+  ]
+}

@@ -1,0 +1,224 @@
+[
+  {
+    "name": "beforeCall",
+    "summary": "Base",
+    "errorType": false,
+    "codes": [
+      17011,
+      17011
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "constructorCall",
+    "summary": "typeof Base",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "constructorProperty",
+    "summary": "Base",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "instanceMethod",
+    "summary": "Base",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "instanceGetter",
+    "summary": "Base",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "instanceSetter",
+    "summary": "Base",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "instanceField",
+    "summary": "Base",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "arrowProperty",
+    "summary": "Base",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "nestedFunction",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2660,
+      2660
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "staticMethod",
+    "summary": "typeof Base",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "staticGetter",
+    "summary": "typeof Base",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "staticSetter",
+    "summary": "typeof Base",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "staticField",
+    "summary": "typeof Base",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "staticBlock",
+    "summary": "typeof Base",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "constructorArgument",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2336,
+      2336,
+      17011,
+      17011
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "arrowCall",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2337,
+      2337,
+      2337
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "noBase",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2335,
+      2335
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "nullCall",
+    "summary": "any",
+    "errorType": true,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "nullProperty",
+    "summary": "null",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "nullStatic",
+    "summary": "null",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "objectMethod",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "objectGetter",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "objectSetter",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "objectArrow",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "outside",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2660,
+      2660
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "computedName",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2466,
+      2466
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "brokenBase",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "genericClass",
+    "summary": "Base",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  }
+]

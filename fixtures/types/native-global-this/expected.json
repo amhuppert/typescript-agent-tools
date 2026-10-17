@@ -1,0 +1,338 @@
+[
+  {
+    "scenario": "clean",
+    "name": "this",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "scenario": "clean",
+    "name": "identifier",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "scenario": "clean",
+    "name": "query",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "scenario": "variable",
+    "name": "this",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "variable",
+    "name": "identifier",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "variable",
+    "name": "query",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "block",
+    "name": "this",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "block",
+    "name": "identifier",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "block",
+    "name": "query",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "function",
+    "name": "this",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "function",
+    "name": "identifier",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "function",
+    "name": "query",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "namespace",
+    "name": "this",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "namespace",
+    "name": "identifier",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "namespace",
+    "name": "query",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "interface",
+    "name": "this",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "interface",
+    "name": "identifier",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "interface",
+    "name": "query",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "class",
+    "name": "this",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "class",
+    "name": "identifier",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "class",
+    "name": "query",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "enum",
+    "name": "this",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "enum",
+    "name": "identifier",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "enum",
+    "name": "query",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "ambient",
+    "name": "this",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "ambient",
+    "name": "identifier",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "ambient",
+    "name": "query",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [
+      2397
+    ],
+    "after": [
+      2397
+    ]
+  },
+  {
+    "scenario": "shadow",
+    "name": "this",
+    "summary": "undefined",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "scenario": "shadow",
+    "name": "identifier",
+    "summary": "{ local: number; }",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "scenario": "shadow",
+    "name": "query",
+    "summary": "{ local: number; }",
+    "errorType": false,
+    "before": [],
+    "after": []
+  }
+]

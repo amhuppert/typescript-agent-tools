@@ -1,0 +1,51 @@
+{
+  "compiler": "TypeScript 7.0.2",
+  "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "scope": "read-only source snapshot; public read tests may change after this capture",
+  "files": [
+    {
+      "file": "src/project/binding/flow.rs",
+      "sha256": "9a9b5e6cbe7ed0e302482c29bded2630dccd895b2932e56df74c49d33c849ca7"
+    },
+    {
+      "file": "src/project/binding/flow/syntax.rs",
+      "sha256": "f2236fc5153b2e9516996386ae62e9bf1f1d8873a2e024769677d0c930bb9cde"
+    },
+    {
+      "file": "src/project/binding/semantic_flow.rs",
+      "sha256": "60aff2df8e52d1e0aeab133349c82402fe915825387924dc007594959564dbe6"
+    },
+    {
+      "file": "src/project/binding/semantic.rs",
+      "sha256": "98fd3e49351b7b98744f238de556aa6c0d45153d00aaf6bd6e965f810824e823"
+    },
+    {
+      "file": "src/project/semantic/source/reads.rs",
+      "sha256": "fe1517dfa670b2a1f01f90ab2ee8595b55f0fd3092fe2f3d3894c2c3b55f9a88"
+    },
+    {
+      "file": "src/project/semantic/evaluation/reads.rs",
+      "sha256": "3f14bb484617b4e28890cadc9bb1b3e13fbc41da178b1af689f563cfe21dd97c"
+    },
+    {
+      "file": "tests/type_reads.rs",
+      "sha256": "eed4e6acd38204dd21a8f479188d16ad6ff879f28936d48b6aac66d77489d150"
+    },
+    {
+      "file": "tools/type-oracle.mjs",
+      "sha256": "46685c7bb9b659349a1e317d4007ece056e58fcdbd7bb6ffe557bdc5a9ff8eed"
+    },
+    {
+      "file": "tools/semantic-oracle.mjs",
+      "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+    },
+    {
+      "file": "fixtures/types/compiler-hook/checker-hook.go",
+      "sha256": "e2d5c10ae680c02f912cd1eff4d9b17dc922894559fea2028a82663d9a501419"
+    },
+    {
+      "file": "fixtures/types/compiler-hook/oracle-test.go",
+      "sha256": "eeea4327d99fa38e1030d229a92905e6955d2fbfad5d2384eef7ed761e566535"
+    }
+  ]
+}

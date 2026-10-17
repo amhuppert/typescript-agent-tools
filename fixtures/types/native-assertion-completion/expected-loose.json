@@ -1,0 +1,120 @@
+[
+  {
+    "name": "asHealthy",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "angleHealthy",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "asRecovery",
+    "kind": "value",
+    "summary": "MissingAsTarget",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "angleRecovery",
+    "kind": "value",
+    "summary": "MissingAngleTarget",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "constLiteral",
+    "kind": "value",
+    "summary": "1",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "constInvalid",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      1355
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "constRecovery",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      1355,
+      2304
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "satisfiesSourceFirst",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "satisfiesErrorTarget",
+    "kind": "value",
+    "summary": "MissingErrorTarget",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "satisfiesFalse",
+    "kind": "value",
+    "summary": "1",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "healthyAfter",
+    "kind": "value",
+    "summary": "\"after\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  }
+]

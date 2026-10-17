@@ -1,0 +1,792 @@
+[
+  {
+    "name": "primaryValid",
+    "summary": "(value?: number) => number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 660,
+        "kind": 170,
+        "pos": 643
+      },
+      {
+        "name": "variableLikeSymbol:643:660",
+        "kind": 170,
+        "primary": true
+      }
+    ]
+  },
+  {
+    "name": "primaryMismatch",
+    "summary": "(value?: number) => number",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 740,
+        "kind": 170,
+        "pos": 717
+      },
+      {
+        "name": "variableLikeSymbol:717:740",
+        "kind": 170,
+        "primary": true
+      }
+    ]
+  },
+  {
+    "name": "primaryRecovery",
+    "summary": "(value?: MissingPrimaryAnnotation) => MissingPrimaryAnnotation",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 863,
+        "kind": 170,
+        "pos": 797
+      },
+      {
+        "name": "variableLikeSymbol:797:863",
+        "kind": 170,
+        "primary": true
+      }
+    ]
+  },
+  {
+    "name": "primaryReportDisplay",
+    "summary": "(value?: { required: string; }) => { required: string; }",
+    "errorType": false,
+    "codes": [
+      2304,
+      2741
+    ],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 971,
+        "kind": 170,
+        "pos": 930
+      },
+      {
+        "name": "variableLikeEntry:2",
+        "end": 955,
+        "kind": 172,
+        "pos": 938
+      },
+      {
+        "name": "variableLikeSymbol:930:971",
+        "kind": 170,
+        "primary": true
+      },
+      {
+        "name": "variableLikeSymbol:938:955",
+        "kind": 172,
+        "primary": true
+      }
+    ]
+  },
+  {
+    "name": "recoveryThenLater",
+    "summary": "(first?: MissingFirstAnnotation, last?: MissingLastAnnotation) => MissingFirstAnnotation",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 1092,
+        "kind": 170,
+        "pos": 1032
+      },
+      {
+        "name": "variableLikeEntry:2",
+        "end": 1150,
+        "kind": 170,
+        "pos": 1093
+      },
+      {
+        "name": "variableLikeSymbol:1032:1092",
+        "kind": 170,
+        "primary": true
+      },
+      {
+        "name": "variableLikeSymbol:1093:1150",
+        "kind": 170,
+        "primary": true
+      }
+    ]
+  },
+  {
+    "name": "objectValid",
+    "summary": "({ value }?: { value: number; }) => number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 1242,
+        "kind": 170,
+        "pos": 1199
+      },
+      {
+        "name": "variableLikeEntry:2",
+        "end": 1225,
+        "kind": 172,
+        "pos": 1211
+      },
+      {
+        "name": "variableLikeEntry:3",
+        "end": 1206,
+        "kind": 209,
+        "pos": 1200
+      },
+      {
+        "name": "variableLikePattern:1199:1242",
+        "empty": false,
+        "initializer": true,
+        "kind": 207
+      },
+      {
+        "name": "variableLikeSymbol:1200:1206",
+        "kind": 209,
+        "primary": true
+      },
+      {
+        "name": "variableLikeSymbol:1211:1225",
+        "kind": 172,
+        "primary": true
+      }
+    ]
+  },
+  {
+    "name": "objectMismatch",
+    "summary": "({ value }?: { value: number; }) => number",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 1346,
+        "kind": 170,
+        "pos": 1297
+      },
+      {
+        "name": "variableLikeEntry:2",
+        "end": 1323,
+        "kind": 172,
+        "pos": 1309
+      },
+      {
+        "name": "variableLikeEntry:3",
+        "end": 1304,
+        "kind": 209,
+        "pos": 1298
+      },
+      {
+        "name": "variableLikePattern:1297:1346",
+        "empty": false,
+        "initializer": true,
+        "kind": 207
+      },
+      {
+        "name": "variableLikeSymbol:1298:1304",
+        "kind": 209,
+        "primary": true
+      },
+      {
+        "name": "variableLikeSymbol:1309:1323",
+        "kind": 172,
+        "primary": true
+      }
+    ]
+  },
+  {
+    "name": "nestedPattern",
+    "summary": "({ outer: { value } }?: { outer: { value?: number; }; }) => number",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 1478,
+        "kind": 170,
+        "pos": 1399
+      },
+      {
+        "name": "variableLikeEntry:2",
+        "end": 1460,
+        "kind": 172,
+        "pos": 1434
+      },
+      {
+        "name": "variableLikeEntry:3",
+        "end": 1458,
+        "kind": 172,
+        "pos": 1443
+      },
+      {
+        "name": "variableLikeEntry:4",
+        "end": 1429,
+        "kind": 209,
+        "pos": 1400
+      },
+      {
+        "name": "variableLikeEntry:5",
+        "end": 1427,
+        "kind": 209,
+        "pos": 1409
+      },
+      {
+        "name": "variableLikePattern:1399:1478",
+        "empty": false,
+        "initializer": true,
+        "kind": 207
+      },
+      {
+        "name": "variableLikePattern:1400:1429",
+        "empty": false,
+        "initializer": false,
+        "kind": 207
+      },
+      {
+        "name": "variableLikeSymbol:1409:1427",
+        "kind": 209,
+        "primary": true
+      },
+      {
+        "name": "variableLikeSymbol:1434:1460",
+        "kind": 172,
+        "primary": true
+      },
+      {
+        "name": "variableLikeSymbol:1443:1458",
+        "kind": 172,
+        "primary": true
+      }
+    ]
+  },
+  {
+    "name": "computedBinding",
+    "summary": "({ [fixedKey]: value }?: { value: number; }) => number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 1590,
+        "kind": 170,
+        "pos": 1535
+      },
+      {
+        "name": "variableLikeEntry:2",
+        "end": 1573,
+        "kind": 172,
+        "pos": 1559
+      },
+      {
+        "name": "variableLikeEntry:3",
+        "end": 1554,
+        "kind": 209,
+        "pos": 1536
+      },
+      {
+        "name": "variableLikePattern:1535:1590",
+        "empty": false,
+        "initializer": true,
+        "kind": 207
+      },
+      {
+        "name": "variableLikeSymbol:1536:1554",
+        "kind": 209,
+        "primary": true
+      },
+      {
+        "name": "variableLikeSymbol:1559:1573",
+        "kind": 172,
+        "primary": true
+      }
+    ]
+  },
+  {
+    "name": "computedRecovery",
+    "summary": "({ [computedBad]: value }?: any) => any",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 1683,
+        "kind": 170,
+        "pos": 1649
+      },
+      {
+        "name": "variableLikeEntry:2",
+        "end": 1671,
+        "kind": 209,
+        "pos": 1650
+      },
+      {
+        "name": "variableLikePattern:1649:1683",
+        "empty": false,
+        "initializer": true,
+        "kind": 207
+      },
+      {
+        "name": "variableLikeSymbol:1650:1671",
+        "kind": 209,
+        "primary": true
+      }
+    ]
+  },
+  {
+    "name": "emptyObject",
+    "summary": "({}?: object) => number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 1747,
+        "kind": 170,
+        "pos": 1732
+      },
+      {
+        "name": "variableLikePattern:1732:1747",
+        "empty": true,
+        "initializer": true,
+        "kind": 207
+      }
+    ]
+  },
+  {
+    "name": "emptyObjectNull",
+    "summary": "({}?: object) => number",
+    "errorType": false,
+    "codes": [
+      2531
+    ],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 1817,
+        "kind": 170,
+        "pos": 1800
+      },
+      {
+        "name": "variableLikePattern:1800:1817",
+        "empty": true,
+        "initializer": true,
+        "kind": 207
+      }
+    ]
+  },
+  {
+    "name": "emptyArray",
+    "summary": "([]?: []) => number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 1871,
+        "kind": 170,
+        "pos": 1860
+      },
+      {
+        "name": "variableLikePattern:1860:1871",
+        "empty": true,
+        "initializer": true,
+        "kind": 208
+      }
+    ]
+  },
+  {
+    "name": "omittedArray",
+    "summary": "([,]?: [number]) => number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 1937,
+        "kind": 170,
+        "pos": 1918
+      },
+      {
+        "name": "variableLikeEntry:2",
+        "end": 1919,
+        "kind": 209,
+        "pos": 1919
+      },
+      {
+        "name": "variableLikePattern:1918:1937",
+        "empty": true,
+        "initializer": true,
+        "kind": 208
+      }
+    ]
+  },
+  {
+    "name": "restIdentifier",
+    "summary": "(...values: number[]) => number[]",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 2007,
+        "kind": 170,
+        "pos": 1988
+      },
+      {
+        "name": "variableLikeSymbol:1988:2007",
+        "kind": 170,
+        "primary": true
+      }
+    ]
+  },
+  {
+    "name": "restPattern",
+    "summary": "(value: number) => number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 2077,
+        "kind": 170,
+        "pos": 2057
+      },
+      {
+        "name": "variableLikeEntry:2",
+        "end": 2066,
+        "kind": 209,
+        "pos": 2061
+      },
+      {
+        "name": "variableLikePattern:2057:2077",
+        "empty": false,
+        "initializer": false,
+        "kind": 208
+      },
+      {
+        "name": "variableLikeSymbol:2061:2066",
+        "kind": 209,
+        "primary": true
+      }
+    ]
+  },
+  {
+    "name": "bodylessSkip",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2347,
+      2371
+    ],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeBodyless:2136:2177",
+        "bodyless": true
+      },
+      {
+        "name": "variableLikeEntry:1",
+        "end": 2177,
+        "kind": 170,
+        "pos": 2136
+      }
+    ]
+  },
+  {
+    "name": "bodylessPatternSkip",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2347,
+      2371,
+      2304
+    ],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeBodyless:2252:2315",
+        "bodyless": true
+      },
+      {
+        "name": "variableLikeEntry:1",
+        "end": 2315,
+        "kind": 170,
+        "pos": 2252
+      },
+      {
+        "name": "variableLikeEntry:2",
+        "end": 2278,
+        "kind": 172,
+        "pos": 2264
+      },
+      {
+        "name": "variableLikeEntry:3",
+        "end": 2259,
+        "kind": 209,
+        "pos": 2253
+      },
+      {
+        "name": "variableLikeSymbol:2253:2259",
+        "kind": 209,
+        "primary": true
+      },
+      {
+        "name": "variableLikeSymbol:2264:2278",
+        "kind": 172,
+        "primary": true
+      }
+    ]
+  },
+  {
+    "name": "bodylessRenamed",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2347
+    ],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 2419,
+        "kind": 170,
+        "pos": 2382
+      },
+      {
+        "name": "variableLikeEntry:2",
+        "end": 2417,
+        "kind": 172,
+        "pos": 2403
+      },
+      {
+        "name": "variableLikeEntry:3",
+        "end": 2398,
+        "kind": 209,
+        "pos": 2383
+      },
+      {
+        "name": "variableLikePattern:2382:2419",
+        "empty": false,
+        "initializer": false,
+        "kind": 207
+      },
+      {
+        "name": "variableLikeSymbol:2403:2417",
+        "kind": 172,
+        "primary": true
+      }
+    ]
+  },
+  {
+    "name": "bodylessAnnotation",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2347,
+      2371,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeBodyless:2492:2567",
+        "bodyless": true
+      },
+      {
+        "name": "variableLikeEntry:1",
+        "end": 2567,
+        "kind": 170,
+        "pos": 2492
+      }
+    ]
+  },
+  {
+    "name": "literalMembers",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2347,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 2715,
+        "kind": 172,
+        "pos": 2668
+      },
+      {
+        "name": "variableLikeEntry:2",
+        "end": 2758,
+        "kind": 172,
+        "pos": 2715
+      },
+      {
+        "name": "variableLikeSymbol:2668:2715",
+        "kind": 172,
+        "primary": true
+      },
+      {
+        "name": "variableLikeSymbol:2715:2758",
+        "kind": 172,
+        "primary": true
+      }
+    ]
+  },
+  {
+    "name": "secondaryMismatch",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2347,
+      2300,
+      2300,
+      2717
+    ],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 2837,
+        "kind": 172,
+        "pos": 2822
+      },
+      {
+        "name": "variableLikeEntry:2",
+        "end": 2851,
+        "kind": 172,
+        "pos": 2837
+      },
+      {
+        "name": "variableLikeSymbol:2822:2837",
+        "kind": 172,
+        "primary": true
+      },
+      {
+        "name": "variableLikeSymbol:2837:2851",
+        "kind": 172,
+        "primary": false
+      }
+    ]
+  },
+  {
+    "name": "secondaryDisplay",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2300,
+      2300,
+      2717
+    ],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 2942,
+        "kind": 172,
+        "pos": 2913
+      },
+      {
+        "name": "variableLikeEntry:2",
+        "end": 2970,
+        "kind": 172,
+        "pos": 2942
+      },
+      {
+        "name": "variableLikeEntry:3",
+        "end": 2968,
+        "kind": 172,
+        "pos": 2951
+      },
+      {
+        "name": "variableLikeSymbol:2913:2942",
+        "kind": 172,
+        "primary": true
+      },
+      {
+        "name": "variableLikeSymbol:2942:2970",
+        "kind": 172,
+        "primary": false
+      },
+      {
+        "name": "variableLikeSymbol:2951:2968",
+        "kind": 172,
+        "primary": true
+      }
+    ]
+  },
+  {
+    "name": "quickControl",
+    "summary": "\"quick\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "checks": []
+  },
+  {
+    "name": "healthyAfter",
+    "summary": "(value?: number) => number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "checks": [
+      {
+        "name": "variableLikeEntry:1",
+        "end": 3192,
+        "kind": 170,
+        "pos": 3183
+      },
+      {
+        "name": "variableLikeSymbol:3183:3192",
+        "kind": 170,
+        "primary": true
+      }
+    ]
+  }
+]

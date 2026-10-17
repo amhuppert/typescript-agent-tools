@@ -1,0 +1,10 @@
+import { Point as /*#pointValue*/PointValue, Code as /*#codeValue*/CodeValue, Preferred as /*#preferredValue*/PreferredValue } from "./factory.cjs";
+import type { Point as /*#pointDeclared*/PointDeclared, Code as /*#codeDeclared*/CodeDeclared } from "./factory.cjs";
+import { Both as /*#bothValue*/BothValue } from "./namespace.cjs";
+import type { Both as /*#bothDeclared*/BothDeclared } from "./namespace.cjs";
+declare const /*#pointRead*/point: PointDeclared;
+declare const /*#codeRead*/code: CodeDeclared;
+declare const /*#bothRead*/both: BothDeclared;
+point./*#pointMember*/x;
+code./*#codeMember*/code;
+both./*#bothMember*/valueTag;

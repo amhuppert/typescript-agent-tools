@@ -1,0 +1,21 @@
+export declare function identity<T>(value: T): T;
+export declare function constrained<T extends string>(value: T): T;
+export declare function literalConstraint<T extends "ready">(value: T): T;
+export declare function defaulted<T = number>(): T;
+export declare function dependent<T, U = T>(value: T): U;
+export declare function related<T, U extends T>(value: U): U;
+export declare function unionConstraint<T extends string | number>(value: T): T;
+export declare function unknownConstraint<T extends unknown>(value: T): T;
+export declare function brokenDefault<T = MissingDefault>(value: T): T;
+export declare function brokenConstraint<T extends MissingConstraint>(value: T): T;
+export declare function brokenDependent<T, U = MissingDefault>(value: T): U;
+export declare function forwardDefault<T, U = V, V = string>(value: T): U;
+export declare function candidates<T extends string>(value: T): "generic";
+export declare function candidates<T extends number>(value: T): "number";
+export declare function skippedConstraint<T extends MissingConstraint>(first: T, second: T): "bad";
+export declare function skippedConstraint<T>(first: T): T;
+export declare function pair<T>(left: T, right: T): T;
+export declare function unused<T>(): T;
+
+export declare function omitted<T, U extends MissingConstraint = number>(value: T): U;
+export declare function defaultBeforeConstraint<T extends string, U = MissingDefault>(value: T): U;

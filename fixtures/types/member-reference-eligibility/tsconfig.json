@@ -1,0 +1,1 @@
+{"compilerOptions":{"strict":true,"noLib":true,"module":"commonjs"},"files":["globals.d.ts","cases.ts","exported.ts"]}

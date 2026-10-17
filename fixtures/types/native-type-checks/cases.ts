@@ -1,0 +1,32 @@
+type Box<T extends number> = T;
+type Hidden<T extends MissingConstraint> = number;
+type Later<A extends number, B extends MissingLaterConstraint> = number;
+interface HiddenObject { value: MissingSkippedRelation; }
+interface Provided { value: boolean; }
+type Skip<A extends number, B extends HiddenObject> = number;
+type Phantom<T> = number;
+declare const numeric: number;
+const /*#valid*/valid = 1 as Box<1>;
+const /*#rejected*/rejected = "bad" as Box<string>;
+const /*#hidden*/hidden = 1 as Hidden<1>;
+const /*#later*/later = 1 as Later<string, boolean>;
+const /*#skipped*/skipped = 1 as Skip<string, Provided>;
+const /*#argument*/argument = 1 as Phantom<MissingArgument>;
+const /*#query*/query = 1 as typeof numeric;
+const /*#satisfied*/satisfied = 1 satisfies Box<number>;
+const /*#satisfiesHidden*/satisfiesHidden = 1 satisfies Hidden<1>;
+const /*#named*/named = [1] as [value: Box<1>];
+const /*#indexed*/indexed = 1 as [1, 2][0];
+const /*#angle*/angle = <Box<1>>1;
+const /*#assertionOrder*/assertionOrder = MissingAssertionOperand as Hidden<1>;
+const /*#satisfiesOrder*/satisfiesOrder = MissingSatisfiesOperand satisfies Hidden<1>;
+const /*#checkedRejected*/checkedRejected = ("bad" as Box<string>) satisfies string;
+const /*#checkedHidden*/checkedHidden = (1 as Hidden<1>) satisfies number;
+const /*#checkedLater*/checkedLater = (1 as Later<string, boolean>) satisfies number;
+const /*#checkedSkipped*/checkedSkipped = (1 as Skip<string, Provided>) satisfies number;
+const /*#checkedAssertionOrder*/checkedAssertionOrder = (MissingCheckedOperand as Hidden<1>) satisfies number;
+const /*#checkedAngle*/checkedAngle = (<Hidden<1>>1) satisfies number;
+declare const callback: (value: number) => string;
+const /*#checkedFunction*/checkedFunction = (callback as (value: number) => string) satisfies (value: number) => string;
+const /*#checkedMissingFunction*/checkedMissingFunction = (1 as (value: MissingParameter) => number) satisfies unknown;
+const /*#checkedMissingConstructor*/checkedMissingConstructor = (1 as new (value: MissingConstructorParameter) => object) satisfies unknown;

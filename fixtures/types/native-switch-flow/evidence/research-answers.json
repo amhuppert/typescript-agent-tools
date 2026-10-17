@@ -1,0 +1,4646 @@
+[
+  {
+    "config": "strict.json",
+    "marker": "unrelated-case",
+    "request": {
+      "file": "cases.ts",
+      "line": 5,
+      "column": 51
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 5,
+          "column": 51
+        },
+        "end": {
+          "line": 5,
+          "column": 56
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 4,
+              "column": 8
+            },
+            "end": {
+              "line": 4,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "unrelated-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 5,
+      "column": 97
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 5,
+          "column": 97
+        },
+        "end": {
+          "line": 5,
+          "column": 102
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 4,
+              "column": 8
+            },
+            "end": {
+              "line": 4,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "unrelated-after",
+    "request": {
+      "file": "cases.ts",
+      "line": 6,
+      "column": 23
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 6,
+          "column": 23
+        },
+        "end": {
+          "line": 6,
+          "column": 28
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 4,
+              "column": 8
+            },
+            "end": {
+              "line": 4,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "direct-case",
+    "request": {
+      "file": "cases.ts",
+      "line": 10,
+      "column": 43
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 10,
+          "column": 43
+        },
+        "end": {
+          "line": 10,
+          "column": 48
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "1",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 9,
+              "column": 8
+            },
+            "end": {
+              "line": 9,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "direct-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 10,
+      "column": 86
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 10,
+          "column": 86
+        },
+        "end": {
+          "line": 10,
+          "column": 91
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 9,
+              "column": 8
+            },
+            "end": {
+              "line": 9,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "direct-after",
+    "request": {
+      "file": "cases.ts",
+      "line": 11,
+      "column": 20
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 11,
+          "column": 20
+        },
+        "end": {
+          "line": 11,
+          "column": 25
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 9,
+              "column": 8
+            },
+            "end": {
+              "line": 9,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "typeof-number",
+    "request": {
+      "file": "cases.ts",
+      "line": 15,
+      "column": 59
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 15,
+          "column": 59
+        },
+        "end": {
+          "line": 15,
+          "column": 64
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 14,
+              "column": 8
+            },
+            "end": {
+              "line": 14,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "typeof-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 15,
+      "column": 102
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 15,
+          "column": 102
+        },
+        "end": {
+          "line": 15,
+          "column": 107
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 14,
+              "column": 8
+            },
+            "end": {
+              "line": 14,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "typeof-after",
+    "request": {
+      "file": "cases.ts",
+      "line": 16,
+      "column": 20
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 16,
+          "column": 20
+        },
+        "end": {
+          "line": 16,
+          "column": 25
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 14,
+              "column": 8
+            },
+            "end": {
+              "line": 14,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "duplicate-first",
+    "request": {
+      "file": "cases.ts",
+      "line": 20,
+      "column": 61
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 20,
+          "column": 61
+        },
+        "end": {
+          "line": 20,
+          "column": 66
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 19,
+              "column": 8
+            },
+            "end": {
+              "line": 19,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "duplicate-second",
+    "request": {
+      "file": "cases.ts",
+      "line": 20,
+      "column": 112
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 20,
+          "column": 112
+        },
+        "end": {
+          "line": 20,
+          "column": 117
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 19,
+              "column": 8
+            },
+            "end": {
+              "line": 19,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "duplicate-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 20,
+      "column": 158
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 20,
+          "column": 158
+        },
+        "end": {
+          "line": 20,
+          "column": 163
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 19,
+              "column": 8
+            },
+            "end": {
+              "line": 19,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "nil-string",
+    "request": {
+      "file": "cases.ts",
+      "line": 24,
+      "column": 56
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 24,
+          "column": 56
+        },
+        "end": {
+          "line": 24,
+          "column": 61
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 23,
+              "column": 8
+            },
+            "end": {
+              "line": 23,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "nil-missing",
+    "request": {
+      "file": "cases.ts",
+      "line": 24,
+      "column": 101
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 24,
+          "column": 101
+        },
+        "end": {
+          "line": 24,
+          "column": 106
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 23,
+              "column": 8
+            },
+            "end": {
+              "line": 23,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "nil-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 24,
+      "column": 141
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 24,
+          "column": 141
+        },
+        "end": {
+          "line": 24,
+          "column": 146
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 23,
+              "column": 8
+            },
+            "end": {
+              "line": 23,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "nil-after",
+    "request": {
+      "file": "cases.ts",
+      "line": 25,
+      "column": 17
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 25,
+          "column": 17
+        },
+        "end": {
+          "line": 25,
+          "column": 22
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 23,
+              "column": 8
+            },
+            "end": {
+              "line": 23,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "host-case",
+    "request": {
+      "file": "cases.ts",
+      "line": 29,
+      "column": 59
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 29,
+          "column": 59
+        },
+        "end": {
+          "line": 29,
+          "column": 64
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 28,
+              "column": 8
+            },
+            "end": {
+              "line": 28,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "host-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 29,
+      "column": 100
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 29,
+          "column": 100
+        },
+        "end": {
+          "line": 29,
+          "column": 105
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 28,
+              "column": 8
+            },
+            "end": {
+              "line": 28,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "grouped-types",
+    "request": {
+      "file": "cases.ts",
+      "line": 33,
+      "column": 74
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 33,
+          "column": 74
+        },
+        "end": {
+          "line": 33,
+          "column": 79
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 32,
+              "column": 8
+            },
+            "end": {
+              "line": 32,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "grouped-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 33,
+      "column": 118
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 33,
+          "column": 118
+        },
+        "end": {
+          "line": 33,
+          "column": 123
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 32,
+              "column": 8
+            },
+            "end": {
+              "line": 32,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "default-grouped-number",
+    "request": {
+      "file": "cases.ts",
+      "line": 37,
+      "column": 77
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 37,
+          "column": 77
+        },
+        "end": {
+          "line": 37,
+          "column": 82
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 36,
+              "column": 8
+            },
+            "end": {
+              "line": 36,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "default-later-string",
+    "request": {
+      "file": "cases.ts",
+      "line": 37,
+      "column": 132
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 37,
+          "column": 132
+        },
+        "end": {
+          "line": 37,
+          "column": 137
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 36,
+              "column": 8
+            },
+            "end": {
+              "line": 36,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "fallthrough-string",
+    "request": {
+      "file": "cases.ts",
+      "line": 41,
+      "column": 64
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 41,
+          "column": 64
+        },
+        "end": {
+          "line": 41,
+          "column": 69
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 40,
+              "column": 8
+            },
+            "end": {
+              "line": 40,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "fallthrough-number",
+    "request": {
+      "file": "cases.ts",
+      "line": 41,
+      "column": 110
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 41,
+          "column": 110
+        },
+        "end": {
+          "line": 41,
+          "column": 115
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 40,
+              "column": 8
+            },
+            "end": {
+              "line": 40,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "fallthrough-after",
+    "request": {
+      "file": "cases.ts",
+      "line": 42,
+      "column": 25
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 42,
+          "column": 25
+        },
+        "end": {
+          "line": 42,
+          "column": 30
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 40,
+              "column": 8
+            },
+            "end": {
+              "line": 40,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "exhaustive-function",
+    "request": {
+      "file": "cases.ts",
+      "line": 44,
+      "column": 42
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "value",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 44,
+          "column": 42
+        },
+        "end": {
+          "line": 44,
+          "column": 52
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "() => 1 | 2",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "FunctionDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 44,
+              "column": 42
+            },
+            "end": {
+              "line": 44,
+              "column": 52
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "incomplete-function",
+    "request": {
+      "file": "cases.ts",
+      "line": 45,
+      "column": 42
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "value",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 45,
+          "column": 42
+        },
+        "end": {
+          "line": 45,
+          "column": 52
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "() => 1 | undefined",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "FunctionDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 45,
+              "column": 42
+            },
+            "end": {
+              "line": 45,
+              "column": 52
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "nil-function",
+    "request": {
+      "file": "cases.ts",
+      "line": 46,
+      "column": 35
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "value",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 46,
+          "column": 35
+        },
+        "end": {
+          "line": 46,
+          "column": 46
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "() => 1 | 2 | undefined",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "FunctionDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 46,
+              "column": 35
+            },
+            "end": {
+              "line": 46,
+              "column": 46
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "true-function",
+    "request": {
+      "file": "cases.ts",
+      "line": 47,
+      "column": 36
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "value",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 47,
+          "column": 36
+        },
+        "end": {
+          "line": 47,
+          "column": 48
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "() => 1 | 2",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "FunctionDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 47,
+              "column": 36
+            },
+            "end": {
+              "line": 47,
+              "column": 48
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "unpaired-case",
+    "request": {
+      "file": "cases.ts",
+      "line": 51,
+      "column": 52
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 51,
+          "column": 52
+        },
+        "end": {
+          "line": 51,
+          "column": 57
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "\"\\uD800\"",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 50,
+              "column": 8
+            },
+            "end": {
+              "line": 50,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "unpaired-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 51,
+      "column": 97
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 51,
+          "column": 97
+        },
+        "end": {
+          "line": 51,
+          "column": 102
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "string",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 50,
+              "column": 8
+            },
+            "end": {
+              "line": 50,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "unpaired-witness",
+    "request": {
+      "file": "cases.ts",
+      "line": 55,
+      "column": 62
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 55,
+          "column": 62
+        },
+        "end": {
+          "line": 55,
+          "column": 67
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 54,
+              "column": 8
+            },
+            "end": {
+              "line": 54,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "unpaired-witness-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 55,
+      "column": 115
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 55,
+          "column": 115
+        },
+        "end": {
+          "line": 55,
+          "column": 120
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 54,
+              "column": 8
+            },
+            "end": {
+              "line": 54,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "escaped-witness-number",
+    "request": {
+      "file": "cases.ts",
+      "line": 60,
+      "column": 73
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 60,
+          "column": 73
+        },
+        "end": {
+          "line": 60,
+          "column": 78
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 59,
+              "column": 8
+            },
+            "end": {
+              "line": 59,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "template-witness-string",
+    "request": {
+      "file": "cases.ts",
+      "line": 60,
+      "column": 131
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 60,
+          "column": 131
+        },
+        "end": {
+          "line": 60,
+          "column": 136
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 59,
+              "column": 8
+            },
+            "end": {
+              "line": 59,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "escaped-witness-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 60,
+      "column": 183
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 60,
+          "column": 183
+        },
+        "end": {
+          "line": 60,
+          "column": 188
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 59,
+              "column": 8
+            },
+            "end": {
+              "line": 59,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "parenthesized-witness-string",
+    "request": {
+      "file": "cases.ts",
+      "line": 64,
+      "column": 76
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 64,
+          "column": 76
+        },
+        "end": {
+          "line": 64,
+          "column": 81
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 63,
+              "column": 8
+            },
+            "end": {
+              "line": 63,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "parenthesized-witness-number",
+    "request": {
+      "file": "cases.ts",
+      "line": 64,
+      "column": 139
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 64,
+          "column": 139
+        },
+        "end": {
+          "line": 64,
+          "column": 144
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 63,
+              "column": 8
+            },
+            "end": {
+              "line": 63,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "parenthesized-witness-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 64,
+      "column": 197
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 64,
+          "column": 197
+        },
+        "end": {
+          "line": 64,
+          "column": 202
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 63,
+              "column": 8
+            },
+            "end": {
+              "line": 63,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "empty-witness-case",
+    "request": {
+      "file": "cases.ts",
+      "line": 68,
+      "column": 58
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 68,
+          "column": 58
+        },
+        "end": {
+          "line": 68,
+          "column": 63
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 67,
+              "column": 8
+            },
+            "end": {
+              "line": 67,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "empty-witness-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 68,
+      "column": 108
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 68,
+          "column": 108
+        },
+        "end": {
+          "line": 68,
+          "column": 113
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 67,
+              "column": 8
+            },
+            "end": {
+              "line": 67,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "all-typeof-function",
+    "request": {
+      "file": "cases.ts",
+      "line": 70,
+      "column": 42
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "value",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 70,
+          "column": 42
+        },
+        "end": {
+          "line": 70,
+          "column": 51
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "(value: any) => 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "FunctionDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 70,
+              "column": 42
+            },
+            "end": {
+              "line": 70,
+              "column": 51
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "incomplete-typeof-function",
+    "request": {
+      "file": "cases.ts",
+      "line": 73,
+      "column": 49
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "value",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 73,
+          "column": 49
+        },
+        "end": {
+          "line": 73,
+          "column": 65
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "(value: any) => 1 | 2 | 3 | 4 | 5 | 6 | 7 | undefined",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "FunctionDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 73,
+              "column": 49
+            },
+            "end": {
+              "line": 73,
+              "column": 65
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/strict.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "unrelated-case",
+    "request": {
+      "file": "cases.ts",
+      "line": 5,
+      "column": 51
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 5,
+          "column": 51
+        },
+        "end": {
+          "line": 5,
+          "column": 56
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 4,
+              "column": 8
+            },
+            "end": {
+              "line": 4,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "unrelated-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 5,
+      "column": 97
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 5,
+          "column": 97
+        },
+        "end": {
+          "line": 5,
+          "column": 102
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 4,
+              "column": 8
+            },
+            "end": {
+              "line": 4,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "unrelated-after",
+    "request": {
+      "file": "cases.ts",
+      "line": 6,
+      "column": 23
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 6,
+          "column": 23
+        },
+        "end": {
+          "line": 6,
+          "column": 28
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 4,
+              "column": 8
+            },
+            "end": {
+              "line": 4,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "direct-case",
+    "request": {
+      "file": "cases.ts",
+      "line": 10,
+      "column": 43
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 10,
+          "column": 43
+        },
+        "end": {
+          "line": 10,
+          "column": 48
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "1",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 9,
+              "column": 8
+            },
+            "end": {
+              "line": 9,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "direct-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 10,
+      "column": 86
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 10,
+          "column": 86
+        },
+        "end": {
+          "line": 10,
+          "column": 91
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 9,
+              "column": 8
+            },
+            "end": {
+              "line": 9,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "direct-after",
+    "request": {
+      "file": "cases.ts",
+      "line": 11,
+      "column": 20
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 11,
+          "column": 20
+        },
+        "end": {
+          "line": 11,
+          "column": 25
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 9,
+              "column": 8
+            },
+            "end": {
+              "line": 9,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "typeof-number",
+    "request": {
+      "file": "cases.ts",
+      "line": 15,
+      "column": 59
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 15,
+          "column": 59
+        },
+        "end": {
+          "line": 15,
+          "column": 64
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 14,
+              "column": 8
+            },
+            "end": {
+              "line": 14,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "typeof-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 15,
+      "column": 102
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 15,
+          "column": 102
+        },
+        "end": {
+          "line": 15,
+          "column": 107
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 14,
+              "column": 8
+            },
+            "end": {
+              "line": 14,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "typeof-after",
+    "request": {
+      "file": "cases.ts",
+      "line": 16,
+      "column": 20
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 16,
+          "column": 20
+        },
+        "end": {
+          "line": 16,
+          "column": 25
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 14,
+              "column": 8
+            },
+            "end": {
+              "line": 14,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "duplicate-first",
+    "request": {
+      "file": "cases.ts",
+      "line": 20,
+      "column": 61
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 20,
+          "column": 61
+        },
+        "end": {
+          "line": 20,
+          "column": 66
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 19,
+              "column": 8
+            },
+            "end": {
+              "line": 19,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "duplicate-second",
+    "request": {
+      "file": "cases.ts",
+      "line": 20,
+      "column": 112
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 20,
+          "column": 112
+        },
+        "end": {
+          "line": 20,
+          "column": 117
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 19,
+              "column": 8
+            },
+            "end": {
+              "line": 19,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "duplicate-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 20,
+      "column": 158
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 20,
+          "column": 158
+        },
+        "end": {
+          "line": 20,
+          "column": 163
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 19,
+              "column": 8
+            },
+            "end": {
+              "line": 19,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "nil-string",
+    "request": {
+      "file": "cases.ts",
+      "line": 24,
+      "column": 56
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 24,
+          "column": 56
+        },
+        "end": {
+          "line": 24,
+          "column": 61
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 23,
+              "column": 8
+            },
+            "end": {
+              "line": 23,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "nil-missing",
+    "request": {
+      "file": "cases.ts",
+      "line": 24,
+      "column": 101
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 24,
+          "column": 101
+        },
+        "end": {
+          "line": 24,
+          "column": 106
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 23,
+              "column": 8
+            },
+            "end": {
+              "line": 23,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "nil-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 24,
+      "column": 141
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 24,
+          "column": 141
+        },
+        "end": {
+          "line": 24,
+          "column": 146
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 23,
+              "column": 8
+            },
+            "end": {
+              "line": 23,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "nil-after",
+    "request": {
+      "file": "cases.ts",
+      "line": 25,
+      "column": 17
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 25,
+          "column": 17
+        },
+        "end": {
+          "line": 25,
+          "column": 22
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 23,
+              "column": 8
+            },
+            "end": {
+              "line": 23,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "host-case",
+    "request": {
+      "file": "cases.ts",
+      "line": 29,
+      "column": 59
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 29,
+          "column": 59
+        },
+        "end": {
+          "line": 29,
+          "column": 64
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 28,
+              "column": 8
+            },
+            "end": {
+              "line": 28,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "host-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 29,
+      "column": 100
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 29,
+          "column": 100
+        },
+        "end": {
+          "line": 29,
+          "column": 105
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 28,
+              "column": 8
+            },
+            "end": {
+              "line": 28,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "grouped-types",
+    "request": {
+      "file": "cases.ts",
+      "line": 33,
+      "column": 74
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 33,
+          "column": 74
+        },
+        "end": {
+          "line": 33,
+          "column": 79
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 32,
+              "column": 8
+            },
+            "end": {
+              "line": 32,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "grouped-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 33,
+      "column": 118
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 33,
+          "column": 118
+        },
+        "end": {
+          "line": 33,
+          "column": 123
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 32,
+              "column": 8
+            },
+            "end": {
+              "line": 32,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "default-grouped-number",
+    "request": {
+      "file": "cases.ts",
+      "line": 37,
+      "column": 77
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 37,
+          "column": 77
+        },
+        "end": {
+          "line": 37,
+          "column": 82
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 36,
+              "column": 8
+            },
+            "end": {
+              "line": 36,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "default-later-string",
+    "request": {
+      "file": "cases.ts",
+      "line": 37,
+      "column": 132
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 37,
+          "column": 132
+        },
+        "end": {
+          "line": 37,
+          "column": 137
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 36,
+              "column": 8
+            },
+            "end": {
+              "line": 36,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "fallthrough-string",
+    "request": {
+      "file": "cases.ts",
+      "line": 41,
+      "column": 64
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 41,
+          "column": 64
+        },
+        "end": {
+          "line": 41,
+          "column": 69
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 40,
+              "column": 8
+            },
+            "end": {
+              "line": 40,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "fallthrough-number",
+    "request": {
+      "file": "cases.ts",
+      "line": 41,
+      "column": 110
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 41,
+          "column": 110
+        },
+        "end": {
+          "line": 41,
+          "column": 115
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 40,
+              "column": 8
+            },
+            "end": {
+              "line": 40,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "fallthrough-after",
+    "request": {
+      "file": "cases.ts",
+      "line": 42,
+      "column": 25
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 42,
+          "column": 25
+        },
+        "end": {
+          "line": 42,
+          "column": 30
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 40,
+              "column": 8
+            },
+            "end": {
+              "line": 40,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "exhaustive-function",
+    "request": {
+      "file": "cases.ts",
+      "line": 44,
+      "column": 42
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "value",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 44,
+          "column": 42
+        },
+        "end": {
+          "line": 44,
+          "column": 52
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "() => 1 | 2",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "FunctionDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 44,
+              "column": 42
+            },
+            "end": {
+              "line": 44,
+              "column": 52
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "incomplete-function",
+    "request": {
+      "file": "cases.ts",
+      "line": 45,
+      "column": 42
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "value",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 45,
+          "column": 42
+        },
+        "end": {
+          "line": 45,
+          "column": 52
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "() => number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "FunctionDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 45,
+              "column": 42
+            },
+            "end": {
+              "line": 45,
+              "column": 52
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "nil-function",
+    "request": {
+      "file": "cases.ts",
+      "line": 46,
+      "column": 35
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "value",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 46,
+          "column": 35
+        },
+        "end": {
+          "line": 46,
+          "column": 46
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "() => 1 | 2",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "FunctionDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 46,
+              "column": 35
+            },
+            "end": {
+              "line": 46,
+              "column": 46
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "true-function",
+    "request": {
+      "file": "cases.ts",
+      "line": 47,
+      "column": 36
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "value",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 47,
+          "column": 36
+        },
+        "end": {
+          "line": 47,
+          "column": 48
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "() => 1 | 2",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "FunctionDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 47,
+              "column": 36
+            },
+            "end": {
+              "line": 47,
+              "column": 48
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "unpaired-case",
+    "request": {
+      "file": "cases.ts",
+      "line": 51,
+      "column": 52
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 51,
+          "column": 52
+        },
+        "end": {
+          "line": 51,
+          "column": 57
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "\"\\uD800\"",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 50,
+              "column": 8
+            },
+            "end": {
+              "line": 50,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "unpaired-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 51,
+      "column": 97
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 51,
+          "column": 97
+        },
+        "end": {
+          "line": 51,
+          "column": 102
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "string",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 50,
+              "column": 8
+            },
+            "end": {
+              "line": 50,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "unpaired-witness",
+    "request": {
+      "file": "cases.ts",
+      "line": 55,
+      "column": 62
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 55,
+          "column": 62
+        },
+        "end": {
+          "line": 55,
+          "column": 67
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 54,
+              "column": 8
+            },
+            "end": {
+              "line": 54,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "unpaired-witness-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 55,
+      "column": 115
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 55,
+          "column": 115
+        },
+        "end": {
+          "line": 55,
+          "column": 120
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 54,
+              "column": 8
+            },
+            "end": {
+              "line": 54,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "escaped-witness-number",
+    "request": {
+      "file": "cases.ts",
+      "line": 60,
+      "column": 73
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 60,
+          "column": 73
+        },
+        "end": {
+          "line": 60,
+          "column": 78
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 59,
+              "column": 8
+            },
+            "end": {
+              "line": 59,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "template-witness-string",
+    "request": {
+      "file": "cases.ts",
+      "line": 60,
+      "column": 131
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 60,
+          "column": 131
+        },
+        "end": {
+          "line": 60,
+          "column": 136
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 59,
+              "column": 8
+            },
+            "end": {
+              "line": 59,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "escaped-witness-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 60,
+      "column": 183
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 60,
+          "column": 183
+        },
+        "end": {
+          "line": 60,
+          "column": 188
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 59,
+              "column": 8
+            },
+            "end": {
+              "line": 59,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "parenthesized-witness-string",
+    "request": {
+      "file": "cases.ts",
+      "line": 64,
+      "column": 76
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 64,
+          "column": 76
+        },
+        "end": {
+          "line": 64,
+          "column": 81
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 63,
+              "column": 8
+            },
+            "end": {
+              "line": 63,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "parenthesized-witness-number",
+    "request": {
+      "file": "cases.ts",
+      "line": 64,
+      "column": 139
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 64,
+          "column": 139
+        },
+        "end": {
+          "line": 64,
+          "column": 144
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 63,
+              "column": 8
+            },
+            "end": {
+              "line": 63,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "parenthesized-witness-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 64,
+      "column": 197
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 64,
+          "column": 197
+        },
+        "end": {
+          "line": 64,
+          "column": 202
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 63,
+              "column": 8
+            },
+            "end": {
+              "line": 63,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "empty-witness-case",
+    "request": {
+      "file": "cases.ts",
+      "line": 68,
+      "column": 58
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 68,
+          "column": 58
+        },
+        "end": {
+          "line": 68,
+          "column": 63
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "never",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 67,
+              "column": 8
+            },
+            "end": {
+              "line": 67,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "empty-witness-default",
+    "request": {
+      "file": "cases.ts",
+      "line": 68,
+      "column": 108
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 68,
+          "column": 108
+        },
+        "end": {
+          "line": 68,
+          "column": 113
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 67,
+              "column": 8
+            },
+            "end": {
+              "line": 67,
+              "column": 13
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "all-typeof-function",
+    "request": {
+      "file": "cases.ts",
+      "line": 70,
+      "column": 42
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "value",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 70,
+          "column": 42
+        },
+        "end": {
+          "line": 70,
+          "column": 51
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "(value: any) => 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "FunctionDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 70,
+              "column": 42
+            },
+            "end": {
+              "line": 70,
+              "column": 51
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "incomplete-typeof-function",
+    "request": {
+      "file": "cases.ts",
+      "line": 73,
+      "column": 49
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "value",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 73,
+          "column": 49
+        },
+        "end": {
+          "line": 73,
+          "column": 65
+        }
+      },
+      "sourceHash": "faf32f0c334508a3914056aa19aaa65a7d482e4f84973e0952608e807633d992",
+      "summary": "(value: any) => 1 | 2 | 3 | 4 | 5 | 6 | 7",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "FunctionDeclaration",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 73,
+              "column": 49
+            },
+            "end": {
+              "line": 73,
+              "column": 65
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-switch-research/loose.json"
+      }
+    }
+  }
+]

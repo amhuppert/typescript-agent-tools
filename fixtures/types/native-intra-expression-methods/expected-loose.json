@@ -1,0 +1,81 @@
+[
+  {
+    "name": "method",
+    "summary": "\"method\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "arrow",
+    "summary": "\"arrow\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "function",
+    "summary": "\"function\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "computed",
+    "summary": "\"computed\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "numeric",
+    "summary": "\"numeric\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "symbol",
+    "summary": "\"symbol\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "annotated",
+    "summary": "\"annotated\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "consumerFirst",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "mixed",
+    "summary": "\"mixed\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "missing",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "healthyAfter",
+    "summary": "\"healthy\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  }
+]

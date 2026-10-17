@@ -1,0 +1,154 @@
+[
+  {
+    "name": "ordinary",
+    "summary": "{ number: number; text: string; flag: boolean; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "shorthand",
+    "summary": "{ numberValue: number; stringValue: string; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "constShorthand",
+    "summary": "{ readonly numberValue: number; readonly literalKey: \"renamed\"; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "computedLiteral",
+    "summary": "{ renamed: number; 2: string; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "computedString",
+    "summary": "{ [x: string]: string | number; explicit: string; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "computedNumber",
+    "summary": "{ [x: number]: string; explicit: boolean; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "computedSymbol",
+    "summary": "{ [x: symbol]: number; explicit: boolean; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "plainMethod",
+    "summary": "{ method(value: string): string; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "getter",
+    "summary": "{ readonly value: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "setterOnly",
+    "summary": "{ value: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "accessor",
+    "summary": "{ value: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "spreadSetter",
+    "summary": "{ value: undefined; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "spreadOverwrite",
+    "summary": "{ x: string; y: boolean; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "spreadOptional",
+    "summary": "{ optional?: string | undefined; fixed: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "spreadNullable",
+    "summary": "{ present?: string | undefined; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "spreadConst",
+    "summary": "{ readonly number: number; readonly text: string; readonly flag: boolean; readonly added: 1; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "spreadStringIndex",
+    "summary": "{ fixed: boolean; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "spreadSymbolIndex",
+    "summary": "{ present?: string | undefined; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "contextualArrow",
+    "summary": "string",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "contextualMethod",
+    "summary": "string",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "discriminated",
+    "summary": "{ kind: \"text\"; read: (value: string) => string; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "shorthandDiscriminated",
+    "summary": "{ kind: \"text\"; read: (value: string) => string; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "absentDiscriminant",
+    "summary": "{ read: (value: string) => string; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "reverseMapped",
+    "summary": "{ text: string; count: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "duplicateProperty",
+    "summary": "{ value: string; }",
+    "errorType": false,
+    "codes": [
+      1117
+    ]
+  }
+]

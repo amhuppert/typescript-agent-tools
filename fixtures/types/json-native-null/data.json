@@ -1,0 +1,8 @@
+{
+  "nil": null,
+  "nested": {"nil": null},
+  "toNull": 1,
+  "toNull": null,
+  "fromNull": null,
+  "fromNull": 1
+}

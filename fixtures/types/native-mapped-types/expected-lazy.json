@@ -1,0 +1,542 @@
+[
+  {
+    "config": "tsconfig",
+    "name": "excluded",
+    "summary": "Omit<Source, \"drop\" | \"retained\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "lazy.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "renamedExcluded",
+    "summary": "ExceptFields<Source, \"drop\" | \"retained\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "lazy.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "retained",
+    "summary": "Omit<Source, \"drop\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "lazy.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "retained",
+        "summary": "Missing_retained",
+        "errorType": true,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "lazy.ts",
+              "start": {
+                "line": 2,
+                "column": 65
+              },
+              "end": {
+                "line": 2,
+                "column": 73
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "empty",
+    "summary": "Omit<Source, keyof Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "hidden",
+    "summary": "Hidden",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "x",
+        "summary": "Missing_template",
+        "errorType": true,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "healthy",
+    "summary": "Pick<{ answer: number; }, \"answer\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "answer",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "lazy.ts",
+              "start": {
+                "line": 9,
+                "column": 43
+              },
+              "end": {
+                "line": 9,
+                "column": 49
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "genericHidden",
+    "summary": "GenericHidden<T>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "invalidHeader",
+    "summary": "InvalidRemap",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "excluded",
+    "summary": "Omit<Source, \"drop\" | \"retained\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "lazy.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "renamedExcluded",
+    "summary": "ExceptFields<Source, \"drop\" | \"retained\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "lazy.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "retained",
+    "summary": "Omit<Source, \"drop\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "lazy.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "retained",
+        "summary": "Missing_retained",
+        "errorType": true,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "lazy.ts",
+              "start": {
+                "line": 2,
+                "column": 65
+              },
+              "end": {
+                "line": 2,
+                "column": 73
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "empty",
+    "summary": "Omit<Source, keyof Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "hidden",
+    "summary": "Hidden",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "x",
+        "summary": "Missing_template",
+        "errorType": true,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "healthy",
+    "summary": "Pick<{ answer: number; }, \"answer\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "answer",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "lazy.ts",
+              "start": {
+                "line": 9,
+                "column": 43
+              },
+              "end": {
+                "line": 9,
+                "column": 49
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "genericHidden",
+    "summary": "GenericHidden<T>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "invalidHeader",
+    "summary": "InvalidRemap",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "excluded",
+    "summary": "Omit<Source, \"drop\" | \"retained\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "lazy.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "renamedExcluded",
+    "summary": "ExceptFields<Source, \"drop\" | \"retained\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "lazy.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "retained",
+    "summary": "Omit<Source, \"drop\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "string | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "lazy.ts",
+              "start": {
+                "line": 2,
+                "column": 26
+              },
+              "end": {
+                "line": 2,
+                "column": 30
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "retained",
+        "summary": "Missing_retained",
+        "errorType": true,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "lazy.ts",
+              "start": {
+                "line": 2,
+                "column": 65
+              },
+              "end": {
+                "line": 2,
+                "column": 73
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "empty",
+    "summary": "Omit<Source, keyof Source>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "hidden",
+    "summary": "Hidden",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "x",
+        "summary": "Missing_template",
+        "errorType": true,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "healthy",
+    "summary": "Pick<{ answer: number; }, \"answer\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "answer",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "lazy.ts",
+              "start": {
+                "line": 9,
+                "column": 43
+              },
+              "end": {
+                "line": 9,
+                "column": 49
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "genericHidden",
+    "summary": "GenericHidden<T>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "invalidHeader",
+    "summary": "InvalidRemap",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  }
+]

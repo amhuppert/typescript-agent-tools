@@ -1,0 +1,2594 @@
+[
+  {
+    "config": "tsconfig.json",
+    "marker": "nestedAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 4,
+        "column": 21
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 4,
+          "column": 21
+        },
+        "end": {
+          "line": 4,
+          "column": 26
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 2,
+              "column": 9
+            },
+            "end": {
+              "line": 2,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/tsconfig.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 29,
+      "actualId": 29,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "conditionalAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 9,
+        "column": 26
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 9,
+          "column": 26
+        },
+        "end": {
+          "line": 9,
+          "column": 31
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 7,
+              "column": 9
+            },
+            "end": {
+              "line": 7,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/tsconfig.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 29,
+      "actualId": 29,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "continuesAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 18,
+        "column": 24
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 18,
+          "column": 24
+        },
+        "end": {
+          "line": 18,
+          "column": 29
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 12,
+              "column": 9
+            },
+            "end": {
+              "line": 12,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/tsconfig.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 29,
+      "actualId": 29,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "innerHead",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 23,
+        "column": 39
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 23,
+          "column": 39
+        },
+        "end": {
+          "line": 23,
+          "column": 44
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 21,
+              "column": 9
+            },
+            "end": {
+              "line": 21,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/tsconfig.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 29,
+      "actualId": 29,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "innerExit",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 24,
+        "column": 23
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 24,
+          "column": 23
+        },
+        "end": {
+          "line": 24,
+          "column": 28
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 21,
+              "column": 9
+            },
+            "end": {
+              "line": 21,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/tsconfig.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 29,
+      "actualId": 29,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "innerEntryAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 26,
+        "column": 25
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 26,
+          "column": 25
+        },
+        "end": {
+          "line": 26,
+          "column": 30
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 21,
+              "column": 9
+            },
+            "end": {
+              "line": 21,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/tsconfig.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 29,
+      "actualId": 29,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "assignmentRhs",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 30,
+        "column": 46
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 30,
+          "column": 46
+        },
+        "end": {
+          "line": 30,
+          "column": 51
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 29,
+              "column": 9
+            },
+            "end": {
+              "line": 29,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/tsconfig.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 29,
+      "actualId": 29,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "referenceAssignmentAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 31,
+        "column": 34
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 31,
+          "column": 34
+        },
+        "end": {
+          "line": 31,
+          "column": 39
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 29,
+              "column": 9
+            },
+            "end": {
+              "line": 29,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/tsconfig.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 29,
+      "actualId": 29,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "nestedRhs",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 35,
+        "column": 59
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 35,
+          "column": 59
+        },
+        "end": {
+          "line": 35,
+          "column": 64
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 34,
+              "column": 9
+            },
+            "end": {
+              "line": 34,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/tsconfig.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 29,
+      "actualId": 29,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "nestedReferenceAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 36,
+        "column": 30
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 36,
+          "column": 30
+        },
+        "end": {
+          "line": 36,
+          "column": 35
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 34,
+              "column": 9
+            },
+            "end": {
+              "line": 34,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/tsconfig.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 29,
+      "actualId": 29,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "backedgeInnerHead",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 42,
+        "column": 47
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 42,
+          "column": 47
+        },
+        "end": {
+          "line": 42,
+          "column": 52
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 39,
+              "column": 9
+            },
+            "end": {
+              "line": 39,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/tsconfig.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 29,
+      "actualId": 29,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "outerBackedgeAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 44,
+        "column": 28
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 44,
+          "column": 28
+        },
+        "end": {
+          "line": 44,
+          "column": 33
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 39,
+              "column": 9
+            },
+            "end": {
+              "line": 39,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/tsconfig.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 29,
+      "actualId": 29,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "narrowedAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 49,
+        "column": 23
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 49,
+          "column": 23
+        },
+        "end": {
+          "line": 49,
+          "column": 28
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 47,
+              "column": 9
+            },
+            "end": {
+              "line": 47,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/tsconfig.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 29,
+      "actualId": 15,
+      "sameIdentity": false,
+      "rawSummary": "string | number",
+      "actualSummary": "number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "doAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 54,
+        "column": 17
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 54,
+          "column": 17
+        },
+        "end": {
+          "line": 54,
+          "column": 22
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 52,
+              "column": 9
+            },
+            "end": {
+              "line": 52,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/tsconfig.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 29,
+      "actualId": 14,
+      "sameIdentity": false,
+      "rawSummary": "string | number",
+      "actualSummary": "string",
+      "errorType": false
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "declaredEntryAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 59,
+        "column": 28
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 59,
+          "column": 28
+        },
+        "end": {
+          "line": 59,
+          "column": 33
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 57,
+              "column": 9
+            },
+            "end": {
+              "line": 57,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/tsconfig.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 29,
+      "actualId": 29,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "shadowInner",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 64,
+        "column": 74
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 64,
+          "column": 74
+        },
+        "end": {
+          "line": 64,
+          "column": 79
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 64,
+              "column": 24
+            },
+            "end": {
+              "line": 64,
+              "column": 29
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/tsconfig.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 29,
+      "actualId": 14,
+      "sameIdentity": false,
+      "rawSummary": "string | number",
+      "actualSummary": "string",
+      "errorType": false
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "shadowOuter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 65,
+        "column": 21
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 65,
+          "column": 21
+        },
+        "end": {
+          "line": 65,
+          "column": 26
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 63,
+              "column": 9
+            },
+            "end": {
+              "line": 63,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/tsconfig.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 29,
+      "actualId": 15,
+      "sameIdentity": false,
+      "rawSummary": "string | number",
+      "actualSummary": "number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "unreachableAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 70,
+        "column": 26
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 70,
+          "column": 26
+        },
+        "end": {
+          "line": 70,
+          "column": 31
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 68,
+              "column": 9
+            },
+            "end": {
+              "line": 68,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/tsconfig.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 29,
+      "actualId": 29,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "nestedAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 4,
+        "column": 21
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 4,
+          "column": 21
+        },
+        "end": {
+          "line": 4,
+          "column": 26
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 2,
+              "column": 9
+            },
+            "end": {
+              "line": 2,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/loose.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 31,
+      "actualId": 31,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "conditionalAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 9,
+        "column": 26
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 9,
+          "column": 26
+        },
+        "end": {
+          "line": 9,
+          "column": 31
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 7,
+              "column": 9
+            },
+            "end": {
+              "line": 7,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/loose.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 31,
+      "actualId": 31,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "continuesAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 18,
+        "column": 24
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 18,
+          "column": 24
+        },
+        "end": {
+          "line": 18,
+          "column": 29
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 12,
+              "column": 9
+            },
+            "end": {
+              "line": 12,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/loose.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 31,
+      "actualId": 31,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "innerHead",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 23,
+        "column": 39
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 23,
+          "column": 39
+        },
+        "end": {
+          "line": 23,
+          "column": 44
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 21,
+              "column": 9
+            },
+            "end": {
+              "line": 21,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/loose.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 31,
+      "actualId": 31,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "innerExit",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 24,
+        "column": 23
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 24,
+          "column": 23
+        },
+        "end": {
+          "line": 24,
+          "column": 28
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 21,
+              "column": 9
+            },
+            "end": {
+              "line": 21,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/loose.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 31,
+      "actualId": 31,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "innerEntryAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 26,
+        "column": 25
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 26,
+          "column": 25
+        },
+        "end": {
+          "line": 26,
+          "column": 30
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 21,
+              "column": 9
+            },
+            "end": {
+              "line": 21,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/loose.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 31,
+      "actualId": 31,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "assignmentRhs",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 30,
+        "column": 46
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 30,
+          "column": 46
+        },
+        "end": {
+          "line": 30,
+          "column": 51
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 29,
+              "column": 9
+            },
+            "end": {
+              "line": 29,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/loose.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 31,
+      "actualId": 31,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "referenceAssignmentAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 31,
+        "column": 34
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 31,
+          "column": 34
+        },
+        "end": {
+          "line": 31,
+          "column": 39
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 29,
+              "column": 9
+            },
+            "end": {
+              "line": 29,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/loose.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 31,
+      "actualId": 31,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "nestedRhs",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 35,
+        "column": 59
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 35,
+          "column": 59
+        },
+        "end": {
+          "line": 35,
+          "column": 64
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 34,
+              "column": 9
+            },
+            "end": {
+              "line": 34,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/loose.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 31,
+      "actualId": 31,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "nestedReferenceAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 36,
+        "column": 30
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 36,
+          "column": 30
+        },
+        "end": {
+          "line": 36,
+          "column": 35
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 34,
+              "column": 9
+            },
+            "end": {
+              "line": 34,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/loose.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 31,
+      "actualId": 31,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "backedgeInnerHead",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 42,
+        "column": 47
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 42,
+          "column": 47
+        },
+        "end": {
+          "line": 42,
+          "column": 52
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 39,
+              "column": 9
+            },
+            "end": {
+              "line": 39,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/loose.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 31,
+      "actualId": 31,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "outerBackedgeAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 44,
+        "column": 28
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 44,
+          "column": 28
+        },
+        "end": {
+          "line": 44,
+          "column": 33
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 39,
+              "column": 9
+            },
+            "end": {
+              "line": 39,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/loose.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 31,
+      "actualId": 31,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "narrowedAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 49,
+        "column": 23
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 49,
+          "column": 23
+        },
+        "end": {
+          "line": 49,
+          "column": 28
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 47,
+              "column": 9
+            },
+            "end": {
+              "line": 47,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/loose.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 31,
+      "actualId": 17,
+      "sameIdentity": false,
+      "rawSummary": "string | number",
+      "actualSummary": "number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "doAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 54,
+        "column": 17
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 54,
+          "column": 17
+        },
+        "end": {
+          "line": 54,
+          "column": 22
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 52,
+              "column": 9
+            },
+            "end": {
+              "line": 52,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/loose.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 31,
+      "actualId": 16,
+      "sameIdentity": false,
+      "rawSummary": "string | number",
+      "actualSummary": "string",
+      "errorType": false
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "declaredEntryAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 59,
+        "column": 28
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 59,
+          "column": 28
+        },
+        "end": {
+          "line": 59,
+          "column": 33
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 57,
+              "column": 9
+            },
+            "end": {
+              "line": 57,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/loose.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 31,
+      "actualId": 31,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "shadowInner",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 64,
+        "column": 74
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 64,
+          "column": 74
+        },
+        "end": {
+          "line": 64,
+          "column": 79
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 64,
+              "column": 24
+            },
+            "end": {
+              "line": 64,
+              "column": 29
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/loose.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 31,
+      "actualId": 16,
+      "sameIdentity": false,
+      "rawSummary": "string | number",
+      "actualSummary": "string",
+      "errorType": false
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "shadowOuter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 65,
+        "column": 21
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 65,
+          "column": 21
+        },
+        "end": {
+          "line": 65,
+          "column": 26
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 63,
+              "column": 9
+            },
+            "end": {
+              "line": 63,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/loose.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 31,
+      "actualId": 17,
+      "sameIdentity": false,
+      "rawSummary": "string | number",
+      "actualSummary": "number",
+      "errorType": false
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "unreachableAfter",
+    "request": {
+      "at": {
+        "file": "loops.ts",
+        "line": 70,
+        "column": 26
+      },
+      "diagnostics": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "expression",
+      "location": {
+        "file": "loops.ts",
+        "start": {
+          "line": 70,
+          "column": 26
+        },
+        "end": {
+          "line": 70,
+          "column": 31
+        }
+      },
+      "sourceHash": "5817daae8c13d29e54f64666e7403a4025dba265d8b7affc5ba3fa992781f3a6",
+      "summary": "string | number",
+      "errorType": false,
+      "origins": [
+        {
+          "kind": "VariableDeclaration",
+          "location": {
+            "file": "loops.ts",
+            "start": {
+              "line": 68,
+              "column": 9
+            },
+            "end": {
+              "line": 68,
+              "column": 14
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-loop-cache/loose.json"
+      }
+    },
+    "identity": {
+      "inputs": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "rawId": 31,
+      "actualId": 31,
+      "sameIdentity": true,
+      "rawSummary": "string | number",
+      "actualSummary": "string | number",
+      "errorType": false
+    }
+  }
+]

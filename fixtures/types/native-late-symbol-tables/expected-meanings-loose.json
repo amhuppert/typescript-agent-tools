@@ -1,0 +1,735 @@
+[
+  {
+    "file": "meanings.ts",
+    "name": "mixedAliasValue",
+    "summary": "81",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 303,
+        "declarationPos": 253,
+        "depth": 0,
+        "event": "enter",
+        "name": "mixedAliasValue",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 162,
+        "declarationPos": 80,
+        "depth": 1,
+        "event": "enter",
+        "name": "Mixed",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 162,
+        "declarationPos": 80,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Mixed",
+        "operation": "getTypeOfSymbol",
+        "type": 81
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 42,
+        "declarationPos": 24,
+        "depth": 1,
+        "event": "enter",
+        "name": "aliasKey",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 42,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 34
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 42,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 34,
+        "type": 84
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 42,
+        "declarationPos": 24,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "name": "aliasKey",
+        "operation": "getTypeOfSymbol",
+        "type": 84
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 79,
+        "declarationPos": 57,
+        "depth": 1,
+        "event": "enter",
+        "name": "interfaceKey",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 79,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 71
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 79,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 71,
+        "type": 86
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 79,
+        "declarationPos": 57,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "name": "interfaceKey",
+        "operation": "getTypeOfSymbol",
+        "type": 86
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 129,
+        "declarationPos": 102,
+        "depth": 1,
+        "event": "enter",
+        "name": "Alias",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 128,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 125
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 128,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 125,
+        "type": 88
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 129,
+        "declarationPos": 102,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "Alias",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 303,
+        "declarationPos": 253,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "mixedAliasValue",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      }
+    ]
+  },
+  {
+    "file": "meanings.ts",
+    "name": "mixedAliasType",
+    "summary": "83",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 394,
+        "declarationPos": 348,
+        "depth": 0,
+        "event": "enter",
+        "name": "mixedAliasType",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 341,
+        "declarationPos": 318,
+        "depth": 1,
+        "event": "enter",
+        "name": "aliasType",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 341,
+        "event": "enter",
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 329
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 42,
+        "declarationPos": 24,
+        "depth": 3,
+        "event": "enter",
+        "name": "aliasKey",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 4,
+        "end": 42,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 34
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 4,
+        "end": 42,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 34,
+        "type": 81
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 42,
+        "declarationPos": 24,
+        "depth": 3,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "name": "aliasKey",
+        "operation": "getTypeOfSymbol",
+        "type": 81
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 79,
+        "declarationPos": 57,
+        "depth": 3,
+        "event": "enter",
+        "name": "interfaceKey",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 4,
+        "end": 79,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 71
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 4,
+        "end": 79,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 71,
+        "type": 83
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 79,
+        "declarationPos": 57,
+        "depth": 3,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "name": "interfaceKey",
+        "operation": "getTypeOfSymbol",
+        "type": 83
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 3,
+        "end": 208,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 205
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 3,
+        "end": 208,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 205,
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 341,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 329,
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 341,
+        "declarationPos": 318,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "aliasType",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 394,
+        "declarationPos": 348,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "mixedAliasType",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      }
+    ]
+  },
+  {
+    "file": "meanings.ts",
+    "name": "mixedInterfaceValue",
+    "summary": "82",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 459,
+        "declarationPos": 401,
+        "depth": 0,
+        "event": "enter",
+        "name": "mixedInterfaceValue",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 162,
+        "declarationPos": 80,
+        "depth": 1,
+        "event": "enter",
+        "name": "Mixed",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 162,
+        "declarationPos": 80,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Mixed",
+        "operation": "getTypeOfSymbol",
+        "type": 81
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 42,
+        "declarationPos": 24,
+        "depth": 1,
+        "event": "enter",
+        "name": "aliasKey",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 42,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 34
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 42,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 34,
+        "type": 84
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 42,
+        "declarationPos": 24,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "name": "aliasKey",
+        "operation": "getTypeOfSymbol",
+        "type": 84
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 79,
+        "declarationPos": 57,
+        "depth": 1,
+        "event": "enter",
+        "name": "interfaceKey",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 79,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 71
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 79,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 71,
+        "type": 86
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 79,
+        "declarationPos": 57,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "name": "interfaceKey",
+        "operation": "getTypeOfSymbol",
+        "type": 86
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 160,
+        "declarationPos": 129,
+        "depth": 1,
+        "event": "enter",
+        "name": "Shape",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 159,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 156
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 159,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 156,
+        "type": 88
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 160,
+        "declarationPos": 129,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "Shape",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 459,
+        "declarationPos": 401,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "mixedInterfaceValue",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      }
+    ]
+  },
+  {
+    "file": "meanings.ts",
+    "name": "mixedInterfaceType",
+    "summary": "84",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 573,
+        "declarationPos": 508,
+        "depth": 0,
+        "event": "enter",
+        "name": "mixedInterfaceType",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 501,
+        "declarationPos": 474,
+        "depth": 1,
+        "event": "enter",
+        "name": "interfaceType",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 501,
+        "event": "enter",
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 489
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 42,
+        "declarationPos": 24,
+        "depth": 3,
+        "event": "enter",
+        "name": "aliasKey",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 4,
+        "end": 42,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 34
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 4,
+        "end": 42,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 34,
+        "type": 81
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 42,
+        "declarationPos": 24,
+        "depth": 3,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "name": "aliasKey",
+        "operation": "getTypeOfSymbol",
+        "type": 81
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 79,
+        "declarationPos": 57,
+        "depth": 3,
+        "event": "enter",
+        "name": "interfaceKey",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 4,
+        "end": 79,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 71
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 4,
+        "end": 79,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 71,
+        "type": 83
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 79,
+        "declarationPos": 57,
+        "depth": 3,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "name": "interfaceKey",
+        "operation": "getTypeOfSymbol",
+        "type": 83
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 501,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 489,
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 501,
+        "declarationPos": 474,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "interfaceType",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 243,
+        "declarationPos": 231,
+        "depth": 1,
+        "event": "enter",
+        "name": "member",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 242,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 239
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 242,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 239,
+        "type": 86
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 243,
+        "declarationPos": 231,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "member",
+        "operation": "getTypeOfSymbol",
+        "type": 86
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 573,
+        "declarationPos": 508,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "mixedInterfaceType",
+        "operation": "getTypeOfSymbol",
+        "type": 86
+      }
+    ]
+  }
+]

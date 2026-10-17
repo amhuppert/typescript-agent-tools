@@ -6,6 +6,160 @@
 //! Values keep the byte offset where they start so that diagnostics can
 //! point at them.
 
+use super::{disk, io_error, paths, version};
+use crate::analysis::{InputError, InputErrorKind};
+use crate::source::SourceText;
+use std::borrow::Cow;
+use std::path::{Path, PathBuf};
+use std::sync::Arc;
+
+/// Native `PackageJsonInfo`: an existing malformed file still establishes a
+/// package scope. A missing file is the outer Option returned by `read`.
+#[derive(Debug, Clone, Default)]
+pub(super) struct PackageInfo {
+    pub(super) directory: String,
+    pub(super) contents: Option<Arc<Value>>,
+    runtime_dependencies: Vec<String>,
+}
+
+impl PackageInfo {
+    /// `InfoCacheEntry.WithPackageDirectory`: canonical cache identity must
+    /// not replace the caller's raw candidate directory in downstream paths.
+    pub(super) fn with_directory(&self, directory: &str) -> Cow<'_, Self> {
+        if self.directory == directory {
+            Cow::Borrowed(self)
+        } else {
+            Cow::Owned(Self {
+                directory: directory.to_owned(),
+                ..self.clone()
+            })
+        }
+    }
+
+    /// `Parse` / `GetPackageJsonInfo` preserve ordered fields and retain one
+    /// shared interpretation for resolution and module-specifier generation.
+    fn parse(directory: &str, text: &str) -> Result<Self, SyntaxError> {
+        let (contents, runtime_dependencies) = match parse_preserving_duplicates(text) {
+            Ok(mut value) if value.entries().is_some() => {
+                let runtime_dependencies = runtime_dependency_names(&value);
+                value.normalize_objects();
+                (Some(Arc::new(value)), runtime_dependencies)
+            }
+            Ok(_) => (None, Vec::new()),
+            Err(error) if error.failure == Failure::Malformed => (None, Vec::new()),
+            Err(error) => return Err(error),
+        };
+        Ok(Self {
+            directory: directory.to_owned(),
+            contents,
+            runtime_dependencies,
+        })
+    }
+
+    pub(super) fn read(
+        directory: &str,
+        disk: &disk::Disk,
+    ) -> Result<Option<Arc<Self>>, InputError> {
+        let directory = paths::directory(directory.to_owned());
+        let path = paths::combine(&directory, "package.json");
+        if !disk
+            .file_exists(&path)
+            .map_err(|error| io_error(Path::new(&path), &error))?
+        {
+            return Ok(None);
+        }
+        let bytes = disk
+            .read(&path)
+            .map_err(|error| io_error(Path::new(&path), &error))?;
+        // As in the existing resolver, invalid source encoding is an
+        // unparsable manifest. It never manufactures identity text.
+        let text = crate::source::decode(&bytes).unwrap_or("");
+        Self::parse(&directory, text)
+            .map(|package| Some(Arc::new(package)))
+            .map_err(|error| InputError {
+                kind: InputErrorKind::Unsupported,
+                message: error.message,
+                path: Some(PathBuf::from(path)),
+                position: Some(SourceText::new(text.to_owned()).position(error.offset)),
+            })
+    }
+
+    /// `PackageJson.GetVersionPaths` / `VersionPaths.GetPaths`: first matching
+    /// range wins even when its value is invalid. Non-array mappings disappear;
+    /// non-string array slots remain empty, as native's allocated string slice.
+    pub(super) fn version_paths(&self) -> Option<Vec<(String, Vec<String>)>> {
+        let ranges = self.contents.as_ref()?.field("typesVersions")?.entries()?;
+        let (range, paths) = ranges
+            .iter()
+            .find(|(range, _)| version::matches_typescript(range))?;
+        if range.is_empty() {
+            return None;
+        }
+        Some(
+            paths
+                .entries()?
+                .iter()
+                .filter_map(|(pattern, targets)| {
+                    Some((
+                        pattern.clone(),
+                        targets
+                            .as_array()?
+                            .iter()
+                            .map(|target| target.as_str().unwrap_or("").to_owned())
+                            .collect(),
+                    ))
+                })
+                .collect(),
+        )
+    }
+
+    /// `GetRuntimeDependencyNames`, captured before JSONValue normalization:
+    /// Expected's partial maps observe duplicate fields and invalid values.
+    pub(super) fn runtime_dependency_names(&self) -> Vec<String> {
+        self.runtime_dependencies.clone()
+    }
+}
+
+/// `Expected[map[string]string].UnmarshalJSON` followed by
+/// `GetRuntimeDependencyNames`. Each field decode reuses its map, except null
+/// resets it. Its fresh JSON decoder rejects duplicate keys, inserts a key
+/// before a value-type error, and leaves earlier entries available despite
+/// Valid=false. The enclosing PackageJson parser permits repeated fields.
+fn runtime_dependency_names(value: &Value) -> Vec<String> {
+    use std::collections::BTreeSet;
+    let mut maps: [BTreeSet<String>; 3] = Default::default();
+    for (field, value) in value.entries().expect("package object") {
+        let index = match field.as_str() {
+            "dependencies" => 0,
+            "peerDependencies" => 1,
+            "optionalDependencies" => 2,
+            _ => continue,
+        };
+        let map = &mut maps[index];
+        match &value.kind {
+            Kind::Null => map.clear(),
+            Kind::Object(entries) => {
+                let mut seen = BTreeSet::new();
+                for (name, value) in entries {
+                    if !seen.insert(name) {
+                        break;
+                    }
+                    map.insert(name.clone());
+                    if !matches!(value.kind, Kind::String(_) | Kind::Null) {
+                        break;
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+    maps.into_iter()
+        .flatten()
+        .collect::<BTreeSet<_>>()
+        .into_iter()
+        .collect()
+}
+
 /// A parsed value. Object keys are unique: a repeated key keeps its first
 /// position and its last value, like a JavaScript object.
 #[derive(Debug, Clone, PartialEq)]
@@ -42,6 +196,63 @@ pub(super) struct SyntaxError {
 }
 
 impl Value {
+    /// `JSONValue` stores an OrderedMap: a repeated key retains its first
+    /// position and last value. Expected fields instead consume the raw order
+    /// above, so this normalization follows their one-time interpretation.
+    fn normalize_objects(&mut self) {
+        match &mut self.kind {
+            Kind::Object(entries) => {
+                let raw = std::mem::take(entries);
+                for (key, mut value) in raw {
+                    value.normalize_objects();
+                    match entries.iter_mut().find(|(name, _)| *name == key) {
+                        Some(entry) => entry.1 = value,
+                        None => entries.push((key, value)),
+                    }
+                }
+            }
+            Kind::Array(values) => {
+                for value in values {
+                    value.normalize_objects();
+                }
+            }
+            _ => {}
+        }
+    }
+    /// Native `ExportsOrImports.IsSubpaths` / `initObjectKind`: empty keys do
+    /// not contribute, dot+hash is Subpaths, and ordinary keys mixed with
+    /// either prefix make an invalid object rather than a condition table.
+    pub(super) fn is_exports_subpaths(&self) -> bool {
+        self.exports_object_kind() == Some(ExportsObject::Subpaths)
+    }
+
+    pub(super) fn is_exports_conditions(&self) -> bool {
+        self.exports_object_kind() == Some(ExportsObject::Conditions)
+    }
+
+    fn exports_object_kind(&self) -> Option<ExportsObject> {
+        let mut dot = false;
+        let mut hash = false;
+        let mut other = false;
+        for (key, _) in self.entries()? {
+            match key.as_bytes().first() {
+                Some(b'.') => dot = true,
+                Some(b'#') => hash = true,
+                Some(_) => other = true,
+                None => {}
+            }
+        }
+        Some(if other && (dot || hash) {
+            ExportsObject::Invalid
+        } else if dot {
+            ExportsObject::Subpaths
+        } else if hash {
+            ExportsObject::Imports
+        } else {
+            ExportsObject::Conditions
+        })
+    }
+
     pub(super) fn get(&self, key: &str) -> Option<&Value> {
         self.entries()?
             .iter()
@@ -74,6 +285,14 @@ impl Value {
             _ => None,
         }
     }
+}
+
+#[derive(PartialEq, Eq)]
+enum ExportsObject {
+    Subpaths,
+    Imports,
+    Conditions,
+    Invalid,
 }
 
 /// Containers under construction; nesting uses this explicit stack.
@@ -109,10 +328,7 @@ impl Frame {
             Frame::Array(_, items) => items.push(value),
             Frame::Object(_, entries, key) => {
                 let key = key.take().expect("a value follows its key");
-                match entries.iter_mut().find(|(name, _)| *name == key) {
-                    Some(entry) => entry.1 = value,
-                    None => entries.push((key, value)),
-                }
+                entries.push((key, value));
             }
         }
     }
@@ -122,7 +338,14 @@ impl Frame {
 /// recurse, stay shallow. The same limit as `crate::parser::json`.
 const MAX_DEPTH: usize = crate::parser::json::MAX_JSON_DEPTH;
 
-pub(super) fn parse(text: &str) -> Result<Value, SyntaxError> {
+#[cfg(test)]
+fn parse(text: &str) -> Result<Value, SyntaxError> {
+    let mut value = parse_preserving_duplicates(text)?;
+    value.normalize_objects();
+    Ok(value)
+}
+
+fn parse_preserving_duplicates(text: &str) -> Result<Value, SyntaxError> {
     let mut parser = Parser { text, pos: 0 };
     let mut stack: Vec<Frame> = Vec::new();
     loop {

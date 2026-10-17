@@ -1,0 +1,610 @@
+[
+  {
+    "name": "relative-minimal",
+    "display": "\"./target\"",
+    "defaultMode": 1,
+    "resolvedPath": "target.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "target.d.ts",
+        "text": "./target"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "target.d.ts",
+        "text": "./target"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "relative-js",
+    "display": "\"./target.js\"",
+    "defaultMode": 99,
+    "resolvedPath": "target.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "target.d.ts",
+        "text": "./target.js"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "target.d.ts",
+        "text": "./target.js"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "relative-ts",
+    "display": "\"./target.ts\"",
+    "defaultMode": 99,
+    "resolvedPath": "target.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "target.ts",
+        "text": "./target"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "target.ts",
+        "text": "./target"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "rewrite-relative",
+    "display": "\"./target.ts\"",
+    "defaultMode": 99,
+    "resolvedPath": "target.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "target.ts",
+        "text": "./target"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "target.ts",
+        "text": "./target"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "declaration-importer",
+    "display": "\"./target\"",
+    "defaultMode": 1,
+    "resolvedPath": "target.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "target.d.ts",
+        "text": "./target"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "target.d.ts",
+        "text": "./target"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "index-minimal",
+    "display": "\"./dir\"",
+    "defaultMode": 1,
+    "resolvedPath": "dir/index.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "dir/index.ts",
+        "text": "./dir/index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "dir/index.ts",
+        "text": "./dir/index"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "index-collision",
+    "display": "\"./dir\"",
+    "defaultMode": 1,
+    "resolvedPath": "dir/index.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "dir/index.ts",
+        "text": "./dir/index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "dir/index.ts",
+        "text": "./dir/index"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "index-empty-directory",
+    "display": "\"./dir\"",
+    "defaultMode": 1,
+    "resolvedPath": "dir/index.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "dir/index.ts",
+        "text": "./dir/index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "dir/index.ts",
+        "text": "./dir/index"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "index-tsx-collision",
+    "display": "\"./dir\"",
+    "defaultMode": 1,
+    "resolvedPath": "dir/index.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "dir/index.ts",
+        "text": "./dir/index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "dir/index.ts",
+        "text": "./dir/index"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "index-js-collision",
+    "display": "\"./dir\"",
+    "defaultMode": 1,
+    "resolvedPath": "dir/index.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "dir/index.ts",
+        "text": "./dir/index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "dir/index.ts",
+        "text": "./dir/index"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "required-target-mts",
+    "display": "\"./target.mjs\"",
+    "defaultMode": 1,
+    "resolvedPath": "target.mts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "target.mts",
+        "text": "./target.mjs"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "target.mts",
+        "text": "./target.mjs"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "required-target-cts",
+    "display": "\"./target.cjs\"",
+    "defaultMode": 1,
+    "resolvedPath": "target.cts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "target.cts",
+        "text": "./target.cjs"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "target.cts",
+        "text": "./target.cjs"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "required-target-d-mts",
+    "display": "\"./target.mjs\"",
+    "defaultMode": 1,
+    "resolvedPath": "target.d.mts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "target.d.mts",
+        "text": "./target.mjs"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "target.d.mts",
+        "text": "./target.mjs"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "required-target-d-cts",
+    "display": "\"./target.cjs\"",
+    "defaultMode": 1,
+    "resolvedPath": "target.d.cts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "target.d.cts",
+        "text": "./target.cjs"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "target.d.cts",
+        "text": "./target.cjs"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "jsx-preserve",
+    "display": "\"./target.jsx\"",
+    "defaultMode": 99,
+    "resolvedPath": "target.tsx",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "target.tsx",
+        "text": "./target.js"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "target.tsx",
+        "text": "./target.js"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "jsx-react",
+    "display": "\"./target.js\"",
+    "defaultMode": 99,
+    "resolvedPath": "target.tsx",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "target.tsx",
+        "text": "./target.js"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "target.tsx",
+        "text": "./target.js"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "arbitrary-css",
+    "display": "\"./style.css\"",
+    "defaultMode": 1,
+    "resolvedPath": "style.d.css.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "style.d.css.ts",
+        "text": "./style.css"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "style.d.css.ts",
+        "text": "./style.css"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "root-dirs",
+    "display": "\"./sub\"",
+    "defaultMode": 1,
+    "resolvedPath": "generated/sub/index.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "generated/sub/index.ts",
+        "text": "../generated/sub/index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "generated/sub/index.ts",
+        "text": "../generated/sub/index"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "paths-in-project",
+    "display": "\"./lib/target.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "lib/target.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "lib/target.d.ts",
+        "text": "./lib/target.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "lib/target.d.ts",
+        "text": "./lib/target.js"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "paths-cross-project",
+    "display": "\"mapped\"",
+    "defaultMode": 1,
+    "resolvedPath": "../lib/target.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "../lib/target.d.ts",
+        "text": "../lib/target.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "../lib/target.d.ts",
+        "text": "../lib/target.js"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "paths-empty-key",
+    "display": "\"../lib/target.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "../lib/target.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "../lib/target.d.ts",
+        "text": "../lib/target.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "../lib/target.d.ts",
+        "text": "../lib/target.js"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "paths-star-ts",
+    "display": "\"mapped/target\"",
+    "defaultMode": 1,
+    "resolvedPath": "../lib/target.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "../lib/target.d.ts",
+        "text": "../lib/target.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "../lib/target.d.ts",
+        "text": "../lib/target.js"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "paths-star-noext",
+    "display": "\"mapped/target.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "../lib/target.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "../lib/target.d.ts",
+        "text": "../lib/target.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "../lib/target.d.ts",
+        "text": "../lib/target.js"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "package-single-file",
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg.ts",
+        "text": "pkg"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "package-index-no-manifest",
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "package-types",
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/types/main.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/types/main.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/types/main.d.ts",
+        "text": "pkg"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "package-exports-exact",
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/types/main.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/types/main.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/types/main.d.ts",
+        "text": "pkg"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "package-exports-pattern",
+    "display": "\"pkg/main\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/types/main.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/types/main.d.ts",
+        "text": "pkg/main"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/types/main.d.ts",
+        "text": "pkg/main"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "package-types-versions",
+    "display": "\"pkg/main\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/v7/main.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/v7/main.d.ts",
+        "text": "pkg/main"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/v7/main.d.ts",
+        "text": "pkg/main"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "package-types-names",
+    "display": "\"@scope/pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/@types/scope__pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/@types/scope__pkg/index.d.ts",
+        "text": "@scope/pkg"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/@types/scope__pkg/index.d.ts",
+        "text": "@scope/pkg"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "package-imports",
+    "display": "\"./src/target\"",
+    "defaultMode": 1,
+    "resolvedPath": "src/target.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "src/target.ts",
+        "text": "#target"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "src/target.ts",
+        "text": "#target"
+      }
+    ],
+    "presentSummary": "number"
+  },
+  {
+    "name": "package-imports-output",
+    "display": "\"./target.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "src/target.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "src/target.ts",
+        "text": "./target.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "src/target.ts",
+        "text": "./target.js"
+      }
+    ],
+    "presentSummary": "number"
+  }
+]

@@ -1,0 +1,100 @@
+[
+  {
+    "name": "cheap",
+    "summary": "number"
+  },
+  {
+    "name": "groupedSmall",
+    "summary": "number",
+    "width": 16,
+    "repetitionsPerAlias": 4,
+    "order": "grouped"
+  },
+  {
+    "name": "mixxxxxSmall",
+    "summary": "number",
+    "width": 16,
+    "repetitionsPerAlias": 4,
+    "order": "mixxxxx"
+  },
+  {
+    "name": "groupedLarge",
+    "summary": "number",
+    "width": 256,
+    "repetitionsPerAlias": 32,
+    "order": "grouped"
+  },
+  {
+    "name": "mixxxxxLarge",
+    "summary": "number",
+    "width": 256,
+    "repetitionsPerAlias": 32,
+    "order": "mixxxxx"
+  },
+  {
+    "name": "orderedAscending",
+    "summary": "0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15",
+    "ordered": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ]
+  },
+  {
+    "name": "orderedDescending",
+    "summary": "0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15",
+    "ordered": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ]
+  },
+  {
+    "name": "orderedDuplicates",
+    "summary": "0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15",
+    "ordered": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ]
+  }
+]

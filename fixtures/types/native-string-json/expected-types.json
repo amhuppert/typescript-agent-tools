@@ -1,0 +1,610 @@
+[
+  {
+    "name": "json-high",
+    "summary": "number",
+    "location": {
+      "file": "main.ts",
+      "start": {
+        "line": 1,
+        "column": 18
+      },
+      "end": {
+        "line": 1,
+        "column": 26
+      }
+    },
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "location": {
+          "file": "data.json",
+          "start": {
+            "line": 1,
+            "column": 2
+          },
+          "end": {
+            "line": 1,
+            "column": 6
+          }
+        }
+      }
+    ],
+    "codes": []
+  },
+  {
+    "name": "manifest-high",
+    "summary": "3",
+    "location": {
+      "file": "main.ts",
+      "start": {
+        "line": 1,
+        "column": 19
+      },
+      "end": {
+        "line": 1,
+        "column": 27
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "node_modules/pkg/index.d.ts",
+          "start": {
+            "line": 1,
+            "column": 14
+          },
+          "end": {
+            "line": 1,
+            "column": 19
+          }
+        }
+      }
+    ],
+    "codes": []
+  },
+  {
+    "name": "json-low",
+    "summary": "number",
+    "location": {
+      "file": "main.ts",
+      "start": {
+        "line": 1,
+        "column": 18
+      },
+      "end": {
+        "line": 1,
+        "column": 26
+      }
+    },
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "location": {
+          "file": "data.json",
+          "start": {
+            "line": 1,
+            "column": 2
+          },
+          "end": {
+            "line": 1,
+            "column": 6
+          }
+        }
+      }
+    ],
+    "codes": []
+  },
+  {
+    "name": "manifest-low",
+    "summary": "3",
+    "location": {
+      "file": "main.ts",
+      "start": {
+        "line": 1,
+        "column": 19
+      },
+      "end": {
+        "line": 1,
+        "column": 27
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "node_modules/pkg/index.d.ts",
+          "start": {
+            "line": 1,
+            "column": 14
+          },
+          "end": {
+            "line": 1,
+            "column": 19
+          }
+        }
+      }
+    ],
+    "codes": []
+  },
+  {
+    "name": "json-lf",
+    "summary": "number",
+    "location": {
+      "file": "main.ts",
+      "start": {
+        "line": 1,
+        "column": 18
+      },
+      "end": {
+        "line": 1,
+        "column": 26
+      }
+    },
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "location": {
+          "file": "data.json",
+          "start": {
+            "line": 1,
+            "column": 2
+          },
+          "end": {
+            "line": 1,
+            "column": 6
+          }
+        }
+      }
+    ],
+    "codes": []
+  },
+  {
+    "name": "manifest-lf",
+    "summary": "3",
+    "location": {
+      "file": "main.ts",
+      "start": {
+        "line": 1,
+        "column": 19
+      },
+      "end": {
+        "line": 1,
+        "column": 27
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "node_modules/pkg/index.d.ts",
+          "start": {
+            "line": 1,
+            "column": 14
+          },
+          "end": {
+            "line": 1,
+            "column": 19
+          }
+        }
+      }
+    ],
+    "codes": []
+  },
+  {
+    "name": "json-cr",
+    "summary": "number",
+    "location": {
+      "file": "main.ts",
+      "start": {
+        "line": 1,
+        "column": 18
+      },
+      "end": {
+        "line": 1,
+        "column": 26
+      }
+    },
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "location": {
+          "file": "data.json",
+          "start": {
+            "line": 1,
+            "column": 2
+          },
+          "end": {
+            "line": 1,
+            "column": 6
+          }
+        }
+      }
+    ],
+    "codes": []
+  },
+  {
+    "name": "manifest-cr",
+    "summary": "3",
+    "location": {
+      "file": "main.ts",
+      "start": {
+        "line": 1,
+        "column": 19
+      },
+      "end": {
+        "line": 1,
+        "column": 27
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "node_modules/pkg/index.d.ts",
+          "start": {
+            "line": 1,
+            "column": 14
+          },
+          "end": {
+            "line": 1,
+            "column": 19
+          }
+        }
+      }
+    ],
+    "codes": []
+  },
+  {
+    "name": "json-crlf",
+    "summary": "number",
+    "location": {
+      "file": "main.ts",
+      "start": {
+        "line": 1,
+        "column": 18
+      },
+      "end": {
+        "line": 1,
+        "column": 26
+      }
+    },
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "location": {
+          "file": "data.json",
+          "start": {
+            "line": 1,
+            "column": 2
+          },
+          "end": {
+            "line": 1,
+            "column": 6
+          }
+        }
+      }
+    ],
+    "codes": []
+  },
+  {
+    "name": "manifest-crlf",
+    "summary": "3",
+    "location": {
+      "file": "main.ts",
+      "start": {
+        "line": 1,
+        "column": 19
+      },
+      "end": {
+        "line": 1,
+        "column": 27
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "node_modules/pkg/index.d.ts",
+          "start": {
+            "line": 1,
+            "column": 14
+          },
+          "end": {
+            "line": 1,
+            "column": 19
+          }
+        }
+      }
+    ],
+    "codes": []
+  },
+  {
+    "name": "json-ls",
+    "summary": "number",
+    "location": {
+      "file": "main.ts",
+      "start": {
+        "line": 1,
+        "column": 18
+      },
+      "end": {
+        "line": 1,
+        "column": 26
+      }
+    },
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "location": {
+          "file": "data.json",
+          "start": {
+            "line": 1,
+            "column": 2
+          },
+          "end": {
+            "line": 1,
+            "column": 6
+          }
+        }
+      }
+    ],
+    "codes": []
+  },
+  {
+    "name": "manifest-ls",
+    "summary": "3",
+    "location": {
+      "file": "main.ts",
+      "start": {
+        "line": 1,
+        "column": 19
+      },
+      "end": {
+        "line": 1,
+        "column": 27
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "node_modules/pkg/index.d.ts",
+          "start": {
+            "line": 1,
+            "column": 14
+          },
+          "end": {
+            "line": 1,
+            "column": 19
+          }
+        }
+      }
+    ],
+    "codes": []
+  },
+  {
+    "name": "json-ps",
+    "summary": "number",
+    "location": {
+      "file": "main.ts",
+      "start": {
+        "line": 1,
+        "column": 18
+      },
+      "end": {
+        "line": 1,
+        "column": 26
+      }
+    },
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "location": {
+          "file": "data.json",
+          "start": {
+            "line": 1,
+            "column": 2
+          },
+          "end": {
+            "line": 1,
+            "column": 6
+          }
+        }
+      }
+    ],
+    "codes": []
+  },
+  {
+    "name": "manifest-ps",
+    "summary": "3",
+    "location": {
+      "file": "main.ts",
+      "start": {
+        "line": 1,
+        "column": 19
+      },
+      "end": {
+        "line": 1,
+        "column": 27
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "node_modules/pkg/index.d.ts",
+          "start": {
+            "line": 1,
+            "column": 14
+          },
+          "end": {
+            "line": 1,
+            "column": 19
+          }
+        }
+      }
+    ],
+    "codes": []
+  },
+  {
+    "name": "json-pair",
+    "summary": "boolean",
+    "location": {
+      "file": "main.ts",
+      "start": {
+        "line": 1,
+        "column": 18
+      },
+      "end": {
+        "line": 1,
+        "column": 26
+      }
+    },
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "location": {
+          "file": "data.json",
+          "start": {
+            "line": 1,
+            "column": 2
+          },
+          "end": {
+            "line": 1,
+            "column": 6
+          }
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "location": {
+          "file": "data.json",
+          "start": {
+            "line": 1,
+            "column": 9
+          },
+          "end": {
+            "line": 1,
+            "column": 23
+          }
+        }
+      }
+    ],
+    "codes": [
+      1117
+    ]
+  },
+  {
+    "name": "manifest-pair",
+    "summary": "1",
+    "location": {
+      "file": "main.ts",
+      "start": {
+        "line": 1,
+        "column": 19
+      },
+      "end": {
+        "line": 1,
+        "column": 27
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "node_modules/pkg/𐀀.d.ts",
+          "start": {
+            "line": 1,
+            "column": 14
+          },
+          "end": {
+            "line": 1,
+            "column": 19
+          }
+        }
+      }
+    ],
+    "codes": []
+  },
+  {
+    "name": "json-scalar",
+    "summary": "boolean",
+    "location": {
+      "file": "main.ts",
+      "start": {
+        "line": 1,
+        "column": 18
+      },
+      "end": {
+        "line": 1,
+        "column": 26
+      }
+    },
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "location": {
+          "file": "data.json",
+          "start": {
+            "line": 1,
+            "column": 2
+          },
+          "end": {
+            "line": 1,
+            "column": 6
+          }
+        }
+      },
+      {
+        "kind": "PropertyAssignment",
+        "location": {
+          "file": "data.json",
+          "start": {
+            "line": 1,
+            "column": 9
+          },
+          "end": {
+            "line": 1,
+            "column": 13
+          }
+        }
+      }
+    ],
+    "codes": [
+      1117
+    ]
+  },
+  {
+    "name": "manifest-scalar",
+    "summary": "1",
+    "location": {
+      "file": "main.ts",
+      "start": {
+        "line": 1,
+        "column": 19
+      },
+      "end": {
+        "line": 1,
+        "column": 27
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "node_modules/pkg/𐀀.d.ts",
+          "start": {
+            "line": 1,
+            "column": 14
+          },
+          "end": {
+            "line": 1,
+            "column": 19
+          }
+        }
+      }
+    ],
+    "codes": []
+  }
+]

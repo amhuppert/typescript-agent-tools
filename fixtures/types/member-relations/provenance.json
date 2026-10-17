@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "compiler": "7.0.2",
+  "goSourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "probeNote": "Exploratory standalone scripts and exact shared oracle snapshot; recorded answers precede later oracle fixes. Historical paths in captured-tooling are unchanged. These results do not establish product normalization or native Rust semantics.",
+  "tooling": {
+    "type-oracle.mjs": "c37d927f8d158683bc1f08812e46b3d70b0fcb02463ebfea9730c0485b589e89",
+    "oracle-test.go": "9ce47f74a9973a1b8c56544ee50aa5d1499f9416119129d4de8218b38bc67fd9",
+    "member-probe.mjs": "9b96588174cf36f91429e855e2bd81d13a3e5bc0f02dddec01724b27982c70ca",
+    "semantic-oracle.mjs": "bc969538c077b64b4bf65e87be063ed5903f7d2cca739676b3780c13565f565a",
+    "checker-hook.go": "a5126a28ba18275c125ce73a7d603bdc0b3907156bfb96e8947cee192610fb9c",
+    "corpus-probe.mjs": "4c9948fe328c1b3e9c3ff2982dadbe158cbb0e7ee45dcaa6fe768cb5885afe72",
+    "ls-hook.go": "73c9a52f43914571bdf7f29e8817720d0ff98bdb0aeb7cad183fa8397a848dce",
+    "hashes.json": "c875ed41d5c73d92c0fcc1586b6b8adf3b4e9c17359f1b5ad4187338aab56ba6"
+  },
+  "fixtures": {
+    "fixtures/types/member-relations/cases.ts": "02b0c3b5c0dfdc39ed1fede2aa839f06cf32544f4b4214989e70bcf8e26fc38f",
+    "fixtures/types/member-relations/tsconfig.json": "8a77b692b7a1d7446027a8635200aeff4e48aa483f7ad48e4c286271caa8c4a6",
+    "fixtures/types/member-relations/observations.json": "409227992dc24184c48bcdce7fef35edb932b6a38164a92509d7b0c2f88b6dcc",
+    "fixtures/types/command-center/input-manifest.json": "53cdf23518d299cba7b6540985cd76538147da0cd5016b05098ff577f3e42f1f",
+    "fixtures/types/command-center/member-observations.json": "fb86778920acbf3aacd7ac430c5ec001a42b6126e754e9d5e6b0abaa41562cc3"
+  }
+}

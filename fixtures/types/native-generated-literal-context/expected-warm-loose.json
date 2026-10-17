@@ -1,0 +1,911 @@
+[
+  {
+    "name": "whole",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 414,
+        "declarationPos": 357,
+        "depth": 0,
+        "event": "enter",
+        "name": "v",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 414,
+        "event": "enter",
+        "kind": 193,
+        "operation": "getTypeFromTypeNode",
+        "pos": 359
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 365,
+        "event": "enter",
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 359
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 365,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 359,
+        "type": 81
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 414,
+        "event": "enter",
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 367
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 414,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 367,
+        "type": 83
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 414,
+        "errorType": false,
+        "event": "exit",
+        "flags": 134217728,
+        "kind": 193,
+        "operation": "getTypeFromTypeNode",
+        "pos": 359,
+        "type": 84
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 414,
+        "declarationPos": 357,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 134217728,
+        "name": "v",
+        "operation": "getTypeOfSymbol",
+        "type": 84
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "end": 413,
+        "event": "enter",
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 406
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "end": 413,
+        "errorType": false,
+        "event": "exit",
+        "flags": 32,
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 406,
+        "type": 16
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "end": 404,
+        "event": "enter",
+        "kind": 204,
+        "operation": "getTypeFromTypeNode",
+        "pos": 374
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 384,
+        "event": "enter",
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 378
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 384,
+        "errorType": false,
+        "event": "exit",
+        "flags": 32,
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 378,
+        "type": 16
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 394,
+        "event": "enter",
+        "kind": 150,
+        "operation": "getTypeFromTypeNode",
+        "pos": 388
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 394,
+        "errorType": false,
+        "event": "exit",
+        "flags": 64,
+        "kind": 150,
+        "operation": "getTypeFromTypeNode",
+        "pos": 388,
+        "type": 17
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "end": 404,
+        "errorType": false,
+        "event": "exit",
+        "flags": 4194304,
+        "kind": 204,
+        "operation": "getTypeFromTypeNode",
+        "pos": 374,
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "event": "enter",
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 341,
+        "event": "enter",
+        "kind": 150,
+        "operation": "getTypeFromTypeNode",
+        "pos": 334
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 341,
+        "errorType": false,
+        "event": "exit",
+        "flags": 64,
+        "kind": 150,
+        "operation": "getTypeFromTypeNode",
+        "pos": 334,
+        "type": 17
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 64,
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol",
+        "type": 17
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "event": "enter",
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 64,
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol",
+        "type": 17
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "event": "enter",
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 134217728,
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol",
+        "type": 31
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 414,
+        "declarationPos": 357,
+        "depth": 0,
+        "event": "enter",
+        "name": "v",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 414,
+        "declarationPos": 357,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 134217728,
+        "name": "v",
+        "operation": "getTypeOfSymbol",
+        "type": 84
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "event": "enter",
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 134217728,
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol",
+        "type": 31
+      }
+    ]
+  },
+  {
+    "name": "split",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 524,
+        "declarationPos": 458,
+        "depth": 0,
+        "event": "enter",
+        "name": "v",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 524,
+        "event": "enter",
+        "kind": 193,
+        "operation": "getTypeFromTypeNode",
+        "pos": 460
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 466,
+        "event": "enter",
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 460
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 466,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 460,
+        "type": 81
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 524,
+        "event": "enter",
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 468
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 524,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 468,
+        "type": 83
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 524,
+        "errorType": false,
+        "event": "exit",
+        "flags": 134217728,
+        "kind": 193,
+        "operation": "getTypeFromTypeNode",
+        "pos": 460,
+        "type": 84
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 524,
+        "declarationPos": 458,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 134217728,
+        "name": "v",
+        "operation": "getTypeOfSymbol",
+        "type": 84
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "end": 523,
+        "event": "enter",
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 516
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "end": 523,
+        "errorType": false,
+        "event": "exit",
+        "flags": 32,
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 516,
+        "type": 16
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "end": 514,
+        "event": "enter",
+        "kind": 204,
+        "operation": "getTypeFromTypeNode",
+        "pos": 475
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 485,
+        "event": "enter",
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 479
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 485,
+        "errorType": false,
+        "event": "exit",
+        "flags": 32,
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 479,
+        "type": 16
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 495,
+        "event": "enter",
+        "kind": 150,
+        "operation": "getTypeFromTypeNode",
+        "pos": 489
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 495,
+        "errorType": false,
+        "event": "exit",
+        "flags": 64,
+        "kind": 150,
+        "operation": "getTypeFromTypeNode",
+        "pos": 489,
+        "type": 17
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 504,
+        "event": "enter",
+        "kind": 150,
+        "operation": "getTypeFromTypeNode",
+        "pos": 498
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 504,
+        "errorType": false,
+        "event": "exit",
+        "flags": 64,
+        "kind": 150,
+        "operation": "getTypeFromTypeNode",
+        "pos": 498,
+        "type": 17
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "end": 514,
+        "errorType": false,
+        "event": "exit",
+        "flags": 4194304,
+        "kind": 204,
+        "operation": "getTypeFromTypeNode",
+        "pos": 475,
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "event": "enter",
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 341,
+        "event": "enter",
+        "kind": 150,
+        "operation": "getTypeFromTypeNode",
+        "pos": 334
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 341,
+        "errorType": false,
+        "event": "exit",
+        "flags": 64,
+        "kind": 150,
+        "operation": "getTypeFromTypeNode",
+        "pos": 334,
+        "type": 17
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 64,
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol",
+        "type": 17
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "event": "enter",
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 64,
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol",
+        "type": 17
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "event": "enter",
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 134217728,
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol",
+        "type": 31
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 524,
+        "declarationPos": 458,
+        "depth": 0,
+        "event": "enter",
+        "name": "v",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 524,
+        "declarationPos": 458,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 134217728,
+        "name": "v",
+        "operation": "getTypeOfSymbol",
+        "type": 84
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "event": "enter",
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 134217728,
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol",
+        "type": 31
+      }
+    ]
+  },
+  {
+    "name": "suffix",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 615,
+        "declarationPos": 569,
+        "depth": 0,
+        "event": "enter",
+        "name": "v",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 615,
+        "event": "enter",
+        "kind": 193,
+        "operation": "getTypeFromTypeNode",
+        "pos": 571
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 577,
+        "event": "enter",
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 571
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 577,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 571,
+        "type": 81
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 615,
+        "event": "enter",
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 579
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 615,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "kind": 188,
+        "operation": "getTypeFromTypeNode",
+        "pos": 579,
+        "type": 83
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 615,
+        "errorType": false,
+        "event": "exit",
+        "flags": 134217728,
+        "kind": 193,
+        "operation": "getTypeFromTypeNode",
+        "pos": 571,
+        "type": 84
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 615,
+        "declarationPos": 569,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 134217728,
+        "name": "v",
+        "operation": "getTypeOfSymbol",
+        "type": 84
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "end": 614,
+        "event": "enter",
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 607
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "end": 614,
+        "errorType": false,
+        "event": "exit",
+        "flags": 32,
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 607,
+        "type": 16
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "end": 605,
+        "event": "enter",
+        "kind": 204,
+        "operation": "getTypeFromTypeNode",
+        "pos": 586
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 596,
+        "event": "enter",
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 590
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 596,
+        "errorType": false,
+        "event": "exit",
+        "flags": 32,
+        "kind": 154,
+        "operation": "getTypeFromTypeNode",
+        "pos": 590,
+        "type": 16
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "end": 605,
+        "errorType": false,
+        "event": "exit",
+        "flags": 4194304,
+        "kind": 204,
+        "operation": "getTypeFromTypeNode",
+        "pos": 586,
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "event": "enter",
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 341,
+        "event": "enter",
+        "kind": 150,
+        "operation": "getTypeFromTypeNode",
+        "pos": 334
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 341,
+        "errorType": false,
+        "event": "exit",
+        "flags": 64,
+        "kind": 150,
+        "operation": "getTypeFromTypeNode",
+        "pos": 334,
+        "type": 17
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 64,
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol",
+        "type": 17
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "event": "enter",
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 64,
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol",
+        "type": 17
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "event": "enter",
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 134217728,
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol",
+        "type": 31
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 615,
+        "declarationPos": 569,
+        "depth": 0,
+        "event": "enter",
+        "name": "v",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 615,
+        "declarationPos": 569,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 134217728,
+        "name": "v",
+        "operation": "getTypeOfSymbol",
+        "type": 84
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "event": "enter",
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 346,
+        "declarationPos": 321,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 134217728,
+        "name": "�#10@#field1",
+        "operation": "getTypeOfSymbol",
+        "type": 31
+      }
+    ]
+  }
+]

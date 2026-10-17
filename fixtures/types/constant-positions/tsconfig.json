@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "noLib": true,
+    "strict": true,
+    "target": "es2025"
+  },
+  "files": [
+    "positions.ts",
+    "globals.d.ts"
+  ]
+}

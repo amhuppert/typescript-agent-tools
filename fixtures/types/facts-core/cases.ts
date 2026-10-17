@@ -1,0 +1,12 @@
+export declare const literalUnion: 0 | 1;
+export declare const truthyUnion: 1 | 2;
+export declare const primitiveUnion: string | number;
+export declare const nullableUnion: null | undefined;
+export declare const mixedUnion: number | undefined;
+export declare const neverValue: never;
+export const negatedLiteral = !literalUnion;
+export const negatedTruthy = !truthyUnion;
+export const negatedPrimitive = !primitiveUnion;
+export const negatedNullable = !nullableUnion;
+export const negatedMixed = !mixedUnion;
+export const negatedNever = !neverValue;

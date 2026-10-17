@@ -20,6 +20,8 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 unicode-id-start = "=1.5.0"
 smallvec = { version = "=1.15.1", features = ["union"] }
+num-bigint = "=0.4.6"
+ryu = "=1.0.20"
 
 [[bench]]
 name = "parse"

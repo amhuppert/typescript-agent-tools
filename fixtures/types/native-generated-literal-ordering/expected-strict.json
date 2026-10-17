@@ -1,0 +1,1209 @@
+[
+  {
+    "name": "sharedSuffix",
+    "summary": "[\"1\", \"1:a\" | \"1:b\"]",
+    "identities": [
+      "1"
+    ],
+    "unionSummary": "\"1:a\" | \"1:b\"",
+    "ordered": [
+      "1:a",
+      "1:b"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 7,
+        "column": 51
+      },
+      "end": {
+        "line": 7,
+        "column": 54
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 7,
+            "column": 26
+          },
+          "end": {
+            "line": 7,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "sharedSuffixReverse",
+    "summary": "[\"2\", \"2:a\" | \"2:b\"]",
+    "identities": [
+      "2"
+    ],
+    "unionSummary": "\"2:a\" | \"2:b\"",
+    "ordered": [
+      "2:a",
+      "2:b"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 13,
+        "column": 58
+      },
+      "end": {
+        "line": 13,
+        "column": 61
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 13,
+            "column": 26
+          },
+          "end": {
+            "line": 13,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "sharedPrefix",
+    "summary": "[\"3\", \"3\" | \"3:tail\"]",
+    "identities": [
+      "3"
+    ],
+    "unionSummary": "\"3\" | \"3:tail\"",
+    "ordered": [
+      "3",
+      "3:tail"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 19,
+        "column": 51
+      },
+      "end": {
+        "line": 19,
+        "column": 54
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 19,
+            "column": 26
+          },
+          "end": {
+            "line": 19,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "repeatedAtom",
+    "summary": "[\"4\", \"44:a\" | \"44:b\"]",
+    "identities": [
+      "4"
+    ],
+    "unionSummary": "\"44:a\" | \"44:b\"",
+    "ordered": [
+      "44:a",
+      "44:b"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 25,
+        "column": 51
+      },
+      "end": {
+        "line": 25,
+        "column": 54
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 25,
+            "column": 26
+          },
+          "end": {
+            "line": 25,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "fixedPrefix",
+    "summary": "[\"5\", \"a5\" | \"z5\"]",
+    "identities": [
+      "5"
+    ],
+    "unionSummary": "\"a5\" | \"z5\"",
+    "ordered": [
+      "a5",
+      "z5"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 31,
+        "column": 50
+      },
+      "end": {
+        "line": 31,
+        "column": 53
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 31,
+            "column": 26
+          },
+          "end": {
+            "line": 31,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "empty",
+    "summary": "[\"6\", \"\" | \"6\"]",
+    "identities": [
+      "6"
+    ],
+    "unionSummary": "\"\" | \"6\"",
+    "ordered": [
+      "",
+      "6"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 37,
+        "column": 44
+      },
+      "end": {
+        "line": 37,
+        "column": 47
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 37,
+            "column": 26
+          },
+          "end": {
+            "line": 37,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "emptyReverse",
+    "summary": "[\"7\", \"\" | \"7\"]",
+    "identities": [
+      "7"
+    ],
+    "unionSummary": "\"\" | \"7\"",
+    "ordered": [
+      "",
+      "7"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 43,
+        "column": 51
+      },
+      "end": {
+        "line": 43,
+        "column": 54
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 43,
+            "column": 26
+          },
+          "end": {
+            "line": 43,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "nul",
+    "summary": "[\"8\", \"\\0\" | \"8\"]",
+    "identities": [
+      "8"
+    ],
+    "unionSummary": "\"\\0\" | \"8\"",
+    "ordered": [
+      "\u0000",
+      "8"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 49,
+        "column": 42
+      },
+      "end": {
+        "line": 49,
+        "column": 45
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 49,
+            "column": 26
+          },
+          "end": {
+            "line": 49,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "nulReverse",
+    "summary": "[\"9\", \"\\0\" | \"9\"]",
+    "identities": [
+      "9"
+    ],
+    "unionSummary": "\"\\0\" | \"9\"",
+    "ordered": [
+      "\u0000",
+      "9"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 55,
+        "column": 49
+      },
+      "end": {
+        "line": 55,
+        "column": 52
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 55,
+            "column": 26
+          },
+          "end": {
+            "line": 55,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "zero",
+    "summary": "[\"10\", \"0\" | \"10\"]",
+    "identities": [
+      "10"
+    ],
+    "unionSummary": "\"0\" | \"10\"",
+    "ordered": [
+      "0",
+      "10"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 61,
+        "column": 43
+      },
+      "end": {
+        "line": 61,
+        "column": 46
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 61,
+            "column": 26
+          },
+          "end": {
+            "line": 61,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "zeroReverse",
+    "summary": "[\"11\", \"0\" | \"11\"]",
+    "identities": [
+      "11"
+    ],
+    "unionSummary": "\"0\" | \"11\"",
+    "ordered": [
+      "0",
+      "11"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 67,
+        "column": 50
+      },
+      "end": {
+        "line": 67,
+        "column": 53
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 67,
+            "column": 26
+          },
+          "end": {
+            "line": 67,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "colon",
+    "summary": "[\"12\", \"12\" | \":\"]",
+    "identities": [
+      "12"
+    ],
+    "unionSummary": "\"12\" | \":\"",
+    "ordered": [
+      "12",
+      ":"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 73,
+        "column": 44
+      },
+      "end": {
+        "line": 73,
+        "column": 47
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 73,
+            "column": 26
+          },
+          "end": {
+            "line": 73,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "colonReverse",
+    "summary": "[\"13\", \"13\" | \":\"]",
+    "identities": [
+      "13"
+    ],
+    "unionSummary": "\"13\" | \":\"",
+    "ordered": [
+      "13",
+      ":"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 79,
+        "column": 51
+      },
+      "end": {
+        "line": 79,
+        "column": 54
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 79,
+            "column": 26
+          },
+          "end": {
+            "line": 79,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "rawFE",
+    "summary": "[\"14\", \"�\" | \"\\uFFFD\"]",
+    "identities": [
+      "14"
+    ],
+    "unionSummary": "\"�\" | \"\\uFFFD\"",
+    "ordered": [
+      "�",
+      "�"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 85,
+        "column": 44
+      },
+      "end": {
+        "line": 85,
+        "column": 47
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 85,
+            "column": 26
+          },
+          "end": {
+            "line": 85,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "uniqueCycle",
+    "summary": "[\"15\", \"\\uFFFD@a0@15\" | \"\\uFFFD@a915\" | \"\\uFFFD@a@15\"]",
+    "identities": [
+      "15"
+    ],
+    "unionSummary": "\"\\uFFFD@a0@15\" | \"\\uFFFD@a915\" | \"\\uFFFD@a@15\"",
+    "ordered": [
+      "�@a0@15",
+      "�@a915",
+      "�@a@15"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 91,
+        "column": 50
+      },
+      "end": {
+        "line": 91,
+        "column": 53
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 91,
+            "column": 26
+          },
+          "end": {
+            "line": 91,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "uniqueCycleReverse",
+    "summary": "[\"16\", \"\\uFFFD@a0@16\" | \"\\uFFFD@a916\" | \"\\uFFFD@a@16\"]",
+    "identities": [
+      "16"
+    ],
+    "unionSummary": "\"\\uFFFD@a0@16\" | \"\\uFFFD@a916\" | \"\\uFFFD@a@16\"",
+    "ordered": [
+      "�@a0@16",
+      "�@a916",
+      "�@a@16"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 97,
+        "column": 57
+      },
+      "end": {
+        "line": 97,
+        "column": 60
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 97,
+            "column": 26
+          },
+          "end": {
+            "line": 97,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "templateSpans",
+    "summary": "[\"17\", \"ordered\"]",
+    "identities": [
+      "17"
+    ],
+    "unionSummary": "\"ordered\"",
+    "ordered": [
+      "ordered"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 103,
+        "column": 52
+      },
+      "end": {
+        "line": 103,
+        "column": 55
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 103,
+            "column": 26
+          },
+          "end": {
+            "line": 103,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "digit1",
+    "summary": "[\"18\", \"18x\" | \"1y\"]",
+    "identities": [
+      "18"
+    ],
+    "unionSummary": "\"18x\" | \"1y\"",
+    "ordered": [
+      "18x",
+      "1y"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 109,
+        "column": 45
+      },
+      "end": {
+        "line": 109,
+        "column": 48
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 109,
+            "column": 26
+          },
+          "end": {
+            "line": 109,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "digit2",
+    "summary": "[\"19\", \"19x\" | \"2y\"]",
+    "identities": [
+      "19"
+    ],
+    "unionSummary": "\"19x\" | \"2y\"",
+    "ordered": [
+      "19x",
+      "2y"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 115,
+        "column": 45
+      },
+      "end": {
+        "line": 115,
+        "column": 48
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 115,
+            "column": 26
+          },
+          "end": {
+            "line": 115,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "digit3",
+    "summary": "[\"20\", \"20x\" | \"3y\"]",
+    "identities": [
+      "20"
+    ],
+    "unionSummary": "\"20x\" | \"3y\"",
+    "ordered": [
+      "20x",
+      "3y"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 121,
+        "column": 45
+      },
+      "end": {
+        "line": 121,
+        "column": 48
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 121,
+            "column": 26
+          },
+          "end": {
+            "line": 121,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "digit4",
+    "summary": "[\"21\", \"21x\" | \"4y\"]",
+    "identities": [
+      "21"
+    ],
+    "unionSummary": "\"21x\" | \"4y\"",
+    "ordered": [
+      "21x",
+      "4y"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 127,
+        "column": 45
+      },
+      "end": {
+        "line": 127,
+        "column": 48
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 127,
+            "column": 26
+          },
+          "end": {
+            "line": 127,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "digit5",
+    "summary": "[\"22\", \"22x\" | \"5y\"]",
+    "identities": [
+      "22"
+    ],
+    "unionSummary": "\"22x\" | \"5y\"",
+    "ordered": [
+      "22x",
+      "5y"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 133,
+        "column": 45
+      },
+      "end": {
+        "line": 133,
+        "column": 48
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 133,
+            "column": 26
+          },
+          "end": {
+            "line": 133,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "digit6",
+    "summary": "[\"23\", \"23x\" | \"6y\"]",
+    "identities": [
+      "23"
+    ],
+    "unionSummary": "\"23x\" | \"6y\"",
+    "ordered": [
+      "23x",
+      "6y"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 139,
+        "column": 45
+      },
+      "end": {
+        "line": 139,
+        "column": 48
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 139,
+            "column": 26
+          },
+          "end": {
+            "line": 139,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "digit7",
+    "summary": "[\"24\", \"24x\" | \"7y\"]",
+    "identities": [
+      "24"
+    ],
+    "unionSummary": "\"24x\" | \"7y\"",
+    "ordered": [
+      "24x",
+      "7y"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 145,
+        "column": 45
+      },
+      "end": {
+        "line": 145,
+        "column": 48
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 145,
+            "column": 26
+          },
+          "end": {
+            "line": 145,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "digit8",
+    "summary": "[\"25\", \"25x\" | \"8y\"]",
+    "identities": [
+      "25"
+    ],
+    "unionSummary": "\"25x\" | \"8y\"",
+    "ordered": [
+      "25x",
+      "8y"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 151,
+        "column": 45
+      },
+      "end": {
+        "line": 151,
+        "column": 48
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 151,
+            "column": 26
+          },
+          "end": {
+            "line": 151,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "digit9",
+    "summary": "[\"26\", \"26x\" | \"9y\"]",
+    "identities": [
+      "26"
+    ],
+    "unionSummary": "\"26x\" | \"9y\"",
+    "ordered": [
+      "26x",
+      "9y"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 157,
+        "column": 45
+      },
+      "end": {
+        "line": 157,
+        "column": 48
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 157,
+            "column": 26
+          },
+          "end": {
+            "line": 157,
+            "column": 29
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "unequalAtoms",
+    "summary": "[\"27\", \"28\", \"27\" | \"28\"]",
+    "identities": [
+      "27",
+      "28"
+    ],
+    "unionSummary": "\"27\" | \"28\"",
+    "ordered": [
+      "27",
+      "28"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 165,
+        "column": 61
+      },
+      "end": {
+        "line": 165,
+        "column": 66
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 165,
+            "column": 34
+          },
+          "end": {
+            "line": 165,
+            "column": 39
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "adjacentPartitions",
+    "summary": "[\"29\", \"30\", \"2930x\" | \"3029y\"]",
+    "identities": [
+      "29",
+      "30"
+    ],
+    "unionSummary": "\"2930x\" | \"3029y\"",
+    "ordered": [
+      "2930x",
+      "3029y"
+    ],
+    "kind": "expression",
+    "location": {
+      "file": "cases.ts",
+      "start": {
+        "line": 175,
+        "column": 67
+      },
+      "end": {
+        "line": 175,
+        "column": 72
+      }
+    },
+    "origins": [
+      {
+        "kind": "Parameter",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 175,
+            "column": 34
+          },
+          "end": {
+            "line": 175,
+            "column": 39
+          }
+        }
+      }
+    ],
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  }
+]

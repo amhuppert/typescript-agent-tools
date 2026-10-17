@@ -34,6 +34,9 @@ enum Observation {
     Canonical(PathBuf),
     Entry(Option<Entry>),
     Absent,
+    /// Anticipatory module-specifier probes can fail without failing load;
+    /// query-time demand still depends on that exact captured failure.
+    Failed(io::ErrorKind, Option<i32>, String),
 }
 
 /// The actual answers used during construction, including unsuccessful probes.
@@ -62,6 +65,7 @@ impl Observations {
             let after = match result {
                 Ok(value) => value,
                 Err(error) if is_absence(&error) => Observation::Absent,
+                Err(error) if matches!(before, Observation::Failed(..)) => failure(&error),
                 Err(error) => return Err(super::io_error(path, &error)),
             };
             if *before != after {
@@ -93,8 +97,7 @@ impl Disk {
         let value = match result {
             Ok(value) => value,
             Err(error) if is_absence(error) => Observation::Absent,
-            // The caller owns reporting this failure; failed loads are not cached.
-            Err(_) => return,
+            Err(error) => failure(error),
         };
         match observations.values.entry((path.to_path_buf(), operation)) {
             std::collections::btree_map::Entry::Vacant(entry) => {
@@ -169,9 +172,22 @@ impl Disk {
         Ok(self.entry(Path::new(path))? == Some(Entry::File))
     }
 
+    /// Native `vfs.Common.FileExists` includes every non-directory entry.
+    /// Input admission's regular-file test (`is_file`) is a different question.
+    pub(super) fn file_exists(&self, path: &str) -> io::Result<bool> {
+        Ok(matches!(
+            self.entry(Path::new(path))?,
+            Some(Entry::File | Entry::Other)
+        ))
+    }
+
     pub(super) fn is_dir(&self, path: &str) -> io::Result<bool> {
         Ok(self.entry(Path::new(path))? == Some(Entry::Directory))
     }
+}
+
+fn failure(error: &io::Error) -> Observation {
+    Observation::Failed(error.kind(), error.raw_os_error(), error.to_string())
 }
 
 fn directory(path: &Path) -> io::Result<(Vec<std::fs::DirEntry>, Vec<OsString>)> {

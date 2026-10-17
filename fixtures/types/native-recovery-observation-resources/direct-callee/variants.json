@@ -1,0 +1,802 @@
+[
+  {
+    "family": "ascii",
+    "width": 16,
+    "profile": "strict",
+    "file": "a-16.ts",
+    "config": "ascii-16-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "a-16.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "ascii",
+    "width": 16,
+    "profile": "nocheck",
+    "file": "a-16.ts",
+    "config": "ascii-16-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "a-16.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "ascii",
+    "width": 16,
+    "profile": "loose",
+    "file": "a-16.ts",
+    "config": "ascii-16-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "a-16.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "ascii",
+    "width": 16,
+    "profile": "loose-nocheck",
+    "file": "a-16.ts",
+    "config": "ascii-16-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "a-16.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "ascii",
+    "width": 64,
+    "profile": "strict",
+    "file": "a-64.ts",
+    "config": "ascii-64-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "a-64.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "ascii",
+    "width": 64,
+    "profile": "nocheck",
+    "file": "a-64.ts",
+    "config": "ascii-64-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "a-64.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "ascii",
+    "width": 64,
+    "profile": "loose",
+    "file": "a-64.ts",
+    "config": "ascii-64-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "a-64.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "ascii",
+    "width": 64,
+    "profile": "loose-nocheck",
+    "file": "a-64.ts",
+    "config": "ascii-64-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "a-64.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "latin",
+    "width": 16,
+    "profile": "strict",
+    "file": "é-16.ts",
+    "config": "latin-16-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "é-16.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "latin",
+    "width": 16,
+    "profile": "nocheck",
+    "file": "é-16.ts",
+    "config": "latin-16-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "é-16.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "latin",
+    "width": 16,
+    "profile": "loose",
+    "file": "é-16.ts",
+    "config": "latin-16-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "é-16.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "latin",
+    "width": 16,
+    "profile": "loose-nocheck",
+    "file": "é-16.ts",
+    "config": "latin-16-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "é-16.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "latin",
+    "width": 64,
+    "profile": "strict",
+    "file": "é-64.ts",
+    "config": "latin-64-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "é-64.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "latin",
+    "width": 64,
+    "profile": "nocheck",
+    "file": "é-64.ts",
+    "config": "latin-64-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "é-64.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "latin",
+    "width": 64,
+    "profile": "loose",
+    "file": "é-64.ts",
+    "config": "latin-64-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "é-64.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "latin",
+    "width": 64,
+    "profile": "loose-nocheck",
+    "file": "é-64.ts",
+    "config": "latin-64-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "é-64.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "bmp",
+    "width": 16,
+    "profile": "strict",
+    "file": "Σ-16.ts",
+    "config": "bmp-16-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "Σ-16.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "bmp",
+    "width": 16,
+    "profile": "nocheck",
+    "file": "Σ-16.ts",
+    "config": "bmp-16-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "Σ-16.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "bmp",
+    "width": 16,
+    "profile": "loose",
+    "file": "Σ-16.ts",
+    "config": "bmp-16-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "Σ-16.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "bmp",
+    "width": 16,
+    "profile": "loose-nocheck",
+    "file": "Σ-16.ts",
+    "config": "bmp-16-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "Σ-16.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "bmp",
+    "width": 64,
+    "profile": "strict",
+    "file": "Σ-64.ts",
+    "config": "bmp-64-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "Σ-64.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "bmp",
+    "width": 64,
+    "profile": "nocheck",
+    "file": "Σ-64.ts",
+    "config": "bmp-64-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "Σ-64.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "bmp",
+    "width": 64,
+    "profile": "loose",
+    "file": "Σ-64.ts",
+    "config": "bmp-64-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "Σ-64.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "bmp",
+    "width": 64,
+    "profile": "loose-nocheck",
+    "file": "Σ-64.ts",
+    "config": "bmp-64-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "Σ-64.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "astral",
+    "width": 16,
+    "profile": "strict",
+    "file": "𝒜-16.ts",
+    "config": "astral-16-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "𝒜-16.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "astral",
+    "width": 16,
+    "profile": "nocheck",
+    "file": "𝒜-16.ts",
+    "config": "astral-16-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "𝒜-16.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "astral",
+    "width": 16,
+    "profile": "loose",
+    "file": "𝒜-16.ts",
+    "config": "astral-16-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "𝒜-16.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "astral",
+    "width": 16,
+    "profile": "loose-nocheck",
+    "file": "𝒜-16.ts",
+    "config": "astral-16-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "𝒜-16.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "astral",
+    "width": 64,
+    "profile": "strict",
+    "file": "𝒜-64.ts",
+    "config": "astral-64-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "𝒜-64.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "astral",
+    "width": 64,
+    "profile": "nocheck",
+    "file": "𝒜-64.ts",
+    "config": "astral-64-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "𝒜-64.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "astral",
+    "width": 64,
+    "profile": "loose",
+    "file": "𝒜-64.ts",
+    "config": "astral-64-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "𝒜-64.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  },
+  {
+    "family": "astral",
+    "width": 64,
+    "profile": "loose-nocheck",
+    "file": "𝒜-64.ts",
+    "config": "astral-64-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "𝒜-64.ts"
+      ]
+    },
+    "expected": "17",
+    "codes": []
+  }
+]

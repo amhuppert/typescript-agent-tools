@@ -1,0 +1,12 @@
+export {};
+declare function makeBase(): MissingUntouchedCallResult;
+const Plain = class implements makeBase() { static value: 280 = 280; };
+const /*#plain*/plain = Plain.value;
+const Argument = class implements makeBase()<number> { static value: 281 = 281; };
+const /*#argument*/argument = Argument.value;
+const Missing = class implements makeBase()<MissingNilArgument> { static value: 282 = 282; };
+const /*#missing*/missing = Missing.value;
+const Element = class implements MissingUntouchedReceiver["Base"] { static value: 283 = 283; };
+const /*#element*/element = Element.value;
+const Parenthesized = class ParenthesizedNamed implements (MissingUntouchedParenthesized) { static value: 284 = 284; };
+const /*#parenthesized*/parenthesized = Parenthesized.value;

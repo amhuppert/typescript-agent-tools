@@ -9,7 +9,7 @@ impl<'src> Parser<'src> {
     // Each caller budgets its recursive type entry. An additional guard here
     // would charge twice for the same entry, including conditional false arms.
     fn conditional_type(&mut self, conditional: bool) -> Result<NodeId> {
-        if self.function_type_ahead() {
+        if self.function_type_ahead()? {
             if let Some(node) = self.probe_cached(ProbeKind::FunctionType, Self::function_type)? {
                 return Ok(node);
             }
@@ -33,7 +33,7 @@ impl<'src> Parser<'src> {
                     ("trueType", yes.into()),
                     ("falseType", no.into()),
                 ],
-            ))
+            )?)
         } else {
             Ok(check)
         }
@@ -46,7 +46,7 @@ impl<'src> Parser<'src> {
         if !leading && !self.at("|") {
             return Ok(first);
         }
-        let mut types = vec![first];
+        let mut types = Vec::from([first]);
         if leading
             && matches!(
                 self.nodes[first.0].syntax_kind,
@@ -67,7 +67,7 @@ impl<'src> Parser<'src> {
             }
             types.push(node);
         }
-        Ok(self.finish(UnionType, start, fields![("types", types.into())]))
+        self.finish(UnionType, start, fields![("types", types.into())])
     }
     fn intersection_type(&mut self) -> Result<NodeId> {
         let start = self.pos();
@@ -76,7 +76,7 @@ impl<'src> Parser<'src> {
         if !leading && !self.at("&") {
             return Ok(first);
         }
-        let mut types = vec![first];
+        let mut types = Vec::from([first]);
         if leading
             && matches!(
                 self.nodes[first.0].syntax_kind,
@@ -99,7 +99,7 @@ impl<'src> Parser<'src> {
             }
             types.push(node);
         }
-        Ok(self.finish(IntersectionType, start, fields![("types", types.into())]))
+        self.finish(IntersectionType, start, fields![("types", types.into())])
     }
     fn type_operator(&mut self) -> Result<NodeId> {
         let start = self.pos();
@@ -111,14 +111,14 @@ impl<'src> Parser<'src> {
                 "unique" => UniqueKeyword.number(),
                 _ => ReadonlyKeyword.number(),
             };
-            return Ok(self.finish(
+            return self.finish(
                 TypeOperator,
                 start,
                 fields![
                     ("operator", Value::Number(number)),
                     ("type", type_node.into()),
                 ],
-            ));
+            );
         }
         if self.eat("infer")? {
             let parameter_start = self.pos();
@@ -143,12 +143,12 @@ impl<'src> Parser<'src> {
                     fields.push(("constraint", constraint.into()));
                 }
             }
-            let parameter = self.finish(TypeParameter, parameter_start, fields);
-            return Ok(self.finish(
+            let parameter = self.finish(TypeParameter, parameter_start, fields)?;
+            return self.finish(
                 InferType,
                 start,
                 fields![("typeParameter", parameter.into())],
-            ));
+            );
         }
         self.in_context(
             self.context.without(DISALLOW_CONDITIONAL_TYPES),
@@ -158,7 +158,7 @@ impl<'src> Parser<'src> {
     fn postfix_type(&mut self) -> Result<NodeId> {
         let mut node = self.primary_type()?;
         while !self.current.newline {
-            if self.at("!") || self.at("?") && !self.type_start(self.peek()) {
+            if self.at("!") || self.at("?") && !self.type_start(self.peek()?)? {
                 let kind = if self.at("!") {
                     JSDocNonNullableType
                 } else {
@@ -169,7 +169,7 @@ impl<'src> Parser<'src> {
                     kind,
                     self.start(node),
                     fields![("type", node.into()), ("postfix", true.into())],
-                );
+                )?;
                 continue;
             }
             if !self.at("[") {
@@ -181,7 +181,7 @@ impl<'src> Parser<'src> {
                     ArrayType,
                     self.start(node),
                     fields![("elementType", node.into())],
-                );
+                )?;
                 self.nodes[node.0].flags &= !DISALLOW_CONDITIONAL_TYPES;
             } else {
                 let index = self.type_node()?;
@@ -190,14 +190,14 @@ impl<'src> Parser<'src> {
                     IndexedAccessType,
                     self.start(node),
                     fields![("objectType", node.into()), ("indexType", index.into())],
-                );
+                )?;
                 self.nodes[node.0].flags &= !DISALLOW_CONDITIONAL_TYPES;
             }
         }
         Ok(node)
     }
-    fn type_start(&self, token: Token<'_>) -> bool {
-        matches!(
+    fn type_start(&self, token: Token<'_>) -> Result<bool> {
+        Ok(matches!(
             token.kind,
             Kind::String | Kind::Number | Kind::NoSubstitutionTemplate | Kind::TemplateHead
         ) || token.kind == Kind::Word
@@ -218,13 +218,13 @@ impl<'src> Parser<'src> {
                 token.raw,
                 "{" | "[" | "(" | "<" | "|" | "&" | "*" | "?" | "!" | "..."
             )
-            || token.raw == "-" && self.peek_second().kind == Kind::Number
+            || token.raw == "-" && self.peek_second()?.kind == Kind::Number)
     }
     fn primary_type(&mut self) -> Result<NodeId> {
         self.nest(|p| {
             p.check_token()?;
             let start = p.pos();
-            if p.function_type_ahead() {
+            if p.function_type_ahead()? {
                 if let Some(node) = p.probe_cached(ProbeKind::FunctionType, Self::function_type)? {
                     return Ok(node);
                 }
@@ -235,20 +235,20 @@ impl<'src> Parser<'src> {
         })
     }
 
-    fn function_type_ahead(&self) -> bool {
-        if self.at("<") || self.at("new") || self.at("abstract") && self.peek_at("new") {
-            return true;
+    fn function_type_ahead(&self) -> Result<bool> {
+        if self.at("<") || self.at("new") || self.at("abstract") && self.peek_at("new")? {
+            return Ok(true);
         }
         if !self.at("(") {
-            return false;
+            return Ok(false);
         }
         let mut lexer = self.lexer;
-        let mut token = lexer.next();
+        let mut token = lexer.next_controlled(self.control.as_ref())?;
         if matches!(token.raw, ")" | "...") {
-            return true;
+            return Ok(true);
         }
         while modifier_keyword(token.raw) {
-            let next = lexer.next();
+            let next = lexer.next_controlled(self.control.as_ref())?;
             if matches!(next.raw, ":" | "," | "?" | "=" | ")") {
                 token = next;
                 break;
@@ -258,9 +258,9 @@ impl<'src> Parser<'src> {
         if matches!(token.raw, "[" | "{") {
             let mut depth = 1usize;
             while depth != 0 {
-                token = lexer.next();
+                token = lexer.next_controlled(self.control.as_ref())?;
                 if token.kind == Kind::Eof {
-                    return false;
+                    return Ok(false);
                 }
                 if matches!(token.raw, "[" | "{") {
                     depth += 1;
@@ -269,11 +269,12 @@ impl<'src> Parser<'src> {
                     depth -= 1;
                 }
             }
-            token = lexer.next();
+            token = lexer.next_controlled(self.control.as_ref())?;
         } else if token.kind == Kind::Word && (!reserved_word(token.raw) || token.raw == "this") {
-            token = lexer.next();
+            token = lexer.next_controlled(self.control.as_ref())?;
         }
-        matches!(token.raw, ":" | "," | "?" | "=") || token.raw == ")" && lexer.next().raw == "=>"
+        Ok(matches!(token.raw, ":" | "," | "?" | "=")
+            || token.raw == ")" && lexer.next_controlled(self.control.as_ref())?.raw == "=>")
     }
     fn primary_type_inner(&mut self, start: usize) -> Result<NodeId> {
         if self.at("*") || self.at("*=") {
@@ -281,16 +282,16 @@ impl<'src> Parser<'src> {
                 self.split_type_token();
             }
             self.bump()?;
-            return Ok(self.finish(JSDocAllType, start, vec![]));
+            return self.finish(JSDocAllType, start, vec![]);
         }
         if self.at("!") {
             self.bump()?;
             let type_node = self.nest(Self::primary_type)?;
-            return Ok(self.finish(
+            return self.finish(
                 JSDocNonNullableType,
                 start,
                 fields![("type", type_node.into()), ("postfix", false.into())],
-            ));
+            );
         }
         if self.at("?") || self.at("??") {
             if self.at("??") {
@@ -301,34 +302,34 @@ impl<'src> Parser<'src> {
                 return Err(self.error("Expected a type after '?'"));
             }
             let type_node = self.type_node()?;
-            return Ok(self.finish(
+            return self.finish(
                 JSDocNullableType,
                 start,
                 fields![("type", type_node.into()), ("postfix", false.into())],
-            ));
+            );
         }
-        if self.at("function") && self.peek_at("(") {
+        if self.at("function") && self.peek_at("(")? {
             return Err(self.error("Use an arrow signature for a function type"));
         }
         if self.at("this") {
             self.bump()?;
-            let name = self.finish(ThisType, start, vec![]);
+            let name = self.finish(ThisType, start, vec![])?;
             if !self.current.newline && self.eat("is")? {
                 let type_node = self.type_node()?;
-                return Ok(self.finish(
+                return self.finish(
                     TypePredicate,
                     start,
                     fields![("parameterName", name.into()), ("type", type_node.into())],
-                ));
+                );
             }
             return Ok(name);
         }
-        if self.at("asserts") && self.peek().kind == Kind::Word && !self.peek().newline {
+        if self.at("asserts") && self.peek()?.kind == Kind::Word && !self.peek()?.newline {
             let mut fields = fields![("assertsModifier", self.token_node()?.into())];
             let name = if self.at("this") {
                 let start = self.pos();
                 self.bump()?;
-                self.finish(ThisType, start, vec![])
+                self.finish(ThisType, start, vec![])?
             } else {
                 self.identifier()?
             };
@@ -336,7 +337,7 @@ impl<'src> Parser<'src> {
             if self.eat("is")? {
                 fields.push(("type", self.type_node()?.into()));
             }
-            return Ok(self.finish(TypePredicate, start, fields));
+            return self.finish(TypePredicate, start, fields);
         }
         if self.eat("(")? {
             let type_node = self.type_node()?;
@@ -345,7 +346,7 @@ impl<'src> Parser<'src> {
                 ParenthesizedType,
                 start,
                 fields![("type", type_node.into())],
-            );
+            )?;
             self.nodes[id.0].flags &= !DISALLOW_CONDITIONAL_TYPES;
             return Ok(id);
         }
@@ -354,21 +355,21 @@ impl<'src> Parser<'src> {
                 return Ok(mapped);
             }
             let members = self.type_members()?;
-            return Ok(self.finish(TypeLiteral, start, fields![("members", members.into())]));
+            return self.finish(TypeLiteral, start, fields![("members", members.into())]);
         }
         if self.eat("[")? {
             let mut elements = vec![];
             while !self.at("]") {
                 let pos = self.pos();
                 let mut fields: Fields<'src> = Fields::new();
-                let labelled = self.tuple_label_ahead();
+                let labelled = self.tuple_label_ahead()?;
                 let element = if labelled {
                     self.optional_token("...", "dotDotDotToken", &mut fields)?;
                     fields.push(("name", self.identifier()?.into()));
                     self.optional_token("?", "questionToken", &mut fields)?;
                     self.expect(":")?;
                     fields.push(("type", self.tuple_element_type()?.into()));
-                    self.finish(NamedTupleMember, pos, fields)
+                    self.finish_native_jsdoc(NamedTupleMember, pos, fields)?
                 } else {
                     self.tuple_element_type()?
                 };
@@ -378,7 +379,7 @@ impl<'src> Parser<'src> {
                 }
             }
             self.expect("]")?;
-            return Ok(self.finish(TupleType, start, fields![("elements", elements.into())]));
+            return self.finish(TupleType, start, fields![("elements", elements.into())]);
         }
         if self.at("typeof") {
             self.bump()?;
@@ -390,7 +391,7 @@ impl<'src> Parser<'src> {
             if !self.current.newline && self.at("<") {
                 fields.push(("typeArguments", self.type_arguments()?.into()));
             }
-            return Ok(self.finish(TypeQuery, start, fields));
+            return self.finish(TypeQuery, start, fields);
         }
         if self.at("import") {
             return self.import_type(start, false);
@@ -413,44 +414,34 @@ impl<'src> Parser<'src> {
                         ("operator", Value::Number(MinusToken.number())),
                         ("operand", operand.into())
                     ],
-                )
+                )?
             } else if matches!(self.current.raw, "true" | "false" | "null") {
                 self.token_node()?
             } else {
                 self.literal()?
             };
-            return Ok(self.finish(LiteralType, start, fields![("literal", literal.into())]));
+            return self.finish(LiteralType, start, fields![("literal", literal.into())]);
         }
-        let keyword = match self.current.raw {
-            "any" => Some(AnyKeyword),
-            "unknown" => Some(UnknownKeyword),
-            "number" => Some(NumberKeyword),
-            "object" => Some(ObjectKeyword),
-            "boolean" => Some(BooleanKeyword),
-            "bigint" => Some(BigIntKeyword),
-            "string" => Some(StringKeyword),
-            "symbol" => Some(SymbolKeyword),
-            "void" => Some(VoidKeyword),
-            "undefined" => Some(UndefinedKeyword),
-            "never" => Some(NeverKeyword),
-            _ => None,
-        };
+        // Intrinsic is admitted only by the type-alias grammar. The other
+        // type keywords use the scanner's shared IdentifierToKeywordKind map.
+        let keyword = crate::lexer::identifier_keyword_syntax(self.current.raw)
+            .filter(|&kind| kind != IntrinsicKeyword && crate::syntax::is_type_node_kind(kind));
         if let Some(kind) = keyword {
-            if kind == VoidKeyword || !self.peek_at(".") {
+            if kind == VoidKeyword || !self.peek_at(".")? {
                 self.bump()?;
-                return Ok(self.finish(kind, start, vec![]));
+                return self.finish(kind, start, vec![]);
             }
         }
         let name = match self.entity_name() {
             Ok(name) => name,
-            Err(error) if self.recovering_types() => {
+            Err(Failure::Syntax(error)) if self.recovering_types() => {
                 self.record_type_error(error);
                 self.make(
                     Identifier,
                     self.pos(),
                     self.pos(),
                     fields![("escapedText", "".into())],
-                )
+                )?
             }
             Err(error) => return Err(error),
         };
@@ -458,7 +449,7 @@ impl<'src> Parser<'src> {
         if !self.current.newline && self.type_open() {
             fields.push(("typeArguments", self.type_arguments()?.into()));
         }
-        Ok(self.finish(TypeReference, start, fields))
+        self.finish(TypeReference, start, fields)
     }
     /// Retain the first character as the current token and return the suffix to
     /// the lexer. The next bump consumes that prefix and scans the remainder.
@@ -467,30 +458,31 @@ impl<'src> Parser<'src> {
         self.current.raw = &self.lexer.src[self.current.start..self.current.end];
         self.lexer.pos = self.current.end;
     }
-    fn tuple_label_ahead(&self) -> bool {
+    fn tuple_label_ahead(&self) -> Result<bool> {
         let mut lexer = self.lexer;
         let name = if self.at("...") {
-            lexer.next()
+            lexer.next_controlled(self.control.as_ref())?
         } else {
             self.current
         };
         if name.kind != Kind::Word {
-            return false;
+            return Ok(false);
         }
-        let next = lexer.next();
-        next.raw == ":" || next.raw == "?" && lexer.next().raw == ":"
+        let next = lexer.next_controlled(self.control.as_ref())?;
+        Ok(next.raw == ":"
+            || next.raw == "?" && lexer.next_controlled(self.control.as_ref())?.raw == ":")
     }
     fn tuple_element_type(&mut self) -> Result<NodeId> {
         let start = self.pos();
         if self.eat("...")? {
             let type_node = self.type_node()?;
-            return Ok(self.finish(RestType, start, fields![("type", type_node.into())]));
+            return self.finish(RestType, start, fields![("type", type_node.into())]);
         }
         let id = self.type_node()?;
         if self.nodes[id.0].syntax_kind == JSDocNullableType
             && matches!(self.nodes[id.0].field("postfix"), Some(Value::Bool(true)))
         {
-            self.set_kind(id, OptionalType);
+            self.set_kind(id, OptionalType)?;
             self.nodes[id.0].fields.retain(|(key, _)| *key != "postfix");
         }
         Ok(id)
@@ -513,7 +505,7 @@ impl<'src> Parser<'src> {
             // out a parenthesized type when the remainder cannot be parsed.
             committed = p.type_delimiter("=>")?;
             fields.push(("type", p.return_type()?.into()));
-            let id = p.finish(
+            let id = p.finish_native_jsdoc(
                 if constructor {
                     ConstructorType
                 } else {
@@ -521,8 +513,8 @@ impl<'src> Parser<'src> {
                 },
                 start,
                 fields,
-            );
-            p.attach_modifiers(id, modifiers);
+            )?;
+            p.attach_modifiers(id, modifiers)?;
             Ok(Some(id))
         });
         if committed {
@@ -541,8 +533,8 @@ impl<'src> Parser<'src> {
         let start = self.pos();
         let mut fields: Fields<'src> = Fields::new();
         if self.current.kind == Kind::Word
-            && self.peek_at("is")
-            && !self.peek().newline
+            && self.peek_at("is")?
+            && !self.peek()?.newline
             && !reserved_word(self.current.raw)
             && !(self.at("await") && self.context.contains(AWAIT)
                 || self.at("yield") && self.context.contains(YIELD))
@@ -552,7 +544,7 @@ impl<'src> Parser<'src> {
             if self.eat("is")? {
                 fields.push(("type", self.type_node()?.into()));
             }
-            return Ok(self.finish(TypePredicate, start, fields));
+            return self.finish(TypePredicate, start, fields);
         }
         self.type_node()
     }
@@ -573,7 +565,7 @@ impl<'src> Parser<'src> {
                 QualifiedName,
                 self.start(name),
                 fields![("left", name.into()), ("right", right.into())],
-            );
+            )?;
         }
         Ok(name)
     }
@@ -583,7 +575,11 @@ impl<'src> Parser<'src> {
         // left without a `>` for it and each enclosing list.
         if let Some(stop) = self.speculation {
             let at = self.current.start;
-            let unmatched = !self.recovering_types() && !self.angles.at(self.lexer.src, at).strict;
+            let unmatched = !self.recovering_types()
+                && !self
+                    .angles
+                    .at(self.lexer.src, at, self.control.as_ref())?
+                    .strict;
             if unmatched || self.angles.closers(at, stop) <= self.type_argument_frames {
                 return Err(self.error("Expected '>'"));
             }
@@ -610,6 +606,11 @@ impl<'src> Parser<'src> {
                 arguments.push(p.type_node()?);
             }
             if p.recovering_types() && !p.type_close() {
+                if p.context.contains(node_flags::JSDOC) {
+                    p.check_budget()?;
+                    p.type_recovery_diagnostic("Expected '>'");
+                    return Ok(arguments);
+                }
                 return Err(p.error("Expected '>'"));
             }
             p.expect_type_close()?;
@@ -640,8 +641,8 @@ impl<'src> Parser<'src> {
             if self.eat("=")? {
                 fields.push(("default", self.type_node()?.into()));
             }
-            let id = self.finish(TypeParameter, start, fields);
-            self.attach_modifiers(id, modifiers);
+            let id = self.finish(TypeParameter, start, fields)?;
+            self.attach_modifiers(id, modifiers)?;
             parameters.push(id);
             if !self.eat(",")? || self.type_close() {
                 break;
@@ -699,7 +700,7 @@ impl<'src> Parser<'src> {
         if self.type_open() {
             fields.push(("typeArguments", self.type_arguments()?.into()));
         }
-        Ok(self.finish(ImportType, start, fields))
+        self.finish(ImportType, start, fields)
     }
     fn mapped_type(&mut self) -> Result<Option<NodeId>> {
         let mut committed = false;
@@ -725,7 +726,7 @@ impl<'src> Parser<'src> {
                 TypeParameter,
                 parameter_start,
                 fields![("name", name.into()), ("constraint", constraint.into())],
-            );
+            )?;
             fields.push(("typeParameter", parameter.into()));
             if p.eat("as")? {
                 fields.push(("nameType", p.type_node()?.into()));
@@ -747,7 +748,7 @@ impl<'src> Parser<'src> {
             }
             p.expect("}")?;
             fields.push(("members", members.into()));
-            Ok(Some(p.finish(MappedType, start, fields)))
+            Ok(Some(p.finish(MappedType, start, fields)?))
         });
         if committed {
             result
@@ -776,14 +777,14 @@ impl<'src> Parser<'src> {
         let site = self.jsdoc_site();
         let result = self.in_context(self.context, |p| p.nest(|p| p.member_inner(signature)));
         if let Ok(id) = result {
-            self.mark_deprecated(site, id);
+            self.mark_deprecated(site, id)?;
         }
         result
     }
     fn member_inner(&mut self, signature: bool) -> Result<NodeId> {
         let start = self.pos();
         let modifiers = self.modifiers_inner(true, !signature)?;
-        if !signature && self.at("static") && self.peek_at("{") {
+        if !signature && self.at("static") && self.peek_at("{")? {
             self.bump()?;
             let body = self.in_context(self.context.without(YIELD).with(AWAIT), |parser| {
                 parser.block(Block)
@@ -792,25 +793,25 @@ impl<'src> Parser<'src> {
                 ClassStaticBlockDeclaration,
                 start,
                 fields![("body", body.into())],
-            );
-            self.attach_modifiers(id, modifiers);
+            )?;
+            self.attach_modifiers(id, modifiers)?;
             return Ok(id);
         }
-        if self.index_signature_ahead() {
+        if self.index_signature_ahead()? {
             let parameters = self.parameter_list("[", "]", false)?;
             let mut fields = fields![("parameters", parameters.into())];
             if self.eat(":")? {
                 fields.push(("type", self.type_node()?.into()));
             }
             self.member_semi()?;
-            let id = self.finish(IndexSignature, start, fields);
-            self.attach_modifiers(id, modifiers);
+            let id = self.finish(IndexSignature, start, fields)?;
+            self.attach_modifiers(id, modifiers)?;
             return Ok(id);
         }
         if signature
             && (self.at("(")
                 || self.at("<")
-                || (self.at("new") && matches!(self.peek().raw, "(" | "<")))
+                || (self.at("new") && matches!(self.peek()?.raw, "(" | "<")))
         {
             let construct = self.eat("new")?;
             let mut fields: Fields<'src> = Fields::new();
@@ -830,15 +831,15 @@ impl<'src> Parser<'src> {
                 },
                 start,
                 fields,
-            );
-            self.attach_modifiers(id, modifiers);
+            )?;
+            self.attach_modifiers(id, modifiers)?;
             return Ok(id);
         }
         let accessor = if matches!(self.current.raw, "get" | "set")
             && (matches!(
-                self.peek().kind,
+                self.peek()?.kind,
                 Kind::Word | Kind::Private | Kind::String | Kind::Number
-            ) || self.peek_at("["))
+            ) || self.peek_at("[")?)
         {
             Some(self.bump()?.raw)
         } else {
@@ -851,11 +852,11 @@ impl<'src> Parser<'src> {
             && accessor.is_none()
             && !generator
             && self.current.kind == Kind::String
-            && self.peek_at("(")
-            && matches!(decode_string(&self.current.raw[1..self.current.raw.len() - 1]), Ok(Value::Text(text)) if text == "constructor");
+            && self.peek_at("(")?
+            && matches!(decode_string(self.current, self.control.as_ref())?, Ok(Value::Text(text)) if text == "constructor");
         let constructor = constructor_keyword || quoted_constructor;
         if accessor.is_none() && !constructor {
-            self.ambient_modifiers(&modifiers);
+            self.ambient_modifiers(&modifiers)?;
         }
         let mut fields: Fields<'src> = Fields::new();
         self.optional_token("*", "asteriskToken", &mut fields)?;
@@ -881,9 +882,7 @@ impl<'src> Parser<'src> {
             }
             let async_function = accessor.is_none()
                 && !constructor
-                && modifiers
-                    .iter()
-                    .any(|id| self.nodes[id.0].syntax_kind == AsyncKeyword);
+                && self.has_modifier(&modifiers, AsyncKeyword)?;
             let generator = generator && accessor.is_none() && !constructor;
             let parameters = self.parameters_with_context(async_function, generator)?;
             fields.push(("parameters", parameters.into()));
@@ -929,42 +928,42 @@ impl<'src> Parser<'src> {
                 PropertyDeclaration
             }
         };
-        let id = self.finish(kind, start, fields);
-        self.attach_modifiers(id, modifiers);
+        let id = self.finish(kind, start, fields)?;
+        self.attach_modifiers(id, modifiers)?;
         Ok(id)
     }
     fn member_semi(&mut self) -> Result<()> {
         if self.eat(",")? { Ok(()) } else { self.semi() }
     }
-    fn index_signature_ahead(&self) -> bool {
+    fn index_signature_ahead(&self) -> Result<bool> {
         if !self.at("[") {
-            return false;
+            return Ok(false);
         }
         let mut lexer = self.lexer;
-        let first = lexer.next();
+        let first = lexer.next_controlled(self.control.as_ref())?;
         if matches!(first.raw, "..." | "]") {
-            return true;
+            return Ok(true);
         }
-        let mut next = lexer.next();
+        let mut next = lexer.next_controlled(self.control.as_ref())?;
         if modifier_keyword(first.raw) {
             if next.kind == Kind::Word && !reserved_word(next.raw) {
-                return true;
+                return Ok(true);
             }
         } else if first.kind != Kind::Word
             || reserved_word(first.raw)
             || first.raw == "await" && self.context.contains(AWAIT)
             || first.raw == "yield" && self.context.contains(YIELD)
         {
-            return false;
+            return Ok(false);
         }
         if matches!(next.raw, ":" | ",") {
-            return true;
+            return Ok(true);
         }
         if next.raw != "?" {
-            return false;
+            return Ok(false);
         }
-        next = lexer.next();
-        matches!(next.raw, ":" | "," | "]")
+        next = lexer.next_controlled(self.control.as_ref())?;
+        Ok(matches!(next.raw, ":" | "," | "]"))
     }
 }
 

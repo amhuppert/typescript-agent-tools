@@ -1,0 +1,473 @@
+{
+  "tsconfig.json": [
+    {
+      "marker": "upper",
+      "summary": "\"HELLO\" | \"SSFFIÉ\"",
+      "errorType": false
+    },
+    {
+      "marker": "lower",
+      "summary": "\"i̇οσ.σaσ𐐨\"",
+      "errorType": false
+    },
+    {
+      "marker": "sigma",
+      "summary": "\"σ aς aσa aς' aσ'a aς́ aσ́a ªς ºς ⅰς\"",
+      "errorType": false
+    },
+    {
+      "marker": "capitalize",
+      "summary": "\"\" | \"SStail\" | \"𐐀tail\" | \"😀tail\"",
+      "errorType": false
+    },
+    {
+      "marker": "uncapitalize",
+      "summary": "\"\" | \"i̇TAIL\" | \"σΣ\" | \"𐐨TAIL\"",
+      "errorType": false
+    },
+    {
+      "marker": "upperTemplate",
+      "summary": "`X${Uppercase<string>}Y${Uppercase<`${number}`>}Z`",
+      "errorType": false
+    },
+    {
+      "marker": "lowerTemplate",
+      "summary": "`aς${Lowercase<string>}σb`",
+      "errorType": false
+    },
+    {
+      "marker": "capHead",
+      "summary": "`Abc${string}`",
+      "errorType": false
+    },
+    {
+      "marker": "capSlot",
+      "summary": "`${Capitalize<string>}ABC`",
+      "errorType": false
+    },
+    {
+      "marker": "uncapSlot",
+      "summary": "`${Uncapitalize<string>}ABC`",
+      "errorType": false
+    },
+    {
+      "marker": "any",
+      "summary": "Uppercase<any>",
+      "errorType": false
+    },
+    {
+      "marker": "unknown",
+      "summary": "unknown",
+      "errorType": false
+    },
+    {
+      "marker": "never",
+      "summary": "never",
+      "errorType": false
+    },
+    {
+      "marker": "number",
+      "summary": "Uppercase<`${number}`>",
+      "errorType": false
+    },
+    {
+      "marker": "numberPattern",
+      "summary": "Uppercase<`${number}`>",
+      "errorType": false
+    },
+    {
+      "marker": "generic",
+      "summary": "Uppercase<S>",
+      "errorType": false
+    },
+    {
+      "marker": "substituted",
+      "summary": "\"HELLO\"",
+      "errorType": false
+    },
+    {
+      "marker": "same",
+      "summary": "Uppercase<string>",
+      "errorType": false
+    },
+    {
+      "marker": "nested",
+      "summary": "Uppercase<Lowercase<string>>",
+      "errorType": false
+    },
+    {
+      "marker": "empty",
+      "summary": "\"\"",
+      "errorType": false
+    },
+    {
+      "marker": "builtin",
+      "summary": "undefined",
+      "errorType": false
+    },
+    {
+      "marker": "noInfer",
+      "summary": "NoInfer<T>",
+      "errorType": false
+    },
+    {
+      "marker": "noInferLiteral",
+      "summary": "\"yes\"",
+      "errorType": false
+    },
+    {
+      "marker": "ordinary",
+      "summary": "\"lower\"",
+      "errorType": false
+    },
+    {
+      "marker": "missing",
+      "summary": "Uppercase<Missing>",
+      "errorType": false
+    },
+    {
+      "marker": "unionString",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "unionPattern",
+      "summary": "UnionPattern",
+      "errorType": false
+    },
+    {
+      "marker": "unionNested",
+      "summary": "UnionNested",
+      "errorType": false
+    },
+    {
+      "marker": "pairMapping",
+      "summary": "\"😀\"",
+      "errorType": false
+    },
+    {
+      "marker": "patternMembers",
+      "summary": "\"lower\" | Uppercase<string>",
+      "errorType": false
+    },
+    {
+      "marker": "nestedMembers",
+      "summary": "\"lower\" | Uppercase<Lowercase<string>>",
+      "errorType": false
+    }
+  ],
+  "loose.json": [
+    {
+      "marker": "upper",
+      "summary": "\"HELLO\" | \"SSFFIÉ\"",
+      "errorType": false
+    },
+    {
+      "marker": "lower",
+      "summary": "\"i̇οσ.σaσ𐐨\"",
+      "errorType": false
+    },
+    {
+      "marker": "sigma",
+      "summary": "\"σ aς aσa aς' aσ'a aς́ aσ́a ªς ºς ⅰς\"",
+      "errorType": false
+    },
+    {
+      "marker": "capitalize",
+      "summary": "\"\" | \"SStail\" | \"𐐀tail\" | \"😀tail\"",
+      "errorType": false
+    },
+    {
+      "marker": "uncapitalize",
+      "summary": "\"\" | \"i̇TAIL\" | \"σΣ\" | \"𐐨TAIL\"",
+      "errorType": false
+    },
+    {
+      "marker": "upperTemplate",
+      "summary": "`X${Uppercase<string>}Y${Uppercase<`${number}`>}Z`",
+      "errorType": false
+    },
+    {
+      "marker": "lowerTemplate",
+      "summary": "`aς${Lowercase<string>}σb`",
+      "errorType": false
+    },
+    {
+      "marker": "capHead",
+      "summary": "`Abc${string}`",
+      "errorType": false
+    },
+    {
+      "marker": "capSlot",
+      "summary": "`${Capitalize<string>}ABC`",
+      "errorType": false
+    },
+    {
+      "marker": "uncapSlot",
+      "summary": "`${Uncapitalize<string>}ABC`",
+      "errorType": false
+    },
+    {
+      "marker": "any",
+      "summary": "Uppercase<any>",
+      "errorType": false
+    },
+    {
+      "marker": "unknown",
+      "summary": "unknown",
+      "errorType": false
+    },
+    {
+      "marker": "never",
+      "summary": "never",
+      "errorType": false
+    },
+    {
+      "marker": "number",
+      "summary": "Uppercase<`${number}`>",
+      "errorType": false
+    },
+    {
+      "marker": "numberPattern",
+      "summary": "Uppercase<`${number}`>",
+      "errorType": false
+    },
+    {
+      "marker": "generic",
+      "summary": "Uppercase<S>",
+      "errorType": false
+    },
+    {
+      "marker": "substituted",
+      "summary": "\"HELLO\"",
+      "errorType": false
+    },
+    {
+      "marker": "same",
+      "summary": "Uppercase<string>",
+      "errorType": false
+    },
+    {
+      "marker": "nested",
+      "summary": "Uppercase<Lowercase<string>>",
+      "errorType": false
+    },
+    {
+      "marker": "empty",
+      "summary": "\"\"",
+      "errorType": false
+    },
+    {
+      "marker": "builtin",
+      "summary": "any",
+      "errorType": false
+    },
+    {
+      "marker": "noInfer",
+      "summary": "NoInfer<T>",
+      "errorType": false
+    },
+    {
+      "marker": "noInferLiteral",
+      "summary": "\"yes\"",
+      "errorType": false
+    },
+    {
+      "marker": "ordinary",
+      "summary": "\"lower\"",
+      "errorType": false
+    },
+    {
+      "marker": "missing",
+      "summary": "Uppercase<Missing>",
+      "errorType": false
+    },
+    {
+      "marker": "unionString",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "unionPattern",
+      "summary": "UnionPattern",
+      "errorType": false
+    },
+    {
+      "marker": "unionNested",
+      "summary": "UnionNested",
+      "errorType": false
+    },
+    {
+      "marker": "pairMapping",
+      "summary": "\"😀\"",
+      "errorType": false
+    },
+    {
+      "marker": "patternMembers",
+      "summary": "\"lower\" | Uppercase<string>",
+      "errorType": false
+    },
+    {
+      "marker": "nestedMembers",
+      "summary": "\"lower\" | Uppercase<Lowercase<string>>",
+      "errorType": false
+    }
+  ],
+  "exact.json": [
+    {
+      "marker": "upper",
+      "summary": "\"HELLO\" | \"SSFFIÉ\"",
+      "errorType": false
+    },
+    {
+      "marker": "lower",
+      "summary": "\"i̇οσ.σaσ𐐨\"",
+      "errorType": false
+    },
+    {
+      "marker": "sigma",
+      "summary": "\"σ aς aσa aς' aσ'a aς́ aσ́a ªς ºς ⅰς\"",
+      "errorType": false
+    },
+    {
+      "marker": "capitalize",
+      "summary": "\"\" | \"SStail\" | \"𐐀tail\" | \"😀tail\"",
+      "errorType": false
+    },
+    {
+      "marker": "uncapitalize",
+      "summary": "\"\" | \"i̇TAIL\" | \"σΣ\" | \"𐐨TAIL\"",
+      "errorType": false
+    },
+    {
+      "marker": "upperTemplate",
+      "summary": "`X${Uppercase<string>}Y${Uppercase<`${number}`>}Z`",
+      "errorType": false
+    },
+    {
+      "marker": "lowerTemplate",
+      "summary": "`aς${Lowercase<string>}σb`",
+      "errorType": false
+    },
+    {
+      "marker": "capHead",
+      "summary": "`Abc${string}`",
+      "errorType": false
+    },
+    {
+      "marker": "capSlot",
+      "summary": "`${Capitalize<string>}ABC`",
+      "errorType": false
+    },
+    {
+      "marker": "uncapSlot",
+      "summary": "`${Uncapitalize<string>}ABC`",
+      "errorType": false
+    },
+    {
+      "marker": "any",
+      "summary": "Uppercase<any>",
+      "errorType": false
+    },
+    {
+      "marker": "unknown",
+      "summary": "unknown",
+      "errorType": false
+    },
+    {
+      "marker": "never",
+      "summary": "never",
+      "errorType": false
+    },
+    {
+      "marker": "number",
+      "summary": "Uppercase<`${number}`>",
+      "errorType": false
+    },
+    {
+      "marker": "numberPattern",
+      "summary": "Uppercase<`${number}`>",
+      "errorType": false
+    },
+    {
+      "marker": "generic",
+      "summary": "Uppercase<S>",
+      "errorType": false
+    },
+    {
+      "marker": "substituted",
+      "summary": "\"HELLO\"",
+      "errorType": false
+    },
+    {
+      "marker": "same",
+      "summary": "Uppercase<string>",
+      "errorType": false
+    },
+    {
+      "marker": "nested",
+      "summary": "Uppercase<Lowercase<string>>",
+      "errorType": false
+    },
+    {
+      "marker": "empty",
+      "summary": "\"\"",
+      "errorType": false
+    },
+    {
+      "marker": "builtin",
+      "summary": "undefined",
+      "errorType": false
+    },
+    {
+      "marker": "noInfer",
+      "summary": "NoInfer<T>",
+      "errorType": false
+    },
+    {
+      "marker": "noInferLiteral",
+      "summary": "\"yes\"",
+      "errorType": false
+    },
+    {
+      "marker": "ordinary",
+      "summary": "\"lower\"",
+      "errorType": false
+    },
+    {
+      "marker": "missing",
+      "summary": "Uppercase<Missing>",
+      "errorType": false
+    },
+    {
+      "marker": "unionString",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "marker": "unionPattern",
+      "summary": "UnionPattern",
+      "errorType": false
+    },
+    {
+      "marker": "unionNested",
+      "summary": "UnionNested",
+      "errorType": false
+    },
+    {
+      "marker": "pairMapping",
+      "summary": "\"😀\"",
+      "errorType": false
+    },
+    {
+      "marker": "patternMembers",
+      "summary": "\"lower\" | Uppercase<string>",
+      "errorType": false
+    },
+    {
+      "marker": "nestedMembers",
+      "summary": "\"lower\" | Uppercase<Lowercase<string>>",
+      "errorType": false
+    }
+  ]
+}

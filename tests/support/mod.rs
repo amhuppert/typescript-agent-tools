@@ -68,10 +68,26 @@ pub fn check(files: &[(&str, &str)]) {
     fixture.check_markers(&fixture.load());
 }
 
+/// Assert the legacy input classification at a load boundary. Semantic and
+/// query failures must fail these fixtures, never masquerade as input errors.
+pub fn input_error(error: AnalysisError) -> InputError {
+    match error {
+        AnalysisError::Input(error) => error,
+        AnalysisError::Semantic(error) => {
+            panic!("expected an input failure, got semantic failure: {error:?}")
+        }
+        AnalysisError::Query(error) => {
+            panic!("expected an input failure, got query failure: {error:?}")
+        }
+    }
+}
+
 /// The error from loading a temporary `CONFIG` project with `files`.
 pub fn load_error(files: &[(&str, &str)]) -> InputError {
     let fixture = project(files);
-    Project::load(&fixture.path("tsconfig.json")).expect_err("the project should fail to load")
+    Project::load(&fixture.path("tsconfig.json"))
+        .map_err(input_error)
+        .expect_err("the project should fail to load")
 }
 
 /// The directory of the checked-in marker fixtures.
@@ -160,9 +176,15 @@ impl Fixture {
     /// Query every marked token and compare its groups with the marked sets.
     pub fn check_markers(&self, project: &Project) {
         let markers = self.markers();
+        self.check_marker_set(project, &markers);
+    }
+
+    /// Query markers supplied in analyzed-source coordinates. Encoding-prefix
+    /// tests retain that template separately from the bytes written to disk.
+    pub fn check_marker_set(&self, project: &Project, markers: &[Marker]) {
         assert!(!markers.is_empty(), "fixture has no markers");
-        let groups = expected_groups(&markers);
-        for marker in &markers {
+        let groups = expected_groups(markers);
+        for marker in markers {
             let query = ReferenceQuery::At {
                 file: self.path(&marker.location.file),
                 position: marker.location.start,
@@ -190,7 +212,7 @@ impl Fixture {
                     let result = result.unwrap_or_else(|error| panic!("{}: {error}", context()));
                     let wanted: Vec<_> =
                         labels.iter().map(|label| (label, &groups[label])).collect();
-                    compare_groups(&context(), &result.groups, &wanted, &markers);
+                    compare_groups(&context(), &result.groups, &wanted, markers);
                 }
             }
         }

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "noLib": true
+  },
+  "files": [
+    "globals.d.ts",
+    "protocol.d.ts",
+    "cases.ts"
+  ]
+}

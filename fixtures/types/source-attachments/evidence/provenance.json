@@ -1,0 +1,46 @@
+{
+  "scope": "historical copied-source capture-only measurement; source dependencies named by hashes, full copied crate retained only under .cc/temp",
+  "productionTelemetry": false,
+  "files": [
+    {
+      "file": "README.md",
+      "sha256": "0cafe36d9f83c673a4c09de7c3b735f14319225fc9b359b54f1e931224fde4be",
+      "bytes": 1629
+    },
+    {
+      "file": "allocator.rs",
+      "sha256": "c939f3701d5c48e35473c9931f3d57e2546e945807e5b7dd6ede62307326e531",
+      "bytes": 1521
+    },
+    {
+      "file": "captured-syntax.rs",
+      "sha256": "de4af8f7d9c687523708d44f6a0995269452d1c5ae6ff45150781f66d826a8db",
+      "bytes": 4307
+    },
+    {
+      "file": "copied-source-inputs.json",
+      "sha256": "05610e7f4707a60ccfd305f01230703190f2223c7c951031a27454d162737d94",
+      "bytes": 19553
+    },
+    {
+      "file": "measurement-test.rs",
+      "sha256": "fba57304c73a495a29745666c44eb517c89027a088bac72b3229ecad918e625d",
+      "bytes": 2628
+    },
+    {
+      "file": "measurements.json",
+      "sha256": "bede3d54ed045d19f3f773e2bb1217ae364cfbd97ed94bded8bd4b18a6c95dac",
+      "bytes": 2752
+    },
+    {
+      "file": "output.txt",
+      "sha256": "6677e2a599a05a33bf2fd1fd9d22c58432bbf19e31fedd6c8b7518cfca3653de",
+      "bytes": 4169
+    },
+    {
+      "file": "registered-post-index.json",
+      "sha256": "4cf0be72cf0deb4dddf77064c4abc6d8a3a801145229727757233feace0722ce",
+      "bytes": 636
+    }
+  ]
+}

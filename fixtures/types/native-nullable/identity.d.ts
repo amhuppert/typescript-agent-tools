@@ -1,0 +1,1 @@
+type NonNullable<T> = T;

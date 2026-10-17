@@ -1,0 +1,178 @@
+[
+  {
+    "name": "outsideHigh",
+    "summary": "number",
+    "errorType": false,
+    "demandFailures": [],
+    "codes": [
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318
+    ],
+    "augmentation": {}
+  },
+  {
+    "name": "outsideLow",
+    "summary": "number",
+    "errorType": false,
+    "demandFailures": [],
+    "codes": [
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318
+    ],
+    "augmentation": {}
+  },
+  {
+    "name": "insideHigh",
+    "summary": "number",
+    "errorType": false,
+    "demandFailures": [],
+    "codes": [
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318
+    ],
+    "augmentation": {
+      "objectAugmentation:���": {
+        "emptyRecovery": true
+      }
+    }
+  },
+  {
+    "name": "insideLow",
+    "summary": "number",
+    "errorType": false,
+    "demandFailures": [],
+    "codes": [
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318
+    ],
+    "augmentation": {
+      "objectAugmentation:���": {
+        "emptyRecovery": true
+      }
+    }
+  },
+  {
+    "name": "insidePair",
+    "summary": "number",
+    "errorType": false,
+    "demandFailures": [],
+    "codes": [
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318
+    ],
+    "augmentation": {
+      "objectAugmentation:💡": {
+        "emptyRecovery": true
+      }
+    }
+  },
+  {
+    "name": "insideCooked",
+    "summary": "number",
+    "errorType": false,
+    "demandFailures": [],
+    "codes": [
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318
+    ],
+    "augmentation": {
+      "objectAugmentation:name": {
+        "emptyRecovery": true
+      }
+    }
+  },
+  {
+    "name": "insideNumeric",
+    "summary": "number",
+    "errorType": false,
+    "demandFailures": [],
+    "codes": [
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318
+    ],
+    "augmentation": {
+      "objectAugmentation:16": {
+        "emptyRecovery": true
+      }
+    }
+  },
+  {
+    "name": "insideIdentifier",
+    "summary": "number",
+    "errorType": false,
+    "demandFailures": [],
+    "codes": [
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318
+    ],
+    "augmentation": {
+      "objectAugmentation:name": {
+        "emptyRecovery": true
+      }
+    }
+  }
+]

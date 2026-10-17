@@ -1,0 +1,90 @@
+{
+  "version": "7.0.2",
+  "binary": "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/tsc",
+  "rows": [
+    {
+      "strict": true,
+      "length": 261394,
+      "sha256": "70ee06543de53fb5200ae3e2bb2947cbc2eaeee398c3746171d0a7b50fc7b0d3",
+      "root": "Budget",
+      "rootError": false,
+      "child": "number",
+      "childError": false
+    },
+    {
+      "strict": true,
+      "length": 261395,
+      "sha256": "9efa823109c8016101d9c1ba2cf733b34bce2642892e1d287fc4fb79aaeebf22",
+      "root": "Budget",
+      "rootError": false,
+      "child": "number",
+      "childError": false
+    },
+    {
+      "strict": true,
+      "length": 261396,
+      "sha256": "755ac9d7ac52a80b75b3682d61750ee8a96405a3e9a398c86e91529b953d3973",
+      "root": "Budget",
+      "rootError": false,
+      "child": "number",
+      "childError": false
+    },
+    {
+      "strict": true,
+      "length": 263000,
+      "sha256": "fdb3b716e7728f78eea1e25bdaa6821e31c5b05857968d89f7f25bdf2f40b001",
+      "root": "Budget",
+      "rootError": false,
+      "child": "MissingType",
+      "childError": true
+    },
+    {
+      "strict": false,
+      "length": 261394,
+      "sha256": "70ee06543de53fb5200ae3e2bb2947cbc2eaeee398c3746171d0a7b50fc7b0d3",
+      "root": "Budget",
+      "rootError": false,
+      "child": "number",
+      "childError": false
+    },
+    {
+      "strict": false,
+      "length": 261395,
+      "sha256": "9efa823109c8016101d9c1ba2cf733b34bce2642892e1d287fc4fb79aaeebf22",
+      "root": "Budget",
+      "rootError": false,
+      "child": "number",
+      "childError": false
+    },
+    {
+      "strict": false,
+      "length": 261396,
+      "sha256": "755ac9d7ac52a80b75b3682d61750ee8a96405a3e9a398c86e91529b953d3973",
+      "root": "Budget",
+      "rootError": false,
+      "child": "number",
+      "childError": false
+    },
+    {
+      "strict": false,
+      "length": 263000,
+      "sha256": "fdb3b716e7728f78eea1e25bdaa6821e31c5b05857968d89f7f25bdf2f40b001",
+      "root": "Budget",
+      "rootError": false,
+      "child": "MissingType",
+      "childError": true
+    }
+  ],
+  "scope": "Fresh declared interface root, complete exact own-property identity, then explicit child demand. These are compiler controls, not product graph-budget outcomes.",
+  "probeSha256": "c7a2e1d75d678bbb5c200914244883bdda3117775d057f7a63b5f83d7d3b3def",
+  "originalProbePath": ".cc/temp/types-lazy-budget/probe.mjs",
+  "archivedProbePath": "fixtures/types/presentation/captured-tooling/lazy-budget-probe.mjs",
+  "reproduce": "Copy the unchanged archived probe back to its original scratch path, then run with the pinned compiler environment from scripts/validate/common.sh. It regenerates exact source/config files in scratch.",
+  "sharedToolHashes": [
+    {
+      "file": "tools/semantic-oracle.mjs",
+      "sha256": "bc969538c077b64b4bf65e87be063ed5903f7d2cca739676b3780c13565f565a"
+    }
+  ],
+  "binarySha256": "76e4987d060ef8207875a53a73619ce665ff16fb2800c0d57a452e21c829bd7b"
+}
