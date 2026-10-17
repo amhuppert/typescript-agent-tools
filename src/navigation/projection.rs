@@ -82,7 +82,11 @@ pub(super) fn project(ast: &Ast<'_>, detail: Detail) -> Vec<Record> {
     let mut projection = Projection {
         ast,
         detail,
-        literals: ast.literal_token_spans(),
+        // Only signatures read the literals, and a selection renders none.
+        literals: match detail {
+            Detail::Complete => ast.literal_token_spans(),
+            Detail::Selection => Vec::new(),
+        },
         records: Vec::new(),
         work: Vec::new(),
     };
@@ -775,6 +779,7 @@ impl<'a, 'src> Projection<'a, 'src> {
     }
 
     fn render(&self, root: NodeId, spec: Spec) -> String {
+        debug_assert_eq!(self.detail, Detail::Complete, "a selection has no literals");
         let bounds = Span {
             start: spec.parts[0].start,
             end: spec.parts[spec.parts.len() - 1].end,

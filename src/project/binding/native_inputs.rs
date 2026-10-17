@@ -31,9 +31,9 @@ impl RawDeclaration {
     pub(super) fn kind(self, files: BindingFiles<'_>) -> SyntaxKind {
         use super::store::SymbolDeclaration;
         match self.0 {
-            SymbolDeclaration::Bound(file, id) => files.file(file).decls[id.index()].native_kind,
+            SymbolDeclaration::Bound(file, id) => files.file(file).decls()[id.index()].native_kind,
             SymbolDeclaration::Alias(alias) => {
-                files.file(alias.file).aliases[alias.id.index()].native_kind
+                files.file(alias.file).aliases()[alias.id.index()].native_kind
             }
             SymbolDeclaration::ExportStar { .. } => SyntaxKind::ExportDeclaration,
             SymbolDeclaration::Module { .. } => SyntaxKind::ModuleDeclaration,
@@ -44,10 +44,11 @@ impl RawDeclaration {
 
     pub(super) fn is_default(self, files: BindingFiles<'_>) -> bool {
         match self.0 {
-            super::store::SymbolDeclaration::Bound(file, id) => files.file(file).decls[id.index()]
-                .export
-                .as_ref()
-                .is_some_and(|(_, name)| name == "default"),
+            super::store::SymbolDeclaration::Bound(file, id) => files.file(file).decls()
+                [id.index()]
+            .export
+            .as_ref()
+            .is_some_and(|(_, name)| name == "default"),
             _ => false,
         }
     }
@@ -152,7 +153,7 @@ impl<'p> NativeInputs<'p> {
             .own_declarations(symbol)
             .filter(|(role, _)| *role == DeclKind::Member(kind))
             .map(|(_, declaration)| BoundMemberDeclaration {
-                native_kind: self.files.file(declaration.file).decls[declaration.id.index()]
+                native_kind: self.files.file(declaration.file).decls()[declaration.id.index()]
                     .native_kind,
                 declaration,
             })
@@ -194,7 +195,7 @@ impl<'p> NativeInputs<'p> {
         let mut symbols = self
             .files
             .file(file)
-            .decls
+            .decls()
             .iter()
             .enumerate()
             .filter(|(_, declaration)| {
@@ -306,7 +307,7 @@ impl<'p> NativeInputs<'p> {
         let scope = self
             .files
             .file(file)
-            .conditional_scopes
+            .conditional_scopes()
             .get(&span)
             .ok_or(TypeBindingFailure::NotRetained)?;
         let Some(table) = self.raw.scope_tables[file.index()][scope.index()] else {
@@ -407,7 +408,7 @@ impl<'p> NativeInputs<'p> {
                 };
                 self.files
                     .file(*file)
-                    .aliases
+                    .aliases()
                     .iter()
                     .any(|alias| matches!(alias.bind, super::collect::AliasBind::Global { .. }))
             })
@@ -447,7 +448,7 @@ impl<'p> NativeInputs<'p> {
         let mut declarations =
             self.files
                 .file(file)
-                .decls
+                .decls()
                 .iter()
                 .enumerate()
                 .filter(|(_, declaration)| {
@@ -519,7 +520,7 @@ impl<'p> NativeInputs<'p> {
         use super::store::SymbolDeclaration;
         Ok(match declaration {
             SymbolDeclaration::Bound(file, id) => {
-                let data = &self.files.file(file).decls[id.index()];
+                let data = &self.files.file(file).decls()[id.index()];
                 NativeSymbolDeclaration {
                     json: None,
                     file,
@@ -528,7 +529,7 @@ impl<'p> NativeInputs<'p> {
                 }
             }
             SymbolDeclaration::Alias(alias) => {
-                let data = &self.files.file(alias.file).aliases[alias.id.index()];
+                let data = &self.files.file(alias.file).aliases()[alias.id.index()];
                 NativeSymbolDeclaration {
                     json: None,
                     file: alias.file,
@@ -552,7 +553,7 @@ impl<'p> NativeInputs<'p> {
                 json: self
                     .files
                     .file(file)
-                    .json
+                    .json()
                     .as_ref()
                     .map(|_| super::JsonDeclaration::SourceFile),
                 file,
@@ -602,7 +603,7 @@ impl<'p> NativeInputs<'p> {
             .inspect(|_| {})
             .filter_map(|declaration| declaration.bound())
             .map(|(file, id)| {
-                let declaration = &self.files.file(file).decls[id.index()];
+                let declaration = &self.files.file(file).decls()[id.index()];
                 (
                     declaration.kind,
                     BoundDeclaration {
@@ -740,7 +741,7 @@ impl<'p> NativeInputs<'p> {
         let mut declarations =
             self.files
                 .file(file)
-                .decls
+                .decls()
                 .iter()
                 .enumerate()
                 .filter(|(_, declaration)| {
@@ -943,7 +944,7 @@ impl<'p> NativeInputs<'p> {
         span: Span,
     ) -> Result<Option<ReadOrigin>, TypeBindingFailure> {
         let mut local = None;
-        for (index, declaration) in self.files.file(file).decls.iter().enumerate() {
+        for (index, declaration) in self.files.file(file).decls().iter().enumerate() {
             if declaration.native_kind == kind
                 && declaration.native_span == Some(span)
                 && let Some(symbol) = self.raw.declaration_locals[file.index()][index]
@@ -982,7 +983,7 @@ impl<'p> NativeInputs<'p> {
         _raw: bool,
         matches: impl Fn(&super::collect::Decl) -> bool,
     ) -> Result<BoundSymbol, TypeBindingFailure> {
-        let declarations = self.files.file(file).decls;
+        let declarations = self.files.file(file).decls();
         let mut targets = declarations
             .iter()
             .enumerate()
@@ -1142,7 +1143,7 @@ impl<'p> NativeInputs<'p> {
     }
 
     fn bound_declaration(&self, file: FileId, id: DeclId) -> BoundDeclaration {
-        let declaration = &self.files.file(file).decls[id.index()];
+        let declaration = &self.files.file(file).decls()[id.index()];
         BoundDeclaration {
             file,
             id,
@@ -1175,7 +1176,7 @@ impl NativeInputs<'_> {
             let alias = self
                 .files
                 .file(file)
-                .aliases
+                .aliases()
                 .iter()
                 .find(|alias| {
                     alias.target_name == Some((SyntaxKind::Identifier, anchor))
@@ -1253,7 +1254,7 @@ impl NativeInputs<'_> {
         let alias = self
             .alias_declaration_at(file, kind, span)?
             .ok_or(TypeBindingFailure::NotRetained)?;
-        let request = match &self.files.file(file).aliases[alias.id.index()].kind {
+        let request = match &self.files.file(file).aliases()[alias.id.index()].kind {
             super::collect::AliasKind::Import { request, .. }
             | super::collect::AliasKind::Namespace { request } => *request,
             _ => return Ok(None),
@@ -1318,7 +1319,7 @@ impl NativeInputs<'_> {
         span: Span,
     ) -> Result<Option<NativeRawSymbolTable>, TypeBindingFailure> {
         let mut table = None;
-        for (index, scope) in self.files.file(file).scopes.iter().enumerate() {
+        for (index, scope) in self.files.file(file).scopes().iter().enumerate() {
             if scope.native_owner != Some((kind, span)) {
                 continue;
             }
@@ -1438,19 +1439,19 @@ impl<'p> NativeInputs<'p> {
             super::raw::RawModuleRequest::Module { header, pattern } => Ok(ModuleSelection {
                 symbol: BoundSymbol(header),
                 pattern_name: pattern.then(|| {
-                    self.files.file(site.file).requests[site.request.index()]
+                    self.files.file(site.file).requests()[site.request.index()]
                         .specifier
                         .as_str()
                 }),
             }),
             super::raw::RawModuleRequest::Script => Err(TypeBindingFailure::Dependency {
                 file: site.file,
-                span: self.files.file(site.file).requests[site.request.index()].span,
+                span: self.files.file(site.file).requests()[site.request.index()].span,
                 reason: "imported file is not a module".into(),
             }),
             super::raw::RawModuleRequest::Ignored => Err(TypeBindingFailure::Dependency {
                 file: site.file,
-                span: self.files.file(site.file).requests[site.request.index()].span,
+                span: self.files.file(site.file).requests()[site.request.index()].span,
                 reason: "module is not resolved".into(),
             }),
         }
@@ -1463,7 +1464,7 @@ impl<'p> NativeInputs<'p> {
             super::raw::RawModuleRequest::Module { .. } => self.module_selection(site).map(Some),
             super::raw::RawModuleRequest::Script => Ok(None),
             super::raw::RawModuleRequest::Ignored => {
-                match &self.files.file(site.file).modules[site.request.index()] {
+                match &self.files.file(site.file).modules()[site.request.index()] {
                     super::ModuleResolution::Missing => Ok(None),
                     super::ModuleResolution::Unchecked => Err(TypeBindingFailure::Pending(
                         "native module resolution request has not been established",
@@ -1514,11 +1515,11 @@ impl NativeInputs<'_> {
         use super::store::SymbolDeclaration;
         match declaration.0 {
             SymbolDeclaration::Bound(file, id) => {
-                (file, self.files.file(file).decls[id.index()].anchor)
+                (file, self.files.file(file).decls()[id.index()].anchor)
             }
             SymbolDeclaration::Alias(alias) => (
                 alias.file,
-                self.files.file(alias.file).aliases[alias.id.index()].span,
+                self.files.file(alias.file).aliases()[alias.id.index()].span,
             ),
             SymbolDeclaration::ExportStar { file, span, .. }
             | SymbolDeclaration::Module { file, span }
@@ -1558,7 +1559,7 @@ impl<'p> NativeInputs<'p> {
         };
         self.files
             .file(file)
-            .module_declarations
+            .module_declarations()
             .iter()
             .any(|declaration| declaration.span == span && declaration.shorthand)
     }
@@ -1571,7 +1572,7 @@ impl<'p> NativeInputs<'p> {
         let parameter = self
             .files
             .file(file)
-            .decls
+            .decls()
             .iter()
             .find(|decl| decl.kind == DeclKind::Parameter && decl.native_span == Some(declaration))
             .ok_or(TypeBindingFailure::NotRetained)?;
@@ -1586,7 +1587,7 @@ impl<'p> NativeInputs<'p> {
         let Some(request) = self
             .files
             .file(file)
-            .requests
+            .requests()
             .iter()
             .position(|request| request.implicit == Some(super::ImplicitImport::Helpers))
         else {
@@ -1600,7 +1601,7 @@ impl<'p> NativeInputs<'p> {
             super::raw::RawModuleRequest::Module { .. } => self.module_selection(site).map(Some),
             super::raw::RawModuleRequest::Script => Ok(None),
             super::raw::RawModuleRequest::Ignored => {
-                match &self.files.file(file).modules[request] {
+                match &self.files.file(file).modules()[request] {
                     super::ModuleResolution::Missing
                     | super::ModuleResolution::Unchecked
                     | super::ModuleResolution::NotAdmitted(_) => Ok(None),

@@ -498,7 +498,7 @@ impl<'a> Resolver<'a> {
                         let (file, span) = match need.task {
                             Task::Alias(alias) => (
                                 alias.file,
-                                self.inputs.file(alias.file).aliases[alias.id.index()].span,
+                                self.inputs.file(alias.file).aliases()[alias.id.index()].span,
                             ),
                             Task::Ref(reference) => {
                                 let data = self.inputs.reference(reference);
@@ -582,7 +582,7 @@ impl<'a> Resolver<'a> {
         );
         let mut value_origin = found.targets().value().map(ValueOrigin::Direct);
         let alias = entry.alias.filter(|alias| {
-            !lexical || !self.inputs.file(alias.file).aliases[alias.id.index()].export_only
+            !lexical || !self.inputs.file(alias.file).aliases()[alias.id.index()].export_only
         });
         if let Some(alias) = alias {
             let task = Task::Alias(alias);
@@ -721,7 +721,7 @@ impl<'a> Resolver<'a> {
     ) -> u8 {
         if scope.is_some_and(|scope| {
             matches!(
-                self.inputs.file(file).scopes[scope.index()].kind,
+                self.inputs.file(file).scopes()[scope.index()].kind,
                 ScopeKind::Members { .. }
             )
         }) {
@@ -810,7 +810,7 @@ impl<'a> Resolver<'a> {
             let index = plan.index;
             // An infer constraint sees only its own declaration's name.
             if let Some(decl) = plan.infer {
-                let own = &facts.decls[decl.index()];
+                let own = &facts.decls()[decl.index()];
                 if own.name == name && requested.accepts(flags::TYPE_PARAMETER) {
                     if let Some(symbol) = self.inputs.decl_symbols[file.index()][decl.index()] {
                         return Some(Step::Done(NameLookup::Resolved(LexicalLookup {
@@ -945,7 +945,7 @@ impl<'a> Resolver<'a> {
                         if lookup_mask & 8 != 0
                             && let Some(alias) = entry.alias
                             && (matches!(table_recipe, NameTable::Exports { .. })
-                                || !self.inputs.file(alias.file).aliases[alias.id.index()]
+                                || !self.inputs.file(alias.file).aliases()[alias.id.index()]
                                     .export_only)
                         {
                             return Some(Step::Done(NameLookup::Symbol(ValueOrigin::Alias(alias))));
@@ -1413,7 +1413,7 @@ impl<'a> Resolver<'a> {
                 ));
             }
         };
-        let json = self.inputs.file(file).json.expect("a JSON module's file");
+        let json = self.inputs.file(file).json().expect("a JSON module's file");
         if let Some(child) = json.property(at, name) {
             return Some(value(ValueTarget::Json { file, value: child }));
         }
@@ -1460,7 +1460,7 @@ impl<'a> Resolver<'a> {
 
     fn try_alias(&mut self, alias: AliasRef) -> Step<Resolution> {
         let facts = self.inputs.file(alias.file);
-        let data = &facts.aliases[alias.id.index()];
+        let data = &facts.aliases()[alias.id.index()];
         let mut value_origin = None;
         let step = match &data.kind {
             AliasKind::Import { request, name } => {
@@ -1487,7 +1487,7 @@ impl<'a> Resolver<'a> {
                     },
                     Err(why) => Step::Done(Resolution::Unresolved(
                         ResolutionFailure::from(why)
-                            .at_dependency(alias.file, facts.requests[request.index()].span),
+                            .at_dependency(alias.file, facts.requests()[request.index()].span),
                     )),
                 }
             }
@@ -1496,7 +1496,7 @@ impl<'a> Resolver<'a> {
                     Ok(module) => self.module_object(module),
                     Err(why) => Step::Done(Resolution::Unresolved(
                         ResolutionFailure::from(why)
-                            .at_dependency(alias.file, facts.requests[request.index()].span),
+                            .at_dependency(alias.file, facts.requests()[request.index()].span),
                     )),
                 }
             }
@@ -1687,7 +1687,7 @@ impl<'a> Resolver<'a> {
                 Err(why) => Step::Done(Resolution::Unresolved(
                     ResolutionFailure::from(why).at_dependency(
                         reference.file,
-                        self.inputs.file(reference.file).requests[request.index()].span,
+                        self.inputs.file(reference.file).requests()[request.index()].span,
                     ),
                 )),
             },
@@ -1717,7 +1717,7 @@ impl Files<'_> {
         let mut finished = false;
         std::iter::from_fn(move || {
             if let Some(index) = current {
-                current = self.file(file).scopes[index.index()].parent;
+                current = self.file(file).scopes()[index.index()].parent;
                 saw_global |= matches!(self.storage(file, index), Storage::Script);
                 Some(Some(index))
             } else if !finished && !saw_global {
@@ -1731,8 +1731,8 @@ impl Files<'_> {
     /// Where a scope stores its names. Every scope kind is decided here, for
     /// both declaration and lookup.
     pub(super) fn storage(&self, file: FileId, scope: ScopeId) -> Storage {
-        match self.file(file).scopes[scope.index()].kind {
-            ScopeKind::Root if !self.file(file).module => Storage::Script,
+        match self.file(file).scopes()[scope.index()].kind {
+            ScopeKind::Root if !self.file(file).module() => Storage::Script,
             ScopeKind::Global => Storage::Own(Some(Host::Global)),
             ScopeKind::Members { decl } => Storage::Members(decl),
             ScopeKind::Namespace { decl } => Storage::Own(Some(Host::Namespace(decl))),
@@ -1766,7 +1766,7 @@ impl Files<'_> {
             plan.tables.push(NameTable::Global);
             return plan;
         };
-        let kind = self.file(file).scopes[index.index()].kind;
+        let kind = self.file(file).scopes()[index.index()].kind;
         match kind {
             ScopeKind::InferConstraint { decl } => plan.infer = Some(decl),
             ScopeKind::Enum { decl } => plan.enum_ = Some(decl),
@@ -1788,7 +1788,7 @@ impl Files<'_> {
                         | ScopeKind::AmbientModule { .. }
                         | ScopeKind::Augmentation { .. } => true,
                         ScopeKind::Namespace { decl } => {
-                            self.file(file).decls[decl.index()].ambient
+                            self.file(file).decls()[decl.index()].ambient
                         }
                         _ => false,
                     };

@@ -5,10 +5,10 @@ use super::reference_tokens::{
     CollectedReferenceToken, ReferenceSyntax, ReferenceToken, ReferenceTokenEntry,
 };
 use crate::Span;
+use crate::hash::FastMap;
 use crate::project::sources::{FileId, Sources};
 use crate::source::SourcePosition;
 use smallvec::SmallVec;
-use std::collections::HashMap;
 
 /// One declaration of a symbol: a name token, or the anchor of a synthetic
 /// declaration such as an anonymous default export or a module.
@@ -122,7 +122,8 @@ pub(crate) struct OccurrenceRef {
 
 #[derive(Debug, Default)]
 pub(crate) struct Index {
-    sites: HashMap<SymbolId, Vec<IndexedSite>>,
+    /// Its maps are only looked up; nothing iterates them.
+    sites: FastMap<SymbolId, Vec<IndexedSite>>,
     /// Occurrences of each file, indexed by `FileId` and ordered by start.
     files: Vec<Vec<Occurrence>>,
     /// Derived selectors over the same entries; full JSX names can overlap
@@ -131,9 +132,9 @@ pub(crate) struct Index {
     reference_positions: Vec<Vec<OccurrenceId>>,
     /// Public result order, with duplicate locations' roles combined. This
     /// immutable work is shared by position and name queries.
-    by_symbol: HashMap<SymbolId, Vec<IndexedOccurrence>>,
-    by_name: HashMap<String, Vec<OccurrenceRef>>,
-    by_reference_name: HashMap<String, Box<[ReferenceToken]>>,
+    by_symbol: FastMap<SymbolId, Vec<IndexedOccurrence>>,
+    by_name: FastMap<String, Vec<OccurrenceRef>>,
+    by_reference_name: FastMap<String, Box<[ReferenceToken]>>,
     /// Names and reasons shared by many occurrences.
     strings: Vec<Box<str>>,
 }
@@ -221,9 +222,10 @@ pub(crate) struct Token<'a> {
 #[derive(Debug, Default)]
 pub(crate) struct Builder {
     index: Index,
-    string_ids: crate::hash::FastMap<Box<str>, StringId>,
-    by_symbol: HashMap<SymbolId, Vec<OccurrenceRef>>,
-    by_reference_name: HashMap<String, Vec<(ReferenceToken, Span)>>,
+    string_ids: FastMap<Box<str>, StringId>,
+    /// `finish` sorts each entry, so its order is not the hasher's.
+    by_symbol: FastMap<SymbolId, Vec<OccurrenceRef>>,
+    by_reference_name: FastMap<String, Vec<(ReferenceToken, Span)>>,
 }
 
 impl Builder {

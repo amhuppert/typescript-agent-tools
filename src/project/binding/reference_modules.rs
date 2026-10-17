@@ -39,7 +39,7 @@ impl<'a> BindingFiles<'a> {
     ) -> Result<(ReferenceModuleSite, bool), TypeBindingFailure> {
         let mut matches = self
             .file(file)
-            .stars
+            .stars()
             .iter()
             .filter(|star| star.declaration_span == declaration_span);
         let star = matches.next().ok_or(TypeBindingFailure::NotRetained)?;
@@ -56,11 +56,11 @@ impl<'a> BindingFiles<'a> {
     }
 
     pub(in crate::project) fn file_is_declaration(&self, file: FileId) -> bool {
-        self.file(file).declaration
+        self.file(file).declaration()
     }
 
     pub(in crate::project) fn file_is_json(&self, file: FileId) -> bool {
-        self.file(file).json.is_some()
+        self.file(file).json().is_some()
     }
 
     /// Candidate request inventory for `SourceFile.Imports` and the fallback
@@ -72,7 +72,7 @@ impl<'a> BindingFiles<'a> {
         &self,
         file: FileId,
     ) -> Vec<ReferenceModuleSite> {
-        let requests = self.file(file).requests;
+        let requests = self.file(file).requests();
         let mut sites = Vec::new();
         for (index, request) in requests.iter().enumerate() {
             if !matches!(request.kind, RequestKind::Augmentation { .. }) {
@@ -102,7 +102,7 @@ impl<'a> BindingFiles<'a> {
         &self,
         site: ReferenceModuleSite,
     ) -> ReferenceModuleSiteFacts {
-        let request = &self.file(site.file).requests[site.request.index()];
+        let request = &self.file(site.file).requests()[site.request.index()];
         ReferenceModuleSiteFacts {
             mode: request.mode,
             emit_mode: request.emit_mode,
@@ -118,14 +118,14 @@ impl<'a> BindingFiles<'a> {
         &self,
         file: FileId,
     ) -> crate::project::program::FileModuleSemantics {
-        self.file(file).module_semantics
+        self.file(file).module_semantics()
     }
 
     pub(in crate::project) fn reference_module_specifier(
         &self,
         site: ReferenceModuleSite,
     ) -> &'a str {
-        &self.file(site.file).requests[site.request.index()].specifier
+        &self.file(site.file).requests()[site.request.index()].specifier
     }
 
     /// `GetResolvedModuleFromModuleSpecifier` observes raw resolution, before
@@ -134,7 +134,7 @@ impl<'a> BindingFiles<'a> {
         &self,
         site: ReferenceModuleSite,
     ) -> Option<&'a str> {
-        self.file(site.file).requests[site.request.index()]
+        self.file(site.file).requests()[site.request.index()]
             .resolved_path
             .as_deref()
     }

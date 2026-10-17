@@ -288,6 +288,26 @@ fn load_program(
                     other => other,
                 })
                 .collect();
+            // A searched input keeps its catalog, built now where the guess
+            // at its reservation left it out (`capture::Job::navigation`).
+            let navigation = match loaded.navigation {
+                Some(navigation) if search => Some(navigation),
+                None if search => {
+                    let source = &loader.sources.get(id);
+                    let path = source
+                        .path
+                        .to_str()
+                        .expect("loading names its inputs with text");
+                    let ast = loader
+                        .parser
+                        .parse(source.text.as_str(), path)
+                        .map_err(|error| {
+                            InputError::unparsable(error, &source.text, &source.path)
+                        })?;
+                    Some(Captured::typescript(&ast, &source.text))
+                }
+                _ => None,
+            };
             files.push(ProgramFile {
                 module_semantics: loaded.module_semantics,
                 search,
@@ -295,7 +315,7 @@ fn load_program(
                 facts: loaded.facts,
                 modules,
                 diagnostics,
-                navigation: loaded.navigation.filter(|_| search),
+                navigation,
             });
         }
         let specifier_environment = cwd.map(|cwd| {
@@ -447,7 +467,7 @@ impl Loader<'_> {
     /// root tasks.
     fn load_all(&mut self, roots: &[files::Root]) -> Result<(), InputError> {
         for root in roots {
-            let id = self.enqueue(&root.path)?;
+            let id = self.enqueue_as(&root.path, None, true)?;
             self.search_roots.push(id);
             self.root_tasks.push(id);
         }
@@ -468,7 +488,7 @@ impl Loader<'_> {
     /// The id of an input, queueing it on first sight. Identity is the real
     /// path unless `preserveSymlinks` is set.
     fn enqueue(&mut self, path: &str) -> Result<FileId, InputError> {
-        self.enqueue_as(path, None)
+        self.enqueue_as(path, None, false)
     }
 
     /// The id of a standard library file, as `pathForLibFile` locates it:
@@ -487,7 +507,7 @@ impl Loader<'_> {
         };
         let replaced = replacement.is_some();
         let path = replacement.unwrap_or_else(|| paths::combine(self.library_dir, file));
-        let id = self.enqueue_as(&path, Some(Library { file, replaced }))?;
+        let id = self.enqueue_as(&path, Some(Library { file, replaced }), false)?;
         self.library_ids.insert(file, id);
         Ok(id)
     }
@@ -544,7 +564,13 @@ impl Loader<'_> {
 
     /// `enqueue`, recording whether a library route reached the input
     /// first; the first route decides, as in TypeScript's `collectFiles`.
-    fn enqueue_as(&mut self, path: &str, library: Option<Library>) -> Result<FileId, InputError> {
+    /// A `root` is a configuration root.
+    fn enqueue_as(
+        &mut self,
+        path: &str,
+        library: Option<Library>,
+        root: bool,
+    ) -> Result<FileId, InputError> {
         let identity = self.identity(path)?;
         let key = self.case.key(&identity);
         let lexical = paths::normalize(path);
@@ -557,6 +583,11 @@ impl Loader<'_> {
                     id,
                     path: identity.clone(),
                     library: library.is_some(),
+                    // A guess, corrected once the program is known: a root
+                    // is searched, and an input in a package is reached
+                    // through an external-library edge, which searching does
+                    // not cross, unless some route reaches it otherwise.
+                    navigation: library.is_none() && (root || !paths::has_node_modules(&identity)),
                     // What the name means follows TypeScript, which
                     // classifies the exact spelling, or its script kind
                     // without case; the case policy decides only identity and

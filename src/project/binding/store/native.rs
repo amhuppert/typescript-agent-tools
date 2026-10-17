@@ -75,6 +75,13 @@ pub(in crate::project::binding) struct NativeSymbols {
 }
 
 impl NativeSymbols {
+    pub(in crate::project::binding) fn with_capacity(headers: usize) -> Self {
+        Self {
+            headers: Vec::with_capacity(headers),
+            ..Self::default()
+        }
+    }
+
     /// Binder `bindCommonJSTypeExports`: preserve each raw export's identity
     /// and name on export=, then give that alias its own namespace meaning.
     /// This uses raw Type/Namespace bits, including symbols with Value bits;

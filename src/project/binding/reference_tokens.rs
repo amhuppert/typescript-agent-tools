@@ -351,7 +351,7 @@ impl super::inputs::BindingFiles<'_> {
     ) -> Span {
         let facts = self
             .file(file)
-            .json
+            .json()
             .expect("JSON declaration belongs to captured JSON");
         match declaration {
             super::JsonDeclaration::SourceFile => Span {

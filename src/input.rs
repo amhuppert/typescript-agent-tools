@@ -81,6 +81,18 @@ impl Case {
         }
     }
 
+    /// `fold` of an owned `text`, folding ASCII text in place.
+    pub(crate) fn fold_owned(self, mut text: String) -> String {
+        match self {
+            Self::Sensitive => text,
+            Self::Insensitive if text.is_ascii() => {
+                text.make_ascii_lowercase();
+                text
+            }
+            Self::Insensitive => to_file_name_lower_case(&text).into_owned(),
+        }
+    }
+
     /// `fold` for one character of a pattern comparison.
     pub(crate) fn fold_char(self, c: char) -> char {
         match self {
@@ -160,8 +172,12 @@ pub(crate) fn is_javascript(path: &str) -> bool {
 /// Go's `unicode.ToLower` gives it, except U+0130 (capital I with dot
 /// above), which stays because its lowercase form has its own uppercase.
 pub(crate) fn to_file_name_lower_case(text: &str) -> Cow<'_, str> {
-    if text.is_ascii() && !text.bytes().any(|byte| byte.is_ascii_uppercase()) {
-        return Cow::Borrowed(text);
+    if text.is_ascii() {
+        // An ASCII character's simple lowercase form is its ASCII one.
+        if !text.bytes().any(|byte| byte.is_ascii_uppercase()) {
+            return Cow::Borrowed(text);
+        }
+        return Cow::Owned(text.to_ascii_lowercase());
     }
     Cow::Owned(text.chars().map(file_name_lower_char).collect())
 }
@@ -253,5 +269,32 @@ mod tests {
         assert_eq!(Case::Insensitive.fold_char('\u{130}'), '\u{130}');
         assert_eq!(simple_lowercase('\u{130}'), 'i');
         assert_eq!(Case::Sensitive.fold("AΣ"), "AΣ");
+    }
+
+    /// Folding an owned name, in place where it is ASCII, gives `fold`'s
+    /// answer for each class of character the rule distinguishes.
+    #[test]
+    fn owned_names_fold_as_borrowed_names_do() {
+        for text in [
+            "",
+            "/users/me/a.ts",
+            "/Users/Me/A.TS",
+            "/Users/Me/WEBWOR\u{212A}ER.ts",
+            "/\u{130}NTL/AΣ.ts",
+            "/caf\u{e9}/\u{c9}T\u{c9}.ts",
+        ] {
+            for case in [Case::Sensitive, Case::Insensitive] {
+                assert_eq!(
+                    case.fold_owned(text.to_owned()),
+                    case.fold(text),
+                    "{case:?} {text}"
+                );
+            }
+        }
+        assert_eq!(
+            Case::Insensitive.fold_owned("/Users/Me/A.TS".into()),
+            "/users/me/a.ts"
+        );
+        assert_eq!(Case::Insensitive.fold("/Users/Me/A.TS"), "/users/me/a.ts");
     }
 }

@@ -192,7 +192,7 @@ impl NativeInputs<'_> {
         let scope = self
             .files
             .file(file)
-            .lookup_scopes
+            .lookup_scopes()
             .get((kind, span))
             .ok_or(NativeSelectionFailure::Binding(
                 TypeBindingFailure::NotRetained,
@@ -252,7 +252,7 @@ impl NativeInputs<'_> {
     ) -> Result<Option<O::Symbol>, NativeSelectionFailure<O::Error>> {
         use NativeSelectionFailure::Binding;
         let facts = self.files.file(file);
-        let mut declarations = facts.decls.iter().filter(|declaration| {
+        let mut declarations = facts.decls().iter().filter(|declaration| {
             declaration.native_kind == SyntaxKind::Parameter
                 && declaration.native_span == Some(native_span)
         });
@@ -296,7 +296,7 @@ impl NativeInputs<'_> {
         for index in self.files.lookup_scope_chain(file, scope) {
             let plan = self.files.name_scope(file, index);
             if let Some(declaration) = plan.infer
-                && self.files.file(file).decls[declaration.index()].name == name
+                && self.files.file(file).decls()[declaration.index()].name == name
                 && meaning.0 & flags::TYPE_PARAMETER != 0
             {
                 let raw = self

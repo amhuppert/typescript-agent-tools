@@ -668,7 +668,7 @@ impl super::NativeInputs<'_> {
         container: BoundSymbol,
     ) -> Result<bool, TypeBindingFailure> {
         for own in self.native_declarations(container)? {
-            let outer = self.files.file(own.file).decls[own.id.index()]
+            let outer = self.files.file(own.file).decls()[own.id.index()]
                 .native_span
                 .ok_or(TypeBindingFailure::Pending(
                     "native container declaration span is not retained",

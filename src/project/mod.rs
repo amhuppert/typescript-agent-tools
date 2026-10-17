@@ -62,6 +62,32 @@ pub struct Project {
     specifier_environment: Result<program::specifier_environment::SpecifierEnvironment, InputError>,
 }
 
+/// Where a load frees the state only loading used (`retained::LoadOnly`).
+#[derive(Debug, Clone, Copy)]
+enum Release {
+    /// Before the load returns: a loaded `Project` holds no more memory than
+    /// it retains.
+    Inline,
+    /// On a thread of its own, while the caller goes on with the published
+    /// project; a session validates its inputs meanwhile. A thread that
+    /// cannot start frees it inline.
+    Background,
+}
+
+impl Release {
+    fn free<T: Send + 'static>(self, state: T) {
+        match self {
+            Release::Inline => drop(state),
+            Release::Background => {
+                // `spawn` drops the closure, and so the state, when it fails.
+                let _ = std::thread::Builder::new()
+                    .name("tsparse-release".into())
+                    .spawn(move || drop(state));
+            }
+        }
+    }
+}
+
 impl Project {
     /// Load the project selected by a `tsconfig.json`-style file. Nothing
     /// searches ancestor directories for another configuration. Parsing runs
@@ -72,7 +98,12 @@ impl Project {
     /// and causes remain intact instead of becoming a tolerated input feature.
     pub fn load(config: &Path) -> Result<Self, AnalysisError> {
         Self::on_loading_thread(config, |parser| {
-            Self::load_here(config, &program::disk::Disk::default(), parser)
+            Self::load_here(
+                config,
+                &program::disk::Disk::default(),
+                parser,
+                Release::Inline,
+            )
         })
     }
 
@@ -96,8 +127,9 @@ impl Project {
         config: &Path,
         disk: &program::disk::Disk,
         parser: &crate::analysis::Parser,
+        release: Release,
     ) -> Result<Self, AnalysisError> {
-        Self::from_program(program::load(config, disk, parser)?, parser)
+        Self::from_program(program::load(config, disk, parser)?, parser, release)
     }
 
     fn load_reusing(
@@ -105,18 +137,20 @@ impl Project {
         disk: &program::disk::Disk,
         parser: &crate::analysis::Parser,
         previous: &mut program::Reuse,
+        release: Release,
     ) -> Result<(Self, program::Reuse), AnalysisError> {
         let (program, next) = program::load_reusing(config, disk, parser, previous)?;
         // New captures already share every reusable input they need. Release
         // obsolete inputs before the binding peak, without publishing a cache
         // from an unvalidated generation. A later failure simply retries cold.
         *previous = program::Reuse::default();
-        Ok((Self::from_program(program, parser)?, next))
+        Ok((Self::from_program(program, parser, release)?, next))
     }
 
     fn from_program(
         mut program: program::Program,
         parser: &crate::analysis::Parser,
+        release: Release,
     ) -> Result<Self, AnalysisError> {
         let files = program.file_lookup();
         let linked = binding::bind(&program, parser)?;
@@ -127,8 +161,8 @@ impl Project {
                 .map(|file| file.navigation.take())
                 .collect(),
         );
-        let bindings = linked.retain_files(program.files);
-        Ok(Self {
+        let (bindings, load_only) = linked.retain_files(program.files);
+        let project = Self {
             semantic: program.semantic,
             specifier_environment: program.specifier_environment,
             config: program.config,
@@ -136,7 +170,9 @@ impl Project {
             files,
             bindings,
             navigation,
-        })
+        };
+        release.free(load_only);
+        Ok(project)
     }
 
     /// Answer one request from this snapshot. This is the one dispatch over

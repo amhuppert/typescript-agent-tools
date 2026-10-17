@@ -297,6 +297,13 @@ impl ModuleIndicators {
 }
 
 fn first_jsx(ast: &Ast<'_>) -> Option<usize> {
+    // The parser makes JSX nodes only for the JSX language variant, as
+    // TypeScript's `parsePrimaryExpression` reaches
+    // `parseJsxElementOrSelfClosingElementOrFragment` only then: any other
+    // file has none, without a walk of its whole tree.
+    if syntax::number(ast.root(), "languageVariant") != Some(crate::compiler::variant::JSX) {
+        return None;
+    }
     ast.walk()
         .find(|&id| {
             matches!(

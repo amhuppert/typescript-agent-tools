@@ -505,7 +505,7 @@ impl From<&ResolutionFailure> for TypeBindingFailure {
 impl<'a> BindingFiles<'a> {
     /// Captured `Program.IsSourceFileDefaultLibrary` for checker diagnostics.
     pub(in crate::project) fn is_source_file_default_library(&self, file: FileId) -> bool {
-        self.file(file).diagnostics.is_default_library()
+        self.file(file).diagnostics().is_default_library()
     }
 
     /// `IsExternalOrCommonJSModule`: the accepted TS/JSON program retains
@@ -517,19 +517,19 @@ impl<'a> BindingFiles<'a> {
     }
 
     pub(in crate::project) fn reference_file_is_external(&self, file: FileId) -> bool {
-        self.file(file).module && self.file(file).json.is_none()
+        self.file(file).module() && self.file(file).json().is_none()
     }
 
     /// BoundJson is made only by the completed linker, so absence is an
     /// internal attachment violation, never an ordinary missing dependency.
     pub(in crate::project) fn json_facts(&self, value: BoundJson) -> &'a super::JsonFacts {
         self.file(value.file)
-            .json
+            .json()
             .expect("canonical JSON target has captured JSON facts")
     }
 
     pub(in crate::project) fn declaration_name(&self, declaration: BoundDeclaration) -> &'a str {
-        &self.file(declaration.file).decls[declaration.id.index()].name
+        &self.file(declaration.file).decls()[declaration.id.index()].name
     }
 
     /// The actual declaration kind retained at binding, not its lexical
@@ -538,7 +538,7 @@ impl<'a> BindingFiles<'a> {
         &self,
         declaration: BoundDeclaration,
     ) -> crate::syntax_kind::SyntaxKind {
-        self.file(declaration.file).decls[declaration.id.index()].native_kind
+        self.file(declaration.file).decls()[declaration.id.index()].native_kind
     }
 
     /// Exact native alias-declaration attachment, shared by node.Symbol and
@@ -552,7 +552,7 @@ impl<'a> BindingFiles<'a> {
     ) -> Result<Option<AliasRef>, TypeBindingFailure> {
         let mut aliases = self
             .file(file)
-            .aliases
+            .aliases()
             .iter()
             .enumerate()
             .filter(|(_, alias)| alias.native_kind == kind && alias.native_span == span);
@@ -581,7 +581,7 @@ impl<'a> BindingFiles<'a> {
         let alias = self
             .alias_declaration_at(file, kind, span)?
             .ok_or(TypeBindingFailure::NotRetained)?;
-        Ok(self.file(file).aliases[alias.id.index()].type_only)
+        Ok(self.file(file).aliases()[alias.id.index()].type_only)
     }
 }
 

@@ -178,11 +178,19 @@ impl ProjectSession {
             let disk = disk::Disk::recording();
             let (project, reuse) = match self.reuse.as_mut() {
                 Some(previous) => {
-                    let (project, reuse) =
-                        Project::load_reusing(&self.config, &disk, parser, previous)?;
+                    let (project, reuse) = Project::load_reusing(
+                        &self.config,
+                        &disk,
+                        parser,
+                        previous,
+                        super::Release::Background,
+                    )?;
                     (project, Some(reuse))
                 }
-                None => (Project::load_here(&self.config, &disk, parser)?, None),
+                None => (
+                    Project::load_here(&self.config, &disk, parser, super::Release::Background)?,
+                    None,
+                ),
             };
             let observations = disk.finish();
             if !observations.unchanged()? {

@@ -13,7 +13,7 @@ use crate::input::Case;
 use crate::project::sources::Sources;
 use std::borrow::Cow;
 use std::collections::BTreeSet;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::Path;
 use std::sync::Arc;
 
@@ -59,6 +59,10 @@ pub(super) struct KnownSymlinks {
 
 impl KnownSymlinks {
     pub(super) fn directories_by_realpath(&self, realpath: &str, case: Case) -> Option<&[String]> {
+        // Most programs reach no symlinked directory: no key to make.
+        if self.directories_by_realpath.is_empty() {
+            return None;
+        }
         self.directories_by_realpath
             .get(&case.key(realpath))
             .map(Vec::as_slice)
@@ -223,13 +227,14 @@ impl SpecifierEnvironment {
             .map(|file| resolver.source_package_scope(file))
             .collect();
         env.symlinks = env.capture_symlinks(resolver, &importers, files, scopes);
+        let mut walked = HashSet::new();
         for path in importers.iter().chain(&targets) {
-            env.capture_packages(resolver, path);
+            env.capture_packages(resolver, &mut walked, path);
         }
         match specifiers::module_path_candidates(&env, &importers, &targets) {
             Ok(paths) => {
                 for path in paths {
-                    env.capture_packages(resolver, &path);
+                    env.capture_packages(resolver, &mut walked, &path);
                 }
             }
             Err(error) => env.planning_failure = Some(error),
@@ -257,8 +262,21 @@ impl SpecifierEnvironment {
 
     /// Include the complete filename itself: native single-file packages may
     /// ask for targetFile/package.json before stepping to its parent directory.
-    fn capture_packages(&mut self, resolver: &mut Resolver<'_>, path: &str) {
+    ///
+    /// `walked` holds every path whose ancestors were all walked. Ancestors
+    /// depend only on a path's spelling, so the walk stops at the first one
+    /// walked before, whose own and later probes are captured already: in
+    /// order, each package observation is still made where it first was.
+    fn capture_packages(
+        &mut self,
+        resolver: &mut Resolver<'_>,
+        walked: &mut HashSet<String>,
+        path: &str,
+    ) {
         for directory in paths::ancestors(path) {
+            if !walked.insert(directory.to_owned()) {
+                break;
+            }
             let file = paths::combine(directory, "package.json");
             let key = self.observation_key(&file);
             self.packages.entry(key).or_insert_with(|| {

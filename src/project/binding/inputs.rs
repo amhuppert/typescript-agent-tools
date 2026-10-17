@@ -5,7 +5,7 @@
 //! names, invents reference attachments, resolves symbols, or owns query caches.
 
 use super::JsonFacts;
-use super::collect::{Alias, Decl, Host, RefBase, Scope};
+use super::collect::{Alias, Decl, Host, RefBase, Scope, SharedFacts};
 use super::ids::{ModuleId, RefId, ScopeId, SymbolId, TableId};
 use super::link::{AmbientHost, Fragment, ValueTarget};
 use super::resolution::RefRef;
@@ -46,24 +46,95 @@ pub(in crate::project) struct BindingInputs<'a> {
     pub(super) native_facts: Option<&'a dyn super::NativeFacts>,
     pub(super) values: &'a HashMap<SymbolId, ValueTarget>,
 }
-#[allow(dead_code)] // Shared source facts precede remaining native-reader migration.
+/// One file's binding facts, borrowed from collection while loading and from
+/// the published product afterwards. Lookups ask for it at every scope step,
+/// so it is two pointers, and each accessor reads one field where it lives.
+#[derive(Clone, Copy)]
 pub(super) struct File<'a> {
-    pub(super) module: bool,
-    pub(super) declaration: bool,
-    pub(super) module_semantics: crate::project::program::FileModuleSemantics,
-    pub(super) diagnostics: &'a crate::project::program::Diagnostics,
-    pub(super) flow: Option<&'a super::flow::Graph>,
-    pub(super) json: Option<&'a JsonFacts>,
-    pub(super) conditional_scopes: &'a HashMap<crate::Span, ScopeId>,
-    pub(super) lookup_scopes: &'a super::site_map::SiteMap<ScopeId>,
-    pub(super) module_declarations: &'a [super::collect::ModuleDeclaration],
-    pub(super) modules: &'a [super::ModuleResolution],
-    pub(super) reference_count: usize,
-    pub(super) scopes: &'a [Scope],
-    pub(super) decls: &'a [Decl],
-    pub(super) aliases: &'a [Alias],
-    pub(super) stars: &'a [super::collect::Star],
-    pub(super) requests: &'a [super::ModuleRequest],
+    shared: &'a SharedFacts,
+    owner: Owner<'a>,
+}
+
+#[derive(Clone, Copy)]
+enum Owner<'a> {
+    Loading(&'a crate::project::program::ProgramFile),
+    Retained(&'a super::retained::File),
+}
+
+#[allow(dead_code)] // Shared source facts precede remaining native-reader migration.
+impl<'a> File<'a> {
+    pub(super) fn module(self) -> bool {
+        match self.owner {
+            Owner::Loading(file) => file.facts.module,
+            Owner::Retained(file) => file.module,
+        }
+    }
+    pub(super) fn declaration(self) -> bool {
+        match self.owner {
+            Owner::Loading(file) => file.facts.declaration,
+            Owner::Retained(file) => file.declaration,
+        }
+    }
+    pub(super) fn module_semantics(self) -> crate::project::program::FileModuleSemantics {
+        match self.owner {
+            Owner::Loading(file) => file.module_semantics,
+            Owner::Retained(file) => file.module_semantics,
+        }
+    }
+    pub(super) fn diagnostics(self) -> &'a crate::project::program::Diagnostics {
+        match self.owner {
+            Owner::Loading(file) => &file.diagnostics,
+            Owner::Retained(file) => &file.diagnostics,
+        }
+    }
+    pub(super) fn json(self) -> Option<&'a JsonFacts> {
+        match self.owner {
+            Owner::Loading(file) => file.facts.json.as_deref(),
+            Owner::Retained(file) => file.json.as_deref(),
+        }
+    }
+    pub(super) fn modules(self) -> &'a [super::ModuleResolution] {
+        match self.owner {
+            Owner::Loading(file) => &file.modules,
+            Owner::Retained(file) => &file.modules,
+        }
+    }
+    pub(super) fn requests(self) -> &'a [super::ModuleRequest] {
+        match self.owner {
+            Owner::Loading(file) => &file.facts.requests,
+            Owner::Retained(file) => &file.requests,
+        }
+    }
+    pub(super) fn reference_count(self) -> usize {
+        match self.owner {
+            Owner::Loading(file) => file.facts.facts.refs.len(),
+            Owner::Retained(file) => file.refs.len(),
+        }
+    }
+    pub(super) fn flow(self) -> Option<&'a super::flow::Graph> {
+        self.shared.flow.as_ref()
+    }
+    pub(super) fn conditional_scopes(self) -> &'a HashMap<crate::Span, ScopeId> {
+        &self.shared.conditional_scopes
+    }
+    pub(super) fn lookup_scopes(self) -> &'a super::site_map::SiteMap<ScopeId> {
+        &self.shared.lookup_scopes
+    }
+    pub(super) fn module_declarations(self) -> &'a [super::collect::ModuleDeclaration] {
+        &self.shared.module_declarations
+    }
+    pub(super) fn scopes(self) -> &'a [Scope] {
+        &self.shared.scopes
+    }
+    pub(super) fn decls(self) -> &'a [Decl] {
+        &self.shared.decls
+    }
+    pub(super) fn aliases(self) -> &'a [Alias] {
+        &self.shared.aliases
+    }
+    pub(super) fn stars(self) -> &'a [super::collect::Star] {
+        &self.shared.stars
+    }
 }
 #[derive(Clone, Copy)]
 pub(super) struct Reference<'a> {
@@ -110,7 +181,7 @@ impl<'a> BindingInputs<'a> {
 
 impl<'a> BindingFiles<'a> {
     pub(super) fn references(self, file: FileId) -> impl ExactSizeIterator<Item = Reference<'a>> {
-        (0..self.file(file).reference_count).map(move |index| {
+        (0..self.file(file).reference_count()).map(move |index| {
             self.reference(RefRef {
                 file,
                 id: RefId::new(index),
@@ -121,46 +192,17 @@ impl<'a> BindingFiles<'a> {
     pub(super) fn file(&self, id: FileId) -> File<'a> {
         match *self {
             BindingFiles::Loading(program) => {
-                let program_file = &program.files[id.index()];
-                let file = &program_file.facts;
+                let file = &program.files[id.index()];
                 File {
-                    module: file.module,
-                    declaration: file.declaration,
-                    module_semantics: program_file.module_semantics,
-                    diagnostics: &program_file.diagnostics,
-                    flow: file.facts.flow.as_ref(),
-                    json: file.json.as_deref(),
-                    conditional_scopes: &file.facts.conditional_scopes,
-                    lookup_scopes: &file.facts.lookup_scopes,
-                    module_declarations: &file.facts.module_declarations,
-                    modules: &program_file.modules,
-                    reference_count: file.facts.refs.len(),
-                    scopes: &file.facts.scopes,
-                    decls: &file.facts.decls,
-                    aliases: &file.facts.aliases,
-                    stars: &file.facts.stars,
-                    requests: &file.requests,
+                    shared: &file.facts.facts.shared,
+                    owner: Owner::Loading(file),
                 }
             }
             BindingFiles::Retained(bindings) => {
                 let file = &bindings.files[id.index()];
                 File {
-                    module: file.module,
-                    declaration: file.declaration,
-                    module_semantics: file.module_semantics,
-                    diagnostics: &file.diagnostics,
-                    flow: file.flow.as_ref(),
-                    json: file.json.as_deref(),
-                    conditional_scopes: &file.conditional_scopes,
-                    lookup_scopes: &file.lookup_scopes,
-                    module_declarations: &file.module_declarations,
-                    modules: &file.modules,
-                    reference_count: file.refs.len(),
-                    scopes: &file.scopes,
-                    decls: &file.decls,
-                    aliases: &file.aliases,
-                    stars: &file.stars,
-                    requests: &file.requests,
+                    shared: file,
+                    owner: Owner::Retained(file),
                 }
             }
         }

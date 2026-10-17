@@ -73,11 +73,7 @@ impl FileLookup {
 impl Case {
     /// A normalized absolute identity key.
     pub(super) fn key(self, path: &str) -> String {
-        let path = normalize(path);
-        match self.fold(&path) {
-            std::borrow::Cow::Borrowed(_) => path,
-            std::borrow::Cow::Owned(folded) => folded,
-        }
+        self.fold_owned(normalize(path))
     }
 }
 

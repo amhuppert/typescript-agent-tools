@@ -206,6 +206,75 @@ fn in_this_file(outcome: ShowOutcome, file: &str) -> Vec<Candidate> {
     .collect()
 }
 
+/// Whether an input is searched is known only once the whole program is, so
+/// loading guesses it when it first meets the input and builds no catalog
+/// for an input in a package. A package file that a reference directive of
+/// a searched file reaches, or that is a configuration root, is searched all
+/// the same, and navigable, also when a session refreshes and reuses it.
+#[test]
+fn searched_files_in_packages_are_navigable() {
+    let fixture = Fixture::new(&[
+        (
+            "tsconfig.json",
+            r#"{ "compilerOptions": { "noLib": true }, "files": ["src/app.ts", "node_modules/root/index.d.ts"] }"#,
+        ),
+        (
+            "src/app.ts",
+            "/// <reference path=\"../node_modules/referenced/globals.d.ts\" />\nexport const value = fromPackage + fromRoot;\n",
+        ),
+        (
+            "node_modules/referenced/globals.d.ts",
+            "declare const fromPackage: number;\n",
+        ),
+        (
+            "node_modules/root/index.d.ts",
+            "declare const fromRoot: number;\n",
+        ),
+    ]);
+    let referenced = fixture.path("node_modules/referenced/globals.d.ts");
+    let root = fixture.path("node_modules/root/index.d.ts");
+    let labels = |outline: Outline| -> Vec<String> {
+        outline
+            .entries
+            .into_iter()
+            .map(|entry| entry.label)
+            .collect()
+    };
+    let project = fixture.load();
+    assert_eq!(labels(outline(&project, &referenced)), ["fromPackage"]);
+    assert_eq!(labels(outline(&project, &root)), ["fromRoot"]);
+    for (name, file) in [
+        ("fromPackage", "node_modules/referenced/globals.d.ts"),
+        ("fromRoot", "node_modules/root/index.d.ts"),
+    ] {
+        match show(&project, self::name(name, None)).outcome {
+            ShowOutcome::Found(found) => assert_eq!(found.file, file, "{name}"),
+            other => panic!("{name}: {other:?}"),
+        }
+    }
+
+    let mut session = ProjectSession::new(&config(&fixture)).unwrap();
+    let outline_of = |session: &mut ProjectSession, file: &Path| match session
+        .execute(ProjectRequest::Outline {
+            file: file.to_path_buf(),
+        })
+        .unwrap()
+    {
+        ProjectResponse::Outline(outline) => labels(outline),
+        other => panic!("an outline request answered {other:?}"),
+    };
+    assert_eq!(outline_of(&mut session, &referenced), ["fromPackage"]);
+    // A refresh reuses the unchanged package file's capture.
+    std::fs::write(
+        fixture.path("src/app.ts"),
+        "/// <reference path=\"../node_modules/referenced/globals.d.ts\" />\nexport const value = fromPackage + fromRoot + 1;\n",
+    )
+    .unwrap();
+    assert_eq!(outline_of(&mut session, &referenced), ["fromPackage"]);
+    assert_eq!(outline_of(&mut session, &root), ["fromRoot"]);
+    assert_eq!(session.generation(), 2);
+}
+
 #[test]
 fn only_searched_files_are_navigable() {
     let fixture = Fixture::new(&[

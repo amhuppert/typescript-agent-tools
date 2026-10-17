@@ -2,7 +2,8 @@
 //!
 //! Native queries consume the captured binder headers and file facts. Lexical
 //! queries consume the completed Index. The mutable lexical Store and its
-//! resolution work belong only to loading and are dropped after final checks.
+//! resolution work belong only to loading: after final checks they leave
+//! with the collection recipes as `LoadOnly`, which the loader frees.
 
 use super::collect::{RefBase, SharedFacts};
 use super::ids::OccurrenceId;
@@ -31,6 +32,17 @@ pub(in crate::project) struct Linked {
     pub(super) reference_origins: Vec<Vec<Option<ValueOrigin>>>,
     pub(super) reference_type_alias_origins: Vec<Vec<Option<super::store::AliasRef>>>,
     pub(super) raw: super::raw::RawBindingSnapshot,
+    /// The linker's working state, which publication leaves behind.
+    pub(super) link_state: super::link::LinkState,
+}
+
+/// What only loading used, left behind when the files are retained: the
+/// linker's working state and each file's collection recipes. Freeing it
+/// takes a noticeable part of a load, so its owner decides when and where
+/// (`Project::from_program`).
+pub(in crate::project) struct LoadOnly {
+    _link_state: super::link::LinkState,
+    _recipes: Vec<Arc<super::collect::Facts>>,
 }
 
 impl Bindings {
@@ -46,23 +58,32 @@ impl Bindings {
 }
 
 impl Linked {
-    pub(in crate::project) fn retain_files(self, files: Vec<ProgramFile>) -> Bindings {
+    pub(in crate::project) fn retain_files(self, files: Vec<ProgramFile>) -> (Bindings, LoadOnly) {
         assert_eq!(files.len(), self.reference_sources.len());
         assert_eq!(files.len(), self.reference_origins.len());
         assert_eq!(files.len(), self.reference_type_alias_origins.len());
-        Bindings {
+        let mut recipes = Vec::with_capacity(files.len());
+        let files = files
+            .into_iter()
+            .zip(self.reference_sources)
+            .zip(self.reference_origins)
+            .zip(self.reference_type_alias_origins)
+            .map(|(((file, sources), origins), type_alias_origins)| {
+                let (file, facts) = File::retain(file, sources, origins, type_alias_origins);
+                recipes.push(facts);
+                file
+            })
+            .collect();
+        let bindings = Bindings {
             index: self.index,
             raw: self.raw,
-            files: files
-                .into_iter()
-                .zip(self.reference_sources)
-                .zip(self.reference_origins)
-                .zip(self.reference_type_alias_origins)
-                .map(|(((file, sources), origins), type_alias_origins)| {
-                    File::retain(file, sources, origins, type_alias_origins)
-                })
-                .collect(),
-        }
+            files,
+        };
+        let load_only = LoadOnly {
+            _link_state: self.link_state,
+            _recipes: recipes,
+        };
+        (bindings, load_only)
     }
 }
 
@@ -111,7 +132,7 @@ impl File {
         sources: Vec<OccurrenceId>,
         origins: Vec<Option<ValueOrigin>>,
         type_alias_origins: Vec<Option<super::store::AliasRef>>,
-    ) -> Self {
+    ) -> (Self, Arc<super::collect::Facts>) {
         let ProgramFile {
             module_semantics,
             search,
@@ -159,7 +180,7 @@ impl File {
                 },
             )
             .collect();
-        Self {
+        let file = Self {
             module_semantics,
             search,
             shared: Arc::clone(&facts.shared),
@@ -171,7 +192,8 @@ impl File {
             diagnostics,
             refs,
             json,
-        }
+        };
+        (file, facts)
     }
 }
 

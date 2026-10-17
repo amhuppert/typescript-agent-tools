@@ -501,6 +501,12 @@ pub(in crate::project) struct LinkState {
     conflicts: Vec<(TableId, String)>,
 }
 
+impl std::fmt::Debug for LinkState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("LinkState").finish_non_exhaustive()
+    }
+}
+
 struct Linker<'p, 'l> {
     program: &'p Program,
     state: &'l mut LinkState,
@@ -566,8 +572,12 @@ impl super::super::semantic::InitializationObserver for ProjectionObserver<'_, '
 impl LinkState {
     fn new(program: &Program) -> Self {
         let files = &program.files;
+        let symbols = files
+            .iter()
+            .map(|file| file.facts.facts.decls.len() + file.facts.facts.aliases.len() + 1)
+            .sum();
         Self {
-            store: Store::new(),
+            store: Store::new(symbols),
             scope_tables: files
                 .iter()
                 .map(|f| vec![None; f.facts.facts.scopes.len()])
@@ -619,7 +629,7 @@ impl LinkState {
         }
     }
 
-    fn complete(self, raw: super::raw::RawBindingSnapshot, output: NativeLinkOutput) -> Linked {
+    fn complete(mut self, raw: super::raw::RawBindingSnapshot, output: NativeLinkOutput) -> Linked {
         assert!(
             self.resolution.running.is_none(),
             "completed linking has no active demand"
@@ -637,9 +647,10 @@ impl LinkState {
         Linked {
             index: output.index,
             reference_sources: output.reference_sources,
-            reference_origins: self.ref_origins,
-            reference_type_alias_origins: self.ref_type_alias_origins,
+            reference_origins: std::mem::take(&mut self.ref_origins),
+            reference_type_alias_origins: std::mem::take(&mut self.ref_type_alias_origins),
             raw,
+            link_state: self,
         }
     }
     pub(in crate::project) fn finish_with_native_facts(

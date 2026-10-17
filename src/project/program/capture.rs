@@ -36,6 +36,12 @@ pub(super) struct Job {
     /// The identity path, which names the input in every failure.
     pub(super) path: String,
     pub(super) library: bool,
+    /// Whether to build the input's navigation catalog, which only searched
+    /// inputs keep. Whether an input is searched is known only once the
+    /// whole program is (`Loader::search`): this is the loader's guess when
+    /// it reserves the input, and the loader builds a catalog the guess
+    /// left out (`Program`'s final pass).
+    pub(super) navigation: bool,
     /// Whether the input is a JSON module, which loading decides once, when
     /// it reserves the input.
     pub(super) json: bool,
@@ -150,7 +156,7 @@ fn contents(parser: &Parser, job: &Job, source: &Arc<SourceText>) -> Result<Cont
     let indicators = ModuleIndicators::of(&ast);
     let module = indicators.module(job.options);
     Ok(Contents::TypeScript {
-        navigation: (!job.library).then(|| Captured::typescript(&ast, source)),
+        navigation: job.navigation.then(|| Captured::typescript(&ast, source)),
         indicators,
         module,
         facts: collect(&ast, source, indicators, module, &file_path),
@@ -452,6 +458,7 @@ pub(super) mod tests {
                     id,
                     path: path.to_str().unwrap().into(),
                     library: false,
+                    navigation: true,
                     json: false,
                     options: FileOptions::default(),
                 });

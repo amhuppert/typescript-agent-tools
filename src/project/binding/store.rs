@@ -17,6 +17,7 @@ use super::ids::{
 use super::index::Site;
 use super::member::MemberKey;
 use super::targets::Slots;
+use crate::hash::FastMap;
 use crate::syntax_kind::SyntaxKind;
 use smallvec::SmallVec;
 use std::collections::HashMap;
@@ -252,8 +253,11 @@ pub(super) struct Store {
     global_this: Option<SymbolId>,
     json_symbols: HashMap<(FileId, super::JsonDeclaration), SymbolId>,
     json_exports: HashMap<FileId, SymbolId>,
-    tables: Vec<HashMap<String, Entry>>,
-    special_members: HashMap<TableId, HashMap<MemberKey, SymbolId>>,
+    /// Lookup tables: their order is the hasher's, so nothing that reaches
+    /// output may follow it (`member_entries` and `drain` merge whatever
+    /// order they meet).
+    tables: Vec<FastMap<String, Entry>>,
+    special_members: FastMap<TableId, FastMap<MemberKey, SymbolId>>,
     symbols: Vec<Symbol>,
     parents: Vec<SymbolId>,
     modules: Vec<Module>,
@@ -638,21 +642,24 @@ impl Store {
         let symbol = self.find(symbol);
         self.symbols[symbol.index()].native_name.get_or_insert(name);
     }
-    pub(super) fn new() -> Self {
-        let mut native = native::NativeSymbols::default();
+    /// A store for about `symbols` symbols: one per declaration and alias is
+    /// a close estimate, which spares the large symbol records the copies of
+    /// repeated growth. Published headers release any excess when frozen.
+    pub(super) fn new(symbols: usize) -> Self {
+        let mut native = native::NativeSymbols::with_capacity(symbols);
         let global = native.new_table();
         Self {
             native: Some(native),
-            symbol_headers: Vec::new(),
+            symbol_headers: Vec::with_capacity(symbols),
             table_headers: vec![Some(global)],
             binding_headers: true,
             global_this: None,
             json_symbols: HashMap::new(),
             json_exports: HashMap::new(),
-            tables: vec![HashMap::new()],
-            special_members: HashMap::new(),
-            symbols: Vec::new(),
-            parents: Vec::new(),
+            tables: vec![FastMap::default()],
+            special_members: FastMap::default(),
+            symbols: Vec::with_capacity(symbols),
+            parents: Vec::with_capacity(symbols),
             modules: Vec::new(),
             requests: Vec::new(),
             interface_members: HashMap::new(),
@@ -669,7 +676,7 @@ impl Store {
 
     // Reads
 
-    pub(super) fn table(&self, table: TableId) -> &HashMap<String, Entry> {
+    pub(super) fn table(&self, table: TableId) -> &FastMap<String, Entry> {
         &self.tables[table.index()]
     }
 
@@ -803,7 +810,7 @@ impl Store {
 
     pub(super) fn new_table(&mut self) -> TableId {
         self.write();
-        self.tables.push(HashMap::new());
+        self.tables.push(FastMap::default());
         self.table_headers
             .push(self.native.as_mut().map(|native| native.new_table()));
         TableId::new(self.tables.len() - 1)

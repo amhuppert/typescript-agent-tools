@@ -34,10 +34,12 @@ impl<'a> BindingFiles<'a> {
         &self,
         file: FileId,
     ) -> Result<&'a Graph, TypeBindingFailure> {
-        self.file(file).flow.ok_or(TypeBindingFailure::NotRetained)
+        self.file(file)
+            .flow()
+            .ok_or(TypeBindingFailure::NotRetained)
     }
 
     pub(in crate::project) fn file_is_module(&self, file: FileId) -> bool {
-        self.file(file).module
+        self.file(file).module()
     }
 }
