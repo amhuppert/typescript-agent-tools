@@ -3830,3 +3830,232 @@ fn manifest_edges_match_native_loaded_files_and_fresh_spellings() {
         assert_eq!(actual.first(), Some(&spelling), "{name}: {actual:?}");
     }
 }
+
+/// Inputs are captured on worker threads ahead of the loader, yet every
+/// number of workers, none included, loads the same program, in the same
+/// order and with the same facts, and the project answers the same. The
+/// inputs cover JSON, TSX with and without JSX, `.mts`/`.cts`, files whose
+/// package scope forces module semantics on them (collected again after
+/// capture), scripts, libraries, a package with a reference directive and
+/// an augmentation, and many roots, which workers capture ahead of the
+/// loader, one of which begins a long import chain.
+#[test]
+fn every_number_of_capture_workers_loads_the_same_project() {
+    let mut files: Vec<(String, String)> = vec![
+        (
+            "tsconfig.json".into(),
+            r#"{ "compilerOptions": { "module": "nodenext", "moduleDetection": "auto", "jsx": "react-jsx", "resolveJsonModule": true, "lib": ["es5"], "types": [] }, "include": ["src", "esm", "scripts"] }"#.into(),
+        ),
+        (
+            "src/index.ts".into(),
+            "import { util } from './util.js';\nimport data = require('./data.json');\nimport { fromPkg } from 'pkg';\nimport { chain0 } from './fill/f0.js';\nexport const total = util + data.value + fromPkg + chain0;\n".into(),
+        ),
+        ("src/util.ts".into(), "export const util = 1;\n".into()),
+        ("src/data.json".into(), r#"{ "value": 2 }"#.into()),
+        ("src/view.tsx".into(), "const view = <div />;\n".into()),
+        ("src/plain.tsx".into(), "var plainTsx = 1;\n".into()),
+        ("src/m.mts".into(), "var inMts = 1;\n".into()),
+        ("src/c.cts".into(), "var inCts = 1;\n".into()),
+        (
+            "src/augment.ts".into(),
+            "import 'pkg';\ndeclare module 'pkg' { export const augmented: number; }\n".into(),
+        ),
+        ("esm/package.json".into(), r#"{ "type": "module" }"#.into()),
+        ("esm/a.ts".into(), "var forced = 1;\nvar forcedA = forced;\n".into()),
+        ("esm/b.ts".into(), "var forced = 2;\nvar forcedB = forced;\n".into()),
+        ("esm/c.ts".into(), "export const exported = 1;\n".into()),
+        ("scripts/g1.ts".into(), "var globalOne = 1;\n".into()),
+        ("scripts/g2.ts".into(), "var useGlobal = globalOne;\n".into()),
+        (
+            "node_modules/pkg/package.json".into(),
+            r#"{ "name": "pkg", "types": "index.d.ts" }"#.into(),
+        ),
+        (
+            "node_modules/pkg/index.d.ts".into(),
+            "/// <reference path=\"./extra.d.ts\" />\nexport declare const fromPkg: number;\n".into(),
+        ),
+        (
+            "node_modules/pkg/extra.d.ts".into(),
+            "declare const fromExtra: number;\n".into(),
+        ),
+        (
+            "node_modules/react/package.json".into(),
+            r#"{ "name": "react", "exports": { ".": { "types": "./index.d.ts" }, "./jsx-runtime": { "types": "./jsx-runtime.d.ts" } } }"#.into(),
+        ),
+        ("node_modules/react/index.d.ts".into(), "export {};\n".into()),
+        (
+            "node_modules/react/jsx-runtime.d.ts".into(),
+            "export declare function jsx(...args: any[]): any;\ndeclare global { namespace JSX { interface IntrinsicElements { [name: string]: any } } }\n".into(),
+        ),
+    ];
+    for index in 0..80 {
+        let next = if index + 1 < 80 {
+            format!(
+                "import {{ chain{} }} from './f{}.js';\n",
+                index + 1,
+                index + 1
+            )
+        } else {
+            String::new()
+        };
+        files.push((
+            format!("src/fill/f{index}.ts"),
+            format!("{next}export const chain{index} = {index};\nfunction local{index}() {{ if (chain{index}) {{ return 1; }} return 0; }}\nlocal{index}();\n"),
+        ));
+    }
+    let borrowed: Vec<(&str, &str)> = files
+        .iter()
+        .map(|(path, text)| (path.as_str(), text.as_str()))
+        .collect();
+    let project = Project::new(&borrowed);
+    let names = [
+        "util",
+        "total",
+        "fromPkg",
+        "fromExtra",
+        "augmented",
+        "view",
+        "plainTsx",
+        "inMts",
+        "inCts",
+        "forced",
+        "forcedA",
+        "forcedB",
+        "exported",
+        "globalOne",
+        "chain0",
+        "chain79",
+        "local40",
+        "jsx",
+    ];
+    let summary = |workers: usize| -> String {
+        let _workers = capture::tests::use_workers(Some(workers));
+        let program = project.load("tsconfig.json");
+        let mut summary = String::new();
+        for id in program.sources.ids() {
+            let source = program.sources.get(id);
+            let file = &program.files[id.index()];
+            summary.push_str(&format!(
+                "{} {:?} search={} paths={:?} semantics={:?} module={} declaration={} jsx={:?} directives={:?} requests={:?} modules={:?} diagnostics={:?} navigation={}\n",
+                source.display,
+                source.path,
+                file.search,
+                file.paths,
+                file.module_semantics,
+                file.facts.module,
+                file.facts.declaration,
+                file.facts.jsx,
+                file.facts.comment_directives(),
+                file.facts.requests,
+                file.modules,
+                file.diagnostics,
+                file.navigation.is_some(),
+            ));
+        }
+        let loaded = crate::project::Project::load(&project.root.join("tsconfig.json"))
+            .unwrap_or_else(|error| panic!("{workers} workers: {error:?}"));
+        for name in names {
+            let references = loaded.find_references(crate::references::ReferenceQuery::Name {
+                name: name.into(),
+                file: None,
+            });
+            summary.push_str(&format!("{name}: {references:?}\n"));
+        }
+        for (path, _) in &files {
+            if path.starts_with("src/") || path.starts_with("esm/") || path.starts_with("scripts/")
+            {
+                if path.ends_with(".json") {
+                    continue;
+                }
+                let outline = loaded.outline(&project.root.join(path));
+                summary.push_str(&format!("{path}: {outline:?}\n"));
+            }
+        }
+        summary
+    };
+    let sequential = summary(0);
+    // Under `moduleDetection: auto`, the package scope's `type: module`
+    // makes each `esm` file a module, which its capture did not assume, so
+    // their `forced` variables are separate; the scripts share a global.
+    let loaded = crate::project::Project::load(&project.root.join("tsconfig.json")).unwrap();
+    let groups = |name: &str| {
+        loaded
+            .find_references(crate::references::ReferenceQuery::Name {
+                name: name.into(),
+                file: None,
+            })
+            .unwrap()
+            .groups
+    };
+    assert_eq!(groups("forced").len(), 2, "{:?}", groups("forced"));
+    assert_eq!(groups("globalOne").len(), 1);
+    assert_eq!(groups("globalOne")[0].occurrences.len(), 2);
+    assert_eq!(groups("chain79").len(), 1);
+    for workers in [1, 2, 3, 8] {
+        let parallel = summary(workers);
+        if parallel != sequential {
+            let first = sequential
+                .lines()
+                .zip(parallel.lines())
+                .find(|(left, right)| left != right);
+            panic!("{workers} workers load differently: {first:?}");
+        }
+    }
+}
+
+/// Under bundler resolution, a package's `type: module` makes a TypeScript
+/// script inside `node_modules` a module, so its top-level variable is not
+/// global; a package without `type` leaves its script global. TypeScript
+/// 7.0.2 reports TS2304 for `scriptGlobal` and nothing for `cjsGlobal`. The
+/// package format decides this after the input was captured, which collects
+/// it again.
+#[test]
+fn a_bundler_package_type_forces_module_semantics_on_its_scripts() {
+    let project = Project::new(&[
+        (
+            "tsconfig.json",
+            r#"{ "compilerOptions": { "module": "esnext", "moduleResolution": "bundler", "noLib": true, "types": [] }, "files": ["app.ts"] }"#,
+        ),
+        (
+            "app.ts",
+            "import 'pkg/script';\nimport 'cjspkg/script';\nscriptGlobal;\ncjsGlobal;\n",
+        ),
+        (
+            "node_modules/pkg/package.json",
+            r#"{ "name": "pkg", "type": "module", "exports": { "./script": "./script.ts" } }"#,
+        ),
+        ("node_modules/pkg/script.ts", "var scriptGlobal = 1;\n"),
+        (
+            "node_modules/cjspkg/package.json",
+            r#"{ "name": "cjspkg", "exports": { "./script": "./script.ts" } }"#,
+        ),
+        ("node_modules/cjspkg/script.ts", "var cjsGlobal = 1;\n"),
+    ]);
+    for workers in [None, Some(0)] {
+        let chosen = capture::tests::use_workers(workers);
+        let loaded = crate::project::Project::load(&project.root.join("tsconfig.json")).unwrap();
+        drop(chosen);
+        let at = |line| {
+            loaded.find_references(crate::references::ReferenceQuery::At {
+                file: project.root.join("app.ts"),
+                position: SourcePosition { line, column: 1 },
+            })
+        };
+        assert!(
+            matches!(
+                at(3),
+                Err(crate::analysis::AnalysisError::Query(ref error))
+                    if error.kind == crate::analysis::QueryErrorKind::UnresolvedTarget
+            ),
+            "{:?}",
+            at(3)
+        );
+        let global = at(4).unwrap();
+        assert_eq!(global.groups.len(), 1);
+        assert_eq!(global.groups[0].occurrences.len(), 1, "{global:?}");
+        assert_eq!(
+            global.groups[0].declarations[0].location.file,
+            "node_modules/cjspkg/script.ts"
+        );
+    }
+}

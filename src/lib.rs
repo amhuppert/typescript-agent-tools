@@ -21,6 +21,7 @@ pub mod analysis;
 pub mod ast;
 mod compiler;
 pub mod editing;
+mod hash;
 mod identifier_exclusions;
 mod input;
 mod json;

@@ -139,7 +139,7 @@ pub(super) enum ResolutionMode {
 }
 
 /// File-level settings decided by the project configuration.
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub(super) struct FileOptions {
     /// The configuration and file format force module semantics.
     pub(super) force_module: bool,
@@ -214,17 +214,19 @@ pub(super) mod meaning {
 
 /// Capture one file's semantic facts from `ast`, parsed from `source`.
 /// Errors carry a position but no path.
+/// `indicators` are the file's own (`ModuleIndicators::of`).
 pub(super) fn collect(
     ast: &Ast<'_>,
     source: &SourceText,
+    indicators: ModuleIndicators,
     options: FileOptions,
 ) -> Result<FileFacts, InputError> {
-    let module = is_module(ast, options);
+    let module = indicators.module(options);
     let (facts, requests) = collect::Collector::new(ast, source, module).run()?;
     Ok(FileFacts {
         module,
         declaration: syntax::flag(ast.root(), "isDeclarationFile"),
-        jsx: first_jsx(ast),
+        jsx: indicators.first_jsx,
         requests,
         directives: comment_directives(ast.source(), ast.literal_token_spans()),
         facts,
@@ -253,13 +255,34 @@ pub(super) fn bind(
     link::link(program, parser)
 }
 
-/// TypeScript's external-module indicators (`crate::ast::external_module`),
-/// plus configuration and format rules supplied by the project.
-fn is_module(ast: &Ast<'_>, options: FileOptions) -> bool {
-    let root = ast.root();
-    options.force_module
-        || crate::ast::external_module(ast.nodes(), syntax::ids(root, "statements"), root.flags)
-        || options.jsx_module && first_jsx(ast).is_some()
+/// What in one file's syntax decides, with its `FileOptions`, whether the
+/// file is a module: TypeScript's external-module indicators
+/// (`crate::ast::external_module`) and its first JSX element, to which the
+/// project adds configuration and format rules. A file collected under some
+/// options thereby shows whether others would collect it differently.
+#[derive(Debug, Clone, Copy)]
+pub(super) struct ModuleIndicators {
+    external: bool,
+    first_jsx: Option<usize>,
+}
+
+impl ModuleIndicators {
+    pub(super) fn of(ast: &Ast<'_>) -> Self {
+        let root = ast.root();
+        Self {
+            external: crate::ast::external_module(
+                ast.nodes(),
+                syntax::ids(root, "statements"),
+                root.flags,
+            ),
+            first_jsx: first_jsx(ast),
+        }
+    }
+
+    /// Whether `collect` with `options` treats the file as a module.
+    pub(super) fn module(self, options: FileOptions) -> bool {
+        options.force_module || self.external || options.jsx_module && self.first_jsx.is_some()
+    }
 }
 
 fn first_jsx(ast: &Ast<'_>) -> Option<usize> {

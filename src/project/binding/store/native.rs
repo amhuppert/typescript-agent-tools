@@ -7,6 +7,7 @@
 use super::{
     AliasRef, IntrinsicSymbol, SymbolDeclaration, ValueDeclaration, set_value_declaration,
 };
+use crate::hash::FastMap;
 use crate::project::binding::ids::{NativeHeaderId, NativeTableId, SymbolId};
 use crate::project::binding::instances::Instance;
 use crate::project::binding::link::flags;
@@ -44,16 +45,17 @@ pub(in crate::project::binding) struct NativeHeader {
 
 type NativeTable = super::super::NativeSymbolTable<NativeHeaderId>;
 
+/// Its maps are looked up, never iterated (`crate::hash::FastMap`).
 #[derive(Debug, Default)]
 pub(in crate::project::binding) struct NativeSymbols {
     headers: Vec<NativeHeader>,
     tables: Vec<NativeTable>,
-    declarations: HashMap<SymbolDeclaration, NativeHeaderId>,
-    aliases: HashMap<AliasRef, NativeHeaderId>,
+    declarations: DeclarationSymbols,
+    aliases: FastMap<AliasRef, NativeHeaderId>,
     /// The binder table placement is known before its declaration-name
     /// recipe is attached. Publication completes inside the name owner.
-    pending_names: HashMap<NativeHeaderId, Vec<NativeTableId>>,
-    locals: HashMap<
+    pending_names: FastMap<NativeHeaderId, Vec<NativeTableId>>,
+    locals: FastMap<
         (
             crate::project::sources::FileId,
             crate::syntax_kind::SyntaxKind,
@@ -61,9 +63,9 @@ pub(in crate::project::binding) struct NativeSymbols {
         ),
         NativeTableId,
     >,
-    global_exports: HashMap<crate::project::sources::FileId, NativeTableId>,
+    global_exports: FastMap<crate::project::sources::FileId, NativeTableId>,
     /// Request identities captured before navigation redirects pattern modules.
-    requests: HashMap<
+    requests: FastMap<
         (
             crate::project::sources::FileId,
             crate::project::binding::ids::RequestId,
@@ -108,6 +110,15 @@ impl NativeSymbols {
             self.header_mut(export_equals).flags |= flags::NAMESPACE_MODULE;
         }
         Ok(())
+    }
+
+    /// Published headers and tables never grow: release the capacity their
+    /// growth left. Ids and order are unchanged; table contents are not
+    /// rehashed.
+    pub(in crate::project::binding) fn freeze(&mut self) {
+        self.headers.shrink_to_fit();
+        self.tables.shrink_to_fit();
+        self.declarations.freeze();
     }
 
     /// Binder `newSymbol` allocates a stable header; checker `newSymbol` also
@@ -443,7 +454,7 @@ impl NativeSymbols {
         &self,
         declaration: SymbolDeclaration,
     ) -> Option<NativeHeaderId> {
-        self.declarations.get(&declaration).copied()
+        self.declarations.get(declaration)
     }
 
     pub(in crate::project::binding) fn alias_symbol(
@@ -460,5 +471,51 @@ impl NativeSymbols {
     ) {
         self.aliases.insert(alias, symbol);
         self.add_declaration(symbol, SymbolDeclaration::Alias(alias), None);
+    }
+}
+
+/// The symbol of each declaration, the last one `add_declaration` gave it.
+/// Nearly every declaration is a bound one, whose ids are dense in its file,
+/// so those occupy a slot of their file's table by id; the rest are keyed.
+#[derive(Debug, Default)]
+struct DeclarationSymbols {
+    /// By file, then by declaration id.
+    bound: Vec<Vec<Option<NativeHeaderId>>>,
+    other: FastMap<SymbolDeclaration, NativeHeaderId>,
+}
+
+impl DeclarationSymbols {
+    fn insert(&mut self, declaration: SymbolDeclaration, symbol: NativeHeaderId) {
+        let Some((file, id)) = declaration.bound() else {
+            self.other.insert(declaration, symbol);
+            return;
+        };
+        if self.bound.len() <= file.index() {
+            self.bound.resize_with(file.index() + 1, Vec::new);
+        }
+        let symbols = &mut self.bound[file.index()];
+        if symbols.len() <= id.index() {
+            symbols.resize(id.index() + 1, None);
+        }
+        symbols[id.index()] = Some(symbol);
+    }
+
+    fn get(&self, declaration: SymbolDeclaration) -> Option<NativeHeaderId> {
+        match declaration.bound() {
+            Some((file, id)) => self
+                .bound
+                .get(file.index())?
+                .get(id.index())
+                .copied()
+                .flatten(),
+            None => self.other.get(&declaration).copied(),
+        }
+    }
+
+    fn freeze(&mut self) {
+        for symbols in &mut self.bound {
+            symbols.shrink_to_fit();
+        }
+        self.bound.shrink_to_fit();
     }
 }

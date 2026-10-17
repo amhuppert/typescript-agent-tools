@@ -77,9 +77,10 @@ session request boundary, which checks the captured filesystem inputs before
 every request and loads a new generation after any change; there is no second
 service, cache, or refresh path per operation. It reuses a complete snapshot
 while its inputs match. The check rereads and compares every captured input,
-so it dominates a warm request on a large project: on Command Center (4,154
-searched files) the check takes about 0.44 s of a 0.5–0.6 s warm query, and a
-rebuild after an edit about 20 s ([measurements](performance-command-center.md#current-state-2026-10-17)).
+on several threads, so it dominates a warm request on a large project: on
+Command Center (4,154 searched files) the check takes about 0.1 s of a
+0.12–0.16 s warm query, and a rebuild after an edit about 9.5 s
+([measurements](performance-command-center.md#current-state-2026-10-17-after-the-performance-work)).
 `--references-status --project CONFIG` reports `running`, `pid`, and `generation`
 (the number of successfully published snapshots); status does not check freshness.
 `--references-stop --project CONFIG` stops it, and `--direct` (or

@@ -511,7 +511,7 @@ cargo bench --offline --bench memory -- /path/to/sources
 | Generated (300 modules through one barrel) | 302 files, about 150 KB | 73 ms | 2.3 µs | 7.4 MB | 2.1 MB |
 | TypeScript 6.0.3 compiler sources | 43 files, 9.4 MB | 756 ms | 132 µs | 142 MB | 47 MB |
 
-Parsing accounts for roughly a third of the compiler's load time at the throughput above. Retained memory is the captured source text plus one record per identifier token, with names interned. Query time grows with the size of the returned groups; the compiler sample includes groups with thousands of occurrences. No parallelism or persistent cache was added; these measurements do not show a need for either.
+Parsing accounts for roughly a third of the compiler's load time at the throughput above. Retained memory is the captured source text plus one record per identifier token, with names interned. Query time grows with the size of the returned groups; the compiler sample includes groups with thousands of occurrences. No persistent cache was added. Loading later began capturing inputs on worker threads, after Command Center measurements showed a single-threaded load ([Command Center performance](performance-command-center.md)).
 
 ### Project navigation
 

@@ -1112,3 +1112,228 @@ fn an_included_file_without_a_unicode_name_is_unsupported() {
         .unwrap_err();
     assert_eq!(error.kind, InputErrorKind::Unsupported, "{error}");
 }
+
+/// Loading reports the failure of the first input in load order, however
+/// many inputs follow it and whichever failure is found first: a file whose
+/// bytes are not UTF-8 cannot be read (`Io`), and a file that does not parse
+/// is a `Syntax` failure.
+#[test]
+fn the_first_failing_input_in_load_order_is_reported_among_many() {
+    let invalid: &[u8] = b"export const broken = \"\xff\";\n";
+    for (first, first_kind, second) in [
+        ("m010.ts", InputErrorKind::Io, "m290.ts"),
+        ("m010.ts", InputErrorKind::Syntax, "m290.ts"),
+        ("m289.ts", InputErrorKind::Syntax, "m290.ts"),
+        ("m289.ts", InputErrorKind::Io, "m290.ts"),
+    ] {
+        let mut files = vec![("tsconfig.json".to_owned(), support::CONFIG.to_owned())];
+        for index in 0..300 {
+            files.push((
+                format!("m{index:03}.ts"),
+                format!("export const value{index} = {index};\n"),
+            ));
+        }
+        let borrowed: Vec<(&str, &str)> = files
+            .iter()
+            .map(|(path, text)| (path.as_str(), text.as_str()))
+            .collect();
+        let fixture = Fixture::new(&borrowed);
+        let fail = |file: &str, kind: InputErrorKind| match kind {
+            InputErrorKind::Io => std::fs::write(fixture.path(file), invalid).unwrap(),
+            _ => std::fs::write(fixture.path(file), "export const = ;\n").unwrap(),
+        };
+        fail(first, first_kind);
+        // The later failure is of the other kind, so the kind also shows
+        // which one was reported.
+        let second_kind = if first_kind == InputErrorKind::Io {
+            InputErrorKind::Syntax
+        } else {
+            InputErrorKind::Io
+        };
+        fail(second, second_kind);
+        let error =
+            support::input_error(Project::load(&fixture.path("tsconfig.json")).unwrap_err());
+        assert_eq!(error.kind, first_kind, "{first} before {second}: {error:?}");
+        let reported = error.path.clone().expect("the failure names its file");
+        assert_eq!(
+            reported.file_name().and_then(|name| name.to_str()),
+            Some(first),
+            "{error:?}"
+        );
+    }
+}
+
+#[cfg(unix)]
+fn pipe(path: &std::path::Path) {
+    let made = std::process::Command::new("mkfifo")
+        .arg(path)
+        .status()
+        .unwrap();
+    assert!(made.success());
+}
+
+/// An input whose read would wait, a pipe without a writer, does not delay
+/// the failure of an input loading reaches before it: loading reads inputs
+/// in order and never reaches this one. The earlier failure itself arrives
+/// through a pipe a second late, long after the later input was reserved.
+#[cfg(unix)]
+#[test]
+fn an_unreached_pipe_does_not_delay_an_earlier_failure() {
+    let fixture = Fixture::new(&[
+        (
+            "tsconfig.json",
+            r#"{ "compilerOptions": { "noLib": true }, "files": ["first.ts"] }"#,
+        ),
+        ("first.ts", "import './second';\nimport './pipe';\n"),
+    ]);
+    pipe(&fixture.path("pipe.ts"));
+    pipe(&fixture.path("second.ts"));
+    let writer = {
+        let path = fixture.path("second.ts");
+        std::thread::spawn(move || {
+            use std::io::Write;
+            let mut pipe = std::fs::OpenOptions::new().write(true).open(path).unwrap();
+            std::thread::sleep(std::time::Duration::from_secs(1));
+            let _ = pipe.write_all(b"export const = ;\n");
+        })
+    };
+    let config = fixture.path("tsconfig.json");
+    let (sender, receiver) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        let _ = sender.send(Project::load(&config).map(|_| ()));
+    });
+    let result = receiver.recv_timeout(std::time::Duration::from_secs(20));
+    if result.is_err() {
+        // A read waits on the pipe: let it see the pipe's end. Opening for
+        // writing waits for a reader, so this thread is not joined.
+        let path = fixture.path("pipe.ts");
+        std::thread::spawn(move || drop(std::fs::OpenOptions::new().write(true).open(path)));
+    }
+    writer.join().unwrap();
+    let error = support::input_error(
+        result
+            .expect("loading answers without reading the pipe")
+            .expect_err("second.ts does not parse"),
+    );
+    assert_eq!(error.kind, InputErrorKind::Syntax);
+    assert!(error.path.unwrap().ends_with("second.ts"));
+}
+
+/// An input loading reaches is read however it must be read, also from a
+/// pipe whose writer supplies its text.
+#[cfg(unix)]
+#[test]
+fn a_pipe_loading_reaches_is_read_like_any_input() {
+    let fixture = Fixture::new(&[
+        (
+            "tsconfig.json",
+            r#"{ "compilerOptions": { "noLib": true }, "files": ["first.ts"] }"#,
+        ),
+        ("first.ts", "import { piped } from './pipe';\npiped;\n"),
+    ]);
+    pipe(&fixture.path("pipe.ts"));
+    let writer = {
+        let path = fixture.path("pipe.ts");
+        std::thread::spawn(move || {
+            use std::io::Write;
+            let mut pipe = std::fs::OpenOptions::new().write(true).open(path).unwrap();
+            pipe.write_all(b"export const piped = 1;\n").unwrap();
+        })
+    };
+    let project = Project::load(&fixture.path("tsconfig.json")).unwrap();
+    writer.join().unwrap();
+    let result = project
+        .find_references(ReferenceQuery::Name {
+            name: "piped".into(),
+            file: None,
+        })
+        .unwrap();
+    assert_eq!(result.groups.len(), 1);
+    assert_eq!(result.groups[0].occurrences.len(), 3);
+}
+
+/// An input that changes while an earlier input is read from a pipe loads
+/// with its new text, as loading in order reads it after the pipe: here the
+/// pipe's writer, once loading opens it, changes `z.ts`, which loading
+/// reaches next and a worker had already read.
+#[cfg(unix)]
+#[test]
+fn an_input_changed_while_an_earlier_pipe_is_read_loads_its_new_text() {
+    let fixture = Fixture::new(&[
+        (
+            "tsconfig.json",
+            r#"{ "compilerOptions": { "noLib": true }, "files": ["first.ts"] }"#,
+        ),
+        ("first.ts", "import './pipe';\nimport './z';\n"),
+        ("z.ts", "export const before = 1;\n"),
+    ]);
+    pipe(&fixture.path("pipe.ts"));
+    let writer = {
+        let (path, source) = (fixture.path("pipe.ts"), fixture.path("z.ts"));
+        std::thread::spawn(move || {
+            use std::io::Write;
+            // By now a worker has read `z.ts`; loading reaches the pipe.
+            std::thread::sleep(std::time::Duration::from_millis(500));
+            let mut pipe = std::fs::OpenOptions::new().write(true).open(path).unwrap();
+            std::fs::write(source, "export const after_ = 1;\n").unwrap();
+            pipe.write_all(b"export {};\n").unwrap();
+        })
+    };
+    let project = Project::load(&fixture.path("tsconfig.json")).unwrap();
+    writer.join().unwrap();
+    let groups = |name: &str| {
+        project
+            .find_references(ReferenceQuery::Name {
+                name: name.into(),
+                file: None,
+            })
+            .unwrap()
+            .groups
+            .len()
+    };
+    assert_eq!(groups("after_"), 1);
+    assert_eq!(groups("before"), 0);
+}
+
+/// A source changed while loading reads a package manifest from a pipe loads
+/// with its new text, as loading in order reads the source after the
+/// manifest: the manifest's writer, once loading opens it, changes `z.ts`,
+/// which a worker had already read.
+#[cfg(unix)]
+#[test]
+fn a_source_changed_while_a_manifest_pipe_is_read_loads_its_new_text() {
+    let fixture = Fixture::new(&[
+        (
+            "tsconfig.json",
+            r#"{ "compilerOptions": { "module": "nodenext", "noLib": true, "types": [] }, "files": ["sub/a.ts", "z.ts"] }"#,
+        ),
+        ("sub/a.ts", "export const a = 1;\n"),
+        ("z.ts", "export const before = 1;\n"),
+    ]);
+    pipe(&fixture.path("sub/package.json"));
+    let writer = {
+        let (path, source) = (fixture.path("sub/package.json"), fixture.path("z.ts"));
+        std::thread::spawn(move || {
+            use std::io::Write;
+            let mut pipe = std::fs::OpenOptions::new().write(true).open(path).unwrap();
+            // Meanwhile a worker reads `z.ts`.
+            std::thread::sleep(std::time::Duration::from_millis(500));
+            std::fs::write(source, "export const after_ = 1;\n").unwrap();
+            pipe.write_all(b"{}").unwrap();
+        })
+    };
+    let project = Project::load(&fixture.path("tsconfig.json")).unwrap();
+    writer.join().unwrap();
+    let groups = |name: &str| {
+        project
+            .find_references(ReferenceQuery::Name {
+                name: name.into(),
+                file: None,
+            })
+            .unwrap()
+            .groups
+            .len()
+    };
+    assert_eq!(groups("after_"), 1);
+    assert_eq!(groups("before"), 0);
+}

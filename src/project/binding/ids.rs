@@ -2,15 +2,28 @@
 //! Each link names the kind of record it refers to; indexing requires an
 //! explicit conversion.
 
+/// Each id stores its index plus one, so that an absent id (`Option`) takes
+/// no more room than a present one; ids compare and debug-print by index.
 macro_rules! ids {
     ($($name:ident),+ $(,)?) => {$(
-        #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-        pub(crate) struct $name(u32);
+        #[derive(Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+        pub(crate) struct $name(std::num::NonZeroU32);
         impl $name {
             pub(crate) fn new(index: usize) -> Self {
-                Self(u32::try_from(index).expect("semantic record count fits in u32"))
+                Self(
+                    u32::try_from(index)
+                        .ok()
+                        .and_then(|index| index.checked_add(1))
+                        .and_then(std::num::NonZeroU32::new)
+                        .expect("semantic record count fits in u32"),
+                )
             }
-            pub(crate) fn index(self) -> usize { self.0 as usize }
+            pub(crate) fn index(self) -> usize { (self.0.get() - 1) as usize }
+        }
+        impl std::fmt::Debug for $name {
+            fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.debug_tuple(stringify!($name)).field(&self.index()).finish()
+            }
         }
     )+};
 }
@@ -38,7 +51,13 @@ pub(super) struct TypeParameterListId(pub(super) usize);
 
 impl TableId {
     pub(super) const fn new_const(index: u32) -> Self {
-        Self(index)
+        match index.checked_add(1) {
+            Some(stored) => match std::num::NonZeroU32::new(stored) {
+                Some(stored) => Self(stored),
+                None => unreachable!(),
+            },
+            None => panic!("semantic record count fits in u32"),
+        }
     }
 }
 
@@ -46,10 +65,10 @@ impl super::site_map::PackedValue for ScopeId {
     type Packed = u32;
 
     fn pack(self) -> Option<Self::Packed> {
-        Some(self.0)
+        Some(self.0.get())
     }
 
     fn unpack(value: Self::Packed) -> Self {
-        Self(value)
+        Self(std::num::NonZeroU32::new(value).expect("a packed scope id is stored nonzero"))
     }
 }

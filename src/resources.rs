@@ -21,6 +21,8 @@ pub(crate) fn request_interruption(payload: &(dyn std::any::Any + Send)) -> Opti
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum Stop {
     Depth,
+    /// Another thread no longer wants the request's answer (`Control::new`).
+    Superseded,
 }
 #[derive(Clone, Copy)]
 pub(crate) struct Limits {
@@ -40,22 +42,38 @@ struct State {
     limits: Limits,
     usage: Cell<Usage>,
     stopped: Cell<Option<Stop>>,
+    superseded: Option<std::sync::Arc<std::sync::atomic::AtomicBool>>,
 }
 #[derive(Clone)]
 pub(crate) struct Control(Rc<State>);
 impl Control {
-    pub(crate) fn new(limits: Limits) -> Self {
+    /// A request within `limits`, which stops at its next check once
+    /// `superseded` is set.
+    pub(crate) fn new(
+        limits: Limits,
+        superseded: Option<std::sync::Arc<std::sync::atomic::AtomicBool>>,
+    ) -> Self {
         Self(Rc::new(State {
             limits,
             usage: Cell::new(Usage::default()),
             stopped: Cell::new(None),
+            superseded,
         }))
     }
     pub(crate) fn check(&self) -> Result<(), Stop> {
-        match self.0.stopped.get() {
-            Some(reason) => Err(reason),
-            None => Ok(()),
+        if let Some(reason) = self.0.stopped.get() {
+            return Err(reason);
         }
+        if self
+            .0
+            .superseded
+            .as_ref()
+            .is_some_and(|superseded| superseded.load(std::sync::atomic::Ordering::Relaxed))
+        {
+            self.0.stopped.set(Some(Stop::Superseded));
+            return Err(Stop::Superseded);
+        }
+        Ok(())
     }
     pub(crate) fn poll(&self) -> Result<(), Stop> {
         self.check()

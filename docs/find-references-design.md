@@ -518,9 +518,11 @@ or read failure is an I/O error; the tool takes no locks and promises no protect
 against concurrent edits during loading. The index is disposable navigation data,
 so retries, journaling, durable IDs, and cross-process coordination add no value.
 
-Parse files sequentially and release each AST after extraction. Retained memory
-is source text plus semantic records and indexes, with only one file's parse
-working set added at a time. Use worklists for graph cycles and iterative syntax
+Capture files (read, parse, index, and collect each one) on up to four worker
+threads ahead of the loader, which integrates them in TypeScript's order and
+reports their failures there; each AST is released after extraction. Retained
+memory is source text plus semantic records and indexes, with at most one parse
+working set per worker, and one for the loader, added at a time. Use worklists for graph cycles and iterative syntax
 walks so the existing parser's depth safeguards are not undermined by a later
 recursive walk. Cache module-resolution and alias results only inside this load.
 Measure construction time, peak memory, and query time separately.

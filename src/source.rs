@@ -72,7 +72,11 @@ pub(crate) fn encode_like(original: &[u8], text: &str) -> Vec<u8> {
 /// Read a file and `decode` its contents. Contents that are not UTF-8 are
 /// an `InvalidData` error, as from `std::fs::read_to_string`.
 pub(crate) fn read_text(path: &Path) -> io::Result<String> {
-    let mut bytes = std::fs::read(path)?;
+    decode_text(std::fs::read(path)?)
+}
+
+/// The text of a file read as `bytes`, as `read_text` reads it.
+pub(crate) fn decode_text(mut bytes: Vec<u8>) -> io::Result<String> {
     bytes.drain(..text_start(&bytes));
     String::from_utf8(bytes).map_err(|_| {
         io::Error::new(

@@ -53,8 +53,9 @@ use std::panic::{AssertUnwindSafe, catch_unwind};
 pub(super) fn references(
     project: &Project,
     request: ReferenceRequest,
+    superseded: Option<&Superseded>,
 ) -> Result<ReferenceAnswer, AnalysisError> {
-    worker(project, |parser, control| {
+    worker(project, superseded, |parser, control| {
         let mut evaluator = evaluation::Evaluator::new(
             CheckerInputs::from_project(project, Some(&control)),
             parser,
@@ -70,28 +71,49 @@ pub(super) fn references(
 pub(super) fn type_of(
     project: &Project,
     request: TypeRequest,
+    superseded: Option<&Superseded>,
 ) -> Result<TypeAnswer, AnalysisError> {
-    worker(project, |parser, control| {
+    worker(project, superseded, |parser, control| {
         type_of_here(project, &request, parser, control)
     })
 }
+
+/// A flag another thread sets when a request's answer is no longer wanted
+/// (`Project::execute_unless`).
+pub(super) type Superseded = std::sync::Arc<std::sync::atomic::AtomicBool>;
 
 /// Shared execution boundary for type inspection and member search. The
 /// request creates one checker inside this worker, including candidate work.
 fn worker<T: Send>(
     project: &Project,
+    superseded: Option<&Superseded>,
     work: impl FnOnce(&Parser, crate::resources::Control) -> Result<T, AnalysisError> + Send,
 ) -> Result<T, AnalysisError> {
-    worker_with_limits(project, crate::resources::Limits::default(), work)
+    worker_until(
+        project,
+        crate::resources::Limits::default(),
+        superseded.cloned(),
+        work,
+    )
 }
 
+#[cfg(test)]
 fn worker_with_limits<T: Send>(
     project: &Project,
     limits: crate::resources::Limits,
     work: impl FnOnce(&Parser, crate::resources::Control) -> Result<T, AnalysisError> + Send,
 ) -> Result<T, AnalysisError> {
+    worker_until(project, limits, None, work)
+}
+
+fn worker_until<T: Send>(
+    project: &Project,
+    limits: crate::resources::Limits,
+    superseded: Option<Superseded>,
+    work: impl FnOnce(&Parser, crate::resources::Control) -> Result<T, AnalysisError> + Send,
+) -> Result<T, AnalysisError> {
     crate::analysis::on_parsing_thread("tsparse-semantic", |parser| {
-        let control = crate::resources::Control::new(limits);
+        let control = crate::resources::Control::new(limits, superseded);
         catch_unwind(AssertUnwindSafe(|| {
             control.check().map_err(resource_failure)?;
             let value = work(parser, control.clone())?;
@@ -453,6 +475,8 @@ fn internal(message: &str) -> AnalysisError {
 fn resource_failure(stop: crate::resources::Stop) -> AnalysisError {
     use crate::resources::Stop;
     let (kind, reason, message) = match stop {
+        // Nobody receives a superseded request's failure.
+        Stop::Superseded => return internal("the request was superseded"),
         Stop::Depth => (
             SemanticErrorKind::SemanticDepthLimit,
             SemanticResourceReason::SemanticDepthLimit,

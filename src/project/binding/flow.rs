@@ -541,6 +541,9 @@ impl<'a, 's> Builder<'a, 's> {
         }
         self.graph.containers[0].end = Some(self.context.current);
         self.graph.reads = SiteMap::from_entries(self.reads);
+        // The captured graph never grows: release what its growth left.
+        self.graph.nodes.shrink_to_fit();
+        self.graph.containers.shrink_to_fit();
         Capture {
             graph: self.graph,
             contains_this: self.contains_this,

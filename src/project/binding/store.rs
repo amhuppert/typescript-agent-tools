@@ -287,9 +287,12 @@ impl Store {
             "raw capture precedes globalThis creation"
         );
         assert!(!self.frozen, "raw capture precedes completed linking");
-        self.native
+        let mut native = self
+            .native
             .take()
-            .expect("raw binder arena is published once")
+            .expect("raw binder arena is published once");
+        native.freeze();
+        native
     }
     pub(super) fn native_headers_mut(&mut self) -> &mut native::NativeSymbols {
         self.write();

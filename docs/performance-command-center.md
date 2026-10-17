@@ -1,16 +1,108 @@
 # Command Center performance
 
 The unchanged Command Center configuration loads and answers every CLI command;
-this report records what that costs. [Current state](#current-state-2026-10-17)
-measures every command, including type queries and editing, on the real
-`tsconfig.json`. [The 2026-10-08 state](#current-state-2026-10-08) measured the
-finished navigation delivery before the native type engine. The [historical
+this report records what that costs. [Current state](#current-state-2026-10-17-after-the-performance-work)
+compares the commands before and after the 2026-10-17 performance work.
+[Before that work](#before-the-performance-work-2026-10-17) measures every
+command, including type queries and editing, on the real `tsconfig.json`.
+[The 2026-10-08 state](#current-state-2026-10-08) measured the finished
+navigation delivery before the native type engine. The [historical
 baseline](#historical-baseline-2026-10-06) is the original report from before the
 compatibility work and the optimizations in [performance
 improvements](performance-improvements.md), kept as measured: its reference
 timings used benchmark shims and do not describe the unchanged project.
 
-## Current state (2026-10-17)
+## Current state (2026-10-17, after the performance work)
+
+Same host and Command Center revision as [before the
+work](#before-the-performance-work-2026-10-17); release builds (thin LTO, one
+codegen unit) of `76e6b61` and of the final working tree (binary SHA-256
+`53cc1fe9d6fc2e0b…`). Every sample is a separate CLI process timed to a blocking
+wait; the two binaries ran alternately. Service figures are medians of 12 warm
+requests in each of two service runs per binary; loads are three samples per
+binary, edits three per service. Ranges omit the first sample of a session, which
+read a cold file cache (24.5 s for the baseline's first cold service), and
+nothing else. Query outputs were byte-identical between the binaries (status
+replies differ only by process id). The host carried a browser, a dev server,
+and other agents (load average 2.6–3.6).
+
+| Command | Before | After |
+| --- | ---: | ---: |
+| Warm `--outline --project` (small file) | 457–467 ms | 117–119 ms |
+| Warm `--references --name getTicketService` | 576–579 ms | 150–152 ms |
+| Warm `--type --at service-factory.ts:201:17` | 579–580 ms | 153–155 ms |
+| `--references-status` | 27–28 ms | 4.5–4.6 ms |
+| Direct load (`--outline … --direct`), wall / CPU | 16.4–16.5 s / 13.8–13.9 s | 8.9–9.1 s / 14.1–14.2 s |
+| Cold service, first request | 16.3–16.5 s | 8.8–9.3 s |
+| First request after an edit (clone, 3 edits) | 16.8–17.8 s | 9.3–9.5 s |
+| Warm member search `AgentTaskRunner.run` (partial) | 10.4–10.6 s | 9.9–10.2 s |
+| Peak footprint of a direct load | 2.86–2.89 GiB | 2.66–2.67 GiB |
+| Service footprint after loading | 1,902–1,951 MB | 1,670–1,695 MB |
+| Service footprint after later generations | 1.31–1.40 GB | 1.04–1.22 GB |
+| Requested heap of an in-process load, retained / peak | 1,878 / 3,185 MiB | 1,412 / 2,663 MiB |
+
+The member-search baseline is from an earlier pair of runs of the same binaries
+on the same day; the requested-heap figures are from a counting-allocator probe
+of the same changes in a no-LTO build.
+
+File-only commands are unchanged (`--check` of the small file 5 ms, outline of
+the largest 20 ms). Member searches are checker work, which these changes do not
+target; their partial results are identical.
+
+**What changed.**
+
+- *Validation* (`program::disk::Observations::unchanged`) repeats the same exact
+  comparisons on eight threads; the first differing or failing observation in
+  key order decides, as one ordered pass would. A speculative read never waits
+  for a writer: a path that is not a regular file, such as a pipe, and any
+  failure other than absence are left to a blocking read made in key order,
+  after which the observations up to the next such read are repeated. The
+  service accepts connections from a thread blocked in `accept` instead of
+  polling every 20 ms.
+- *Answering while validating* (`ProjectSession::execute`): a warm request is
+  answered from the current generation on its own thread while it is validated,
+  and delivered only once validation confirms the generation. Stopping is
+  cooperative: once an input differs, a semantic answer stops at its next check
+  (`resources::Control`); other answers finish first. Either way the answer is
+  discarded. This hides checker initialization (about 0.1 s) behind validation
+  for `--references` and `--type`.
+- *Loading* (`program::capture`): four worker threads read, parse, index, and
+  collect each input as soon as the loader reserves it; the loader integrates
+  captures in TypeScript's order, records each read where it uses it, and reports
+  failures in that order. An input that needs different module semantics once
+  its package format is known is collected again, and so is a capture made
+  before a read in order that may have waited, such as of a pipe. More workers measured no
+  faster: inputs are discovered only as the loader resolves their importers. A
+  load asks each path's real path once, the index orders results by a
+  precomputed rank of display names, and the binder's lookup-only maps use FxHash
+  (`crate::hash`).
+- *Retained storage*: vectors release their growth slack when published, a bound
+  declaration's symbol is a dense per-file slot instead of a hashed entry (114 →
+  15 MiB), and binder ids store their index plus one, so an absent id takes no
+  more room than a present one.
+
+**Where time goes now.** A warm request spends about 0.1 s validating, nearly
+all of it `stat`, `realpath`, and file reads across 8 threads; semantic queries
+overlap their checker initialization with it. A load spends about 3.4 s linking,
+1.4 s capturing the module-specifier environment, and 3.3 s capturing and
+resolving inputs, of which about 1.5 s the loader waits on captures of inputs it
+has only just discovered.
+
+**Remaining candidates.** Reusing unchanged files' captures and resolutions
+after an edit (an estimated 2–4 s of a refresh); the linker's
+`resolve_and_index` and `declare`; the specifier environment's relative-path
+work (`index_collision_paths`); and the largest records, `Decl` (224 bytes with
+two owned names), `Occurrence` (120 bytes), and `NativeHeader` (192 bytes).
+An answer prepared from a generation that validation rejects counts toward the
+watchdog's process limits until it stops, so a process already near its memory
+limit can reach it where a sequential refresh would not.
+
+The measurement scripts and raw results are session-local under
+`.cc/temp/perf/` (`warm.py`, `edits.py`, `member.py`, `warm-last.txt`,
+`edits-last.txt`, `direct-last.txt`, `member-final.txt`, `member-last.txt`); retained-heap attribution used a
+temporary counting-allocator probe (`.cc/temp/perf/probe/`).
+
+## Before the performance work (2026-10-17)
 
 Command Center `92fbfd94221b`, its worktree clean before and after; parser
 `9f53da6`, release profile (thin LTO, one codegen unit), binary SHA-256

@@ -95,18 +95,29 @@ pub(crate) fn on_parsing_thread<T: Send>(
     work: impl FnOnce(&Parser) -> T + Send,
 ) -> std::io::Result<T> {
     std::thread::scope(|scope| {
-        let thread = std::thread::Builder::new()
-            .name(name.into())
-            .stack_size(crate::DEEP_PARSE_STACK_BYTES)
-            .spawn_scoped(scope, || {
-                work(&Parser {
-                    _thread: PhantomData,
-                })
-            })?;
+        let thread = spawn_parsing_thread(scope, name, work)?;
         Ok(thread
             .join()
             .unwrap_or_else(|panic| std::panic::resume_unwind(panic)))
     })
+}
+
+/// Start `work` with its own `Parser` on a new thread of `scope`, with the
+/// stack `on_parsing_thread` gives, for work that parses alongside the
+/// caller, such as capturing a project's inputs while it loads.
+pub(crate) fn spawn_parsing_thread<'scope, T: Send + 'scope>(
+    scope: &'scope std::thread::Scope<'scope, '_>,
+    name: &str,
+    work: impl FnOnce(&Parser) -> T + Send + 'scope,
+) -> std::io::Result<std::thread::ScopedJoinHandle<'scope, T>> {
+    std::thread::Builder::new()
+        .name(name.into())
+        .stack_size(crate::DEEP_PARSE_STACK_BYTES)
+        .spawn_scoped(scope, || {
+            work(&Parser {
+                _thread: PhantomData,
+            })
+        })
 }
 
 /// Inputs that could not be analyzed: a project that could not be

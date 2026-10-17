@@ -10,6 +10,7 @@
 //! libraries first, then each file after the files it reaches
 //! (`collectFiles`).
 
+mod capture;
 mod config;
 mod diagnostics;
 mod directives;
@@ -33,9 +34,7 @@ use crate::ScriptKind;
 use crate::analysis::Parser;
 use crate::analysis::{InputError, InputErrorKind};
 use crate::input::Case;
-use crate::parser::json::JsonErrorKind;
 use crate::source::SourcePosition;
-use crate::source::SourceText;
 use config::{Config, Detection};
 use diagnostics::{Checking, FileOrigin, Unchecked};
 use directives::Directive;
@@ -43,7 +42,6 @@ use libraries::Library;
 use resolve::{FileFormat, NotAdmitted, Resolved, Resolver};
 use std::collections::{HashMap, VecDeque};
 use std::path::{Path, PathBuf};
-use std::sync::Arc;
 
 pub(super) use config::Resolution as ModuleResolutionKind;
 pub(super) use config::SemanticOptions;
@@ -143,106 +141,110 @@ fn load_with_libraries(
     let config = config::load(&path, disk, parser)?;
     let case = Case::detect();
     let roots = files::roots(&config, case, disk)?;
-    let mut loader = Loader {
-        config: &config,
-        resolver: Resolver::new(&config, case, disk),
-        disk,
-        parser,
-        case,
-        library_dir,
-        ids: HashMap::new(),
-        queue: VecDeque::new(),
-        sources: Sources::default(),
-        loaded: Vec::new(),
-        edges: Vec::new(),
-        search_roots: Vec::new(),
-        root_tasks: Vec::new(),
-        reached: Vec::new(),
-        libraries: Vec::new(),
-        library_ids: HashMap::new(),
-        program_only: Vec::new(),
-    };
-    let loaded = loader.load_all(&roots);
-    // An unreadable manifest or type root may have caused another failure.
-    loader.resolver.check_reads()?;
-    loaded?;
-    loader.settle_program_only()?;
-    // Provenance is known only now that the dependency graph is complete.
-    let search = loader.search();
-    let order = loader.program_order();
-    let renumbered = loader.sources.reorder(&order);
-    let spelled_dir = path.parent().unwrap_or(Path::new("/"));
-    let mut loaded: Vec<Option<Loaded>> = loader.loaded.into_iter().map(Some).collect();
-    let mut files = Vec::with_capacity(order.len());
-    for (id, old) in loader.sources.ids().zip(order) {
-        let loaded = loaded[old.index()].take().expect("order is a permutation");
-        let search = search[old.index()];
-        let origin = if loader.libraries[old.index()].is_some() {
-            FileOrigin::DefaultLibrary
-        } else if search {
-            FileOrigin::Project
-        } else {
-            FileOrigin::Dependency
+    // Inputs are captured ahead of the loader while it reserves them.
+    capture::Captures::with(disk.waits(), |captures| {
+        let mut loader = Loader {
+            config: &config,
+            resolver: Resolver::new(&config, case, disk),
+            disk,
+            parser,
+            case,
+            library_dir,
+            ids: HashMap::new(),
+            queue: VecDeque::new(),
+            sources: Sources::default(),
+            loaded: Vec::new(),
+            edges: Vec::new(),
+            search_roots: Vec::new(),
+            root_tasks: Vec::new(),
+            reached: Vec::new(),
+            libraries: Vec::new(),
+            library_ids: HashMap::new(),
+            program_only: Vec::new(),
+            captures,
         };
-        let diagnostics = Diagnostics::new(origin, loaded.checking);
-        if let Some(error) = loaded.unsupported {
-            if !diagnostics.tolerates_unsupported_input() {
+        let loaded = loader.load_all(&roots);
+        // An unreadable manifest or type root may have caused another failure.
+        loader.resolver.check_reads()?;
+        loaded?;
+        loader.settle_program_only()?;
+        // Provenance is known only now that the dependency graph is complete.
+        let search = loader.search();
+        let order = loader.program_order();
+        let renumbered = loader.sources.reorder(&order);
+        let spelled_dir = path.parent().unwrap_or(Path::new("/"));
+        let mut loaded: Vec<Option<Loaded>> = loader.loaded.into_iter().map(Some).collect();
+        let mut files = Vec::with_capacity(order.len());
+        for (id, old) in loader.sources.ids().zip(order) {
+            let loaded = loaded[old.index()].take().expect("order is a permutation");
+            let search = search[old.index()];
+            let origin = if loader.libraries[old.index()].is_some() {
+                FileOrigin::DefaultLibrary
+            } else if search {
+                FileOrigin::Project
+            } else {
+                FileOrigin::Dependency
+            };
+            let diagnostics = Diagnostics::new(origin, loaded.checking);
+            if let Some(error) = loaded.unsupported {
+                if !diagnostics.tolerates_unsupported_input() {
+                    return Err(error);
+                }
+            }
+            // The first reported missing reference directive target, in source
+            // order.
+            let text = &loader.sources.get(id).text;
+            if let Some((_, error)) = loaded
+                .missing
+                .into_iter()
+                .find(|&(offset, _)| diagnostics.reports(text, offset))
+            {
                 return Err(error);
             }
+            let mut paths = std::mem::take(&mut loader.reached[old.index()]);
+            if let Some(spelled) = spelled_under(spelled_dir, &loader.sources.get(id).display) {
+                paths.push(spelled);
+            }
+            let modules = loaded
+                .modules
+                .into_iter()
+                .map(|module| match module {
+                    ModuleResolution::File(target) => {
+                        ModuleResolution::File(renumbered[target.index()])
+                    }
+                    other => other,
+                })
+                .collect();
+            files.push(ProgramFile {
+                module_semantics: loaded.module_semantics,
+                search,
+                paths,
+                facts: loaded.facts,
+                modules,
+                diagnostics,
+                navigation: loaded.navigation.filter(|_| search),
+            });
         }
-        // The first reported missing reference directive target, in source
-        // order.
-        let text = &loader.sources.get(id).text;
-        if let Some((_, error)) = loaded
-            .missing
-            .into_iter()
-            .find(|&(offset, _)| diagnostics.reports(text, offset))
-        {
-            return Err(error);
-        }
-        let mut paths = std::mem::take(&mut loader.reached[old.index()]);
-        if let Some(spelled) = spelled_under(spelled_dir, &loader.sources.get(id).display) {
-            paths.push(spelled);
-        }
-        let modules = loaded
-            .modules
-            .into_iter()
-            .map(|module| match module {
-                ModuleResolution::File(target) => {
-                    ModuleResolution::File(renumbered[target.index()])
-                }
-                other => other,
-            })
-            .collect();
-        files.push(ProgramFile {
-            module_semantics: loaded.module_semantics,
-            search,
-            paths,
-            facts: loaded.facts,
-            modules,
-            diagnostics,
-            navigation: loaded.navigation.filter(|_| search),
+        let specifier_environment = cwd.map(|cwd| {
+            specifier_environment::SpecifierEnvironment::capture(
+                &config,
+                &cwd,
+                case,
+                disk,
+                &mut loader.resolver,
+                &loader.sources,
+                &files,
+            )
         });
-    }
-    let specifier_environment = cwd.map(|cwd| {
-        specifier_environment::SpecifierEnvironment::capture(
-            &config,
-            &cwd,
+        Ok(Program {
+            semantic: config.options.semantic.clone(),
+            preserve_const_enums: config.options.preserve_const_enums,
+            config: PathBuf::from(&config.file),
             case,
-            disk,
-            &mut loader.resolver,
-            &loader.sources,
-            &files,
-        )
-    });
-    Ok(Program {
-        semantic: config.options.semantic.clone(),
-        preserve_const_enums: config.options.preserve_const_enums,
-        config: PathBuf::from(&config.file),
-        case,
-        sources: loader.sources,
-        files,
-        specifier_environment,
+            sources: loader.sources,
+            files,
+            specifier_environment,
+        })
     })
 }
 
@@ -326,6 +328,9 @@ struct Loader<'a> {
     /// augmentation's target (`shouldAddFile`). Settled once every input is
     /// known (`settle_program_only`).
     program_only: Vec<(FileId, usize, String)>,
+    /// Inputs being captured ahead of `load_file`, as `enqueue_as` reserves
+    /// them.
+    captures: &'a capture::Captures<'a>,
 }
 
 /// One captured input whose provenance is not yet known.
@@ -471,6 +476,21 @@ impl Loader<'_> {
             None => {
                 let id = self.sources.reserve();
                 self.ids.insert(key, id);
+                self.captures.reserve(capture::Job {
+                    id,
+                    path: identity.clone(),
+                    library: library.is_some(),
+                    // What the name means follows TypeScript, which
+                    // classifies the exact spelling, or its script kind
+                    // without case; the case policy decides only identity and
+                    // support.
+                    json: crate::script_kind(&identity) == ScriptKind::Json,
+                    options: self.file_options(
+                        &identity,
+                        paths::is_declaration(&identity),
+                        FileFormat::undeclared(),
+                    ),
+                });
                 self.queue.push_back((identity, id));
                 self.reached.push(Vec::new());
                 self.libraries.push(library);
@@ -516,19 +536,19 @@ impl Loader<'_> {
         paths::relative(&self.config.dir, path)
     }
 
-    /// Parses one input once, captures its facts, and resolves its edges.
+    /// Integrates one input's capture (`capture::capture`): it was read and
+    /// parsed once, and its facts collected, ahead of this or now. Then
+    /// resolves its edges.
     fn load_file(&mut self, path: String, id: FileId) -> Result<(), InputError> {
         let file_path = PathBuf::from(&path);
-        let text = self
-            .disk
-            .read_to_string(&file_path)
+        let capture = self.captures.take(id, self.parser);
+        self.disk
+            .receive(capture.read)
             .map_err(|error| io_error(&file_path, &error))?;
-        let source = Arc::new(SourceText::shared(text));
+        let parsed = capture.parsed.expect("a successful read is parsed");
+        let source = parsed.source;
         let library = self.libraries[id.index()].is_some();
-        // What the name means follows TypeScript, which classifies the exact
-        // spelling, or its script kind without case; the case policy decides
-        // only identity and support.
-        let json = crate::script_kind(&path) == ScriptKind::Json;
+        let json = capture.json;
         let format = if library {
             FileFormat::library()
         } else if json {
@@ -539,36 +559,31 @@ impl Loader<'_> {
         let declaration = paths::is_declaration(&path);
         let module_semantics = self.resolver.module_semantics(format, json);
         let jsx = crate::ParseOptions::for_file(path.as_str()).jsx;
-        let navigation;
-        let mut facts = if json {
-            navigation = Some(Captured::Json);
-            // TypeScript's `ParseSourceFile` with `ScriptKindJSON`, read by the
-            // reader configuration files share.
-            let text = self
-                .parser
-                .parse_json(source.as_str())
-                .map_err(|error| InputError {
-                    kind: match error.kind {
-                        JsonErrorKind::Syntax => InputErrorKind::Syntax,
-                        JsonErrorKind::TooDeep => InputErrorKind::Unsupported,
-                    },
-                    message: error.message,
-                    path: Some(file_path.clone()),
-                    position: Some(source.position(error.offset)),
-                })?;
-            binding::collect_json(&text, source.as_str())
-        } else {
-            let ast = self
-                .parser
-                .parse(source.as_str(), &path)
-                .map_err(|error| InputError::unparsable(error, &source, &file_path))?;
-            navigation = (!library).then(|| Captured::typescript(&ast, &source));
-            binding::collect(&ast, &source, self.file_options(&path, declaration, format)).map_err(
-                |mut error| {
-                    error.path.get_or_insert_with(|| file_path.clone());
-                    error
-                },
-            )?
+        let (navigation, mut facts) = match parsed.contents? {
+            capture::Contents::Json(facts) => (Some(Captured::Json), facts),
+            capture::Contents::TypeScript {
+                navigation,
+                indicators,
+                options: captured,
+                facts,
+            } => {
+                let options = self.file_options(&path, declaration, format);
+                let facts = if indicators.module(options) == indicators.module(captured) {
+                    facts?
+                } else {
+                    // The format forces module semantics the capture did not
+                    // assume: collect the same text again, with them, in
+                    // place of the facts collected without them.
+                    drop(facts);
+                    let ast = self
+                        .parser
+                        .parse(source.as_str(), &path)
+                        .map_err(|error| InputError::unparsable(error, &source, &file_path))?;
+                    let indicators = binding::ModuleIndicators::of(&ast);
+                    capture::collect(&ast, &source, indicators, options, &file_path)?
+                };
+                (navigation, facts)
+            }
         };
         // `resolveImportsAndModuleAugmentations` resolves synthetic helpers
         // before JSX and written requests. Helpers are loaded even when no

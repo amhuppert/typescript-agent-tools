@@ -64,9 +64,10 @@ they must never accidentally reuse each other's captured lookup aliases.
 * `project::program::disk`: filesystem operations and their observations:
   exact text/bytes read, directory names, entry kinds (including absence), and
   canonicalization results (including absence). Share captured source text with
-  `SourceText` rather than retaining another copy. Validation repeats these
-  operations and compares their results; source identity does not depend on size
-  or modification time. I/O failures remain failures.
+  `SourceText` rather than retaining another copy. A load asks each path's real
+  path once. Validation repeats these operations and compares their results;
+  source identity does not depend on size or modification time. I/O failures
+  remain failures.
 * `project::ProjectSession`: one project's current generation. Its one
   request operation (`execute(ProjectRequest)`) validates, loads when
   necessary, and answers any operation from a complete immutable `Project`.
@@ -89,6 +90,18 @@ probes and directory listings. Adding a higher-priority module candidate,
 changing inherited configuration or package metadata, retargeting a symlink,
 adding a wildcard root, or replacing a dependency must invalidate the generation.
 An unchanged metadata timestamp does not establish unchanged contents.
+
+Validation repeats the observations on several threads; the first observation in
+key order that differs or fails decides, exactly as one pass in key order would.
+A read that could wait for another process, such as a pipe without a writer, is
+never made speculatively: a path that is not a regular file, and a read that
+fails other than by absence, are read only where that pass would read them, and
+the observations after such a read are repeated after it ends. Loading follows
+the same rule for its captures (`Reading::InOrder`). A warm request is answered
+from the current generation while it is validated, and the answer is delivered
+only once validation confirms the generation; otherwise a semantic answer stops
+at its next check, any other answer finishes, the answer is discarded, and the
+session reloads as before.
 
 If an old observation is now unreadable, discard the cached generation and do a
 full load. The current configuration/import graph decides whether that old path

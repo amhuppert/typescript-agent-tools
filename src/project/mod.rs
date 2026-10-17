@@ -123,18 +123,29 @@ impl Project {
     /// the operations, shared by `ProjectSession::execute`; each operation
     /// is also available directly.
     pub fn execute(&self, request: ProjectRequest) -> Result<ProjectResponse, AnalysisError> {
+        self.execute_unless(request, None)
+    }
+
+    /// `execute`, whose semantic operations stop at their next check once
+    /// `superseded` is set: the answer is then no longer wanted, and the
+    /// failure returned instead is for nobody.
+    pub(super) fn execute_unless(
+        &self,
+        request: ProjectRequest,
+        superseded: Option<&semantic::Superseded>,
+    ) -> Result<ProjectResponse, AnalysisError> {
         Ok(match request {
             ProjectRequest::References(query) => {
                 ProjectResponse::References(self.find_references(query)?)
             }
-            ProjectRequest::ReferenceSearch(request) => {
-                ProjectResponse::ReferenceSearch(Box::new(self.references(request)?))
-            }
+            ProjectRequest::ReferenceSearch(request) => ProjectResponse::ReferenceSearch(Box::new(
+                self.references_unless(request, superseded)?,
+            )),
             ProjectRequest::Outline { file } => ProjectResponse::Outline(self.outline(&file)?),
             ProjectRequest::Show(query) => ProjectResponse::Show(Box::new(self.show(query)?)),
             ProjectRequest::Edit(request) => ProjectResponse::Edit(Box::new(self.edit(request)?)),
             ProjectRequest::Type(request) => {
-                ProjectResponse::Type(Box::new(self.type_of(request)?))
+                ProjectResponse::Type(Box::new(self.type_of_unless(request, superseded)?))
             }
         })
     }
@@ -150,14 +161,32 @@ impl Project {
     /// Find reference groups with explicit call and test-path filters.
     /// Filters affect occurrences only; selection and origins remain complete.
     pub fn references(&self, request: ReferenceRequest) -> Result<ReferenceAnswer, AnalysisError> {
-        semantic::references(self, request)
+        self.references_unless(request, None)
+    }
+
+    /// `references`, stopping as `execute_unless` describes.
+    fn references_unless(
+        &self,
+        request: ReferenceRequest,
+        superseded: Option<&semantic::Superseded>,
+    ) -> Result<ReferenceAnswer, AnalysisError> {
+        semantic::references(self, request, superseded)
     }
 
     /// Establish the selected type from this captured generation, then present
     /// its bounded description. Display options do not change admission.
     pub fn type_of(&self, request: TypeRequest) -> Result<TypeAnswer, AnalysisError> {
+        self.type_of_unless(request, None)
+    }
+
+    /// `type_of`, stopping as `execute_unless` describes.
+    fn type_of_unless(
+        &self,
+        request: TypeRequest,
+        superseded: Option<&semantic::Superseded>,
+    ) -> Result<TypeAnswer, AnalysisError> {
         request.validate()?;
-        semantic::type_of(self, request)
+        semantic::type_of(self, request, superseded)
     }
 
     /// Effective inputs captured with this generation, resolved only by the

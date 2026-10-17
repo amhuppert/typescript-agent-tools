@@ -318,7 +318,6 @@ pub fn serve(config: &Path) -> io::Result<()> {
     remove_socket(&endpoint.socket)?;
     let listener =
         UnixListener::bind(&endpoint.socket).map_err(|error| endpoint.socket_error(error))?;
-    listener.set_nonblocking(true)?;
     let mut session = ProjectSession::new(config).map_err(io::Error::other)?;
     let idle = match std::env::var("TSPARSE_SERVICE_IDLE_SECS") {
         Ok(value) => Duration::from_secs(value.parse::<u64>().ok().filter(|&s| s > 0).ok_or_else(
@@ -332,10 +331,26 @@ pub fn serve(config: &Path) -> io::Result<()> {
         Err(std::env::VarError::NotPresent) => Duration::from_secs(600),
         Err(error) => return Err(io::Error::new(io::ErrorKind::InvalidInput, error)),
     };
+    // A connection is handled as soon as it arrives, and the idle limit
+    // passes without polling: one thread blocks in `accept` and hands each
+    // connection over a rendezvous channel. While a request is handled it
+    // holds at most one more accepted connection; other clients wait in the
+    // listen backlog. It stays blocked until the process, which `serve`
+    // ends, exits.
+    let (connections, accepted) = std::sync::mpsc::sync_channel(0);
+    std::thread::Builder::new()
+        .name("tsparse-accept".into())
+        .spawn(move || {
+            for connection in listener.incoming() {
+                if connections.send(connection).is_err() {
+                    return;
+                }
+            }
+        })?;
     let mut last_request = Instant::now();
     let result = loop {
-        match listener.accept() {
-            Ok((stream, _)) => {
+        match accepted.recv_timeout(idle.saturating_sub(last_request.elapsed())) {
+            Ok(Ok(stream)) => {
                 // A malformed, stalled, or disconnected client must not kill the
                 // project's service. The client receives the transport failure.
                 match handle(stream, &endpoint.identity, &mut session) {
@@ -343,14 +358,16 @@ pub fn serve(config: &Path) -> io::Result<()> {
                     Ok(false) | Err(_) => last_request = Instant::now(),
                 }
             }
-            Err(error) if error.kind() == io::ErrorKind::WouldBlock => {
+            Ok(Err(error)) if error.kind() == io::ErrorKind::Interrupted => {}
+            Ok(Err(error)) => break Err(error),
+            Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {
                 if last_request.elapsed() >= idle {
                     break Ok(());
                 }
-                std::thread::sleep(POLL);
             }
-            Err(error) if error.kind() == io::ErrorKind::Interrupted => {}
-            Err(error) => break Err(error),
+            Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => {
+                unreachable!("the accept thread only ends when the service stops receiving")
+            }
         }
     };
     let cleanup = remove_socket(&endpoint.socket);

@@ -1,5 +1,11 @@
 # Command Center performance improvements
 
+The 2026-10-17 work (parallel exact validation, answering while validating,
+parallel capture during loading, and smaller retained storage) is recorded with
+its measurements in [Command Center
+performance](performance-command-center.md#current-state-2026-10-17-after-the-performance-work).
+This report records the earlier 2026-10-06 optimizations.
+
 Measured 2026-10-06, following the [original baseline](performance-command-center.md). The implemented reference index prepares ordered locations and combined roles once. On fresh matched queries, median result construction is **1.8–10.8× faster**, depending on result size. This costs **43.1 MiB of additional retained heap**. Project initialization remains around 22–25 seconds. The parser also avoids one temporary allocation per ordinary numeric literal; whole-corpus timing does not establish a parsing speedup.
 
 ## Implementation

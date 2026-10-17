@@ -1764,3 +1764,56 @@ fn uninstantiated_namespaces_in_dependencies_stay_beside_values() {
     assert_eq!(declarations.len(), 1, "{declarations:?}");
     assert_eq!(declarations[0].location.start, at(2, 22));
 }
+
+/// Results list locations by file display name, then position, whatever
+/// order loading discovered the files in: here `b.ts`, `a.ts`, `z/a.ts`.
+/// The export alias `again` joins the group.
+#[test]
+fn results_follow_display_names_not_discovery_order() {
+    let fixture = Fixture::new(&[
+        (
+            "tsconfig.json",
+            r#"{ "compilerOptions": { "noLib": true }, "files": ["b.ts", "a.ts"] }"#,
+        ),
+        (
+            "b.ts",
+            "import { shared } from './z/a';\nshared; shared;\nexport { shared as again };\n",
+        ),
+        ("a.ts", "import { shared } from './z/a';\nshared;\n"),
+        ("z/a.ts", "export const shared = 1;\nshared;\n"),
+    ]);
+    let project = fixture.load();
+    let result = project
+        .find_references(ReferenceQuery::Name {
+            name: "shared".into(),
+            file: None,
+        })
+        .unwrap();
+    assert_eq!(result.groups.len(), 1);
+    let places: Vec<(String, usize, usize)> = result.groups[0]
+        .occurrences
+        .iter()
+        .map(|occurrence| {
+            (
+                occurrence.location.file.clone(),
+                occurrence.location.start.line,
+                occurrence.location.start.column,
+            )
+        })
+        .collect();
+    let expected: Vec<(String, usize, usize)> = [
+        ("a.ts", 1, 10),
+        ("a.ts", 2, 1),
+        ("b.ts", 1, 10),
+        ("b.ts", 2, 1),
+        ("b.ts", 2, 9),
+        ("b.ts", 3, 10),
+        ("b.ts", 3, 20),
+        ("z/a.ts", 1, 14),
+        ("z/a.ts", 2, 1),
+    ]
+    .into_iter()
+    .map(|(file, line, column)| (file.to_owned(), line, column))
+    .collect();
+    assert_eq!(places, expected);
+}

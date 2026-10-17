@@ -37,10 +37,36 @@ impl IndexedLocation {
         }
     }
 
-    /// The public `Location` order, using its display name rather than the
-    /// file's discovery order. No filenames are allocated for comparisons.
-    fn key(self, sources: &Sources) -> (&str, SourcePosition, SourcePosition) {
-        (&sources.get(self.file).display, self.start, self.end)
+    /// The public `Location` order, by its file's display name rather than
+    /// the file's discovery order (`DisplayOrder`).
+    fn key(self, order: &DisplayOrder) -> (u32, SourcePosition, SourcePosition) {
+        (order.of(self.file), self.start, self.end)
+    }
+}
+
+/// Each file's place among the display names, which order public locations:
+/// ordering by place is ordering by name, without comparing names. Files
+/// with the same display name share a place.
+struct DisplayOrder(Vec<u32>);
+
+impl DisplayOrder {
+    fn new(sources: &Sources) -> Self {
+        let mut files: Vec<FileId> = sources.ids().collect();
+        files.sort_by(|left, right| sources.get(*left).display.cmp(&sources.get(*right).display));
+        let mut places = vec![0; files.len()];
+        let mut place = 0;
+        for (position, &file) in files.iter().enumerate() {
+            if position > 0 && sources.get(file).display != sources.get(files[position - 1]).display
+            {
+                place += 1;
+            }
+            places[file.index()] = place;
+        }
+        Self(places)
+    }
+
+    fn of(&self, file: FileId) -> u32 {
+        self.0[file.index()]
     }
 }
 
@@ -107,7 +133,7 @@ pub(crate) struct Index {
     /// immutable work is shared by position and name queries.
     by_symbol: HashMap<SymbolId, Vec<IndexedOccurrence>>,
     by_name: HashMap<String, Vec<OccurrenceRef>>,
-    by_reference_name: HashMap<String, Vec<ReferenceToken>>,
+    by_reference_name: HashMap<String, Box<[ReferenceToken]>>,
     /// Names and reasons shared by many occurrences.
     strings: Vec<Box<str>>,
 }
@@ -140,7 +166,10 @@ impl Index {
         // the exact query bytes before the indivisible standard-table lookup;
         // this neither copies the key nor changes its hash/equality policy.
 
-        let tokens: &[ReferenceToken] = self.by_reference_name.get(name).map_or(&[], Vec::as_slice);
+        let tokens: &[ReferenceToken] = self
+            .by_reference_name
+            .get(name)
+            .map_or(&[], |tokens| tokens);
         if let Some(control) = control {
             crate::resources::complete_or_abort(control.check());
         }
@@ -192,7 +221,7 @@ pub(crate) struct Token<'a> {
 #[derive(Debug, Default)]
 pub(crate) struct Builder {
     index: Index,
-    string_ids: HashMap<Box<str>, StringId>,
+    string_ids: crate::hash::FastMap<Box<str>, StringId>,
     by_symbol: HashMap<SymbolId, Vec<OccurrenceRef>>,
     by_reference_name: HashMap<String, Vec<(ReferenceToken, Span)>>,
 }
@@ -310,26 +339,17 @@ impl Builder {
         sources: &Sources,
         sites: impl Fn(SymbolId) -> Vec<Site>,
     ) -> Index {
+        let order = DisplayOrder::new(sources);
         for (name, mut references) in self.by_reference_name {
-            references.sort_by(|(left, left_span), (right, right_span)| {
-                (
-                    &sources.get(left.file).display,
-                    left_span.start,
-                    left_span.end,
-                )
-                    .cmp(&(
-                        &sources.get(right.file).display,
-                        right_span.start,
-                        right_span.end,
-                    ))
-            });
-            self.index.by_reference_name.insert(
-                name,
-                references
-                    .into_iter()
-                    .map(|(reference, _)| reference)
-                    .collect(),
-            );
+            references
+                .sort_by_key(|(reference, span)| (order.of(reference.file), span.start, span.end));
+            // Collected at its exact length: mapping in place would keep the
+            // larger pairs' allocation and the slack of their growth.
+            let mut tokens = Vec::with_capacity(references.len());
+            tokens.extend(references.into_iter().map(|(reference, _)| reference));
+            self.index
+                .by_reference_name
+                .insert(name, tokens.into_boxed_slice());
         }
         for (symbol, references) in self.by_symbol {
             let mut declarations: Vec<_> = sites(symbol)
@@ -339,9 +359,9 @@ impl Builder {
                     location: IndexedLocation::new(sources, site.file, site.span),
                 })
                 .collect();
-            declarations.sort_by_key(|site| site.location.key(sources));
+            declarations.sort_by_key(|site| site.location.key(&order));
             declarations.dedup_by(|a, b| {
-                a.location.key(sources) == b.location.key(sources) && a.name == b.name
+                a.location.key(&order) == b.location.key(&order) && a.name == b.name
             });
             self.index.sites.insert(symbol, declarations);
 
@@ -359,9 +379,9 @@ impl Builder {
                 .collect();
             // Stable sorting keeps the first token's spelling at a shared
             // location, as the former query-time map did. Every role survives.
-            occurrences.sort_by_key(|occurrence| occurrence.location.key(sources));
+            occurrences.sort_by_key(|occurrence| occurrence.location.key(&order));
             occurrences.dedup_by(|later, first| {
-                if later.location.key(sources) != first.location.key(sources) {
+                if later.location.key(&order) != first.location.key(&order) {
                     return false;
                 }
                 first.roles |= later.roles;

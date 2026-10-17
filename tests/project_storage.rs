@@ -112,8 +112,12 @@ fn published_project_retains_compact_facts_and_answers_queries() {
     assert_eq!(result.description.summary, "number");
     assert!(result.issues.is_empty());
 
+    // Published storage keeps no growth slack: vectors that grew while
+    // binding release their spare capacity when they are frozen, each bound
+    // declaration's symbol is a dense slot rather than a keyed entry, and an
+    // absent record id costs no more than a present one.
     assert!(
-        retained < 8 * 1024 * 1024,
-        "published facts exceed the 8 MiB retained-heap budget: {retained} bytes (peak {peak})"
+        retained < 6_700_000,
+        "published facts exceed the 6,700,000-byte retained-heap budget: {retained} bytes (peak {peak})"
     );
 }

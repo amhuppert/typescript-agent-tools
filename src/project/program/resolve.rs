@@ -198,6 +198,15 @@ impl FileFormat {
         }
     }
 
+    /// The format of a file whose extension and package scope declare none,
+    /// as `file_format` decides it without a `type` field.
+    pub(super) fn undeclared() -> Self {
+        Self {
+            implied: Format::CommonJs,
+            declared: None,
+        }
+    }
+
     /// A JSON file's format: `GetImpliedNodeFormatForFile` gives `.json` none
     /// and consults no `package.json`. A reference directive in it resolves
     /// as TypeScript resolves one without a mode: `require` conditions under
@@ -788,10 +797,7 @@ impl<'a> Resolver<'a> {
         match scope.as_ref().and_then(|package| package.kind.as_deref()) {
             Some("module") => fixed(Format::Esm),
             Some("commonjs") => fixed(Format::CommonJs),
-            _ => FileFormat {
-                implied: Format::CommonJs,
-                declared: None,
-            },
+            _ => FileFormat::undeclared(),
         }
     }
 

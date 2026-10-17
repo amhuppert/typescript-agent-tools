@@ -319,3 +319,376 @@ fn new_automatic_type_package_is_observed_without_root_source_edits() {
     );
     assert_eq!(session.generation(), 2);
 }
+
+/// Validation compares every captured observation, wherever its path sorts
+/// among many: contents, directory listings, resolution probes, and real
+/// paths, for the first and last inputs as well as one in the middle.
+#[cfg(unix)]
+#[test]
+fn every_kind_of_input_is_validated_wherever_it_sorts_in_a_large_project() {
+    let mut files = vec![(
+        "tsconfig.json".to_owned(),
+        r#"{"compilerOptions":{"noLib":true},"include":["d*/**/*","zlink.ts"]}"#.to_owned(),
+    )];
+    for directory in 0..24 {
+        for file in 0..24 {
+            files.push((
+                format!("d{directory:02}/m{file:02}.ts"),
+                format!(
+                    "import {{ shared{file} }} from '../ydeps/dep{file}';\nexport const v{directory}_{file} = shared{file};\n"
+                ),
+            ));
+        }
+    }
+    for file in 0..24 {
+        files.push((
+            format!("ydeps/dep{file}.d.ts"),
+            format!("export declare const shared{file}: number;\n"),
+        ));
+    }
+    files.push(("a.ts".to_owned(), "export const linkedA = 1;".to_owned()));
+    files.push(("b.ts".to_owned(), "export const linkedB = 1;".to_owned()));
+    let borrowed: Vec<(&str, &str)> = files
+        .iter()
+        .map(|(path, text)| (path.as_str(), text.as_str()))
+        .collect();
+    let fixture = support::Fixture::new(&borrowed);
+    std::os::unix::fs::symlink(fixture.path("a.ts"), fixture.path("zlink.ts")).unwrap();
+    let mut session = ProjectSession::new(&fixture.path("tsconfig.json")).unwrap();
+    assert_eq!(count(&mut session, "v23_23"), 1);
+    assert_eq!(count(&mut session, "v0_0"), 1);
+    assert_eq!(
+        session.generation(),
+        1,
+        "an unchanged project reuses its generation"
+    );
+
+    // Same-size edits that restore the modification time, at both ends of
+    // the key order and in the middle.
+    for (directory, file) in [(23, 23), (0, 0), (11, 12)] {
+        let path = fixture.path(&format!("d{directory:02}/m{file:02}.ts"));
+        let modified = std::fs::metadata(&path).unwrap().modified().unwrap();
+        let before = std::fs::read_to_string(&path).unwrap();
+        let old = format!("v{directory}_{file}");
+        let new = format!("w{directory}_{file}");
+        std::fs::write(&path, before.replace(&old, &new)).unwrap();
+        std::fs::File::options()
+            .write(true)
+            .open(&path)
+            .unwrap()
+            .set_times(std::fs::FileTimes::new().set_modified(modified))
+            .unwrap();
+        assert_eq!(count(&mut session, &old), 0, "{old}");
+        assert_eq!(count(&mut session, &new), 1, "{new}");
+    }
+    assert_eq!(session.generation(), 4);
+
+    // A listing: a new file in the directory that sorts last.
+    std::fs::write(fixture.path("d23/added.ts"), "export const added = 1;").unwrap();
+    assert_eq!(count(&mut session, "added"), 1);
+    assert_eq!(session.generation(), 5);
+
+    // A resolution probe outside every listed directory: a previously
+    // absent, higher-priority import target.
+    std::fs::write(
+        fixture.path("ydeps/dep23.ts"),
+        "export const shared23 = 1;\nexport const replaced = 1;\n",
+    )
+    .unwrap();
+    assert_eq!(count(&mut session, "replaced"), 1);
+    assert_eq!(session.generation(), 6);
+
+    // A real path: the symbolic link that sorts last changes its target.
+    std::fs::remove_file(fixture.path("zlink.ts")).unwrap();
+    std::os::unix::fs::symlink(fixture.path("b.ts"), fixture.path("zlink.ts")).unwrap();
+    assert_eq!(count(&mut session, "linkedA"), 0);
+    assert_eq!(count(&mut session, "linkedB"), 1);
+    assert_eq!(session.generation(), 7);
+    assert_eq!(count(&mut session, "linkedB"), 1);
+    assert_eq!(session.generation(), 7);
+}
+
+/// An input that changes after loading read it, while loading still runs,
+/// fails the refresh rather than publishing what was read: the check after
+/// loading compares every observation again. Here a pipe whose writer
+/// answers a second late keeps loading running while an input already read
+/// changes; the pipe sorts after it, so the check never waits on the pipe.
+#[cfg(unix)]
+#[test]
+fn an_input_changed_while_loading_fails_the_refresh() {
+    let fixture = project(&[
+        (
+            "tsconfig.json",
+            r#"{"compilerOptions":{"noLib":true},"files":["a.ts","first.ts"]}"#,
+        ),
+        ("a.ts", "export const before = 1;"),
+        ("first.ts", "import { late } from './z';\nlate;\n"),
+    ]);
+    let made = std::process::Command::new("mkfifo")
+        .arg(fixture.path("z.ts"))
+        .status()
+        .unwrap();
+    assert!(made.success());
+    let writer = {
+        let path = fixture.path("z.ts");
+        std::thread::spawn(move || {
+            use std::io::Write;
+            let mut pipe = std::fs::OpenOptions::new().write(true).open(path).unwrap();
+            std::thread::sleep(std::time::Duration::from_secs(1));
+            pipe.write_all(b"export const late = 1;").unwrap();
+        })
+    };
+    let editor = {
+        let path = fixture.path("a.ts");
+        std::thread::spawn(move || {
+            std::thread::sleep(std::time::Duration::from_millis(300));
+            std::fs::write(path, "export const after_ = 1;").unwrap();
+        })
+    };
+    let mut session = ProjectSession::new(&fixture.path("tsconfig.json")).unwrap();
+    let result = support::references(&mut session, name("before"));
+    writer.join().unwrap();
+    editor.join().unwrap();
+    match result {
+        Err(AnalysisError::Input(error)) => {
+            assert_eq!(error.kind, InputErrorKind::Io);
+            assert!(
+                error.message.contains("changed during indexing"),
+                "{error:?}"
+            );
+        }
+        other => panic!("a refresh that read a changed input published: {other:?}"),
+    }
+    assert_eq!(session.generation(), 0);
+}
+
+/// A type query after an edit answers from the new generation, although a
+/// warm session answers while it validates.
+#[test]
+fn a_type_query_after_an_edit_answers_from_the_new_generation() {
+    let fixture = project(&[("a.ts", "export const value = 1;\n")]);
+    let mut session = ProjectSession::new(&fixture.path("tsconfig.json")).unwrap();
+    let request = || {
+        typescript_parser::project::ProjectRequest::Type(
+            typescript_parser::types::TypeRequest::new(typescript_parser::types::TypeQuery::At {
+                file: fixture.path("a.ts"),
+                position: typescript_parser::source::SourcePosition {
+                    line: 1,
+                    column: 14,
+                },
+            }),
+        )
+    };
+    let summary = |session: &mut ProjectSession| match session.execute(request()).unwrap() {
+        typescript_parser::project::ProjectResponse::Type(answer) => match *answer {
+            typescript_parser::types::TypeAnswer::Selected(result) => result.description.summary,
+            other => panic!("{other:?}"),
+        },
+        other => panic!("{other:?}"),
+    };
+    assert_eq!(summary(&mut session), "1");
+    assert_eq!(summary(&mut session), "1");
+    std::fs::write(fixture.path("a.ts"), "export const value = 'two';\n").unwrap();
+    assert_eq!(summary(&mut session), "\"two\"");
+    assert_eq!(session.generation(), 2);
+}
+
+/// A pipe at `path` whose writer answers each reader with `contents`, after
+/// `before(read)` for the reader's one-based read number, until stopped.
+#[cfg(unix)]
+struct Pipe {
+    path: std::path::PathBuf,
+    stop: std::sync::Arc<std::sync::atomic::AtomicBool>,
+    writer: Option<std::thread::JoinHandle<()>>,
+}
+
+#[cfg(unix)]
+impl Pipe {
+    fn new(
+        path: std::path::PathBuf,
+        contents: &'static [u8],
+        before: impl Fn(usize) + Send + 'static,
+    ) -> Self {
+        let made = std::process::Command::new("mkfifo")
+            .arg(&path)
+            .status()
+            .unwrap();
+        assert!(made.success());
+        let stop = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let writer = {
+            let (path, stop) = (path.clone(), stop.clone());
+            std::thread::spawn(move || {
+                use std::io::Write;
+                for read in 1.. {
+                    let mut pipe = std::fs::OpenOptions::new().write(true).open(&path).unwrap();
+                    if stop.load(std::sync::atomic::Ordering::SeqCst) {
+                        return;
+                    }
+                    before(read);
+                    let _ = pipe.write_all(contents);
+                    drop(pipe);
+                    // Let the reader see the end before the next writer opens.
+                    std::thread::sleep(std::time::Duration::from_millis(100));
+                }
+            })
+        };
+        Self {
+            path,
+            stop,
+            writer: Some(writer),
+        }
+    }
+}
+
+#[cfg(unix)]
+impl Drop for Pipe {
+    fn drop(&mut self) {
+        self.stop.store(true, std::sync::atomic::Ordering::SeqCst);
+        // The writer waits for a reader; this one releases it.
+        drop(std::fs::File::open(&self.path));
+        if let Some(writer) = self.writer.take() {
+            let _ = writer.join();
+        }
+    }
+}
+
+/// An input changed while an earlier input is read from a pipe is seen, as
+/// validating in key order sees it: the configuration, a pipe sorting before
+/// `z.ts`, changes `z.ts` only once its third reader has begun.
+#[cfg(unix)]
+#[test]
+fn a_change_made_while_an_earlier_pipe_is_read_is_seen() {
+    let fixture = project(&[("z.ts", "export const before = 1;\n")]);
+    let source = fixture.path("z.ts");
+    let config = Pipe::new(
+        fixture.path("aconfig.json"),
+        br#"{"compilerOptions":{"noLib":true},"files":["z.ts"]}"#,
+        move |read| {
+            if read == 3 {
+                std::fs::write(&source, "export const after_ = 1;\n").unwrap();
+            }
+        },
+    );
+    let mut session = ProjectSession::new(&config.path).unwrap();
+    // Reads 1 and 2: loading and the check after it.
+    assert_eq!(count(&mut session, "before"), 1);
+    // Read 3 validates the next request; the edit precedes its end.
+    assert_eq!(count(&mut session, "before"), 0);
+    assert_eq!(count(&mut session, "after_"), 1);
+    assert_eq!(session.generation(), 2);
+}
+
+/// A symbolic link retargeted while loading still runs fails the refresh, as
+/// its real path changed after loading asked it; the next request publishes
+/// the new target. A pipe whose writer answers a second late keeps the first
+/// load running.
+#[cfg(unix)]
+#[test]
+fn a_link_retargeted_while_loading_fails_the_refresh_then_publishes() {
+    let fixture = project(&[
+        (
+            "tsconfig.json",
+            r#"{"compilerOptions":{"noLib":true},"files":["link.ts","first.ts"]}"#,
+        ),
+        ("first.ts", "import { late } from './z';\nlate;\n"),
+        ("t1.ts", "export const firstTarget = 1;\n"),
+        ("t2.ts", "export const secondTarget = 1;\n"),
+    ]);
+    std::os::unix::fs::symlink(fixture.path("t1.ts"), fixture.path("link.ts")).unwrap();
+    let _pipe = Pipe::new(fixture.path("z.ts"), b"export const late = 1;\n", |read| {
+        if read == 1 {
+            std::thread::sleep(std::time::Duration::from_secs(1));
+        }
+    });
+    let retarget = {
+        let (link, target) = (fixture.path("link.ts"), fixture.path("t2.ts"));
+        std::thread::spawn(move || {
+            std::thread::sleep(std::time::Duration::from_millis(300));
+            std::fs::remove_file(&link).unwrap();
+            std::os::unix::fs::symlink(target, &link).unwrap();
+        })
+    };
+    let mut session = ProjectSession::new(&fixture.path("tsconfig.json")).unwrap();
+    let result = support::references(&mut session, name("firstTarget"));
+    retarget.join().unwrap();
+    match result {
+        Err(AnalysisError::Input(error)) => {
+            assert!(
+                error.message.contains("changed during indexing"),
+                "{error:?}"
+            )
+        }
+        other => panic!("a refresh across a retargeted link published: {other:?}"),
+    }
+    assert_eq!(session.generation(), 0);
+    assert_eq!(count(&mut session, "secondTarget"), 1);
+    assert_eq!(count(&mut session, "firstTarget"), 0);
+    assert_eq!(session.generation(), 1);
+}
+
+/// A session loads a source changed while a package manifest is read from a
+/// pipe with its new text and publishes it: the manifest's writer, once its
+/// first reader opens it, changes `z.ts`, which a worker had already read.
+#[cfg(unix)]
+#[test]
+fn a_source_changed_while_a_manifest_pipe_is_read_is_published_with_its_new_text() {
+    let fixture = project(&[
+        (
+            "tsconfig.json",
+            r#"{"compilerOptions":{"module":"nodenext","noLib":true,"types":[]},"files":["sub/a.ts","z.ts"]}"#,
+        ),
+        ("sub/a.ts", "export const a = 1;\n"),
+        ("z.ts", "export const before = 1;\n"),
+    ]);
+    let source = fixture.path("z.ts");
+    let _manifest = Pipe::new(fixture.path("sub/package.json"), b"{}", move |read| {
+        if read == 1 {
+            std::thread::sleep(std::time::Duration::from_millis(500));
+            std::fs::write(&source, "export const after_ = 1;\n").unwrap();
+        }
+    });
+    let mut session = ProjectSession::new(&fixture.path("tsconfig.json")).unwrap();
+    assert_eq!(count(&mut session, "after_"), 1);
+    assert_eq!(count(&mut session, "before"), 0);
+    assert_eq!(session.generation(), 1);
+}
+
+/// Package manifests the module-specifier environment found unreadable stay
+/// unreadable without making the generation stale, and an edit beside them
+/// is still found.
+#[cfg(unix)]
+#[test]
+fn unchanged_unreadable_manifests_keep_the_generation_and_edits_are_found() {
+    use std::os::unix::fs::PermissionsExt;
+    let mut files = vec![(
+        "tsconfig.json".to_owned(),
+        r#"{"compilerOptions":{"module":"esnext","moduleResolution":"bundler","noLib":true,"types":[]},"include":["d*/**/*"]}"#.to_owned(),
+    )];
+    for index in 0..60 {
+        files.push((
+            format!("d{index:02}/m.ts"),
+            format!("export const v{index} = {index};\n"),
+        ));
+        files.push((format!("d{index:02}/package.json"), "{}".to_owned()));
+    }
+    let borrowed: Vec<(&str, &str)> = files
+        .iter()
+        .map(|(path, text)| (path.as_str(), text.as_str()))
+        .collect();
+    let fixture = support::Fixture::new(&borrowed);
+    for index in 0..60 {
+        let manifest = fixture.path(&format!("d{index:02}/package.json"));
+        std::fs::set_permissions(manifest, std::fs::Permissions::from_mode(0o000)).unwrap();
+    }
+    let mut session = ProjectSession::new(&fixture.path("tsconfig.json")).unwrap();
+    assert_eq!(count(&mut session, "v59"), 1);
+    assert_eq!(count(&mut session, "v0"), 1);
+    assert_eq!(session.generation(), 1);
+    std::fs::write(fixture.path("d30/m.ts"), "export const w30 = 30;\n").unwrap();
+    assert_eq!(count(&mut session, "w30"), 1);
+    assert_eq!(session.generation(), 2);
+    for index in 0..60 {
+        let manifest = fixture.path(&format!("d{index:02}/package.json"));
+        std::fs::set_permissions(manifest, std::fs::Permissions::from_mode(0o644)).unwrap();
+    }
+}
