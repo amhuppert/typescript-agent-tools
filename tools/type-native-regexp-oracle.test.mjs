@@ -22,5 +22,6 @@ test('native regular expressions read the actual RegExp global and its members',
       rows.push({profile, marker, native});
     }
   }
-  fs.writeFileSync('.cc/temp/completion-next/native-regexp-observations.json', JSON.stringify(rows, null, 2));
+  fs.mkdirSync('.cc/temp', {recursive: true});
+  fs.writeFileSync('.cc/temp/native-regexp-observations.json', JSON.stringify(rows, null, 2));
 });

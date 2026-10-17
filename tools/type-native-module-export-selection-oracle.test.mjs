@@ -8,6 +8,10 @@ import {lineStarts, position} from './semantic-oracle.mjs';
 
 const root = fileURLToPath(new URL('../fixtures/types/native-module-export-selection/', import.meta.url));
 const source = fs.readFileSync(path.join(root,'cases.cts'),'utf8');
+// Module names spell the fixture's absolute directory; compare them as
+// `<fixture>/…`, wherever the repository is checked out.
+const located = rows => JSON.parse([root, fs.realpathSync(root) + path.sep].reduce(
+  (text, directory) => text.replaceAll(directory, '<fixture>/'), JSON.stringify(rows)));
 for (const profile of ['node20','nodenext']) {
   test(`native alias export selection and module-star links (${profile})`, async () => {
     const rows = [];
@@ -22,9 +26,9 @@ for (const profile of ['node20','nodenext']) {
         location:api.location,origins:api.origins,codes:native.beforeSummary.diagnosticCodes,
         demandFailures:native.beforeSummary.demandFailures,acquisitions:native.beforeSummary.displayAcquisitions ?? []});
       fs.mkdirSync('.cc/temp',{recursive:true});
-      fs.writeFileSync(`.cc/temp/native-module-export-selection-${profile}.json`,JSON.stringify(rows,null,2)+'\n');
+      fs.writeFileSync(`.cc/temp/native-module-export-selection-${profile}.json`,JSON.stringify(located(rows),null,2)+'\n');
     }
     assert.equal(rows.length,12);
-    assert.deepEqual(rows,JSON.parse(fs.readFileSync(path.join(root,`expected-${profile}.json`),'utf8')));
+    assert.deepEqual(located(rows),JSON.parse(fs.readFileSync(path.join(root,`expected-${profile}.json`),'utf8')));
   });
 }

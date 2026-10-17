@@ -1696,7 +1696,7 @@
         "declarationPos": 0,
         "depth": 0,
         "event": "enter",
-        "name": "\"/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-module-export-selection/module-star\"",
+        "name": "\"<fixture>/module-star\"",
         "operation": "getTypeOfSymbol"
       },
       {
@@ -1707,7 +1707,7 @@
         "errorType": false,
         "event": "exit",
         "flags": 1048576,
-        "name": "\"/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-module-export-selection/module-star\"",
+        "name": "\"<fixture>/module-star\"",
         "operation": "getTypeOfSymbol",
         "type": 82
       },
@@ -1797,7 +1797,7 @@
         "declarationPos": 0,
         "depth": 0,
         "event": "enter",
-        "name": "\"/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-module-export-selection/module-star\"",
+        "name": "\"<fixture>/module-star\"",
         "operation": "getTypeOfSymbol"
       },
       {
@@ -1808,7 +1808,7 @@
         "errorType": false,
         "event": "exit",
         "flags": 1048576,
-        "name": "\"/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-module-export-selection/module-star\"",
+        "name": "\"<fixture>/module-star\"",
         "operation": "getTypeOfSymbol",
         "type": 82
       },
@@ -1818,7 +1818,7 @@
         "declarationPos": 0,
         "depth": 0,
         "event": "enter",
-        "name": "\"/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-module-export-selection/module-star\"",
+        "name": "\"<fixture>/module-star\"",
         "operation": "getTypeOfSymbol"
       },
       {
@@ -1829,7 +1829,7 @@
         "errorType": false,
         "event": "exit",
         "flags": 1048576,
-        "name": "\"/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-module-export-selection/module-star\"",
+        "name": "\"<fixture>/module-star\"",
         "operation": "getTypeOfSymbol",
         "type": 82
       },
@@ -1846,7 +1846,7 @@
         "declarationPos": 0,
         "depth": 1,
         "event": "enter",
-        "name": "\"/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-module-export-selection/module-star\"",
+        "name": "\"<fixture>/module-star\"",
         "operation": "getTypeOfSymbol"
       },
       {
@@ -1857,7 +1857,7 @@
         "errorType": false,
         "event": "exit",
         "flags": 1048576,
-        "name": "\"/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-module-export-selection/module-star\"",
+        "name": "\"<fixture>/module-star\"",
         "operation": "getTypeOfSymbol",
         "type": 82
       },

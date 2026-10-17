@@ -35,42 +35,42 @@
   "code": [
     {
       "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-values/setup.mjs",
-      "archive": "code/.cc/temp/types-member-values/setup.mjs",
+      "archive": "code/cc-temp/types-member-values/setup.mjs",
       "sha256": "3a183ac04ad13b2e870a06ae2ecea302b5796cb39473b1ddb5f880e2a498ab27"
     },
     {
       "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-values/probe.mjs",
-      "archive": "code/.cc/temp/types-member-values/probe.mjs",
+      "archive": "code/cc-temp/types-member-values/probe.mjs",
       "sha256": "2ce0539959391c710735c888644c0dbfcf51010c3851314028a4eed7058490ec"
     },
     {
       "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-values/probe-extra.mjs",
-      "archive": "code/.cc/temp/types-member-values/probe-extra.mjs",
+      "archive": "code/cc-temp/types-member-values/probe-extra.mjs",
       "sha256": "d9868398c57f6562065ee24c707b6d71288f5a79baf4a25dfb87b1e6bca3e567"
     },
     {
       "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-values/freeze.mjs",
-      "archive": "code/.cc/temp/types-member-values/freeze.mjs",
+      "archive": "code/cc-temp/types-member-values/freeze.mjs",
       "sha256": "14f2ab1de7b4bca69687fc97ab25eef37a716e762930a0343d4faaa7e99e9a8c"
     },
     {
       "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-values/oracle.mjs",
-      "archive": "code/.cc/temp/types-member-values/oracle.mjs",
+      "archive": "code/cc-temp/types-member-values/oracle.mjs",
       "sha256": "6dee0f5640403657660bfd07446bd4f053b3e3f687c819b12b7126c97d693165"
     },
     {
       "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-values/checker-hook.go",
-      "archive": "code/.cc/temp/types-member-values/checker-hook.go",
+      "archive": "code/cc-temp/types-member-values/checker-hook.go",
       "sha256": "3a761dd1907257625516f0f1ee525b983604573d601c4255ecd5f20123485014"
     },
     {
       "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-values/ls-hook.go",
-      "archive": "code/.cc/temp/types-member-values/ls-hook.go",
+      "archive": "code/cc-temp/types-member-values/ls-hook.go",
       "sha256": "73c9a52f43914571bdf7f29e8817720d0ff98bdb0aeb7cad183fa8397a848dce"
     },
     {
       "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-values/oracle-test.go",
-      "archive": "code/.cc/temp/types-member-values/oracle-test.go",
+      "archive": "code/cc-temp/types-member-values/oracle-test.go",
       "sha256": "d3802d71e04fcda779adde08c9eb62ff91680571278aeb2006c80be0fcd4e28c"
     },
     {
