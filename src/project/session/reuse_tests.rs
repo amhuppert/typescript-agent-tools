@@ -324,3 +324,56 @@ fn parse_failure_preserves_reuse_but_never_answers_from_it() {
     assert_eq!(session.generation(), 2);
     assert_eq!(stable, identity(&session, &fixture, "b.ts"));
 }
+
+/// A searched package file's catalog, which its capture leaves out and the
+/// loader builds (`capture::Job::navigation`), is reused with the rest of the
+/// file's capture: for a file a reference directive reaches, and for a
+/// dependency that becomes a configuration root.
+#[test]
+fn refresh_reuses_catalogs_built_after_capture() {
+    let fixture = Fixture::new();
+    let referenced = "node_modules/referenced/globals.d.ts";
+    let promoted = "node_modules/promoted/index.d.ts";
+    fixture.write(
+        "tsconfig.json",
+        r#"{"compilerOptions":{"noLib":true,"types":[]},"files":["app.ts"]}"#,
+    );
+    fixture.write(
+        "app.ts",
+        "/// <reference path=\"./node_modules/referenced/globals.d.ts\" />\nimport \"./node_modules/promoted/index\";\nexport const edited = 1;\n",
+    );
+    fixture.write(referenced, "declare const fromPackage: number;\n");
+    fixture.write(promoted, "export declare const fromRoot: number;\n");
+    let mut session = fixture.session();
+    fixture.references(&mut session, "fromPackage");
+    let catalog = identity(&session, &fixture, referenced);
+    assert!(
+        catalog.1.is_some(),
+        "the searched package file has a catalog"
+    );
+    // A dependency outside the searched files has none.
+    assert_eq!(identity(&session, &fixture, promoted).1, None);
+
+    fixture.write(
+        "app.ts",
+        "/// <reference path=\"./node_modules/referenced/globals.d.ts\" />\nimport \"./node_modules/promoted/index\";\nexport const edited = 2;\n",
+    );
+    fixture.references(&mut session, "fromPackage");
+    assert_eq!(identity(&session, &fixture, referenced), catalog);
+
+    fixture.write(
+        "tsconfig.json",
+        r#"{"compilerOptions":{"noLib":true,"types":[]},"files":["app.ts","node_modules/promoted/index.d.ts"]}"#,
+    );
+    fixture.references(&mut session, "fromRoot");
+    let root = identity(&session, &fixture, promoted);
+    assert!(root.1.is_some(), "the promoted root has a catalog");
+    fixture.write(
+        "app.ts",
+        "/// <reference path=\"./node_modules/referenced/globals.d.ts\" />\nimport \"./node_modules/promoted/index\";\nexport const edited = 3;\n",
+    );
+    fixture.references(&mut session, "fromRoot");
+    assert_eq!(identity(&session, &fixture, promoted), root);
+    assert_eq!(identity(&session, &fixture, referenced), catalog);
+    assert_eq!(session.generation(), 4);
+}

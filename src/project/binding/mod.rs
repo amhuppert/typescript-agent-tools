@@ -301,7 +301,9 @@ fn first_jsx(ast: &Ast<'_>) -> Option<usize> {
     // TypeScript's `parsePrimaryExpression` reaches
     // `parseJsxElementOrSelfClosingElementOrFragment` only then: any other
     // file has none, without a walk of its whole tree.
-    if syntax::number(ast.root(), "languageVariant") != Some(crate::compiler::variant::JSX) {
+    let variant = syntax::number(ast.root(), "languageVariant");
+    debug_assert!(variant.is_some(), "the parser records the language variant");
+    if variant != Some(crate::compiler::variant::JSX) {
         return None;
     }
     ast.walk()

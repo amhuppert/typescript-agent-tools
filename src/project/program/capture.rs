@@ -69,8 +69,8 @@ pub(super) struct Parsed {
 pub(super) enum Contents {
     /// A JSON module (`binding::collect_json`).
     Json(FileFacts),
-    /// A TypeScript input: its navigation index, unless it is a library,
-    /// its module indicators, and the effective `module` decision under
+    /// A TypeScript input: its navigation index, unless its job left it
+    /// out (`Job::navigation`), its module indicators, and the effective `module` decision under
     /// which its facts were collected. This is collection's whole cache key.
     TypeScript {
         navigation: Option<Captured>,
@@ -90,6 +90,22 @@ pub(super) struct Cached {
     pub(super) library: bool,
     pub(super) json: bool,
     pub(super) parsed: Parsed,
+}
+
+/// Keep in `cache` the catalog the loader built for `path` after its
+/// capture left it out (`Job::navigation`).
+pub(super) fn keep_navigation(cache: &mut Cache, path: &str, catalog: &Captured) {
+    if let Some(Cached {
+        parsed:
+            Parsed {
+                contents: Ok(Contents::TypeScript { navigation, .. }),
+                ..
+            },
+        ..
+    }) = cache.get_mut(path)
+    {
+        *navigation = Some(catalog.clone());
+    }
 }
 
 /// Capture `job`'s input with `parser`, reading as `reading` reads; nothing

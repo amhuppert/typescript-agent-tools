@@ -231,6 +231,7 @@ fn load_program(
             root_tasks: Vec::new(),
             reached: Vec::new(),
             libraries: Vec::new(),
+            navigated: Vec::new(),
             library_ids: HashMap::new(),
             program_only: Vec::new(),
             captures,
@@ -304,7 +305,13 @@ fn load_program(
                         .map_err(|error| {
                             InputError::unparsable(error, &source.text, &source.path)
                         })?;
-                    Some(Captured::typescript(&ast, &source.text))
+                    let navigation = Captured::typescript(&ast, &source.text);
+                    // The next generation reuses the catalog with the rest of
+                    // the input's capture.
+                    if let Some(cache) = loader.next_captures.as_deref_mut() {
+                        capture::keep_navigation(cache, path, &navigation);
+                    }
+                    Some(navigation)
                 }
                 _ => None,
             };
@@ -417,6 +424,9 @@ struct Loader<'a> {
     reached: Vec<Vec<String>>,
     /// By id: the standard library a library route first reached it as.
     libraries: Vec<Option<Library>>,
+    /// By id: whether its reservation guessed it searched and so captured
+    /// its catalog (`capture::Job::navigation`).
+    navigated: Vec<bool>,
     /// Each library file's id once captured: `pathForLibFile`'s cache.
     library_ids: HashMap<&'static str, FileId>,
     /// Requests, by importing file and request index, that resolved to a
@@ -443,8 +453,10 @@ struct Loaded {
     /// The first unsupported reference path target, an error unless the file
     /// turns out to be a dependency.
     unsupported: Option<InputError>,
-    /// What navigation captured, for any input but a library, which is
-    /// never searched.
+    /// What navigation captured: nothing for a library, which is never
+    /// searched, or for an input its reservation guessed unsearched
+    /// (`capture::Job::navigation`), whose catalog the final pass builds if
+    /// it is searched after all.
     navigation: Option<Captured>,
 }
 
@@ -564,12 +576,13 @@ impl Loader<'_> {
 
     /// `enqueue`, recording whether a library route reached the input
     /// first; the first route decides, as in TypeScript's `collectFiles`.
-    /// A `root` is a configuration root.
+    /// A `searched_route` is one searching follows from a searched input: a
+    /// configuration root, or a reference path of an input guessed searched.
     fn enqueue_as(
         &mut self,
         path: &str,
         library: Option<Library>,
-        root: bool,
+        searched_route: bool,
     ) -> Result<FileId, InputError> {
         let identity = self.identity(path)?;
         let key = self.case.key(&identity);
@@ -579,15 +592,17 @@ impl Loader<'_> {
             None => {
                 let id = self.sources.reserve();
                 self.ids.insert(key, id);
+                // A guess, corrected once the program is known: a searched
+                // route reaches a searched input, and other routes into a
+                // package cross an external-library edge, which searching
+                // does not cross, unless some later route reaches it.
+                let navigation =
+                    library.is_none() && (searched_route || !paths::has_node_modules(&identity));
                 self.captures.reserve(capture::Job {
                     id,
                     path: identity.clone(),
                     library: library.is_some(),
-                    // A guess, corrected once the program is known: a root
-                    // is searched, and an input in a package is reached
-                    // through an external-library edge, which searching does
-                    // not cross, unless some route reaches it otherwise.
-                    navigation: library.is_none() && (root || !paths::has_node_modules(&identity)),
+                    navigation,
                     // What the name means follows TypeScript, which
                     // classifies the exact spelling, or its script kind
                     // without case; the case policy decides only identity and
@@ -602,6 +617,7 @@ impl Loader<'_> {
                 self.queue.push_back((identity, id));
                 self.reached.push(Vec::new());
                 self.libraries.push(library);
+                self.navigated.push(navigation);
                 id
             }
         };
@@ -799,7 +815,7 @@ impl Loader<'_> {
                 path: file_path.clone(),
                 position: Some(source.position(reference.offset)),
             };
-            match self.directive(&path, format, reference.directive, &origin)? {
+            match self.directive(id, &path, format, reference.directive, &origin)? {
                 Followed::Edge(target, external) => targets.push((target, external)),
                 Followed::Nothing => {}
                 // Settled with provenance (`Diagnostics::reports`).
@@ -992,6 +1008,7 @@ impl Loader<'_> {
     /// directive appears; other failures are outcomes the caller settles.
     fn directive(
         &mut self,
+        importer: FileId,
         path: &str,
         format: FileFormat,
         directive: Directive,
@@ -1041,7 +1058,12 @@ impl Loader<'_> {
                         kind.label()
                     )),
                     files::Literal::Found(found) => {
-                        Ok(Followed::Edge(self.enqueue(&found)?, false))
+                        // A reference path is never an external edge.
+                        let navigated = self.navigated[importer.index()];
+                        Ok(Followed::Edge(
+                            self.enqueue_as(&found, None, navigated)?,
+                            false,
+                        ))
                     }
                     files::Literal::Missing => Ok(Followed::Missing(origin.error(
                         InputErrorKind::UnresolvedImport,
