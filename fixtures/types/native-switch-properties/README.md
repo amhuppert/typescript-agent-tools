@@ -12,5 +12,5 @@ source-sorted. Native source supplies scheduling evidence, and ordinary API
 results are checked independently. Exact captured baselines are installed;
 the maintained 120-query run passed as
 `vrun-2a93c7ff-c859-4436-ac44-c444048f06fa`.
-See `docs/types-switch-properties-plan.md` for the whole operation and final
-query proof contract.
+The historical switch-properties implementation plan and final-query proof
+contract are available in Git history.

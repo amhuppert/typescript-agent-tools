@@ -249,7 +249,7 @@ measured 4999999. Final green `vrun-fd9885db-7854-454f-9278-57cead88017e` passed
 all **16 tests with zero skips**, proving Head depth 99/100/100 and natural
 count 4999999/5000000/5000000 before printing, with exact valid numeric union under
 the count boundary and error-root `any` at/over it. The
-[independent follow-up](types-oracle-review.md) inspected cloned phase snapshots,
+independent follow-up (archived in Git history) inspected cloned phase snapshots,
 the natural generator, current manifest hashes and those registered outcomes.
 
 The candidate-ledger behavior first failed precisely on missing output in
@@ -263,7 +263,7 @@ was the subsequently disproved expected JSX nil-symbol blocker. A fresh final
 hook result identified the actual `JsxAttribute` symbol and related property,
 so the expectation was corrected from compiler evidence.
 
-The independent [Q4 selector review](types-selection-oracle-review.md) reproduced
+The independent Q4 selector review (archived in Git history) reproduced
 renamed type-only alias, type-query operand and parameter modifier selection
 errors. Its expanded run `vrun-60abb32a-d878-4efb-9124-924ca19f049e` additionally
 proved three synthetic punctuation-token RPC failures and an unresolved alias
@@ -379,5 +379,5 @@ representation decision. Bounded native implementation increments close neither.
 
 The option classification and its separate configuration verification are in
 [types-options.md](types-options.md) and
-[types-configuration-review.md](types-configuration-review.md); this oracle slice
+the configuration review (archived in Git history); this oracle slice
 does not substitute for their tests.

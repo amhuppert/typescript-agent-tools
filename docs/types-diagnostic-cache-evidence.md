@@ -66,7 +66,7 @@ The nested lazy object and its enclosing source display each install the
 transform's completion in their own serialized-node slot. The outer result
 contains the nested result once. Later source-node cache hits skip those native
 getter calls and return the installed completion under the product's
-[cache evidence contract](types-native-recovery-plan.md#relation-completion-checkpoint).
+cache evidence contract (archived in Git history).
 They do not add six fresh getter events or traverse the nested cache again.
 Native publication and hit behavior are owned by
 [`visitAndTransformType`](https://github.com/microsoft/typescript-go/blob/2bd066d87f5bafd315be9f40889d0a60b9e58e0b/internal/checker/nodebuilderimpl.go#L3089).

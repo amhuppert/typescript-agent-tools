@@ -11,5 +11,5 @@ copy the captured probe back to that scratch path and provide the pinned
 `TYPE_SCRIPT_SEMANTIC_API` and `TYPE_SCRIPT_NATIVE` environment variables. It
 does not invoke whole-program semantic diagnostics.
 
-See `docs/types-read-review.md` for scope, the exact used-before-assignment
+See [native read evidence](../../../docs/types-native-read-evidence.md) for scope, the exact used-before-assignment
 branch and the distinct unrelated-condition/never-antecedent observations.

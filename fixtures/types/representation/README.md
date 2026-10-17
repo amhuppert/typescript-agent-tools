@@ -1,9 +1,9 @@
 # Historical representation experiment
 
 These are exact copies of the reviewed experiment's code and raw measurements.
-See [the report](../../../docs/types-representation-evidence.md) and
-[independent review](../../../docs/types-representation-review.md) for scope,
-results, hashes and remaining obligations. No production representation is
+See [the report](../../../docs/types-representation-evidence.md) for scope,
+results, hashes and remaining obligations. The independent review is available
+in Git history. No production representation is
 selected by this experiment.
 
 The scripts preserve their original `.cc/temp/types-representation` working

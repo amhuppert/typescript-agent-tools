@@ -77,9 +77,9 @@ session request boundary, which checks the captured filesystem inputs before
 every request and loads a new generation after any change; there is no second
 service, cache, or refresh path per operation. It reuses a complete snapshot
 while its inputs match. The check rereads and compares every captured input,
-so it dominates a warm request on a large project: on Command Center (7,639
-inputs) a warm query takes about 0.4 s, nearly all of it the check, and a
-rebuild after an edit about 10 s ([measurements](performance-command-center.md#current-state-2026-10-08)).
+so it dominates a warm request on a large project: on Command Center (4,154
+searched files) the check takes about 0.44 s of a 0.5–0.6 s warm query, and a
+rebuild after an edit about 20 s ([measurements](performance-command-center.md#current-state-2026-10-17)).
 `--references-status --project CONFIG` reports `running`, `pid`, and `generation`
 (the number of successfully published snapshots); status does not check freshness.
 `--references-stop --project CONFIG` stops it, and `--direct` (or
@@ -919,10 +919,94 @@ records the current validation status; this section is not a delivery-complete c
   [evaluation baseline](types-design.md#evaluation-order-baseline). This
   deliberately removes native collisions between encoded IDs and property
   names, and decimal-ID ordering in generated names. The
-  [identity review](types-native-identity-review.md) preserves compiler evidence
-  that unrelated process allocations can otherwise change a final type. The
+  [compiler identity evidence](#compiler-identity-evidence) shows that unrelated
+  process allocations can otherwise change a final type. The
   implementation and final-query proof remain separate completion obligations.
 
 The design also defines product call/test filters, bounded presentation,
 unsupported-flow/JSX gaps and typed failures. These limitations are not a claim
 that TypeScript itself cannot analyze those sites.
+
+## Compiler identity evidence
+
+These pinned compiler observations explain the deliberate identity differences
+above. They were retained from the historical identity review; the final
+[completion checkpoint](types-completion-correctness-2026-10-13.md) owns delivery
+status. The maintained oracle tests and fixture paths below preserve the
+reproduction inputs.
+
+### A fresh checker does not define one native answer
+
+Pinned TypeScript Go 7.0.2 stores `nextSymbolId` and `nextNodeId` in process-global atomics (`internal/ast/utilities.go`, `GetSymbolId` / `GetNodeId`). A new checker does not reset them. `GetSymbolId` assigns on first use, not on symbol construction. Concurrent compare-and-swap can also consume unused numbers.
+
+The maintained control is `tools/type-symbol-id-collision-oracle.test.mjs`, with source in `fixtures/types/native-symbol-id-collision/cases.ts`. Registered run **vrun-969941b9-9e68-43e7-99f3-05c206668c19** passed all three tests with zero skips. The earlier inequality probe passed as **vrun-ca455c2c-e6e3-4d55-a95d-e8768ee8618f**.
+
+The fixture assigns a number to a literal property and a string to a stable dynamic index, both before and inside a loop. Its selected result reads the literal property first and the dynamic index second:
+
+```ts
+obj["@\u0002\u0000\u0000\u0000\u0000\u0000\u0000\u0000"] = 0;
+obj[key] = "value";
+// The same two assignments occur in the loop.
+const answer = {
+    warm: obj["@\u0002\u0000\u0000\u0000\u0000\u0000\u0000\u0000"],
+    result: obj[key]
+};
+```
+
+The test-only oracle allocates zero, one, or two unrelated native symbols before constructing the same fresh program/checker. It uses the same serial binding setting and call prelude each time. The maintained assertions compare every captured input hash and the compiler options across the three executions. The hook observes the ID inside the existing `keyBuilder.writeSymbol` call; it does not make an extra ID request.
+
+| Prior unrelated IDs | Actual `key` ID | Final native summary |
+| --- | --- | --- |
+| 0 | 2 | `{ warm: number; result: number; }` |
+| 1 | 3 | `{ warm: number; result: string; }` |
+| 2 | 4 | `{ warm: number; result: string; }` |
+
+Every result has `errorType == false` and no acquired demand failure. The only permitted diagnostics are the expected missing-global-library diagnostics from `noLib`. Replacing the literal key with ordinary decimal text `"@2"` returns `result: string` under both tested histories.
+
+This is a final type difference, not merely a changed private cache key. It demonstrates that the current fresh-checker wording alone leaves an observable process-history dimension unspecified. It does not show that every native ID assignment is semantically observable.
+
+### Mechanism and concurrent binding evidence
+
+`checker.writeFlowCacheKey` (`internal/checker/flow.go`) writes a literal access as its object key followed by `'.'` and raw property-name bytes. A stable identifier index writes the same object key followed by `".@"` and `keyBuilder.writeSymbol`. The latter writes **eight little-endian binary bytes**, through `hashWrite64`; it does not write decimal digits. When the symbol ID is 2, the two byte sequences in the fixture are identical and reuse the same loop-flow cache entry.
+
+Native type IDs use four little-endian bytes. Node IDs use the same eight-byte numeric representation as symbol IDs. The decision therefore concerns all identity-bearing key components, not only this one dynamic-index branch.
+
+Binding also affects the process epoch. `binder.GetSymbolNameForPrivateIdentifier` embeds `GetSymbolId(containingClassSymbol)` in `FE#<decimal ID>@<description>`. `Program.BindSourceFiles` queues each source file through `core.NewWorkGroup`. The default work group starts goroutines. The single-thread work group pops from the end of its queue: it binds files in **reverse** program order.
+
+The third maintained test creates 12 independent private-field classes, reads only their already-bound private-name suffixes, and queries the same unrelated scalar result. Reading the suffixes requests no new ID or type. Two serial fresh runs assigned classes C0 through C11 the IDs `[12,11,10,9,8,7,6,5,4,3,2,1]`. Four parallel fresh runs recorded these different permutations:
+
+```text
+[2,3,4,6,8,1,5,7,10,11,9,12]
+[2,3,4,5,7,1,6,8,11,9,10,12]
+[2,3,4,6,7,1,5,8,10,9,11,12]
+[2,3,4,5,1,6,11,12,8,7,9,10]
+```
+
+The test asserts serial ordering and that every parallel observation is a permutation of the actual allocated IDs. It deliberately does not require a particular parallel permutation, or require two runs to differ. The captured artifact is `.cc/temp/type-symbol-id-bind-observations.json`. All six scalar results were `0`; this concurrency control demonstrates variable allocation order, not a second final-answer difference.
+
+
+### Chosen policy and generated-name length
+
+The alternative of reproducing one native process epoch would require a fresh
+process, explicit binding order, and the precise intrinsic initialization and
+ID-acquisition schedule. This tool instead retains opaque symbol, type, and
+node identities, separate from exact user-name bytes, with one deterministic
+request-local lazy ordering owner. Native named-dot byte concatenation remains
+unchanged; the exception concerns identity serialization and generated names.
+
+Native nodebuilder's `addPropertyToElementList` charges
+`len(ast.SymbolName(propertySymbol)) + 1` to approximate display length.
+`getESSymbolLikeTypeForNode` embeds the decimal `GetSymbolId` in unique names,
+so native truncation and subsequent dependencies can vary with unrelated
+process allocations. This tool counts each opaque identity atom as one logical
+unit, retaining every fixed prefix, separator and exact textual byte, recursively
+for generated underlying names. Length reads do not acquire ordering identities.
+The native `SymbolName` special case for a real private-name declaration still
+precedes this calculation. Fixed names retain native lengths and cutoffs.
+
+The historical typed-key final-query regression is `tests/type_flow_identity.rs`;
+the matching strict/loose compiler controls are
+`tools/type-flow-identity-oracle.test.mjs`. Actual equal-name/declaration symbol
+ties are covered by `tools/type-symbol-order-identity-oracle.test.mjs`. Each
+control retains its own scope; the binding-order observations above establish
+variable allocation order rather than a second final-answer difference.

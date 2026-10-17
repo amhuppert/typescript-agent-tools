@@ -35,9 +35,10 @@ CLI invocations. Every query checks the captured inputs; changed sources,
 configuration, or resolution inputs trigger a full rebuild. A failed refresh
 reports its error. Services stop after ten idle minutes. `--direct` answers in
 the CLI process instead, with the same output. On Command Center, a Next.js
-application whose configuration selects 7,639 program inputs, a load takes
-about 9 seconds, a warm query about 0.4 seconds, most of it that check, and a
-rebuild after an edit about 10 seconds ([measurements](docs/performance-command-center.md#current-state-2026-10-08)).
+application with 4,154 searched files, a load takes about 18–21 seconds and
+3 GiB, a warm query about 0.5–0.9 seconds, most of it that check, a semantic
+member search 12–16 seconds, and a rebuild after an edit about 20 seconds; the
+service retains about 1.9 GiB ([measurements](docs/performance-command-center.md#current-state-2026-10-17)).
 
 ```sh
 ./target/release/tsparse --references-status --project ./tsconfig.json

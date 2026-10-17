@@ -18,7 +18,7 @@ The behavior gates are actual final Project assertion failures:
 
 The source pin is TypeScript 7.0.2 commit
 `2bd066d87f5bafd315be9f40889d0a60b9e58e0b`. The complete branch ledger and
-design alternatives remain in [types-native-algebra-plan.md](types-native-algebra-plan.md).
+design alternatives remain in the algebra implementation plan (archived in Git history).
 These gates authorize the intersection increment; they do not prove it or
 complete tuple, symbolic operator, relation, member, graph-budget or corpus work.
 
@@ -179,7 +179,7 @@ to the first predicate must not accidentally remove those facts dependencies.
 Both use one native resolved-empty collection predicate and preserve failures.
 
 The new shared `recursion_identity(ty, consumer)` operation proposed in
-[types-native-property-symbols-plan.md](types-native-property-symbols-plan.md)
+the property-symbol implementation plan (archived in Git history)
 replaces `constraints.rs::constraint_recursion_identity`. It asks actual
 symbol/node/type identity, including literal exclusion, deferred reference
 node priority, FromTypeNode, static-class exclusion and cloned parameter

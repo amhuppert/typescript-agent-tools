@@ -1,27 +1,19 @@
 # Native types and member queries: technical design
 
-Status: implementation in progress, revised 2026-10-12, starting from repository
-revision `ea23d8b`. The user authorized implementation of **T, Q3, Q4**. This
-document defines their contracts and internal ownership; it does not claim the
-delivery is complete or authorize the ticket's other capabilities.
-The configuration snapshot, lexical call/test filters, and lexical
-coverage/member advisory metadata are implemented. Native type, member, generic,
-call, relation, operator and flow operations now have scoped implementation and
-public-query evidence recorded in [implementation status](types-implementation-status.md).
-Shared checker initialization and recovery continuation remain active work;
-the complete native checker, Q3/Q4 profiles, resource bounds and corpus journeys
-remain subject to the proof gates below. [Option inventory](types-options.md) and
-[configuration review](types-configuration-review.md) record the completed
-configuration slice and its limits. Revised after the [Astra xhigh review](types-design-review.md);
-the [first response](types-review-response.md) records its dispositions. The
-[second review](types-design-review-2.md) and [second response](types-review-response-2.md)
-supersede the first review’s readiness conclusion for this revision. The
-existing navigation and editing deliveries remain the foundation.
-[Compiler evidence](types-design-evidence.md) distinguishes measured behavior
-from the implementation proof still required.
-[Member relationship fixtures](types-member-relations-evidence.md) and
-[corpus observations](types-corpus-evidence.md) extend that baseline;
-their compiler successes do not establish native semantic delivery.
+Status: T/Q3/Q4 completed 2026-10-16 under the user-approved single-user
+resource policy and documented TypeScript compatibility profile. The
+[completion checkpoint](types-completion-correctness-2026-10-13.md) records the
+final validation and supersedes the historical implementation-stage proof
+obligations below, including per-operation resource accounting. Current process
+protection and user-facing behavior are described in [types.md](types.md).
+
+This document retains the selected contracts and internal ownership, starting
+from repository revision `ea23d8b`; it does not authorize the ticket's other
+capabilities. Historical implementation plans and reviews are available in Git
+history. [Option inventory](types-options.md),
+[compiler evidence](types-design-evidence.md),
+[member relationship fixtures](types-member-relations-evidence.md), and
+[corpus observations](types-corpus-evidence.md) retain their own measured scopes.
 
 ## Purpose and operating envelope
 
@@ -100,24 +92,22 @@ with an explicit `getMergedSymbol` map. The lexical union-find and meaning
 slots remain navigation projections. Raw metadata reads never follow those
 projections; checker clone/merge operations record their own header and table
 writes at the native operation. This also gives private keys, raw Parent,
-LocalSymbol and ExportSymbol one identity owner. The
-[native-header migration](types-native-symbol-headers-migration.md) records the
-alternatives, factory contracts, and staged verification. Missing raw metadata
+LocalSymbol and ExportSymbol one identity owner. Missing raw metadata
 continues to fail until that producer and its readers are migrated together.
 
 Load-time JSON augmentation exposed the next boundary: resolving a merge target
 can require checker-created object properties and type-dependent widening.
-The accepted [shared initialization design](types-native-checker-initialization-plan.md)
-uses one initializer over immutable checker inputs, with a temporary evaluator
-during load and fresh initialization in each request. Raw binder associations
+The shared initialization contract uses one initializer over immutable checker
+inputs, with a temporary evaluator during load and fresh initialization in each
+request. Raw binder associations
 remain captured; checker-created headers, merge links, types, and caches belong
 to that evaluator. The completed lexical projection/index remains the Q1
 product. This replaces load-native cache import with replay of the same owner,
 without a cloned checker-state seed. Native diagnostic acquisitions retain their
 order before the separate existing load admission policy. The shared bootstrap
 and actual JSON declaration carriers are connected and have scoped public/load
-proof. Broader compatibility, resource and replay gates remain open; their
-current receipts are recorded in implementation status.
+proof. Final compatibility and replay receipts are recorded in the
+[completion checkpoint](types-completion-correctness-2026-10-13.md).
 At that composition boundary, Project::load returns the existing AnalysisError
 envelope so an interrupted initializer retains semantic reason and causes.
 Legacy Input errors keep their CLI/service wire fields; direct Rust callers
@@ -173,8 +163,6 @@ typing, constant-reference checks, and returned discriminant candidates consume
 complete syntax identities. Callers cannot reinterpret those nodes in the
 current graph's file. Native constant-condition inlining retains the checker-wide
 five-level scope and restores it before returning or propagating an interruption.
-The [reference-context plan](types-native-reference-context-plan.md) records the
-implementation and its cross-file and boundary proof status.
 
 Admission is a restricted interpreter with three outcomes: an exact read type
 from supported setup/identity cases, `flow_required`, or a distinct failure.
@@ -208,8 +196,8 @@ empty-if diamonds prove the separate output limit.
 Shared caching belongs to the reference invocation's native window, and stores
 only the last Shared node in a normally completed tail frame. General memoization
 of every flow node cannot replace that schedule. The strict/loose natural
-boundary and long flat controls are recorded in
-[the flow plan](types-native-flow-plan.md).
+boundary and long flat controls are recorded in the historical implementation
+plan, available in Git history.
 
 * Compute the compiler's declared/initial inputs and read setup first.
   `getNarrowedTypeOfSymbol` can itself ask about destructured pseudo-references;
@@ -354,9 +342,7 @@ and diagnostic-only type and symbol acquisitions.
 Missing-property reports likewise own their complete native acquisition order,
 including the report-key cache and node `TypeChecked` publication. Property
 access and relation reporting share the native spelling and never-intersection
-elaboration operations where they ask the same question. The
-[missing-property implementation plan](types-native-missing-properties-plan.md)
-records the current migration boundary and proof obligations.
+elaboration operations where they ask the same question.
 
 Implementation uses a private `NativeCompletion<T>` for the established native
 value and typed recovery evidence. Its sequencing operation owns causal order
@@ -373,8 +359,7 @@ source-free recovery markers in cached results and locate observation copies,
 including secondary causes under an already located primary. Bounded public
 cause lists retain an aggregate classification of omitted dependencies so an
 omitted invalid cause cannot authorize an unsupported Q4 leaf. The wire schema
-and output cause cap remain unchanged. [The recovery plan](types-native-recovery-plan.md)
-records the migration and its final-query proof obligations.
+and output cause cap remain unchanged.
 
 Relation cache entries retain the acquisitions of the comparison that actually
 installed them. A recursive `Maybe` assumption does not retroactively acquire
@@ -832,7 +817,7 @@ or byte budget, omit that display record using the normal graph omission
 contract. Keep the original located issue and partial outcome even when staged
 nodes and edges roll back. This separates the semantic failure from its bounded
 display and avoids allocating beyond the graph cap. The native byte and node
-boundary controls in [types-presentation-plan.md](types-presentation-plan.md),
+boundary controls,
 including Project GREEN `vrun-5406cf97-5faf-4203-8197-145c50543270` and
 `vrun-ebeb92d0-e553-4991-bdd8-84f6163ed542`, prove this distinction for the
 admitted lazy-member family. Signature/index/type-argument budgets, recursive
@@ -1094,16 +1079,13 @@ associations and first declaration nodes; selection anchors and display names
 cannot reconstruct them. Its shared `compareSymbols` operation serves member
 enumeration and type ordering. Model owns established mapper identity/data and
 `CompareTypes`; Evaluation executes substitutions. Comparison must preserve a
-required fact's failure and cannot force unrelated type or source work. The
-[ordering plan](types-native-order-plan.md) records native branch order and
-the producer migration required to replace acquisition-order sorting.
+required fact's failure and cannot force unrelated type or source work.
 
 Numeric AST spelling and numeric property-name classification share one
 `jsnum.Number.String` owner. Scanner/radix conversion and exact index identity
 remain separate questions. Property lookup owns ordered applicability, string
 fallback and multi-index combination, so its callers do not reproduce numeric
-classification or relation policy. The [numeric plan](types-numeric-index-plan.md)
-records the compiler-observed shortest-decimal tie and final-query controls.
+classification or relation policy.
 
 Failures carry the identity of the native question that failed through display
 and dependent read/write wrappers. A property read reused by its write question
@@ -1155,8 +1137,7 @@ query time. Checkpoint 2 closes the concrete representation, migration map and
 source-site round-trip before a full checker is built. Consumers are insulated
 from either choice. No permanent source substring copies per semantic term.
 
-[Migration audit](types-binding-migration.md) identifies the concrete old facts
-and their replacement owners. Descriptor acquisition measurements alone cannot
+Descriptor acquisition measurements alone cannot
 settle semantic latency. Use the same bounded native vertical consumer for both
 representation candidates, covering actual cross-file demands established by
 the baseline; keep reprojection provisional until that comparison exists.
@@ -1177,9 +1158,7 @@ implementation failure, not a successful mismatch. Normalized segments and
 placeholder TypeIds form the interned template header; display text never stands
 in for this identity. Intrinsic string mapping retains its
 actual alias symbol and target, and casing uses the pinned compiler's Unicode
-tables. [Template implementation notes](types-native-template-plan.md) record
-the adversarial findings and distinguish compiler evidence from final-query
-verification.
+tables.
 
 Implementation may also graduate a compiler-pinned vertical operation through
 the complete `Project::type_of` contract while these checkpoints remain open.
@@ -1193,9 +1172,8 @@ operation follows an ordinary import/export alias to a value-only variable and
 infers its object initializer. It does not claim flow admission for arbitrary
 expression reads.
 
-[Representation evidence](types-representation-evidence.md), independently
-[reviewed](types-representation-review.md), compares partial structural
-descriptions and a direct primitive-annotation consumer on 18 hashed inputs.
+[Representation evidence](types-representation-evidence.md) compares partial
+structural descriptions and a direct primitive-annotation consumer on 18 hashed inputs.
 It proves replay of 662,181 final-tree sites and request-cache teardown for that
 prototype. Its 29,135,892-byte partial payload and 16-file reprojection costs do
 not measure complete terms, canonical bindings or full native type journeys.
@@ -1257,12 +1235,9 @@ Index-signature records also carry native identity. One `newIndexInfo` factory
 returns immutable shared records with actual declaration/component associations;
 inventory copies preserve their identity, and `instantiateIndexInfo` allocates
 only when the value changes. The Any-base index is a single startup record.
-This avoids attaching stable identities to mutable value copies. The
-[source-check plan](types-native-type-literal-check-plan.md) records the required
-index-constraint consumers and remaining proof. Mapped types will reuse this
-factory, the lazy-object member installer, and the property-symbol owner; their
-[implementation plan](types-native-mapped-plan.md) records the complete native
-operation boundary and exact-name prerequisites.
+This avoids attaching stable identities to mutable value copies. Mapped
+types reuse this factory, the lazy-object member installer, and the
+property-symbol owner.
 
 **Call context and inference.** `chooseOverload` owns per-call-site state and
 its transition from skipping context-sensitive arguments to normal checking.
@@ -1295,8 +1270,7 @@ same completion contract through key-map selection, source and absent-optional
 discriminants, and the shared lazy comparison loop. Context-free expression
 results retain recovery in their existing cache and restore the actual Any
 context after publication. A key-map hit skips fallback member inventory; a
-failed discriminator cannot eliminate every candidate. [Contextual method implementation](types-native-contextual-method-plan.md)
-records the migration and its current validation limits.
+failed discriminator cannot eliminate every candidate.
 
 An actual signature owns the contextual type-parameter and this-parameter slots
 observed by all handles for that signature. Native clone/instantiation factories
@@ -1311,8 +1285,7 @@ assertion consumes the operand first and then `checkSourceElement` on its type;
 `satisfies` checks the target source elements before the expression. The shared
 source-check owner preserves argument/parameter/child order, diagnostic-only
 relation outcomes, consumed failures, and instantiation-count resets. Lazy
-`getTypeFromTypeNode` cannot replace that owner. [Array integration evidence](types-native-array-expressions-plan.md)
-records the compiler observations that exposed this distinction during implementation.
+`getTypeFromTypeNode` cannot replace that owner.
 
 **Re-entrance is per operation.** There is no universal “evaluating means cycle”
 policy. Type resolution ports `pushTypeResolution`,
@@ -1422,10 +1395,10 @@ runs before this calculation. This deliberately also changes truncation and
 the dependencies acquired beyond a generated-name cutoff: process-global
 decimal ID width is not an input to a deterministic request. Ordinary and
 fixed-name lengths and cutoff comparisons remain native behavior.
-The [identity review](types-native-identity-review.md) records a final native
-type that changes solely with unrelated prior symbol allocations, the rejected
-process-epoch alternative, and the required final-query controls. Adopting this
-rule does not claim those factories or controls are already implemented.
+The [compiler identity evidence](references.md#compiler-identity-evidence)
+records a final native type that changes solely with unrelated prior symbol
+allocations and the deterministic identity policy chosen for this tool. Adopting
+this rule does not claim those factories or controls are already implemented.
 
 Native source probes now establish that a generated private name can become
 an inferred string literal through contextual generic mapped types. A template
@@ -1473,9 +1446,7 @@ The summary uses an explicit algebraic form such as
 text is still quoted as a string literal. Bounded summaries may elide the whole
 expression; exact admitted graph values remain intact. Implementation and the
 bounded-delivery proof are in progress; until implemented, an acquired opaque
-spelling is an explicit failure. The
-[literal-value plan](types-native-literal-values-plan.md) records the measured
-reachability, representation alternatives and remaining proof obligations.
+spelling is an explicit failure.
 
 The private-name binder factory now captures the actual nearest class before
 checker merges. Its containing-class context crosses function and type

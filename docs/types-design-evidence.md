@@ -167,11 +167,11 @@ integration or every presentation operation has already been tested.
 
 ## What remains unproved
 
-The [Astra xhigh review](types-design-review.md) adds independent 7.0.2
+The Astra xhigh review (archived in Git history) adds independent 7.0.2
 counterexamples for late-bound computed members, annotated-initializer flow,
 inferred predicates, flow through `typeof` annotations, and imported interfaces
 without value types. Its source cases and results are retained in that document;
-the revised design incorporates them. The [response](types-review-response.md)
+the revised design incorporates them. The response (archived in Git history)
 maps each finding to the new contract and required implementation evidence.
 
 There is no native semantic implementation, memory measurement for retained
@@ -184,7 +184,7 @@ called complete. These probes must not be reported as a successful delivery of T
 
 ## Round-two verification and corrections (2026-10-10)
 
-The [additional review](types-design-review-2.md) was an incomplete review run;
+The additional review (archived in Git history) was an incomplete review run;
 its verification labels are preserved. For the response, three bounded
 investigations independently read the Ousterhout skill, repository owners,
 pinned 7.0.2 sources and retained review probes. New probes below test the

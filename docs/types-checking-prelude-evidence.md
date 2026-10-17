@@ -25,7 +25,7 @@ request that demands the signature return consumes its own missing annotation.
 Nested resolution uses the existing actual call cache and native resolution
 window. An outer arity rejection precedes the inner site's own question.
 
-The design comparison in [types-native-calls-plan.md](types-native-calls-plan.md)
+The design comparison in the call implementation plan (archived in Git history)
 rejects reverse-mapping public Locations and reusing the checked-call return
 question. Both would push missing scheduling/identity decisions onto callers.
 The chosen complete prelude hides those decisions without adding a checker,

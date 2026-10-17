@@ -5,7 +5,7 @@ request-local evaluator. This is a proved read increment within T, not complete
 flow infrastructure or T/Q3/Q4 delivery. F remains excluded.
 
 The implementation follows the Ousterhout alternatives in
-[the flow plan](types-native-flow-plan.md): one retained binder graph and
+the flow plan (archived in Git history): one retained binder graph and
 complete checker operations over actual symbol/site identity. Source exposes
 grammar and declaration flags. Evaluation owns reference matching, readonly
 checking, mutable-local policy, assignment kinds, initial inputs, and native
@@ -40,7 +40,7 @@ versus loose inputs. `getBaseTypeOfLiteralType` is distinct from fresh-literal
 widening. The whole native `containsUndefinedType` question consumes the first
 canonical union constituent's Undefined flag.
 
-The [independent read review](types-read-review.md) archives twelve additional
+The independent read review (archived in Git history) archives twelve additional
 fresh same-checker controls. It confirms that required definite-assignment
 analysis produces `flow_required`, rather than fabricating an error-type marker
 from TS2454. Direct non-null and TypeQuery context setup remain separately
@@ -158,7 +158,7 @@ truthiness. Matching truthiness uses the complete adjusted-facts operation and
 admits only unchanged canonical type identity. Conditional-expression shape and
 effects also pass both final review controls in
 `vrun-a00a259b-ba76-4b95-9ab6-e945290fdd0f`. The independent
-[bounded graph review](types-logical-flow-review.md) records the remaining
+bounded graph review (archived in Git history) records the remaining
 optional-chain, switch/try, narrowing and resource obligations.
 
 Assertion read identity has twenty-two-test RED

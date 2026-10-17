@@ -7,9 +7,9 @@ overload recovery, relation limits and public delivery gates remain required.
 The source is the pinned TypeScript 7.0.2 checker at commit
 `2bd066d87f5bafd315be9f40889d0a60b9e58e0b`.
 
-The ownership choice follows the two designs in
-`types-native-call-inference-plan.md`. A map keyed by parameter spelling would
-lose canonical cloned parameters and independent parameter/return questions.
+The ownership choice follows the two designs in the historical call-inference
+plan (archived in Git history). A map keyed by parameter spelling would lose
+canonical cloned parameters and independent parameter/return questions.
 The implementation uses the existing canonical mapper, constraint/default and
 signature factories, with one native call-instantiation cache keyed by actual
 SignatureId and the ordered filled TypeId vector. Arbitrary member signature

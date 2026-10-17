@@ -119,8 +119,9 @@ implement its future known-present/known-absent/deferred contract. This review
 made no change to those production owners.
 
 The subsequent bounded mechanical retention change is recorded separately in
-`types-json-retention.md`. Its fact-structure proof and public compatibility
-controls do not turn this compiler baseline into a native JSON type evaluator.
+the historical JSON-retention document (archived in Git history). Its
+fact-structure proof and public compatibility controls do not turn this compiler
+baseline into a native JSON type evaluator.
 
 ## Evidence and limits
 

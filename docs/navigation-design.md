@@ -8,10 +8,8 @@ rounds, and reconciled with the implementation at step 6 and after the final
 text outlines, pasteable locations, and the comment-directive rules.
 Scope selected by the user: **S, C, Q1, Q2**. This document records the behavior
 and architecture as implemented; it does not authorize implementation of the
-other ticket ideas. The [implementation plan](navigation-plan.md) records the
-sequence, the evidence, and the [implementation
-outcome](navigation-plan.md#implementation-outcome). Revised after [round-one
-review](navigation-review-response.md).
+other ticket ideas. Historical implementation plans and reviews are available
+in Git history; maintained validation is recorded in [validation](validation.md).
 
 ## Purpose and operating envelope
 
@@ -853,8 +851,8 @@ repeated ambient module blocks and its copies of a property merged into two
 variables. The costs are in [Command Center
 performance](performance-command-center.md#current-state-2026-10-08); a warm
 query there spends over 90% of its 0.4 s validating freshness, and an edit
-costs a full load. The remaining limits are listed in the plan's
-[implementation outcome](navigation-plan.md#implementation-outcome).
+costs a full load. The supported behavior and limits are documented in
+[navigation](navigation.md).
 
 **After the final review** (2026-10-08, same Command Center revision), the
 proof reruns from maintained tools (`tools/program-inputs.mjs`,

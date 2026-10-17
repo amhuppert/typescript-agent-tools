@@ -1,13 +1,11 @@
 # Source preserving editing technical design
 
 Status: implemented, 2026-10-08, from repository revision `ac24bc5`, for
-**E, E1, E2** in `typescript-agent-tools#1`; revisions made during
-implementation are marked and recorded in the
-[implementation plan](editing-plan.md#implementation-outcome). The user selected these capabilities
+**E, E1, E2** in `typescript-agent-tools#1`. Historical implementation plans
+and reviews are available in Git history. The user selected these capabilities
 for design and confirmed **one active writer per worktree during apply**.
 The existing [navigation design](navigation-design.md) supplies S, C, Q1,
 and Q2.
-Revised after the [first editing design review](editing-review-response.md).
 
 An agent should select a declaration, supply new source, inspect the resulting
 diff, and apply precisely that change. Use syntax to locate and validate edits,
@@ -604,9 +602,9 @@ The compiler invocations use `--noEmit --ignoreConfig --target esnext --module
 esnext --pretty false`, with and without `--noCheck`; the comparison roles are
 those in [validation](validation.md). These are feasibility probes, not evidence
 that an editing engine has been implemented.
-The [review response](editing-review-response.md#verification) records 14 further
-probes of metadata, directive reach, harmless comments, and module-induced
-reparsing that support the refined validation contracts.
+The historical review records 14 further probes of metadata, directive reach,
+harmless comments, and module-induced reparsing that support the refined
+validation contracts.
 
 Implementation uses failing behavior-level tests first, scoped through the
 registered test command to the single test file under development. Expectations

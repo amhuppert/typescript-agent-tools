@@ -30,8 +30,8 @@ passed two tests with zero skips in
 `tests/type_narrowable_reference.rs` passed four tests with zero skips in
 `vrun-fdd13747-eed1-45a4-b1a1-756150e0c963`, after actual missing-behavior RED
 `vrun-5246a92f-11b6-436f-a16a-d0f4871f2dae`. Setup-only retries and the separate
-failure-reason premise correction are documented in
-`docs/types-narrowable-reference-plan.md`.
+failure-reason premise correction are documented in the historical
+narrowable-reference implementation plan, available in Git history.
 
 `historical-*.json` remains an earlier observation history. Its provenance is not
 retroactively invented from this fresh replay. Copied scripts retain their

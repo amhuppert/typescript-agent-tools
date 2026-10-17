@@ -91,7 +91,7 @@ library identity remain separate obligations; before/after disk checks still do
 not provide transactional capture. The artifact-level regression failed four
 assertions in `vrun-250977bd-4deb-4f10-8527-94c9d9c36fcd`, then passed four tests
 with no skips in `vrun-d6304deb-cc94-4501-a958-0d3ae0ffa87a`.
-The [capture review](types-corpus-capture-review.md) exposed malformed inventory,
+The capture review (archived in Git history) exposed malformed inventory,
 lifecycle and caller seed gaps. Four additional artifact/caller tests reproduced
 them in `vrun-cf3b0b10-60e1-4c1f-8951-8ff8e4a6dcc2`; all eight tests then passed
 without skips in `vrun-6e043def-115f-487f-8610-2c4b973dce63`. Input completeness
@@ -146,7 +146,7 @@ and generated inputs. Its explicit config extends the pristine original config
 with `singleThreaded:true`. Parallel native parsing varied default-library
 external provenance on unchanged inputs; this profile preserves actual native
 flags and order instead of folding them. Original parallel artifacts remain
-unfinished historical evidence. The [capture review](types-corpus-capture-review.md)
+unfinished historical evidence. The capture review (archived in Git history)
 records source evidence, RED/GREEN runs and limitations.
 
 Registered freeze `vrun-85e920b5-4e96-43e0-a8f8-989faf646f33` passed two fresh

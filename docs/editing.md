@@ -10,9 +10,9 @@ and checked so that the syntax it does not replace keeps its meaning and
 comment directives and JSDoc keep governing what they governed. The Rust
 library exposes the same operations as `typescript_parser::editing` (see
 [Library](#library)). The design is recorded in
-[editing-design.md](editing-design.md), with the decisions made while
-implementing it in [editing-plan.md](editing-plan.md); this document describes
-the implemented behavior.
+[editing-design.md](editing-design.md); this document describes the
+implemented behavior. Historical implementation plans and reviews are available
+in Git history.
 
 Validation is syntax and edit-boundary validation. A prepared edit parses and
 keeps every protected relationship; it is not type-checked.

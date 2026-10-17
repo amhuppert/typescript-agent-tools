@@ -39,7 +39,7 @@ type-only access emits TS1361/TS1362 but can still have a healthy native type.
 The actual alias target wins over a missing or same-named outer projected value;
 unvisited and failed targets remain failures. The final paired runtime/type-query
 controls and their behavior RED/GREEN are recorded in
-[types-native-type-query-plan.md](types-native-type-query-plan.md).
+the type-query implementation plan (archived in Git history).
 
 The existing signature nine-test compatibility checkpoint passed with zero
 skips in `vrun-2dae1ca4-3836-4849-9761-90e73856e1b2`; parent reader controls
