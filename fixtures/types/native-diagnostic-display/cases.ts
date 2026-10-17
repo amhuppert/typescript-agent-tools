@@ -1,0 +1,18 @@
+declare function inspect<T>(): number;
+type Box_under = { payload: { aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: number; p1: Missing_under; p2: number; p3: number; p4: number; p5: number } };
+const /*#under*/under = inspect<{ value: Box_under["payload"]; [key: string]: number }>();
+type Box_at = { payload: { aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: number; p1: Missing_at; p2: number; p3: number; p4: number; p5: number } };
+const /*#at*/at = inspect<{ value: Box_at["payload"]; [key: string]: number }>();
+type Box_over = { payload: { aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: number; p1: Missing_over; p2: number; p3: number; p4: number; p5: number } };
+const /*#over*/over = inspect<{ value: Box_over["payload"]; [key: string]: number }>();
+type Box_utf8At = { payload: { 界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界: number; p1: Missing_utf8At; p2: number; p3: number; p4: number; p5: number } };
+const /*#utf8At*/utf8At = inspect<{ value: Box_utf8At["payload"]; [key: string]: number }>();
+type Box_utf8Over = { payload: { 界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界: number; p1: Missing_utf8Over; p2: number; p3: number; p4: number; p5: number } };
+const /*#utf8Over*/utf8Over = inspect<{ value: Box_utf8Over["payload"]; [key: string]: number }>();
+type Box_first = { payload: { bad: Missing_first; aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: number; p2: number; p3: number; p4: number; p5: number } };
+const /*#first*/first = inspect<{ value: Box_first["payload"]; [key: string]: number }>();
+type Box_last = { payload: { aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: number; p1: number; p2: number; p3: number; p4: number; p5: Missing_last } };
+const /*#last*/last = inspect<{ value: Box_last["payload"]; [key: string]: number }>();
+type AliasSuppressed = { deep: Missing_alias };
+const /*#alias*/alias = inspect<{ value: AliasSuppressed; [key: string]: number }>();
+const /*#healthyAfter*/healthyAfter = inspect<{ okay: number }>();

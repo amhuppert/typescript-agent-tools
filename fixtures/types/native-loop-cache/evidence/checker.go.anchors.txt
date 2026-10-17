@@ -1,0 +1,89 @@
+internal/checker/checker.go:7487-7525
+7487: 	return node
+7488: }
+7489: 
+7490: func (c *Checker) checkExpressionCached(node *ast.Node) *Type {
+7491: 	return c.checkExpressionCachedEx(node, CheckModeNormal)
+7492: }
+7493: 
+7494: func (c *Checker) checkExpressionCachedEx(node *ast.Node, checkMode CheckMode) *Type {
+7495: 	if checkMode != CheckModeNormal {
+7496: 		return c.checkExpressionEx(node, checkMode)
+7497: 	}
+7498: 	links := c.typeNodeLinks.Get(node)
+7499: 	if links.resolvedType == nil {
+7500: 		// When computing a type that we're going to cache, we need to ignore any ongoing control flow
+7501: 		// analysis because variables may have transient types in indeterminable states. Moving flowLoopStart
+7502: 		// to the top of the stack ensures all transient types are computed from a known point.
+7503: 		saveFlowLoopStack := c.flowLoopStack
+7504: 		saveFlowTypeCache := c.flowTypeCache
+7505: 		c.flowLoopStack = nil
+7506: 		c.flowTypeCache = nil
+7507: 		links.resolvedType = c.checkExpressionEx(node, checkMode)
+7508: 		c.flowTypeCache = saveFlowTypeCache
+7509: 		c.flowLoopStack = saveFlowLoopStack
+7510: 	}
+7511: 	return links.resolvedType
+7512: }
+7513: 
+7514: // Returns the type of an expression. Unlike checkExpression, this function is simply concerned
+7515: // with computing the type and may not fully check all contained sub-expressions for errors.
+7516: // It is intended for uses where you know there is no contextual type,
+7517: // and requesting the contextual type might cause a circularity or other bad behaviour.
+7518: // It sets the contextual type of the node to any before calling getTypeOfExpression.
+7519: func (c *Checker) getContextFreeTypeOfExpression(node *ast.Node) *Type {
+7520: 	if cached := c.contextFreeTypes[node]; cached != nil {
+7521: 		return cached
+7522: 	}
+7523: 	c.pushContextualType(node, c.anyType, false /*isCache*/)
+7524: 	t := c.checkExpressionEx(node, CheckModeSkipContextSensitive)
+7525: 	c.contextFreeTypes[node] = t
+
+internal/checker/checker.go:8383-8428
+8383: func (c *Checker) getResolvedSignature(node *ast.Node, candidatesOutArray *[]*Signature, checkMode CheckMode) *Signature {
+8384: 	links := c.signatureLinks.Get(node)
+8385: 	// If getResolvedSignature has already been called, we will have cached the resolvedSignature.
+8386: 	// However, it is possible that either candidatesOutArray was not passed in the first time,
+8387: 	// or that a different candidatesOutArray was passed in. Therefore, we need to redo the work
+8388: 	// to correctly fill the candidatesOutArray.
+8389: 	cached := links.resolvedSignature
+8390: 	if cached != nil && cached != c.resolvingSignature && candidatesOutArray == nil {
+8391: 		return cached
+8392: 	}
+8393: 	saveResolutionStart := c.resolutionStart
+8394: 	if cached == nil {
+8395: 		// If we haven't already done so, temporarily reset the resolution stack. This allows us to
+8396: 		// handle "inverted" situations where, for example, an API client asks for the type of a symbol
+8397: 		// containined in a function call argument whose contextual type depends on the symbol itself
+8398: 		// through resolution of the containing function call. By resetting the resolution stack we'll
+8399: 		// retry the symbol type resolution with the resolvingSignature marker in place to suppress
+8400: 		// the contextual type circularity.
+8401: 		c.resolutionStart = len(c.typeResolutions)
+8402: 	}
+8403: 	links.resolvedSignature = c.resolvingSignature
+8404: 	result := c.resolveSignature(node, candidatesOutArray, checkMode)
+8405: 	c.resolutionStart = saveResolutionStart
+8406: 	// When CheckMode.SkipGenericFunctions is set we use resolvingSignature to indicate that call
+8407: 	// resolution should be deferred.
+8408: 	if result != c.resolvingSignature {
+8409: 		// if the signature resolution originated on a node that itself depends on the contextual type
+8410: 		// then it's possible that the resolved signature might not be the same as the one that would be computed in source order
+8411: 		// since resolving such signature leads to resolving the potential outer signature, its arguments and thus the very same signature
+8412: 		// it's possible that this inner resolution sets the resolvedSignature first.
+8413: 		// In such a case we ignore the local result and reuse the correct one that was cached.
+8414: 		if links.resolvedSignature != c.resolvingSignature {
+8415: 			result = links.resolvedSignature
+8416: 		}
+8417: 		// If signature resolution originated in control flow type analysis (for example to compute the
+8418: 		// assigned type in a flow assignment) we don't cache the result as it may be based on temporary
+8419: 		// types from the control flow analysis.
+8420: 		if len(c.flowLoopStack) == 0 {
+8421: 			links.resolvedSignature = result
+8422: 		} else {
+8423: 			links.resolvedSignature = cached
+8424: 		}
+8425: 	}
+8426: 	return result
+8427: }
+8428: 
+

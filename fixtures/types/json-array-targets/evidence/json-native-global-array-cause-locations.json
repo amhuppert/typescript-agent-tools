@@ -1,0 +1,156 @@
+[
+  {
+    "case": "missing",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol then already accumulated GetGlobalDiagnostics and later file GetSemanticDiagnostics",
+    "summary": "{}",
+    "diagnostics": [
+      {
+        "code": 2318,
+        "message": "Cannot find global type 'Array'."
+      }
+    ]
+  },
+  {
+    "case": "value-only",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol then already accumulated GetGlobalDiagnostics and later file GetSemanticDiagnostics",
+    "summary": "{}",
+    "diagnostics": [
+      {
+        "code": 2318,
+        "message": "Cannot find global type 'Array'."
+      }
+    ]
+  },
+  {
+    "case": "module-local",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol then already accumulated GetGlobalDiagnostics and later file GetSemanticDiagnostics",
+    "summary": "{}",
+    "diagnostics": [
+      {
+        "code": 2318,
+        "message": "Cannot find global type 'Array'."
+      }
+    ]
+  },
+  {
+    "case": "type-alias",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol then already accumulated GetGlobalDiagnostics and later file GetSemanticDiagnostics",
+    "summary": "{}",
+    "diagnostics": [
+      {
+        "code": 2316,
+        "message": "Global type 'Array' must be a class or interface type.",
+        "location": {
+          "file": "globals.ts",
+          "start": {
+            "line": 1,
+            "column": 6
+          },
+          "end": {
+            "line": 1,
+            "column": 11
+          }
+        }
+      }
+    ]
+  },
+  {
+    "case": "enum",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol then already accumulated GetGlobalDiagnostics and later file GetSemanticDiagnostics",
+    "summary": "{}",
+    "diagnostics": [
+      {
+        "code": 2316,
+        "message": "Global type 'Array' must be a class or interface type.",
+        "location": {
+          "file": "globals.ts",
+          "start": {
+            "line": 1,
+            "column": 6
+          },
+          "end": {
+            "line": 1,
+            "column": 11
+          }
+        }
+      }
+    ]
+  },
+  {
+    "case": "arity-zero",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol then already accumulated GetGlobalDiagnostics and later file GetSemanticDiagnostics",
+    "summary": "{}",
+    "diagnostics": [
+      {
+        "code": 2317,
+        "message": "Global type 'Array' must have 1 type parameter(s).",
+        "location": {
+          "file": "globals.ts",
+          "start": {
+            "line": 1,
+            "column": 11
+          },
+          "end": {
+            "line": 1,
+            "column": 16
+          }
+        }
+      }
+    ]
+  },
+  {
+    "case": "arity-two",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol then already accumulated GetGlobalDiagnostics and later file GetSemanticDiagnostics",
+    "summary": "{}",
+    "diagnostics": [
+      {
+        "code": 2317,
+        "message": "Global type 'Array' must have 1 type parameter(s).",
+        "location": {
+          "file": "globals.ts",
+          "start": {
+            "line": 1,
+            "column": 11
+          },
+          "end": {
+            "line": 1,
+            "column": 16
+          }
+        }
+      }
+    ]
+  },
+  {
+    "case": "script-alias",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol then already accumulated GetGlobalDiagnostics and later file GetSemanticDiagnostics",
+    "summary": "{}",
+    "diagnostics": [
+      {
+        "code": 2316,
+        "message": "Global type 'Array' must be a class or interface type."
+      }
+    ]
+  },
+  {
+    "case": "merged-optional-two",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol then already accumulated GetGlobalDiagnostics and later file GetSemanticDiagnostics",
+    "summary": "{}",
+    "diagnostics": [
+      {
+        "code": 2317,
+        "message": "Global type 'Array' must have 1 type parameter(s).",
+        "location": {
+          "file": "globals.ts",
+          "start": {
+            "line": 1,
+            "column": 11
+          },
+          "end": {
+            "line": 1,
+            "column": 16
+          }
+        }
+      }
+    ]
+  }
+]

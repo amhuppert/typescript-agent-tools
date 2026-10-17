@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noLib": true,
+    "types": [],
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "importHelpers": true
+  },
+  "files": [
+    "globals.d.ts",
+    "helpers.ts",
+    "target.d.ts"
+  ]
+}

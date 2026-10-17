@@ -1,0 +1,1 @@
+import { nil as /*#nil*/nil, empty as /*#empty*/empty, numbers as /*#numbers*/numbers, mixed as /*#mixed*/mixed, shapes as /*#shapes*/shapes, recursive as /*#recursive*/recursive } from "./data.json";

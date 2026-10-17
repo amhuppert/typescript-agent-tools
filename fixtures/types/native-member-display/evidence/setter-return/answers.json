@@ -1,0 +1,680 @@
+[
+  {
+    "config": "strict.json",
+    "marker": "bodyless",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 1,
+        "column": 42
+      },
+      "operation": "type"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/strict.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/cases.ts",
+          "sha256": "a87b7b831ffa381a2c7f7d4675a86af6dd05e7ba458a14d04c8e50aaa7621e31"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/strict.json",
+          "sha256": "439876e79f1fbcf8d64c2bc98d844865dfa34a474e71d2162d8eb7a8d024ce17"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 65536,
+      "symbolMode": "",
+      "summary": "number",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "setterReturn": {
+        "afterReturn": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "beforeReturn": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "flags": 1,
+        "id": 1,
+        "summary": "any"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "paired",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 2,
+        "column": 59
+      },
+      "operation": "type"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/strict.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/cases.ts",
+          "sha256": "a87b7b831ffa381a2c7f7d4675a86af6dd05e7ba458a14d04c8e50aaa7621e31"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/strict.json",
+          "sha256": "439876e79f1fbcf8d64c2bc98d844865dfa34a474e71d2162d8eb7a8d024ce17"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 98304,
+      "symbolMode": "",
+      "summary": "string",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "setterReturn": {
+        "afterReturn": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "beforeReturn": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "flags": 1,
+        "id": 1,
+        "summary": "any"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/strict.json"
+      }
+    }
+  },
+  {
+    "config": "strict.json",
+    "marker": "implemented",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 3,
+        "column": 47
+      },
+      "operation": "type"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/strict.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/cases.ts",
+          "sha256": "a87b7b831ffa381a2c7f7d4675a86af6dd05e7ba458a14d04c8e50aaa7621e31"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/strict.json",
+          "sha256": "439876e79f1fbcf8d64c2bc98d844865dfa34a474e71d2162d8eb7a8d024ce17"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 65536,
+      "symbolMode": "",
+      "summary": "number",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "setterReturn": {
+        "afterReturn": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "beforeReturn": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "flags": 16,
+        "id": 23,
+        "summary": "void"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/strict.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "bodyless",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 1,
+        "column": 42
+      },
+      "operation": "type"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/loose.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/cases.ts",
+          "sha256": "a87b7b831ffa381a2c7f7d4675a86af6dd05e7ba458a14d04c8e50aaa7621e31"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/loose.json",
+          "sha256": "88202bca6c6cf9cbade072cd6e0af9a691fbac33df0fe7ef5e486944b097997d"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 65536,
+      "symbolMode": "",
+      "summary": "number",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "setterReturn": {
+        "afterReturn": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "beforeReturn": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "flags": 1,
+        "id": 1,
+        "summary": "any"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "paired",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 2,
+        "column": 59
+      },
+      "operation": "type"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/loose.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/cases.ts",
+          "sha256": "a87b7b831ffa381a2c7f7d4675a86af6dd05e7ba458a14d04c8e50aaa7621e31"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/loose.json",
+          "sha256": "88202bca6c6cf9cbade072cd6e0af9a691fbac33df0fe7ef5e486944b097997d"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 98304,
+      "symbolMode": "",
+      "summary": "string",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "setterReturn": {
+        "afterReturn": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "beforeReturn": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "flags": 1,
+        "id": 1,
+        "summary": "any"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "marker": "implemented",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 3,
+        "column": 47
+      },
+      "operation": "type"
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/loose.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/cases.ts",
+          "sha256": "a87b7b831ffa381a2c7f7d4675a86af6dd05e7ba458a14d04c8e50aaa7621e31"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/loose.json",
+          "sha256": "88202bca6c6cf9cbade072cd6e0af9a691fbac33df0fe7ef5e486944b097997d"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 65536,
+      "symbolMode": "",
+      "summary": "number",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "setterReturn": {
+        "afterReturn": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "beforeReturn": {
+          "counters": {},
+          "demandFailures": [],
+          "observations": {},
+          "diagnosticCodes": [
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318,
+            2318
+          ]
+        },
+        "errorType": false,
+        "flags": 16,
+        "id": 25,
+        "summary": "void"
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "module": 99,
+        "noEmit": true,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-setter-return/loose.json"
+      }
+    }
+  }
+]

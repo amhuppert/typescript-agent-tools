@@ -1,0 +1,43 @@
+export {};
+type /*#keyof*/Keys = keyof { first: string; second: number };
+type /*#indexed*/Indexed = { first: string; second: number }['second'];
+type /*#distributed*/Distributed<T> = T extends string ? { text: T } : { other: T };
+declare const /*#distribution*/distribution: Distributed<'s' | 1>;
+type Result<T> = T extends (...args: any[]) => infer R ? R : never;
+declare const /*#infer*/inferred: Result<(x: string) => number>;
+type Mutable<T> = { -readonly [K in keyof T]-?: T[K] };
+declare const /*#modifiers*/modifiers: Mutable<{ readonly first?: string; second?: number }>;
+type Remap<T> = { [K in keyof T as `get${Capitalize<K & string>}`]: () => T[K] };
+declare const /*#remap*/remap: Remap<{ first: string; second: number }>;
+declare const /*#template*/template: `slot-${'a' | 'b'}-${1 | 2}`;
+declare const /*#uppercase*/uppercase: Uppercase<'aBc'>;
+declare const /*#lowercase*/lowercase: Lowercase<'aBc'>;
+declare const /*#capitalize*/capitalize: Capitalize<'word'>;
+declare const /*#uncapitalize*/uncapitalize: Uncapitalize<'Word'>;
+declare const /*#awaited*/awaited: Awaited<Promise<PromiseLike<string>>>;
+declare const /*#builtin*/builtin: BuiltinIteratorReturn;
+function hinted<T>(value: T, hint: NoInfer<T>): T { return value; }
+const /*#noInfer*/noInfer = hinted(1, 1);
+const /*#noInferRecovery*/noInferRecovery = hinted(1, 2);
+declare const /*#tuple*/tuple: readonly [name: string, count?: number, ...tail: boolean[]];
+type Prepend<T extends unknown[]> = [first: string, ...T];
+declare const /*#variadic*/variadic: Prepend<[number, boolean?]>;
+declare const /*#thisType*/thisType: { compare(this: Date, other: Date): boolean };
+declare const /*#symbol*/symbol: unique symbol;
+type /*#symbolKey*/SymbolKey = { [symbol]: string };
+enum Stage { Start = 0x10, Next, End = Next + 3 }
+declare const /*#enumValue*/enumValue: Stage.Next;
+const /*#freshObject*/freshObject = { text: 's', count: 1 };
+const /*#constant*/constant = { text: 's', count: 1 } as const;
+function factory<T>(input: T) { return { get: () => input, pair: [input, input] as const }; }
+const /*#factory*/fromFactory = factory('s');
+const /*#callback*/fromCallback = [1, 2].map(value => ({ text: String(value), count: value }));
+const /*#genericClass*/genericClass = new Map<string, number>();
+type Recursive<T> = { value: T; child?: Recursive<T> };
+declare const /*#recursive*/recursive: Recursive<string>;
+type Growing<T> = { value: T; child: Growing<T[]> };
+declare const /*#growing*/growing: Growing<string>;
+declare const /*#any*/ordinaryAny: any;
+declare const /*#unknown*/ordinaryUnknown: unknown;
+declare const /*#missing*/missing: Unresolved;
+declare const /*#unknownConditional*/unknownConditional: Distributed<unknown>;

@@ -1,0 +1,84 @@
+{
+  "compiler": "7.0.2",
+  "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "apiControl": "15 fresh sessions, type-reference owner node selected; input diagnostics collected before question",
+  "defaultControl": "3 fresh replay checkers, actual GetDefaultFromTypeParameter; captured input hashes in answers; eager 2318 diagnostic inventory preserved separately",
+  "files": [
+    {
+      "file": "fixtures/types/parameters/evidence/api-inputs/any/globals.ts",
+      "sha256": "acbc5de3a0381844c601c0adb997cfb49ef1b0778978b3014184b9c313f14517"
+    },
+    {
+      "file": "fixtures/types/parameters/evidence/api-inputs/any/tsconfig.json",
+      "sha256": "681a27323c05700e4ef20238edc3fa36c94a491e37b3d69573ceda11bf95ea0b"
+    },
+    {
+      "file": "fixtures/types/parameters/evidence/api-inputs/default/globals.ts",
+      "sha256": "86230ab1d180919b67e3588cbe71850b44e85d82e9ef1611d8832ba72426647a"
+    },
+    {
+      "file": "fixtures/types/parameters/evidence/api-inputs/default/tsconfig.json",
+      "sha256": "681a27323c05700e4ef20238edc3fa36c94a491e37b3d69573ceda11bf95ea0b"
+    },
+    {
+      "file": "fixtures/types/parameters/evidence/api-inputs/missingConstraint/globals.ts",
+      "sha256": "fdeb7a1eb855b8fb3e057884ea477f9f13e02164da657fe1fbb7603688926989"
+    },
+    {
+      "file": "fixtures/types/parameters/evidence/api-inputs/missingConstraint/tsconfig.json",
+      "sha256": "681a27323c05700e4ef20238edc3fa36c94a491e37b3d69573ceda11bf95ea0b"
+    },
+    {
+      "file": "fixtures/types/parameters/evidence/api-inputs/missingDefault/globals.ts",
+      "sha256": "b12ec3d1e5897744b8e63c4bc32ecdac8952cadc2cb3ac9d46059fbaa34ed1c5"
+    },
+    {
+      "file": "fixtures/types/parameters/evidence/api-inputs/missingDefault/tsconfig.json",
+      "sha256": "681a27323c05700e4ef20238edc3fa36c94a491e37b3d69573ceda11bf95ea0b"
+    },
+    {
+      "file": "fixtures/types/parameters/evidence/api-inputs/unknown/globals.ts",
+      "sha256": "4e85fa269a367ab7409c61be42dde08d4ebb7758709b47ef5a0b41692b10e7c5"
+    },
+    {
+      "file": "fixtures/types/parameters/evidence/api-inputs/unknown/tsconfig.json",
+      "sha256": "681a27323c05700e4ef20238edc3fa36c94a491e37b3d69573ceda11bf95ea0b"
+    },
+    {
+      "file": "fixtures/types/parameters/evidence/default/answers.json",
+      "sha256": "ad8998585e9b1eb4a77078210e9cced45f47d4d263016aee857f27d5bb3aa523"
+    },
+    {
+      "file": "fixtures/types/parameters/evidence/default/checker-hook.go",
+      "sha256": "e2d5c10ae680c02f912cd1eff4d9b17dc922894559fea2028a82663d9a501419"
+    },
+    {
+      "file": "fixtures/types/parameters/evidence/default/ls-hook.go",
+      "sha256": "73c9a52f43914571bdf7f29e8817720d0ff98bdb0aeb7cad183fa8397a848dce"
+    },
+    {
+      "file": "fixtures/types/parameters/evidence/default/oracle-test.go",
+      "sha256": "73d86d5e23ac598c3742d26b9e0082e5ff84d5aad88ae36d896b85084d1f12e7"
+    },
+    {
+      "file": "fixtures/types/parameters/evidence/default/oracle.mjs",
+      "sha256": "ed6ceb4d0b1ef8d6addae120be07bcf5d05432a85026516173a25d87da2cb3f1"
+    },
+    {
+      "file": "fixtures/types/parameters/evidence/default/probe.mjs",
+      "sha256": "f41a9264e40ea5d358339639495a8f92fbcd8828a633fdc4601559d4dc6362f9"
+    },
+    {
+      "file": "fixtures/types/parameters/evidence/default/setup.mjs",
+      "sha256": "6d42fd8527633e85b7f509116c542df4fac29c6a106bc3ec4d6fd90db9d53988"
+    },
+    {
+      "file": "fixtures/types/parameters/evidence/type-parameter-native-control.json",
+      "sha256": "9b5c3fdb17a93be2eee0b6d1c38a2282a4504b8d2912b749dfac4cccdaee5e04"
+    },
+    {
+      "file": "fixtures/types/parameters/evidence/type-parameter-native-control.mjs",
+      "sha256": "b8bc80244e58e7534dc4b572be06cfc237b9f8e6a9936ebe42c8f38ecce9bf1c"
+    }
+  ]
+}

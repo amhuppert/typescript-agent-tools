@@ -737,11 +737,14 @@ fn unmatched_reference_names_remain_successful_empty_results() {
         assert_eq!(output.status.code(), Some(0), "{entry:?} {output:?}");
         assert!(output.stderr.is_empty());
         assert_eq!(
-            text(&output.stdout),
-            format!(
-                "{{\"project\":{},\"groups\":[]}}\n",
-                json!(project.config())
-            )
+            document(&output, 0),
+            json!({
+                "operation": "references", "outcome": "complete",
+                "project": project.config(), "groups": [],
+                "filters": { "calls": false, "excludeTests": false },
+                "coverage": { "baseline": "lexical", "status": "complete", "gaps": [] },
+                "unsearchedMembers": { "count": 0, "selectors": [] },
+            })
         );
         project.check_no_service();
     }
@@ -825,23 +828,27 @@ fn an_overlong_service_socket_path_names_the_socket_and_the_remedy() {
 }
 
 #[test]
-fn reference_names_are_single_identifiers() {
+fn dotted_reference_names_select_catalog_declarations() {
     let project = Project::new(Entry::Direct);
     for args in [
         &["--references", "--name", "createRunHost.run"][..],
         &["--references", "--name", "Tools.run", "src/other.ts"],
     ] {
         let output = project.run(args);
-        assert_eq!(output.status.code(), Some(2), "{args:?}");
-        assert!(output.stdout.is_empty(), "{args:?}");
+        assert_eq!(output.status.code(), Some(0), "{args:?}: {output:?}");
+        assert!(output.stderr.is_empty(), "{args:?}");
+        let answer: Value = serde_json::from_slice(&output.stdout).unwrap();
+        assert_eq!(answer["operation"], "references");
+        assert_eq!(answer["outcome"], "complete", "{answer:#}");
         assert_eq!(
-            text(&output.stderr),
-            format!(
-                "--references --name takes one identifier, not {}; select a declaration by containment with --show --name, or a token with --at FILE:LINE:COLUMN\n",
-                args[2]
-            ),
-            "{args:?}"
+            answer["coverage"]["baseline"],
+            if args[2] == "Tools.run" {
+                "lexical"
+            } else {
+                "member"
+            }
         );
+        assert_eq!(answer["groups"].as_array().unwrap().len(), 1);
     }
     project.check_no_service();
 }
@@ -1025,14 +1032,6 @@ fn valid_project_requests_and_usage_errors() {
             "--project",
             "tsconfig.json",
             "--direct",
-        ],
-        &[
-            "--references",
-            "--project",
-            "tsconfig.json",
-            "--name",
-            "run",
-            "--json",
         ],
         // Conflicting operations.
         &[

@@ -1,0 +1,503 @@
+[
+  {
+    "name": "separateReturns",
+    "kind": "value",
+    "summary": "never",
+    "errorType": false,
+    "codes": [
+      2769
+    ],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 61,
+        "errorType": false,
+        "kind": 263,
+        "pos": 10,
+        "declaration": "\n\ndeclare function separate(value: string): \"text\";"
+      },
+      {
+        "end": 113,
+        "errorType": false,
+        "kind": 263,
+        "pos": 61,
+        "declaration": "\ndeclare function separate(value: number): \"number\";"
+      }
+    ]
+  },
+  {
+    "name": "intersectedReturns",
+    "kind": "value",
+    "summary": "{ left: string; } & { right: number; }",
+    "errorType": false,
+    "codes": [
+      2769
+    ],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 239,
+        "errorType": false,
+        "kind": 263,
+        "pos": 173,
+        "declaration": "\n\ndeclare function objectResults(value: string): { left: string };"
+      },
+      {
+        "end": 305,
+        "errorType": false,
+        "kind": 263,
+        "pos": 239,
+        "declaration": "\ndeclare function objectResults(value: number): { right: number };"
+      }
+    ]
+  },
+  {
+    "name": "genuineAnyReturn",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2769
+    ],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 425,
+        "errorType": false,
+        "kind": 263,
+        "pos": 376,
+        "declaration": "\n\ndeclare function actualAny(value: string): any;"
+      },
+      {
+        "end": 476,
+        "errorType": false,
+        "kind": 263,
+        "pos": 425,
+        "declaration": "\ndeclare function actualAny(value: number): number;"
+      }
+    ]
+  },
+  {
+    "name": "selectedSkipsReturn",
+    "kind": "value",
+    "summary": "\"selected\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 594,
+        "errorType": false,
+        "kind": 263,
+        "pos": 539,
+        "declaration": "\n\ndeclare function selected(value: string): \"selected\";"
+      }
+    ]
+  },
+  {
+    "name": "allMissingReturns",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2769
+    ],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 792,
+        "errorType": true,
+        "kind": 263,
+        "pos": 727,
+        "declaration": "\n\ndeclare function allReturns(value: string): MissingFirstReturn;"
+      },
+      {
+        "end": 857,
+        "errorType": true,
+        "kind": 263,
+        "pos": 792,
+        "declaration": "\ndeclare function allReturns(value: number): MissingSecondReturn;"
+      }
+    ]
+  },
+  {
+    "name": "positionsBeforeReturns",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304,
+      2304,
+      2769
+    ],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 1025,
+        "errorType": true,
+        "kind": 263,
+        "pos": 923,
+        "declaration": "\n\ndeclare function allPositions(value: string, later?: MissingFirstParameter): MissingPositionReturnA;"
+      },
+      {
+        "end": 1127,
+        "errorType": true,
+        "kind": 263,
+        "pos": 1025,
+        "declaration": "\ndeclare function allPositions(value: number, later?: MissingSecondParameter): MissingPositionReturnB;"
+      }
+    ]
+  },
+  {
+    "name": "unevenRawCounts",
+    "kind": "value",
+    "summary": "{ short: true; } & { long: true; }",
+    "errorType": false,
+    "codes": [
+      2304,
+      2769
+    ],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 1263,
+        "errorType": false,
+        "kind": 263,
+        "pos": 1205,
+        "declaration": "\n\ndeclare function uneven(value: string): { short: true };"
+      },
+      {
+        "end": 1367,
+        "errorType": false,
+        "kind": 263,
+        "pos": 1263,
+        "declaration": "\ndeclare function uneven(value: number, second?: MissingExtraPosition, third?: boolean): { long: true };"
+      }
+    ]
+  },
+  {
+    "name": "fixedTupleRest",
+    "kind": "value",
+    "summary": "{ tuple: true; } & { fixed: true; }",
+    "errorType": false,
+    "codes": [
+      2769
+    ],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 1532,
+        "errorType": false,
+        "kind": 263,
+        "pos": 1425,
+        "declaration": "\n\ndeclare function fixedTuple(value: string, ...tail: [count: number, enabled?: boolean]): { tuple: true };"
+      },
+      {
+        "end": 1611,
+        "errorType": false,
+        "kind": 263,
+        "pos": 1532,
+        "declaration": "\ndeclare function fixedTuple(value: number, fallback: string): { fixed: true };"
+      }
+    ]
+  },
+  {
+    "name": "variadicTupleRest",
+    "kind": "value",
+    "summary": "{ variadic: true; } & { array: true; }",
+    "errorType": false,
+    "codes": [
+      2769
+    ],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 1787,
+        "errorType": false,
+        "kind": 263,
+        "pos": 1674,
+        "declaration": "\n\ndeclare function variadicTuple(value: string, ...tail: [head: number, ...rest: boolean[]]): { variadic: true };"
+      },
+      {
+        "end": 1885,
+        "errorType": false,
+        "kind": 263,
+        "pos": 1787,
+        "declaration": "\ndeclare function variadicTuple(value: number, extra: string, ...rest: number[]): { array: true };"
+      }
+    ]
+  },
+  {
+    "name": "restBeforeReturns",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304,
+      2769
+    ],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 2061,
+        "errorType": true,
+        "kind": 263,
+        "pos": 1964,
+        "declaration": "\n\ndeclare function missingRest(value: string, ...tail: MissingRestElement[]): MissingRestReturnA;"
+      },
+      {
+        "end": 2146,
+        "errorType": true,
+        "kind": 263,
+        "pos": 2061,
+        "declaration": "\ndeclare function missingRest(value: number, ...tail: boolean[]): MissingRestReturnB;"
+      }
+    ]
+  },
+  {
+    "name": "tupleOnlyRawZero",
+    "kind": "value",
+    "summary": "never",
+    "errorType": false,
+    "codes": [
+      2769
+    ],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 2278,
+        "errorType": false,
+        "kind": 263,
+        "pos": 2213,
+        "declaration": "\n\ndeclare function emptyTuples(...left: [value: string]): \"left\";"
+      },
+      {
+        "end": 2344,
+        "errorType": false,
+        "kind": 263,
+        "pos": 2278,
+        "declaration": "\ndeclare function emptyTuples(...right: [value: number]): \"right\";"
+      }
+    ]
+  },
+  {
+    "name": "optionalFirstSource",
+    "kind": "value",
+    "summary": "{ optional: true; } & { required: true; }",
+    "errorType": false,
+    "codes": [
+      2769
+    ],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 2501,
+        "errorType": false,
+        "kind": 263,
+        "pos": 2409,
+        "declaration": "\n\ndeclare function optionalNames(first: string, optionalFirst?: number): { optional: true };"
+      },
+      {
+        "end": 2594,
+        "errorType": false,
+        "kind": 263,
+        "pos": 2501,
+        "declaration": "\ndeclare function optionalNames(second: number, requiredSecond: boolean): { required: true };"
+      }
+    ]
+  },
+  {
+    "name": "combinedThis",
+    "kind": "value",
+    "summary": "{ first: true; } & { second: true; }",
+    "errorType": false,
+    "codes": [
+      2769
+    ],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 2766,
+        "errorType": false,
+        "kind": 174,
+        "pos": 2700,
+        "declaration": "\n  method(this: { tag: \"first\" }, value: string): { first: true };"
+      },
+      {
+        "end": 2834,
+        "errorType": false,
+        "kind": 174,
+        "pos": 2766,
+        "declaration": "\n  method(this: { tag: \"second\" }, value: number): { second: true };"
+      }
+    ]
+  },
+  {
+    "name": "thisBeforeReturns",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2304,
+      2304,
+      2769
+    ],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 3001,
+        "errorType": true,
+        "kind": 174,
+        "pos": 2932,
+        "declaration": "\n  method(this: MissingFirstThis, value: string): MissingThisReturnA;"
+      },
+      {
+        "end": 3071,
+        "errorType": true,
+        "kind": 174,
+        "pos": 3001,
+        "declaration": "\n  method(this: MissingSecondThis, value: number): MissingThisReturnB;"
+      }
+    ]
+  },
+  {
+    "name": "literalCandidateFlags",
+    "kind": "value",
+    "summary": "{ literal: true; } & { broad: true; } & { numeric: true; }",
+    "errorType": false,
+    "codes": [
+      2769
+    ],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 3215,
+        "errorType": false,
+        "kind": 263,
+        "pos": 3152,
+        "declaration": "\n\ndeclare function specialized(value: string): { broad: true };"
+      },
+      {
+        "end": 3282,
+        "errorType": false,
+        "kind": 263,
+        "pos": 3215,
+        "declaration": "\ndeclare function specialized(value: \"literal\"): { literal: true };"
+      },
+      {
+        "end": 3346,
+        "errorType": false,
+        "kind": 263,
+        "pos": 3282,
+        "declaration": "\ndeclare function specialized(value: number): { numeric: true };"
+      }
+    ]
+  },
+  {
+    "name": "combinedCallbackParameter",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2769,
+      7006
+    ],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 3501,
+        "errorType": false,
+        "kind": 263,
+        "pos": 3421,
+        "declaration": "\n\ndeclare function callback(value: string, handler: (first: number) => void): 0;"
+      },
+      {
+        "end": 3581,
+        "errorType": false,
+        "kind": 263,
+        "pos": 3501,
+        "declaration": "\ndeclare function callback(value: number, handler: (second: string) => void): 0;"
+      }
+    ]
+  },
+  {
+    "name": "tupleCallbackParameter",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2769,
+      7006
+    ],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 3743,
+        "errorType": false,
+        "kind": 263,
+        "pos": 3642,
+        "declaration": "\n\ndeclare function tupleCallback(...args: [value: string, handler: (tupleInput: number) => void]): 0;"
+      },
+      {
+        "end": 3835,
+        "errorType": false,
+        "kind": 263,
+        "pos": 3743,
+        "declaration": "\ndeclare function tupleCallback(value: number, handler: (ordinaryInput: string) => void): 0;"
+      }
+    ]
+  },
+  {
+    "name": "singleCandidateControl",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 3947,
+        "errorType": false,
+        "kind": 263,
+        "pos": 3898,
+        "declaration": "\n\ndeclare function single(value: string): number;"
+      }
+    ]
+  },
+  {
+    "name": "genericLongestControl",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2345
+    ],
+    "demandFailures": [],
+    "returns": [
+      {
+        "end": 4067,
+        "errorType": false,
+        "kind": 263,
+        "pos": 4019,
+        "declaration": "\n\ndeclare function generic<T>(value: string): T;"
+      }
+    ]
+  },
+  {
+    "name": "healthyIndependent",
+    "kind": "value",
+    "summary": "42",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "returns": []
+  }
+]

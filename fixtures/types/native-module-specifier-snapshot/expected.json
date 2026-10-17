@@ -1,0 +1,178 @@
+[
+  {
+    "file": "fresh.cts",
+    "collision": false,
+    "display": "\"pkg/sub\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+        "text": "pkg/sub/index.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+        "text": "pkg/sub/index.js"
+      }
+    ]
+  },
+  {
+    "file": "fresh.cts",
+    "collision": true,
+    "display": "\"pkg/sub/index\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+        "text": "pkg/sub/index.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+        "text": "pkg/sub/index.js"
+      }
+    ]
+  },
+  {
+    "file": "reuse.cts",
+    "collision": false,
+    "display": "\"pkg/sub/index.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+        "text": "pkg/sub/index.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+        "text": "pkg/sub/index.js"
+      }
+    ]
+  },
+  {
+    "file": "reuse.cts",
+    "collision": true,
+    "display": "\"pkg/sub/index.js\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+        "text": "pkg/sub/index.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+        "text": "pkg/sub/index.js"
+      }
+    ]
+  },
+  {
+    "file": "runtime.cts",
+    "runtime": true,
+    "collision": false,
+    "display": "\"./sub/index\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+        "text": "pkg/sub/index.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "sub/index.d.ts",
+        "text": "./sub/index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+        "text": "pkg/sub/index.js"
+      }
+    ]
+  },
+  {
+    "file": "runtime.cts",
+    "runtime": true,
+    "collision": true,
+    "display": "\"./sub/index\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+        "text": "pkg/sub/index.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "sub/index.d.ts",
+        "text": "./sub/index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+        "text": "pkg/sub/index.js"
+      }
+    ]
+  },
+  {
+    "file": "runtime.cts",
+    "runtime": false,
+    "collision": false,
+    "display": "\"pkg/sub\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+        "text": "pkg/sub/index.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "sub/index.d.ts",
+        "text": "./sub/index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+        "text": "pkg/sub/index.js"
+      }
+    ]
+  },
+  {
+    "file": "runtime.cts",
+    "runtime": false,
+    "collision": true,
+    "display": "\"pkg/sub/index\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+        "text": "pkg/sub/index.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "sub/index.d.ts",
+        "text": "./sub/index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/sub/index.d.ts",
+        "text": "pkg/sub/index.js"
+      }
+    ]
+  }
+]

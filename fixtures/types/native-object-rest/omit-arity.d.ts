@@ -1,0 +1,1 @@
+type Omit<T> = T;

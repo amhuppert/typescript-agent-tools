@@ -1,0 +1,223 @@
+[
+  {
+    "file": "reuse.ts",
+    "display": "\"././target.js\"",
+    "defaultMode": 0,
+    "resolvedPath": "target.d.ts",
+    "imports": [
+      {
+        "mode": 0,
+        "resolvedPath": "target.d.ts",
+        "text": "././target.js"
+      },
+      {
+        "mode": 0,
+        "resolvedPath": "target.d.ts",
+        "text": "./target.js"
+      }
+    ]
+  },
+  {
+    "file": "first-require.mts",
+    "display": "\"././target.js\"",
+    "defaultMode": 0,
+    "resolvedPath": "target.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "target.d.ts",
+        "text": "././target.js"
+      },
+      {
+        "mode": 0,
+        "resolvedPath": "target.d.ts",
+        "text": "./target.js"
+      }
+    ]
+  },
+  {
+    "file": "first-import.mts",
+    "display": "\"././target.js\"",
+    "defaultMode": 0,
+    "resolvedPath": "target.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "target.d.ts",
+        "text": "././target.js"
+      },
+      {
+        "mode": 0,
+        "resolvedPath": "target.d.ts",
+        "text": "./target.js"
+      }
+    ]
+  },
+  {
+    "file": "first-import.cts",
+    "display": "\"././target.js\"",
+    "defaultMode": 0,
+    "resolvedPath": "target.d.ts",
+    "imports": [
+      {
+        "mode": 99,
+        "resolvedPath": "target.d.ts",
+        "text": "././target.js"
+      },
+      {
+        "mode": 0,
+        "resolvedPath": "target.d.ts",
+        "text": "./target.js"
+      }
+    ]
+  },
+  {
+    "file": "first-require.cts",
+    "display": "\"././target.js\"",
+    "defaultMode": 0,
+    "resolvedPath": "target.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "target.d.ts",
+        "text": "././target.js"
+      },
+      {
+        "mode": 0,
+        "resolvedPath": "target.d.ts",
+        "text": "./target.js"
+      }
+    ]
+  },
+  {
+    "file": "dynamic.ts",
+    "display": "\"./target.js\"",
+    "defaultMode": 0,
+    "resolvedPath": "target.d.ts",
+    "imports": [
+      {
+        "mode": 0,
+        "resolvedPath": "target.d.ts",
+        "text": "./target.js"
+      },
+      {
+        "mode": 0,
+        "resolvedPath": "target.d.ts",
+        "text": "././target.js"
+      }
+    ]
+  },
+  {
+    "file": "import-type.ts",
+    "display": "\"./target.js\"",
+    "defaultMode": 0,
+    "resolvedPath": "target.d.ts",
+    "imports": [
+      {
+        "mode": 0,
+        "resolvedPath": "target.d.ts",
+        "text": "./target.js"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "target.d.ts",
+        "text": "././target.js"
+      }
+    ]
+  },
+  {
+    "file": "require.mts",
+    "display": "\"././target.js\"",
+    "defaultMode": 0,
+    "resolvedPath": "target.d.ts",
+    "imports": [
+      {
+        "mode": 0,
+        "resolvedPath": "target.d.ts",
+        "text": "././target.js"
+      },
+      {
+        "mode": 0,
+        "resolvedPath": "target.d.ts",
+        "text": "./target.js"
+      }
+    ]
+  },
+  {
+    "file": "missing-side.ts",
+    "display": "\"././target.js\"",
+    "defaultMode": 0,
+    "resolvedPath": "target.d.ts",
+    "imports": [
+      {
+        "mode": 0,
+        "resolvedPath": null,
+        "text": "missing-side-effect"
+      },
+      {
+        "mode": 0,
+        "resolvedPath": "target.d.ts",
+        "text": "././target.js"
+      },
+      {
+        "mode": 0,
+        "resolvedPath": "target.d.ts",
+        "text": "./target.js"
+      }
+    ]
+  },
+  {
+    "file": "javascript.ts",
+    "display": "\"module-probe\"",
+    "defaultMode": 0,
+    "resolvedPath": "node_modules/module-probe/index.d.ts",
+    "imports": [
+      {
+        "mode": 0,
+        "resolvedPath": "node_modules/module-probe/index.d.ts",
+        "text": "module-probe"
+      }
+    ]
+  },
+  {
+    "file": "unadmitted-tsx.ts",
+    "display": "\"././target.js\"",
+    "defaultMode": 0,
+    "resolvedPath": "target.d.ts",
+    "imports": [
+      {
+        "mode": 0,
+        "resolvedPath": "other.tsx",
+        "text": "./other.tsx"
+      },
+      {
+        "mode": 0,
+        "resolvedPath": "target.d.ts",
+        "text": "././target.js"
+      },
+      {
+        "mode": 0,
+        "resolvedPath": "target.d.ts",
+        "text": "./target.js"
+      }
+    ]
+  },
+  {
+    "file": "helpers.ts",
+    "display": "\"././target.js\"",
+    "defaultMode": 0,
+    "resolvedPath": "target.d.ts",
+    "imports": [
+      {
+        "mode": 0,
+        "resolvedPath": "target.d.ts",
+        "text": "././target.js"
+      },
+      {
+        "mode": 0,
+        "resolvedPath": "target.d.ts",
+        "text": "./target.js"
+      }
+    ]
+  }
+]

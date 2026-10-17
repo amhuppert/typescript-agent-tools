@@ -1,0 +1,1 @@
+{"extends": "./loose.json", "files": ["globals.d.ts", "merged-b.d.ts", "merged-a.d.ts"]}

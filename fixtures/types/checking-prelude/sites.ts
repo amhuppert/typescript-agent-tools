@@ -1,0 +1,16 @@
+import { accept as take, outer, inner, hiddenReturn, hiddenParameter, wrongThis, generic, Made, tag } from "./definitions";
+export const ordinary = take(/*#ordinary*/1);
+export const nested = outer(inner(/*#nested*/2));
+export const returnHidden = hiddenReturn(/*#returnHidden*/3);
+export const missingParameter = hiddenParameter(/*#missingParameter*/4);
+export const rejected = take(/*#rejected*/"bad");
+export const outerRejected = outer(inner(/*#outerRejected*/5), 6);
+export const thisRejected = wrongThis(/*#thisRejected*/7);
+export const nullable = take(/*#nullable*/null);
+export const explicitGeneric = generic</*#typeArgument*/number>(/*#genericArgument*/8);
+export const constructed = new Made(/*#newArgument*/9);
+export const tagged = tag/*#tagged*/`x`;
+export const calledReturn = hiddenReturn(10/*#calledReturn*/);
+declare function callback(value: () => number): number;
+export const localValue = callback(() => { const /*#callbackValue*/local = 1; return local; });
+export const localType = callback(() => { type /*#callbackDeclared*/Local = number; const value: /*#callbackType*/number = 1; return value; });

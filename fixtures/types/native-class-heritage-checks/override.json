@@ -1,0 +1,1 @@
+{"compilerOptions": {"strict": true, "noLib": true, "target": "ES2022", "noImplicitOverride": true}, "files": ["globals.d.ts", "cases.ts"]}

@@ -1,0 +1,1 @@
+{"compilerOptions":{"strict":true,"strictNullChecks":false,"noCheck":true,"noLib":true,"module":"CommonJS","target":"ESNext"},"files":["globals.d.ts","factory.ts","default.ts","types.ts","ambient.d.ts","ambient-use.ts","global-module.d.ts","global-use.ts"]}

@@ -81,7 +81,7 @@ pub(super) enum Module {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(super) enum Resolution {
+pub(crate) enum Resolution {
     Node16,
     NodeNext,
     Bundler,
@@ -100,12 +100,13 @@ pub(super) enum Detection {
 /// trailing separator except at a root.
 #[derive(Debug)]
 pub(super) struct Options {
-    pub(super) module: Module,
+    pub(crate) semantic: SemanticOptions,
     pub(super) resolution: Resolution,
     pub(super) detection: Detection,
     /// `jsx` is set, to any mode: a `.tsx` file may then be a program input
     /// that a module request reaches (`GetResolutionDiagnostic`).
     pub(super) jsx: bool,
+    pub(super) jsx_preserve: bool,
     /// `jsx: react-jsx` or `react-jsxdev`.
     pub(super) jsx_automatic: bool,
     /// `jsx: react-jsxdev`, whose runtime module is `jsx-dev-runtime`.
@@ -132,6 +133,8 @@ pub(super) struct Options {
     /// declaration file may reach a declaration file for an arbitrary
     /// extension, such as `styles.d.css.ts` (`GetResolutionDiagnostic`).
     pub(super) allow_arbitrary_extensions: bool,
+    pub(super) allow_importing_ts_extensions: bool,
+    pub(super) rewrite_relative_import_extensions: bool,
     pub(super) resolve_json_module: bool,
     pub(super) package_exports: bool,
     pub(super) package_imports: bool,
@@ -157,6 +160,176 @@ pub(super) struct Options {
     pub(super) preserve_const_enums: bool,
 }
 
+/// Effective checker inputs from TypeScript 7.0.2's
+/// `CompilerOptions.GetStrictOptionValue` and `OptionsDeclarations`.
+/// Inheritance and explicit per-option settings have already been applied;
+/// consumers never interpret raw `strict` or reopen configuration files.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct SemanticOptions {
+    target: Target,
+    pub(crate) module_kind: super::ModuleKind,
+    pub(crate) module_resolution: Resolution,
+    pub(crate) no_check: bool,
+    pub(crate) no_implicit_any: bool,
+    pub(crate) no_implicit_this: bool,
+    pub(crate) no_implicit_override: bool,
+    pub(crate) strict_null_checks: bool,
+    pub(crate) strict_function_types: bool,
+    pub(crate) strict_bind_call_apply: bool,
+    pub(crate) strict_property_initialization: bool,
+    pub(crate) strict_builtin_iterator_return: bool,
+    pub(crate) use_unknown_in_catch_variables: bool,
+    pub(crate) exact_optional_property_types: bool,
+    pub(crate) no_unchecked_indexed_access: bool,
+    pub(crate) no_property_access_from_index_signature: bool,
+    /// `typeToStringEx` consumes this even when only diagnostic formatting
+    /// causes a lazy semantic dependency. It is not a strict-family option.
+    pub(crate) no_error_truncation: bool,
+    pub(crate) stable_type_ordering: bool,
+    pub(crate) deduplicate_packages: bool,
+    pub(crate) allow_js: bool,
+    pub(crate) check_js: bool,
+    pub(crate) experimental_decorators: bool,
+    pub(crate) emit_decorator_metadata: bool,
+    pub(crate) use_define_for_class_fields: bool,
+    pub(crate) emit_standard_class_fields: bool,
+    /// Native `needsImportHelpersImportSpecifier` input for program capture.
+    pub(crate) import_helpers: bool,
+    /// `CompilerOptions.GetIsolatedModules`: effective isolated compilation.
+    pub(crate) isolated_modules: bool,
+    /// Raw `VerbatimModuleSyntax`: alias-reference collection uses this alone.
+    pub(crate) verbatim_module_syntax: bool,
+    pub(crate) preserve_const_enums: bool,
+    explicit_dom_library: bool,
+    pub(crate) jsx_factory: Option<String>,
+    pub(crate) jsx_fragment_factory: Option<String>,
+    pub(crate) react_namespace: Option<String>,
+}
+
+impl SemanticOptions {
+    /// Ask the retained effective ScriptTarget; no consumer reinterprets the
+    /// configured target string or independently supplies its default.
+    pub(crate) fn target_supports_iterables(&self) -> bool {
+        self.target.supports_iterables()
+    }
+    pub(crate) fn target_supports_object_rest(&self) -> bool {
+        self.target.supports_object_rest()
+    }
+    /// Native private-access helper gate combines the two feature targets
+    /// with define semantics; ESNext is the later ClassElementDecorators gate.
+    pub(crate) fn private_access_needs_emit_helpers(&self) -> bool {
+        !self.target.supports_class_element_decorators() || !self.use_define_for_class_fields
+    }
+    /// `getFirstTransformableStaticClassElement` compares both native feature targets.
+    pub(crate) fn class_static_elements_need_transform(&self) -> bool {
+        !self.target.is_at_least_es2022() || !self.target.supports_class_element_decorators()
+    }
+    /// `checkDecorators` compares the decorator feature target independently
+    /// of the static-field and useDefineForClassFields transformation gates.
+    pub(crate) fn decorators_need_emit_helpers(&self) -> bool {
+        !self.target.supports_class_element_decorators()
+    }
+    /// `containerSeemsToBeEmptyDomElement` asks the configured Lib names,
+    /// independently of the loaded/default library set.
+    pub(crate) fn explicit_dom_library(&self) -> bool {
+        self.explicit_dom_library
+    }
+    /// Defaults from `OptionsDeclarations` and `GetStrictOptionValue`.
+    /// `alwaysStrict` is a removed false mode, not a strict-family flag.
+    const DEFAULT: Self = Self {
+        target: Target::LATEST_STANDARD,
+        module_kind: super::ModuleKind::EsNext,
+        module_resolution: Resolution::Bundler,
+        no_check: false,
+        no_implicit_any: true,
+        no_implicit_this: true,
+        no_implicit_override: false,
+        strict_null_checks: true,
+        strict_function_types: true,
+        strict_bind_call_apply: true,
+        strict_property_initialization: true,
+        strict_builtin_iterator_return: true,
+        use_unknown_in_catch_variables: true,
+        exact_optional_property_types: false,
+        no_unchecked_indexed_access: false,
+        no_property_access_from_index_signature: false,
+        no_error_truncation: false,
+        stable_type_ordering: true,
+        deduplicate_packages: true,
+        allow_js: false,
+        check_js: false,
+        experimental_decorators: false,
+        emit_decorator_metadata: false,
+        use_define_for_class_fields: true,
+        emit_standard_class_fields: true,
+        import_helpers: false,
+        isolated_modules: false,
+        verbatim_module_syntax: false,
+        preserve_const_enums: false,
+        explicit_dom_library: false,
+        jsx_factory: None,
+        jsx_fragment_factory: None,
+        react_namespace: None,
+    };
+
+    /// Capture checker inputs after configuration inheritance and target
+    /// selection. Ports `GetStrictOptionValue` (the explicit flag wins,
+    /// otherwise strict, otherwise on), `GetUseDefineForClassFields`, and
+    /// the separate `GetEmitStandardClassFields` operation.
+    fn from_reader(read: &Reader<'_, '_>, target: Target) -> Result<Self, InputError> {
+        let strict = read.bool("strict");
+        let strict_option = |name| read.bool(name).or(strict).unwrap_or(true);
+        let use_define = read.bool("useDefineForClassFields");
+        let configured_string = |name| -> Result<Option<String>, InputError> {
+            Ok(read
+                .string(name, Kind::String)?
+                .map(|(text, _)| text.to_owned()))
+        };
+        Ok(Self {
+            module_kind: super::ModuleKind::EsNext,
+            module_resolution: Resolution::Bundler,
+            target,
+            no_check: read.bool("noCheck").unwrap_or(false),
+            no_implicit_any: strict_option("noImplicitAny"),
+            no_implicit_this: strict_option("noImplicitThis"),
+            no_implicit_override: read.bool("noImplicitOverride").unwrap_or(false),
+            strict_null_checks: strict_option("strictNullChecks"),
+            strict_function_types: strict_option("strictFunctionTypes"),
+            strict_bind_call_apply: strict_option("strictBindCallApply"),
+            strict_property_initialization: strict_option("strictPropertyInitialization"),
+            strict_builtin_iterator_return: strict_option("strictBuiltinIteratorReturn"),
+            use_unknown_in_catch_variables: strict_option("useUnknownInCatchVariables"),
+            exact_optional_property_types: read.bool("exactOptionalPropertyTypes").unwrap_or(false),
+            no_unchecked_indexed_access: read.bool("noUncheckedIndexedAccess").unwrap_or(false),
+            no_property_access_from_index_signature: read
+                .bool("noPropertyAccessFromIndexSignature")
+                .unwrap_or(false),
+            no_error_truncation: read.bool("noErrorTruncation").unwrap_or(false),
+            stable_type_ordering: read.bool("stableTypeOrdering").unwrap_or(true),
+            deduplicate_packages: read.bool("deduplicatePackages").unwrap_or(true),
+            allow_js: read.allow_js(),
+            check_js: read.bool("checkJs").unwrap_or(false),
+            experimental_decorators: read.bool("experimentalDecorators").unwrap_or(false),
+            emit_decorator_metadata: read.bool("emitDecoratorMetadata").unwrap_or(false),
+            // `GetUseDefineForClassFields` is distinct from emission:
+            // explicit true can select define semantics below ES2022.
+            use_define_for_class_fields: use_define.unwrap_or(target.is_at_least_es2022()),
+            // `GetEmitStandardClassFields`: native fields additionally need
+            // the target to support them, even for an explicit true setting.
+            emit_standard_class_fields: use_define != Some(false) && target.is_at_least_es2022(),
+            import_helpers: read.bool("importHelpers").unwrap_or(false),
+            verbatim_module_syntax: read.bool("verbatimModuleSyntax").unwrap_or(false),
+            preserve_const_enums: false,
+            explicit_dom_library: false,
+            isolated_modules: read.bool("isolatedModules").unwrap_or(false)
+                || read.bool("verbatimModuleSyntax").unwrap_or(false),
+            jsx_factory: configured_string("jsxFactory")?,
+            jsx_fragment_factory: configured_string("jsxFragmentFactory")?,
+            react_namespace: configured_string("reactNamespace")?,
+        })
+    }
+}
+
 /// `paths` patterns and their substitutions, relative to `base`: the
 /// directory of the configuration that declared them.
 #[derive(Debug)]
@@ -170,10 +343,14 @@ impl Options {
     /// the compiler defaults, which `convert` applies.
     pub(super) fn for_extends_lookup() -> Self {
         Self {
-            module: Module::Node,
+            semantic: SemanticOptions {
+                module_kind: super::ModuleKind::NodeNext,
+                ..SemanticOptions::DEFAULT
+            },
             resolution: Resolution::NodeNext,
             detection: Detection::Force,
             jsx: false,
+            jsx_preserve: false,
             jsx_automatic: false,
             jsx_dev: false,
             jsx_import_source: None,
@@ -189,6 +366,8 @@ impl Options {
             no_check: false,
             allow_js: false,
             allow_arbitrary_extensions: false,
+            allow_importing_ts_extensions: false,
+            rewrite_relative_import_extensions: false,
             resolve_json_module: true,
             package_exports: true,
             package_imports: true,
@@ -254,6 +433,7 @@ impl File {
             identity,
             text,
             root: JsonValue {
+                native_span: None,
                 span: crate::Span { start: 0, end: 0 },
                 kind: JsonKind::Object(Vec::new()),
             },
@@ -270,6 +450,7 @@ impl File {
     fn config_root(&self, root: Option<JsonValue>) -> Result<JsonValue, InputError> {
         let Some(root) = root else {
             return Ok(JsonValue {
+                native_span: None,
                 span: crate::Span { start: 0, end: 0 },
                 kind: JsonKind::Object(Vec::new()),
             });
@@ -344,10 +525,10 @@ impl File {
     }
 
     /// `message` for a value that is not the string expected, unless it is a
-    /// string this tool cannot represent exactly (`JsonString::Utf16`).
+    /// string this tool cannot represent exactly (`JsonString::NonScalar`).
     fn not_string(&self, value: &JsonValue, message: impl Into<String>) -> InputError {
         match value.kind {
-            JsonKind::String(JsonString::Utf16(_)) => self.unsupported(
+            JsonKind::String(JsonString::NonScalar(_)) => self.unsupported(
                 value,
                 "This string has an unpaired UTF-16 surrogate, which cannot name a file, module, or option value",
             ),
@@ -422,7 +603,7 @@ fn string_list<'a>(
     for item in items {
         match &item.kind {
             JsonKind::String(JsonString::Text(text)) => strings.push((text.as_str(), item)),
-            JsonKind::String(JsonString::Utf16(_)) if !applies => {}
+            JsonKind::String(JsonString::NonScalar(_)) if !applies => {}
             JsonKind::Null => {}
             _ => return Err(file.not_string(item, format!("'{name}' entries must be strings"))),
         }
@@ -435,6 +616,181 @@ fn string_list<'a>(
 struct Declared<'a> {
     value: &'a JsonValue,
     file: &'a File,
+}
+
+/// The accepted exact configuration keys and conversion kinds from
+/// TypeScript 7.0.2's `OptionsDeclarations`, `convertJsonOption`, and
+/// `parseOwnConfigOfJsonSourceFile.onPropertySet`. Command-line aliases are
+/// not configuration keys. Specialized enum, list, and object conversion
+/// stays in `Reader`; this catalog owns primitive type validation.
+fn catalog(name: &str) -> Option<Catalog> {
+    match name {
+        "preserveWatchOutput"
+        | "listFiles"
+        | "explainFiles"
+        | "listEmittedFiles"
+        | "pretty"
+        | "traceResolution"
+        | "diagnostics"
+        | "extendedDiagnostics"
+        | "incremental"
+        | "declaration"
+        | "declarationMap"
+        | "emitDeclarationOnly"
+        | "sourceMap"
+        | "inlineSourceMap"
+        | "noCheck"
+        | "deduplicatePackages"
+        | "noEmit"
+        | "assumeChangesOnlyAffectDirectDependencies"
+        | "quiet"
+        | "singleThreaded"
+        | "all"
+        | "version"
+        | "init"
+        | "allowJs"
+        | "checkJs"
+        | "composite"
+        | "removeComments"
+        | "importHelpers"
+        | "downlevelIteration"
+        | "isolatedModules"
+        | "verbatimModuleSyntax"
+        | "isolatedDeclarations"
+        | "erasableSyntaxOnly"
+        | "libReplacement"
+        | "strict"
+        | "noImplicitAny"
+        | "strictNullChecks"
+        | "strictFunctionTypes"
+        | "strictBindCallApply"
+        | "strictPropertyInitialization"
+        | "strictBuiltinIteratorReturn"
+        | "noImplicitThis"
+        | "useUnknownInCatchVariables"
+        | "alwaysStrict"
+        | "stableTypeOrdering"
+        | "noUnusedLocals"
+        | "noUnusedParameters"
+        | "exactOptionalPropertyTypes"
+        | "noImplicitReturns"
+        | "noFallthroughCasesInSwitch"
+        | "noUncheckedIndexedAccess"
+        | "noImplicitOverride"
+        | "noPropertyAccessFromIndexSignature"
+        | "allowSyntheticDefaultImports"
+        | "esModuleInterop"
+        | "preserveSymlinks"
+        | "allowUmdGlobalAccess"
+        | "allowImportingTsExtensions"
+        | "rewriteRelativeImportExtensions"
+        | "resolvePackageJsonExports"
+        | "resolvePackageJsonImports"
+        | "noUncheckedSideEffectImports"
+        | "inlineSources"
+        | "experimentalDecorators"
+        | "emitDecoratorMetadata"
+        | "resolveJsonModule"
+        | "allowArbitraryExtensions"
+        | "skipDefaultLibCheck"
+        | "emitBOM"
+        | "noErrorTruncation"
+        | "noLib"
+        | "noResolve"
+        | "stripInternal"
+        | "disableSizeLimit"
+        | "disableSourceOfProjectReferenceRedirect"
+        | "disableSolutionSearching"
+        | "disableReferencedProjectLoad"
+        | "noEmitHelpers"
+        | "noEmitOnError"
+        | "preserveConstEnums"
+        | "skipLibCheck"
+        | "allowUnusedLabels"
+        | "allowUnreachableCode"
+        | "forceConsistentCasingInFileNames"
+        | "useDefineForClassFields" => Some(Catalog::Bool),
+        "generateCpuProfile" | "generateTrace" | "pprofDir" | "project" | "outFile" | "outDir"
+        | "rootDir" | "tsBuildInfoFile" | "baseUrl" | "sourceRoot" | "mapRoot" | "jsxFactory"
+        | "jsxFragmentFactory" | "jsxImportSource" | "reactNamespace" | "declarationDir"
+        | "ignoreDeprecations" => Some(Catalog::String),
+        "checkers" | "maxNodeModuleJsDepth" => Some(Catalog::Number),
+        "help" | "watch" | "locale" | "showConfig" | "listFilesOnly" | "ignoreConfig" => {
+            Some(Catalog::CommandLine)
+        }
+        "target" | "module" | "jsx" | "moduleResolution" | "newLine" | "moduleDetection"
+        | "lib" | "rootDirs" | "typeRoots" | "types" | "moduleSuffixes" | "customConditions"
+        | "paths" => Some(Catalog::Converted),
+        "plugins" => Some(Catalog::Plugins),
+        // Existing navigation-only profile: an internal compiler setting
+        // cannot turn off declaration-file resolution in this tool.
+        "noDtsResolution" => Some(Catalog::Bool),
+        _ => None,
+    }
+}
+
+#[derive(Clone, Copy)]
+enum Catalog {
+    Bool,
+    String,
+    Number,
+    Plugins,
+    Converted,
+    CommandLine,
+}
+
+/// The primitive checks `convertJsonOption` makes on each occurrence,
+/// before effective inheritance. Unknown nulls and empty keys are ignored
+/// by `parseOwnConfigOfJsonSourceFile.onPropertySet`; command-line-only
+/// options are rejected even when null.
+fn validate_option(name: &str, declared: Declared<'_>, key_start: usize) -> Result<(), InputError> {
+    let shape = catalog(name);
+    if matches!(shape, Some(Catalog::CommandLine)) {
+        return Err(declared.file.origin_at(key_start).error(
+            InputErrorKind::Config,
+            format!("Option '{name}' can only be specified on command line"),
+        ));
+    }
+    if name.is_empty() || declared.value.is_null() {
+        return Ok(());
+    }
+    let kind = match shape {
+        None => {
+            return Err(declared.file.origin_at(key_start).error(
+                InputErrorKind::Config,
+                format!("Unknown compiler option '{name}'"),
+            ));
+        }
+        Some(Catalog::Bool) if matches!(declared.value.kind, JsonKind::Bool(_)) => return Ok(()),
+        Some(Catalog::Bool) => "boolean",
+        Some(Catalog::String) if matches!(declared.value.kind, JsonKind::String(_)) => {
+            return Ok(());
+        }
+        Some(Catalog::String) => "string",
+        Some(Catalog::Number) if matches!(declared.value.kind, JsonKind::Number) => return Ok(()),
+        Some(Catalog::Number) => "number",
+        Some(Catalog::Plugins) => {
+            let Some(items) = declared.value.as_array() else {
+                return Err(type_error(declared, name, "list"));
+            };
+            for item in items {
+                if !item.is_null() && !matches!(item.kind, JsonKind::Object(_)) {
+                    return Err(type_error(
+                        Declared {
+                            value: item,
+                            ..declared
+                        },
+                        "plugin",
+                        "object",
+                    ));
+                }
+            }
+            return Ok(());
+        }
+        Some(Catalog::Converted) => return Ok(()),
+        Some(Catalog::CommandLine) => unreachable!("handled before null conversion"),
+    };
+    Err(type_error(declared, name, kind))
 }
 
 pub(super) fn load(path: &Path, disk: &disk::Disk, parser: &Parser) -> Result<Config, InputError> {
@@ -453,13 +809,18 @@ pub(super) fn load(path: &Path, disk: &disk::Disk, parser: &Parser) -> Result<Co
                 return Err(file.error(compiler_options, "'compilerOptions' must be an object"));
             };
             for property in properties {
-                // A key that cannot be written exactly names no option, so it
-                // is ignored like any unknown option.
+                let declared = Declared {
+                    value: &property.value,
+                    file,
+                };
                 if let Some(name) = property.key.as_str() {
-                    options.entry(name).or_default().push(Declared {
-                        value: &property.value,
-                        file,
-                    });
+                    validate_option(name, declared, property.key_span.start)?;
+                    options.entry(name).or_default().push(declared);
+                } else if !property.value.is_null() {
+                    return Err(file.origin_at(property.key_span.start).error(
+                        InputErrorKind::Unsupported,
+                        "A compiler option key has an unpaired UTF-16 surrogate",
+                    ));
                 }
             }
         }
@@ -526,10 +887,11 @@ struct Chain {
     /// application. Occurrences are validated in this order.
     order: Vec<Rc<File>>,
     /// Every file once, each after every file it names, which is the order
-    /// in which TypeScript's `parseConfig` completes them.
-    bases_first: Vec<Rc<File>>,
-    /// By identity: the files a file's applying `extends` names, in order.
-    bases: HashMap<PathBuf, Vec<Rc<File>>>,
+    /// in which TypeScript's `parseConfig` completes them, with the
+    /// positions in this list of the files its applying `extends` names, in
+    /// order. Each option is folded over the whole graph, so a step must not
+    /// hash paths: a 10,000-file chain is read once per option.
+    bases_first: Vec<(Rc<File>, Vec<usize>)>,
 }
 
 impl Chain {
@@ -542,23 +904,31 @@ impl Chain {
     }
 
     /// A fold over the graph, bases first: `step` computes a file's value
-    /// from the values of its bases, in `extends` order, or of none when the
-    /// file has no `extends`. Returns the selected configuration's value.
-    fn fold<'a, T: Copy>(&'a self, mut step: impl FnMut(&'a File, Option<Vec<T>>) -> T) -> T {
-        let mut values: HashMap<&Path, T> = HashMap::new();
-        let mut last = None;
-        for file in &self.bases_first {
-            let bases = Self::extends(file).then(|| {
-                self.bases[&file.identity]
-                    .iter()
-                    .map(|base| values[base.identity.as_path()])
-                    .collect()
-            });
-            let value = step(file, bases);
-            values.insert(&file.identity, value);
-            last = Some(value);
+    /// from its bases and their values, in `extends` order, or from none
+    /// when the file has no `extends`. Returns the selected configuration's
+    /// value.
+    fn fold<'a, T: Copy>(
+        &'a self,
+        mut step: impl FnMut(&'a File, Option<&[(&'a File, T)]>) -> T,
+    ) -> T {
+        let mut values: Vec<T> = Vec::with_capacity(self.bases_first.len());
+        let mut bases = Vec::new();
+        for (file, targets) in &self.bases_first {
+            let inherited = if Self::extends(file) {
+                bases.clear();
+                bases.extend(
+                    targets
+                        .iter()
+                        .map(|&base| (&*self.bases_first[base].0, values[base])),
+                );
+                Some(bases.as_slice())
+            } else {
+                None
+            };
+            let value = step(file, inherited);
+            values.push(value);
         }
-        last.expect("the selected configuration")
+        *values.last().expect("the selected configuration")
     }
 
     /// `files`, `include`, or `exclude` as TypeScript's raw configuration
@@ -568,13 +938,13 @@ impl Chain {
     /// value of the last base whose own value, after its own inheritance, is
     /// a list. Paths in it stay relative to the file that declared them.
     fn root_list(&self, key: &str) -> Option<Declared<'_>> {
-        self.fold(|file, bases: Option<Vec<Option<Declared>>>| {
+        self.fold(|file, bases: Option<&[(&File, Option<Declared>)]>| {
             if let Some(value) = get(&file.root, key) {
                 return Some(Declared { value, file });
             }
             bases?
-                .into_iter()
-                .flatten()
+                .iter()
+                .filter_map(|&(_, declared)| declared)
                 .rfind(|declared| declared.value.as_array().is_some())
         })
     }
@@ -597,8 +967,9 @@ impl Chain {
             let Some(bases) = bases else {
                 return own;
             };
-            let bases = self.bases[&file.identity].iter().zip(bases);
-            let inherited = bases.fold(None, |into, (base, value)| merge(into, base, value));
+            let inherited = bases
+                .iter()
+                .fold(None, |into, &(base, value)| merge(into, base, value));
             merge(inherited, file, own)
         })
     }
@@ -682,19 +1053,25 @@ fn explicit_null(file: &File, name: &str) -> bool {
 fn inheritance(leaf: &Rc<File>, disk: &disk::Disk, parser: &Parser) -> Result<Chain, InputError> {
     let mut files: HashMap<String, Rc<File>> = HashMap::new();
     let mut targets: HashMap<PathBuf, Vec<Rc<File>>> = HashMap::new();
+    let mut positions: HashMap<PathBuf, usize> = HashMap::new();
     let mut bases_first = Vec::new();
     let mut active = HashSet::from([leaf.identity.clone()]);
     // Each frame is a file, its resolved `extends` targets, and the next one.
     let mut stack = vec![(leaf.clone(), extends_of(leaf, disk)?, 0)];
     while let Some((file, pending, next)) = stack.last_mut() {
         let Some((target, value)) = pending.get(*next).cloned() else {
-            let parents = pending
+            let parents: Vec<Rc<File>> = pending
                 .iter()
                 .map(|(target, _)| files[target].clone())
                 .collect();
+            let bases = parents
+                .iter()
+                .map(|parent| positions[&parent.identity])
+                .collect();
             active.remove(&file.identity);
+            positions.insert(file.identity.clone(), bases_first.len());
             targets.insert(file.identity.clone(), parents);
-            bases_first.push(file.clone());
+            bases_first.push((file.clone(), bases));
             stack.pop();
             continue;
         };
@@ -748,11 +1125,7 @@ fn inheritance(leaf: &Rc<File>, disk: &disk::Disk, parser: &Parser) -> Result<Ch
         }
     }
     order.reverse();
-    Ok(Chain {
-        order,
-        bases_first,
-        bases: targets,
-    })
+    Ok(Chain { order, bases_first })
 }
 
 /// The paths named by a file's `extends`, with the values that named them.
@@ -918,20 +1291,24 @@ impl<'a> Reader<'a, '_> {
         let declared =
             self.checked(name, kind, |declared, applies| match &declared.value.kind {
                 JsonKind::String(JsonString::Text(_)) => Ok(()),
-                JsonKind::String(JsonString::Utf16(_)) if !applies => Ok(()),
+                JsonKind::String(JsonString::NonScalar(_)) if !applies => Ok(()),
                 _ => Err(type_error(declared, name, "string")),
             })?;
         Ok(declared.map(|declared| (declared.value.as_str().expect("checked"), declared)))
     }
 
-    fn bool(&self, name: &str) -> Result<Option<bool>, InputError> {
-        let declared = self.checked(name, Kind::Bool, |declared, _| {
-            match declared.value.as_bool() {
-                Some(_) => Ok(()),
-                None => Err(type_error(declared, name, "boolean")),
-            }
-        })?;
-        Ok(declared.and_then(|declared| declared.value.as_bool()))
+    /// Primitive types were validated on every occurrence by the catalog
+    /// before inheritance; this reads the effective boolean only.
+    fn bool(&self, name: &str) -> Option<bool> {
+        self.get(name, Kind::Bool)
+            .map(|declared| declared.value.as_bool().expect("validated boolean"))
+    }
+
+    /// TypeScript's `CompilerOptions.GetAllowJS`: explicit `allowJs`
+    /// wins; otherwise `checkJs` true enables JavaScript program inputs.
+    fn allow_js(&self) -> bool {
+        self.bool("allowJs")
+            .unwrap_or_else(|| self.bool("checkJs") == Some(true))
     }
 
     /// A list of strings; `check_entry` validates each string entry of every
@@ -953,7 +1330,7 @@ impl<'a> Reader<'a, '_> {
                 };
                 match &item.kind {
                     JsonKind::String(JsonString::Text(text)) => check_entry(entry, Some(text))?,
-                    JsonKind::String(JsonString::Utf16(_)) if !applies => {
+                    JsonKind::String(JsonString::NonScalar(_)) if !applies => {
                         check_entry(entry, None)?;
                     }
                     JsonKind::Null => {}
@@ -1033,7 +1410,7 @@ impl<'a> Reader<'a, '_> {
                     _ => Ok(()),
                 },
                 // No key is an unpaired surrogate.
-                JsonKind::String(JsonString::Utf16(_)) if !applies => {
+                JsonKind::String(JsonString::NonScalar(_)) if !applies => {
                     Err(invalid_value(declared, name, allowed))
                 }
                 _ => Err(type_error(declared, name, "string")),
@@ -1061,10 +1438,15 @@ fn quoted(names: &[&str]) -> String {
 }
 
 fn type_error(declared: Declared, name: &str, kind: &str) -> InputError {
-    declared.file.not_string(
-        declared.value,
-        format!("Compiler option '{name}' requires a value of type {kind}"),
-    )
+    let message = format!("Compiler option '{name}' requires a value of type {kind}");
+    // `convertJsonOption`'s expected-kind check is different from exact
+    // string identity. A surrogate-valued string is still the wrong kind
+    // for booleans, numbers, lists, and objects (TS5024 / Config).
+    if kind == "string" {
+        declared.file.not_string(declared.value, message)
+    } else {
+        declared.file.error(declared.value, message)
+    }
 }
 
 fn invalid_value(declared: Declared, name: &str, allowed: &str) -> InputError {
@@ -1084,26 +1466,56 @@ fn convert<'a>(
         chain,
         leaf_dir: &leaf.dir,
     };
+    // TypeScript's `verifyCompilerOptions` rejects removed settings only
+    // after inheritance: an overridden false interop mode is harmless.
+    for name in [
+        "alwaysStrict",
+        "esModuleInterop",
+        "allowSyntheticDefaultImports",
+    ] {
+        if read.bool(name) == Some(false) {
+            let declared = read.get(name, Kind::Bool).expect("present");
+            return Err(declared.file.error(
+                declared.value,
+                format!("Option '{name}=false' was removed in TypeScript 7"),
+            ));
+        }
+    }
+    for (name, kind) in [("downlevelIteration", Kind::Bool), ("outFile", Kind::Path)] {
+        if let Some(declared) = read.get(name, kind) {
+            return Err(declared.file.error(
+                declared.value,
+                format!("Option '{name}' was removed in TypeScript 7"),
+            ));
+        }
+    }
+    // The remaining enumeration is emit-only, but invalid values are
+    // still configuration errors (`convertJsonOptionOfEnumType`).
+    read.choice("newLine", &["crlf", "lf"], "'crlf', 'lf'")?;
     if let Some(declared) = read.get("baseUrl", Kind::Path) {
         return Err(declared.file.unsupported(
             declared.value,
             "Option 'baseUrl' was removed in TypeScript 7; use 'paths' relative to the configuration",
         ));
     }
-    for name in ["noResolve", "noDtsResolution"] {
-        if read.bool(name)? == Some(true) {
-            let declared = read.get(name, Kind::Bool).expect("present");
-            return Err(declared.file.unsupported(
-                declared.value,
-                format!("Option '{name}' changes module resolution in a way that is not supported"),
-            ));
-        }
+    if let Some(declared) = read.get("noDtsResolution", Kind::Bool) {
+        return Err(declared.file.unsupported(
+            declared.value,
+            "Option 'noDtsResolution' is an internal compiler setting outside the supported configuration profile",
+        ));
+    }
+    if read.bool("noResolve") == Some(true) {
+        let declared = read.get("noResolve", Kind::Bool).expect("present");
+        return Err(declared.file.unsupported(
+            declared.value,
+            "Option 'noResolve' changes module resolution in a way that is not supported",
+        ));
     }
 
     // `module` also decides `resolveJsonModule`'s default: TypeScript's
     // `GetResolveJsonModule` turns it on for `node20` and `nodenext`, off for
     // `node16` and `node18`, and otherwise only with bundler resolution.
-    let (module, node_next_module, node_json_modules) = match read.choice(
+    let (module, node_next_module, node_json_modules, module_kind) = match read.choice(
         "module",
         &[
             "commonjs", "amd", "system", "umd", "es6", "es2015", "es2020", "es2022", "esnext",
@@ -1111,14 +1523,18 @@ fn convert<'a>(
         ],
         "'commonjs', 'es6', 'es2015', 'es2020', 'es2022', 'esnext', 'node16', 'node18', 'node20', 'nodenext', 'preserve'",
     )? {
-        None => (Module::Es, false, false),
+        None => (Module::Es, false, false, super::ModuleKind::EsNext),
         Some((value, declared)) => match value.as_str() {
-            "commonjs" => (Module::CommonJs, false, false),
-            "es6" | "es2015" | "es2020" | "es2022" | "esnext" => (Module::Es, false, false),
-            "node16" | "node18" => (Module::Node, false, false),
-            "node20" => (Module::Node, false, true),
-            "nodenext" => (Module::Node, true, true),
-            "preserve" => (Module::Preserve, false, false),
+            "commonjs" => (Module::CommonJs, false, false, super::ModuleKind::CommonJs),
+            "es6" | "es2015" => (Module::Es, false, false, super::ModuleKind::Es2015),
+            "es2020" => (Module::Es, false, false, super::ModuleKind::Es2020),
+            "es2022" => (Module::Es, false, false, super::ModuleKind::Es2022),
+            "esnext" => (Module::Es, false, false, super::ModuleKind::EsNext),
+            "node16" => (Module::Node, false, false, super::ModuleKind::Node16),
+            "node18" => (Module::Node, false, false, super::ModuleKind::Node18),
+            "node20" => (Module::Node, false, true, super::ModuleKind::Node20),
+            "nodenext" => (Module::Node, true, true, super::ModuleKind::NodeNext),
+            "preserve" => (Module::Preserve, false, false, super::ModuleKind::Preserve),
             "amd" | "umd" | "system" => {
                 return Err(declared.file.unsupported(
                     declared.value,
@@ -1205,7 +1621,28 @@ fn convert<'a>(
             None => unreachable!("`choice` accepts only the option's keys"),
         },
     };
-    let no_lib = read.bool("noLib")?.unwrap_or(false);
+    let mut semantic = SemanticOptions::from_reader(&read, target)?;
+    semantic.module_kind = module_kind;
+    semantic.module_resolution = resolution;
+    if !semantic.strict_null_checks {
+        for name in ["strictPropertyInitialization", "exactOptionalPropertyTypes"] {
+            if read.bool(name) == Some(true) {
+                let declared = read.get(name, Kind::Bool).expect("present");
+                return Err(declared.file.error(
+                    declared.value,
+                    format!(
+                        "Option '{name}' cannot be specified without option 'strictNullChecks'"
+                    ),
+                ));
+            }
+        }
+    }
+    let allow_js = semantic.allow_js;
+    let isolated_modules = semantic.isolated_modules;
+    semantic.preserve_const_enums =
+        read.bool("preserveConstEnums").unwrap_or(false) || isolated_modules;
+    let preserve_const_enums = semantic.preserve_const_enums;
+    let no_lib = read.bool("noLib").unwrap_or(false);
     // Each entry of every `lib` occurrence must name a library (TS6046).
     let lib_entry = |entry: Declared, text: Option<&str>| match text.map(enum_key) {
         Some(None) => Ok(()),
@@ -1232,6 +1669,10 @@ fn convert<'a>(
         }
     };
 
+    semantic.explicit_dom_library = lib
+        .as_ref()
+        .is_some_and(|files| files.contains(&"lib.dom.d.ts"));
+
     let types = match read.strings("types")? {
         None => Vec::new(),
         Some((items, declared)) => items
@@ -1247,12 +1688,13 @@ fn convert<'a>(
     };
 
     Ok(Options {
-        module,
+        semantic,
         resolution,
         detection,
         jsx_automatic,
         jsx_dev,
         jsx: jsx_set,
+        jsx_preserve: jsx.as_ref().is_some_and(|(value, _)| value == "preserve"),
         jsx_import_source: read
             .string("jsxImportSource", Kind::String)?
             .map(|(text, _)| text.to_owned()),
@@ -1275,30 +1717,32 @@ fn convert<'a>(
             .strings_with("moduleSuffixes", |_, _| Ok(()))?
             .map(|(items, _)| items.into_iter().map(|(text, _)| text.to_owned()).collect())
             .unwrap_or_default(),
-        preserve_symlinks: read.bool("preserveSymlinks")?.unwrap_or(false),
-        check_side_effect_imports: read.bool("noUncheckedSideEffectImports")?.unwrap_or(true),
-        skip_lib_check: read.bool("skipLibCheck")?.unwrap_or(false),
-        no_check: read.bool("noCheck")?.unwrap_or(false),
-        allow_js: read.bool("allowJs")?.unwrap_or(false),
-        allow_arbitrary_extensions: read.bool("allowArbitraryExtensions")?.unwrap_or(false),
-        resolve_json_module: read.bool("resolveJsonModule")?.unwrap_or(match module {
+        preserve_symlinks: read.bool("preserveSymlinks").unwrap_or(false),
+        check_side_effect_imports: read.bool("noUncheckedSideEffectImports").unwrap_or(true),
+        skip_lib_check: read.bool("skipLibCheck").unwrap_or(false),
+        no_check: read.bool("noCheck").unwrap_or(false),
+        allow_js,
+        allow_arbitrary_extensions: read.bool("allowArbitraryExtensions").unwrap_or(false),
+        allow_importing_ts_extensions: read.bool("allowImportingTsExtensions").unwrap_or(false),
+        rewrite_relative_import_extensions: read
+            .bool("rewriteRelativeImportExtensions")
+            .unwrap_or(false),
+        resolve_json_module: read.bool("resolveJsonModule").unwrap_or(match module {
             Module::Node => node_json_modules,
             _ => resolution == Resolution::Bundler,
         }),
-        package_exports: read.bool("resolvePackageJsonExports")?.unwrap_or(true),
-        package_imports: read.bool("resolvePackageJsonImports")?.unwrap_or(true),
+        package_exports: read.bool("resolvePackageJsonExports").unwrap_or(true),
+        package_imports: read.bool("resolvePackageJsonImports").unwrap_or(true),
         target,
         lib,
         no_lib,
-        lib_replacement: read.bool("libReplacement")?.unwrap_or(false),
-        skip_default_lib_check: read.bool("skipDefaultLibCheck")?.unwrap_or(false),
+        lib_replacement: read.bool("libReplacement").unwrap_or(false),
+        skip_default_lib_check: read.bool("skipDefaultLibCheck").unwrap_or(false),
         out_dir: read.directory("outDir")?,
         declaration_dir: read.directory("declarationDir")?,
         root_dir: read.directory("rootDir")?,
-        composite: read.bool("composite")?.unwrap_or(false),
-        preserve_const_enums: read.bool("preserveConstEnums")?.unwrap_or(false)
-            || read.bool("isolatedModules")?.unwrap_or(false)
-            || read.bool("verbatimModuleSyntax")?.unwrap_or(false),
+        composite: read.bool("composite").unwrap_or(false),
+        preserve_const_enums,
     })
 }
 
@@ -1367,4 +1811,249 @@ fn paths_option(declared: Declared, leaf_dir: &str) -> Result<Paths, InputError>
         base: file.dir.clone(),
         patterns,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::SemanticOptions;
+    use crate::project::Project;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
+    const FLAGS: [&str; 8] = [
+        "noImplicitAny",
+        "noImplicitThis",
+        "strictNullChecks",
+        "strictFunctionTypes",
+        "strictBindCallApply",
+        "strictPropertyInitialization",
+        "strictBuiltinIteratorReturn",
+        "useUnknownInCatchVariables",
+    ];
+
+    fn strict_values(options: SemanticOptions) -> [bool; 8] {
+        [
+            options.no_implicit_any,
+            options.no_implicit_this,
+            options.strict_null_checks,
+            options.strict_function_types,
+            options.strict_bind_call_apply,
+            options.strict_property_initialization,
+            options.strict_builtin_iterator_return,
+            options.use_unknown_in_catch_variables,
+        ]
+    }
+
+    /// Loads the final Project boundary, then inspects its private snapshot;
+    /// this does not create a public config API for test access.
+    fn snapshot(config: &str, bases: &[(&str, &str)]) -> SemanticOptions {
+        static NEXT: AtomicUsize = AtomicUsize::new(0);
+        let root = std::env::temp_dir().join(format!(
+            "tsparse-semantic-options-{}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, Ordering::Relaxed)
+        ));
+        std::fs::create_dir_all(&root).unwrap();
+        for (file, text) in bases
+            .iter()
+            .copied()
+            .chain([("tsconfig.json", config), ("a.ts", "export {};\n")])
+        {
+            std::fs::write(root.join(file), text).unwrap();
+        }
+        let result = Project::load(&root.join("tsconfig.json"));
+        std::fs::remove_dir_all(root).unwrap();
+        result.unwrap().semantic_options().clone()
+    }
+
+    fn configuration(options: &str) -> String {
+        format!(r#"{{"compilerOptions":{{"noLib":true,"types":[],{options}}},"files":["a.ts"]}}"#)
+    }
+
+    #[test]
+    fn semantic_options_strict_defaults_and_explicit_overrides() {
+        // `GetStrictOptionValue`: true unless strict is explicitly false;
+        // each strict flag overrides it in either direction.
+        for (strict, default) in [("null", true), ("true", true), ("false", false)] {
+            let settings = format!(r#""strict":{strict}"#);
+            assert_eq!(
+                strict_values(snapshot(&configuration(&settings), &[])),
+                [default; 8],
+                "strict={strict}"
+            );
+            for (index, flag) in FLAGS.iter().enumerate() {
+                for (value, expected) in [("null", default), ("true", true), ("false", false)] {
+                    let mut values = [default; 8];
+                    values[index] = expected;
+                    let mut settings = format!(r#""strict":{strict},"{flag}":{value}"#);
+                    if index == 5 && expected && !default {
+                        // Explicit property initialization requires null
+                        // checking; TypeScript rejects the other combination.
+                        settings.push_str(r#", "strictNullChecks":true"#);
+                        values[2] = true;
+                    }
+                    assert_eq!(
+                        strict_values(snapshot(&configuration(&settings), &[])),
+                        values,
+                        "{settings}"
+                    );
+                }
+            }
+        }
+        assert_eq!(
+            strict_values(snapshot(&configuration(r#""strict":null"#), &[])),
+            [true; 8]
+        );
+        assert_eq!(
+            strict_values(snapshot(
+                &configuration(r#""stableTypeOrdering":null"#),
+                &[]
+            )),
+            [true; 8]
+        );
+    }
+
+    #[test]
+    fn semantic_options_inherit_flags_before_effective_defaults() {
+        for (index, flag) in FLAGS.iter().enumerate() {
+            let base = format!(r#"{{"compilerOptions":{{"strict":false,"{flag}":false}}}}"#);
+            for (setting, expected) in [
+                ("", false),
+                (",\"VALUE\":true", true),
+                (",\"VALUE\":null", true),
+            ] {
+                let setting = setting.replace("VALUE", flag);
+                let leaf = format!(
+                    r#"{{"extends":"./base.json","compilerOptions":{{"noLib":true,"strict":true{setting}}},"files":["a.ts"]}}"#
+                );
+                let mut values = [true; 8];
+                values[index] = expected;
+                assert_eq!(
+                    strict_values(snapshot(&leaf, &[("base.json", &base)])),
+                    values,
+                    "{flag}: {setting}"
+                );
+            }
+        }
+        let leaf = r#"{"extends":["./first.json","./second.json"],"compilerOptions":{"noLib":true},"files":["a.ts"]}"#;
+        let first = r#"{"compilerOptions":{"strict":false,"noImplicitAny":true}}"#;
+        let second = r#"{"compilerOptions":{"strict":true,"noImplicitAny":false}}"#;
+        assert_eq!(
+            strict_values(snapshot(
+                leaf,
+                &[("first.json", first), ("second.json", second)]
+            )),
+            [false, true, true, true, true, true, true, true]
+        );
+        let leaf = r#"{"extends":"./base.json","compilerOptions":{"noLib":true,"strict":null},"files":["a.ts"]}"#;
+        assert_eq!(
+            strict_values(snapshot(leaf, &[("base.json", first)])),
+            [true; 8]
+        );
+    }
+
+    #[test]
+    fn semantic_options_non_strict_defaults_and_overrides() {
+        for strict in ["null", "true", "false"] {
+            for (value, expected) in [("null", false), ("true", true), ("false", false)] {
+                let settings = format!(
+                    r#""strict":{strict},"strictNullChecks":true,"exactOptionalPropertyTypes":{value},"noUncheckedIndexedAccess":{value},"noPropertyAccessFromIndexSignature":{value}"#
+                );
+                let options = snapshot(&configuration(&settings), &[]);
+                assert_eq!(
+                    options.exact_optional_property_types, expected,
+                    "{settings}"
+                );
+                assert_eq!(options.no_unchecked_indexed_access, expected, "{settings}");
+                assert_eq!(
+                    options.no_property_access_from_index_signature, expected,
+                    "{settings}"
+                );
+            }
+        }
+        let leaf = r#"{"extends":"./base.json","compilerOptions":{"noLib":true,"noUncheckedIndexedAccess":false,"exactOptionalPropertyTypes":null},"files":["a.ts"]}"#;
+        let base = r#"{"compilerOptions":{"noUncheckedIndexedAccess":true,"exactOptionalPropertyTypes":true,"noPropertyAccessFromIndexSignature":true}}"#;
+        let options = snapshot(leaf, &[("base.json", base)]);
+        assert!(!options.exact_optional_property_types);
+        assert!(!options.no_unchecked_indexed_access);
+        assert!(options.no_property_access_from_index_signature);
+    }
+
+    #[test]
+    fn semantic_options_stable_type_ordering_has_independent_true_default() {
+        for value in ["null", "true", "false"] {
+            let settings = format!(r#""strict":false,"stableTypeOrdering":{value}"#);
+            assert_eq!(
+                snapshot(&configuration(&settings), &[]).stable_type_ordering,
+                value != "false"
+            );
+        }
+        let base = r#"{"compilerOptions":{"stableTypeOrdering":false}}"#;
+        for (setting, expected) in [
+            ("", false),
+            (",\"stableTypeOrdering\":true", true),
+            (",\"stableTypeOrdering\":null", true),
+        ] {
+            let leaf = format!(
+                r#"{{"extends":"./base.json","compilerOptions":{{"noLib":true{setting}}},"files":["a.ts"]}}"#
+            );
+            assert_eq!(
+                snapshot(&leaf, &[("base.json", base)]).stable_type_ordering,
+                expected
+            );
+        }
+    }
+
+    #[test]
+    fn semantic_options_retain_demanded_deferred_inputs() {
+        let options = snapshot(
+            &configuration(
+                r#""deduplicatePackages":false,"experimentalDecorators":true,"emitDecoratorMetadata":true,"checkJs":true,"allowJs":false,"jsxFactory":"h","jsxFragmentFactory":"Fragment","reactNamespace":"Custom""#,
+            ),
+            &[],
+        );
+        assert!(!options.deduplicate_packages);
+        assert!(options.experimental_decorators);
+        assert!(options.emit_decorator_metadata);
+        assert!(options.check_js);
+        assert!(!options.allow_js);
+        assert_eq!(options.jsx_factory.as_deref(), Some("h"));
+        assert_eq!(options.jsx_fragment_factory.as_deref(), Some("Fragment"));
+        assert_eq!(options.react_namespace.as_deref(), Some("Custom"));
+        let base = r#"{"compilerOptions":{"deduplicatePackages":false,"experimentalDecorators":true,"emitDecoratorMetadata":true,"jsxFactory":"h"}}"#;
+        let leaf = r#"{"extends":"./base.json","compilerOptions":{"noLib":true,"experimentalDecorators":false,"jsxFactory":null},"files":["a.ts"]}"#;
+        let options = snapshot(leaf, &[("base.json", base)]);
+        assert!(!options.deduplicate_packages);
+        assert!(!options.experimental_decorators);
+        assert!(options.emit_decorator_metadata);
+        assert!(options.jsx_factory.is_none());
+    }
+
+    #[test]
+    fn semantic_options_resolve_distinct_class_field_operations() {
+        for target in ["es2021", "es2022", "es2023", "esnext"] {
+            for setting in ["null", "true", "false"] {
+                let options = snapshot(
+                    &configuration(&format!(
+                        r#""target":"{target}","useDefineForClassFields":{setting}"#,
+                    )),
+                    &[],
+                );
+                let modern = target != "es2021";
+                let expected = match setting {
+                    "true" => true,
+                    "false" => false,
+                    _ => modern,
+                };
+                assert_eq!(
+                    options.use_define_for_class_fields, expected,
+                    "{target}: {setting}"
+                );
+                assert_eq!(
+                    options.emit_standard_class_fields,
+                    setting != "false" && modern,
+                    "{target}: {setting}"
+                );
+            }
+        }
+    }
 }

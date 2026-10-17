@@ -14,6 +14,7 @@ tsparse --references --project ./tsconfig.json --at 12:8 src/app.ts
 tsparse --references --project ./tsconfig.json --at src/app.ts:12:8
 tsparse --references --project ./tsconfig.json --name run
 tsparse --references --project ./tsconfig.json --name run src/app.ts --pretty
+tsparse --references --project ./tsconfig.json --name run --calls --no-tests
 ```
 
 `--project` names a configuration file; no ancestor directory is searched.
@@ -21,16 +22,39 @@ Exactly one of `--at LINE:COLUMN` (one-based line, one-based UTF-16 column, with
 a required FILE) or `--name NAME` (with an optional FILE that narrows the
 candidates) selects the symbols. `--at FILE:LINE:COLUMN`, the form navigation
 text prints, names the file without a FILE operand; it is read from the right,
-so FILE may contain `:`, and giving both is a usage error. NAME is one
-identifier: a name containing `.` is a usage error that points to
-`--show --name`, whose qualified names select by containment, and to `--at`,
-since no reference candidate can contain `.`. Argument paths are relative to
+so FILE may contain `:`, and giving both is a usage error. A bare NAME selects
+lexical declarations and aliases. A dotted NAME such as `RunHost.observe`
+selects by declaration containment, with explicit not-found/ambiguous results;
+`--at` also selects supported semantic member tokens. Argument paths are relative to
 the working directory. `--pretty` and `-o OUTPUT` keep their parse-mode meanings; stdin,
-`--check`, `--tsx`, `--json`, and `--depth` are rejected. `--direct` (or
+`--check`, `--tsx`, and `--depth` are rejected. `--direct` (or
 `--references-direct`) answers in the CLI process instead of the service.
-A result goes to stdout or `-o`; a failure is a diagnostic on stderr and never
-creates or replaces the `-o` file, under the delivery policy navigation shares
+A result goes to stdout or `-o`; by default a failure is a diagnostic on stderr
+and never creates or replaces the `-o` file. With `--json`, an analysis failure
+is delivered as a document to stdout or `-o`. Usage, transport and delivery
+failures remain stderr diagnostics, under the delivery policy navigation shares
 ([exit codes and channels](navigation.md#exit-codes-and-channels)).
+
+`--calls` keeps only direct call, optional call, constructor and tagged-template
+targets. Parentheses, non-null assertions, type assertions, `as`, `satisfies`
+and instantiation wrappers are peeled. Namespace accesses count their member,
+not their receiver. Taking a function as a value, passing it as an argument,
+or calling its `.call`, `.apply` or `.bind` member does not count as a call to
+that function. Implicit decorator calls and JSX tags are excluded; explicit
+`@factory()` calls are included. Declaration metadata survives an empty filter.
+
+`--no-tests` removes occurrences in exact case-sensitive directory segments
+`test`, `tests`, `__tests__`, or basenames ending `.test` or `.spec` followed by
+`.ts`, `.tsx`, `.mts` or `.cts`, on normalized project-relative `/` paths.
+Selection, loading, dependencies and declaration metadata still include those
+files. `fixtures`, `spec`, `Tests`, and `.TEST.ts` are retained. Both filters
+are echoed in the result and rejected on service-administration commands.
+Results identify their coverage as `lexical` or `member`. Bare-name lexical
+results list matching catalog members in `unsearchedMembers`. Member searches
+report `complete` or `partial` coverage and located gaps; they do not merge
+unrelated properties by spelling. See [types.md](types.md) for semantic selection,
+partial results, and process limits. Final delivery validation is tracked in
+[the completion checkpoint](types-completion-correctness-2026-10-13.md).
 
 | Exit | Meaning |
 | --- | --- |
@@ -46,9 +70,9 @@ text, so first-line columns in queries, results, and diagnostics are the ones
 
 ## Persistent CLI service
 
-On macOS and Linux, ordinary CLI project queries use a local service: reference
+On macOS and Linux, ordinary CLI project queries use a local service: reference and type
 queries, and [outline and show](navigation.md#project-mode) with `--project`.
-One service per absolute configuration spelling answers all three through one
+One service per absolute configuration spelling answers these through one
 session request boundary, which checks the captured filesystem inputs before
 every request and loads a new generation after any change; there is no second
 service, cache, or refresh path per operation. It reuses a complete snapshot
@@ -107,6 +131,13 @@ discard the old generation. An unreadable *previous* input forces a full load:
 current selection decides whether that input is still required. Required input
 failures are reported by the loader, never answered from stale state.
 
+`Project::references(ReferenceRequest { query, filters })` and
+`ProjectRequest::ReferenceSearch(request)` apply the reporting filters at the
+shared lexical/semantic selection owner. `find_references` keeps its existing name/position
+selection with default filters; both return the additive coverage and advisory
+fields below. A legacy library name containing `.` keeps its exact lexical
+question and does not gain containment selection.
+
 `Project` retains its immutable, explicitly captured snapshot semantics:
 
 ```rust
@@ -159,11 +190,16 @@ can outlive the project.
 
 ```json
 {
+  "operation": "references",
+  "outcome": "complete",
   "project": "/abs/path/tsconfig.json",
   "groups": [{
     "declarations": [{ "name": "run", "location": { "file": "src/api.ts", "start": { "line": 1, "column": 17 }, "end": { "line": 1, "column": 20 } } }],
     "occurrences": [{ "name": "run", "location": { "...": "..." }, "roles": ["declaration", "export"] }]
-  }]
+  }],
+  "filters": { "calls": false, "excludeTests": false },
+  "coverage": { "baseline": "lexical", "status": "complete", "gaps": [] },
+  "unsearchedMembers": { "count": 0, "selectors": [] }
 }
 ```
 
@@ -183,13 +219,41 @@ spelled through a symlink. Ranges are exact identifier tokens without trivia; `e
 exclusive. Occurrences are ordered by file and position, groups by their
 earliest declaration.
 
+`complete` describes the existing lexical question and the effective filters.
+It does not establish receiver/member identity, infer types, or certify all
+TypeScript semantic references. Lexical queries produce no semantic coverage gaps and do not demand receiver or
+member types. The shared request boundary still performs checker initialization.
+
+For a bare name, `unsearchedMembers.selectors` lists matching method, accessor,
+property and enum-member declarations from the captured Q2 catalog. FILE narrows
+these declarations; `--calls` and `--no-tests` do not hide them. A position query
+has an empty advisory. Each suggestion has `file`, `selector`, and
+`anchor: {file,line,column}`. The key match is exact decoded text, including
+empty and normalized numeric keys; it is distinct from selector containment.
+Computed/unkeyed sites and inferred members absent from Q2 are not enumerated.
+
+Suggestions are ordered by exact file, selector (null before strings), then
+anchor. Entries with one file/selector share the earliest Q2 anchor, including
+overload, accessor, merged and static/instance display duplicates. An
+unspellable key or ancestor keeps `selector:null` and is deduplicated by
+file/anchor instead; distinct anchors remain visible. `count` equals the emitted
+suggestions. These are catalog suggestions, not a semantic identity merge.
+Their anchors replay `--show --at`. In particular, a parameter property's Q2
+name anchor still selects its lexical parameter for reference queries;
+its first property-producing modifier is a semantic member anchor.
+
 Declarations that have no identifier use an anchor: an anonymous default export
 (`export default function () {}`, `export default 42`) is named `default` at the
 `default` keyword, `export = expression` is named `export=` at its `=`, a module file used as a namespace (`import * as ns`, `import x =
 require()`, `export * as ns`) is named by its path at line 1, column 1, and an
 ambient module (`declare module "x"`) is named `x` at its string literal.
 
-## Selection
+## Lexical selection
+
+This section describes the lexical projection. Member declarations and uses
+are handled by the semantic selection owner described in [types.md](types.md),
+including dotted selectors and parameter-property modifier anchors.
+
 
 A position must fall inside an identifier token, start inclusive and end
 exclusive. Whitespace, punctuation, and keywords give an empty result. Member,
@@ -616,11 +680,11 @@ JSX follows a `.tsx` extension in any case.
 - File and directory names must be Unicode. On a file system that allows
   other names, such a name that file selection or `"types": ["*"]` would use
   is `Unsupported` rather than converted to a different name.
-- Properties, methods, class members, enum members, inferred receiver types,
-  and a JSON module's value, its properties, and the library members a JSON
-  value has are not reference targets.
+- Lexical searches do not infer receiver/member identity. Semantic member
+  searches are a separate coverage baseline; their failures and deliberate
+  differences are described below and in [types.md](types.md).
 
-## Differences from TypeScript 7.0.2
+## Loading and lexical differences from TypeScript 7.0.2
 
 The semantic oracle is TypeScript 7.0.2's language service (see
 [validation](validation.md#reference-semantics)). Its results are normalized
@@ -810,3 +874,55 @@ TypeScript 7.0.2 defaults `types` to `[]`: `@types` packages are included only
 when listed in `types`, or all of them with `"types": ["*"]`. The design assumed
 automatic discovery when `types` is absent; the implementation follows the
 compiler.
+
+## Semantic type and member-query differences
+
+The semantic owners implement the contract in [types-design.md](types-design.md),
+including its deliberate differences from TypeScript. This supersedes lexical-only
+member exclusions for semantic queries. The [completion checkpoint](types-completion-correctness-2026-10-13.md)
+records the current validation status; this section is not a delivery-complete claim.
+
+- Coverage names its operation: existing lexical search versus semantic member
+  search. A complete lexical result does not promise all receiver/property
+  occurrences in the compiler's broader reference operation. Bare-name results
+  disclose matching catalog member selectors that were not searched.
+- Member candidates use exact decoded keys instead of 7.0.2's raw-text bounded
+  substring optimization, covering escaped and equivalent numeric spellings.
+  Compiler syntax/meaning eligibility still applies; arbitrary computed-key
+  variable tokens are not wildcard property candidates.
+- Member identity uses the resolved combined early/late member, independent of
+  cold language-server query order. This also permits established literal-name
+  uses of computed-only members that the cold server omits. Declaration origins
+  and eligible occurrence tokens remain different questions.
+- A parameter property's name preserves lexical parameter selection; its first
+  property-producing modifier is a member anchor. Dotted namespace candidates
+  anchor the actual selected segment. Ambiguity anchors must round-trip through
+  that operation's selection owner.
+- Q4 normalizes declaration/alias meanings for useful inspection. Both type-only
+  import/export spellings follow one table; type-reference name tokens select
+  their type syntax. Explicit closing delimiters can select call/access/tagged
+  results. These product anchors use node-level type operations rather than
+  claiming equality to every raw compiler position query. Unsupported catalog
+  forms and positions inside JSON remain explicit target failures.
+- Checking starts fresh per semantic request, resolves containing calls
+  outermost-first, and uses a defined candidate/expansion schedule. It does not
+  inherit earlier queries' caches or promise the same limit/context history as
+  a complete `tsc` diagnostics pass. Oracle fixtures must record raw observations
+  and the exact normalized sequence; a diagnostics request alone does not settle
+  the API checker. Compiler constants, reset points and operation outcomes remain
+  unchanged inside that schedule.
+- Compiler-process numeric IDs do not affect semantic identity. Cache keys
+  distinguish opaque symbol/type/node identities from exact user-name bytes;
+  adjacent name bytes still concatenate as in the native operation. Generated
+  private/unique keys retain identity and exact textual components with the
+  request-local ordering defined in the
+  [evaluation baseline](types-design.md#evaluation-order-baseline). This
+  deliberately removes native collisions between encoded IDs and property
+  names, and decimal-ID ordering in generated names. The
+  [identity review](types-native-identity-review.md) preserves compiler evidence
+  that unrelated process allocations can otherwise change a final type. The
+  implementation and final-query proof remain separate completion obligations.
+
+The design also defines product call/test filters, bounded presentation,
+unsupported-flow/JSX gaps and typed failures. These limitations are not a claim
+that TypeScript itself cannot analyze those sites.

@@ -5,35 +5,90 @@
 //! and occurrence resolution, then freezes the index served to queries.
 
 mod collect;
+pub(super) mod flow;
 mod ids;
 mod index;
+pub(super) mod inputs;
 mod instances;
+mod json;
 mod link;
+pub(super) use link::{LinkState, NativeLinkOutput, ProjectionObserver};
+mod member;
+pub(in crate::project) mod native_inputs;
+mod ordering;
+pub(super) use native_inputs::{NativeInputs, RawDeclaration};
+pub(super) use resolution::names::{Names as NameSymbols, ScopeSymbols};
+mod native_facts;
+pub(super) use native_facts::{LookupFailure, NativeFacts, ScopeExportRead};
+pub(super) use resolution::names::{ScopeExportLookup, scope_export_lookup};
+mod native_symbol_table;
+pub(super) use native_symbol_table::NativeSymbolTable;
+pub(in crate::project) mod module_exports;
+pub(super) mod raw;
+mod reference_modules;
+mod reference_tokens;
+mod resolution;
+mod retained;
+mod semantic;
+mod semantic_flow;
+mod site_map;
 mod store;
 mod targets;
 mod text;
+pub(super) use instances::{Instance as ModuleInstanceState, module_instance_state};
+pub(super) use json::{JsonDeclaration, JsonPropertyId};
+pub(super) use member::{declaration_anchor, declaration_anchor_controlled};
+pub(super) use ordering::{
+    IdentityOrder, NativeByteInput, NativeDeclaration, NativeNodeIdentity, NativePropertyKey,
+    NativePropertyKeyKind, NativeStringError, NativeStringPart, NativeStringPosition,
+    NativeStringSegment, NativeStringValue, NativeSymbol, NativeSymbolIdentity, try_sort_by,
+};
+pub(super) use reference_modules::ReferenceModuleSite;
+pub(super) use reference_tokens::{
+    ReferenceToken, ReferenceTokenFacts, ReferenceTokenRole, ReferenceTokenSource,
+};
 
 use super::program::Program;
 use super::sources::FileId;
 use crate::analysis::InputError;
-use crate::parser::json::{JsonKind, JsonString, JsonText, JsonValue};
+use crate::parser::json::JsonText;
 use crate::source::SourceText;
 use crate::syntax;
 use crate::syntax_kind::SyntaxKind;
 use crate::{Ast, Span};
-use std::collections::HashMap;
 
-/// A module one file requests: a specifier written in it, or the automatic
-/// JSX runtime that the project adds for its configuration.
+/// A module one file requests, including the program's synthetic imports.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct ModuleRequest {
     pub(super) specifier: String,
     pub(super) kind: RequestKind,
     /// An explicit `resolution-mode` import attribute.
     pub(super) mode: Option<ResolutionMode>,
+    /// `GetEmitSyntaxForUsageLocation`, captured independently of an explicit
+    /// resolution override; None is native ModuleKindNone, never unbound input
+    /// after the loader publishes this request.
+    pub(super) emit_mode: Option<ResolutionMode>,
+    /// `getModeForUsageLocation`, including explicit type-only overrides and
+    /// native None. Captured independently from the emit syntax above.
+    pub(super) resolution_mode: Option<ResolutionMode>,
+    /// Raw `ResolvedModule.ResolvedFileName`, before program admission.
+    /// None means the resolver found no file, even for unchecked requests.
+    pub(super) resolved_path: Option<String>,
     /// Where diagnostics report the request: the specifier's string literal
     /// token, or the start of the first JSX tag for the JSX runtime.
     pub(super) span: Span,
+    /// Program-created specifiers are actual synthetic import nodes, not a
+    /// source literal whose token happens to have a zero-width range.
+    pub(super) implicit: Option<ImplicitImport>,
+}
+
+/// `forEachImport` visits JSX before helpers; program resolution deliberately
+/// uses the reverse order. Retain the factory role instead of recognizing its
+/// specifier text, which may also occur in an ordinary source import.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub(super) enum ImplicitImport {
+    JsxRuntime,
+    Helpers,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -77,7 +132,7 @@ impl RequestKind {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub(super) enum ResolutionMode {
     Import,
     Require,
@@ -107,117 +162,11 @@ pub(super) struct FileFacts {
     directives: Vec<u32>,
     facts: collect::Facts,
     /// A JSON source file's module, which declares no names.
-    json: Option<JsonModule>,
+    json: Option<JsonFacts>,
 }
 
-/// What linking needs from a JSON source file. TypeScript's binder gives it
-/// exactly one export, `export=`, a property whose declaration is the file
-/// and whose value is the file's root (`bindSourceFileIfExternalModule`).
-/// A name selects a property of a value's type (`getPropertyOfType`): a key
-/// of an object, recorded here along every path of keys, or a member of the
-/// library interface that is a string's, number's, boolean's, or array's
-/// apparent type, which linking looks up (`JsonShape::interface`).
-#[derive(Debug)]
-pub(super) struct JsonModule {
-    /// The file's value at `JsonModule::ROOT`, then each value an object key
-    /// reaches from it; an array's elements have no names.
-    values: Vec<JsonShape>,
-}
-
-/// The global interfaces that are the apparent types of JSON values
-/// (`JsonShape::interface`), whose declarations' members collection records.
-const APPARENT_INTERFACES: [&str; 4] = ["String", "Number", "Boolean", "Array"];
-
-/// One JSON value as names see it.
-#[derive(Debug)]
-pub(super) enum JsonShape {
-    /// The value of an empty or trivia-only file, which has no properties.
-    Empty,
-    Null,
-    String,
-    Number,
-    Boolean,
-    Array,
-    /// Each distinct exact key once, in source order, with the index of its
-    /// last value: a repeated key is one property, of the last value's type.
-    Object(Vec<(JsonString, u32)>),
-}
-
-impl JsonShape {
-    /// The global interface that is this value's apparent type, whose members
-    /// are its properties (`getApparentType`); `Object`'s own members are
-    /// left out (`skipObjectFunctionPropertyAugment`).
-    pub(super) fn interface(&self) -> Option<&'static str> {
-        match self {
-            JsonShape::String => Some("String"),
-            JsonShape::Number => Some("Number"),
-            JsonShape::Boolean => Some("Boolean"),
-            JsonShape::Array => Some("Array"),
-            JsonShape::Empty | JsonShape::Null | JsonShape::Object(_) => None,
-        }
-    }
-}
-
-impl JsonModule {
-    /// The file's value, its `export=`.
-    pub(super) const ROOT: u32 = 0;
-
-    fn new(root: Option<&JsonValue>) -> Self {
-        let mut module = JsonModule { values: Vec::new() };
-        // Breadth first, so each value's index is the order it was queued in.
-        let mut pending = std::collections::VecDeque::from([root]);
-        while let Some(value) = pending.pop_front() {
-            let shape = match value.map(|value| &value.kind) {
-                None => JsonShape::Empty,
-                Some(JsonKind::Null) => JsonShape::Null,
-                Some(JsonKind::Bool(_)) => JsonShape::Boolean,
-                Some(JsonKind::Number) => JsonShape::Number,
-                Some(JsonKind::String(_)) => JsonShape::String,
-                Some(JsonKind::Array(_)) => JsonShape::Array,
-                Some(JsonKind::Object(properties)) => {
-                    let mut keys: Vec<(&JsonString, &JsonValue)> = Vec::new();
-                    let mut positions: HashMap<&JsonString, usize> = HashMap::new();
-                    for property in properties {
-                        match positions.get(&property.key) {
-                            Some(&index) => keys[index].1 = &property.value,
-                            None => {
-                                positions.insert(&property.key, keys.len());
-                                keys.push((&property.key, &property.value));
-                            }
-                        }
-                    }
-                    let next = module.values.len() + 1 + pending.len();
-                    let shape = JsonShape::Object(
-                        keys.iter()
-                            .enumerate()
-                            .map(|(index, (key, _))| ((*key).clone(), (next + index) as u32))
-                            .collect(),
-                    );
-                    pending.extend(keys.into_iter().map(|(_, value)| Some(value)));
-                    shape
-                }
-            };
-            module.values.push(shape);
-        }
-        module
-    }
-
-    pub(super) fn shape(&self, value: u32) -> &JsonShape {
-        &self.values[value as usize]
-    }
-
-    /// The value of the property `name` of an object `value`, compared
-    /// exactly.
-    pub(super) fn property(&self, value: u32, name: &str) -> Option<u32> {
-        match self.shape(value) {
-            JsonShape::Object(keys) => keys
-                .iter()
-                .find(|(key, _)| key.as_str() == Some(name))
-                .map(|&(_, child)| child),
-            _ => None,
-        }
-    }
-}
+use json::APPARENT_INTERFACES;
+pub(super) use json::{JsonFacts, JsonShape, JsonValueId};
 
 /// How the project resolved one `ModuleRequest`.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -240,6 +189,15 @@ pub(super) enum ModuleResolution {
 
 pub(super) use ids::SymbolId;
 pub(super) use index::{Index, IndexedLocation, Occurrence, Target};
+pub(super) use retained::Bindings;
+pub(super) use semantic::{
+    BoundClassKind, BoundClassOrInterface, BoundDeclaration, BoundDeclaredType, BoundJson,
+    BoundMember, BoundMemberKind, BoundSymbol, BoundTypeLiteral, BoundValueType, EntityNameRecipe,
+    NativeLookupMeaning, NativePropertyFlags, NativePropertyParent, NativeRawSymbolTable,
+    NativeSelectionFailure, NativeSymbolDeclaration, NativeSymbolFlags, ReadOrigin,
+    ReferenceSymbol, TypeBindingFailure, TypeSymbolFlags,
+};
+pub(super) use store::should_replace_value_declaration;
 
 /// Occurrence role bits.
 pub(super) mod roles {
@@ -281,14 +239,18 @@ pub(super) fn collect_json(text: &JsonText, source: &str) -> FileFacts {
     FileFacts {
         module: true,
         directives: comment_directives(source, text.literal_spans()),
-        json: Some(JsonModule::new(text.root.as_ref())),
+        json: Some(JsonFacts::new(text.root.as_ref())),
         ..FileFacts::default()
     }
 }
 
-/// Link every captured file into the frozen semantic index.
-pub(super) fn bind(program: &Program) -> Result<Index, InputError> {
-    link::link(program)
+/// Complete every existing link/check before retaining its lexical decisions.
+/// The caller then transfers the owned file facts with `Linked::retain_files`.
+pub(super) fn bind(
+    program: &Program,
+    parser: &crate::analysis::Parser,
+) -> Result<retained::Linked, crate::analysis::AnalysisError> {
+    link::link(program, parser)
 }
 
 /// TypeScript's external-module indicators (`crate::ast::external_module`),

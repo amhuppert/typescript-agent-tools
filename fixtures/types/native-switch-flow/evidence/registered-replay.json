@@ -1,0 +1,8 @@
+{
+  "started": "2026-10-11T00:17:01.547Z",
+  "finished": "2026-10-11T00:17:04.986Z",
+  "status": 0,
+  "signal": null,
+  "stdout": "effect: applied\nrecovery: {\"kind\":\"reported\",\"references\":[{\"kind\":\"validation-run\",\"id\":\"vrun-75bc6c27-e290-48db-aaad-a833c35170f8\"}]}\nValidation harness-test: vrun-75bc6c27-e290-48db-aaad-a833c35170f8; scope changed → changed\nValidation passed (1 files matched).\nharness tests: 3 total, 3 executed, 3 passed, 0 skipped\n",
+  "stderr": ""
+}

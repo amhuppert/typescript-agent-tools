@@ -31,6 +31,12 @@ pub(crate) struct Diagnostics {
 }
 
 impl Diagnostics {
+    /// `Program.IsSourceFileDefaultLibrary` uses captured load provenance,
+    /// including library replacements, rather than a file-name convention.
+    pub(in crate::project) fn is_default_library(&self) -> bool {
+        self.origin == FileOrigin::DefaultLibrary
+    }
+
     pub(super) fn new(origin: FileOrigin, checking: Checking) -> Self {
         Self { origin, checking }
     }

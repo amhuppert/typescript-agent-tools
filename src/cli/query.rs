@@ -19,9 +19,44 @@ use typescript_parser::project::{ProjectRequest, ProjectResponse, ProjectSession
 pub(crate) type Answer = Result<Result<ProjectResponse, AnalysisError>, io::Error>;
 
 pub(crate) fn run(query: Query) -> Result<(), Exit> {
+    // The service protects its own process. Direct/file reads protect this one;
+    // edit application has a separate entry and must never be killed mid-write.
+    if cfg!(unix) && matches!(&query.target, Target::Project { direct: false, .. }) {
+        return run_here(&query);
+    }
+    let answer = crate::process_limits::run(
+        |failure| {
+            let answer = Err(failure.into_error());
+            let outcome = delivery::deliver(
+                query.format,
+                query.pretty,
+                query.output.as_deref(),
+                Ok(delivery(&query, &answer)),
+            );
+            match outcome {
+                Ok(()) => 1,
+                Err((code, message)) => {
+                    if !message.is_empty() {
+                        eprintln!("{message}");
+                    }
+                    code.into()
+                }
+            }
+        },
+        || answer(&query.target),
+    )
+    .map_err(|error| (2, error.to_string()))?;
+    deliver_answer(&query, &answer)
+}
+
+fn run_here(query: &Query) -> Result<(), Exit> {
     let answer = answer(&query.target);
-    let outcome = match &answer {
-        Ok(answer) => Ok(delivery(&query, answer)),
+    deliver_answer(query, &answer)
+}
+
+fn deliver_answer(query: &Query, answer: &Answer) -> Result<(), Exit> {
+    let outcome = match answer {
+        Ok(answer) => Ok(delivery(query, answer)),
         Err(transport) => Err(transport),
     };
     delivery::deliver(query.format, query.pretty, query.output.as_deref(), outcome)
@@ -56,9 +91,7 @@ pub(crate) fn project(config: &Path, mut request: ProjectRequest, direct: bool) 
     let answer = if direct {
         // A fresh session's first request loads the project, as the
         // service's does, through the same refresh and validation.
-        Ok(ProjectSession::new(config)
-            .map_err(AnalysisError::from)
-            .and_then(|mut session| session.execute(request)))
+        Ok(one_shot(config, request))
     } else {
         service(config, request)
     };
@@ -68,6 +101,15 @@ pub(crate) fn project(config: &Path, mut request: ProjectRequest, direct: bool) 
             error
         })
     })
+}
+
+/// Answer this process's only request. The process exits after delivering
+/// it, and the session holds no external resource, so its memory returns
+/// with the process instead of being freed piece by piece, which takes
+/// seconds for a large project.
+fn one_shot(config: &Path, request: ProjectRequest) -> Result<ProjectResponse, AnalysisError> {
+    let session = ProjectSession::new(config).map_err(AnalysisError::from)?;
+    std::mem::ManuallyDrop::new(session).execute(request)
 }
 
 #[cfg(unix)]
@@ -82,9 +124,7 @@ fn service(config: &Path, request: ProjectRequest) -> Answer {
 /// Platforms without the service answer directly.
 #[cfg(not(unix))]
 fn service(config: &Path, request: ProjectRequest) -> Answer {
-    Ok(ProjectSession::new(config)
-        .map_err(AnalysisError::from)
-        .and_then(|mut session| session.execute(request)))
+    Ok(one_shot(config, request))
 }
 
 /// The forms of one answer.
@@ -95,6 +135,7 @@ fn delivery<'a>(
     match answer {
         Ok(ProjectResponse::References(result)) => Delivery {
             code: 0,
+            text_is_result: true,
             document: Box::new(move |writer, pretty| {
                 if pretty {
                     serde_json::to_writer_pretty(writer, result)
@@ -105,8 +146,30 @@ fn delivery<'a>(
             }),
             text: None,
         },
+        Ok(ProjectResponse::ReferenceSearch(answer)) => Delivery {
+            code: match answer.as_ref() {
+                typescript_parser::references::ReferenceAnswer::Selected(result)
+                    if result.outcome
+                        == typescript_parser::references::ReferenceOutcome::Complete =>
+                {
+                    0
+                }
+                _ => 1,
+            },
+            text_is_result: true,
+            document: Box::new(move |writer, pretty| {
+                if pretty {
+                    serde_json::to_writer_pretty(writer, answer)
+                } else {
+                    serde_json::to_writer(writer, answer)
+                }
+                .map_err(io::Error::other)
+            }),
+            text: None,
+        },
         Ok(ProjectResponse::Outline(outline)) => navigation::outline(outline, query.depth),
         Ok(ProjectResponse::Show(show)) => navigation::show(show),
+        Ok(ProjectResponse::Type(answer)) => super::types::answer(answer),
         Ok(ProjectResponse::Edit(_)) => unreachable!("edit requests are delivered by cli::editing"),
         Err(error) => {
             let base = match &query.target {

@@ -1,0 +1,5 @@
+# These package inputs are compiler fixtures, not installed dependencies.
+!node_modules/
+!node_modules/native-fixture/
+!node_modules/native-fixture/package.json
+!node_modules/native-fixture/index.ts

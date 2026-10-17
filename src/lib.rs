@@ -26,13 +26,19 @@ mod input;
 mod json;
 mod lexer;
 pub mod navigation;
+mod numbers;
 mod parser;
 mod pragmas;
+mod printer;
 pub mod project;
 pub mod references;
+mod resources;
 pub mod source;
+mod spelling;
+mod strings;
 mod syntax;
 mod syntax_kind;
+pub mod types;
 pub use ast::{Ast, Diagnostic, Fields, Node, NodeId, NodeView, Span, Value};
 
 #[derive(Debug, Clone)]
@@ -131,14 +137,21 @@ fn jsx_file_name(name: &str) -> bool {
 /// TypeScript's declaration file names: `.d.ts`, `.d.mts`, `.d.cts`, or an
 /// arbitrary-extension declaration such as `styles.d.css.ts`.
 pub(crate) fn declaration_file_name(name: &str) -> bool {
-    [".d.ts", ".d.mts", ".d.cts"]
-        .iter()
-        .any(|suffix| name.ends_with(suffix))
-        || name.ends_with(".ts")
-            && name
-                .rsplit(['/', '\\'])
-                .next()
-                .is_some_and(|base| base.contains(".d."))
+    declaration_file_extension(name).is_some()
+}
+
+/// Native `GetDeclarationFileExtension`, shared by parse context, loading,
+/// and filename rewriting. Arbitrary forms start at the basename's first .d.
+pub(crate) fn declaration_file_extension(name: &str) -> Option<&str> {
+    let base = name.rsplit(['/', '\\']).next().unwrap_or(name);
+    [".d.ts", ".d.cts", ".d.mts"]
+        .into_iter()
+        .find(|suffix| base.ends_with(suffix))
+        .or_else(|| {
+            base.ends_with(".ts")
+                .then(|| base.find(".d.").map(|at| &base[at..]))
+                .flatten()
+        })
 }
 
 pub fn parse(source: &str) -> Result<Ast<'_>, Diagnostic> {

@@ -47,7 +47,7 @@ impl ProjectSession {
             .execute(request)
     }
 
-    fn refresh(&mut self) -> Result<(), InputError> {
+    fn refresh(&mut self) -> Result<(), AnalysisError> {
         if let Some((_, observations)) = &self.current {
             match observations.unchanged() {
                 Ok(true) => return Ok(()),
@@ -76,7 +76,8 @@ impl ProjectSession {
                             .into(),
                     path: Some(self.config.clone()),
                     position: None,
-                });
+                }
+                .into());
             }
             Ok((project, observations))
         })?;

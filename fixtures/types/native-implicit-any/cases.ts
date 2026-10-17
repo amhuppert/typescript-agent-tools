@@ -1,0 +1,13 @@
+export {};
+type Poison = Unavailable<never>;
+declare const ValueOnly: number;
+declare const /*#keywords*/keywords: (any, unknown, number, bigint, object, boolean, string, symbol, undefined, never, intrinsic) => void;
+declare const /*#escaped*/escaped: (\u006eumber) => void;
+declare const /*#names*/names: <T>(T, Poison, ValueOnly, missing, async, immediate) => void;
+declare const /*#rest*/rest: (...Poison) => void;
+declare const /*#call*/call: { (Poison): void };
+declare const /*#method*/method: { method(Poison): void };
+declare const /*#construct*/construct: new (Poison) => object;
+declare function named(/*#parameter*/Poison): void;
+declare function restFunction(.../*#restParameter*/Poison): void;
+const /*#widening*/widening = { nested: { nullable: null, absent: undefined }, empty: [] };

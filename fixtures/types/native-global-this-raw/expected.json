@@ -1,0 +1,261 @@
+[
+  {
+    "scenario": "overload",
+    "name": "badCall",
+    "summary": "\"called\"",
+    "errorType": false,
+    "codes": [
+      2397,
+      2397,
+      2397,
+      2345
+    ],
+    "observations": {
+      "globalThisDeclaration:0:45": {
+        "end": 45,
+        "globalDeclarations": 3,
+        "kind": 263,
+        "mappedToGlobal": true,
+        "pos": 0,
+        "rawDeclarations": 2,
+        "rawIsGlobal": false
+      },
+      "globalThisRawImplementation:0:45": {
+        "end": 45,
+        "globalDeclarations": 3,
+        "kind": 263,
+        "mappedToGlobal": true,
+        "pos": 0,
+        "rawDeclarations": 2,
+        "rawIsGlobal": false
+      },
+      "globalThisValue": {
+        "declarations": 3,
+        "initialized": true,
+        "readonly": true,
+        "transient": true
+      }
+    }
+  },
+  {
+    "scenario": "overload",
+    "name": "goodCall",
+    "summary": "\"called\"",
+    "errorType": false,
+    "codes": [
+      2397,
+      2397,
+      2397
+    ],
+    "observations": {
+      "globalThisDeclaration:0:45": {
+        "end": 45,
+        "globalDeclarations": 3,
+        "kind": 263,
+        "mappedToGlobal": true,
+        "pos": 0,
+        "rawDeclarations": 2,
+        "rawIsGlobal": false
+      },
+      "globalThisValue": {
+        "declarations": 3,
+        "initialized": true,
+        "readonly": true,
+        "transient": true
+      }
+    }
+  },
+  {
+    "scenario": "overload",
+    "name": "declaration",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "codes": [
+      2397,
+      2397,
+      2397
+    ],
+    "observations": {
+      "globalThisValue": {
+        "declarations": 3,
+        "initialized": true,
+        "readonly": true,
+        "transient": true
+      }
+    }
+  },
+  {
+    "scenario": "overload_reverse",
+    "name": "badCall",
+    "summary": "\"called\"",
+    "errorType": false,
+    "codes": [
+      2397,
+      2397,
+      2397,
+      2345
+    ],
+    "observations": {
+      "globalThisDeclaration:0:45": {
+        "end": 45,
+        "globalDeclarations": 3,
+        "kind": 263,
+        "mappedToGlobal": true,
+        "pos": 0,
+        "rawDeclarations": 2,
+        "rawIsGlobal": false
+      },
+      "globalThisRawImplementation:0:45": {
+        "end": 45,
+        "globalDeclarations": 3,
+        "kind": 263,
+        "mappedToGlobal": true,
+        "pos": 0,
+        "rawDeclarations": 2,
+        "rawIsGlobal": false
+      },
+      "globalThisValue": {
+        "declarations": 3,
+        "initialized": true,
+        "readonly": true,
+        "transient": true
+      }
+    }
+  },
+  {
+    "scenario": "overload_reverse",
+    "name": "goodCall",
+    "summary": "\"called\"",
+    "errorType": false,
+    "codes": [
+      2397,
+      2397,
+      2397
+    ],
+    "observations": {
+      "globalThisDeclaration:0:45": {
+        "end": 45,
+        "globalDeclarations": 3,
+        "kind": 263,
+        "mappedToGlobal": true,
+        "pos": 0,
+        "rawDeclarations": 2,
+        "rawIsGlobal": false
+      },
+      "globalThisValue": {
+        "declarations": 3,
+        "initialized": true,
+        "readonly": true,
+        "transient": true
+      }
+    }
+  },
+  {
+    "scenario": "overload_reverse",
+    "name": "declaration",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "codes": [
+      2397,
+      2397,
+      2397
+    ],
+    "observations": {
+      "globalThisValue": {
+        "declarations": 3,
+        "initialized": true,
+        "readonly": true,
+        "transient": true
+      }
+    }
+  },
+  {
+    "scenario": "local",
+    "name": "badCall",
+    "summary": "\"called\"",
+    "errorType": false,
+    "codes": [
+      2345
+    ],
+    "observations": {
+      "globalThisDeclaration:10:56": {
+        "end": 56,
+        "globalDeclarations": 0,
+        "kind": 263,
+        "mappedToGlobal": false,
+        "pos": 10,
+        "rawDeclarations": 2,
+        "rawIsGlobal": false
+      },
+      "globalThisRawImplementation:10:56": {
+        "end": 56,
+        "globalDeclarations": 0,
+        "kind": 263,
+        "mappedToGlobal": false,
+        "pos": 10,
+        "rawDeclarations": 2,
+        "rawIsGlobal": false
+      }
+    }
+  },
+  {
+    "scenario": "local",
+    "name": "goodCall",
+    "summary": "\"called\"",
+    "errorType": false,
+    "codes": [],
+    "observations": {
+      "globalThisDeclaration:10:56": {
+        "end": 56,
+        "globalDeclarations": 0,
+        "kind": 263,
+        "mappedToGlobal": false,
+        "pos": 10,
+        "rawDeclarations": 2,
+        "rawIsGlobal": false
+      }
+    }
+  },
+  {
+    "scenario": "local",
+    "name": "declaration",
+    "summary": "(value: string) => \"called\"",
+    "errorType": false,
+    "codes": [],
+    "observations": {}
+  },
+  {
+    "scenario": "collision",
+    "name": "this",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "codes": [
+      2397
+    ],
+    "observations": {
+      "globalThisValue": {
+        "declarations": 0,
+        "initialized": true,
+        "readonly": true,
+        "transient": true
+      }
+    }
+  },
+  {
+    "scenario": "collision",
+    "name": "identifier",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "codes": [
+      2397
+    ],
+    "observations": {
+      "globalThisValue": {
+        "declarations": 0,
+        "initialized": true,
+        "readonly": true,
+        "transient": true
+      }
+    }
+  }
+]

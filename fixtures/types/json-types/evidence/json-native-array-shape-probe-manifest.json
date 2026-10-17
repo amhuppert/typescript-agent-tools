@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "compilerVersion": "7.0.2",
+  "question": "GetAliasedSymbol → GetTypeOfSymbol",
+  "requests": 10,
+  "diagnosticPhase": "config/program/syntactic/bind diagnostics collected after the selected type/member demand",
+  "sources": [
+    {
+      "file": "fixtures/types/json-types/empty-array.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "file": "fixtures/types/json-types/data.json",
+      "sha256": "c4a840597560c2a2d59c23a10b3b6e6afd5e469bf912900512f362301c7ac4bf"
+    },
+    {
+      "file": "fixtures/types/json-types/strict-0-exact-1-unchecked-1.json",
+      "sha256": "0c8fe39ce486c5c5f241be482d8df54e29baedc477279a71eb6b7067ee3d6bf1"
+    },
+    {
+      "file": "fixtures/types/json-types/cases.ts",
+      "sha256": "1ce9df4815a5f3351a648d6e58c70863ce0e46e01a2b0461c3715197214dda4c"
+    },
+    {
+      "file": "fixtures/types/json-types/strict-1-exact-0-unchecked-0.json",
+      "sha256": "b8d2e9f6f4f5198191fb7ebe59fc22d759e587491294ee3948282a53a9c365cc"
+    },
+    {
+      "file": "fixtures/types/json-types/strict-1-exact-0-unchecked-1.json",
+      "sha256": "ba7110c5a2f6be2967f66349b0260d3e522aad02476c38c2e7c572998f97aaec"
+    },
+    {
+      "file": "fixtures/types/json-types/null.json",
+      "sha256": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed"
+    },
+    {
+      "file": "fixtures/types/json-types/strict-0-exact-1-unchecked-0.json",
+      "sha256": "3e327522a479711e6e2963ba8c3a539ece52fbd98856e473100672ea90312ec4"
+    },
+    {
+      "file": "fixtures/types/json-types/tsconfig.json",
+      "sha256": "73ee26adc1d16c8444811c67b5bf62ecd420531a89f735fbccb195fba0a4032a"
+    },
+    {
+      "file": "fixtures/types/json-types/strict-0-exact-0-unchecked-1.json",
+      "sha256": "e5e905574fea7ed1d1008ed06677d0addf4832ef6b805e17ac5a525c3aefdf48"
+    },
+    {
+      "file": "fixtures/types/json-types/strict-1-exact-1-unchecked-0.json",
+      "sha256": "41cbe1ebbae50b744974ef36b3bad96d7c7579c17e5d7471ead50b2bebb7fb70"
+    },
+    {
+      "file": "fixtures/types/json-types/strict-1-exact-1-unchecked-1.json",
+      "sha256": "719d2f1ae3c4b815cd78027cdc386d45ae8e4156949ac8f9fc394cb07cef627e"
+    },
+    {
+      "file": "fixtures/types/json-types/strict-0-exact-0-unchecked-0.json",
+      "sha256": "c5f00e00664834a2c64e60a50d66f6811e2ab2237b345e68167dbd7d507d3b9e"
+    },
+    {
+      "file": "fixtures/types/json-types/scalar.json",
+      "sha256": "084c799cd551dd1d8d5c5f9a5d593b2e931f5e36122ee5c793c1d08a19839cc0"
+    },
+    {
+      "file": "tools/semantic-oracle.mjs",
+      "sha256": "bc969538c077b64b4bf65e87be063ed5903f7d2cca739676b3780c13565f565a"
+    },
+    {
+      "file": "tools/navigation-oracle.mjs",
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+    },
+    {
+      "file": "tools/vendor-typescript-libs.mjs",
+      "sha256": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d"
+    }
+  ],
+  "compilerSource": {
+    "file": "/Users/alex/github/typescript-agent-tools/.cache/typescript-go-7.0.2/internal/checker/checker.go",
+    "sha256": "32384dde486c33c59c5695505f4c951c3009c6d7e50589cb5b18d0ea92cbf161"
+  },
+  "controls": [
+    {
+      "file": "fixtures/types/json-types/evidence/json-native-array-shape-probe.mjs",
+      "sha256": "e7317b71381ffce799836d0e9edfa7c7477c300a83e4a4029481bf7ddf14ec40"
+    },
+    {
+      "file": "fixtures/types/json-types/evidence/json-native-array-shape-probe.json",
+      "sha256": "0badb348a95f1ceea5c41f76944cd7b1a7326ebe40c96baab876587cb5b6f05b"
+    }
+  ],
+  "toolingSnapshot": "current-tooling",
+  "limitations": [
+    "Hash capture after probe is inspection provenance, not transactional compiler-read capture.",
+    "Archived scripts retain their original scratch relative imports/output paths.",
+    "Default libraries are loaded in this fixture. Array members are enumerated, not guessed empty.",
+    "Ten fresh raw controls cover two strict-null profiles; full eight-state imported-read baseline is separate."
+  ]
+}

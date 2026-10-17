@@ -1,0 +1,72 @@
+[
+  {
+    "name": "keywords",
+    "summary": "(any: any, unknown: any, number: any, bigint: any, object: any, boolean: any, string: any, symbol: any, undefined: any, never: any, intrinsic: any) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "escaped",
+    "summary": "(number: any) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "names",
+    "summary": "<T>(T: any, Poison: any, ValueOnly: any, missing: any, async: any, immediate: any) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "rest",
+    "summary": "(...Poison: any[]) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "call",
+    "summary": "(Poison: any) => void",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "method",
+    "summary": "{ method(Poison: any): void; }",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "construct",
+    "summary": "new (Poison: any) => object",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "parameter",
+    "summary": "any",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "restParameter",
+    "summary": "any[]",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "widening",
+    "summary": "{ nested: { nullable: null; absent: undefined; }; empty: never[]; }",
+    "errorType": false,
+    "before": [],
+    "after": []
+  }
+]

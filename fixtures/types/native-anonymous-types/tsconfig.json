@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noLib": true,
+    "target": "esnext",
+    "module": "esnext"
+  },
+  "files": ["cases.ts", "written-names.ts"]
+}

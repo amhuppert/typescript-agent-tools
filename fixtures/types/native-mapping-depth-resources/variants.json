@@ -1,0 +1,1730 @@
+[
+  {
+    "layout": "nested",
+    "width": 16,
+    "outer": "Uppercase",
+    "matches": true,
+    "profile": "strict",
+    "file": "nested-16-uppercase-match.ts",
+    "config": "nested-16-uppercase-match-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-16-uppercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 16,
+    "outer": "Uppercase",
+    "matches": true,
+    "profile": "nocheck",
+    "file": "nested-16-uppercase-match.ts",
+    "config": "nested-16-uppercase-match-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-16-uppercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 16,
+    "outer": "Uppercase",
+    "matches": true,
+    "profile": "loose",
+    "file": "nested-16-uppercase-match.ts",
+    "config": "nested-16-uppercase-match-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-16-uppercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 16,
+    "outer": "Uppercase",
+    "matches": true,
+    "profile": "loose-nocheck",
+    "file": "nested-16-uppercase-match.ts",
+    "config": "nested-16-uppercase-match-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-16-uppercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 16,
+    "outer": "Uppercase",
+    "matches": false,
+    "profile": "strict",
+    "file": "nested-16-uppercase-miss.ts",
+    "config": "nested-16-uppercase-miss-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-16-uppercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 16,
+    "outer": "Uppercase",
+    "matches": false,
+    "profile": "nocheck",
+    "file": "nested-16-uppercase-miss.ts",
+    "config": "nested-16-uppercase-miss-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-16-uppercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 16,
+    "outer": "Uppercase",
+    "matches": false,
+    "profile": "loose",
+    "file": "nested-16-uppercase-miss.ts",
+    "config": "nested-16-uppercase-miss-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-16-uppercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 16,
+    "outer": "Uppercase",
+    "matches": false,
+    "profile": "loose-nocheck",
+    "file": "nested-16-uppercase-miss.ts",
+    "config": "nested-16-uppercase-miss-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-16-uppercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 16,
+    "outer": "Lowercase",
+    "matches": true,
+    "profile": "strict",
+    "file": "nested-16-lowercase-match.ts",
+    "config": "nested-16-lowercase-match-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-16-lowercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 16,
+    "outer": "Lowercase",
+    "matches": true,
+    "profile": "nocheck",
+    "file": "nested-16-lowercase-match.ts",
+    "config": "nested-16-lowercase-match-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-16-lowercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 16,
+    "outer": "Lowercase",
+    "matches": true,
+    "profile": "loose",
+    "file": "nested-16-lowercase-match.ts",
+    "config": "nested-16-lowercase-match-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-16-lowercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 16,
+    "outer": "Lowercase",
+    "matches": true,
+    "profile": "loose-nocheck",
+    "file": "nested-16-lowercase-match.ts",
+    "config": "nested-16-lowercase-match-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-16-lowercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 16,
+    "outer": "Lowercase",
+    "matches": false,
+    "profile": "strict",
+    "file": "nested-16-lowercase-miss.ts",
+    "config": "nested-16-lowercase-miss-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-16-lowercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 16,
+    "outer": "Lowercase",
+    "matches": false,
+    "profile": "nocheck",
+    "file": "nested-16-lowercase-miss.ts",
+    "config": "nested-16-lowercase-miss-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-16-lowercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 16,
+    "outer": "Lowercase",
+    "matches": false,
+    "profile": "loose",
+    "file": "nested-16-lowercase-miss.ts",
+    "config": "nested-16-lowercase-miss-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-16-lowercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 16,
+    "outer": "Lowercase",
+    "matches": false,
+    "profile": "loose-nocheck",
+    "file": "nested-16-lowercase-miss.ts",
+    "config": "nested-16-lowercase-miss-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-16-lowercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 16,
+    "outer": "Uppercase",
+    "matches": true,
+    "profile": "strict",
+    "file": "flat-16-uppercase-match.ts",
+    "config": "flat-16-uppercase-match-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-16-uppercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 16,
+    "outer": "Uppercase",
+    "matches": true,
+    "profile": "nocheck",
+    "file": "flat-16-uppercase-match.ts",
+    "config": "flat-16-uppercase-match-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-16-uppercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 16,
+    "outer": "Uppercase",
+    "matches": true,
+    "profile": "loose",
+    "file": "flat-16-uppercase-match.ts",
+    "config": "flat-16-uppercase-match-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-16-uppercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 16,
+    "outer": "Uppercase",
+    "matches": true,
+    "profile": "loose-nocheck",
+    "file": "flat-16-uppercase-match.ts",
+    "config": "flat-16-uppercase-match-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-16-uppercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 16,
+    "outer": "Uppercase",
+    "matches": false,
+    "profile": "strict",
+    "file": "flat-16-uppercase-miss.ts",
+    "config": "flat-16-uppercase-miss-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-16-uppercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 16,
+    "outer": "Uppercase",
+    "matches": false,
+    "profile": "nocheck",
+    "file": "flat-16-uppercase-miss.ts",
+    "config": "flat-16-uppercase-miss-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-16-uppercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 16,
+    "outer": "Uppercase",
+    "matches": false,
+    "profile": "loose",
+    "file": "flat-16-uppercase-miss.ts",
+    "config": "flat-16-uppercase-miss-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-16-uppercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 16,
+    "outer": "Uppercase",
+    "matches": false,
+    "profile": "loose-nocheck",
+    "file": "flat-16-uppercase-miss.ts",
+    "config": "flat-16-uppercase-miss-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-16-uppercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 16,
+    "outer": "Lowercase",
+    "matches": true,
+    "profile": "strict",
+    "file": "flat-16-lowercase-match.ts",
+    "config": "flat-16-lowercase-match-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-16-lowercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 16,
+    "outer": "Lowercase",
+    "matches": true,
+    "profile": "nocheck",
+    "file": "flat-16-lowercase-match.ts",
+    "config": "flat-16-lowercase-match-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-16-lowercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 16,
+    "outer": "Lowercase",
+    "matches": true,
+    "profile": "loose",
+    "file": "flat-16-lowercase-match.ts",
+    "config": "flat-16-lowercase-match-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-16-lowercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 16,
+    "outer": "Lowercase",
+    "matches": true,
+    "profile": "loose-nocheck",
+    "file": "flat-16-lowercase-match.ts",
+    "config": "flat-16-lowercase-match-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-16-lowercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 16,
+    "outer": "Lowercase",
+    "matches": false,
+    "profile": "strict",
+    "file": "flat-16-lowercase-miss.ts",
+    "config": "flat-16-lowercase-miss-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-16-lowercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 16,
+    "outer": "Lowercase",
+    "matches": false,
+    "profile": "nocheck",
+    "file": "flat-16-lowercase-miss.ts",
+    "config": "flat-16-lowercase-miss-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-16-lowercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 16,
+    "outer": "Lowercase",
+    "matches": false,
+    "profile": "loose",
+    "file": "flat-16-lowercase-miss.ts",
+    "config": "flat-16-lowercase-miss-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-16-lowercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 16,
+    "outer": "Lowercase",
+    "matches": false,
+    "profile": "loose-nocheck",
+    "file": "flat-16-lowercase-miss.ts",
+    "config": "flat-16-lowercase-miss-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-16-lowercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 64,
+    "outer": "Uppercase",
+    "matches": true,
+    "profile": "strict",
+    "file": "nested-64-uppercase-match.ts",
+    "config": "nested-64-uppercase-match-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-64-uppercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 64,
+    "outer": "Uppercase",
+    "matches": true,
+    "profile": "nocheck",
+    "file": "nested-64-uppercase-match.ts",
+    "config": "nested-64-uppercase-match-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-64-uppercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 64,
+    "outer": "Uppercase",
+    "matches": true,
+    "profile": "loose",
+    "file": "nested-64-uppercase-match.ts",
+    "config": "nested-64-uppercase-match-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-64-uppercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 64,
+    "outer": "Uppercase",
+    "matches": true,
+    "profile": "loose-nocheck",
+    "file": "nested-64-uppercase-match.ts",
+    "config": "nested-64-uppercase-match-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-64-uppercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 64,
+    "outer": "Uppercase",
+    "matches": false,
+    "profile": "strict",
+    "file": "nested-64-uppercase-miss.ts",
+    "config": "nested-64-uppercase-miss-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-64-uppercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 64,
+    "outer": "Uppercase",
+    "matches": false,
+    "profile": "nocheck",
+    "file": "nested-64-uppercase-miss.ts",
+    "config": "nested-64-uppercase-miss-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-64-uppercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 64,
+    "outer": "Uppercase",
+    "matches": false,
+    "profile": "loose",
+    "file": "nested-64-uppercase-miss.ts",
+    "config": "nested-64-uppercase-miss-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-64-uppercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 64,
+    "outer": "Uppercase",
+    "matches": false,
+    "profile": "loose-nocheck",
+    "file": "nested-64-uppercase-miss.ts",
+    "config": "nested-64-uppercase-miss-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-64-uppercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 64,
+    "outer": "Lowercase",
+    "matches": true,
+    "profile": "strict",
+    "file": "nested-64-lowercase-match.ts",
+    "config": "nested-64-lowercase-match-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-64-lowercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 64,
+    "outer": "Lowercase",
+    "matches": true,
+    "profile": "nocheck",
+    "file": "nested-64-lowercase-match.ts",
+    "config": "nested-64-lowercase-match-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-64-lowercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 64,
+    "outer": "Lowercase",
+    "matches": true,
+    "profile": "loose",
+    "file": "nested-64-lowercase-match.ts",
+    "config": "nested-64-lowercase-match-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-64-lowercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 64,
+    "outer": "Lowercase",
+    "matches": true,
+    "profile": "loose-nocheck",
+    "file": "nested-64-lowercase-match.ts",
+    "config": "nested-64-lowercase-match-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-64-lowercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 64,
+    "outer": "Lowercase",
+    "matches": false,
+    "profile": "strict",
+    "file": "nested-64-lowercase-miss.ts",
+    "config": "nested-64-lowercase-miss-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-64-lowercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 64,
+    "outer": "Lowercase",
+    "matches": false,
+    "profile": "nocheck",
+    "file": "nested-64-lowercase-miss.ts",
+    "config": "nested-64-lowercase-miss-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-64-lowercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 64,
+    "outer": "Lowercase",
+    "matches": false,
+    "profile": "loose",
+    "file": "nested-64-lowercase-miss.ts",
+    "config": "nested-64-lowercase-miss-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-64-lowercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "nested",
+    "width": 64,
+    "outer": "Lowercase",
+    "matches": false,
+    "profile": "loose-nocheck",
+    "file": "nested-64-lowercase-miss.ts",
+    "config": "nested-64-lowercase-miss-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "nested-64-lowercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 64,
+    "outer": "Uppercase",
+    "matches": true,
+    "profile": "strict",
+    "file": "flat-64-uppercase-match.ts",
+    "config": "flat-64-uppercase-match-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-64-uppercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 64,
+    "outer": "Uppercase",
+    "matches": true,
+    "profile": "nocheck",
+    "file": "flat-64-uppercase-match.ts",
+    "config": "flat-64-uppercase-match-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-64-uppercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 64,
+    "outer": "Uppercase",
+    "matches": true,
+    "profile": "loose",
+    "file": "flat-64-uppercase-match.ts",
+    "config": "flat-64-uppercase-match-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-64-uppercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 64,
+    "outer": "Uppercase",
+    "matches": true,
+    "profile": "loose-nocheck",
+    "file": "flat-64-uppercase-match.ts",
+    "config": "flat-64-uppercase-match-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-64-uppercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 64,
+    "outer": "Uppercase",
+    "matches": false,
+    "profile": "strict",
+    "file": "flat-64-uppercase-miss.ts",
+    "config": "flat-64-uppercase-miss-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-64-uppercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 64,
+    "outer": "Uppercase",
+    "matches": false,
+    "profile": "nocheck",
+    "file": "flat-64-uppercase-miss.ts",
+    "config": "flat-64-uppercase-miss-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-64-uppercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 64,
+    "outer": "Uppercase",
+    "matches": false,
+    "profile": "loose",
+    "file": "flat-64-uppercase-miss.ts",
+    "config": "flat-64-uppercase-miss-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-64-uppercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 64,
+    "outer": "Uppercase",
+    "matches": false,
+    "profile": "loose-nocheck",
+    "file": "flat-64-uppercase-miss.ts",
+    "config": "flat-64-uppercase-miss-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-64-uppercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 64,
+    "outer": "Lowercase",
+    "matches": true,
+    "profile": "strict",
+    "file": "flat-64-lowercase-match.ts",
+    "config": "flat-64-lowercase-match-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-64-lowercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 64,
+    "outer": "Lowercase",
+    "matches": true,
+    "profile": "nocheck",
+    "file": "flat-64-lowercase-match.ts",
+    "config": "flat-64-lowercase-match-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-64-lowercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 64,
+    "outer": "Lowercase",
+    "matches": true,
+    "profile": "loose",
+    "file": "flat-64-lowercase-match.ts",
+    "config": "flat-64-lowercase-match-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-64-lowercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 64,
+    "outer": "Lowercase",
+    "matches": true,
+    "profile": "loose-nocheck",
+    "file": "flat-64-lowercase-match.ts",
+    "config": "flat-64-lowercase-match-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-64-lowercase-match.ts"
+      ]
+    },
+    "expected": "43",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 64,
+    "outer": "Lowercase",
+    "matches": false,
+    "profile": "strict",
+    "file": "flat-64-lowercase-miss.ts",
+    "config": "flat-64-lowercase-miss-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-64-lowercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 64,
+    "outer": "Lowercase",
+    "matches": false,
+    "profile": "nocheck",
+    "file": "flat-64-lowercase-miss.ts",
+    "config": "flat-64-lowercase-miss-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-64-lowercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 64,
+    "outer": "Lowercase",
+    "matches": false,
+    "profile": "loose",
+    "file": "flat-64-lowercase-miss.ts",
+    "config": "flat-64-lowercase-miss-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-64-lowercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  },
+  {
+    "layout": "flat",
+    "width": 64,
+    "outer": "Lowercase",
+    "matches": false,
+    "profile": "loose-nocheck",
+    "file": "flat-64-lowercase-miss.ts",
+    "config": "flat-64-lowercase-miss-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "flat-64-lowercase-miss.ts"
+      ]
+    },
+    "expected": "44",
+    "codes": []
+  }
+]

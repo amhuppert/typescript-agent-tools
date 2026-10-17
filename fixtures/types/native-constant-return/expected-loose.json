@@ -1,0 +1,164 @@
+[
+  {
+    "name": "named",
+    "summary": "() => never",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "arrow",
+    "summary": "() => any",
+    "errorType": false,
+    "before": [],
+    "after": [
+      7023
+    ]
+  },
+  {
+    "name": "asyncNamed",
+    "summary": "() => Promise<never>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "asyncArrow",
+    "summary": "() => any",
+    "errorType": false,
+    "before": [],
+    "after": [
+      7023
+    ]
+  },
+  {
+    "name": "unassigned",
+    "summary": "() => any",
+    "errorType": false,
+    "before": [],
+    "after": [
+      7023
+    ]
+  },
+  {
+    "name": "assigned",
+    "summary": "() => any",
+    "errorType": false,
+    "before": [],
+    "after": [
+      7023
+    ]
+  },
+  {
+    "name": "parenthesized",
+    "summary": "() => any",
+    "errorType": false,
+    "before": [],
+    "after": [
+      7023
+    ]
+  },
+  {
+    "name": "readonlyMember",
+    "summary": "() => any",
+    "errorType": false,
+    "before": [],
+    "after": [
+      7023
+    ]
+  },
+  {
+    "name": "readonlyIndex",
+    "summary": "() => any",
+    "errorType": false,
+    "before": [],
+    "after": [
+      7023
+    ]
+  },
+  {
+    "name": "mutableMember",
+    "summary": "() => any",
+    "errorType": false,
+    "before": [],
+    "after": [
+      7023
+    ]
+  },
+  {
+    "name": "annotated",
+    "summary": "() => number",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "nested",
+    "summary": "() => number",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "blockArrow",
+    "summary": "() => never",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "blockAsyncArrow",
+    "summary": "() => Promise<never>",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "blockLet",
+    "summary": "() => never",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "blockAssigned",
+    "summary": "() => any",
+    "errorType": false,
+    "before": [],
+    "after": [
+      7023
+    ]
+  },
+  {
+    "name": "blockVar",
+    "summary": "() => any",
+    "errorType": false,
+    "before": [],
+    "after": [
+      7023
+    ]
+  },
+  {
+    "name": "blockParentheses",
+    "summary": "() => any",
+    "errorType": false,
+    "before": [],
+    "after": [
+      7023
+    ]
+  },
+  {
+    "name": "shadowed",
+    "summary": "(recursive: () => number) => number",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "name": "namedAssigned",
+    "summary": "() => never",
+    "errorType": false,
+    "before": [],
+    "after": []
+  }
+]

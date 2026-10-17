@@ -1,0 +1,44 @@
+[
+  {
+    "name": "literal",
+    "summary": "2",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "text",
+    "summary": "2",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "constrained",
+    "summary": "2",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "known",
+    "summary": "2",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "renamedLiteral",
+    "summary": "2",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "renamedText",
+    "summary": "2",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "renamedKnown",
+    "summary": "2",
+    "errorType": false,
+    "codes": []
+  }
+]

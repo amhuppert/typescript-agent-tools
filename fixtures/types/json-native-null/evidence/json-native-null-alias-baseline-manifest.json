@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "compilerVersion": "7.0.2",
+  "question": "GetAliasedSymbol → GetTypeOfSymbol",
+  "requests": 40,
+  "diagnosticPhase": "config/program/syntactic/bind diagnostics collected before selected symbol/type demand",
+  "sources": [
+    {
+      "file": "fixtures/types/json-native-null/consumer.ts",
+      "sha256": "5c3bdf42b465beef117e325002002c7e8d22241150634bfe4500baa8ff5ea94e"
+    },
+    {
+      "file": "fixtures/types/json-native-null/data.json",
+      "sha256": "f46a296e1ef59625acc7333047cbb64f8e6e9f8a6031c87dabf8538f12228738"
+    },
+    {
+      "file": "fixtures/types/json-native-null/strict-0-exact-1-unchecked-1.json",
+      "sha256": "0c8fe39ce486c5c5f241be482d8df54e29baedc477279a71eb6b7067ee3d6bf1"
+    },
+    {
+      "file": "fixtures/types/json-native-null/strict-1-exact-0-unchecked-0.json",
+      "sha256": "b8d2e9f6f4f5198191fb7ebe59fc22d759e587491294ee3948282a53a9c365cc"
+    },
+    {
+      "file": "fixtures/types/json-native-null/strict-1-exact-0-unchecked-1.json",
+      "sha256": "ba7110c5a2f6be2967f66349b0260d3e522aad02476c38c2e7c572998f97aaec"
+    },
+    {
+      "file": "fixtures/types/json-native-null/strict-0-exact-1-unchecked-0.json",
+      "sha256": "3e327522a479711e6e2963ba8c3a539ece52fbd98856e473100672ea90312ec4"
+    },
+    {
+      "file": "fixtures/types/json-native-null/tsconfig.json",
+      "sha256": "c50757eb59e6a0ba3a09d6f13ef52a58ad2d2a37cfbbd695e9e42d6b3b01002c"
+    },
+    {
+      "file": "fixtures/types/json-native-null/strict-0-exact-0-unchecked-1.json",
+      "sha256": "e5e905574fea7ed1d1008ed06677d0addf4832ef6b805e17ac5a525c3aefdf48"
+    },
+    {
+      "file": "fixtures/types/json-native-null/strict-1-exact-1-unchecked-0.json",
+      "sha256": "41cbe1ebbae50b744974ef36b3bad96d7c7579c17e5d7471ead50b2bebb7fb70"
+    },
+    {
+      "file": "fixtures/types/json-native-null/strict-1-exact-1-unchecked-1.json",
+      "sha256": "719d2f1ae3c4b815cd78027cdc386d45ae8e4156949ac8f9fc394cb07cef627e"
+    },
+    {
+      "file": "fixtures/types/json-native-null/strict-0-exact-0-unchecked-0.json",
+      "sha256": "c5f00e00664834a2c64e60a50d66f6811e2ab2237b345e68167dbd7d507d3b9e"
+    },
+    {
+      "file": "tools/semantic-oracle.mjs",
+      "sha256": "bc969538c077b64b4bf65e87be063ed5903f7d2cca739676b3780c13565f565a"
+    },
+    {
+      "file": "tools/navigation-oracle.mjs",
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+    },
+    {
+      "file": "tools/vendor-typescript-libs.mjs",
+      "sha256": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d"
+    }
+  ],
+  "compilerSource": {
+    "file": "/Users/alex/github/typescript-agent-tools/.cache/typescript-go-7.0.2/internal/checker/checker.go",
+    "sha256": "32384dde486c33c59c5695505f4c951c3009c6d7e50589cb5b18d0ea92cbf161"
+  },
+  "controls": [
+    {
+      "file": "fixtures/types/json-native-null/evidence/json-native-null-alias-baseline.mjs",
+      "sha256": "12180bf4289a58ea02664faad8a959b3c048ea165fd07ab20bca73ccc94c38a2"
+    },
+    {
+      "file": "fixtures/types/json-native-null/evidence/json-native-null-alias-baseline.json",
+      "sha256": "248317243104640968a54b2823556dbac494ab65ed8dd9af12a25da26d70a4fc"
+    }
+  ],
+  "toolingSnapshot": "current-tooling",
+  "limitations": [
+    "Hash capture after probe is inspection provenance, not transactional compiler-read capture.",
+    "Archived scripts retain original scratch relative imports/output paths.",
+    "Four input diagnostic families do not inventory every consumed checker recovery."
+  ]
+}

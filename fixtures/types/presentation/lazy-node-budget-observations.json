@@ -1,0 +1,105 @@
+{
+  "version": "7.0.2",
+  "binary": "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/tsc",
+  "binarySha256": "76e4987d060ef8207875a53a73619ce665ff16fb2800c0d57a452e21c829bd7b",
+  "semanticOracleSha256": "bc969538c077b64b4bf65e87be063ed5903f7d2cca739676b3780c13565f565a",
+  "probeSha256": "9138be3755144cdcce26f9da4548757ba274a872ea5b2a7581c84e56d790a81e",
+  "rows": [
+    {
+      "count": 1995,
+      "potentialNodes": 1999,
+      "sourceSha256": "8f13ef0ce6281e9c4b5da78d2960237b9b790ed7c32edd0ae09b6df507c0131c",
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": "Budget",
+      "valuesConstituents": 1995,
+      "late": "Late",
+      "blocked": "number",
+      "blockedLocation": {
+        "file": "cases.ts",
+        "start": {
+          "line": 2,
+          "column": 34
+        },
+        "end": {
+          "line": 2,
+          "column": 73
+        }
+      },
+      "errorTypes": [
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "count": 1996,
+      "potentialNodes": 2000,
+      "sourceSha256": "fd61b09f845fcb2b482e84c4b4e70a3464947a93710ab89e4d2949ef9388a8c2",
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": "Budget",
+      "valuesConstituents": 1996,
+      "late": "Late",
+      "blocked": "number",
+      "blockedLocation": {
+        "file": "cases.ts",
+        "start": {
+          "line": 2,
+          "column": 34
+        },
+        "end": {
+          "line": 2,
+          "column": 73
+        }
+      },
+      "errorTypes": [
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "count": 1997,
+      "potentialNodes": 2001,
+      "sourceSha256": "c058624698e38b203c1cb8fdad58e07884250111f4328a3187dd686dbd932e60",
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": "Budget",
+      "valuesConstituents": 1997,
+      "late": "Late",
+      "blocked": "number",
+      "blockedLocation": {
+        "file": "cases.ts",
+        "start": {
+          "line": 2,
+          "column": 34
+        },
+        "end": {
+          "line": 2,
+          "column": 73
+        }
+      },
+      "errorTypes": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+export {};
+const /*#numbers*/numbers = [1, 2];
+const /*#mixed*/mixed = [1, "two"];
+const /*#frozen*/frozen = [1, "two"] as const;
+const /*#hole*/hole = [, 1] as const;
+const /*#allHole*/allHole = [,] as const;
+const /*#nested*/nested = [[1], ["two"]] as const;
+declare const strings: string[];
+const /*#spread*/spread = [1, ...strings];
+declare const pair: readonly ["x", 2];
+const /*#tupleSpread*/tupleSpread = [...pair] as const;
+const /*#assertion*/assertion = [1] as string[];
+const /*#contextTuple*/contextual = [1] satisfies [1, string?];
+const /*#contextHoles*/contextualHoles = [, "x"] satisfies [number?, string?];
+const /*#contextArray*/contextualLiteral = [1, "two"] satisfies (1 | "two")[];
+const /*#mutableConst*/mutableContext = [1, "two"] as const satisfies [1, "two"];
+const /*#empty*/empty = [];
+const /*#parenthesizedEmpty*/parenthesizedEmpty = ([]);
+
+const /*#spreadFirst*/spreadFirst = [...pair, true] satisfies ["x", 2, boolean];
+const /*#spreadLast*/spreadLast = [true, ...pair] satisfies [boolean, "x", 2];
+const /*#spreadMiddle*/spreadMiddle = [true, ...pair, false] satisfies [boolean, "x", 2, boolean];
+const /*#spreadMultiple*/spreadMultiple = [...pair, true, ...pair] satisfies ["x", 2, boolean, "x", 2];
+declare const emptyPair: readonly [];
+const /*#spreadEmpty*/spreadEmpty = [...emptyPair, true, ...emptyPair] satisfies [boolean];

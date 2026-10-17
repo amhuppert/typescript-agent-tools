@@ -1,0 +1,55 @@
+{
+  "scope": "throwaway fresh API/same-checker member display controls",
+  "before": [
+    {
+      "file": "tools/type-oracle.mjs",
+      "sha256": "2b88ee398209e24c9b3b28a6c39e9d6fbcb3c463f6902638c797e02ae3560b2e"
+    },
+    {
+      "file": "tools/semantic-oracle.mjs",
+      "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+    },
+    {
+      "file": "tools/navigation-oracle.mjs",
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+    },
+    {
+      "file": "fixtures/types/compiler-hook/checker-hook.go",
+      "sha256": "e2d5c10ae680c02f912cd1eff4d9b17dc922894559fea2028a82663d9a501419"
+    },
+    {
+      "file": "fixtures/types/compiler-hook/ls-hook.go",
+      "sha256": "73c9a52f43914571bdf7f29e8817720d0ff98bdb0aeb7cad183fa8397a848dce"
+    },
+    {
+      "file": "fixtures/types/compiler-hook/oracle-test.go",
+      "sha256": "eeea4327d99fa38e1030d229a92905e6955d2fbfad5d2384eef7ed761e566535"
+    }
+  ],
+  "after": [
+    {
+      "file": "tools/type-oracle.mjs",
+      "sha256": "2b88ee398209e24c9b3b28a6c39e9d6fbcb3c463f6902638c797e02ae3560b2e"
+    },
+    {
+      "file": "tools/semantic-oracle.mjs",
+      "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+    },
+    {
+      "file": "tools/navigation-oracle.mjs",
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+    },
+    {
+      "file": "fixtures/types/compiler-hook/checker-hook.go",
+      "sha256": "e2d5c10ae680c02f912cd1eff4d9b17dc922894559fea2028a82663d9a501419"
+    },
+    {
+      "file": "fixtures/types/compiler-hook/ls-hook.go",
+      "sha256": "73c9a52f43914571bdf7f29e8817720d0ff98bdb0aeb7cad183fa8397a848dce"
+    },
+    {
+      "file": "fixtures/types/compiler-hook/oracle-test.go",
+      "sha256": "eeea4327d99fa38e1030d229a92905e6955d2fbfad5d2384eef7ed761e566535"
+    }
+  ]
+}

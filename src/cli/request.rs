@@ -8,8 +8,9 @@ use std::path::PathBuf;
 use typescript_parser::editing::Operation;
 use typescript_parser::navigation::{Selector, ShowQuery};
 use typescript_parser::project::ProjectRequest;
-use typescript_parser::references::ReferenceQuery;
+use typescript_parser::references::{ReferenceFilters, ReferenceQuery, ReferenceRequest};
 use typescript_parser::source::SourcePosition;
+use typescript_parser::types::{TypeQuery, TypeRequest};
 
 pub(crate) enum Request {
     Help,
@@ -136,11 +137,19 @@ impl Target {
             Self::Project {
                 request: ProjectRequest::References(_),
                 ..
+            }
+            | Self::Project {
+                request: ProjectRequest::ReferenceSearch(_),
+                ..
             } => "references",
             Self::Project {
                 request: ProjectRequest::Edit(_),
                 ..
             } => "edit",
+            Self::Project {
+                request: ProjectRequest::Type(_),
+                ..
+            } => "type",
         }
     }
 }
@@ -152,10 +161,14 @@ struct Flags {
     jsx: bool,
     check: bool,
     references: bool,
+    calls: bool,
+    no_tests: bool,
     references_direct: bool,
     service_action: Option<String>,
     outline: bool,
     show: bool,
+    type_query: bool,
+    expand: bool,
     /// `--replace-body` or `--insert-after`.
     edit: Option<Operation>,
     edit_batch: Option<String>,
@@ -203,6 +216,8 @@ pub(crate) fn parse(mut args: impl Iterator<Item = String>) -> Result<Request, S
             "--tsx" => flags.jsx = true,
             "--check" => flags.check = true,
             "--references" => flags.references = true,
+            "--calls" => flags.calls = true,
+            "--no-tests" => flags.no_tests = true,
             "--references-direct" => {
                 flags.references = true;
                 flags.references_direct = true;
@@ -215,6 +230,8 @@ pub(crate) fn parse(mut args: impl Iterator<Item = String>) -> Result<Request, S
             }
             "--outline" => flags.outline = true,
             "--show" => flags.show = true,
+            "--type" => flags.type_query = true,
+            "--expand" => flags.expand = true,
             "--replace-body" | "--insert-after" => {
                 let operation = if arg == "--replace-body" {
                     Operation::ReplaceBody
@@ -252,10 +269,17 @@ pub(crate) fn parse(mut args: impl Iterator<Item = String>) -> Result<Request, S
     if flags.files.len() > 1 {
         return Err("Expected one input file".into());
     }
+    if (flags.calls || flags.no_tests) && !flags.references {
+        return Err("--calls and --no-tests apply only to --references".into());
+    }
+    if flags.expand && !flags.type_query {
+        return Err("--expand applies only to --type".into());
+    }
     if [
         flags.references,
         flags.outline,
         flags.show,
+        flags.type_query,
         flags.edit.is_some(),
         flags.edit_batch.is_some(),
         flags.apply.is_some(),
@@ -265,7 +289,7 @@ pub(crate) fn parse(mut args: impl Iterator<Item = String>) -> Result<Request, S
     .count()
         > 1
     {
-        return Err("Choose one operation: --references, --outline, --show, --replace-body, --insert-after, --edit-batch, or --apply".into());
+        return Err("Choose one operation: --references, --type, --outline, --show, --replace-body, --insert-after, --edit-batch, or --apply".into());
     }
     if flags.edit.is_none()
         && flags.edit_batch.is_none()
@@ -281,6 +305,8 @@ pub(crate) fn parse(mut args: impl Iterator<Item = String>) -> Result<Request, S
         references(flags)
     } else if flags.outline || flags.show {
         navigation(flags)
+    } else if flags.type_query {
+        type_query(flags)
     } else {
         parse_mode(flags)
     }
@@ -289,7 +315,7 @@ pub(crate) fn parse(mut args: impl Iterator<Item = String>) -> Result<Request, S
 fn parse_mode(flags: Flags) -> Result<Request, String> {
     if flags.project.is_some() || flags.at.is_some() || flags.name.is_some() {
         return Err(
-            "--project, --at, and --name require --references, --outline, or --show".into(),
+            "--project, --at, and --name require --references, --type, --outline, or --show".into(),
         );
     }
     navigation_only(&flags)?;
@@ -305,7 +331,72 @@ fn parse_mode(flags: Flags) -> Result<Request, String> {
     }))
 }
 
-/// Parse and reference output is always JSON and has no levels.
+/// Type selection and bounded display options belong to this request boundary.
+/// The evaluator receives one validated project request, in either transport.
+fn type_query(flags: Flags) -> Result<Request, String> {
+    if let Some(flag) = flags.repeated {
+        return Err(format!("--type takes {flag} at most once"));
+    }
+    if flags.check || flags.jsx {
+        return Err("--check and --tsx do not apply to --type".into());
+    }
+    if flags.pretty && !flags.json {
+        return Err("--pretty applies to --type only with --json".into());
+    }
+    if flags.depth.is_some() && !flags.expand {
+        return Err("--depth applies to --type only with --expand".into());
+    }
+    let depth = match flags.depth.as_deref() {
+        None => 3,
+        Some(text) => match text.parse::<usize>() {
+            Ok(depth) if !text.is_empty() && text.bytes().all(|c| c.is_ascii_digit()) => depth,
+            _ => {
+                return Err(format!(
+                    "--depth expects an integer from 0 through 32, got {text}"
+                ));
+            }
+        },
+    };
+    let project = flags.project.ok_or("--type requires --project TSCONFIG")?;
+    let file = flags.files.into_iter().next();
+    if file.as_deref() == Some("-") {
+        return Err("--type reads files from the project, not stdin".into());
+    }
+    let query = match (flags.at, flags.name) {
+        (Some(at), None) => {
+            let (file, position) = location(&at, file, "--type --at")?;
+            TypeQuery::At { file, position }
+        }
+        (None, Some(name)) => TypeQuery::Name {
+            name,
+            file: file.map(PathBuf::from),
+        },
+        _ => return Err("--type requires exactly one of --at or --name".into()),
+    };
+    let request = TypeRequest {
+        query,
+        expand: flags.expand,
+        depth,
+    };
+    request.validate().map_err(|error| error.message)?;
+    Ok(Request::Query(Query {
+        target: Target::Project {
+            config: project,
+            request: ProjectRequest::Type(request),
+            direct: flags.direct,
+        },
+        format: if flags.json {
+            Format::Json
+        } else {
+            Format::Text
+        },
+        pretty: flags.pretty,
+        depth: Depth::default(),
+        output: flags.output,
+    }))
+}
+
+/// Parse and service-administration output has no navigation format or levels.
 fn navigation_only(flags: &Flags) -> Result<(), String> {
     if flags.json {
         return Err("--json applies to --outline and --show".into());
@@ -317,7 +408,11 @@ fn navigation_only(flags: &Flags) -> Result<(), String> {
 }
 
 fn references(flags: Flags) -> Result<Request, String> {
-    navigation_only(&flags)?;
+    if flags.service_action.is_some() {
+        navigation_only(&flags)?;
+    } else if flags.depth.is_some() {
+        return Err("--depth applies to --outline".into());
+    }
     if flags.check || flags.jsx {
         return Err("--check and --tsx do not apply to --references".into());
     }
@@ -330,6 +425,8 @@ fn references(flags: Flags) -> Result<Request, String> {
             || !flags.files.is_empty()
             || flags.references_direct
             || flags.direct
+            || flags.calls
+            || flags.no_tests
         {
             return Err("Service actions do not take a reference query".into());
         }
@@ -355,30 +452,31 @@ fn references(flags: Flags) -> Result<Request, String> {
             let (file, position) = location(&at, file, "--references --at")?;
             ReferenceQuery::At { file, position }
         }
-        (None, Some(name)) => {
-            // Reference candidates are identifiers, which never contain
-            // `.`; qualified names are navigation's containment language.
-            if name.contains('.') {
-                return Err(format!(
-                    "--references --name takes one identifier, not {name}; select a declaration by containment with --show --name, or a token with --at FILE:LINE:COLUMN"
-                ));
-            }
-            ReferenceQuery::Name {
-                name,
-                file: file.map(PathBuf::from),
-            }
-        }
+        (None, Some(name)) => ReferenceQuery::Name {
+            name,
+            file: file.map(PathBuf::from),
+        },
         _ => return Err("--references requires exactly one of --at or --name".into()),
     };
     Ok(Request::Query(Query {
         target: Target::Project {
             config: project,
-            request: ProjectRequest::References(query),
+            request: ProjectRequest::ReferenceSearch(ReferenceRequest {
+                query,
+                filters: ReferenceFilters {
+                    calls: flags.calls,
+                    exclude_tests: flags.no_tests,
+                },
+            }),
             direct: flags.references_direct || flags.direct,
         },
-        // A reference result's one form is its document; failures are
-        // diagnostics.
-        format: Format::Text,
+        // Results always use their document; explicit JSON also delivers
+        // analysis failures as documents through the common delivery owner.
+        format: if flags.json {
+            Format::Json
+        } else {
+            Format::Text
+        },
         pretty: flags.pretty,
         depth: Depth::default(),
         output: flags.output,

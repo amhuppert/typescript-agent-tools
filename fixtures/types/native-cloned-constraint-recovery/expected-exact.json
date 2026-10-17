@@ -1,0 +1,111 @@
+[
+  {
+    "name": "circularTyped",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2304,
+      2313
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "circularInferred",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2304,
+      2313
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "circularWithoutTailFailure",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2313
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "mutualTyped",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2304,
+      2313,
+      2313
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "missingTyped",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "unconstrainedLater",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "mappedBoundLater",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "unconstrainedHealthy",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "mappedBoundHealthy",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "healthyAfter",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  }
+]

@@ -1,6 +1,9 @@
-//! The frozen semantic index served to queries.
+//! The frozen lexical projection served to reference queries.
 
-use super::ids::{OccurrenceId, StringId, SymbolId};
+use super::ids::{NameId, OccurrenceId, StringId, SymbolId};
+use super::reference_tokens::{
+    CollectedReferenceToken, ReferenceSyntax, ReferenceToken, ReferenceTokenEntry,
+};
 use crate::Span;
 use crate::project::sources::{FileId, Sources};
 use crate::source::SourcePosition;
@@ -52,17 +55,21 @@ pub(crate) struct IndexedOccurrence {
     pub(crate) name: StringId,
     pub(crate) location: IndexedLocation,
     pub(crate) roles: u8,
+    pub(crate) call: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum Target {
     Symbols(SmallVec<[SymbolId; 2]>),
+    /// Captured dependency token; lexical binding was not requested. Such
+    /// tokens never enter lexical selectors or result indexes.
+    Unsearched,
     NotReference(&'static str),
     /// The reason, as an `Index::text` string.
     Unresolved(StringId),
 }
 
-/// An identifier token in a searched file.
+/// A captured name token, shared by semantic and lexical projections.
 #[derive(Debug)]
 pub(crate) struct Occurrence {
     pub(crate) span: Span,
@@ -70,7 +77,15 @@ pub(crate) struct Occurrence {
     pub(crate) name: StringId,
     /// `collect` role bits.
     pub(crate) roles: u8,
+    pub(crate) call: bool,
     pub(crate) target: Target,
+    pub(super) reference: Option<ReferenceTokenData>,
+}
+
+#[derive(Debug)]
+pub(super) struct ReferenceTokenData {
+    pub(super) key: Result<StringId, String>,
+    pub(super) syntax: ReferenceSyntax,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -84,10 +99,15 @@ pub(crate) struct Index {
     sites: HashMap<SymbolId, Vec<IndexedSite>>,
     /// Occurrences of each file, indexed by `FileId` and ordered by start.
     files: Vec<Vec<Occurrence>>,
+    /// Derived selectors over the same entries; full JSX names can overlap
+    /// legacy identifier children without changing lexical position queries.
+    lexical_positions: Vec<Vec<OccurrenceId>>,
+    reference_positions: Vec<Vec<OccurrenceId>>,
     /// Public result order, with duplicate locations' roles combined. This
     /// immutable work is shared by position and name queries.
     by_symbol: HashMap<SymbolId, Vec<IndexedOccurrence>>,
     by_name: HashMap<String, Vec<OccurrenceRef>>,
+    by_reference_name: HashMap<String, Vec<ReferenceToken>>,
     /// Names and reasons shared by many occurrences.
     strings: Vec<Box<str>>,
 }
@@ -96,8 +116,9 @@ impl Index {
     /// The identifier token containing `offset`, start inclusive.
     pub(crate) fn occurrence_at(&self, file: FileId, offset: usize) -> Option<&Occurrence> {
         let occurrences = self.files.get(file.index())?;
-        let index = occurrences.partition_point(|occurrence| occurrence.span.start <= offset);
-        let occurrence = occurrences.get(index.checked_sub(1)?)?;
+        let positions = self.lexical_positions.get(file.index())?;
+        let index = positions.partition_point(|id| occurrences[id.index()].span.start <= offset);
+        let occurrence = &occurrences[positions.get(index.checked_sub(1)?)?.index()];
         (offset < occurrence.span.end).then_some(occurrence)
     }
 
@@ -108,6 +129,33 @@ impl Index {
     /// Declaration, local import, and exported alias names spelled `name`.
     pub(crate) fn candidates(&self, name: &str) -> &[OccurrenceRef] {
         self.by_name.get(name).map_or(&[], Vec::as_slice)
+    }
+
+    pub(super) fn reference_tokens(
+        &self,
+        name: &str,
+        control: Option<&crate::resources::Control>,
+    ) -> &[ReferenceToken] {
+        // getPossibleSymbolReferencePositions' decoded-key accelerator. Debit
+        // the exact query bytes before the indivisible standard-table lookup;
+        // this neither copies the key nor changes its hash/equality policy.
+
+        let tokens: &[ReferenceToken] = self.by_reference_name.get(name).map_or(&[], Vec::as_slice);
+        if let Some(control) = control {
+            crate::resources::complete_or_abort(control.check());
+        }
+        tokens
+    }
+
+    pub(super) fn reference_token_at(&self, file: FileId, offset: usize) -> Option<ReferenceToken> {
+        let occurrences = self.files.get(file.index())?;
+        let positions = self.reference_positions.get(file.index())?;
+        let index = positions.partition_point(|id| occurrences[id.index()].span.start <= offset);
+        let &id = positions.get(index.checked_sub(1)?)?;
+        (offset < occurrences[id.index()].span.end).then_some(ReferenceToken {
+            file,
+            entry: ReferenceTokenEntry::Syntax(id),
+        })
     }
 
     pub(crate) fn occurrences_of(&self, symbol: SymbolId) -> &[IndexedOccurrence] {
@@ -125,14 +173,19 @@ impl Index {
 
 /// An identifier token to index.
 pub(crate) struct Token<'a> {
+    /// Its original file-local collected name, before position sorting.
+    pub(crate) source: NameId,
     pub(crate) span: Span,
     pub(crate) name: &'a str,
     /// `collect` role bits.
     pub(crate) roles: u8,
+    pub(crate) call: bool,
     /// A declaration, local import, or exported alias name, which name
     /// queries select.
     pub(crate) candidate: bool,
     pub(crate) target: Target,
+    pub(super) lexical: bool,
+    pub(super) reference: Option<&'a CollectedReferenceToken>,
 }
 
 /// Builds an `Index` one file at a time, in `FileId` order.
@@ -141,6 +194,7 @@ pub(crate) struct Builder {
     index: Index,
     string_ids: HashMap<Box<str>, StringId>,
     by_symbol: HashMap<SymbolId, Vec<OccurrenceRef>>,
+    by_reference_name: HashMap<String, Vec<(ReferenceToken, Span)>>,
 }
 
 impl Builder {
@@ -155,27 +209,62 @@ impl Builder {
         id
     }
 
-    /// Add the next file's tokens, in any order. A file that is not searched
-    /// adds none.
-    pub(crate) fn add_file(&mut self, file: FileId, mut tokens: Vec<Token<'_>>) {
+    /// Add the next captured file. Only searched files enter the lexical
+    /// selectors and result indexes; all files retain reference syntax.
+    pub(crate) fn add_file(
+        &mut self,
+        file: FileId,
+        searched: bool,
+        mut tokens: Vec<Token<'_>>,
+    ) -> Vec<OccurrenceId> {
         assert_eq!(
             file.index(),
             self.index.files.len(),
             "files are added in order"
         );
         tokens.sort_by_key(|token| token.span.start);
+        let mut names = vec![OccurrenceId::new(0); tokens.len()];
         let mut occurrences = Vec::with_capacity(tokens.len());
+        let mut lexical_positions = Vec::new();
+        let mut reference_positions = Vec::new();
         for (position, token) in tokens.into_iter().enumerate() {
             let reference = OccurrenceRef {
                 file,
                 id: OccurrenceId::new(position),
             };
-            if let Target::Symbols(symbols) = &token.target {
+            names[token.source.index()] = reference.id;
+            if searched && token.lexical {
+                lexical_positions.push(reference.id);
+            }
+            let reference_data = token.reference.map(|data| {
+                reference_positions.push(reference.id);
+                let key = match &data.key {
+                    Ok(key) => {
+                        self.by_reference_name
+                            .entry(key.clone())
+                            .or_default()
+                            .push((
+                                ReferenceToken {
+                                    file,
+                                    entry: ReferenceTokenEntry::Syntax(reference.id),
+                                },
+                                token.span,
+                            ));
+                        Ok(self.intern(key))
+                    }
+                    Err(error) => Err(error.clone()),
+                };
+                ReferenceTokenData {
+                    key,
+                    syntax: data.syntax,
+                }
+            });
+            if searched && let Target::Symbols(symbols) = &token.target {
                 for &symbol in symbols {
                     self.by_symbol.entry(symbol).or_default().push(reference);
                 }
             }
-            if token.candidate {
+            if searched && token.candidate {
                 self.index
                     .by_name
                     .entry(token.name.to_string())
@@ -186,10 +275,32 @@ impl Builder {
                 span: token.span,
                 name: self.intern(token.name),
                 roles: token.roles,
+                call: token.call,
                 target: token.target,
+                reference: reference_data,
             });
         }
         self.index.files.push(occurrences);
+        self.index.lexical_positions.push(lexical_positions);
+        self.index.reference_positions.push(reference_positions);
+        names
+    }
+
+    pub(super) fn add_json(&mut self, file: FileId, json: &super::JsonFacts) {
+        for key in json.reference_keys() {
+            if let Some(name) = key.key.as_str() {
+                self.by_reference_name
+                    .entry(name.to_owned())
+                    .or_default()
+                    .push((
+                        ReferenceToken {
+                            file,
+                            entry: ReferenceTokenEntry::Json(key.id),
+                        },
+                        key.span,
+                    ));
+            }
+        }
     }
 
     /// Freeze the index with the declarations of every symbol that an
@@ -199,6 +310,27 @@ impl Builder {
         sources: &Sources,
         sites: impl Fn(SymbolId) -> Vec<Site>,
     ) -> Index {
+        for (name, mut references) in self.by_reference_name {
+            references.sort_by(|(left, left_span), (right, right_span)| {
+                (
+                    &sources.get(left.file).display,
+                    left_span.start,
+                    left_span.end,
+                )
+                    .cmp(&(
+                        &sources.get(right.file).display,
+                        right_span.start,
+                        right_span.end,
+                    ))
+            });
+            self.index.by_reference_name.insert(
+                name,
+                references
+                    .into_iter()
+                    .map(|(reference, _)| reference)
+                    .collect(),
+            );
+        }
         for (symbol, references) in self.by_symbol {
             let mut declarations: Vec<_> = sites(symbol)
                 .into_iter()
@@ -221,6 +353,7 @@ impl Builder {
                         name: occurrence.name,
                         location: IndexedLocation::new(sources, reference.file, occurrence.span),
                         roles: occurrence.roles,
+                        call: occurrence.call,
                     }
                 })
                 .collect();
@@ -232,6 +365,7 @@ impl Builder {
                     return false;
                 }
                 first.roles |= later.roles;
+                first.call |= later.call;
                 true
             });
             self.index.by_symbol.insert(symbol, occurrences);

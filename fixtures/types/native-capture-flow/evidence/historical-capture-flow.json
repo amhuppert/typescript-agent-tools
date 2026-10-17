@@ -1,0 +1,3137 @@
+[
+  {
+    "config": "tsconfig.json",
+    "marker": "constant-arrow",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "constant-function",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "mutable-arrow",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "mutable-function",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "before-last",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "after-last",
+    "summary": "string",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "function-after-last",
+    "summary": "string",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "declaration-after-last",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "constant-refined-arrow",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "constant-refined-expression",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "constant-refined-declaration",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "compound-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "compound-after",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "nested-assignment",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "never-initialized",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "definitely-assigned-before",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "definitely-assigned-after",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "compound-not-definite",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "object-method",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "object-getter",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "object-setter",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "class-expression-method",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "class-expression-getter",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "class-expression-setter",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "class-declaration-method",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "class-declaration-getter",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "class-declaration-setter",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "exported-let",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "module-local-let",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "type-only-export",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "parameter-before-last",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "parameter-after-last",
+    "summary": "string",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "parameter-no-assignment",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 38,
+            "column": 48
+          },
+          "end": {
+            "line": 38,
+            "column": 53
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 48,
+            "column": 5
+          },
+          "end": {
+            "line": 48,
+            "column": 10
+          }
+        }
+      },
+      {
+        "code": 2454,
+        "message": "Variable 'value' is used before being assigned.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 49,
+            "column": 51
+          },
+          "end": {
+            "line": 49,
+            "column": 56
+          }
+        }
+      },
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "constant-arrow",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "constant-function",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "mutable-arrow",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "mutable-function",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "before-last",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "after-last",
+    "summary": "string",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "function-after-last",
+    "summary": "string",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "declaration-after-last",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "constant-refined-arrow",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "constant-refined-expression",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "constant-refined-declaration",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "compound-inside",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "compound-after",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "nested-assignment",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "never-initialized",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "definitely-assigned-before",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "definitely-assigned-after",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "compound-not-definite",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "object-method",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "object-getter",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "object-setter",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "class-expression-method",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "class-expression-getter",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "class-expression-setter",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "class-declaration-method",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "class-declaration-getter",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "class-declaration-setter",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "exported-let",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "module-local-let",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "type-only-export",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "parameter-before-last",
+    "summary": "string | number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "parameter-after-last",
+    "summary": "string",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  },
+  {
+    "config": "loose.json",
+    "marker": "parameter-no-assignment",
+    "summary": "number",
+    "errorType": false,
+    "kind": "expression",
+    "prelude": [],
+    "diagnostics": [
+      {
+        "code": 2322,
+        "message": "Type 'string | number' is not assignable to type 'number'.",
+        "location": {
+          "file": "flow.ts",
+          "start": {
+            "line": 65,
+            "column": 26
+          },
+          "end": {
+            "line": 65,
+            "column": 32
+          }
+        }
+      }
+    ]
+  }
+]

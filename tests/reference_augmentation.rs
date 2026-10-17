@@ -48,7 +48,7 @@ fn load(fixture: &Fixture, case: &str) -> Project {
 }
 
 fn load_error(fixture: &Fixture, case: &str) -> InputError {
-    match Project::load(&fixture.path("tsconfig.json")) {
+    match Project::load(&fixture.path("tsconfig.json")).map_err(support::input_error) {
         Ok(_) => panic!("{case}: the project should fail to load"),
         Err(error) => error,
     }
@@ -1809,7 +1809,7 @@ fn one_way_pattern_merges_check_the_views_their_declarations_select() {
                     ("main.ts", &main),
                 ]);
                 let context = format!("{case}: dependency pattern, skipLibCheck {skip}");
-                match Project::load(&fixture.path("tsconfig.json")) {
+                match Project::load(&fixture.path("tsconfig.json")).map_err(support::input_error) {
                     Ok(_) => assert!(!rejected(pattern, augmentation), "{context} loaded"),
                     Err(error) => {
                         assert!(rejected(pattern, augmentation), "{context}: {error}");
@@ -1828,7 +1828,7 @@ fn one_way_pattern_merges_check_the_views_their_declarations_select() {
                 ("main.ts", &main),
             ]);
             let context = format!("{case}: both in the project");
-            match Project::load(&fixture.path("tsconfig.json")) {
+            match Project::load(&fixture.path("tsconfig.json")).map_err(support::input_error) {
                 Ok(_) => assert!(!rejected(pattern, augmentation), "{context} loaded"),
                 Err(error) => {
                     assert!(rejected(pattern, augmentation), "{context}: {error}");

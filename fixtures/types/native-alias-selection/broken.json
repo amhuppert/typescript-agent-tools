@@ -1,0 +1,10 @@
+{
+  "extends": "./strict.json",
+  "files": [
+    "globals.d.ts",
+    "exports.ts",
+    "broken.ts",
+    "cycle-a.ts",
+    "cycle-b.ts"
+  ]
+}

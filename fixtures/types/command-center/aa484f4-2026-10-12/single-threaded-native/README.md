@@ -1,0 +1,17 @@
+# Controlled native corpus baseline
+
+The independent snapshot remains revision `aa484f422f00dfb64967d2008fac3c4f9a92538e` with a clean tracked tree. This profile selects an untracked `tsconfig.native-corpus.json` extending its pristine original configuration with `singleThreaded:true`. Exact child/base contents and hashes are recorded in `profile-provenance.json`. Product workers are unaffected.
+
+Pinned 7.0.2 parallel parsing produced different default-library external provenance on unchanged tiny and corpus inputs. This profile records actual source order and flags rather than folding them. The earlier parallel manifest and unfinished two-row artifact remain under the parent directory and `superseded-api-baseline`; they cannot acquire completion from the new profile's queries.
+
+Registered freeze `vrun-85e920b5-4e96-43e0-a8f8-989faf646f33` passed with two fresh discoveries agreeing on all 7,639 program inputs and five fixed anchors. The complete source inventory, compiler identity, exact effective options, dependency locks and generated inputs are in `input-manifest.json`. Exact freeze tooling and hashes are archived under `captured-tooling/freeze`.
+
+Fresh native member capture passed `vrun-cf1abce4-3435-458b-af90-8a03dd47c9e6`; all five type anchors passed `vrun-0745e72c-9f3c-4c4b-90a2-b24f142cfe08`. Both artifacts have `captureComplete:true` after exact expected-request joins and full actual replay/API/source/option comparisons. Each request retains 7,639 actual native source rows and hashes all 7,968 consumed raw inputs, including metadata and both configuration files. Raw replay source hashes describe decoded compiler text; raw input hashes preserve original bytes.
+
+The two cleanup member seeds each have 124 decoded inventory rows, 119 native candidate demands, one group and seven occurrences, including three cross-file calls. The JSX seed has 12 candidate demands and two groups with nine occurrences, including four JSX attribute uses. Candidate inventory, native eligibility and product coverage are distinct quantities. JSX/predicate product gap classification is not established by these native answers.
+
+All five Q4 roots are established non-error native types. The inferred factory returns two request handlers with Promise<Response> results. The predicate anchor is the filter property expression; its enclosing call prelude is checked and its overloaded method summary is natively truncated. This is not the whole call-result type or a product graph capture. Every type observation already has two TS2300 diagnostics before summary, yet errorType is false and demandFailures is empty. These startup diagnostics must not be reported as a clean diagnostic project or used to reject all selected types.
+
+Exact member/type toolkits and hashes are archived under `captured-tooling/members` and `captured-tooling/types`. `artifact-hashes.json` binds the baseline and completed raw artifacts; `observation-summary.json` supplies concise raw counts/answers. The temporary external-corpus harness prerequisites were removed after terminal collection.
+
+Native research capture timings include transport, filesystem observation and replay work and do not establish product semantic latency. Product normalized Q3 groups, call/test filter schedules, first/repeated/reversed orders, Q4 graphs, exact JSX/predicate failures, Rust/service/load-refresh comparison, memory and queued-lexical acceptance remain required.

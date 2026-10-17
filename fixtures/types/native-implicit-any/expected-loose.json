@@ -1,0 +1,117 @@
+[
+  {
+    "name": "keywords",
+    "summary": "(any: any, unknown: any, number: any, bigint: any, object: any, boolean: any, string: any, symbol: any, undefined: any, never: any, intrinsic: any) => void",
+    "errorType": false,
+    "before": [],
+    "after": [
+      7051,
+      7051,
+      7051,
+      7051,
+      7051,
+      7051,
+      7051,
+      7051,
+      7051,
+      7051,
+      7051
+    ]
+  },
+  {
+    "name": "escaped",
+    "summary": "(number: any) => void",
+    "errorType": false,
+    "before": [],
+    "after": [
+      7051
+    ]
+  },
+  {
+    "name": "names",
+    "summary": "<T>(T: any, Poison: any, ValueOnly: any, missing: any, async: any, immediate: any) => void",
+    "errorType": false,
+    "before": [],
+    "after": [
+      7051,
+      7051,
+      7006,
+      7006,
+      7006,
+      7006
+    ]
+  },
+  {
+    "name": "rest",
+    "summary": "(...Poison: any[]) => void",
+    "errorType": false,
+    "before": [],
+    "after": [
+      7051
+    ]
+  },
+  {
+    "name": "call",
+    "summary": "(Poison: any) => void",
+    "errorType": false,
+    "before": [],
+    "after": [
+      7051
+    ]
+  },
+  {
+    "name": "method",
+    "summary": "{ method(Poison: any): void; }",
+    "errorType": false,
+    "before": [],
+    "after": [
+      7051
+    ]
+  },
+  {
+    "name": "construct",
+    "summary": "new (Poison: any) => object",
+    "errorType": false,
+    "before": [],
+    "after": [
+      7006
+    ]
+  },
+  {
+    "name": "parameter",
+    "summary": "any",
+    "errorType": false,
+    "before": [
+      7006
+    ],
+    "after": [
+      7006
+    ]
+  },
+  {
+    "name": "restParameter",
+    "summary": "any[]",
+    "errorType": false,
+    "before": [
+      7019
+    ],
+    "after": [
+      7019
+    ]
+  },
+  {
+    "name": "widening",
+    "summary": "{ nested: { nullable: any; absent: any; }; empty: any[]; }",
+    "errorType": false,
+    "before": [
+      7018,
+      7018,
+      7018
+    ],
+    "after": [
+      7018,
+      7018,
+      7018
+    ]
+  }
+]

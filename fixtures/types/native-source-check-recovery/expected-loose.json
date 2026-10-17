@@ -1,0 +1,354 @@
+[
+  {
+    "name": "untypedList",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "nestedReference",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "discardedAliasArguments",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "arityStillChecksChildren",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2315,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "arityAcquisitionSkipsChildren",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2315
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "unionChildren",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "intersectionChildren",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "wrappedArray",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "tupleChildren",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "tuplePrepass",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "tupleGrammarStop",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2304,
+      2574,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "conditionalAllChildren",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "inferConstraint",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "signatureChildren",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2304,
+      2304,
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": {
+      "hasSymbol": true,
+      "parameter": "T"
+    },
+    "lastErrorProperty": null
+  },
+  {
+    "name": "constructorChildren",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "literalMembers",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "indexedChildren",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "templateChildren",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "mappedChildren",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "typeQuery",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304,
+      2347,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "rejectedThenConstraint",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304,
+      2347,
+      2344,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "newTypeArguments",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2347,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "tagTypeArguments",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "healthySource",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2347
+    ],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  },
+  {
+    "name": "healthyAfter",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "defaultError": null,
+    "lastErrorProperty": null
+  }
+]

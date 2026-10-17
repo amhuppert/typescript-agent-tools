@@ -1,0 +1,522 @@
+[
+  {
+    "location": {
+      "file": "merged-b.d.ts",
+      "start": {
+        "line": 7,
+        "column": 47
+      },
+      "end": {
+        "line": 7,
+        "column": 57
+      }
+    },
+    "groups": [
+      {
+        "declarations": [
+          {
+            "name": "value",
+            "location": {
+              "file": "merged-a.d.ts",
+              "start": {
+                "line": 1,
+                "column": 52
+              },
+              "end": {
+                "line": 1,
+                "column": 57
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "name": "value",
+            "location": {
+              "file": "merged-a.d.ts",
+              "start": {
+                "line": 1,
+                "column": 52
+              },
+              "end": {
+                "line": 1,
+                "column": 57
+              }
+            },
+            "roles": [
+              "declaration",
+              "export"
+            ]
+          },
+          {
+            "name": "value",
+            "location": {
+              "file": "merged-a.d.ts",
+              "start": {
+                "line": 3,
+                "column": 14
+              },
+              "end": {
+                "line": 3,
+                "column": 19
+              }
+            },
+            "roles": [
+              "export"
+            ]
+          },
+          {
+            "name": "MixedEntry",
+            "location": {
+              "file": "merged-a.d.ts",
+              "start": {
+                "line": 3,
+                "column": 23
+              },
+              "end": {
+                "line": 3,
+                "column": 33
+              }
+            },
+            "roles": [
+              "export"
+            ]
+          },
+          {
+            "name": "value",
+            "location": {
+              "file": "merged-a.d.ts",
+              "start": {
+                "line": 3,
+                "column": 35
+              },
+              "end": {
+                "line": 3,
+                "column": 40
+              }
+            },
+            "roles": [
+              "export"
+            ]
+          },
+          {
+            "name": "PureEntry",
+            "location": {
+              "file": "merged-a.d.ts",
+              "start": {
+                "line": 3,
+                "column": 44
+              },
+              "end": {
+                "line": 3,
+                "column": 53
+              }
+            },
+            "roles": [
+              "export"
+            ]
+          },
+          {
+            "name": "MixedEntry",
+            "location": {
+              "file": "merged-b.d.ts",
+              "start": {
+                "line": 7,
+                "column": 47
+              },
+              "end": {
+                "line": 7,
+                "column": 57
+              }
+            },
+            "roles": [
+              "use"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "location": {
+      "file": "merged-b.d.ts",
+      "start": {
+        "line": 1,
+        "column": 15
+      },
+      "end": {
+        "line": 1,
+        "column": 25
+      }
+    },
+    "groups": [
+      {
+        "declarations": [
+          {
+            "name": "MixedEntry",
+            "location": {
+              "file": "merged-b.d.ts",
+              "start": {
+                "line": 1,
+                "column": 15
+              },
+              "end": {
+                "line": 1,
+                "column": 25
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "name": "MixedEntry",
+            "location": {
+              "file": "merged-b.d.ts",
+              "start": {
+                "line": 1,
+                "column": 15
+              },
+              "end": {
+                "line": 1,
+                "column": 25
+              }
+            },
+            "roles": [
+              "declaration"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "location": {
+      "file": "merged-b.d.ts",
+      "start": {
+        "line": 2,
+        "column": 11
+      },
+      "end": {
+        "line": 2,
+        "column": 21
+      }
+    },
+    "groups": [
+      {
+        "declarations": [
+          {
+            "name": "MixedEntry",
+            "location": {
+              "file": "merged-b.d.ts",
+              "start": {
+                "line": 2,
+                "column": 11
+              },
+              "end": {
+                "line": 2,
+                "column": 21
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "name": "MixedEntry",
+            "location": {
+              "file": "merged-b.d.ts",
+              "start": {
+                "line": 2,
+                "column": 11
+              },
+              "end": {
+                "line": 2,
+                "column": 21
+              }
+            },
+            "roles": [
+              "declaration"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "location": {
+      "file": "merged-b.d.ts",
+      "start": {
+        "line": 3,
+        "column": 15
+      },
+      "end": {
+        "line": 3,
+        "column": 24
+      }
+    },
+    "groups": [
+      {
+        "declarations": [
+          {
+            "name": "PureEntry",
+            "location": {
+              "file": "merged-b.d.ts",
+              "start": {
+                "line": 3,
+                "column": 15
+              },
+              "end": {
+                "line": 3,
+                "column": 24
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "name": "PureEntry",
+            "location": {
+              "file": "merged-b.d.ts",
+              "start": {
+                "line": 3,
+                "column": 15
+              },
+              "end": {
+                "line": 3,
+                "column": 24
+              }
+            },
+            "roles": [
+              "declaration"
+            ]
+          },
+          {
+            "name": "PureEntry",
+            "location": {
+              "file": "merged-b.d.ts",
+              "start": {
+                "line": 8,
+                "column": 45
+              },
+              "end": {
+                "line": 8,
+                "column": 54
+              }
+            },
+            "roles": [
+              "use"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "location": {
+      "file": "merged-b.d.ts",
+      "start": {
+        "line": 8,
+        "column": 45
+      },
+      "end": {
+        "line": 8,
+        "column": 54
+      }
+    },
+    "groups": [
+      {
+        "declarations": [
+          {
+            "name": "PureEntry",
+            "location": {
+              "file": "merged-b.d.ts",
+              "start": {
+                "line": 3,
+                "column": 15
+              },
+              "end": {
+                "line": 3,
+                "column": 24
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "name": "PureEntry",
+            "location": {
+              "file": "merged-b.d.ts",
+              "start": {
+                "line": 3,
+                "column": 15
+              },
+              "end": {
+                "line": 3,
+                "column": 24
+              }
+            },
+            "roles": [
+              "declaration"
+            ]
+          },
+          {
+            "name": "PureEntry",
+            "location": {
+              "file": "merged-b.d.ts",
+              "start": {
+                "line": 8,
+                "column": 45
+              },
+              "end": {
+                "line": 8,
+                "column": 54
+              }
+            },
+            "roles": [
+              "use"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "location": {
+      "file": "merged-b.d.ts",
+      "start": {
+        "line": 5,
+        "column": 22
+      },
+      "end": {
+        "line": 5,
+        "column": 32
+      }
+    },
+    "groups": [
+      {
+        "declarations": [
+          {
+            "name": "MixedEntry",
+            "location": {
+              "file": "merged-b.d.ts",
+              "start": {
+                "line": 5,
+                "column": 22
+              },
+              "end": {
+                "line": 5,
+                "column": 32
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "name": "MixedEntry",
+            "location": {
+              "file": "merged-b.d.ts",
+              "start": {
+                "line": 5,
+                "column": 22
+              },
+              "end": {
+                "line": 5,
+                "column": 32
+              }
+            },
+            "roles": [
+              "declaration",
+              "export"
+            ]
+          },
+          {
+            "name": "MixedEntry",
+            "location": {
+              "file": "merged-b.d.ts",
+              "start": {
+                "line": 6,
+                "column": 38
+              },
+              "end": {
+                "line": 6,
+                "column": 48
+              }
+            },
+            "roles": [
+              "use"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "location": {
+      "file": "merged-b.d.ts",
+      "start": {
+        "line": 6,
+        "column": 38
+      },
+      "end": {
+        "line": 6,
+        "column": 48
+      }
+    },
+    "groups": [
+      {
+        "declarations": [
+          {
+            "name": "MixedEntry",
+            "location": {
+              "file": "merged-b.d.ts",
+              "start": {
+                "line": 5,
+                "column": 22
+              },
+              "end": {
+                "line": 5,
+                "column": 32
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "name": "MixedEntry",
+            "location": {
+              "file": "merged-b.d.ts",
+              "start": {
+                "line": 5,
+                "column": 22
+              },
+              "end": {
+                "line": 5,
+                "column": 32
+              }
+            },
+            "roles": [
+              "declaration",
+              "export"
+            ]
+          },
+          {
+            "name": "MixedEntry",
+            "location": {
+              "file": "merged-b.d.ts",
+              "start": {
+                "line": 6,
+                "column": 38
+              },
+              "end": {
+                "line": 6,
+                "column": 48
+              }
+            },
+            "roles": [
+              "use"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

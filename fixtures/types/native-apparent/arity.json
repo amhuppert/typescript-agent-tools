@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "files": [
+    "arity.d.ts",
+    "cases.ts"
+  ]
+}

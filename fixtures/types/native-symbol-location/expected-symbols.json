@@ -1,0 +1,319 @@
+[
+  {
+    "file": "cases.ts",
+    "name": "field",
+    "syntax": "Identifier",
+    "flags": 4,
+    "declarations": [
+      {
+        "file": "cases.ts",
+        "kind": "PropertySignature",
+        "start": 28,
+        "end": 49
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "access",
+    "syntax": "Identifier",
+    "flags": 4,
+    "declarations": [
+      {
+        "file": "cases.ts",
+        "kind": "PropertySignature",
+        "start": 28,
+        "end": 49
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "literalAccess",
+    "syntax": "StringLiteral",
+    "flags": 4,
+    "declarations": [
+      {
+        "file": "cases.ts",
+        "kind": "PropertySignature",
+        "start": 28,
+        "end": 49
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "indexedType",
+    "syntax": "StringLiteral",
+    "flags": 4,
+    "declarations": [
+      {
+        "file": "cases.ts",
+        "kind": "PropertySignature",
+        "start": 28,
+        "end": 49
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "bindingProperty",
+    "syntax": "Identifier",
+    "flags": 4,
+    "declarations": [
+      {
+        "file": "cases.ts",
+        "kind": "PropertySignature",
+        "start": 28,
+        "end": 49
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "predicate",
+    "syntax": "Identifier",
+    "flags": 1,
+    "declarations": [
+      {
+        "file": "cases.ts",
+        "kind": "Parameter",
+        "start": 305,
+        "end": 319
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "namespacePrefix",
+    "syntax": "Identifier",
+    "flags": 525312,
+    "declarations": [
+      {
+        "file": "cases.ts",
+        "kind": "ModuleDeclaration",
+        "start": 367,
+        "end": 410
+      },
+      {
+        "file": "cases.ts",
+        "kind": "TypeAliasDeclaration",
+        "start": 463,
+        "end": 483
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "typeReference",
+    "syntax": "Identifier",
+    "flags": 525312,
+    "declarations": [
+      {
+        "file": "cases.ts",
+        "kind": "ModuleDeclaration",
+        "start": 367,
+        "end": 410
+      },
+      {
+        "file": "cases.ts",
+        "kind": "TypeAliasDeclaration",
+        "start": 463,
+        "end": 483
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "ordinaryLiteral",
+    "syntax": "StringLiteral",
+    "flags": null,
+    "declarations": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "surrogateLiteral",
+    "syntax": "StringLiteral",
+    "flags": null,
+    "declarations": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "surrogateTemplate",
+    "syntax": "FirstTemplateToken",
+    "flags": null,
+    "declarations": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "privateDeclaration",
+    "syntax": "PrivateIdentifier",
+    "flags": 4,
+    "declarations": [
+      {
+        "file": "cases.ts",
+        "kind": "PropertyDeclaration",
+        "start": 735,
+        "end": 784
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "privateRead",
+    "syntax": "PrivateIdentifier",
+    "flags": 4,
+    "declarations": [
+      {
+        "file": "cases.ts",
+        "kind": "PropertyDeclaration",
+        "start": 735,
+        "end": 784
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "privateIn",
+    "syntax": "PrivateIdentifier",
+    "flags": 4,
+    "declarations": [
+      {
+        "file": "cases.ts",
+        "kind": "PropertyDeclaration",
+        "start": 735,
+        "end": 784
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "importHead",
+    "syntax": "Identifier",
+    "flags": 512,
+    "declarations": [
+      {
+        "file": "cases.ts",
+        "kind": "ModuleDeclaration",
+        "start": 1045,
+        "end": 1132
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "importMiddle",
+    "syntax": "Identifier",
+    "flags": 512,
+    "declarations": [
+      {
+        "file": "cases.ts",
+        "kind": "ModuleDeclaration",
+        "start": 1064,
+        "end": 1130
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "importTail",
+    "syntax": "Identifier",
+    "flags": 32,
+    "declarations": [
+      {
+        "file": "cases.ts",
+        "kind": "ClassDeclaration",
+        "start": 1089,
+        "end": 1128
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "lateVariable",
+    "syntax": "Identifier",
+    "flags": 1,
+    "declarations": [
+      {
+        "file": "cases.ts",
+        "kind": "VariableDeclaration",
+        "start": 1387,
+        "end": 1398
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "lateClosure",
+    "syntax": "Identifier",
+    "flags": 1,
+    "declarations": [
+      {
+        "file": "cases.ts",
+        "kind": "VariableDeclaration",
+        "start": 1387,
+        "end": 1398
+      }
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "mergedVariable",
+    "syntax": "Identifier",
+    "flags": 1,
+    "declarations": [
+      {
+        "file": "cases.ts",
+        "kind": "VariableDeclaration",
+        "start": 1711,
+        "end": 1721
+      },
+      {
+        "file": "cases.ts",
+        "kind": "VariableDeclaration",
+        "start": 1765,
+        "end": 1775
+      }
+    ]
+  },
+  {
+    "file": "merge-read.ts",
+    "name": "transientVariable",
+    "syntax": "Identifier",
+    "flags": 33554433,
+    "declarations": [
+      {
+        "file": "merge-a.ts",
+        "kind": "VariableDeclaration",
+        "start": 37,
+        "end": 47
+      },
+      {
+        "file": "merge-b.ts",
+        "kind": "VariableDeclaration",
+        "start": 37,
+        "end": 47
+      }
+    ]
+  },
+  {
+    "file": "merge-read.ts",
+    "name": "transientClosure",
+    "syntax": "Identifier",
+    "flags": 33554433,
+    "declarations": [
+      {
+        "file": "merge-a.ts",
+        "kind": "VariableDeclaration",
+        "start": 37,
+        "end": 47
+      },
+      {
+        "file": "merge-b.ts",
+        "kind": "VariableDeclaration",
+        "start": 37,
+        "end": 47
+      }
+    ]
+  }
+]

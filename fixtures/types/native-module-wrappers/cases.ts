@@ -1,0 +1,13 @@
+import * as callable from "./callable";
+import * as object from "./object";
+import * as real from "./default";
+const callableLabel = callable./*#callableLabel*/label;
+const callableDefault = callable./*#callableDefault*/default;
+const objectLabel = object./*#objectLabel*/label;
+const objectOptional = object./*#objectOptional*/optional;
+const objectFixed = object./*#objectFixed*/fixed;
+const realDefault = real./*#realDefault*/default;
+const realLabel = real./*#realLabel*/label;
+const callableNamespace = /*#callableNamespace*/callable;
+const objectNamespace = /*#objectNamespace*/object;
+const realNamespace = /*#realNamespace*/real;

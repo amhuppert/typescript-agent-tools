@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "noLib": true,
+    "types": [],
+    "importHelpers": true,
+    "useDefineForClassFields": false
+  },
+  "files": [
+    "globals.d.ts",
+    "helpers-recover.d.ts",
+    "helpers.ts"
+  ]
+}

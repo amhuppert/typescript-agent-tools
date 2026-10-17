@@ -1,0 +1,4 @@
+{
+  "compilerOptions": { "noLib": true, "target": "es2025", "strict": true },
+  "files": ["cases.ts"]
+}

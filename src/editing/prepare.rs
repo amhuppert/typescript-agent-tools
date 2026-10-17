@@ -235,12 +235,9 @@ fn validate(
             // Preserved syntax right after a change usually means the
             // change's last statement continues into it.
             let follows = composition.regions().iter().find(|region| {
-                crate::lexer::Lexer {
-                    src: composition.text(),
-                    pos: region.composed.end,
-                }
-                .next()
-                .start
+                crate::lexer::Lexer::new(composition.text(), region.composed.end)
+                    .next()
+                    .start
                     == mismatch.composed
             });
             let edit = match (composition.origin(mismatch.composed), follows) {

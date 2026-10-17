@@ -375,12 +375,10 @@ impl<'a, 'src> Projection<'a, 'src> {
             names.extend(syntax::id(ast.node(body), "name"));
             interior = body;
         }
-        let Some(&first) = names.first() else {
+        if names.is_empty() {
             return;
-        };
-        let kind = if ast.node(first).syntax_kind == SyntaxKind::StringLiteral
-            || ast.node(v.node).flags & crate::compiler::node::GLOBAL_AUGMENTATION != 0
-        {
+        }
+        let kind = if syntax::is_ambient_module(ast, v.node) {
             Kind::Module
         } else {
             Kind::Namespace
@@ -528,15 +526,8 @@ impl<'a, 'src> Projection<'a, 'src> {
         let ast = self.ast;
         for &parameter in syntax::ids(ast.node(constructor), "parameters") {
             let node = ast.node(parameter);
-            let property = [
-                SyntaxKind::PublicKeyword,
-                SyntaxKind::PrivateKeyword,
-                SyntaxKind::ProtectedKeyword,
-                SyntaxKind::ReadonlyKeyword,
-                SyntaxKind::OverrideKeyword,
-            ]
-            .into_iter()
-            .any(|modifier| has_modifier(ast, node, modifier));
+            let property =
+                syntax::is_parameter_property_declaration(ast, node, ast.node(constructor));
             let Some(name) = syntax::id(node, "name").filter(|_| property) else {
                 continue;
             };
@@ -615,11 +606,7 @@ impl<'a, 'src> Projection<'a, 'src> {
             let after = syntax::ids(node, "modifiers")
                 .last()
                 .map_or(anchor.start, |&modifier| self.ast.node(modifier).span.end);
-            let keyword = Lexer {
-                src: self.ast.source(),
-                pos: after,
-            }
-            .next();
+            let keyword = Lexer::new(self.ast.source(), after).next();
             if keyword.start != anchor.start && keyword.end > keyword.start {
                 targets.push(Span {
                     start: keyword.start,
@@ -835,11 +822,7 @@ impl<'a, 'src> Projection<'a, 'src> {
 
     fn first_token(&self, node: NodeId) -> Span {
         let start = self.own_range(node).start;
-        let token = Lexer {
-            src: self.ast.source(),
-            pos: start,
-        }
-        .next();
+        let token = Lexer::new(self.ast.source(), start).next();
         Span {
             start,
             end: token.end.max(start),
@@ -863,10 +846,7 @@ impl<'a, 'src> Projection<'a, 'src> {
                 after = after.max(ast.node(last).span.end);
             }
         }
-        let mut lexer = Lexer {
-            src: ast.source(),
-            pos: after,
-        };
+        let mut lexer = Lexer::new(ast.source(), after);
         (0..8)
             .map(|_| lexer.next())
             .take_while(|token| token.end > token.start)

@@ -1,0 +1,146 @@
+[
+  {
+    "config": "tsconfig",
+    "name": "object",
+    "summary": "{ value: number; nested: { text: string; }; }",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "array",
+    "summary": "{ value: number; }[]",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "siblings",
+    "summary": "(flag: boolean) => { left: number; right?: undefined; } | { left?: undefined; right: string; }",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "nested",
+    "summary": "(flag: boolean) => { value: { left: number; right?: undefined; }; } | { value: { left?: undefined; right: string; }; }",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "nullable",
+    "summary": "(flag: boolean) => { value: number; } | undefined",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "shared",
+    "summary": "(flag: boolean) => { left: number; same: { x: string; y?: undefined; }; right?: undefined; } | { left?: undefined; right: string; same: { x?: undefined; y: number; }; }",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "readonly",
+    "summary": "readonly [1, \"x\"]",
+    "errorType": false
+  },
+  {
+    "config": "tsconfig",
+    "name": "literals",
+    "summary": "(1 | 2)[]",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "object",
+    "summary": "{ value: number; nested: { text: string; }; }",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "array",
+    "summary": "{ value: number; }[]",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "siblings",
+    "summary": "(flag: boolean) => { left: number; right?: undefined; } | { left?: undefined; right: string; }",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "nested",
+    "summary": "(flag: boolean) => { value: { left: number; right?: undefined; }; } | { value: { left?: undefined; right: string; }; }",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "nullable",
+    "summary": "(flag: boolean) => { value: number; }",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "shared",
+    "summary": "(flag: boolean) => { left: number; same: { x: string; y?: undefined; }; right?: undefined; } | { left?: undefined; right: string; same: { x?: undefined; y: number; }; }",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "readonly",
+    "summary": "readonly [1, \"x\"]",
+    "errorType": false
+  },
+  {
+    "config": "loose",
+    "name": "literals",
+    "summary": "(1 | 2)[]",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "object",
+    "summary": "{ value: number; nested: { text: string; }; }",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "array",
+    "summary": "{ value: number; }[]",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "siblings",
+    "summary": "(flag: boolean) => { left: number; right?: never; } | { left?: never; right: string; }",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "nested",
+    "summary": "(flag: boolean) => { value: { left: number; right?: never; }; } | { value: { left?: never; right: string; }; }",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "nullable",
+    "summary": "(flag: boolean) => { value: number; } | undefined",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "shared",
+    "summary": "(flag: boolean) => { left: number; same: { x: string; y?: never; }; right?: never; } | { left?: never; right: string; same: { x?: never; y: number; }; }",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "readonly",
+    "summary": "readonly [1, \"x\"]",
+    "errorType": false
+  },
+  {
+    "config": "exact",
+    "name": "literals",
+    "summary": "(1 | 2)[]",
+    "errorType": false
+  }
+]

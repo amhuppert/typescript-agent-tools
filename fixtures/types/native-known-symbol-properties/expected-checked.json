@@ -1,0 +1,111 @@
+[
+  {
+    "name": "stringIndexUnique",
+    "summary": "1",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "symbolIndexUnique",
+    "summary": "3",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "numberIndexUnique",
+    "summary": "6",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "exactUnique",
+    "summary": "7",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "unionStringUnique",
+    "summary": "10",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "intersectionStringUnique",
+    "summary": "11",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "stringIndexPlain",
+    "summary": "13",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "numberIndexNumeric",
+    "summary": "15",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "stringIndexDifferentValue",
+    "summary": "17",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "noIndexUnique",
+    "summary": "20",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "stringIndexMethod",
+    "summary": "21",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "stringElementUnique",
+    "summary": "number | undefined",
+    "errorType": false,
+    "codes": [
+      2538
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "symbolElementUnique",
+    "summary": "number | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "numberElementUnique",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      7015
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "stringElementPlain",
+    "summary": "number | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  }
+]

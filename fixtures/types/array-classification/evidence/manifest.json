@@ -1,0 +1,115 @@
+{
+  "compiler": "7.0.2",
+  "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "purpose": "one fresh same-checker raw Array/ReadonlyArray identity-predicate control; no product gate or generalization",
+  "provenance": "exact replay input hashes came from captured native replay; copies verified after run; observer/tool/native source hashes recorded after run, not an atomic tool installation snapshot",
+  "inputs": [
+    {
+      "originalFile": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-array-targets/valid-members/consumer.ts",
+      "archivedFile": "inputs/consumer.ts",
+      "sha256": "84f86fdf9705f2083660b0e2b5dce9c6519cce470f669e094ce3a0c4b8b9d4b2"
+    },
+    {
+      "originalFile": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-array-targets/valid-members/data.json",
+      "archivedFile": "inputs/data.json",
+      "sha256": "6fcb43778f5d358313c51104af2f6ccc78d5db3b037fff91b31c7994e289fbd5"
+    },
+    {
+      "originalFile": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-array-targets/valid-members/globals.ts",
+      "archivedFile": "inputs/globals.ts",
+      "sha256": "87e205245c589082aa37a87a198fbc53a14544921f194600e06669ef09f66984"
+    },
+    {
+      "originalFile": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-array-targets/valid-members/strict-1-exact-0-unchecked-0.json",
+      "archivedFile": "inputs/strict-1-exact-0-unchecked-0.json",
+      "sha256": "b8d2e9f6f4f5198191fb7ebe59fc22d759e587491294ee3948282a53a9c365cc"
+    },
+    {
+      "originalFile": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-array-targets/valid-members/tsconfig.json",
+      "archivedFile": "inputs/tsconfig.json",
+      "sha256": "f26c18fd1bdfd04aaa2993b2adcc5ff1a229e40f9a9491a40b43d5692de2295f"
+    }
+  ],
+  "observedToolOwners": [
+    {
+      "file": "tools/type-oracle.mjs",
+      "sha256": "46685c7bb9b659349a1e317d4007ece056e58fcdbd7bb6ffe557bdc5a9ff8eed"
+    },
+    {
+      "file": "tools/semantic-oracle.mjs",
+      "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+    },
+    {
+      "file": "tools/navigation-oracle.mjs",
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+    },
+    {
+      "file": "tools/vendor-typescript-libs.mjs",
+      "sha256": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d"
+    }
+  ],
+  "nativeSource": [
+    {
+      "file": "internal/checker/checker.go",
+      "sha256": "32384dde486c33c59c5695505f4c951c3009c6d7e50589cb5b18d0ea92cbf161"
+    },
+    {
+      "file": "internal/checker/nodebuilderimpl.go",
+      "sha256": "254d4fb1a6dd1e8cace5615cee98d7479346c2c3b2ff8196bbe47a7290c8e179"
+    },
+    {
+      "file": "internal/scanner/utilities.go",
+      "sha256": "8e8a42879a911442aadd077abde3a1dd63d56cbe8a5d03e46a8e9f18f84e97e5"
+    }
+  ],
+  "files": [
+    {
+      "file": "answers.json",
+      "sha256": "21b7a729f74b0c7e9a215ceb1fb69f97fdfdd62061bb1a589a2bc7567e30af7c"
+    },
+    {
+      "file": "checker-hook.go",
+      "sha256": "9a43b782f9c9543aaa489be567c4455ae6319d14c2f3f79570b9e958e3feab56"
+    },
+    {
+      "file": "inputs/consumer.ts",
+      "sha256": "84f86fdf9705f2083660b0e2b5dce9c6519cce470f669e094ce3a0c4b8b9d4b2"
+    },
+    {
+      "file": "inputs/data.json",
+      "sha256": "6fcb43778f5d358313c51104af2f6ccc78d5db3b037fff91b31c7994e289fbd5"
+    },
+    {
+      "file": "inputs/globals.ts",
+      "sha256": "87e205245c589082aa37a87a198fbc53a14544921f194600e06669ef09f66984"
+    },
+    {
+      "file": "inputs/strict-1-exact-0-unchecked-0.json",
+      "sha256": "b8d2e9f6f4f5198191fb7ebe59fc22d759e587491294ee3948282a53a9c365cc"
+    },
+    {
+      "file": "inputs/tsconfig.json",
+      "sha256": "f26c18fd1bdfd04aaa2993b2adcc5ff1a229e40f9a9491a40b43d5692de2295f"
+    },
+    {
+      "file": "ls-hook.go",
+      "sha256": "73c9a52f43914571bdf7f29e8817720d0ff98bdb0aeb7cad183fa8397a848dce"
+    },
+    {
+      "file": "oracle-test.go",
+      "sha256": "99d77ba965d6187636a0a43f9f531e1320498df57eb0263421ea6f44c6e68530"
+    },
+    {
+      "file": "oracle.mjs",
+      "sha256": "67e671088d18a423b3b3ec220385198d5d3af05ea71184ba114f02f2566b88ed"
+    },
+    {
+      "file": "probe.mjs",
+      "sha256": "9b48616bb617ac0419ce95d25177563652cc0e89972d0fbd749b62c0807143ec"
+    },
+    {
+      "file": "setup.mjs",
+      "sha256": "66a601e1923c42f5eccd4bcaaab3f9028366e276c49b34d32179e597dcf13f7e"
+    }
+  ]
+}

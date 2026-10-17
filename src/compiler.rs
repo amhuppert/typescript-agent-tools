@@ -7,6 +7,7 @@ pub(crate) mod node {
     pub(crate) const USING: u32 = 4;
     pub(crate) const AWAIT_USING: u32 = 6;
     pub(crate) const NESTED_NAMESPACE: u32 = 8;
+    pub(crate) const REPARSED: u32 = 8;
     pub(crate) const NAMESPACE: u32 = 32;
     pub(crate) const OPTIONAL_CHAIN: u32 = 64;
     pub(crate) const GLOBAL_AUGMENTATION: u32 = 2048;
@@ -17,6 +18,7 @@ pub(crate) mod node {
     pub(crate) const DISALLOW_CONDITIONAL_TYPES_CONTEXT: u32 = 131072;
     pub(crate) const POSSIBLY_CONTAINS_DYNAMIC_IMPORT: u32 = 4194304;
     pub(crate) const POSSIBLY_CONTAINS_IMPORT_META: u32 = 8388608;
+    pub(crate) const JSDOC: u32 = 16777216;
     pub(crate) const AMBIENT: u32 = 33554432;
     pub(crate) const IN_WITH_STATEMENT: u32 = 67108864;
     pub(crate) const DEPRECATED: u32 = 536870912;

@@ -1,0 +1,40 @@
+type BrandString = string & { readonly brand: "string" };
+type BrandNumber = number & { readonly brand: "number" };
+type BrandPattern = `item-${number}` & { readonly brand: "pattern" };
+type Pattern = { [key: `item-${number}`]: "pattern" };
+type Upper = { [key: Uppercase<string>]: "upper" };
+export declare const /*#primitiveString*/primitiveString: { [key: string]: "string" }[string];
+export declare const /*#primitiveNumber*/primitiveNumber: { [key: number]: "number" }[42];
+export declare const /*#primitiveSymbol*/primitiveSymbol: { [key: symbol]: "symbol" }[symbol];
+export declare const /*#patternNumber*/patternNumber: Pattern["item-42"];
+export declare const /*#patternBigInt*/patternBigInt: { [key: `big-${bigint}`]: "big" }["big-12"];
+export declare const /*#patternString*/patternString: { [key: `str-${string}`]: "str" }["str-any"];
+export declare const /*#patternBad*/patternBad: Pattern["other-42"];
+export declare const /*#mappingUpper*/mappingUpper: Upper["UPPER"];
+export declare const /*#mappingBad*/mappingBad: Upper["Mixed"];
+export declare const /*#mappingNested*/mappingNested: { [key: Uppercase<Lowercase<string>>]: "nested" }["ABC"];
+export declare const /*#mappingTemplate*/mappingTemplate: { [key: Uppercase<`pre-${string}`>]: "mapped-template" }["PRE-ABC"];
+export declare const /*#brandString*/brandString: { [key: BrandString]: "brand-string" }[BrandString];
+export declare const /*#brandNumber*/brandNumber: { [key: BrandNumber]: "brand-number" }[BrandNumber];
+export declare const /*#brandPattern*/brandPattern: { [key: BrandPattern]: "brand-pattern" }[BrandPattern];
+export declare const /*#intersectionRejected*/intersectionRejected: keyof { [key: { a: 1 } & { b: 2 }]: "invalid" };
+export declare const /*#literalRejected*/literalRejected: keyof { [key: "one"]: "invalid" };
+export declare const /*#anyRejected*/anyRejected: keyof { [key: any]: "invalid" };
+export declare const /*#booleanPatternRejected*/booleanPatternRejected: keyof { [key: `bool-${boolean}`]: "invalid" };
+export declare const /*#unionPrimitive*/unionPrimitive: { [key: string | number | symbol]: "all" }[number | symbol];
+export declare const /*#unionPatterns*/unionPatterns: { [key: `x-${number}` | Uppercase<string>]: "union" }["x-1" | "ABC"];
+export declare const /*#mixedUnionKey*/mixedUnionKey: { [key: string | boolean]: "valid-part" }[string];
+export declare const /*#overlapFallback*/overlapFallback: { [key: string]: "fallback"; [key: `item-${number}`]: "pattern" }["item-42"];
+export declare const /*#overlapPatterns*/overlapPatterns: { [key: `x-${string}`]: "first"; [key: `${string}-y`]: "second" }["x-y"];
+export declare const /*#duplicate*/duplicate: { [key: `x-${number}`]: "first"; [key: `x-${number}`]: "second" }["x-1"];
+export declare const /*#duplicateUnion*/duplicateUnion: { [key: string | number]: "first"; [key: number]: "second" }[number];
+export declare const /*#readonlyPattern*/readonlyPattern: { readonly [key: `r-${number}`]: "readonly" }["r-1"];
+export function generic<T extends string>(/*#genericRejected*/result: keyof { [key: T & string]: "generic" }) {}
+export function genericPattern<T extends string>(/*#genericPatternRejected*/result: keyof { [key: `g-${T}`]: "generic" }) {}
+export function genericMapping<T extends string>(/*#genericMappingRejected*/result: keyof { [key: Uppercase<T>]: "generic" }) {}
+export declare const /*#duplicateFailure*/duplicateFailure: { [key: `x-${number}`]: "first"; [key: `x-${number}`]: MissingDuplicateValue }["x-1"];
+export declare const /*#invalidKeyFailure*/invalidKeyFailure: { [key: boolean]: MissingInvalidKeyValue }[string];
+export declare const /*#valueBeforeKey*/valueBeforeKey: { [key: MissingIndexKey]: MissingIndexValue }[string];
+export declare const /*#missingKey*/missingKey: { [key: MissingKeyOnly]: "value" }[string];
+declare const patternObject: Pattern;
+const /*#patternExpression*/patternExpression = patternObject["item-42"];

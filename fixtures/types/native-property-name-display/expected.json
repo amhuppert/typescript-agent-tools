@@ -1,0 +1,74 @@
+[
+  {
+    "name": "numeric",
+    "summary": "{ 1: number; 1.5: string; 1000: boolean; 0: null; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "stringNamed",
+    "summary": "{ \"1\": number; \"1.5\": string; \"1e3\": boolean; \"01\": null; \"-1\": undefined; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "singleQuoted",
+    "summary": "{ '1': number; 'with space': string; 'line\\nend': boolean; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "identifiers",
+    "summary": "{ plain: number; other: string; é: boolean; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "methods",
+    "summary": "{ new (): number; \"1\"(): string; 2(): boolean; 'with space'(): null; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "mappedNumbers",
+    "summary": "{ [-1]: -1; 0: 0; 1.5: 1.5; 1000: 1000; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "mappedStrings",
+    "summary": "{ [-1]: \"-1\"; \"01\": \"01\"; 1: \"1\"; \"1e3\": \"1e3\"; \"with space\": \"with space\"; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "computedNumber",
+    "summary": "{ 1: number; \"-1\": string; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "computedString",
+    "summary": "{ \"1\": number; \"-1\": string; \"with space\": boolean; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "mixed",
+    "summary": "{ 1: number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "quoted",
+    "summary": "{ \"with space\": number; }",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "methodNew",
+    "summary": "{ \"new\"?(): number; \"new\"?(): number; }",
+    "errorType": false,
+    "codes": []
+  }
+]

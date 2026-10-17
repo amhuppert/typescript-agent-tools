@@ -1,0 +1,106 @@
+{
+  "compiler": "7.0.2",
+  "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "nativeBinary": {
+    "file": "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/tsc",
+    "sha256": "76e4987d060ef8207875a53a73619ce665ff16fb2800c0d57a452e21c829bd7b"
+  },
+  "artifacts": [
+    {
+      "file": "fixtures/types/reference-shape/evidence/captured-tooling/setup.mjs",
+      "sha256": "b3596b9e79480df7dda4df35031f28c7cfea57a697879aa9f9c11a306452e270"
+    },
+    {
+      "file": "fixtures/types/reference-shape/evidence/captured-tooling/probe.mjs",
+      "sha256": "0f7e1d864ac3999072d4eb296245bbab35fe2e674aa103e61b0b7a566154bda9"
+    },
+    {
+      "file": "fixtures/types/reference-shape/evidence/captured-tooling/checker-hook.go",
+      "sha256": "65dd824afbf156916bd123009d6b026ec9d54505c7d9acf25fba6633df77e3bb"
+    },
+    {
+      "file": "fixtures/types/reference-shape/evidence/captured-tooling/ls-hook.go",
+      "sha256": "73c9a52f43914571bdf7f29e8817720d0ff98bdb0aeb7cad183fa8397a848dce"
+    },
+    {
+      "file": "fixtures/types/reference-shape/evidence/captured-tooling/oracle-test.go",
+      "sha256": "69ce192104dae45973b43fb101da11b3a951e6dd4f08063626c6bfcc0dd8f159"
+    },
+    {
+      "file": "fixtures/types/reference-shape/evidence/captured-tooling/oracle.mjs",
+      "sha256": "409bd254e3ba0f673380b2a5cd229d01f1b45d318d0ab9134fcaefb81a0b9b4e"
+    },
+    {
+      "file": "fixtures/types/reference-shape/evidence/shape-observations.json",
+      "sha256": "371b5a3732e480863a9239079b90dc2151a49bceef64d894524add3d461ae22e"
+    },
+    {
+      "file": "fixtures/types/reference-shape/cases.ts",
+      "sha256": "3f994eb3013fc4a0934e6e0e2df73d9a822182e9345d088b4ac7f9b9bbe480cc"
+    },
+    {
+      "file": "fixtures/types/reference-shape/tsconfig.json",
+      "sha256": "69a3f3ac507f61afaad186d36925334ba51a2251c73817acb7c1f65ebda4e12a"
+    },
+    {
+      "file": "fixtures/types/reference-shape/loose.json",
+      "sha256": "4da10c0c1db4785b8b9fdb174282a6345e106ccdbf745bfc440a9275b62c9a7b"
+    },
+    {
+      "file": "tools/type-reference-shape-oracle.test.mjs",
+      "sha256": "157bd6ce948c43ac85821763a74a6574bfe1ea0d81fb764d2f35dc105fd908b2"
+    }
+  ],
+  "generatedInputs": [
+    {
+      "file": "fixtures/types/reference-shape/evidence/generated-inputs/call/cases.ts",
+      "sha256": "f2775c7f103524fdf64ebacc1671943eada3c773d71d53975ad87e90f64cb6d9"
+    },
+    {
+      "file": "fixtures/types/reference-shape/evidence/generated-inputs/call/tsconfig.json",
+      "sha256": "eb45f66c09229a4aeeadf3be6728c52c9a69be2f0a0dd2954fb68859ec5b56d5"
+    },
+    {
+      "file": "fixtures/types/reference-shape/evidence/generated-inputs/callConditionalIndex/cases.ts",
+      "sha256": "4728f4c5ae3b8be764ebc6d65dacf332a13f6969e06767a030a7443302409214"
+    },
+    {
+      "file": "fixtures/types/reference-shape/evidence/generated-inputs/callConditionalIndex/tsconfig.json",
+      "sha256": "eb45f66c09229a4aeeadf3be6728c52c9a69be2f0a0dd2954fb68859ec5b56d5"
+    },
+    {
+      "file": "fixtures/types/reference-shape/evidence/generated-inputs/callMissingIndex/cases.ts",
+      "sha256": "04b04ed1e1c61dfffb97323d39777bcbffc79c9c1c6195a2fb7d044006e7e062"
+    },
+    {
+      "file": "fixtures/types/reference-shape/evidence/generated-inputs/callMissingIndex/tsconfig.json",
+      "sha256": "eb45f66c09229a4aeeadf3be6728c52c9a69be2f0a0dd2954fb68859ec5b56d5"
+    },
+    {
+      "file": "fixtures/types/reference-shape/evidence/generated-inputs/construct/cases.ts",
+      "sha256": "2c4b6e3dfcfd9b6d6d5e146415cc31f52857b68dab89ab1196bf04c75db2efd9"
+    },
+    {
+      "file": "fixtures/types/reference-shape/evidence/generated-inputs/construct/tsconfig.json",
+      "sha256": "eb45f66c09229a4aeeadf3be6728c52c9a69be2f0a0dd2954fb68859ec5b56d5"
+    },
+    {
+      "file": "fixtures/types/reference-shape/evidence/generated-inputs/object/cases.ts",
+      "sha256": "364b163a72c26655f08e418ffb51ddcf3d526c06f2fa87de9921d533cb29c99f"
+    },
+    {
+      "file": "fixtures/types/reference-shape/evidence/generated-inputs/object/tsconfig.json",
+      "sha256": "eb45f66c09229a4aeeadf3be6728c52c9a69be2f0a0dd2954fb68859ec5b56d5"
+    },
+    {
+      "file": "fixtures/types/reference-shape/evidence/generated-inputs/objectMissingIndex/cases.ts",
+      "sha256": "6bd877da43e2005302ba8412fa95719c166ec7af66e56f051ecf6a3eb6cd704a"
+    },
+    {
+      "file": "fixtures/types/reference-shape/evidence/generated-inputs/objectMissingIndex/tsconfig.json",
+      "sha256": "eb45f66c09229a4aeeadf3be6728c52c9a69be2f0a0dd2954fb68859ec5b56d5"
+    }
+  ],
+  "sequence": "fresh type demand; beforeSummary guard snapshot; Call signatures; Construct signatures; index inventory and native child-error predicate; afterShape guard snapshot; TypeToString",
+  "limits": "Diagnostic snapshots report already-accumulated native state. New TS2304 is supported by consumed actual index errorType, not diagnostics alone. This does not prove all arbitrary-root recovery causality."
+}

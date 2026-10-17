@@ -1,0 +1,1 @@
+{"compilerOptions":{"strict":true,"noLib":true,"target":"ESNext"},"files":["globals.d.ts","names.ts","merges.ts","indexes.ts","recovery.ts"]}

@@ -1,0 +1,17 @@
+{
+  "command": [
+    "cctl",
+    "validate",
+    "run",
+    "test",
+    "--queue-if-busy",
+    "--require-match",
+    "--",
+    "tests/type_flow_limits.rs"
+  ],
+  "elapsedSeconds": 3.258760131,
+  "exitCode": 0,
+  "stdout": "effect: applied\nrecovery: {\"kind\":\"reported\",\"references\":[{\"kind\":\"validation-run\",\"id\":\"vrun-94f7d921-6a08-4a66-8864-4003e3c053e6\"}]}\nValidation test: vrun-94f7d921-6a08-4a66-8864-4003e3c053e6; scope changed \u2192 changed\nValidation passed (1 files matched).\nrust tests: passed, 0 skipped\n",
+  "stderr": "",
+  "timingScope": "whole registered invocation, including queue and compilation"
+}

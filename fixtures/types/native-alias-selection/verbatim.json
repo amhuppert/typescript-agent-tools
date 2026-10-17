@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noLib": true,
+    "types": [],
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true
+  },
+  "files": [
+    "globals.d.ts",
+    "exports.ts",
+    "types-only.ts",
+    "equals.cts",
+    "cases.ts",
+    "same-a.ts",
+    "same-b.ts"
+  ]
+}

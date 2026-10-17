@@ -14,6 +14,7 @@ use crate::Ast;
 use crate::analysis::{AnalysisError, InputError, InputErrorKind};
 use crate::input::InputKind;
 use crate::navigation::{self, Catalog, Index, Outline, Selector, Show, ShowOutcome, ShowQuery};
+use crate::references::{MemberSuggestion, ReferenceAnchor, UnsearchedMembers};
 use crate::source::SourceText;
 use std::path::Path;
 use std::sync::Arc;
@@ -24,6 +25,13 @@ pub(super) struct NameSite<'p> {
     pub(super) file: FileId,
     index: &'p Index,
     site: usize,
+}
+
+impl NameSite<'_> {
+    /// The same captured Q2 candidate used by navigation's own outcomes.
+    pub(super) fn candidate(&self) -> crate::navigation::Candidate {
+        self.index.candidate(self.site, self.display)
+    }
 }
 
 /// What a name selects: one site, or the outcome of no match or several.
@@ -64,6 +72,52 @@ impl Navigation {
 }
 
 impl Project {
+    /// Matching Q2 member declarations omitted by a lexical name query. Reads
+    /// captured selection indexes only, never disk or the semantic evaluator.
+    pub(super) fn unsearched_members(&self, name: &str, only: Option<FileId>) -> UnsearchedMembers {
+        let mut selectors = Vec::new();
+        for (id, captured) in self.sources.ids().zip(&self.navigation.files) {
+            if only.is_some_and(|only| only != id) {
+                continue;
+            }
+            let Some(Captured::Index(index)) = captured else {
+                continue;
+            };
+            let display = &self.sources.get(id).display;
+            selectors.extend(
+                index
+                    .member_candidates(name, display)
+                    .into_iter()
+                    .map(|candidate| MemberSuggestion {
+                        file: candidate.file.clone(),
+                        selector: candidate.selector,
+                        anchor: ReferenceAnchor {
+                            file: candidate.file,
+                            position: candidate.anchor,
+                        },
+                    }),
+            );
+        }
+        // Stable ordering keeps the earliest declaration anchor when overloads,
+        // merged sites, or getter/setter syntax share one display selector.
+        selectors.sort_by(|a, b| {
+            (&a.file, &a.selector, a.anchor.position).cmp(&(
+                &b.file,
+                &b.selector,
+                b.anchor.position,
+            ))
+        });
+        selectors.dedup_by(|a, b| {
+            a.file == b.file
+                && a.selector == b.selector
+                && (a.selector.is_some() || a.anchor.position == b.anchor.position)
+        });
+        UnsearchedMembers {
+            count: selectors.len(),
+            selectors,
+        }
+    }
+
     /// The complete declaration outline of one searched file. Relative paths
     /// use the current working directory and are matched lexically; a path
     /// that is not Unicode names no file (`FileLookup::find`).
@@ -149,6 +203,24 @@ impl Project {
         name: &str,
         only: Option<FileId>,
     ) -> Result<Named<'_>, AnalysisError> {
+        let mut matches = self.declaration_name_sites(name, only)?;
+        Ok(match matches.len() {
+            0 => Named::Other(ShowOutcome::NotFound),
+            1 => Named::One(matches.remove(0)),
+            _ => Named::Other(ShowOutcome::Ambiguous(
+                matches.iter().map(NameSite::candidate).collect(),
+            )),
+        })
+    }
+
+    /// Raw selector sites before semantic identity/meaning normalization.
+    /// Navigation decides its own syntax-site ambiguity; semantic selection
+    /// can resolve these same sites before deciding its different question.
+    pub(super) fn declaration_name_sites(
+        &self,
+        name: &str,
+        only: Option<FileId>,
+    ) -> Result<Vec<NameSite<'_>>, AnalysisError> {
         let files: Vec<(FileId, &Index)> = match only {
             Some(id) => vec![(id, self.index(id)?)],
             None => self
@@ -174,16 +246,7 @@ impl Project {
         }
         // Stable, so each file's matches stay in source order.
         matches.sort_by(|a, b| a.display.cmp(b.display));
-        Ok(match matches.len() {
-            0 => Named::Other(ShowOutcome::NotFound),
-            1 => Named::One(matches.remove(0)),
-            _ => Named::Other(ShowOutcome::Ambiguous(
-                matches
-                    .iter()
-                    .map(|matched| matched.index.candidate(matched.site, matched.display))
-                    .collect(),
-            )),
-        })
+        Ok(matches)
     }
 
     /// The captured index of a searched file, which is navigation input

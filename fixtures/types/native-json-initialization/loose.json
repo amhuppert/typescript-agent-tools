@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "strict": false,
+    "noLib": true,
+    "types": [],
+    "resolveJsonModule": true
+  },
+  "files": [
+    "globals.d.ts",
+    "main.ts",
+    "augment.ts"
+  ]
+}

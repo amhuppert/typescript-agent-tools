@@ -1,0 +1,22 @@
+type F = () => /* Σ */ MissingΣA | MissingΣB;
+const value = (null! as F)();
+const /*#chosen*/chosen = (
+  /* Σ */ value,
+  /* Σ */ value,
+  /* Σ */ value,
+  /* Σ */ value,
+  /* Σ */ value,
+  /* Σ */ value,
+  /* Σ */ value,
+  /* Σ */ value,
+  /* Σ */ value,
+  /* Σ */ value,
+  /* Σ */ value,
+  /* Σ */ value,
+  /* Σ */ value,
+  /* Σ */ value,
+  /* Σ */ value,
+  /* Σ */ value,
+  17
+);
+declare const healthy: number;

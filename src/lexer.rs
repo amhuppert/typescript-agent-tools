@@ -1,6 +1,10 @@
 //! On-demand nom scanner. Regex, templates and JSX are rescanned in the
 //! grammatical context supplied by the parser, rather than guessed lexically.
 
+use crate::resources::{Control, Stop};
+
+pub(crate) mod jsdoc;
+
 use nom::{
     IResult, Parser as _,
     branch::alt,
@@ -25,6 +29,139 @@ pub(crate) enum Kind {
     Unknown,
 }
 
+/// Native `GetIdentifierToken`, retaining the partitions used by scanner
+/// Identifier tests and parser `isIdentifier`. `raw` is already decoded text;
+/// the public AST's serialized token spelling remains a separate projection.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum IdentifierClass {
+    Identifier,
+    ReservedWord,
+    Keyword,
+}
+
+enum IdentifierKeyword {
+    Public(crate::syntax_kind::SyntaxKind),
+    Immediate,
+}
+
+/// `GetIdentifierToken` / `IdentifierToKeywordKind` share one exact keyword
+/// table. `immediate` is native 7 syntax without a keyword kind in the public
+/// TypeScript 6 JSON AST baseline; its lexical class remains Keyword.
+fn identifier_keyword(raw: &str) -> Option<IdentifierKeyword> {
+    use crate::syntax_kind::SyntaxKind::*;
+    Some(IdentifierKeyword::Public(match raw {
+        "break" => BreakKeyword,
+        "case" => CaseKeyword,
+        "catch" => CatchKeyword,
+        "class" => ClassKeyword,
+        "const" => ConstKeyword,
+        "continue" => ContinueKeyword,
+        "debugger" => DebuggerKeyword,
+        "default" => DefaultKeyword,
+        "delete" => DeleteKeyword,
+        "do" => DoKeyword,
+        "else" => ElseKeyword,
+        "enum" => EnumKeyword,
+        "export" => ExportKeyword,
+        "extends" => ExtendsKeyword,
+        "false" => FalseKeyword,
+        "finally" => FinallyKeyword,
+        "for" => ForKeyword,
+        "function" => FunctionKeyword,
+        "if" => IfKeyword,
+        "import" => ImportKeyword,
+        "in" => InKeyword,
+        "instanceof" => InstanceOfKeyword,
+        "new" => NewKeyword,
+        "null" => NullKeyword,
+        "return" => ReturnKeyword,
+        "super" => SuperKeyword,
+        "switch" => SwitchKeyword,
+        "this" => ThisKeyword,
+        "throw" => ThrowKeyword,
+        "true" => TrueKeyword,
+        "try" => TryKeyword,
+        "typeof" => TypeOfKeyword,
+        "var" => VarKeyword,
+        "void" => VoidKeyword,
+        "while" => WhileKeyword,
+        "with" => WithKeyword,
+        "implements" => ImplementsKeyword,
+        "interface" => InterfaceKeyword,
+        "let" => LetKeyword,
+        "package" => PackageKeyword,
+        "private" => PrivateKeyword,
+        "protected" => ProtectedKeyword,
+        "public" => PublicKeyword,
+        "static" => StaticKeyword,
+        "yield" => YieldKeyword,
+        "abstract" => AbstractKeyword,
+        "accessor" => AccessorKeyword,
+        "as" => AsKeyword,
+        "asserts" => AssertsKeyword,
+        "assert" => AssertKeyword,
+        "any" => AnyKeyword,
+        "async" => AsyncKeyword,
+        "await" => AwaitKeyword,
+        "boolean" => BooleanKeyword,
+        "constructor" => ConstructorKeyword,
+        "declare" => DeclareKeyword,
+        "get" => GetKeyword,
+        "infer" => InferKeyword,
+        "intrinsic" => IntrinsicKeyword,
+        "is" => IsKeyword,
+        "keyof" => KeyOfKeyword,
+        "module" => ModuleKeyword,
+        "namespace" => NamespaceKeyword,
+        "never" => NeverKeyword,
+        "out" => OutKeyword,
+        "readonly" => ReadonlyKeyword,
+        "require" => RequireKeyword,
+        "number" => NumberKeyword,
+        "object" => ObjectKeyword,
+        "satisfies" => SatisfiesKeyword,
+        "set" => SetKeyword,
+        "string" => StringKeyword,
+        "symbol" => SymbolKeyword,
+        "type" => TypeKeyword,
+        "undefined" => UndefinedKeyword,
+        "unique" => UniqueKeyword,
+        "unknown" => UnknownKeyword,
+        "using" => UsingKeyword,
+        "from" => FromKeyword,
+        "global" => GlobalKeyword,
+        "bigint" => BigIntKeyword,
+        "override" => OverrideKeyword,
+        "of" => OfKeyword,
+        "defer" => DeferKeyword,
+        "immediate" => return Some(IdentifierKeyword::Immediate),
+        _ => return None,
+    }))
+}
+
+pub(crate) fn identifier_class(raw: &str) -> IdentifierClass {
+    use crate::syntax_kind::SyntaxKind;
+    match identifier_keyword(raw) {
+        None => IdentifierClass::Identifier,
+        Some(IdentifierKeyword::Public(kind))
+            if (SyntaxKind::BreakKeyword as u16..=SyntaxKind::WithKeyword as u16)
+                .contains(&(kind as u16)) =>
+        {
+            IdentifierClass::ReservedWord
+        }
+        Some(_) => IdentifierClass::Keyword,
+    }
+}
+
+/// The public AST keyword kind, when one exists. This projection does not
+/// substitute an AST kind for native-only keywords or change source identity.
+pub(crate) fn identifier_keyword_syntax(raw: &str) -> Option<crate::syntax_kind::SyntaxKind> {
+    match identifier_keyword(raw) {
+        Some(IdentifierKeyword::Public(kind)) => Some(kind),
+        Some(IdentifierKeyword::Immediate) | None => None,
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct Token<'src> {
     pub kind: Kind,
@@ -40,6 +177,7 @@ pub(crate) struct Token<'src> {
 pub(crate) struct Lexer<'src> {
     pub src: &'src str,
     pub pos: usize,
+    skip_jsdoc_leading_asterisks: usize,
 }
 
 pub(crate) fn line_break(c: char) -> bool {
@@ -65,12 +203,26 @@ pub(crate) fn whitespace(c: char) -> bool {
 /// way (`source::decode`); text given to the parser directly,
 /// as in parse mode, may still begin with it.
 pub(crate) fn shebang_end(text: &str) -> usize {
+    scan_shebang_end(text, None)
+}
+
+pub(crate) fn shebang_end_controlled(text: &str, control: Option<&Control>) -> Result<usize, Stop> {
+    let end = scan_shebang_end(text, control);
+    if let Some(control) = control {
+        control.poll()?;
+    }
+    Ok(end)
+}
+
+fn scan_shebang_end(text: &str, control: Option<&Control>) -> usize {
     let start = if text.starts_with('\u{FEFF}') { 3 } else { 0 };
     if !text[start..].starts_with("#!") {
         return 0;
     }
     text[start..]
-        .find(line_break)
+        .char_indices()
+        .find(|(_, c)| !scan_work(control) || line_break(*c))
+        .map(|(at, _)| at)
         .map_or(text.len(), |length| start + length)
 }
 
@@ -78,11 +230,26 @@ pub(crate) fn shebang_end(text: &str) -> usize {
 /// break, a `/* */` comment after its `*/`. `None` when no comment starts at
 /// `pos` or a block comment is unterminated.
 pub(crate) fn comment_end(text: &str, pos: usize) -> Option<usize> {
+    scan_comment_end(text, pos, None)
+}
+
+fn scan_comment_end(text: &str, pos: usize, control: Option<&Control>) -> Option<usize> {
     let rest = &text[pos..];
     if rest.starts_with("//") {
-        Some(pos + rest.find(line_break).unwrap_or(rest.len()))
+        Some(
+            pos + rest
+                .char_indices()
+                .find(|(_, c)| !scan_work(control) || line_break(*c))
+                .map_or(rest.len(), |(at, _)| at),
+        )
     } else if let Some(body) = rest.strip_prefix("/*") {
-        Some(pos + body.find("*/")? + 4)
+        Some(
+            pos + body
+                .as_bytes()
+                .windows(2)
+                .position(|pair| !scan_work(control) || pair == b"*/")?
+                + 4,
+        )
     } else {
         None
     }
@@ -102,18 +269,49 @@ pub(crate) struct Comment<'s> {
 /// The comments in the trivia from `pos` until the next token, as
 /// TypeScript's `iterateCommentRanges` finds them. Consumers apply their own
 /// selection: which comments count, and which whitespace may separate them.
-pub(crate) fn comments(text: &str, mut pos: usize) -> impl Iterator<Item = Comment<'_>> {
+pub(crate) fn comments(text: &str, pos: usize) -> impl Iterator<Item = Comment<'_>> {
+    comments_controlled(text, pos, None).map(|result| result.expect("uncontrolled comment scan"))
+}
+
+pub(crate) fn comments_controlled<'s>(
+    text: &'s str,
+    mut pos: usize,
+    control: Option<&'s Control>,
+) -> impl Iterator<Item = Result<Comment<'s>, Stop>> + 's {
+    let mut stopped = false;
     std::iter::from_fn(move || {
-        let rest = &text[pos..];
-        let start = pos + rest.len() - rest.trim_start_matches(whitespace).len();
-        let end = comment_end(text, start)?;
-        let comment = Comment {
-            text: &text[start..end],
-            start,
-            space_before: &text[pos..start],
-        };
-        pos = end;
-        Some(comment)
+        if stopped {
+            return None;
+        }
+        let result = (|| {
+            let rest = &text[pos..];
+            let start = pos + rest.len() - rest.trim_start_matches(whitespace).len();
+            let end = scan_comment_end(text, start, control);
+            if let Some(control) = control {
+                control.poll()?;
+            }
+            let Some(end) = end else {
+                return Ok(None);
+            };
+            let comment = Comment {
+                text: &text[start..end],
+                start,
+                space_before: &text[pos..start],
+            };
+            pos = end;
+            Ok(Some(comment))
+        })();
+        match result {
+            Ok(Some(comment)) => Some(Ok(comment)),
+            Ok(None) => {
+                stopped = true;
+                None
+            }
+            Err(stop) => {
+                stopped = true;
+                Some(Err(stop))
+            }
+        }
     })
 }
 
@@ -173,18 +371,69 @@ pub(crate) fn jsdoc_comments(
     token_start: usize,
     include_trailing: bool,
 ) -> impl Iterator<Item = Comment<'_>> {
+    jsdoc_comments_controlled(text, full_start, token_start, include_trailing, None)
+        .map(|result| result.expect("uncontrolled JSDoc scan"))
+}
+
+pub(crate) fn jsdoc_comments_controlled<'s>(
+    text: &'s str,
+    full_start: usize,
+    token_start: usize,
+    include_trailing: bool,
+    control: Option<&'s Control>,
+) -> impl Iterator<Item = Result<Comment<'s>, Stop>> + 's {
     let trivia = &text[..token_start];
-    let from = full_start.max(shebang_end(text)).min(trivia.len());
+    let mut comments = None;
+    let mut stopped = false;
     let mut collecting = full_start == 0 || include_trailing;
-    comments(trivia, from).filter(move |comment| {
-        collecting |= comment.space_before.contains(['\r', '\n']);
-        collecting
-            && comment
-                .text
-                .strip_prefix("/*")
-                .and_then(|text| text.strip_suffix("*/"))
-                .is_some_and(|body| body.starts_with('*'))
+    std::iter::from_fn(move || {
+        if stopped {
+            return None;
+        }
+        if comments.is_none() {
+            let start = match shebang_end_controlled(text, control) {
+                Ok(start) => start,
+                Err(stop) => {
+                    stopped = true;
+                    return Some(Err(stop));
+                }
+            };
+            let from = full_start.max(start).min(trivia.len());
+            comments = Some(comments_controlled(trivia, from, control));
+        }
+        loop {
+            let comment = match comments.as_mut().expect("initialized comments").next()? {
+                Ok(comment) => comment,
+                Err(stop) => {
+                    stopped = true;
+                    return Some(Err(stop));
+                }
+            };
+            match Ok::<_, crate::resources::Stop>(comment.space_before.find(['\r', '\n'])) {
+                Ok(found) => collecting |= found.is_some(),
+                Err(stop) => {
+                    stopped = true;
+                    return Some(Err(stop));
+                }
+            }
+            if collecting
+                && comment
+                    .text
+                    .strip_prefix("/*")
+                    .and_then(|text| text.strip_suffix("*/"))
+                    .is_some_and(|body| body.starts_with('*'))
+            {
+                return Some(Ok(comment));
+            }
+        }
     })
+}
+
+/// TypeScript `scanner.IsIdentifierText` for the standard language variant.
+/// Identifier escapes belong to token scanning, not this decoded-text test.
+pub(crate) fn is_identifier_text(text: &str) -> bool {
+    let mut chars = text.chars();
+    chars.next().is_some_and(id_start) && chars.all(id_continue)
 }
 
 pub(crate) fn id_start(c: char) -> bool {
@@ -204,13 +453,13 @@ pub(crate) fn id_continue(c: char) -> bool {
     }
 }
 
-fn unicode_escape(input: &str) -> IResult<&str, &str> {
+fn unicode_escape<'s>(input: &'s str, control: Option<&Control>) -> IResult<&'s str, &'s str> {
     recognize(pair(
         tag("\\u"),
         alt((
             delimited(
                 char('{'),
-                take_while1(|c: char| c.is_ascii_hexdigit()),
+                take_while1(|c: char| scan_work(control) && c.is_ascii_hexdigit()),
                 char('}'),
             ),
             nom::bytes::complete::take_while_m_n(4, 4, |c: char| c.is_ascii_hexdigit()),
@@ -219,22 +468,31 @@ fn unicode_escape(input: &str) -> IResult<&str, &str> {
     .parse(input)
 }
 
-fn identifier(input: &str) -> IResult<&str, &str> {
+fn identifier<'s>(input: &'s str, control: Option<&Control>) -> IResult<&'s str, &'s str> {
     recognize(pair(
         alt((
             recognize(nom::character::complete::satisfy(id_start)),
-            unicode_escape,
+            |input| unicode_escape(input, control),
         )),
-        nom::multi::many0(alt((take_while1(id_continue), unicode_escape))),
+        nom::multi::fold_many0(
+            alt((
+                take_while1(|c| scan_work(control) && id_continue(c)),
+                |input| unicode_escape(input, control),
+            )),
+            || (),
+            |(), _| (),
+        ),
     ))
     .parse(input)
 }
 
-fn quoted(input: &str, quote: char) -> IResult<&str, &str> {
+fn quoted<'s>(input: &'s str, quote: char, control: Option<&Control>) -> IResult<&'s str, &'s str> {
     recognize(delimited(
         char(quote),
         nom::combinator::opt(nom::bytes::complete::escaped(
-            take_while1(move |c| c != quote && c != '\\' && c != '\r' && c != '\n'),
+            take_while1(move |c| {
+                scan_work(control) && c != quote && c != '\\' && c != '\r' && c != '\n'
+            }),
             '\\',
             alt((tag("\r\n"), recognize(anychar))),
         )),
@@ -243,7 +501,35 @@ fn quoted(input: &str, quote: char) -> IResult<&str, &str> {
     .parse(input)
 }
 
+// Nom predicates may stop scanning when the control interrupts. The public
+// controlled scan checks that sticky result before publishing any token, so
+// an interrupted primitive is never exposed as a grammar mismatch.
+fn scan_work(control: Option<&Control>) -> bool {
+    control.is_none_or(|control| control.poll().is_ok())
+}
+
 impl<'src> Lexer<'src> {
+    pub(crate) const fn new(src: &'src str, pos: usize) -> Self {
+        Self {
+            src,
+            pos,
+            skip_jsdoc_leading_asterisks: 0,
+        }
+    }
+
+    /// Native `SetSkipJSDocLeadingAsterisks`: the grammar owns this mode;
+    /// ordinary scanning and scanner checkpoints keep their existing policy.
+    pub(crate) fn set_jsdoc_leading_asterisks(&mut self, enabled: bool) {
+        if enabled {
+            self.skip_jsdoc_leading_asterisks += 1;
+        } else {
+            self.skip_jsdoc_leading_asterisks = self
+                .skip_jsdoc_leading_asterisks
+                .checked_sub(1)
+                .expect("balanced JSDoc scanner mode");
+        }
+    }
+
     fn token(
         &mut self,
         kind: Kind,
@@ -265,26 +551,51 @@ impl<'src> Lexer<'src> {
     }
 
     pub fn next(&mut self) -> Token<'src> {
-        let full_start = self.pos;
-        let mut token = self.scan_next();
-        token.full_start = full_start;
-        token
+        self.next_controlled(None)
+            .expect("uncontrolled scanner cannot stop")
     }
 
-    fn scan_next(&mut self) -> Token<'src> {
+    pub(crate) fn next_controlled(
+        &mut self,
+        control: Option<&Control>,
+    ) -> Result<Token<'src>, Stop> {
+        let full_start = self.pos;
+        let mut token = self.scan_next(control);
+        if let Some(control) = control {
+            control.poll()?;
+        }
+        token.full_start = full_start;
+        Ok(token)
+    }
+
+    fn scan_next(&mut self, control: Option<&Control>) -> Token<'src> {
         let mut newline = false;
+        let mut skipped_jsdoc_asterisk = false;
         loop {
+            if !scan_work(control) {
+                return self.token(Kind::Eof, self.pos, self.pos, newline, None);
+            }
             let rest = &self.src[self.pos..];
-            let (tail, space) = take_while::<_, _, nom::error::Error<&str>>(whitespace)
-                .parse(rest)
-                .unwrap();
-            newline |= space.chars().any(line_break);
+            let (tail, space) = take_while::<_, _, nom::error::Error<&str>>(|c| {
+                scan_work(control) && whitespace(c)
+            })
+            .parse(rest)
+            .unwrap();
+            newline |= space.chars().any(|c| !scan_work(control) || line_break(c));
             self.pos = self.src.len() - tail.len();
-            if self.pos <= 3 && tail.starts_with("#!") && shebang_end(self.src) > self.pos {
-                self.pos = shebang_end(self.src);
+            if self.pos <= 3
+                && tail.starts_with("#!")
+                && scan_shebang_end(self.src, control) > self.pos
+            {
+                self.pos = scan_shebang_end(self.src, control);
             } else if tail.starts_with("//") || tail.starts_with("/*") {
-                if let Some(end) = comment_end(self.src, self.pos) {
-                    newline |= self.src[self.pos..end].chars().any(line_break);
+                if let Some(end) = scan_comment_end(self.src, self.pos, control) {
+                    if control.is_some_and(|control| control.poll().is_err()) {
+                        return self.token(Kind::Eof, self.pos, self.pos, newline, None);
+                    }
+                    newline |= self.src[self.pos..end]
+                        .chars()
+                        .any(|c| !scan_work(control) || line_break(c));
                     self.pos = end;
                 } else {
                     let start = self.pos;
@@ -296,6 +607,15 @@ impl<'src> Lexer<'src> {
                         Some("Unterminated block comment"),
                     );
                 }
+            } else if self.skip_jsdoc_leading_asterisks != 0
+                && newline
+                && !skipped_jsdoc_asterisk
+                && tail.starts_with('*')
+                && !tail.starts_with("**")
+                && !tail.starts_with("*=")
+            {
+                skipped_jsdoc_asterisk = true;
+                self.pos += 1;
             } else {
                 break;
             }
@@ -306,10 +626,10 @@ impl<'src> Lexer<'src> {
             return self.token(Kind::Eof, start, start, newline, None);
         };
         if first == '`' {
-            return self.template(start, false, newline);
+            return self.scan_template(start, false, newline, control);
         }
         if first == '"' || first == '\'' {
-            return match quoted(input, first) {
+            return match quoted(input, first, control) {
                 Ok((rest, _)) => self.token(
                     Kind::String,
                     start,
@@ -319,7 +639,9 @@ impl<'src> Lexer<'src> {
                 ),
                 Err(_) => {
                     let end = input[1..]
-                        .find(line_break)
+                        .char_indices()
+                        .find(|(_, c)| !scan_work(control) || line_break(*c))
+                        .map(|(at, _)| at)
                         .map(|i| start + i + 1)
                         .unwrap_or(self.src.len());
                     self.token(
@@ -334,7 +656,7 @@ impl<'src> Lexer<'src> {
         }
         if id_start(first) || first == '\\' || first == '#' {
             let prefix = usize::from(first == '#');
-            if let Ok((rest, _)) = identifier(&input[prefix..]) {
+            if let Ok((rest, _)) = identifier(&input[prefix..], control) {
                 return self.token(
                     if prefix == 1 {
                         Kind::Private
@@ -351,7 +673,7 @@ impl<'src> Lexer<'src> {
         if first.is_ascii_digit()
             || (first == '.' && input.as_bytes().get(1).is_some_and(u8::is_ascii_digit))
         {
-            return self.number(start, newline);
+            return self.number(start, newline, control);
         }
         // Longest match first. Greater-than tokens are split by type argument
         // parsing without rescanning or allocating another token.
@@ -391,7 +713,7 @@ impl<'src> Lexer<'src> {
         )
     }
 
-    fn number(&mut self, start: usize, newline: bool) -> Token<'src> {
+    fn number(&mut self, start: usize, newline: bool, control: Option<&Control>) -> Token<'src> {
         let input = &self.src[start..];
         let bytes = input.as_bytes();
         let mut pos;
@@ -417,34 +739,34 @@ impl<'src> Lexer<'src> {
             };
             pos = 2;
             let (rest, digits) = take_while::<_, _, nom::error::Error<&str>>(|c: char| {
-                c.is_digit(radix) || c == '_'
+                scan_work(control) && (c.is_digit(radix) || c == '_')
             })
             .parse(&input[pos..])
             .unwrap();
             pos = input.len() - rest.len();
-            if !valid_digits(digits) {
+            if !valid_digits(digits, control) {
                 error = Some("Invalid digits or numeric separator");
             }
         } else {
             let (rest, digits) = take_while::<_, _, nom::error::Error<&str>>(|c: char| {
-                c.is_ascii_digit() || c == '_'
+                scan_work(control) && (c.is_ascii_digit() || c == '_')
             })
             .parse(input)
             .unwrap();
             pos = input.len() - rest.len();
-            if !digits.is_empty() && !valid_digits(digits) {
+            if !digits.is_empty() && !valid_digits(digits, control) {
                 error = Some("Invalid numeric separator");
             }
             if bytes.get(pos) == Some(&b'.') {
                 fractional = true;
                 pos += 1;
                 let (rest, digits) = take_while::<_, _, nom::error::Error<&str>>(|c: char| {
-                    c.is_ascii_digit() || c == '_'
+                    scan_work(control) && (c.is_ascii_digit() || c == '_')
                 })
                 .parse(&input[pos..])
                 .unwrap();
                 pos = input.len() - rest.len();
-                if !digits.is_empty() && !valid_digits(digits) {
+                if !digits.is_empty() && !valid_digits(digits, control) {
                     error = Some("Invalid numeric separator");
                 }
             }
@@ -455,12 +777,12 @@ impl<'src> Lexer<'src> {
                     pos += 1;
                 }
                 let (rest, digits) = take_while::<_, _, nom::error::Error<&str>>(|c: char| {
-                    c.is_ascii_digit() || c == '_'
+                    scan_work(control) && (c.is_ascii_digit() || c == '_')
                 })
                 .parse(&input[pos..])
                 .unwrap();
                 pos = input.len() - rest.len();
-                if !valid_digits(digits) {
+                if !valid_digits(digits, control) {
                     error = Some("Invalid numeric exponent");
                 }
             }
@@ -477,10 +799,30 @@ impl<'src> Lexer<'src> {
         self.token(Kind::Number, start, start + pos, newline, error)
     }
 
-    pub fn template(&mut self, start: usize, continuation: bool, newline: bool) -> Token<'src> {
+    pub(crate) fn template_controlled(
+        &mut self,
+        start: usize,
+        continuation: bool,
+        newline: bool,
+        control: Option<&Control>,
+    ) -> Result<Token<'src>, Stop> {
+        let token = self.scan_template(start, continuation, newline, control);
+        if let Some(control) = control {
+            control.poll()?;
+        }
+        Ok(token)
+    }
+
+    fn scan_template(
+        &mut self,
+        start: usize,
+        continuation: bool,
+        newline: bool,
+        control: Option<&Control>,
+    ) -> Token<'src> {
         let bytes = self.src.as_bytes();
         let mut pos = start + 1;
-        while pos < bytes.len() {
+        while pos < bytes.len() && scan_work(control) {
             match bytes[pos] {
                 b'\\' => {
                     pos += 1;
@@ -526,11 +868,23 @@ impl<'src> Lexer<'src> {
         )
     }
 
-    pub fn regex(&mut self, start: usize) -> Token<'src> {
+    pub(crate) fn regex_controlled(
+        &mut self,
+        start: usize,
+        control: Option<&Control>,
+    ) -> Result<Token<'src>, Stop> {
+        let token = self.scan_regex(start, control);
+        if let Some(control) = control {
+            control.poll()?;
+        }
+        Ok(token)
+    }
+
+    fn scan_regex(&mut self, start: usize, control: Option<&Control>) -> Token<'src> {
         let mut pos = start + 1;
         let bytes = self.src.as_bytes();
         let mut in_class = false;
-        while pos < bytes.len() {
+        while pos < bytes.len() && scan_work(control) {
             let c = self.src[pos..].chars().next().unwrap();
             if line_break(c) {
                 break;
@@ -552,9 +906,11 @@ impl<'src> Lexer<'src> {
                 }
                 '/' if !in_class => {
                     pos += 1;
-                    let (rest, _) = take_while::<_, _, nom::error::Error<&str>>(id_continue)
-                        .parse(&self.src[pos..])
-                        .unwrap();
+                    let (rest, _) = take_while::<_, _, nom::error::Error<&str>>(|c| {
+                        scan_work(control) && id_continue(c)
+                    })
+                    .parse(&self.src[pos..])
+                    .unwrap();
                     return self.token(
                         Kind::String,
                         start,
@@ -576,11 +932,14 @@ impl<'src> Lexer<'src> {
     }
 }
 
-fn valid_digits(digits: &str) -> bool {
+fn valid_digits(digits: &str, control: Option<&Control>) -> bool {
     !digits.is_empty()
         && !digits.starts_with('_')
         && !digits.ends_with('_')
-        && !digits.contains("__")
+        && !digits
+            .as_bytes()
+            .windows(2)
+            .any(|pair| !scan_work(control) || pair == b"__")
 }
 
 #[cfg(test)]

@@ -5,7 +5,7 @@ impl<'src> Parser<'src> {
         let site = self.jsdoc_site();
         let result = self.in_context(self.context, |p| p.nest(Self::statement_inner));
         if let Ok(id) = result {
-            self.mark_deprecated(site, id);
+            self.mark_deprecated(site, id)?;
         }
         result
     }
@@ -15,7 +15,7 @@ impl<'src> Parser<'src> {
         match self.current.raw {
             ";" => {
                 self.bump()?;
-                return Ok(self.finish(EmptyStatement, start, vec![]));
+                return self.finish(EmptyStatement, start, vec![]);
             }
             "{" => return self.block(Block),
             "if" => {
@@ -29,7 +29,7 @@ impl<'src> Parser<'src> {
                 if self.eat("else")? {
                     fields.push(("elseStatement", self.statement()?.into()));
                 }
-                return Ok(self.finish(IfStatement, start, fields));
+                return self.finish(IfStatement, start, fields);
             }
             "while" | "with" => {
                 let kind = if self.at("while") {
@@ -45,14 +45,14 @@ impl<'src> Parser<'src> {
                     self.context
                 };
                 let statement = self.in_context(context, Self::statement)?;
-                return Ok(self.finish(
+                return self.finish(
                     kind,
                     start,
                     fields![
                         ("expression", expression.into()),
                         ("statement", statement.into()),
                     ],
-                ));
+                );
             }
             "do" => {
                 self.bump()?;
@@ -60,14 +60,14 @@ impl<'src> Parser<'src> {
                 self.expect("while")?;
                 let expression = self.parenthesized_expression()?;
                 self.eat(";")?;
-                return Ok(self.finish(
+                return self.finish(
                     DoStatement,
                     start,
                     fields![
                         ("statement", statement.into()),
                         ("expression", expression.into()),
                     ],
-                ));
+                );
             }
             "for" => return self.for_statement(),
             "switch" => return self.switch_statement(),
@@ -98,14 +98,14 @@ impl<'src> Parser<'src> {
                     return Err(self.error("Expected an expression after throw"));
                 }
                 self.semi()?;
-                return Ok(self.finish(kind, start, fields));
+                return self.finish(kind, start, fields);
             }
             "debugger" => {
                 self.bump()?;
                 self.semi()?;
-                return Ok(self.finish(DebuggerStatement, start, vec![]));
+                return self.finish(DebuggerStatement, start, vec![]);
             }
-            "import" if !matches!(self.peek().raw, "(" | "." | "<" | "<<") => {
+            "import" if !matches!(self.peek()?.raw, "(" | "." | "<" | "<<") => {
                 return self.import_declaration(start, vec![]);
             }
             "export" => return self.export_statement(),
@@ -114,20 +114,16 @@ impl<'src> Parser<'src> {
         let mut modifiers = self
             .attempt(|p| {
                 let modifiers = p.modifiers(false)?;
-                if modifiers.is_empty() || p.declaration_head(&modifiers) {
+                if modifiers.is_empty() || p.declaration_head(&modifiers)? {
                     Ok(modifiers)
                 } else {
                     Err(p.error("Expected declaration after modifiers"))
                 }
             })?
             .unwrap_or_default();
-        self.ambient_modifiers(&modifiers);
-        if modifiers
-            .iter()
-            .any(|id| self.nodes[id.0].syntax_kind == DefaultKeyword)
-            && !modifiers
-                .iter()
-                .any(|id| matches!(self.nodes[id.0].syntax_kind, ExportKeyword | Decorator))
+        self.ambient_modifiers(&modifiers)?;
+        if self.has_modifier(&modifiers, DefaultKeyword)?
+            && !self.has_export_or_decorator(&modifiers)?
         {
             return Err(self.error("Expected 'export' before a default declaration"));
         }
@@ -136,31 +132,29 @@ impl<'src> Parser<'src> {
                 Some(self.function(start, FunctionDeclaration, std::mem::take(&mut modifiers))?)
             }
             "class" => Some(self.class(start, ClassDeclaration, std::mem::take(&mut modifiers))?),
-            "interface" if self.peek().kind == Kind::Word && !self.peek().newline => {
+            "interface" if self.peek()?.kind == Kind::Word && !self.peek()?.newline => {
                 Some(self.interface(start, std::mem::take(&mut modifiers))?)
             }
             "type"
-                if self.peek().kind == Kind::Word
-                    && (!self.peek().newline
-                        || modifiers
-                            .iter()
-                            .any(|id| self.nodes[id.0].syntax_kind == DeclareKeyword)) =>
+                if self.peek()?.kind == Kind::Word
+                    && (!self.peek()?.newline
+                        || self.has_modifier(&modifiers, DeclareKeyword)?) =>
             {
                 Some(self.type_alias(start, std::mem::take(&mut modifiers))?)
             }
             "enum" => Some(self.enumeration(start, std::mem::take(&mut modifiers))?),
-            "const" if self.peek_at("enum") => {
+            "const" if self.peek_at("enum")? => {
                 let mut modifiers = std::mem::take(&mut modifiers);
                 modifiers.push(self.token_node()?);
                 Some(self.enumeration(start, modifiers)?)
             }
-            "namespace" | "module" | "global" if self.declaration_head(&modifiers) => {
+            "namespace" | "module" | "global" if self.declaration_head(&modifiers)? => {
                 Some(self.namespace(start, std::mem::take(&mut modifiers))?)
             }
-            "var" | "let" | "const" | "using" if self.declaration_head(&modifiers) => {
+            "var" | "let" | "const" | "using" if self.declaration_head(&modifiers)? => {
                 Some(self.variable_statement(start, std::mem::take(&mut modifiers))?)
             }
-            "await" if self.using_declaration(false) => {
+            "await" if self.using_declaration(false)? => {
                 Some(self.variable_statement(start, std::mem::take(&mut modifiers))?)
             }
             "import" if !modifiers.is_empty() => {
@@ -169,7 +163,7 @@ impl<'src> Parser<'src> {
             "export" if !modifiers.is_empty() => {
                 let id = self.export_statement()?;
                 self.nodes[id.0].span.start = start;
-                self.prepend_modifiers(id, std::mem::take(&mut modifiers));
+                self.prepend_modifiers(id, std::mem::take(&mut modifiers))?;
                 Some(id)
             }
             _ => None,
@@ -180,35 +174,32 @@ impl<'src> Parser<'src> {
         if !modifiers.is_empty() {
             return Err(self.error("Expected declaration after modifiers"));
         }
-        if self.current.kind == Kind::Word && self.peek_at(":") {
+        if self.current.kind == Kind::Word && self.peek_at(":")? {
             let label = self.binding_identifier()?;
             self.expect(":")?;
             let statement = self.statement()?;
-            return Ok(self.finish(
+            return self.finish(
                 LabeledStatement,
                 start,
                 fields![("label", label.into()), ("statement", statement.into())],
-            ));
+            );
         }
         let expression = self.expression_allow_in()?;
         self.semi()?;
-        Ok(self.finish(
+        self.finish(
             ExpressionStatement,
             start,
             fields![("expression", expression.into())],
-        ))
+        )
     }
 
-    fn declaration_head(&self, modifiers: &[NodeId]) -> bool {
-        let next = self.peek();
-        match self.current.raw {
+    fn declaration_head(&self, modifiers: &[NodeId]) -> Result<bool> {
+        let next = self.peek()?;
+        Ok(match self.current.raw {
             "interface" => next.kind == Kind::Word && !next.newline,
             "type" => {
                 next.kind == Kind::Word
-                    && (!next.newline
-                        || modifiers
-                            .iter()
-                            .any(|id| self.nodes[id.0].syntax_kind == DeclareKeyword))
+                    && (!next.newline || self.has_modifier(modifiers, DeclareKeyword)?)
             }
             "namespace" | "module" => {
                 (next.kind == Kind::String || next.kind == Kind::Word && !reserved_word(next.raw))
@@ -218,24 +209,28 @@ impl<'src> Parser<'src> {
             "let" => {
                 matches!(next.raw, "{" | "[") || next.kind == Kind::Word && !reserved_word(next.raw)
             }
-            "using" | "await" => self.using_declaration(false),
+            "using" | "await" => self.using_declaration(false)?,
             "function" | "class" | "enum" | "const" | "var" | "import" | "export" => true,
             _ => false,
-        }
+        })
     }
-    fn using_declaration(&self, disallow_of: bool) -> bool {
+    fn using_declaration(&self, disallow_of: bool) -> Result<bool> {
         let mut lexer = self.lexer;
-        let mut next = lexer.next();
+        let mut next = lexer.next_controlled(self.control.as_ref())?;
         if self.at("await") {
             if next.raw != "using" {
-                return false;
+                return Ok(false);
             }
-            next = lexer.next();
+            next = lexer.next_controlled(self.control.as_ref())?;
         }
         if disallow_of && next.raw == "of" {
-            return matches!(lexer.next().raw, "=" | ";" | ":");
+            return Ok(matches!(
+                lexer.next_controlled(self.control.as_ref())?.raw,
+                "=" | ";" | ":"
+            ));
         }
-        !next.newline && (next.raw == "{" || next.kind == Kind::Word && !reserved_word(next.raw))
+        Ok(!next.newline
+            && (next.raw == "{" || next.kind == Kind::Word && !reserved_word(next.raw)))
     }
 
     pub(super) fn block(&mut self, kind: SyntaxKind) -> Result<NodeId> {
@@ -250,7 +245,11 @@ impl<'src> Parser<'src> {
                 statements.push(p.statement()?);
             }
             p.expect("}")?;
-            Ok(p.finish(kind, start, fields![("statements", statements.into())]))
+            let id = p.finish(kind, start, fields![("statements", statements.into())])?;
+            if kind == Block {
+                p.native_jsdoc_at_start(start, id)?;
+            }
+            Ok(id)
         })
     }
     fn parenthesized_expression(&mut self) -> Result<NodeId> {
@@ -267,8 +266,8 @@ impl<'src> Parser<'src> {
         self.expect("(")?;
         if !self.at(";") {
             let initializer = if matches!(self.current.raw, "var" | "let" | "const")
-                || self.at("using") && self.using_declaration(true)
-                || self.at("await") && self.using_declaration(false)
+                || self.at("using") && self.using_declaration(true)?
+                || self.at("await") && self.using_declaration(false)?
             {
                 self.variable_list(true)?
             } else {
@@ -301,7 +300,7 @@ impl<'src> Parser<'src> {
         };
         self.expect(")")?;
         fields.push(("statement", self.statement()?.into()));
-        Ok(self.finish(kind, start, fields))
+        self.finish(kind, start, fields)
     }
     fn switch_statement(&mut self) -> Result<NodeId> {
         let start = self.pos();
@@ -328,11 +327,12 @@ impl<'src> Parser<'src> {
                 statements.push(self.statement()?);
             }
             fields.push(("statements", statements.into()));
-            clauses.push(self.finish(kind, clause_start, fields));
+            clauses.push(self.finish_native_jsdoc(kind, clause_start, fields)?);
         }
         self.expect("}")?;
-        let block = self.finish(CaseBlock, block_start, fields![("clauses", clauses.into())]);
-        Ok(self.finish(
+        let block =
+            self.finish_native_jsdoc(CaseBlock, block_start, fields![("clauses", clauses.into())])?;
+        self.finish(
             SwitchStatement,
             start,
             fields![
@@ -340,7 +340,7 @@ impl<'src> Parser<'src> {
                 ("caseBlock", block.into()),
                 ("possiblyExhaustive", false.into()),
             ],
-        ))
+        )
     }
     fn try_statement(&mut self) -> Result<NodeId> {
         let start = self.pos();
@@ -357,7 +357,7 @@ impl<'src> Parser<'src> {
             catch_fields.push(("block", self.block(Block)?.into()));
             fields.push((
                 "catchClause",
-                self.finish(CatchClause, catch_start, catch_fields).into(),
+                self.finish(CatchClause, catch_start, catch_fields)?.into(),
             ));
         }
         if self.eat("finally")? {
@@ -366,7 +366,7 @@ impl<'src> Parser<'src> {
         if fields.len() == 1 {
             return Err(self.error("Expected catch or finally"));
         }
-        Ok(self.finish(TryStatement, start, fields))
+        self.finish(TryStatement, start, fields)
     }
     fn variable_statement(&mut self, start: usize, modifiers: Vec<NodeId>) -> Result<NodeId> {
         let list = self.variable_list(false)?;
@@ -375,8 +375,8 @@ impl<'src> Parser<'src> {
             VariableStatement,
             start,
             fields![("declarationList", list.into())],
-        );
-        self.attach_modifiers(id, modifiers);
+        )?;
+        self.attach_modifiers(id, modifiers)?;
         Ok(id)
     }
     /// Header declarations prohibit `in`; ordinary declarations permit it.
@@ -403,9 +403,9 @@ impl<'src> Parser<'src> {
                     || p.current.newline
                     || !p.context.allow_in && matches!(p.current.raw, "in" | ")"))
                 || p.at("of")
-                    && p.peek().kind == Kind::Word
-                    && !reserved_word(p.peek().raw)
-                    && p.peek_second().raw == ")";
+                    && p.peek()?.kind == Kind::Word
+                    && !reserved_word(p.peek()?.raw)
+                    && p.peek_second()?.raw == ")";
             let mut declarations = vec![];
             if !empty {
                 declarations.push(p.variable_declaration()?);
@@ -427,7 +427,7 @@ impl<'src> Parser<'src> {
             VariableDeclarationList,
             start,
             fields![("declarations", declarations.into())],
-        );
+        )?;
         self.nodes[id.0].flags |= flags;
         Ok(id)
     }
@@ -442,7 +442,7 @@ impl<'src> Parser<'src> {
         if self.eat("=")? {
             fields.push(("initializer", self.assignment_expression()?.into()));
         }
-        Ok(self.finish(VariableDeclaration, start, fields))
+        self.finish_native_jsdoc(VariableDeclaration, start, fields)
     }
     pub(super) fn binding_name(&mut self) -> Result<NodeId> {
         self.nest(|p| {
@@ -463,7 +463,7 @@ impl<'src> Parser<'src> {
                             element_start,
                             element_start,
                             vec![],
-                        ));
+                        )?);
                         p.bump()?;
                         continue;
                     }
@@ -487,7 +487,7 @@ impl<'src> Parser<'src> {
                     if p.eat("=")? {
                         fields.push(("initializer", p.assignment_expression()?.into()));
                     }
-                    elements.push(p.finish(BindingElement, element_start, fields));
+                    elements.push(p.finish(BindingElement, element_start, fields)?);
                     if !p.eat(",")? {
                         break;
                     }
@@ -495,7 +495,7 @@ impl<'src> Parser<'src> {
                 p.expect(close)?;
                 Ok(elements)
             })?;
-            Ok(p.finish(
+            p.finish(
                 if object {
                     ObjectBindingPattern
                 } else {
@@ -503,7 +503,7 @@ impl<'src> Parser<'src> {
                 },
                 start,
                 fields![("elements", elements.into())],
-            ))
+            )
         })
     }
     pub(super) fn parameters(&mut self) -> Result<Vec<NodeId>> {
@@ -569,9 +569,9 @@ impl<'src> Parser<'src> {
             if self.eat("=")? {
                 fields.push(("initializer", self.assignment_expression()?.into()));
             }
-            let id = self.finish(Parameter, start, fields);
-            self.mark_deprecated(site, id);
-            self.attach_modifiers(id, modifiers);
+            let id = self.finish(Parameter, start, fields)?;
+            self.mark_deprecated(site, id)?;
+            self.attach_modifiers(id, modifiers)?;
             parameters.push(id);
             if !self.eat(",")? {
                 if self.recovering_types()
@@ -604,9 +604,7 @@ impl<'src> Parser<'src> {
             p.expect("function")?;
             let mut fields: Fields<'src> = Fields::new();
             let generator = p.optional_token("*", "asteriskToken", &mut fields)?;
-            let async_function = modifiers
-                .iter()
-                .any(|id| p.nodes[id.0].syntax_kind == AsyncKeyword);
+            let async_function = p.has_modifier(&modifiers, AsyncKeyword)?;
             if p.current.kind == Kind::Word {
                 let context = if kind == FunctionExpression {
                     p.context.with(
@@ -617,21 +615,13 @@ impl<'src> Parser<'src> {
                 };
                 let name = p.in_context(context, Self::binding_identifier)?;
                 fields.push(("name", name.into()));
-            } else if kind == FunctionDeclaration
-                && !modifiers
-                    .iter()
-                    .any(|id| p.nodes[id.0].syntax_kind == DefaultKeyword)
-            {
+            } else if kind == FunctionDeclaration && !p.has_modifier(&modifiers, DefaultKeyword)? {
                 return Err(p.error("Expected function name"));
             }
             if p.at("<") {
                 fields.push(("typeParameters", p.type_parameters()?.into()));
             }
-            if kind == FunctionDeclaration
-                && modifiers
-                    .iter()
-                    .any(|id| p.nodes[id.0].syntax_kind == ExportKeyword)
-            {
+            if kind == FunctionDeclaration && p.has_modifier(&modifiers, ExportKeyword)? {
                 p.context = p.context.with(AWAIT);
             }
             fields.push((
@@ -653,8 +643,8 @@ impl<'src> Parser<'src> {
             }
             Ok(fields)
         })?;
-        let id = self.finish(kind, start, fields);
-        self.attach_modifiers(id, modifiers);
+        let id = self.finish_native_jsdoc(kind, start, fields)?;
+        self.attach_modifiers(id, modifiers)?;
         Ok(id)
     }
     pub(super) fn class(
@@ -668,17 +658,14 @@ impl<'src> Parser<'src> {
             let mut fields: Fields<'src> = Fields::new();
             if p.current.kind == Kind::Word
                 && !p.at("extends")
-                && !(p.at("implements") && p.peek().kind == Kind::Word)
+                && !(p.at("implements") && p.peek()?.kind == Kind::Word)
             {
                 fields.push(("name", p.binding_identifier()?.into()));
             }
             if p.at("<") {
                 fields.push(("typeParameters", p.type_parameters()?.into()));
             }
-            let context = if modifiers
-                .iter()
-                .any(|id| p.nodes[id.0].syntax_kind == ExportKeyword)
-            {
+            let context = if p.has_modifier(&modifiers, ExportKeyword)? {
                 p.context.with(AWAIT)
             } else {
                 p.context
@@ -697,7 +684,7 @@ impl<'src> Parser<'src> {
                     if p.at(";") {
                         let pos = p.pos();
                         p.bump()?;
-                        members.push(p.finish(SemicolonClassElement, pos, vec![]));
+                        members.push(p.finish_native_jsdoc(SemicolonClassElement, pos, vec![])?);
                         continue;
                     }
                     members.push(p.member(false)?);
@@ -706,8 +693,8 @@ impl<'src> Parser<'src> {
                 fields.push(("members", members.into()));
                 Ok(())
             })?;
-            let id = p.finish(kind, start, fields);
-            p.attach_modifiers(id, modifiers);
+            let id = p.finish_native_jsdoc(kind, start, fields)?;
+            p.attach_modifiers(id, modifiers)?;
             Ok(id)
         })
     }
@@ -717,7 +704,7 @@ impl<'src> Parser<'src> {
             let start = self.pos();
             let token = self.bump()?;
             let mut types = vec![];
-            while self.heritage_element_ahead() {
+            while self.heritage_element_ahead()? {
                 let type_start = self.pos();
                 // Heritage enters expression grammar directly, bypassing the
                 // usual expression_bp guard. Count that frame as well as class
@@ -726,11 +713,11 @@ impl<'src> Parser<'src> {
                 // Type arguments are represented directly on heritage expressions.
                 let mut fields = fields![("expression", expression.into())];
                 if self.nodes[expression.0].syntax_kind == ExpressionWithTypeArguments {
-                    fields = self.nodes[expression.0].fields.clone();
+                    fields = self.clone_fields(expression)?;
                 } else if self.type_open() {
                     fields.push(("typeArguments", self.type_arguments()?.into()));
                 }
-                types.push(self.finish(ExpressionWithTypeArguments, type_start, fields));
+                types.push(self.finish(ExpressionWithTypeArguments, type_start, fields)?);
                 if !self.eat(",")? {
                     break;
                 }
@@ -745,18 +732,21 @@ impl<'src> Parser<'src> {
                     ),
                     ("types", types.into()),
                 ],
-            ));
+            )?);
         }
         Ok(clauses)
     }
-    fn heritage_element_ahead(&self) -> bool {
+    fn heritage_element_ahead(&self) -> Result<bool> {
         if matches!(self.current.raw, "extends" | "implements") {
-            return false;
+            return Ok(false);
         }
-        if self.at("{") && self.peek_at("}") {
-            return matches!(self.peek_second().raw, "," | "{" | "extends" | "implements");
+        if self.at("{") && self.peek_at("}")? {
+            return Ok(matches!(
+                self.peek_second()?.raw,
+                "," | "{" | "extends" | "implements"
+            ));
         }
-        self.current.kind != Kind::Eof && !matches!(self.current.raw, "}" | ";")
+        Ok(self.current.kind != Kind::Eof && !matches!(self.current.raw, "}" | ";"))
     }
     fn interface(&mut self, start: usize, modifiers: Vec<NodeId>) -> Result<NodeId> {
         self.bump()?;
@@ -770,8 +760,8 @@ impl<'src> Parser<'src> {
             fields.push(("heritageClauses", heritage.into()));
         }
         fields.push(("members", self.type_members()?.into()));
-        let id = self.finish(InterfaceDeclaration, start, fields);
-        self.attach_modifiers(id, modifiers);
+        let id = self.finish(InterfaceDeclaration, start, fields)?;
+        self.attach_modifiers(id, modifiers)?;
         Ok(id)
     }
     fn type_alias(&mut self, start: usize, modifiers: Vec<NodeId>) -> Result<NodeId> {
@@ -785,15 +775,15 @@ impl<'src> Parser<'src> {
             fields.push(("typeParameters", self.type_parameters()?.into()));
         }
         self.expect("=")?;
-        let type_node = if self.at("intrinsic") && !self.peek_at(".") {
+        let type_node = if self.at("intrinsic") && !self.peek_at(".")? {
             self.token_node()?
         } else {
             self.type_node()?
         };
         fields.push(("type", type_node.into()));
         self.semi()?;
-        let id = self.finish(TypeAliasDeclaration, start, fields);
-        self.attach_modifiers(id, modifiers);
+        let id = self.finish(TypeAliasDeclaration, start, fields)?;
+        self.attach_modifiers(id, modifiers)?;
         Ok(id)
     }
     fn enumeration(&mut self, start: usize, modifiers: Vec<NodeId>) -> Result<NodeId> {
@@ -810,8 +800,8 @@ impl<'src> Parser<'src> {
                 if p.eat("=")? {
                     fields.push(("initializer", p.assignment_expression()?.into()));
                 }
-                let member = p.finish(EnumMember, member_start, fields);
-                p.mark_deprecated(site, member);
+                let member = p.finish(EnumMember, member_start, fields)?;
+                p.mark_deprecated(site, member)?;
                 members.push(member);
                 if !p.eat(",")? {
                     break;
@@ -824,8 +814,8 @@ impl<'src> Parser<'src> {
             EnumDeclaration,
             start,
             fields![("name", name.into()), ("members", members.into())],
-        );
-        self.attach_modifiers(id, modifiers);
+        )?;
+        self.attach_modifiers(id, modifiers)?;
         Ok(id)
     }
     fn namespace(&mut self, start: usize, modifiers: Vec<NodeId>) -> Result<NodeId> {
@@ -840,7 +830,7 @@ impl<'src> Parser<'src> {
                 token.full_start,
                 token.end,
                 fields![("escapedText", token.raw.into())],
-            )
+            )?
         } else if self.current.kind == Kind::String {
             self.literal()?
         } else {
@@ -857,7 +847,7 @@ impl<'src> Parser<'src> {
         } else {
             self.semi()?;
         }
-        let id = self.finish(ModuleDeclaration, start, fields);
+        let id = self.finish(ModuleDeclaration, start, fields)?;
         self.nodes[id.0].flags |= if global {
             node_flags::GLOBAL_AUGMENTATION
         } else if token.raw == "namespace" {
@@ -865,7 +855,7 @@ impl<'src> Parser<'src> {
         } else {
             0
         };
-        self.attach_modifiers(id, modifiers);
+        self.attach_modifiers(id, modifiers)?;
         Ok(id)
     }
     fn namespace_tail(&mut self, start: usize, name: NodeId) -> Result<NodeId> {
@@ -881,7 +871,7 @@ impl<'src> Parser<'src> {
                 ModuleDeclaration,
                 start,
                 fields![("name", name.into()), ("body", body.into())],
-            );
+            )?;
             p.nodes[id.0].flags |= node_flags::NAMESPACE | node_flags::NESTED_NAMESPACE;
             Ok(id)
         })
@@ -894,26 +884,19 @@ impl<'src> Parser<'src> {
         } else {
             let clause_start = self.pos();
             let type_only = self.at("type")
-                && (!matches!(self.peek().raw, "from" | "=" | ",")
-                    || self.peek_at("from") && matches!(self.peek_second().raw, "from" | "="));
+                && (!matches!(self.peek()?.raw, "from" | "=" | ",")
+                    || self.peek_at("from")? && matches!(self.peek_second()?.raw, "from" | "="));
             let deferred = self.at("defer")
-                && (self.peek_at("from") && self.peek_second().kind != Kind::String
-                    || !matches!(self.peek().raw, "from" | "=" | ","));
+                && (self.peek_at("from")? && self.peek_second()?.kind != Kind::String
+                    || !matches!(self.peek()?.raw, "from" | "=" | ","));
             if type_only || deferred {
                 self.bump()?;
             }
-            let mut clause_fields = fields![("isTypeOnly", type_only.into())];
-            if type_only || deferred {
-                clause_fields.push((
-                    "phaseModifier",
-                    Value::Number(if type_only { TypeKeyword } else { DeferKeyword }.number()),
-                ));
-            }
-            if self.current.kind == Kind::Word {
+            let name = if self.current.kind == Kind::Word {
                 let name = self.binding_identifier()?;
                 if self.eat("=")? {
                     let reference_start = self.pos();
-                    let reference = if self.at("require") && self.peek_at("(") {
+                    let reference = if self.at("require") && self.peek_at("(")? {
                         self.bump()?;
                         self.expect("(")?;
                         let expression = self.module_specifier()?;
@@ -922,7 +905,7 @@ impl<'src> Parser<'src> {
                             ExternalModuleReference,
                             reference_start,
                             fields![("expression", expression.into())],
-                        )
+                        )?
                     } else {
                         self.entity_name()?
                     };
@@ -935,47 +918,23 @@ impl<'src> Parser<'src> {
                             ("name", name.into()),
                             ("moduleReference", reference.into()),
                         ],
-                    );
-                    self.attach_modifiers(id, modifiers);
+                    )?;
+                    self.attach_modifiers(id, modifiers)?;
                     return Ok(id);
                 }
-                clause_fields.push(("name", name.into()));
-                if !self.at("from") {
-                    self.expect(",")?;
-                }
-            }
-            if self.at("*") {
-                let namespace_start = self.pos();
-                self.bump()?;
-                self.expect("as")?;
-                let name = self.binding_identifier()?;
-                clause_fields.push((
-                    "namedBindings",
-                    self.finish(
-                        NamespaceImport,
-                        namespace_start,
-                        fields![("name", name.into())],
-                    )
-                    .into(),
-                ));
-            } else if self.at("{") {
-                let named_start = self.pos();
-                let elements = self.specifiers(false)?;
-                clause_fields.push((
-                    "namedBindings",
-                    self.finish(
-                        NamedImports,
-                        named_start,
-                        fields![("elements", elements.into())],
-                    )
-                    .into(),
-                ));
-            }
-            fields.push((
-                "importClause",
-                self.finish(ImportClause, clause_start, clause_fields)
-                    .into(),
-            ));
+                Some(name)
+            } else {
+                None
+            };
+            let phase = if type_only {
+                Some(TypeKeyword)
+            } else if deferred {
+                Some(DeferKeyword)
+            } else {
+                None
+            };
+            let clause = self.import_clause(name, clause_start, phase, false)?;
+            fields.push(("importClause", clause.into()));
             self.expect("from")?;
             fields.push(("moduleSpecifier", self.module_specifier()?.into()));
         }
@@ -985,9 +944,48 @@ impl<'src> Parser<'src> {
             fields.push(("assertClause", attributes.into()));
         }
         self.semi()?;
-        let id = self.finish(ImportDeclaration, start, fields);
-        self.attach_modifiers(id, modifiers);
+        let id = self.finish(ImportDeclaration, start, fields)?;
+        self.attach_modifiers(id, modifiers)?;
         Ok(id)
+    }
+    /// Native `parseImportClause`; JSDoc changes the scanner's leading-star
+    /// mode only around named bindings, while sharing their complete grammar.
+    pub(super) fn import_clause(
+        &mut self,
+        name: Option<NodeId>,
+        start: usize,
+        phase: Option<SyntaxKind>,
+        jsdoc: bool,
+    ) -> Result<NodeId> {
+        let mut fields = fields![("isTypeOnly", (phase == Some(TypeKeyword)).into())];
+        if let Some(phase) = phase {
+            fields.push(("phaseModifier", Value::Number(phase.number())));
+        }
+        if let Some(name) = name {
+            fields.push(("name", name.into()));
+        }
+        if name.is_none() || self.eat(",")? {
+            if jsdoc {
+                self.lexer.set_jsdoc_leading_asterisks(true);
+            }
+            let result = (|| {
+                let pos = self.pos();
+                if self.eat("*")? {
+                    self.expect("as")?;
+                    let name = self.binding_identifier()?;
+                    self.finish(NamespaceImport, pos, fields![("name", name.into())])
+                } else {
+                    let elements = self.specifiers(false)?;
+                    self.finish(NamedImports, pos, fields![("elements", elements.into())])
+                }
+            })();
+            if jsdoc {
+                self.lexer.set_jsdoc_leading_asterisks(false);
+            }
+            let binding = result?;
+            fields.push(("namedBindings", binding.into()));
+        }
+        self.finish(ImportClause, start, fields)
     }
     fn export_statement(&mut self) -> Result<NodeId> {
         let start = self.pos();
@@ -996,27 +994,27 @@ impl<'src> Parser<'src> {
             let expression =
                 self.in_context(self.context.with(AWAIT), Self::assignment_expression)?;
             self.semi()?;
-            return Ok(self.finish(
+            return self.finish(
                 ExportAssignment,
                 start,
                 fields![
                     ("isExportEquals", true.into()),
                     ("expression", expression.into()),
                 ],
-            ));
+            );
         }
         if self.at("as") {
             self.bump()?;
             self.expect("namespace")?;
             let name = self.identifier()?;
             self.semi()?;
-            return Ok(self.finish(
+            return self.finish(
                 NamespaceExportDeclaration,
                 start,
                 fields![("name", name.into())],
-            ));
+            );
         }
-        let type_only = self.at("type") && matches!(self.peek().raw, "{" | "*");
+        let type_only = self.at("type") && matches!(self.peek()?.raw, "{" | "*");
         if type_only {
             self.bump()?;
         }
@@ -1028,7 +1026,7 @@ impl<'src> Parser<'src> {
                     let elements = p.specifiers(true)?;
                     fields.push((
                         "exportClause",
-                        p.finish(NamedExports, pos, fields![("elements", elements.into())])
+                        p.finish(NamedExports, pos, fields![("elements", elements.into())])?
                             .into(),
                     ));
                 } else {
@@ -1042,7 +1040,7 @@ impl<'src> Parser<'src> {
                                 NamespaceExport,
                                 clause_start,
                                 fields![("name", name.into())],
-                            )
+                            )?
                             .into(),
                         ));
                     }
@@ -1058,33 +1056,35 @@ impl<'src> Parser<'src> {
                 p.semi()?;
                 Ok(fields)
             })?;
-            return Ok(self.finish(ExportDeclaration, start, fields));
+            return self.finish(ExportDeclaration, start, fields);
         }
-        let mut modifiers = vec![export];
+        let mut modifiers = Vec::from([export]);
         if self.at("default") {
             modifiers.push(self.token_node()?);
             let declaration = matches!(self.current.raw, "class" | "function" | "interface")
-                || (self.at("abstract") && self.peek_at("class"))
-                || (self.at("async") && self.peek_at("function"))
+                || (self.at("abstract") && self.peek_at("class")?)
+                || (self.at("async") && self.peek_at("function")?)
                 || self.at("@");
             if !declaration {
                 let expression =
                     self.in_context(self.context.with(AWAIT), Self::assignment_expression)?;
                 self.semi()?;
-                return Ok(self.finish(
+                return self.finish(
                     ExportAssignment,
                     start,
                     fields![("expression", expression.into())],
-                ));
+                );
             }
         }
-        modifiers.extend(self.modifiers(false)?);
-        self.ambient_modifiers(&modifiers);
+        for modifier in self.modifiers(false)? {
+            modifiers.push(modifier);
+        }
+        self.ambient_modifiers(&modifiers)?;
         match self.current.raw {
             "export" => {
                 let id = self.export_statement()?;
                 self.nodes[id.0].span.start = start;
-                self.attach_modifiers(id, modifiers);
+                self.attach_modifiers(id, modifiers)?;
                 Ok(id)
             }
             "function" => self.function(start, FunctionDeclaration, modifiers),
@@ -1092,7 +1092,7 @@ impl<'src> Parser<'src> {
             "interface" => self.interface(start, modifiers),
             "type" => self.type_alias(start, modifiers),
             "enum" => self.enumeration(start, modifiers),
-            "const" if self.peek_at("enum") => {
+            "const" if self.peek_at("enum")? => {
                 modifiers.push(self.token_node()?);
                 self.enumeration(start, modifiers)
             }
@@ -1105,9 +1105,10 @@ impl<'src> Parser<'src> {
         }
     }
     fn specifiers(&mut self, export: bool) -> Result<Vec<NodeId>> {
+        let opened = self.at("{");
         self.expect("{")?;
         let mut elements = vec![];
-        while !self.at("}") {
+        while opened && !self.at("}") {
             let start = self.pos();
             let mut invalid_name = self.import_name_is_keyword();
             let mut name = self.module_export_name()?;
@@ -1154,14 +1155,28 @@ impl<'src> Parser<'src> {
                 name = self.module_export_name()?;
             }
             if !export && (self.nodes[name.0].syntax_kind != Identifier || invalid_name) {
-                return Err(self.error("Expected an import binding identifier"));
+                if self.context.contains(node_flags::JSDOC) {
+                    self.check_budget()?;
+                    self.type_recovery_diagnostic("Expected an import binding identifier");
+                    if self.nodes[name.0].syntax_kind != Identifier {
+                        let span = self.nodes[name.0].span;
+                        name = self.make(
+                            Identifier,
+                            span.start,
+                            span.end,
+                            fields![("escapedText", "".into())],
+                        )?;
+                    }
+                } else {
+                    return Err(self.error("Expected an import binding identifier"));
+                }
             }
             let mut fields = fields![("isTypeOnly", type_only.into())];
             if let Some(property) = property {
                 fields.push(("propertyName", property.into()));
             }
             fields.push(("name", name.into()));
-            elements.push(self.finish(
+            let element = self.finish(
                 if export {
                     ExportSpecifier
                 } else {
@@ -1169,12 +1184,18 @@ impl<'src> Parser<'src> {
                 },
                 start,
                 fields,
-            ));
+            )?;
+            if export {
+                self.native_jsdoc_at_start(start, element)?;
+            }
+            elements.push(element);
             if !self.eat(",")? {
                 break;
             }
         }
-        self.expect("}")?;
+        if opened {
+            self.expect("}")?;
+        }
         Ok(elements)
     }
     fn module_export_name(&mut self) -> Result<NodeId> {
@@ -1195,9 +1216,10 @@ impl<'src> Parser<'src> {
         self.import_attribute_body(start)
     }
     pub(super) fn import_attribute_body(&mut self, start: usize) -> Result<NodeId> {
+        let opened = self.at("{");
         self.expect("{")?;
         let mut elements = vec![];
-        while !self.at("}") {
+        while opened && !self.at("}") {
             let pos = self.pos();
             let name = if self.current.kind == Kind::String {
                 self.literal()?
@@ -1210,22 +1232,24 @@ impl<'src> Parser<'src> {
                 ImportAttribute,
                 pos,
                 fields![("name", name.into()), ("value", value.into())],
-            ));
+            )?);
             if !(self.eat(",")? || self.eat(";")?) {
                 break;
             }
         }
-        self.expect("}")?;
-        Ok(self.finish(
+        if opened {
+            self.expect("}")?;
+        }
+        self.finish(
             ImportAttributes,
             start,
             fields![
                 ("token", Value::Number(WithKeyword.number())),
                 ("elements", elements.into())
             ],
-        ))
+        )
     }
-    fn module_specifier(&mut self) -> Result<NodeId> {
+    pub(super) fn module_specifier(&mut self) -> Result<NodeId> {
         if self.current.kind == Kind::String {
             self.literal()
         } else {

@@ -1,0 +1,194 @@
+[
+  {
+    "name": "sharedSuffix",
+    "identities": 1,
+    "ordered": [
+      "$ID:a",
+      "$ID:b"
+    ]
+  },
+  {
+    "name": "sharedSuffixReverse",
+    "identities": 1,
+    "ordered": [
+      "$ID:a",
+      "$ID:b"
+    ]
+  },
+  {
+    "name": "sharedPrefix",
+    "identities": 1,
+    "ordered": [
+      "$ID",
+      "$ID:tail"
+    ]
+  },
+  {
+    "name": "repeatedAtom",
+    "identities": 1,
+    "ordered": [
+      "$ID$ID:a",
+      "$ID$ID:b"
+    ]
+  },
+  {
+    "name": "fixedPrefix",
+    "identities": 1,
+    "ordered": [
+      "a$ID",
+      "z$ID"
+    ]
+  },
+  {
+    "name": "empty",
+    "identities": 1,
+    "ordered": [
+      "",
+      "$ID"
+    ]
+  },
+  {
+    "name": "emptyReverse",
+    "identities": 1,
+    "ordered": [
+      "",
+      "$ID"
+    ]
+  },
+  {
+    "name": "nul",
+    "identities": 1,
+    "ordered": [
+      "\u0000",
+      "$ID"
+    ]
+  },
+  {
+    "name": "nulReverse",
+    "identities": 1,
+    "ordered": [
+      "\u0000",
+      "$ID"
+    ]
+  },
+  {
+    "name": "zero",
+    "identities": 1,
+    "ordered": [
+      "0",
+      "$ID"
+    ]
+  },
+  {
+    "name": "zeroReverse",
+    "identities": 1,
+    "ordered": [
+      "0",
+      "$ID"
+    ]
+  },
+  {
+    "name": "colon",
+    "identities": 1,
+    "ordered": [
+      "$ID",
+      ":"
+    ]
+  },
+  {
+    "name": "colonReverse",
+    "identities": 1,
+    "ordered": [
+      "$ID",
+      ":"
+    ]
+  },
+  {
+    "name": "rawFE",
+    "identities": 1,
+    "ordered": [
+      "�",
+      "�"
+    ]
+  },
+  {
+    "name": "uniqueCycle",
+    "identities": 1,
+    "ordered": [
+      "�@a0@$ID",
+      "�@a9$ID",
+      "�@a@$ID"
+    ]
+  },
+  {
+    "name": "uniqueCycleReverse",
+    "identities": 1,
+    "ordered": [
+      "�@a0@$ID",
+      "�@a9$ID",
+      "�@a@$ID"
+    ]
+  },
+  {
+    "name": "templateSpans",
+    "identities": 1,
+    "ordered": [
+      "ordered"
+    ]
+  },
+  {
+    "name": "digit1",
+    "identities": 1,
+    "ordered": null
+  },
+  {
+    "name": "digit2",
+    "identities": 1,
+    "ordered": null
+  },
+  {
+    "name": "digit3",
+    "identities": 1,
+    "ordered": null
+  },
+  {
+    "name": "digit4",
+    "identities": 1,
+    "ordered": null
+  },
+  {
+    "name": "digit5",
+    "identities": 1,
+    "ordered": null
+  },
+  {
+    "name": "digit6",
+    "identities": 1,
+    "ordered": null
+  },
+  {
+    "name": "digit7",
+    "identities": 1,
+    "ordered": null
+  },
+  {
+    "name": "digit8",
+    "identities": 1,
+    "ordered": null
+  },
+  {
+    "name": "digit9",
+    "identities": 1,
+    "ordered": null
+  },
+  {
+    "name": "unequalAtoms",
+    "identities": 2,
+    "ordered": null
+  },
+  {
+    "name": "adjacentPartitions",
+    "identities": 2,
+    "ordered": null
+  }
+]

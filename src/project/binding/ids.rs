@@ -18,6 +18,7 @@ macro_rules! ids {
 ids!(
     ScopeId,
     DeclId,
+    ModuleDeclarationId,
     RefId,
     AliasId,
     NameId,
@@ -27,7 +28,9 @@ ids!(
     ModuleId,
     OccurrenceId,
     StringId,
-    SymbolId
+    SymbolId,
+    NativeHeaderId,
+    NativeTableId
 );
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -36,5 +39,17 @@ pub(super) struct TypeParameterListId(pub(super) usize);
 impl TableId {
     pub(super) const fn new_const(index: u32) -> Self {
         Self(index)
+    }
+}
+
+impl super::site_map::PackedValue for ScopeId {
+    type Packed = u32;
+
+    fn pack(self) -> Option<Self::Packed> {
+        Some(self.0)
+    }
+
+    fn unpack(value: Self::Packed) -> Self {
+        Self(value)
     }
 }

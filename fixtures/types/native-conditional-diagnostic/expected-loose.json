@@ -1,0 +1,152 @@
+{
+  "queries": [
+    {
+      "name": "inline",
+      "summary": "any",
+      "errorType": true,
+      "codes": [
+        2304,
+        2304,
+        2339
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeOfSymbol",
+          "name": "�type"
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 79,
+          "end": 97
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 99,
+          "end": 118
+        },
+        {
+          "operation": "checkExpressionEx",
+          "pos": 153,
+          "end": 166
+        },
+        {
+          "operation": "getTypeOfSymbol",
+          "declarationPos": 131,
+          "declarationEnd": 166,
+          "name": "selected"
+        }
+      ]
+    },
+    {
+      "name": "inferContext",
+      "summary": "any",
+      "errorType": true,
+      "codes": [
+        2304,
+        2304,
+        2339
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeOfSymbol",
+          "name": "�type"
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 257,
+          "end": 273
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 279,
+          "end": 297
+        },
+        {
+          "operation": "checkExpressionEx",
+          "pos": 338,
+          "end": 351
+        },
+        {
+          "operation": "getTypeOfSymbol",
+          "declarationPos": 310,
+          "declarationEnd": 351,
+          "name": "selected"
+        }
+      ]
+    },
+    {
+      "name": "nonDistributive",
+      "summary": "any",
+      "errorType": true,
+      "codes": [
+        2304,
+        2304,
+        2339
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeOfSymbol",
+          "name": "�type"
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 436,
+          "end": 453
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 455,
+          "end": 473
+        },
+        {
+          "operation": "checkExpressionEx",
+          "pos": 517,
+          "end": 530
+        },
+        {
+          "operation": "getTypeOfSymbol",
+          "declarationPos": 486,
+          "declarationEnd": 530,
+          "name": "selected"
+        }
+      ]
+    },
+    {
+      "name": "named",
+      "summary": "any",
+      "errorType": true,
+      "codes": [
+        2339
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeOfSymbol",
+          "name": "�type"
+        },
+        {
+          "operation": "checkExpressionEx",
+          "pos": 698,
+          "end": 711
+        },
+        {
+          "operation": "getTypeOfSymbol",
+          "declarationPos": 677,
+          "declarationEnd": 711,
+          "name": "selected"
+        }
+      ]
+    },
+    {
+      "name": "healthy",
+      "summary": "17",
+      "errorType": false,
+      "codes": [],
+      "demandFailures": [],
+      "errors": []
+    }
+  ]
+}

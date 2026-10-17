@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "strictNullChecks": true,
+    "noCheck": false,
+    "noLib": true,
+    "types": [],
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler"
+  },
+  "files": [
+    "globals.d.ts",
+    "è-16.ts",
+    "é-16.ts",
+    "unrelated_source_file_000.ts",
+    "unrelated_source_file_001.ts",
+    "unrelated_source_file_002.ts",
+    "unrelated_source_file_003.ts",
+    "unrelated_source_file_004.ts",
+    "unrelated_source_file_005.ts",
+    "unrelated_source_file_006.ts",
+    "unrelated_source_file_007.ts",
+    "unrelated_source_file_008.ts",
+    "unrelated_source_file_009.ts",
+    "unrelated_source_file_010.ts",
+    "unrelated_source_file_011.ts",
+    "unrelated_source_file_012.ts",
+    "unrelated_source_file_013.ts",
+    "unrelated_source_file_014.ts",
+    "unrelated_source_file_015.ts"
+  ]
+}

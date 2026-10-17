@@ -1,0 +1,530 @@
+[
+  {
+    "name": "trueValue",
+    "expression": "true",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "boolean",
+    "value": "true",
+    "summary": "true",
+    "feature": "boolean"
+  },
+  {
+    "name": "falseValue",
+    "expression": "false",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "boolean",
+    "value": "false",
+    "summary": "false",
+    "feature": "boolean"
+  },
+  {
+    "name": "mutableBoolean",
+    "expression": "false",
+    "declaration": "let",
+    "kind": "primitive",
+    "base": "boolean",
+    "summary": "boolean",
+    "feature": "boolean"
+  },
+  {
+    "name": "templatePlain",
+    "expression": "`ready`",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "string",
+    "value": "ready",
+    "summary": "\"ready\"",
+    "feature": "template"
+  },
+  {
+    "name": "templateEscaped",
+    "expression": "`A\\x42\\u{1F600}`",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "string",
+    "value": "AB😀",
+    "summary": "\"AB😀\"",
+    "feature": "template"
+  },
+  {
+    "name": "templateLf",
+    "expression": "`a\nb`",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "string",
+    "value": "a\nb",
+    "summary": "\"a\\nb\"",
+    "feature": "template"
+  },
+  {
+    "name": "templateCr",
+    "expression": "`a\rb`",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "string",
+    "value": "a\nb",
+    "summary": "\"a\\nb\"",
+    "feature": "template"
+  },
+  {
+    "name": "templateCrLf",
+    "expression": "`a\r\nb`",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "string",
+    "value": "a\nb",
+    "summary": "\"a\\nb\"",
+    "feature": "template"
+  },
+  {
+    "name": "templateLs",
+    "expression": "`a b`",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "string",
+    "value": "a b",
+    "summary": "\"a\\u2028b\"",
+    "feature": "template"
+  },
+  {
+    "name": "templatePs",
+    "expression": "`a b`",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "string",
+    "value": "a b",
+    "summary": "\"a\\u2029b\"",
+    "feature": "template"
+  },
+  {
+    "name": "bigZero",
+    "expression": "0n",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "bigint",
+    "value": "0",
+    "summary": "0n",
+    "feature": "bigint"
+  },
+  {
+    "name": "bigDecimal",
+    "expression": "123456789012345678901234567890n",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "bigint",
+    "value": "123456789012345678901234567890",
+    "summary": "123456789012345678901234567890n",
+    "feature": "bigint"
+  },
+  {
+    "name": "bigSeparated",
+    "expression": "1_234_567_890n",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "bigint",
+    "value": "1234567890",
+    "summary": "1234567890n",
+    "feature": "bigint"
+  },
+  {
+    "name": "bigHex",
+    "expression": "0x18ee90ff6c373e0ee4e3f0ad2n",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "bigint",
+    "value": "123456789012345678901234567890",
+    "summary": "123456789012345678901234567890n",
+    "feature": "bigint"
+  },
+  {
+    "name": "bigHexUpper",
+    "expression": "0X18EE90FF6C373E0EE4E3F0AD2n",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "bigint",
+    "value": "123456789012345678901234567890",
+    "summary": "123456789012345678901234567890n",
+    "feature": "bigint"
+  },
+  {
+    "name": "bigBinary",
+    "expression": "0b1100011101110100100001111111101101100001101110011111000001110111001001110001111110000101011010010n",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "bigint",
+    "value": "123456789012345678901234567890",
+    "summary": "123456789012345678901234567890n",
+    "feature": "bigint"
+  },
+  {
+    "name": "bigBinaryUpper",
+    "expression": "0B0010_1010n",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "bigint",
+    "value": "42",
+    "summary": "42n",
+    "feature": "bigint"
+  },
+  {
+    "name": "bigOctal",
+    "expression": "0o143564417755415637016711617605322n",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "bigint",
+    "value": "123456789012345678901234567890",
+    "summary": "123456789012345678901234567890n",
+    "feature": "bigint"
+  },
+  {
+    "name": "bigOctalUpper",
+    "expression": "0O000_52n",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "bigint",
+    "value": "42",
+    "summary": "42n",
+    "feature": "bigint"
+  },
+  {
+    "name": "bigHexZero",
+    "expression": "0x00_00n",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "bigint",
+    "value": "0",
+    "summary": "0n",
+    "feature": "bigint"
+  },
+  {
+    "name": "bigBinaryZero",
+    "expression": "0b00_00n",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "bigint",
+    "value": "0",
+    "summary": "0n",
+    "feature": "bigint"
+  },
+  {
+    "name": "bigOctalZero",
+    "expression": "0o00_00n",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "bigint",
+    "value": "0",
+    "summary": "0n",
+    "feature": "bigint"
+  },
+  {
+    "name": "negativeBigZero",
+    "expression": "-0n",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "bigint",
+    "value": "0",
+    "summary": "0n",
+    "feature": "bigint"
+  },
+  {
+    "name": "negativeBigHexZero",
+    "expression": "-0x00n",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "bigint",
+    "value": "0",
+    "summary": "0n",
+    "feature": "bigint"
+  },
+  {
+    "name": "negativeBig",
+    "expression": "-0x18ee90ff6c373e0ee4e3f0ad2n",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "bigint",
+    "value": "-123456789012345678901234567890",
+    "summary": "-123456789012345678901234567890n",
+    "feature": "bigint"
+  },
+  {
+    "name": "positiveNumber",
+    "expression": "+1.5",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "number",
+    "value": "1.5",
+    "summary": "1.5",
+    "feature": "unary"
+  },
+  {
+    "name": "negativeNumber",
+    "expression": "-1.5",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "number",
+    "value": "-1.5",
+    "summary": "-1.5",
+    "feature": "unary"
+  },
+  {
+    "name": "negativeZero",
+    "expression": "-0",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "number",
+    "value": "0",
+    "summary": "0",
+    "feature": "unary"
+  },
+  {
+    "name": "negativeUnderflow",
+    "expression": "-1e-400",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "number",
+    "value": "0",
+    "summary": "0",
+    "feature": "unary"
+  },
+  {
+    "name": "negativeHex",
+    "expression": "-0xff",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "number",
+    "value": "-255",
+    "summary": "-255",
+    "feature": "unary"
+  },
+  {
+    "name": "positiveSeparated",
+    "expression": "+1_000",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "number",
+    "value": "1000",
+    "summary": "1000",
+    "feature": "unary"
+  },
+  {
+    "name": "negativeExponent",
+    "expression": "-1e21",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "number",
+    "value": "-1e+21",
+    "summary": "-1e+21",
+    "feature": "unary"
+  },
+  {
+    "name": "parenthesizedNegative",
+    "expression": "-(1)",
+    "declaration": "const",
+    "kind": "primitive",
+    "base": "number",
+    "summary": "number",
+    "feature": "unary"
+  },
+  {
+    "name": "parenthesizedPositive",
+    "expression": "+(1)",
+    "declaration": "const",
+    "kind": "primitive",
+    "base": "number",
+    "summary": "number",
+    "feature": "unary"
+  },
+  {
+    "name": "twiceNegative",
+    "expression": "-(-1)",
+    "declaration": "const",
+    "kind": "primitive",
+    "base": "number",
+    "summary": "number",
+    "feature": "unary"
+  },
+  {
+    "name": "negativeBoolean",
+    "expression": "-true",
+    "declaration": "const",
+    "kind": "primitive",
+    "base": "number",
+    "summary": "number",
+    "feature": "boolean"
+  },
+  {
+    "name": "negativeString",
+    "expression": "-\"1\"",
+    "declaration": "const",
+    "kind": "primitive",
+    "base": "number",
+    "summary": "number",
+    "feature": "unary"
+  },
+  {
+    "name": "tildeNumber",
+    "expression": "~1",
+    "declaration": "const",
+    "kind": "primitive",
+    "base": "number",
+    "summary": "number",
+    "feature": "unary"
+  },
+  {
+    "name": "parenthesizedNegativeBig",
+    "expression": "-(1n)",
+    "declaration": "const",
+    "kind": "primitive",
+    "base": "bigint",
+    "summary": "bigint",
+    "feature": "bigint"
+  },
+  {
+    "name": "tildeBig",
+    "expression": "~1n",
+    "declaration": "const",
+    "kind": "primitive",
+    "base": "bigint",
+    "summary": "bigint",
+    "feature": "bigint"
+  },
+  {
+    "name": "mutableNegative",
+    "expression": "-1",
+    "declaration": "let",
+    "kind": "primitive",
+    "base": "number",
+    "summary": "number",
+    "feature": "unary"
+  },
+  {
+    "name": "mutableBig",
+    "expression": "1n",
+    "declaration": "let",
+    "kind": "primitive",
+    "base": "bigint",
+    "summary": "bigint",
+    "feature": "bigint"
+  },
+  {
+    "name": "notTrue",
+    "expression": "!true",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "boolean",
+    "value": "false",
+    "summary": "false",
+    "feature": "truthiness",
+    "nonStrictSummary": "boolean",
+    "nonStrictKind": "primitive"
+  },
+  {
+    "name": "notFalse",
+    "expression": "!false",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "boolean",
+    "value": "true",
+    "summary": "true",
+    "feature": "truthiness",
+    "nonStrictSummary": "true",
+    "nonStrictKind": "literal"
+  },
+  {
+    "name": "notZero",
+    "expression": "!0",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "boolean",
+    "value": "true",
+    "summary": "true",
+    "feature": "truthiness",
+    "nonStrictSummary": "true",
+    "nonStrictKind": "literal"
+  },
+  {
+    "name": "notNegativeZero",
+    "expression": "!(-0)",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "boolean",
+    "value": "true",
+    "summary": "true",
+    "feature": "truthiness",
+    "nonStrictSummary": "true",
+    "nonStrictKind": "literal"
+  },
+  {
+    "name": "notNonzero",
+    "expression": "!1",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "boolean",
+    "value": "false",
+    "summary": "false",
+    "feature": "truthiness",
+    "nonStrictSummary": "boolean",
+    "nonStrictKind": "primitive"
+  },
+  {
+    "name": "notEmpty",
+    "expression": "!\"\"",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "boolean",
+    "value": "true",
+    "summary": "true",
+    "feature": "truthiness",
+    "nonStrictSummary": "true",
+    "nonStrictKind": "literal"
+  },
+  {
+    "name": "notString",
+    "expression": "!\"ready\"",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "boolean",
+    "value": "false",
+    "summary": "false",
+    "feature": "truthiness",
+    "nonStrictSummary": "boolean",
+    "nonStrictKind": "primitive"
+  },
+  {
+    "name": "notBigZero",
+    "expression": "!0n",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "boolean",
+    "value": "true",
+    "summary": "true",
+    "feature": "truthiness",
+    "nonStrictSummary": "true",
+    "nonStrictKind": "literal"
+  },
+  {
+    "name": "notBigNonzero",
+    "expression": "!1n",
+    "declaration": "const",
+    "kind": "literal",
+    "base": "boolean",
+    "value": "false",
+    "summary": "false",
+    "feature": "truthiness",
+    "nonStrictSummary": "boolean",
+    "nonStrictKind": "primitive"
+  },
+  {
+    "name": "notObject",
+    "expression": "!{}",
+    "declaration": "const",
+    "kind": "primitive",
+    "base": "boolean",
+    "summary": "boolean",
+    "feature": "truthiness",
+    "nonStrictSummary": "boolean",
+    "nonStrictKind": "primitive"
+  }
+]

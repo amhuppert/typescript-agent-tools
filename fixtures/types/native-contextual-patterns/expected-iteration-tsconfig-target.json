@@ -1,0 +1,61 @@
+[
+  {
+    "name": "targetEmptyObject",
+    "kind": "value",
+    "summary": "void",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "targetEmptyArray",
+    "kind": "value",
+    "summary": "void",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "targetSoleRest",
+    "kind": "expression",
+    "summary": "any[]",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:234:245:65": {
+        "end": 245,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 234,
+        "use": 65
+      }
+    }
+  },
+  {
+    "name": "targetFixedAndRest",
+    "kind": "expression",
+    "summary": "any[]",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:312:330:193": {
+        "end": 330,
+        "fallbackAny": true,
+        "inputAny": false,
+        "pos": 312,
+        "use": 193
+      },
+      "checkedIteration:312:330:65": {
+        "end": 330,
+        "fallbackAny": true,
+        "inputAny": false,
+        "pos": 312,
+        "use": 65
+      }
+    }
+  }
+]

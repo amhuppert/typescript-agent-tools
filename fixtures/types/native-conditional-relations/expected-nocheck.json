@@ -1,0 +1,193 @@
+{
+  "alias": {
+    "flags": 34078724,
+    "checkFlags": 0,
+    "transient": true,
+    "property": true,
+    "typeAlias": true,
+    "declarations": [
+      {
+        "kind": "TypeAliasDeclaration",
+        "pos": 1624,
+        "end": 1654
+      },
+      {
+        "kind": "PropertyDeclaration",
+        "pos": 1573,
+        "end": 1596
+      }
+    ]
+  },
+  "queries": [
+    {
+      "name": "targetBoth",
+      "summary": "11",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 67,
+          "end": 85
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 87,
+          "end": 106
+        }
+      ]
+    },
+    {
+      "name": "targetTrue",
+      "summary": "13",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 308,
+          "end": 330
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 332,
+          "end": 356
+        }
+      ]
+    },
+    {
+      "name": "sourceBoth",
+      "summary": "22",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 544,
+          "end": 562
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 564,
+          "end": 583
+        }
+      ]
+    },
+    {
+      "name": "sourceTarget",
+      "summary": "23",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304,
+        2304,
+        2304
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 849,
+          "end": 875
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 877,
+          "end": 904
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 949,
+          "end": 975
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 977,
+          "end": 1004
+        }
+      ]
+    },
+    {
+      "name": "inferenceBoth",
+      "summary": "31 | 32",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 1322,
+          "end": 1343
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 1350,
+          "end": 1372
+        }
+      ]
+    },
+    {
+      "name": "createdAliasValue",
+      "summary": "81",
+      "errorType": false,
+      "codes": [],
+      "demandFailures": [],
+      "errors": []
+    },
+    {
+      "name": "createdAliasRelation",
+      "summary": "41",
+      "errorType": false,
+      "codes": [],
+      "demandFailures": [],
+      "errors": []
+    },
+    {
+      "name": "createdAliasInference",
+      "summary": "31",
+      "errorType": false,
+      "codes": [],
+      "demandFailures": [],
+      "errors": []
+    },
+    {
+      "name": "ordinaryAliasRelation",
+      "summary": "41",
+      "errorType": false,
+      "codes": [],
+      "demandFailures": [],
+      "errors": []
+    },
+    {
+      "name": "ordinaryAliasInference",
+      "summary": "31",
+      "errorType": false,
+      "codes": [],
+      "demandFailures": [],
+      "errors": []
+    },
+    {
+      "name": "healthy",
+      "summary": "45",
+      "errorType": false,
+      "codes": [],
+      "demandFailures": [],
+      "errors": []
+    }
+  ]
+}

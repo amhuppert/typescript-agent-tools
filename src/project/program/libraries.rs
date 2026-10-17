@@ -219,6 +219,28 @@ const TARGETS: [(&str, Target); 14] = [
 ];
 
 impl Target {
+    /// Native `languageVersion >= ScriptTargetES2015`, used by iterator and
+    /// binding-pattern factories independently of default library selection.
+    pub(super) fn supports_iterables(self) -> bool {
+        self != Self::Es5
+    }
+    /// `LanguageFeatureMinimumTarget.ObjectSpreadRest` is ES2018.
+    pub(super) fn supports_object_rest(self) -> bool {
+        !matches!(self, Self::Es5 | Self::Es2015 | Self::Es2016 | Self::Es2017)
+    }
+    /// `LanguageFeatureMinimumTarget.ClassAndClassElementDecorators` is ESNext.
+    pub(super) fn supports_class_element_decorators(self) -> bool {
+        self == Self::EsNext
+    }
+    /// The `ScriptTarget >= ES2022` question shared by TypeScript's
+    /// `GetUseDefineForClassFields` and `GetEmitStandardClassFields`.
+    pub(super) fn is_at_least_es2022(self) -> bool {
+        matches!(
+            self,
+            Self::Es2022 | Self::Es2023 | Self::Es2024 | Self::Es2025 | Self::EsNext
+        )
+    }
+
     /// `core.ScriptTargetLatestStandard`, which `GetEmitScriptTarget` uses
     /// when `target` is unset.
     pub(super) const LATEST_STANDARD: Self = Self::Es2025;

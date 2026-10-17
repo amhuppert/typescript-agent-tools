@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "compiler": "7.0.2",
+  "corpusRevision": "92fe6ab06fbea2c4b6a305689f8cf336173eef81",
+  "manifestSha256": "53cdf23518d299cba7b6540985cd76538147da0cd5016b05098ff577f3e42f1f",
+  "history": "baseline",
+  "diagnostics": "none",
+  "freshCheckerPerQuery": true,
+  "timingNote": "One exploratory sample under concurrent validation load. Includes API process startup, project capture/load, selection, prelude and root/first-level property observation. These are compiler API observations, not native query latency, resource calibration, or admission proofs.",
+  "queries": [
+    {
+      "id": "annotated-member",
+      "elapsedMilliseconds": 2542,
+      "summary": "(target: SpecWorkflowCleanupTarget) => Promise<SpecWorkflowCleanupObservation>",
+      "kind": "value",
+      "errorType": false,
+      "prelude": [],
+      "properties": [],
+      "diagnostics": []
+    },
+    {
+      "id": "contextual-member",
+      "elapsedMilliseconds": 1844,
+      "summary": "(target: SpecWorkflowCleanupTarget) => Promise<GraphWorkflowExecutionPlacement>",
+      "kind": "value",
+      "errorType": false,
+      "prelude": [],
+      "properties": [],
+      "diagnostics": []
+    },
+    {
+      "id": "inferred-factory",
+      "elapsedMilliseconds": 1880,
+      "summary": "(deps?: AgentGatewayDeps) => { handshakeGET: (request: Request) => Promise<Response>; identityGET: () => Promise<Response>; }",
+      "kind": "value",
+      "errorType": false,
+      "prelude": [],
+      "properties": [],
+      "diagnostics": []
+    },
+    {
+      "id": "jsx-member",
+      "elapsedMilliseconds": 2109,
+      "summary": "number | undefined",
+      "kind": "value",
+      "errorType": false,
+      "prelude": [],
+      "properties": [],
+      "diagnostics": []
+    },
+    {
+      "id": "predicate-callback",
+      "elapsedMilliseconds": 2103,
+      "summary": "{ <S extends \"append-only\" | \"full-edit\" | \"read-only\">(predicate: (value: \"append-only\" | \"full-edit\" | \"read-only\", index: number, array: (\"append-only\" | \"full-edit\" | \"read-only\")[]) => value is S, thisArg?: any): S[]; (predicate: (value: \"append-only\" | \"full-edit\" | \"read-only\", index: number, array: (\"append-...",
+      "kind": "expression",
+      "errorType": false,
+      "prelude": [
+        {
+          "kind": "CallExpression",
+          "location": {
+            "file": "src/lib/notepads/service.ts",
+            "start": {
+              "line": 389,
+              "column": 10
+            },
+            "end": {
+              "line": 389,
+              "column": 79
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "diagnostics": []
+    }
+  ]
+}

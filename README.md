@@ -29,7 +29,7 @@ The CLI reads UTF-8 from one input file or stdin (`-`, or no file). `.tsx` and `
 ./target/release/tsparse --references --project ./tsconfig.json --name run --pretty
 ```
 
-On macOS and Linux, project queries (references, and outline and show with
+On macOS and Linux, project queries (references, types, and outline and show with
 `--project`) automatically start a local service and reuse its snapshot across
 CLI invocations. Every query checks the captured inputs; changed sources,
 configuration, or resolution inputs trigger a full rebuild. A failed refresh
@@ -47,8 +47,7 @@ rebuild after an edit about 10 seconds ([measurements](docs/performance-command-
 
 Use `--references-serve --project CONFIG` for a foreground service managed by a
 supervisor. `TSPARSE_SERVICE_DIR` selects a private runtime directory, and
-`TSPARSE_SERVICE_IDLE_SECS` sets its positive idle timeout in seconds. Other
-platforms use direct loading. The [service design](docs/reference-service-design.md)
+`TSPARSE_SERVICE_IDLE_SECS` sets its positive idle timeout in seconds. Read-only query memory monitoring currently supports macOS and Linux. The [service design](docs/reference-service-design.md)
 describes freshness, process ownership, and the current full-rebuild limitation.
 
 The library exposes immutable snapshots through `typescript_parser::project::Project`
@@ -59,12 +58,33 @@ with `tsc --listFilesOnly` ([validation](docs/validation.md#command-center-check
 libraries follow `target`, `lib`, `noLib`, `libReplacement`, and `/// <reference lib>` from the
 TypeScript 7.0.2 declarations vendored in [`vendor/typescript-7.0.2-lib`](vendor/README.md): their
 declarations join groups, but library files are never searched. JSON modules are program inputs
-under `resolveJsonModule`, read with the grammar `tsconfig.json` shares; a JSON module's value and
-its properties, like other properties and class members, are not reference targets. Module
+under `resolveJsonModule`, read with the grammar `tsconfig.json` shares. Member references
+use resolved semantic identities; positions inside JSON are not selectable. Module
 augmentations merge as TypeScript's checker merges them, so TipTap's augmented `Commands` is one
 group with its 78 declarations. Project references are not followed. See
 [find references](docs/references.md) for the result format, binding model, exit codes, and
 compatibility limits.
+
+## Inspect types and member references
+
+```sh
+./target/release/tsparse --type --project tsconfig.json --name createRunHost --expand --json
+./target/release/tsparse --type --project tsconfig.json --at src/runs/host.ts:42:10 --expand --depth 3
+./target/release/tsparse --references --project tsconfig.json --name RunHost.observe --calls --no-tests
+```
+
+Type queries report a summary and, with `--expand`, a bounded graph. Member
+references follow resolved receiver/member identities. Bare reference names
+keep their lexical search and disclose matching members that were not searched.
+Partial results report their gaps or issues and exit 1. See the
+[type and member query guide](docs/types.md) for selection, limits, and failures.
+
+Read-only CLI queries default to a 6144 MiB process-memory threshold and a
+60-second deadline. Set positive `TSPARSE_MAX_MEMORY_MB` and
+`TSPARSE_QUERY_TIMEOUT_MS` values to change them; restart an existing service
+first. A limit failure discards that process and its cache, and the next service
+request restarts it. Memory is sampled and may overshoot. Edit application is
+outside the watchdog, and the Rust library does not terminate its caller.
 
 ## Navigate declarations
 

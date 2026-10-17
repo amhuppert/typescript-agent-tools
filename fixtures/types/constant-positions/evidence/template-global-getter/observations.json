@@ -1,0 +1,401 @@
+[
+  {
+    "config": "tsconfig.json",
+    "marker": "argument",
+    "kind": "expression",
+    "summary": "\"ready\"",
+    "errorType": false,
+    "prelude": [
+      {
+        "kind": "CallExpression",
+        "location": {
+          "file": "positions.ts",
+          "start": {
+            "line": 8,
+            "column": 25
+          },
+          "end": {
+            "line": 8,
+            "column": 53
+          }
+        }
+      }
+    ],
+    "globalGetter": null,
+    "diagnostics": [],
+    "errors": [],
+    "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+    "inputHashes": [
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/globals.d.ts",
+        "sha256": "6fca8ae24c6d91a81594802d5b21659c4781af1e8d3dae1afb8a813291270305"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/positions.ts",
+        "sha256": "4ff95aa9b5057911d60869461454012f245babc243682e2109c551fb331c3b40"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/tsconfig.json",
+        "sha256": "b3f390237d6eb63303e78aa0a9bc16255b11c1ea6b8d58471c7fc1057175b7f0"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constants/cases.ts",
+        "sha256": "f98122ea2087acf810cb0f2814ae1841f6ebbf63adc8f4bfe613714465cde1e7"
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "nestedCall",
+    "kind": "expression",
+    "summary": "\"nested\"",
+    "errorType": false,
+    "prelude": [
+      {
+        "kind": "CallExpression",
+        "location": {
+          "file": "positions.ts",
+          "start": {
+            "line": 17,
+            "column": 24
+          },
+          "end": {
+            "line": 17,
+            "column": 61
+          }
+        }
+      },
+      {
+        "kind": "CallExpression",
+        "location": {
+          "file": "positions.ts",
+          "start": {
+            "line": 17,
+            "column": 30
+          },
+          "end": {
+            "line": 17,
+            "column": 60
+          }
+        }
+      }
+    ],
+    "globalGetter": null,
+    "diagnostics": [],
+    "errors": [],
+    "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+    "inputHashes": [
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/globals.d.ts",
+        "sha256": "6fca8ae24c6d91a81594802d5b21659c4781af1e8d3dae1afb8a813291270305"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/positions.ts",
+        "sha256": "4ff95aa9b5057911d60869461454012f245babc243682e2109c551fb331c3b40"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/tsconfig.json",
+        "sha256": "b3f390237d6eb63303e78aa0a9bc16255b11c1ea6b8d58471c7fc1057175b7f0"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constants/cases.ts",
+        "sha256": "f98122ea2087acf810cb0f2814ae1841f6ebbf63adc8f4bfe613714465cde1e7"
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "newArg",
+    "kind": "expression",
+    "summary": "\"new\"",
+    "errorType": false,
+    "prelude": [
+      {
+        "kind": "NewExpression",
+        "location": {
+          "file": "positions.ts",
+          "start": {
+            "line": 20,
+            "column": 28
+          },
+          "end": {
+            "line": 20,
+            "column": 54
+          }
+        }
+      }
+    ],
+    "globalGetter": null,
+    "diagnostics": [],
+    "errors": [],
+    "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+    "inputHashes": [
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/globals.d.ts",
+        "sha256": "6fca8ae24c6d91a81594802d5b21659c4781af1e8d3dae1afb8a813291270305"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/positions.ts",
+        "sha256": "4ff95aa9b5057911d60869461454012f245babc243682e2109c551fb331c3b40"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/tsconfig.json",
+        "sha256": "b3f390237d6eb63303e78aa0a9bc16255b11c1ea6b8d58471c7fc1057175b7f0"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constants/cases.ts",
+        "sha256": "f98122ea2087acf810cb0f2814ae1841f6ebbf63adc8f4bfe613714465cde1e7"
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "tagToken",
+    "kind": "expression",
+    "summary": "\"tagged\"",
+    "errorType": false,
+    "prelude": [
+      {
+        "kind": "TaggedTemplateExpression",
+        "location": {
+          "file": "positions.ts",
+          "start": {
+            "line": 22,
+            "column": 23
+          },
+          "end": {
+            "line": 22,
+            "column": 47
+          }
+        }
+      }
+    ],
+    "globalGetter": {
+      "arity": 0,
+      "emptyGeneric": false,
+      "emptyObject": false,
+      "errorType": false,
+      "flags": 1048576,
+      "name": "TemplateStringsArray",
+      "nil": false,
+      "reportErrors": true,
+      "type": 83
+    },
+    "diagnostics": [],
+    "errors": [],
+    "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+    "inputHashes": [
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/globals.d.ts",
+        "sha256": "6fca8ae24c6d91a81594802d5b21659c4781af1e8d3dae1afb8a813291270305"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/positions.ts",
+        "sha256": "4ff95aa9b5057911d60869461454012f245babc243682e2109c551fb331c3b40"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/tsconfig.json",
+        "sha256": "b3f390237d6eb63303e78aa0a9bc16255b11c1ea6b8d58471c7fc1057175b7f0"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constants/cases.ts",
+        "sha256": "f98122ea2087acf810cb0f2814ae1841f6ebbf63adc8f4bfe613714465cde1e7"
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "callbackName",
+    "kind": "value",
+    "summary": "1",
+    "errorType": false,
+    "prelude": [
+      {
+        "kind": "CallExpression",
+        "location": {
+          "file": "positions.ts",
+          "start": {
+            "line": 24,
+            "column": 25
+          },
+          "end": {
+            "line": 24,
+            "column": 90
+          }
+        }
+      }
+    ],
+    "globalGetter": null,
+    "diagnostics": [],
+    "errors": [],
+    "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+    "inputHashes": [
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/globals.d.ts",
+        "sha256": "6fca8ae24c6d91a81594802d5b21659c4781af1e8d3dae1afb8a813291270305"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/positions.ts",
+        "sha256": "4ff95aa9b5057911d60869461454012f245babc243682e2109c551fb331c3b40"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/tsconfig.json",
+        "sha256": "b3f390237d6eb63303e78aa0a9bc16255b11c1ea6b8d58471c7fc1057175b7f0"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constants/cases.ts",
+        "sha256": "f98122ea2087acf810cb0f2814ae1841f6ebbf63adc8f4bfe613714465cde1e7"
+      }
+    ]
+  },
+  {
+    "config": "tsconfig.json",
+    "marker": "callProperty",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "prelude": [
+      {
+        "kind": "CallExpression",
+        "location": {
+          "file": "positions.ts",
+          "start": {
+            "line": 26,
+            "column": 30
+          },
+          "end": {
+            "line": 26,
+            "column": 74
+          }
+        }
+      }
+    ],
+    "globalGetter": null,
+    "diagnostics": [],
+    "errors": [],
+    "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+    "inputHashes": [
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/globals.d.ts",
+        "sha256": "6fca8ae24c6d91a81594802d5b21659c4781af1e8d3dae1afb8a813291270305"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/positions.ts",
+        "sha256": "4ff95aa9b5057911d60869461454012f245babc243682e2109c551fb331c3b40"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/tsconfig.json",
+        "sha256": "b3f390237d6eb63303e78aa0a9bc16255b11c1ea6b8d58471c7fc1057175b7f0"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constants/cases.ts",
+        "sha256": "f98122ea2087acf810cb0f2814ae1841f6ebbf63adc8f4bfe613714465cde1e7"
+      }
+    ]
+  },
+  {
+    "config": "missing-globals.json",
+    "marker": "tagToken",
+    "kind": "expression",
+    "summary": "\"tagged\"",
+    "errorType": false,
+    "prelude": [
+      {
+        "kind": "TaggedTemplateExpression",
+        "location": {
+          "file": "positions.ts",
+          "start": {
+            "line": 22,
+            "column": 23
+          },
+          "end": {
+            "line": 22,
+            "column": 47
+          }
+        }
+      }
+    ],
+    "globalGetter": {
+      "arity": 0,
+      "emptyGeneric": false,
+      "emptyObject": true,
+      "errorType": false,
+      "flags": 1048576,
+      "name": "TemplateStringsArray",
+      "nil": false,
+      "reportErrors": true,
+      "type": 35
+    },
+    "diagnostics": [
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2304
+    ],
+    "errors": [
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 1151,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "kind": 184,
+        "operation": "getTypeFromTypeNode",
+        "pos": 1130,
+        "type": 66
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 1151,
+        "declarationPos": 1124,
+        "depth": 0,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "name": "value",
+        "operation": "getTypeOfSymbol",
+        "type": 66
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 1151,
+        "declarationPos": 1124,
+        "depth": 0,
+        "errorType": true,
+        "event": "exit",
+        "flags": 1,
+        "name": "value",
+        "operation": "getTypeOfSymbol",
+        "type": 66
+      }
+    ],
+    "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+    "inputHashes": [
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/missing-globals.json",
+        "sha256": "c6f6385545d7613da273c433228e4a3bd02dac91200a7eb3753770c4b53d9e36"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/positions.ts",
+        "sha256": "4ff95aa9b5057911d60869461454012f245babc243682e2109c551fb331c3b40"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constant-positions/tsconfig.json",
+        "sha256": "b3f390237d6eb63303e78aa0a9bc16255b11c1ea6b8d58471c7fc1057175b7f0"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/constants/cases.ts",
+        "sha256": "f98122ea2087acf810cb0f2814ae1841f6ebbf63adc8f4bfe613714465cde1e7"
+      }
+    ]
+  }
+]

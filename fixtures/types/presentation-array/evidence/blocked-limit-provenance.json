@@ -1,0 +1,112 @@
+{
+  "generatedInputs": [
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260866-false/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260866-false/globals.ts",
+      "sha256": "cb889ab963ff95f52008dbd52e85b16b81de1eaa096da51d7484dcf4edc5d2d2"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260866-false/tsconfig.json",
+      "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260866-false/value.ts",
+      "sha256": "27fcc14fe89d607ce974d3cd169f3db637487506a08fad3d054188db944711a7"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260866-true/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260866-true/globals.ts",
+      "sha256": "cb889ab963ff95f52008dbd52e85b16b81de1eaa096da51d7484dcf4edc5d2d2"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260866-true/tsconfig.json",
+      "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260866-true/value.ts",
+      "sha256": "27fcc14fe89d607ce974d3cd169f3db637487506a08fad3d054188db944711a7"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260867-false/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260867-false/globals.ts",
+      "sha256": "cb889ab963ff95f52008dbd52e85b16b81de1eaa096da51d7484dcf4edc5d2d2"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260867-false/tsconfig.json",
+      "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260867-false/value.ts",
+      "sha256": "0d0b4e39b272fa7dbdc4501079efbae383272a5bc32c5b26ea6dd2693e991e09"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260867-true/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260867-true/globals.ts",
+      "sha256": "cb889ab963ff95f52008dbd52e85b16b81de1eaa096da51d7484dcf4edc5d2d2"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260867-true/tsconfig.json",
+      "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260867-true/value.ts",
+      "sha256": "0d0b4e39b272fa7dbdc4501079efbae383272a5bc32c5b26ea6dd2693e991e09"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260868-false/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260868-false/globals.ts",
+      "sha256": "cb889ab963ff95f52008dbd52e85b16b81de1eaa096da51d7484dcf4edc5d2d2"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260868-false/tsconfig.json",
+      "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260868-false/value.ts",
+      "sha256": "71f9ac384f6588ee62d531d51d8c7bcd60b3dd2a520bec25605d06492b43b6ca"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260868-true/consumer.ts",
+      "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260868-true/globals.ts",
+      "sha256": "cb889ab963ff95f52008dbd52e85b16b81de1eaa096da51d7484dcf4edc5d2d2"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260868-true/tsconfig.json",
+      "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+    },
+    {
+      "file": ".cc/temp/type-array-blocked-limits/260868-true/value.ts",
+      "sha256": "71f9ac384f6588ee62d531d51d8c7bcd60b3dd2a520bec25605d06492b43b6ca"
+    }
+  ],
+  "archivedFiles": [
+    {
+      "file": "fixtures/types/presentation-array/evidence/captured-tooling/blocked-limits-probe.mjs",
+      "sha256": "226c4a8148931f987b814767947ad85fb5545246f40c489085c8dc99331ce3dd"
+    },
+    {
+      "file": "fixtures/types/presentation-array/evidence/blocked-limit-observations.json",
+      "sha256": "966e1df7995d6b4831ab3fd763fab894a1671ddb26dce5c03c7277e74f2e12c1"
+    }
+  ],
+  "nativeVersion": "7.0.2",
+  "limits": "Six fresh API controls only; original source inputs regenerate from historical probe. Product full type-schema byte admission requires final Project tests; no native merged-member implementation claim."
+}

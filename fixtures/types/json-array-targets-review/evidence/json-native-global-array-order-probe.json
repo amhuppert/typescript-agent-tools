@@ -1,0 +1,124 @@
+[
+  {
+    "case": "augmentation-before-script",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol then already accumulated GetGlobalDiagnostics and later file GetSemanticDiagnostics",
+    "summary": "{}",
+    "errorType": false,
+    "preDemandDiagnostics": [],
+    "diagnostics": [
+      {
+        "code": 2317,
+        "message": "Global type 'Array' must have 1 type parameter(s).",
+        "location": {
+          "file": "globals-second.ts",
+          "start": {
+            "line": 1,
+            "column": 11
+          },
+          "end": {
+            "line": 1,
+            "column": 16
+          }
+        }
+      }
+    ]
+  },
+  {
+    "case": "scripts-forward",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol then already accumulated GetGlobalDiagnostics and later file GetSemanticDiagnostics",
+    "summary": "{}",
+    "errorType": false,
+    "preDemandDiagnostics": [],
+    "diagnostics": [
+      {
+        "code": 2317,
+        "message": "Global type 'Array' must have 1 type parameter(s).",
+        "location": {
+          "file": "globals-first.ts",
+          "start": {
+            "line": 1,
+            "column": 11
+          },
+          "end": {
+            "line": 1,
+            "column": 16
+          }
+        }
+      }
+    ]
+  },
+  {
+    "case": "scripts-reverse",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol then already accumulated GetGlobalDiagnostics and later file GetSemanticDiagnostics",
+    "summary": "{}",
+    "errorType": false,
+    "preDemandDiagnostics": [],
+    "diagnostics": [
+      {
+        "code": 2317,
+        "message": "Global type 'Array' must have 1 type parameter(s).",
+        "location": {
+          "file": "globals-second.ts",
+          "start": {
+            "line": 1,
+            "column": 11
+          },
+          "end": {
+            "line": 1,
+            "column": 16
+          }
+        }
+      }
+    ]
+  },
+  {
+    "case": "escaped-type-alias",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol then already accumulated GetGlobalDiagnostics and later file GetSemanticDiagnostics",
+    "summary": "{}",
+    "errorType": false,
+    "preDemandDiagnostics": [],
+    "diagnostics": [
+      {
+        "code": 2316,
+        "message": "Global type 'Array' must be a class or interface type.",
+        "location": {
+          "file": "globals.ts",
+          "start": {
+            "line": 1,
+            "column": 6
+          },
+          "end": {
+            "line": 1,
+            "column": 16
+          }
+        }
+      }
+    ]
+  },
+  {
+    "case": "value-alias",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol then already accumulated GetGlobalDiagnostics and later file GetSemanticDiagnostics",
+    "summary": "{}",
+    "errorType": false,
+    "preDemandDiagnostics": [],
+    "diagnostics": [
+      {
+        "code": 2318,
+        "message": "Cannot find global type 'Array'."
+      }
+    ]
+  },
+  {
+    "case": "folded-case",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol then already accumulated GetGlobalDiagnostics and later file GetSemanticDiagnostics",
+    "summary": "{}",
+    "errorType": false,
+    "preDemandDiagnostics": [],
+    "diagnostics": [
+      {
+        "code": 2318,
+        "message": "Cannot find global type 'Array'."
+      }
+    ]
+  }
+]

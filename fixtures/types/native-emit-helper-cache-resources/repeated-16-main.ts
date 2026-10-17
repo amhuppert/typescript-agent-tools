@@ -1,0 +1,18 @@
+import { f0 } from "./repeated-0";
+import { f1 } from "./repeated-1";
+import { f2 } from "./repeated-2";
+import { f3 } from "./repeated-3";
+import { f4 } from "./repeated-4";
+import { f5 } from "./repeated-5";
+import { f6 } from "./repeated-6";
+import { f7 } from "./repeated-7";
+import { f8 } from "./repeated-8";
+import { f9 } from "./repeated-9";
+import { f10 } from "./repeated-10";
+import { f11 } from "./repeated-11";
+import { f12 } from "./repeated-12";
+import { f13 } from "./repeated-13";
+import { f14 } from "./repeated-14";
+import { f15 } from "./repeated-15";
+const /*#chosen*/chosen = [f0(), f1(), f2(), f3(), f4(), f5(), f6(), f7(), f8(), f9(), f10(), f11(), f12(), f13(), f14(), f15()].length;
+let healthy: number;

@@ -1,0 +1,2655 @@
+[
+  {
+    "case": "basic",
+    "operation": "identity",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array"
+  },
+  {
+    "case": "basic",
+    "operation": "inventory",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "properties": [
+      "value",
+      "length",
+      "first",
+      "self"
+    ],
+    "indexes": [
+      {
+        "key": {
+          "id": 15,
+          "summary": "number",
+          "flags": 64,
+          "objectFlags": 0,
+          "errorType": false,
+          "isThisType": false
+        },
+        "value": {
+          "id": 15,
+          "summary": "number",
+          "flags": 64,
+          "objectFlags": 0,
+          "errorType": false,
+          "isThisType": false
+        },
+        "readonly": false
+      }
+    ],
+    "callCount": 0,
+    "constructCount": 0
+  },
+  {
+    "case": "basic",
+    "operation": "value",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "member": {
+      "name": "value",
+      "type": {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    }
+  },
+  {
+    "case": "basic",
+    "operation": "constraint",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "constraint": null
+  },
+  {
+    "case": "basic",
+    "operation": "default",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "parameterDeclarations": [
+      {
+        "canonicalParameter": {
+          "id": 65,
+          "summary": "T",
+          "flags": 524288,
+          "objectFlags": 0,
+          "errorType": false,
+          "isThisType": false
+        },
+        "hasConstraint": false,
+        "hasDefault": false,
+        "defaultTypeNodeQuestion": null
+      }
+    ]
+  },
+  {
+    "case": "basic",
+    "operation": "self",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "member": {
+      "name": "self",
+      "type": {
+        "id": 75,
+        "summary": "number[]",
+        "flags": 1048576,
+        "objectFlags": 4,
+        "errorType": false,
+        "isThisType": false
+      }
+    }
+  },
+  {
+    "case": "basic",
+    "operation": "first",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "member": {
+      "name": "first",
+      "type": {
+        "id": 80,
+        "summary": "() => number",
+        "flags": 1048576,
+        "objectFlags": 524368,
+        "errorType": false,
+        "isThisType": false
+      },
+      "calls": [
+        {
+          "parameters": [],
+          "returns": {
+            "id": 15,
+            "summary": "number",
+            "flags": 64,
+            "objectFlags": 0,
+            "errorType": false,
+            "isThisType": false
+          }
+        }
+      ]
+    }
+  },
+  {
+    "case": "unused-constraint",
+    "operation": "identity",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array"
+  },
+  {
+    "case": "unused-constraint",
+    "operation": "inventory",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "properties": [
+      "value"
+    ],
+    "indexes": [],
+    "callCount": 0,
+    "constructCount": 0
+  },
+  {
+    "case": "unused-constraint",
+    "operation": "value",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "member": {
+      "name": "value",
+      "type": {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    }
+  },
+  {
+    "case": "unused-constraint",
+    "operation": "constraint",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "constraint": {
+      "id": 79,
+      "summary": "MissingConstraint",
+      "flags": 1,
+      "objectFlags": 0,
+      "errorType": true,
+      "isThisType": false
+    }
+  },
+  {
+    "case": "unused-constraint",
+    "operation": "default",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "parameterDeclarations": [
+      {
+        "canonicalParameter": {
+          "id": 65,
+          "summary": "T",
+          "flags": 524288,
+          "objectFlags": 0,
+          "errorType": false,
+          "isThisType": false
+        },
+        "hasConstraint": true,
+        "hasDefault": false,
+        "defaultTypeNodeQuestion": null
+      }
+    ]
+  },
+  {
+    "case": "unused-default",
+    "operation": "identity",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array"
+  },
+  {
+    "case": "unused-default",
+    "operation": "inventory",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "properties": [
+      "value"
+    ],
+    "indexes": [],
+    "callCount": 0,
+    "constructCount": 0
+  },
+  {
+    "case": "unused-default",
+    "operation": "value",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "member": {
+      "name": "value",
+      "type": {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    }
+  },
+  {
+    "case": "unused-default",
+    "operation": "constraint",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "constraint": null
+  },
+  {
+    "case": "unused-default",
+    "operation": "default",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "parameterDeclarations": [
+      {
+        "canonicalParameter": {
+          "id": 65,
+          "summary": "T",
+          "flags": 524288,
+          "objectFlags": 0,
+          "errorType": false,
+          "isThisType": false
+        },
+        "hasConstraint": false,
+        "hasDefault": true,
+        "defaultTypeNodeQuestion": {
+          "id": 79,
+          "summary": "MissingDefault",
+          "flags": 1,
+          "objectFlags": 0,
+          "errorType": true,
+          "isThisType": false
+        }
+      }
+    ]
+  },
+  {
+    "case": "unused-member",
+    "operation": "identity",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array"
+  },
+  {
+    "case": "unused-member",
+    "operation": "inventory",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "properties": [
+      "value",
+      "broken"
+    ],
+    "indexes": [],
+    "callCount": 0,
+    "constructCount": 0
+  },
+  {
+    "case": "unused-member",
+    "operation": "value",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "member": {
+      "name": "value",
+      "type": {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    }
+  },
+  {
+    "case": "unused-member",
+    "operation": "constraint",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "constraint": null
+  },
+  {
+    "case": "unused-member",
+    "operation": "default",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "parameterDeclarations": [
+      {
+        "canonicalParameter": {
+          "id": 65,
+          "summary": "T",
+          "flags": 524288,
+          "objectFlags": 0,
+          "errorType": false,
+          "isThisType": false
+        },
+        "hasConstraint": false,
+        "hasDefault": false,
+        "defaultTypeNodeQuestion": null
+      }
+    ]
+  },
+  {
+    "case": "unused-member",
+    "operation": "broken",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "member": {
+      "name": "broken",
+      "type": {
+        "id": 79,
+        "summary": "MissingMember",
+        "flags": 1,
+        "objectFlags": 0,
+        "errorType": true,
+        "isThisType": false
+      }
+    }
+  },
+  {
+    "case": "unused-base",
+    "operation": "identity",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array"
+  },
+  {
+    "case": "unused-base",
+    "operation": "inventory",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "properties": [
+      "value"
+    ],
+    "indexes": [],
+    "callCount": 0,
+    "constructCount": 0
+  },
+  {
+    "case": "unused-base",
+    "operation": "value",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "member": {
+      "name": "value",
+      "type": {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    }
+  },
+  {
+    "case": "unused-base",
+    "operation": "constraint",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "constraint": null
+  },
+  {
+    "case": "unused-base",
+    "operation": "default",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "parameterDeclarations": [
+      {
+        "canonicalParameter": {
+          "id": 65,
+          "summary": "T",
+          "flags": 524288,
+          "objectFlags": 0,
+          "errorType": false,
+          "isThisType": false
+        },
+        "hasConstraint": false,
+        "hasDefault": false,
+        "defaultTypeNodeQuestion": null
+      }
+    ]
+  },
+  {
+    "case": "merged-later-constraint",
+    "operation": "identity",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array"
+  },
+  {
+    "case": "merged-later-constraint",
+    "operation": "inventory",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "properties": [
+      "value",
+      "later"
+    ],
+    "indexes": [],
+    "callCount": 0,
+    "constructCount": 0
+  },
+  {
+    "case": "merged-later-constraint",
+    "operation": "value",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "member": {
+      "name": "value",
+      "type": {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    }
+  },
+  {
+    "case": "merged-later-constraint",
+    "operation": "constraint",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "constraint": {
+      "id": 14,
+      "summary": "string",
+      "flags": 32,
+      "objectFlags": 0,
+      "errorType": false,
+      "isThisType": false
+    }
+  },
+  {
+    "case": "merged-later-constraint",
+    "operation": "default",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "parameterDeclarations": [
+      {
+        "canonicalParameter": {
+          "id": 65,
+          "summary": "T",
+          "flags": 524288,
+          "objectFlags": 0,
+          "errorType": false,
+          "isThisType": false
+        },
+        "hasConstraint": false,
+        "hasDefault": false,
+        "defaultTypeNodeQuestion": null
+      },
+      {
+        "canonicalParameter": {
+          "id": 65,
+          "summary": "T",
+          "flags": 524288,
+          "objectFlags": 0,
+          "errorType": false,
+          "isThisType": false
+        },
+        "hasConstraint": true,
+        "hasDefault": false,
+        "defaultTypeNodeQuestion": null
+      }
+    ]
+  },
+  {
+    "case": "merged-later-default",
+    "operation": "identity",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array"
+  },
+  {
+    "case": "merged-later-default",
+    "operation": "inventory",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "properties": [
+      "value",
+      "later"
+    ],
+    "indexes": [],
+    "callCount": 0,
+    "constructCount": 0
+  },
+  {
+    "case": "merged-later-default",
+    "operation": "value",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "member": {
+      "name": "value",
+      "type": {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    }
+  },
+  {
+    "case": "merged-later-default",
+    "operation": "constraint",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "constraint": null
+  },
+  {
+    "case": "merged-later-default",
+    "operation": "default",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 6,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "parameterDeclarations": [
+      {
+        "canonicalParameter": {
+          "id": 65,
+          "summary": "T",
+          "flags": 524288,
+          "objectFlags": 0,
+          "errorType": false,
+          "isThisType": false
+        },
+        "hasConstraint": false,
+        "hasDefault": false,
+        "defaultTypeNodeQuestion": null
+      },
+      {
+        "canonicalParameter": {
+          "id": 65,
+          "summary": "T",
+          "flags": 524288,
+          "objectFlags": 0,
+          "errorType": false,
+          "isThisType": false
+        },
+        "hasConstraint": false,
+        "hasDefault": true,
+        "defaultTypeNodeQuestion": {
+          "id": 79,
+          "summary": "\"ready\"",
+          "flags": 1024,
+          "objectFlags": 0,
+          "errorType": false,
+          "isThisType": false
+        }
+      }
+    ]
+  },
+  {
+    "case": "valid-class",
+    "operation": "identity",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 5,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array"
+  },
+  {
+    "case": "valid-class",
+    "operation": "inventory",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 5,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "properties": [
+      "value",
+      "length",
+      "first",
+      "self"
+    ],
+    "indexes": [
+      {
+        "key": {
+          "id": 15,
+          "summary": "number",
+          "flags": 64,
+          "objectFlags": 0,
+          "errorType": false,
+          "isThisType": false
+        },
+        "value": {
+          "id": 15,
+          "summary": "number",
+          "flags": 64,
+          "objectFlags": 0,
+          "errorType": false,
+          "isThisType": false
+        },
+        "readonly": false
+      }
+    ],
+    "callCount": 0,
+    "constructCount": 0
+  },
+  {
+    "case": "valid-class",
+    "operation": "value",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 5,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "member": {
+      "name": "value",
+      "type": {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    }
+  },
+  {
+    "case": "valid-class",
+    "operation": "constraint",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 5,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "constraint": null
+  },
+  {
+    "case": "valid-class",
+    "operation": "default",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 5,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "parameterDeclarations": [
+      {
+        "canonicalParameter": {
+          "id": 65,
+          "summary": "T",
+          "flags": 524288,
+          "objectFlags": 0,
+          "errorType": false,
+          "isThisType": false
+        },
+        "hasConstraint": false,
+        "hasDefault": false,
+        "defaultTypeNodeQuestion": null
+      }
+    ]
+  },
+  {
+    "case": "valid-class",
+    "operation": "self",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 5,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "member": {
+      "name": "self",
+      "type": {
+        "id": 75,
+        "summary": "number[]",
+        "flags": 1048576,
+        "objectFlags": 4,
+        "errorType": false,
+        "isThisType": false
+      }
+    }
+  },
+  {
+    "case": "valid-class",
+    "operation": "first",
+    "question": "GetAliasedSymbol→GetTypeOfSymbol→target identities",
+    "preDemandDiagnostics": [],
+    "sourceFiles": [
+      "consumer.ts",
+      "data.json",
+      "globals.ts"
+    ],
+    "root": {
+      "id": 75,
+      "summary": "number[]",
+      "flags": 1048576,
+      "objectFlags": 4,
+      "errorType": false,
+      "isThisType": false
+    },
+    "target": {
+      "id": 64,
+      "summary": "T[]",
+      "flags": 1048576,
+      "objectFlags": 5,
+      "errorType": false,
+      "isThisType": false
+    },
+    "isArray": true,
+    "typeArguments": [
+      {
+        "id": 15,
+        "summary": "number",
+        "flags": 64,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "parameters": [
+      {
+        "id": 65,
+        "summary": "T",
+        "flags": 524288,
+        "objectFlags": 0,
+        "errorType": false,
+        "isThisType": false
+      }
+    ],
+    "rootSymbolName": "Array",
+    "member": {
+      "name": "first",
+      "type": {
+        "id": 80,
+        "summary": "() => number",
+        "flags": 1048576,
+        "objectFlags": 524368,
+        "errorType": false,
+        "isThisType": false
+      },
+      "calls": [
+        {
+          "parameters": [],
+          "returns": {
+            "id": 15,
+            "summary": "number",
+            "flags": 64,
+            "objectFlags": 0,
+            "errorType": false,
+            "isThisType": false
+          }
+        }
+      ]
+    }
+  }
+]

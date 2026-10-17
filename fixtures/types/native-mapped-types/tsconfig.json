@@ -1,0 +1,1 @@
+{"compilerOptions":{"strict":true,"noLib":true,"types":[],"target":"es2022"},"files":["../native-variable-patterns/globals.d.ts","library.d.ts","core.ts","homomorphic.ts","generic.ts","inference.ts","lazy.ts","checking.ts","relations.ts"]}

@@ -1,0 +1,58 @@
+{
+  "version": "Version 7.0.2",
+  "binary": "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/tsc",
+  "binarySha256": "76e4987d060ef8207875a53a73619ce665ff16fb2800c0d57a452e21c829bd7b",
+  "apiPackage": "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-7.0.2/package",
+  "apiPackageSha256": "3722b30210616a13a3213ded11575ba6b2dbab10c32a5ef67afca8513e27017e",
+  "apiFiles": 416,
+  "goCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "goTagCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "goTrackedDiff": "",
+  "sourceOwners": [
+    {
+      "file": "internal/checker/checker.go",
+      "sha256": "32384dde486c33c59c5695505f4c951c3009c6d7e50589cb5b18d0ea92cbf161",
+      "anchors": "checker.go.anchors.txt",
+      "ranges": [
+        [
+          7487,
+          7525
+        ],
+        [
+          8383,
+          8428
+        ]
+      ]
+    },
+    {
+      "file": "internal/checker/flow.go",
+      "sha256": "8ed1ee4e3b34a479376c94180ec3acf579ce521e0f42b4ae2a6cfc93a6eaae64",
+      "anchors": "flow.go.anchors.txt",
+      "ranges": [
+        [
+          1300,
+          1394
+        ],
+        [
+          1628,
+          1664
+        ],
+        [
+          225,
+          285
+        ]
+      ]
+    },
+    {
+      "file": "internal/checker/types.go",
+      "sha256": "dc88d24e8e7a50b8568be858f2c71130790869bfa3ad860cc4d3976aa2693bf6",
+      "anchors": "types.go.anchors.txt",
+      "ranges": [
+        [
+          405,
+          475
+        ]
+      ]
+    }
+  ]
+}

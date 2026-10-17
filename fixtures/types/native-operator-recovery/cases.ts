@@ -1,0 +1,13 @@
+export {};
+declare let target: { get n(): number; set n(value: Missing) };
+declare let valid: { get n(): number; set n(value: number | bigint) };
+declare let numeric: number;
+const /*#mixedSetter*/mixedSetter = target.n -= 1n;
+const /*#mixedValidSetter*/mixedValidSetter = valid.n -= 1n;
+const /*#mixedShiftSetter*/mixedShiftSetter = target.n <<= 1n;
+const /*#mixedPlainShift*/mixedPlainShift = numeric << 32n;
+const /*#validNumericSetter*/validNumericSetter = target.n -= 1;
+const /*#genuineAnyPlus*/genuineAnyPlus = numeric + 1n;
+declare let brandedTarget: { get n(): number & { readonly hidden?: DisplayMissing }; set n(value: SetterMissing) };
+const /*#brandedMixedSetter*/brandedMixedSetter = brandedTarget.n -= 1n;
+const /*#brandedMixedPlain*/brandedMixedPlain = brandedTarget.n - 1n;

@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "strict": false,
+    "noLib": true,
+    "types": [],
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleResolution": "Bundler"
+  },
+  "files": [
+    "globals.d.ts",
+    "external.cts",
+    "property.cts",
+    "plain.cts",
+    "remote.ts",
+    "aliases.cts",
+    "ambient.d.ts",
+    "namespace.cts",
+    "cases.ts"
+  ]
+}

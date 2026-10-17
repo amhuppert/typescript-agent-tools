@@ -1,0 +1,21 @@
+export {};
+interface Shape { /*#declaration*/chosen(): number }
+declare const item: Shape;
+item.chosen();
+missing_aaaaaaaaaaaaaaaa.chosen();
+missing_aaaaaaaaaaaaaaaa.chosen();
+missing_aaaaaaaaaaaaaaaa.chosen();
+missing_aaaaaaaaaaaaaaaa.chosen();
+missing_aaaaaaaaaaaaaaaa.chosen();
+missing_aaaaaaaaaaaaaaaa.chosen();
+missing_aaaaaaaaaaaaaaaa.chosen();
+missing_aaaaaaaaaaaaaaaa.chosen();
+missing_aaaaaaaaaaaaaaaa.chosen();
+missing_aaaaaaaaaaaaaaaa.chosen();
+missing_aaaaaaaaaaaaaaaa.chosen();
+missing_aaaaaaaaaaaaaaaa.chosen();
+missing_aaaaaaaaaaaaaaaa.chosen();
+missing_aaaaaaaaaaaaaaaa.chosen();
+missing_aaaaaaaaaaaaaaaa.chosen();
+missing_aaaaaaaaaaaaaaaa.chosen();
+let healthy: number;

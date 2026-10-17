@@ -1,0 +1,1 @@
+{"extends":"./sparse-tsconfig.json","compilerOptions":{"strict":false}}

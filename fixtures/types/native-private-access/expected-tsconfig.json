@@ -1,0 +1,1606 @@
+[
+  {
+    "name": "constructorReadonly",
+    "summary": "7",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 381,
+        "event": "members",
+        "found": true,
+        "pos": 351
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 381,
+        "event": "linked",
+        "parentType": true,
+        "pos": 345,
+        "property": true
+      },
+      {
+        "end": 350,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 345,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 381,
+        "event": "members",
+        "found": true,
+        "pos": 351
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 381,
+        "event": "linked",
+        "parentType": true,
+        "pos": 345,
+        "property": true
+      },
+      {
+        "end": 350,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 345,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "instance",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 433,
+        "event": "members",
+        "found": true,
+        "pos": 414
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 433,
+        "event": "linked",
+        "parentType": true,
+        "pos": 408,
+        "property": true
+      },
+      {
+        "end": 413,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 408,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 433,
+        "event": "members",
+        "found": true,
+        "pos": 414
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 433,
+        "event": "linked",
+        "parentType": true,
+        "pos": 408,
+        "property": true
+      },
+      {
+        "end": 413,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 408,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "peer",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 489,
+        "event": "members",
+        "found": true,
+        "pos": 474
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 489,
+        "event": "linked",
+        "parentType": true,
+        "pos": 467,
+        "property": true
+      },
+      {
+        "end": 473,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 467,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 489,
+        "event": "members",
+        "found": true,
+        "pos": 474
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 489,
+        "event": "linked",
+        "parentType": true,
+        "pos": 467,
+        "property": true
+      },
+      {
+        "end": 473,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 467,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "generic",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 564,
+        "event": "members",
+        "found": true,
+        "pos": 546
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 564,
+        "event": "linked",
+        "parentType": true,
+        "pos": 539,
+        "property": true
+      },
+      {
+        "end": 545,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 539,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 564,
+        "event": "members",
+        "found": true,
+        "pos": 546
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 564,
+        "event": "linked",
+        "parentType": true,
+        "pos": 539,
+        "property": true
+      },
+      {
+        "end": 545,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 539,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "intersection",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 653,
+        "event": "members",
+        "found": true,
+        "pos": 630
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 653,
+        "event": "linked",
+        "parentType": true,
+        "pos": 623,
+        "property": true
+      },
+      {
+        "end": 629,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 623,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 653,
+        "event": "members",
+        "found": true,
+        "pos": 630
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 653,
+        "event": "linked",
+        "parentType": true,
+        "pos": 623,
+        "property": true
+      },
+      {
+        "end": 629,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 623,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "union",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 721,
+        "event": "members",
+        "found": true,
+        "pos": 705
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 721,
+        "event": "linked",
+        "parentType": true,
+        "pos": 698,
+        "property": true
+      },
+      {
+        "end": 704,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 698,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 721,
+        "event": "members",
+        "found": true,
+        "pos": 705
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 721,
+        "event": "linked",
+        "parentType": true,
+        "pos": 698,
+        "property": true
+      },
+      {
+        "end": 704,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 698,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "derived",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 786,
+        "event": "members",
+        "found": true,
+        "pos": 768
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 786,
+        "event": "linked",
+        "parentType": true,
+        "pos": 761,
+        "property": true
+      },
+      {
+        "end": 767,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 761,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 786,
+        "event": "members",
+        "found": true,
+        "pos": 768
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 786,
+        "event": "linked",
+        "parentType": true,
+        "pos": 761,
+        "property": true
+      },
+      {
+        "end": 767,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 761,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "getter",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 833,
+        "event": "members",
+        "found": true,
+        "pos": 817
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 833,
+        "event": "linked",
+        "parentType": true,
+        "pos": 811,
+        "property": true
+      },
+      {
+        "end": 816,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 811,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 833,
+        "event": "members",
+        "found": true,
+        "pos": 817
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 833,
+        "event": "linked",
+        "parentType": true,
+        "pos": 811,
+        "property": true
+      },
+      {
+        "end": 816,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 811,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "setter",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 873,
+        "event": "members",
+        "found": true,
+        "pos": 857
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 873,
+        "event": "linked",
+        "parentType": true,
+        "pos": 851,
+        "property": true
+      },
+      {
+        "end": 856,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 851,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 873,
+        "event": "members",
+        "found": true,
+        "pos": 857
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 873,
+        "event": "linked",
+        "parentType": true,
+        "pos": 851,
+        "property": true
+      },
+      {
+        "end": 856,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 851,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "setonlyRead",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2806,
+      2806
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 930,
+        "event": "members",
+        "found": true,
+        "pos": 909
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 930,
+        "event": "linked",
+        "parentType": true,
+        "pos": 903,
+        "property": true
+      },
+      {
+        "end": 908,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 903,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 930,
+        "event": "members",
+        "found": true,
+        "pos": 909
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 930,
+        "event": "linked",
+        "parentType": true,
+        "pos": 903,
+        "property": true
+      },
+      {
+        "end": 908,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 903,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "setonlyWrite",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 982,
+        "event": "members",
+        "found": true,
+        "pos": 960
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 982,
+        "event": "linked",
+        "parentType": true,
+        "pos": 954,
+        "property": true
+      },
+      {
+        "end": 959,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 954,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 982,
+        "event": "members",
+        "found": true,
+        "pos": 960
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 982,
+        "event": "linked",
+        "parentType": true,
+        "pos": 954,
+        "property": true
+      },
+      {
+        "end": 959,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 954,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "definite",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1031,
+        "event": "members",
+        "found": true,
+        "pos": 1012
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1031,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1006,
+        "property": true
+      },
+      {
+        "end": 1011,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 1006,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1031,
+        "event": "members",
+        "found": true,
+        "pos": 1012
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1031,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1006,
+        "property": true
+      },
+      {
+        "end": 1011,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 1006,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "compound",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1080,
+        "event": "members",
+        "found": true,
+        "pos": 1061
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1080,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1055,
+        "property": true
+      },
+      {
+        "end": 1060,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 1055,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1080,
+        "event": "members",
+        "found": true,
+        "pos": 1061
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1080,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1055,
+        "property": true
+      },
+      {
+        "end": 1060,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 1055,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "methodRead",
+    "summary": "() => \"method\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1142,
+        "event": "members",
+        "found": true,
+        "pos": 1120
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1142,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1114,
+        "property": true
+      },
+      {
+        "end": 1119,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 1114,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1142,
+        "event": "members",
+        "found": true,
+        "pos": 1120
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1142,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1114,
+        "property": true
+      },
+      {
+        "end": 1119,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 1114,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "methodCall",
+    "summary": "() => \"method\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1199,
+        "event": "members",
+        "found": true,
+        "pos": 1177
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1199,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1171,
+        "property": true
+      },
+      {
+        "end": 1176,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 1171,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1199,
+        "event": "members",
+        "found": true,
+        "pos": 1177
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1199,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1171,
+        "property": true
+      },
+      {
+        "end": 1176,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 1171,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "methodWrite",
+    "summary": "() => \"method\"",
+    "errorType": false,
+    "codes": [
+      2803,
+      2803
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1253,
+        "event": "members",
+        "found": true,
+        "pos": 1230
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1253,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1224,
+        "property": true
+      },
+      {
+        "end": 1229,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 1224,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1253,
+        "event": "members",
+        "found": true,
+        "pos": 1230
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1253,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1224,
+        "property": true
+      },
+      {
+        "end": 1229,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 1224,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "staticThis",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1334,
+        "event": "members",
+        "found": false,
+        "pos": 1312
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1334,
+        "event": "exports",
+        "found": true,
+        "pos": 1312
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1334,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1306,
+        "property": true
+      },
+      {
+        "end": 1311,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 1306,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1334,
+        "event": "members",
+        "found": false,
+        "pos": 1312
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1334,
+        "event": "exports",
+        "found": true,
+        "pos": 1312
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1334,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1306,
+        "property": true
+      },
+      {
+        "end": 1311,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 1306,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "staticName",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1398,
+        "event": "members",
+        "found": false,
+        "pos": 1376
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1398,
+        "event": "exports",
+        "found": true,
+        "pos": 1376
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1398,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1370,
+        "property": true
+      },
+      {
+        "end": 1375,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 1370,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1398,
+        "event": "members",
+        "found": false,
+        "pos": 1376
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1398,
+        "event": "exports",
+        "found": true,
+        "pos": 1376
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1398,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1370,
+        "property": true
+      },
+      {
+        "end": 1375,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 1370,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "nestedFunction",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1511,
+        "event": "members",
+        "found": true,
+        "pos": 1486
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1511,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1479,
+        "property": true
+      },
+      {
+        "end": 1485,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 1479,
+        "result": true
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1511,
+        "event": "members",
+        "found": true,
+        "pos": 1486
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1511,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1479,
+        "property": true
+      },
+      {
+        "end": 1485,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 1479,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "outerLexical",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1656,
+        "classPos": 1583,
+        "end": 1651,
+        "event": "members",
+        "found": false,
+        "pos": 1628
+      },
+      {
+        "classEnd": 1656,
+        "classPos": 1583,
+        "end": 1651,
+        "event": "exports",
+        "found": false,
+        "pos": 1628
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1651,
+        "event": "members",
+        "found": true,
+        "pos": 1628
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1651,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1621,
+        "property": true
+      },
+      {
+        "end": 1627,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 1621,
+        "result": true
+      },
+      {
+        "classEnd": 1656,
+        "classPos": 1583,
+        "end": 1651,
+        "event": "members",
+        "found": false,
+        "pos": 1628
+      },
+      {
+        "classEnd": 1656,
+        "classPos": 1583,
+        "end": 1651,
+        "event": "exports",
+        "found": false,
+        "pos": 1628
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1651,
+        "event": "members",
+        "found": true,
+        "pos": 1628
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1651,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1621,
+        "property": true
+      },
+      {
+        "end": 1627,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 1621,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "genuineAny",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1748,
+        "event": "members",
+        "found": true,
+        "pos": 1727
+      },
+      {
+        "classEnd": 1957,
+        "classPos": 39,
+        "end": 1748,
+        "event": "members",
+        "found": true,
+        "pos": 1727
+      }
+    ]
+  },
+  {
+    "name": "literalCollision",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "end": 1788,
+        "event": "self",
+        "kind": 109,
+        "parent": true,
+        "pos": 1783,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "localClass",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 1927,
+        "classPos": 1841,
+        "end": 1922,
+        "event": "members",
+        "found": true,
+        "pos": 1901
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1922,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1895,
+        "property": true
+      },
+      {
+        "end": 1900,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 1895,
+        "result": true
+      },
+      {
+        "classEnd": 1927,
+        "classPos": 1841,
+        "end": 1922,
+        "event": "members",
+        "found": true,
+        "pos": 1901
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 1922,
+        "event": "linked",
+        "parentType": true,
+        "pos": 1895,
+        "property": true
+      },
+      {
+        "end": 1900,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 1895,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "qualifiedSelf",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 2145,
+        "event": "linked",
+        "parentType": true,
+        "pos": 2131,
+        "property": true
+      },
+      {
+        "end": 2139,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 2131,
+        "result": true
+      },
+      {
+        "classEnd": 2240,
+        "classPos": 2033,
+        "end": 2170,
+        "event": "members",
+        "found": false,
+        "pos": 2146
+      },
+      {
+        "classEnd": 2240,
+        "classPos": 2033,
+        "end": 2170,
+        "event": "exports",
+        "found": true,
+        "pos": 2146
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 2170,
+        "event": "linked",
+        "parentType": true,
+        "pos": 2131,
+        "property": true
+      },
+      {
+        "end": 2145,
+        "event": "self",
+        "kind": 212,
+        "parent": true,
+        "pos": 2131,
+        "result": false
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 2145,
+        "event": "linked",
+        "parentType": true,
+        "pos": 2131,
+        "property": true
+      },
+      {
+        "end": 2139,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 2131,
+        "result": true
+      },
+      {
+        "classEnd": 2240,
+        "classPos": 2033,
+        "end": 2170,
+        "event": "members",
+        "found": false,
+        "pos": 2146
+      },
+      {
+        "classEnd": 2240,
+        "classPos": 2033,
+        "end": 2170,
+        "event": "exports",
+        "found": true,
+        "pos": 2146
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 2170,
+        "event": "linked",
+        "parentType": true,
+        "pos": 2131,
+        "property": true
+      },
+      {
+        "end": 2145,
+        "event": "self",
+        "kind": 212,
+        "parent": true,
+        "pos": 2131,
+        "result": false
+      }
+    ]
+  },
+  {
+    "name": "aliasSelf",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 2240,
+        "classPos": 2033,
+        "end": 2231,
+        "event": "members",
+        "found": false,
+        "pos": 2211
+      },
+      {
+        "classEnd": 2240,
+        "classPos": 2033,
+        "end": 2231,
+        "event": "exports",
+        "found": true,
+        "pos": 2211
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 2231,
+        "event": "linked",
+        "parentType": true,
+        "pos": 2205,
+        "property": true
+      },
+      {
+        "alreadyReferenced": false,
+        "event": "alias",
+        "name": "Same"
+      },
+      {
+        "end": 2210,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 2205,
+        "result": true
+      },
+      {
+        "classEnd": 2240,
+        "classPos": 2033,
+        "end": 2231,
+        "event": "members",
+        "found": false,
+        "pos": 2211
+      },
+      {
+        "classEnd": 2240,
+        "classPos": 2033,
+        "end": 2231,
+        "event": "exports",
+        "found": true,
+        "pos": 2211
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 2231,
+        "event": "linked",
+        "parentType": true,
+        "pos": 2205,
+        "property": true
+      },
+      {
+        "alreadyReferenced": true,
+        "event": "alias",
+        "name": "Same"
+      },
+      {
+        "end": 2210,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 2205,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "anonymousClass",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 2340,
+        "classPos": 2260,
+        "end": 2335,
+        "event": "members",
+        "found": true,
+        "pos": 2310
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 2335,
+        "event": "linked",
+        "parentType": true,
+        "pos": 2304,
+        "property": true
+      },
+      {
+        "end": 2309,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 2304,
+        "result": true
+      },
+      {
+        "classEnd": 2340,
+        "classPos": 2260,
+        "end": 2335,
+        "event": "members",
+        "found": true,
+        "pos": 2310
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 2335,
+        "event": "linked",
+        "parentType": true,
+        "pos": 2304,
+        "property": true
+      },
+      {
+        "end": 2309,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 2304,
+        "result": true
+      }
+    ]
+  }
+]

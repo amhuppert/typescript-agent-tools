@@ -1,0 +1,2186 @@
+[
+  {
+    "profile": "strict",
+    "key": "literal",
+    "config": "signatures-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "signatures.ts"
+      ]
+    },
+    "source": "export {};\ndeclare const literalKey: \"literal\";\ndeclare const symbolKey: unique symbol;\nclass Accessors {\n get [literalKey]() { return (/*#literal*/value) => value; }\n set [literalKey](value: (input: number) => number) {}\n get [symbolKey]() { return (/*#symbol*/value) => value; }\n set [symbolKey](value: (input: string) => string) {}\n get plain() { return (/*#plain*/value) => value; }\n set plain(value: (input: boolean) => boolean) {}\n}\nlet healthy: number;\n",
+    "at": {
+      "file": "signatures.ts",
+      "line": 5,
+      "column": 43
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-strict.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-strict.json",
+          "sha256": "4b511c50b798e2ad88c7fcdeadcb856ba63d46be79cb60283425b1ece6af8e5d"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sourceTextSha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "number",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:24:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 261,
+            "pos": 24
+          },
+          "deprecatedConfirmation:61:86": {
+            "deprecated": false,
+            "end": 86,
+            "kind": 261,
+            "pos": 61
+          },
+          "referenceFlow:112:122": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 122,
+            "referencePos": 112,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:173:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 173,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:228:237": {
+            "declaredFlags": 16384,
+            "errorType": false,
+            "referenceEnd": 237,
+            "referencePos": 228,
+            "resultFlags": 16384,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:287:296": {
+            "declaredFlags": 16384,
+            "errorType": false,
+            "referenceEnd": 296,
+            "referencePos": 287,
+            "resultFlags": 16384,
+            "sameDeclared": true,
+            "sameInitial": true
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:24:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 261,
+          "pos": 24
+        },
+        "deprecatedConfirmation:61:86": {
+          "deprecated": false,
+          "end": 86,
+          "kind": 261,
+          "pos": 61
+        },
+        "referenceFlow:112:122": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 122,
+          "referencePos": 112,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:173:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 173,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:228:237": {
+          "declaredFlags": 16384,
+          "errorType": false,
+          "referenceEnd": 237,
+          "referencePos": 228,
+          "resultFlags": 16384,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:287:296": {
+          "declaredFlags": 16384,
+          "errorType": false,
+          "referenceEnd": 296,
+          "referencePos": 287,
+          "resultFlags": 16384,
+          "sameDeclared": true,
+          "sameInitial": true
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "noCheck": false,
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-strict.json"
+      }
+    }
+  },
+  {
+    "profile": "strict",
+    "key": "symbol",
+    "config": "signatures-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "signatures.ts"
+      ]
+    },
+    "source": "export {};\ndeclare const literalKey: \"literal\";\ndeclare const symbolKey: unique symbol;\nclass Accessors {\n get [literalKey]() { return (/*#literal*/value) => value; }\n set [literalKey](value: (input: number) => number) {}\n get [symbolKey]() { return (/*#symbol*/value) => value; }\n set [symbolKey](value: (input: string) => string) {}\n get plain() { return (/*#plain*/value) => value; }\n set plain(value: (input: boolean) => boolean) {}\n}\nlet healthy: number;\n",
+    "at": {
+      "file": "signatures.ts",
+      "line": 7,
+      "column": 41
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-strict.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-strict.json",
+          "sha256": "4b511c50b798e2ad88c7fcdeadcb856ba63d46be79cb60283425b1ece6af8e5d"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sourceTextSha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "string",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:24:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 261,
+            "pos": 24
+          },
+          "deprecatedConfirmation:61:86": {
+            "deprecated": false,
+            "end": 86,
+            "kind": 261,
+            "pos": 61
+          },
+          "referenceFlow:112:122": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 122,
+            "referencePos": 112,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:173:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 173,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:228:237": {
+            "declaredFlags": 16384,
+            "errorType": false,
+            "referenceEnd": 237,
+            "referencePos": 228,
+            "resultFlags": 16384,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:287:296": {
+            "declaredFlags": 16384,
+            "errorType": false,
+            "referenceEnd": 296,
+            "referencePos": 287,
+            "resultFlags": 16384,
+            "sameDeclared": true,
+            "sameInitial": true
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:24:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 261,
+          "pos": 24
+        },
+        "deprecatedConfirmation:61:86": {
+          "deprecated": false,
+          "end": 86,
+          "kind": 261,
+          "pos": 61
+        },
+        "referenceFlow:112:122": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 122,
+          "referencePos": 112,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:173:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 173,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:228:237": {
+          "declaredFlags": 16384,
+          "errorType": false,
+          "referenceEnd": 237,
+          "referencePos": 228,
+          "resultFlags": 16384,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:287:296": {
+          "declaredFlags": 16384,
+          "errorType": false,
+          "referenceEnd": 296,
+          "referencePos": 287,
+          "resultFlags": 16384,
+          "sameDeclared": true,
+          "sameInitial": true
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "noCheck": false,
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-strict.json"
+      }
+    }
+  },
+  {
+    "profile": "strict",
+    "key": "plain",
+    "config": "signatures-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "signatures.ts"
+      ]
+    },
+    "source": "export {};\ndeclare const literalKey: \"literal\";\ndeclare const symbolKey: unique symbol;\nclass Accessors {\n get [literalKey]() { return (/*#literal*/value) => value; }\n set [literalKey](value: (input: number) => number) {}\n get [symbolKey]() { return (/*#symbol*/value) => value; }\n set [symbolKey](value: (input: string) => string) {}\n get plain() { return (/*#plain*/value) => value; }\n set plain(value: (input: boolean) => boolean) {}\n}\nlet healthy: number;\n",
+    "at": {
+      "file": "signatures.ts",
+      "line": 9,
+      "column": 34
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-strict.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-strict.json",
+          "sha256": "4b511c50b798e2ad88c7fcdeadcb856ba63d46be79cb60283425b1ece6af8e5d"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sourceTextSha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "boolean",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": []
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "noCheck": false,
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-strict.json"
+      }
+    }
+  },
+  {
+    "profile": "nocheck",
+    "key": "literal",
+    "config": "signatures-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "signatures.ts"
+      ]
+    },
+    "source": "export {};\ndeclare const literalKey: \"literal\";\ndeclare const symbolKey: unique symbol;\nclass Accessors {\n get [literalKey]() { return (/*#literal*/value) => value; }\n set [literalKey](value: (input: number) => number) {}\n get [symbolKey]() { return (/*#symbol*/value) => value; }\n set [symbolKey](value: (input: string) => string) {}\n get plain() { return (/*#plain*/value) => value; }\n set plain(value: (input: boolean) => boolean) {}\n}\nlet healthy: number;\n",
+    "at": {
+      "file": "signatures.ts",
+      "line": 5,
+      "column": 43
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-nocheck.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-nocheck.json",
+          "sha256": "d641144d0e39c36a55d7f34f5215b591219924ef1b288d1f39d14e2917987307"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sourceTextSha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "number",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:24:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 261,
+            "pos": 24
+          },
+          "deprecatedConfirmation:61:86": {
+            "deprecated": false,
+            "end": 86,
+            "kind": 261,
+            "pos": 61
+          },
+          "referenceFlow:112:122": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 122,
+            "referencePos": 112,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:173:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 173,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:228:237": {
+            "declaredFlags": 16384,
+            "errorType": false,
+            "referenceEnd": 237,
+            "referencePos": 228,
+            "resultFlags": 16384,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:287:296": {
+            "declaredFlags": 16384,
+            "errorType": false,
+            "referenceEnd": 296,
+            "referencePos": 287,
+            "resultFlags": 16384,
+            "sameDeclared": true,
+            "sameInitial": true
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:24:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 261,
+          "pos": 24
+        },
+        "deprecatedConfirmation:61:86": {
+          "deprecated": false,
+          "end": 86,
+          "kind": 261,
+          "pos": 61
+        },
+        "referenceFlow:112:122": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 122,
+          "referencePos": 112,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:173:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 173,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:228:237": {
+          "declaredFlags": 16384,
+          "errorType": false,
+          "referenceEnd": 237,
+          "referencePos": 228,
+          "resultFlags": 16384,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:287:296": {
+          "declaredFlags": 16384,
+          "errorType": false,
+          "referenceEnd": 296,
+          "referencePos": 287,
+          "resultFlags": 16384,
+          "sameDeclared": true,
+          "sameInitial": true
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "noCheck": true,
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-nocheck.json"
+      }
+    }
+  },
+  {
+    "profile": "nocheck",
+    "key": "symbol",
+    "config": "signatures-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "signatures.ts"
+      ]
+    },
+    "source": "export {};\ndeclare const literalKey: \"literal\";\ndeclare const symbolKey: unique symbol;\nclass Accessors {\n get [literalKey]() { return (/*#literal*/value) => value; }\n set [literalKey](value: (input: number) => number) {}\n get [symbolKey]() { return (/*#symbol*/value) => value; }\n set [symbolKey](value: (input: string) => string) {}\n get plain() { return (/*#plain*/value) => value; }\n set plain(value: (input: boolean) => boolean) {}\n}\nlet healthy: number;\n",
+    "at": {
+      "file": "signatures.ts",
+      "line": 7,
+      "column": 41
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-nocheck.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-nocheck.json",
+          "sha256": "d641144d0e39c36a55d7f34f5215b591219924ef1b288d1f39d14e2917987307"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sourceTextSha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "string",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:24:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 261,
+            "pos": 24
+          },
+          "deprecatedConfirmation:61:86": {
+            "deprecated": false,
+            "end": 86,
+            "kind": 261,
+            "pos": 61
+          },
+          "referenceFlow:112:122": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 122,
+            "referencePos": 112,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:173:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 173,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:228:237": {
+            "declaredFlags": 16384,
+            "errorType": false,
+            "referenceEnd": 237,
+            "referencePos": 228,
+            "resultFlags": 16384,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:287:296": {
+            "declaredFlags": 16384,
+            "errorType": false,
+            "referenceEnd": 296,
+            "referencePos": 287,
+            "resultFlags": 16384,
+            "sameDeclared": true,
+            "sameInitial": true
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:24:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 261,
+          "pos": 24
+        },
+        "deprecatedConfirmation:61:86": {
+          "deprecated": false,
+          "end": 86,
+          "kind": 261,
+          "pos": 61
+        },
+        "referenceFlow:112:122": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 122,
+          "referencePos": 112,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:173:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 173,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:228:237": {
+          "declaredFlags": 16384,
+          "errorType": false,
+          "referenceEnd": 237,
+          "referencePos": 228,
+          "resultFlags": 16384,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:287:296": {
+          "declaredFlags": 16384,
+          "errorType": false,
+          "referenceEnd": 296,
+          "referencePos": 287,
+          "resultFlags": 16384,
+          "sameDeclared": true,
+          "sameInitial": true
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "noCheck": true,
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-nocheck.json"
+      }
+    }
+  },
+  {
+    "profile": "nocheck",
+    "key": "plain",
+    "config": "signatures-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "signatures.ts"
+      ]
+    },
+    "source": "export {};\ndeclare const literalKey: \"literal\";\ndeclare const symbolKey: unique symbol;\nclass Accessors {\n get [literalKey]() { return (/*#literal*/value) => value; }\n set [literalKey](value: (input: number) => number) {}\n get [symbolKey]() { return (/*#symbol*/value) => value; }\n set [symbolKey](value: (input: string) => string) {}\n get plain() { return (/*#plain*/value) => value; }\n set plain(value: (input: boolean) => boolean) {}\n}\nlet healthy: number;\n",
+    "at": {
+      "file": "signatures.ts",
+      "line": 9,
+      "column": 34
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-nocheck.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-nocheck.json",
+          "sha256": "d641144d0e39c36a55d7f34f5215b591219924ef1b288d1f39d14e2917987307"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sourceTextSha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "boolean",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": []
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "noCheck": true,
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-nocheck.json"
+      }
+    }
+  },
+  {
+    "profile": "loose",
+    "key": "literal",
+    "config": "signatures-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "signatures.ts"
+      ]
+    },
+    "source": "export {};\ndeclare const literalKey: \"literal\";\ndeclare const symbolKey: unique symbol;\nclass Accessors {\n get [literalKey]() { return (/*#literal*/value) => value; }\n set [literalKey](value: (input: number) => number) {}\n get [symbolKey]() { return (/*#symbol*/value) => value; }\n set [symbolKey](value: (input: string) => string) {}\n get plain() { return (/*#plain*/value) => value; }\n set plain(value: (input: boolean) => boolean) {}\n}\nlet healthy: number;\n",
+    "at": {
+      "file": "signatures.ts",
+      "line": 5,
+      "column": 43
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-loose.json",
+          "sha256": "5e0789286269239601eb125041e57da6ddcd96dc8c9e2249cf66d0f6e78959ec"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sourceTextSha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "number",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:24:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 261,
+            "pos": 24
+          },
+          "deprecatedConfirmation:61:86": {
+            "deprecated": false,
+            "end": 86,
+            "kind": 261,
+            "pos": 61
+          },
+          "referenceFlow:112:122": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 122,
+            "referencePos": 112,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:173:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 173,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:228:237": {
+            "declaredFlags": 16384,
+            "errorType": false,
+            "referenceEnd": 237,
+            "referencePos": 228,
+            "resultFlags": 16384,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:287:296": {
+            "declaredFlags": 16384,
+            "errorType": false,
+            "referenceEnd": 296,
+            "referencePos": 287,
+            "resultFlags": 16384,
+            "sameDeclared": true,
+            "sameInitial": true
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:24:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 261,
+          "pos": 24
+        },
+        "deprecatedConfirmation:61:86": {
+          "deprecated": false,
+          "end": 86,
+          "kind": 261,
+          "pos": 61
+        },
+        "referenceFlow:112:122": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 122,
+          "referencePos": 112,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:173:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 173,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:228:237": {
+          "declaredFlags": 16384,
+          "errorType": false,
+          "referenceEnd": 237,
+          "referencePos": 228,
+          "resultFlags": 16384,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:287:296": {
+          "declaredFlags": 16384,
+          "errorType": false,
+          "referenceEnd": 296,
+          "referencePos": 287,
+          "resultFlags": 16384,
+          "sameDeclared": true,
+          "sameInitial": true
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "noCheck": false,
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-loose.json"
+      }
+    }
+  },
+  {
+    "profile": "loose",
+    "key": "symbol",
+    "config": "signatures-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "signatures.ts"
+      ]
+    },
+    "source": "export {};\ndeclare const literalKey: \"literal\";\ndeclare const symbolKey: unique symbol;\nclass Accessors {\n get [literalKey]() { return (/*#literal*/value) => value; }\n set [literalKey](value: (input: number) => number) {}\n get [symbolKey]() { return (/*#symbol*/value) => value; }\n set [symbolKey](value: (input: string) => string) {}\n get plain() { return (/*#plain*/value) => value; }\n set plain(value: (input: boolean) => boolean) {}\n}\nlet healthy: number;\n",
+    "at": {
+      "file": "signatures.ts",
+      "line": 7,
+      "column": 41
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-loose.json",
+          "sha256": "5e0789286269239601eb125041e57da6ddcd96dc8c9e2249cf66d0f6e78959ec"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sourceTextSha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "string",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:24:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 261,
+            "pos": 24
+          },
+          "deprecatedConfirmation:61:86": {
+            "deprecated": false,
+            "end": 86,
+            "kind": 261,
+            "pos": 61
+          },
+          "referenceFlow:112:122": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 122,
+            "referencePos": 112,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:173:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 173,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:228:237": {
+            "declaredFlags": 16384,
+            "errorType": false,
+            "referenceEnd": 237,
+            "referencePos": 228,
+            "resultFlags": 16384,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:287:296": {
+            "declaredFlags": 16384,
+            "errorType": false,
+            "referenceEnd": 296,
+            "referencePos": 287,
+            "resultFlags": 16384,
+            "sameDeclared": true,
+            "sameInitial": true
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:24:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 261,
+          "pos": 24
+        },
+        "deprecatedConfirmation:61:86": {
+          "deprecated": false,
+          "end": 86,
+          "kind": 261,
+          "pos": 61
+        },
+        "referenceFlow:112:122": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 122,
+          "referencePos": 112,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:173:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 173,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:228:237": {
+          "declaredFlags": 16384,
+          "errorType": false,
+          "referenceEnd": 237,
+          "referencePos": 228,
+          "resultFlags": 16384,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:287:296": {
+          "declaredFlags": 16384,
+          "errorType": false,
+          "referenceEnd": 296,
+          "referencePos": 287,
+          "resultFlags": 16384,
+          "sameDeclared": true,
+          "sameInitial": true
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "noCheck": false,
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-loose.json"
+      }
+    }
+  },
+  {
+    "profile": "loose",
+    "key": "plain",
+    "config": "signatures-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "signatures.ts"
+      ]
+    },
+    "source": "export {};\ndeclare const literalKey: \"literal\";\ndeclare const symbolKey: unique symbol;\nclass Accessors {\n get [literalKey]() { return (/*#literal*/value) => value; }\n set [literalKey](value: (input: number) => number) {}\n get [symbolKey]() { return (/*#symbol*/value) => value; }\n set [symbolKey](value: (input: string) => string) {}\n get plain() { return (/*#plain*/value) => value; }\n set plain(value: (input: boolean) => boolean) {}\n}\nlet healthy: number;\n",
+    "at": {
+      "file": "signatures.ts",
+      "line": 9,
+      "column": 34
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-loose.json",
+          "sha256": "5e0789286269239601eb125041e57da6ddcd96dc8c9e2249cf66d0f6e78959ec"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sourceTextSha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "boolean",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": []
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "noCheck": false,
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-loose.json"
+      }
+    }
+  },
+  {
+    "profile": "loose-nocheck",
+    "key": "literal",
+    "config": "signatures-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "signatures.ts"
+      ]
+    },
+    "source": "export {};\ndeclare const literalKey: \"literal\";\ndeclare const symbolKey: unique symbol;\nclass Accessors {\n get [literalKey]() { return (/*#literal*/value) => value; }\n set [literalKey](value: (input: number) => number) {}\n get [symbolKey]() { return (/*#symbol*/value) => value; }\n set [symbolKey](value: (input: string) => string) {}\n get plain() { return (/*#plain*/value) => value; }\n set plain(value: (input: boolean) => boolean) {}\n}\nlet healthy: number;\n",
+    "at": {
+      "file": "signatures.ts",
+      "line": 5,
+      "column": 43
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-loose-nocheck.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-loose-nocheck.json",
+          "sha256": "0b3928925574529e726b6913225427171ab7380a60fc0871420376f01d006e37"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sourceTextSha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "number",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:24:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 261,
+            "pos": 24
+          },
+          "deprecatedConfirmation:61:86": {
+            "deprecated": false,
+            "end": 86,
+            "kind": 261,
+            "pos": 61
+          },
+          "referenceFlow:112:122": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 122,
+            "referencePos": 112,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:173:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 173,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:228:237": {
+            "declaredFlags": 16384,
+            "errorType": false,
+            "referenceEnd": 237,
+            "referencePos": 228,
+            "resultFlags": 16384,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:287:296": {
+            "declaredFlags": 16384,
+            "errorType": false,
+            "referenceEnd": 296,
+            "referencePos": 287,
+            "resultFlags": 16384,
+            "sameDeclared": true,
+            "sameInitial": true
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:24:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 261,
+          "pos": 24
+        },
+        "deprecatedConfirmation:61:86": {
+          "deprecated": false,
+          "end": 86,
+          "kind": 261,
+          "pos": 61
+        },
+        "referenceFlow:112:122": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 122,
+          "referencePos": 112,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:173:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 173,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:228:237": {
+          "declaredFlags": 16384,
+          "errorType": false,
+          "referenceEnd": 237,
+          "referencePos": 228,
+          "resultFlags": 16384,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:287:296": {
+          "declaredFlags": 16384,
+          "errorType": false,
+          "referenceEnd": 296,
+          "referencePos": 287,
+          "resultFlags": 16384,
+          "sameDeclared": true,
+          "sameInitial": true
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "noCheck": true,
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-loose-nocheck.json"
+      }
+    }
+  },
+  {
+    "profile": "loose-nocheck",
+    "key": "symbol",
+    "config": "signatures-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "signatures.ts"
+      ]
+    },
+    "source": "export {};\ndeclare const literalKey: \"literal\";\ndeclare const symbolKey: unique symbol;\nclass Accessors {\n get [literalKey]() { return (/*#literal*/value) => value; }\n set [literalKey](value: (input: number) => number) {}\n get [symbolKey]() { return (/*#symbol*/value) => value; }\n set [symbolKey](value: (input: string) => string) {}\n get plain() { return (/*#plain*/value) => value; }\n set plain(value: (input: boolean) => boolean) {}\n}\nlet healthy: number;\n",
+    "at": {
+      "file": "signatures.ts",
+      "line": 7,
+      "column": 41
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-loose-nocheck.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-loose-nocheck.json",
+          "sha256": "0b3928925574529e726b6913225427171ab7380a60fc0871420376f01d006e37"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sourceTextSha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "string",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:24:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 261,
+            "pos": 24
+          },
+          "deprecatedConfirmation:61:86": {
+            "deprecated": false,
+            "end": 86,
+            "kind": 261,
+            "pos": 61
+          },
+          "referenceFlow:112:122": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 122,
+            "referencePos": 112,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:173:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 173,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:228:237": {
+            "declaredFlags": 16384,
+            "errorType": false,
+            "referenceEnd": 237,
+            "referencePos": 228,
+            "resultFlags": 16384,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:287:296": {
+            "declaredFlags": 16384,
+            "errorType": false,
+            "referenceEnd": 296,
+            "referencePos": 287,
+            "resultFlags": 16384,
+            "sameDeclared": true,
+            "sameInitial": true
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:24:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 261,
+          "pos": 24
+        },
+        "deprecatedConfirmation:61:86": {
+          "deprecated": false,
+          "end": 86,
+          "kind": 261,
+          "pos": 61
+        },
+        "referenceFlow:112:122": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 122,
+          "referencePos": 112,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:173:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 173,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:228:237": {
+          "declaredFlags": 16384,
+          "errorType": false,
+          "referenceEnd": 237,
+          "referencePos": 228,
+          "resultFlags": 16384,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:287:296": {
+          "declaredFlags": 16384,
+          "errorType": false,
+          "referenceEnd": 296,
+          "referencePos": 287,
+          "resultFlags": 16384,
+          "sameDeclared": true,
+          "sameInitial": true
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "noCheck": true,
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-loose-nocheck.json"
+      }
+    }
+  },
+  {
+    "profile": "loose-nocheck",
+    "key": "plain",
+    "config": "signatures-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "target": "ESNext"
+      },
+      "files": [
+        "globals.d.ts",
+        "signatures.ts"
+      ]
+    },
+    "source": "export {};\ndeclare const literalKey: \"literal\";\ndeclare const symbolKey: unique symbol;\nclass Accessors {\n get [literalKey]() { return (/*#literal*/value) => value; }\n set [literalKey](value: (input: number) => number) {}\n get [symbolKey]() { return (/*#symbol*/value) => value; }\n set [symbolKey](value: (input: string) => string) {}\n get plain() { return (/*#plain*/value) => value; }\n set plain(value: (input: boolean) => boolean) {}\n}\nlet healthy: number;\n",
+    "at": {
+      "file": "signatures.ts",
+      "line": 9,
+      "column": 34
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-loose-nocheck.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-loose-nocheck.json",
+          "sha256": "0b3928925574529e726b6913225427171ab7380a60fc0871420376f01d006e37"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "sourceTextSha256": "cc329d4f61ea093b17a130fd929ba7873611c2561aee10ff308c85efa86fc983"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 1,
+      "symbolMode": "",
+      "summary": "boolean",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": []
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "noCheck": true,
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-accessor-declaration-resources/signatures-loose-nocheck.json"
+      }
+    }
+  }
+]

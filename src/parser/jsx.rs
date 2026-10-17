@@ -34,7 +34,7 @@ impl<'src> Parser<'src> {
                             JsxSpreadAttribute,
                             attribute_start,
                             fields![("expression", expression.into())],
-                        ));
+                        )?);
                     } else {
                         let name = p.jsx_name(false)?;
                         let mut fields = fields![("name", name.into())];
@@ -49,7 +49,7 @@ impl<'src> Parser<'src> {
                                     .map(|i| token.start + 2 + i)
                                     .ok_or_else(|| p.error("Unterminated JSX attribute string"))?;
                                 let text = &p.lexer.src[token.start + 1..end - 1];
-                                p.reset_at(end);
+                                p.reset_at(end)?;
                                 p.make(
                                     StringLiteral,
                                     token.full_start,
@@ -58,7 +58,7 @@ impl<'src> Parser<'src> {
                                         ("text", text.into()),
                                         ("hasExtendedUnicodeEscape", false.into()),
                                     ],
-                                )
+                                )?
                             } else if p.at("{") {
                                 p.jsx_expression(false)?
                             } else if p.at("<") {
@@ -68,20 +68,20 @@ impl<'src> Parser<'src> {
                             };
                             fields.push(("initializer", initializer.into()));
                         }
-                        properties.push(p.finish(JsxAttribute, attribute_start, fields));
+                        properties.push(p.finish(JsxAttribute, attribute_start, fields)?);
                     }
                 }
                 let attributes = p.finish(
                     JsxAttributes,
                     attributes_start,
                     fields![("properties", properties.into())],
-                );
+                )?;
                 opening_fields.push(("attributes", attributes.into()));
             }
             if p.eat("/")? {
                 p.jsx_greater();
                 p.expect(">")?;
-                return Ok(p.finish(JsxSelfClosingElement, start, opening_fields));
+                return p.finish(JsxSelfClosingElement, start, opening_fields);
             }
             if !p.at(">") {
                 return Err(p.error("Expected '>' in JSX opening tag"));
@@ -96,7 +96,7 @@ impl<'src> Parser<'src> {
                 },
                 start,
                 opening_fields,
-            );
+            )?;
             let children = p.jsx_children(content_start)?;
             let closing_start = p.current.start;
             p.expect("<")?;
@@ -104,8 +104,8 @@ impl<'src> Parser<'src> {
             let mut closing_fields = vec![];
             if let Some(tag) = tag_name {
                 let closing_tag = p.jsx_name(true)?;
-                let opening_text = p.jsx_tag_text(tag);
-                let closing_text = p.jsx_tag_text(closing_tag);
+                let opening_text = p.jsx_tag_text(tag)?;
+                let closing_text = p.jsx_tag_text(closing_tag)?;
                 if opening_text != closing_text {
                     return Err(p.error(format!("Expected closing JSX tag for {opening_text}")));
                 }
@@ -121,8 +121,8 @@ impl<'src> Parser<'src> {
                 },
                 closing_start,
                 closing_fields,
-            );
-            Ok(p.finish(
+            )?;
+            p.finish(
                 if fragment { JsxFragment } else { JsxElement },
                 start,
                 fields![
@@ -144,13 +144,14 @@ impl<'src> Parser<'src> {
                         closing.into(),
                     ),
                 ],
-            ))
+            )
         })
     }
-    fn reset_at(&mut self, offset: usize) {
+    fn reset_at(&mut self, offset: usize) -> Result<()> {
         self.end = offset;
         self.lexer.pos = offset;
-        self.current = self.lexer.next();
+        self.current = self.lexer.next_controlled(self.control.as_ref())?;
+        Ok(())
     }
     /// A JSX tag ends at one `>`, which the scanner joins with a following
     /// `=` or `>` (`</b>=text`), as type arguments split `>>`.
@@ -176,7 +177,8 @@ impl<'src> Parser<'src> {
                                 start: position + offset,
                                 end: position + offset + 1,
                             },
-                        });
+                        }
+                        .into());
                     }
                     children.push(p.make(
                         JsxText,
@@ -186,14 +188,14 @@ impl<'src> Parser<'src> {
                         ("text", text.into()),
                         (
                             "containsOnlyTriviaWhiteSpaces",
-                            (text.chars().any(crate::lexer::line_break)
-                                && text.chars().all(crate::lexer::whitespace)).into(),
+                            (text.find(crate::lexer::line_break).is_some()
+                                && text.find(|c| !crate::lexer::whitespace(c)).is_none()).into(),
                         ),
                     ],
-                    ));
+                    )?);
                     position += length;
                 }
-                p.reset_at(position);
+                p.reset_at(position)?;
                 if p.lexer.src[position..].starts_with("</") {
                     break;
                 }
@@ -222,22 +224,22 @@ impl<'src> Parser<'src> {
             fields.push(("expression", self.expression()?.into()));
         }
         self.expect("}")?;
-        Ok(self.finish(JsxExpression, start, fields))
+        self.finish(JsxExpression, start, fields)
     }
-    fn jsx_tag_text(&self, id: NodeId) -> String {
+    fn jsx_tag_text(&self, id: NodeId) -> Result<String> {
         let mut id = id;
         let mut suffixes = Vec::new();
-        let mut result;
+        let mut result = String::new();
         loop {
             let node = &self.nodes[id.0];
             if node.syntax_kind == ThisKeyword {
-                result = "this".into();
+                result.push_str("this");
                 break;
             } else if node.syntax_kind == Identifier {
                 let Some(Value::Text(text)) = node.field("escapedText") else {
                     unreachable!()
                 };
-                result = text.to_string();
+                result.push_str(text);
                 break;
             } else {
                 let left_key = if node.syntax_kind == JsxNamespacedName {
@@ -269,23 +271,23 @@ impl<'src> Parser<'src> {
             result.push(separator);
             result.push_str(suffix);
         }
-        result
+        Ok(result)
     }
     fn jsx_name(&mut self, dotted: bool) -> Result<NodeId> {
         let start = self.pos();
         let mut name = self.jsx_identifier()?;
         if self.eat(":")? {
             let right = self.jsx_identifier()?;
-            return Ok(self.finish(
+            return self.finish(
                 JsxNamespacedName,
                 start,
                 fields![("namespace", name.into()), ("name", right.into())],
-            ));
+            );
         }
         if dotted
             && matches!(self.nodes[name.0].field("escapedText"), Some(Value::Text(text)) if text == "this")
         {
-            self.set_kind(name, ThisKeyword);
+            self.set_kind(name, ThisKeyword)?;
             self.nodes[name.0].fields.clear();
         }
         while dotted && self.eat(".")? {
@@ -294,7 +296,7 @@ impl<'src> Parser<'src> {
                 PropertyAccessExpression,
                 start,
                 fields![("expression", name.into()), ("name", right.into())],
-            );
+            )?;
         }
         Ok(name)
     }
@@ -304,7 +306,7 @@ impl<'src> Parser<'src> {
         if self.current.kind != Kind::Word {
             return Err(self.error("Expected JSX name"));
         }
-        if self.current.raw.contains('\\') {
+        if self.current.raw.contains("\\") {
             return Err(self.error("Unicode escapes are not allowed in JSX names"));
         }
         let mut end = actual_start;
@@ -316,12 +318,15 @@ impl<'src> Parser<'src> {
             }
         }
         let text = &self.lexer.src[actual_start..end];
-        self.reset_at(end);
+        self.reset_at(end)?;
         let escaped = if text.starts_with("__") {
-            Value::from(format!("_{text}"))
+            let mut escaped = String::new();
+            escaped.push('_');
+            escaped.push_str(text);
+            Value::from(escaped)
         } else {
             text.into()
         };
-        Ok(self.make(Identifier, start, end, fields![("escapedText", escaped)]))
+        self.make(Identifier, start, end, fields![("escapedText", escaped)])
     }
 }

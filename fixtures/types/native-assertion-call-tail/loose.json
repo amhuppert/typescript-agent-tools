@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "strictNullChecks": false,
+    "target": "ESNext",
+    "module": "ESNext",
+    "noLib": true,
+    "types": []
+  },
+  "files": ["globals.d.ts", "cases.ts"]
+}

@@ -1,0 +1,281 @@
+{
+  "version": "7.0.2",
+  "answers": [
+    {
+      "literalBytes": 260866,
+      "strict": false,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "\"pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp...",
+        "errorType": false,
+        "isArray": true
+      },
+      "argument": {
+        "count": 1,
+        "flags": 1024,
+        "errorType": false,
+        "summaryBytes": 320,
+        "summary": "\"pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp..."
+      },
+      "members": {
+        "properties": [],
+        "calls": 0,
+        "constructs": 0,
+        "indexes": 0
+      },
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "cb889ab963ff95f52008dbd52e85b16b81de1eaa096da51d7484dcf4edc5d2d2"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "27fcc14fe89d607ce974d3cd169f3db637487506a08fad3d054188db944711a7"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+        }
+      ]
+    },
+    {
+      "literalBytes": 260866,
+      "strict": true,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "\"pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp...",
+        "errorType": false,
+        "isArray": true
+      },
+      "argument": {
+        "count": 1,
+        "flags": 1024,
+        "errorType": false,
+        "summaryBytes": 320,
+        "summary": "\"pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp..."
+      },
+      "members": {
+        "properties": [],
+        "calls": 0,
+        "constructs": 0,
+        "indexes": 0
+      },
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "cb889ab963ff95f52008dbd52e85b16b81de1eaa096da51d7484dcf4edc5d2d2"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "27fcc14fe89d607ce974d3cd169f3db637487506a08fad3d054188db944711a7"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+        }
+      ]
+    },
+    {
+      "literalBytes": 260867,
+      "strict": false,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "\"pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp...",
+        "errorType": false,
+        "isArray": true
+      },
+      "argument": {
+        "count": 1,
+        "flags": 1024,
+        "errorType": false,
+        "summaryBytes": 320,
+        "summary": "\"pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp..."
+      },
+      "members": {
+        "properties": [],
+        "calls": 0,
+        "constructs": 0,
+        "indexes": 0
+      },
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "cb889ab963ff95f52008dbd52e85b16b81de1eaa096da51d7484dcf4edc5d2d2"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "0d0b4e39b272fa7dbdc4501079efbae383272a5bc32c5b26ea6dd2693e991e09"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+        }
+      ]
+    },
+    {
+      "literalBytes": 260867,
+      "strict": true,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "\"pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp...",
+        "errorType": false,
+        "isArray": true
+      },
+      "argument": {
+        "count": 1,
+        "flags": 1024,
+        "errorType": false,
+        "summaryBytes": 320,
+        "summary": "\"pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp..."
+      },
+      "members": {
+        "properties": [],
+        "calls": 0,
+        "constructs": 0,
+        "indexes": 0
+      },
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "cb889ab963ff95f52008dbd52e85b16b81de1eaa096da51d7484dcf4edc5d2d2"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "0d0b4e39b272fa7dbdc4501079efbae383272a5bc32c5b26ea6dd2693e991e09"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+        }
+      ]
+    },
+    {
+      "literalBytes": 260868,
+      "strict": false,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "\"pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp...",
+        "errorType": false,
+        "isArray": true
+      },
+      "argument": {
+        "count": 1,
+        "flags": 1024,
+        "errorType": false,
+        "summaryBytes": 320,
+        "summary": "\"pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp..."
+      },
+      "members": {
+        "properties": [],
+        "calls": 0,
+        "constructs": 0,
+        "indexes": 0
+      },
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "cb889ab963ff95f52008dbd52e85b16b81de1eaa096da51d7484dcf4edc5d2d2"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "71f9ac384f6588ee62d531d51d8c7bcd60b3dd2a520bec25605d06492b43b6ca"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "ab460ee551cf3722a3a3851775c328302cab6342d92691638ea7f6a5450268a6"
+        }
+      ]
+    },
+    {
+      "literalBytes": 260868,
+      "strict": true,
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "root": {
+        "summary": "\"pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp...",
+        "errorType": false,
+        "isArray": true
+      },
+      "argument": {
+        "count": 1,
+        "flags": 1024,
+        "errorType": false,
+        "summaryBytes": 320,
+        "summary": "\"pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp..."
+      },
+      "members": {
+        "properties": [],
+        "calls": 0,
+        "constructs": 0,
+        "indexes": 0
+      },
+      "inputHashes": [
+        {
+          "file": "globals.ts",
+          "sha256": "cb889ab963ff95f52008dbd52e85b16b81de1eaa096da51d7484dcf4edc5d2d2"
+        },
+        {
+          "file": "value.ts",
+          "sha256": "71f9ac384f6588ee62d531d51d8c7bcd60b3dd2a520bec25605d06492b43b6ca"
+        },
+        {
+          "file": "consumer.ts",
+          "sha256": "c83869c93ac7328437cce6936b34b8604b1e141e03764580168504b1ffeceabc"
+        },
+        {
+          "file": "tsconfig.json",
+          "sha256": "a32411522f83e896af47e853679e01a22b06c7457e47cf666a91b933f7d14942"
+        }
+      ]
+    }
+  ]
+}

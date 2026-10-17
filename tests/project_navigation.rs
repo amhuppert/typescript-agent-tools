@@ -679,7 +679,9 @@ fn project_navigation_parses_with_the_deep_budget() {
         ("tsconfig.json", support::CONFIG),
         ("over.ts", &nested(205)),
     ]);
-    let error = Project::load(&over.path("tsconfig.json")).unwrap_err();
+    let error = Project::load(&over.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_err();
     assert_eq!(error.kind, InputErrorKind::ResourceLimit);
     assert_eq!(error.message, "Maximum syntax nesting depth exceeded");
 }

@@ -1,0 +1,1 @@
+{"compilerOptions": {"strict": true, "target": "es2017", "noLib": true, "importHelpers": true}, "files": ["../../native-variable-patterns/globals.d.ts", "broken.d.ts", "cases.ts"]}

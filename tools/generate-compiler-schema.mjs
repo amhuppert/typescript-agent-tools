@@ -34,7 +34,7 @@ const groups = {
   node: ['Let', 'Const', 'Using', 'AwaitUsing', 'NestedNamespace', 'Namespace', 'OptionalChain',
     'GlobalAugmentation', 'DisallowInContext', 'YieldContext', 'DecoratorContext', 'AwaitContext',
     'DisallowConditionalTypesContext', 'PossiblyContainsDynamicImport', 'PossiblyContainsImportMeta',
-    'Ambient', 'InWithStatement', 'Deprecated', 'IdentifierHasExtendedUnicodeEscape'],
+    'JSDoc', 'Ambient', 'InWithStatement', 'Deprecated', 'IdentifierHasExtendedUnicodeEscape'],
   token: ['ExtendedUnicodeEscape', 'Scientific', 'HexSpecifier', 'BinarySpecifier', 'OctalSpecifier',
     'ContainsSeparator', 'UnicodeEscape', 'ContainsInvalidEscape', 'HexEscape'],
   target: ['Latest'],

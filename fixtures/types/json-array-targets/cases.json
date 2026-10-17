@@ -1,0 +1,17 @@
+[
+  "missing",
+  "value-only",
+  "type-alias",
+  "enum",
+  "arity-zero",
+  "arity-two",
+  "valid-empty",
+  "valid-members",
+  "valid-class",
+  "valid-merged",
+  "module-local",
+  "global-augmentation",
+  "script-alias",
+  "merged-optional-two",
+  "stdlib"
+]

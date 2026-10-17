@@ -1,0 +1,1 @@
+{"extends": "./strict.json", "files": ["globals.d.ts", "merged-a.d.ts", "merged-b.d.ts"]}

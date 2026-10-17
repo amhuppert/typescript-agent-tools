@@ -1,0 +1,617 @@
+{
+  "inputs": {
+    "corpus": ".cc/temp/command-center-aa484f4-corpus",
+    "head": "aa484f422f00dfb64967d2008fac3c4f9a92538e",
+    "status": "?? tsconfig.native-corpus.json\n",
+    "files": {
+      ".cc/temp/command-center-aa484f4-corpus/tsconfig.json": "2e09a91453030c847eedec0c49fc5aa2c707d9221a968588b7b5988cbfa31279",
+      ".cc/temp/command-center-aa484f4-corpus/package.json": "b357d66d3abd00ea319a74e526a33dfcc3e43f32469160c489ec87319bffe6d6",
+      ".cc/temp/perf-single-file/source.ts": "b0e701d935991346f6252e492d76a7527ccf54f5c7fe9c8c0854edabe53e44f8",
+      ".cc/temp/perf-single-file/tsconfig.json": "98dce5cbd0a18243b613b8c0b421e2eda53fbd5726b2b1d961296250bc1a5adb",
+      ".cc/temp/command-center-aa484f4-corpus/bun.lock": "b55105eeed80fff1365a71396c73f9cb13af8b8a595f0d9696b4282827001a9a"
+    },
+    "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+    "memoryBytes": 17179869184,
+    "logicalCpus": 16
+  },
+  "variants": {
+    "before": {
+      "binaries": {
+        "tsparse": {
+          "source": "target/release/tsparse",
+          "sha256": "cfa1df6edfdedc504e3c56b056e784aa927fe09e0c4055e00edf5aa86e20bdbf",
+          "mtime": 1791863669.5184722
+        },
+        "references": {
+          "source": "target/release/deps/references-1c89459b70bfc91d",
+          "sha256": "26841cb774f6e4e897dee0b5415e52f83cd7515e641ec348680d2c9f8b79d2fc",
+          "mtime": 1791863621.0042527
+        }
+      },
+      "sourceManifestSha256": "7d99e874fabb5bfce797a29307afcf7ee014fcbe99c421a7fa6b6d7c90c840d3"
+    },
+    "storage": {
+      "binaries": {
+        "tsparse": {
+          "source": "target/release/tsparse",
+          "sha256": "fe697cc3629e271241663d0137bbd347418088747f4031ef97f4567fdd08c5ab",
+          "mtime": 1791865401.69518
+        },
+        "references": {
+          "source": "target/release/deps/references-1c89459b70bfc91d",
+          "sha256": "e4dd6f207a2ff64e102f3f530d4e1cb8a301b549d6d716e5a9f9a9a2a7546b5c",
+          "mtime": 1791865310.7623365
+        }
+      },
+      "sourceManifestSha256": "78c37691b92d03fec8cb39546944db85e8b3973aff03c8ee3ec5ba9983517dda"
+    },
+    "after": {
+      "binaries": {
+        "tsparse": {
+          "source": "target/release/tsparse",
+          "sha256": "9242993dce638b559bba3b00da8782afb4641d1f6f0f7820418d51c1ffb842b3",
+          "mtime": 1791866203.4520946
+        },
+        "references": {
+          "source": "target/release/deps/references-1c89459b70bfc91d",
+          "sha256": "590a4433ef78e0f8a78cc489cdc94a261c4c72b34adafecbf380e51cdf0bd4c7",
+          "mtime": 1791866122.9659526
+        }
+      },
+      "sourceManifestSha256": "eca0c26cf9d92098d1c6b0a944d804499ae409ac91f944b46f1bcc1e0a54e669"
+    }
+  },
+  "benchmarks": {
+    "before": {
+      "generated": {
+        "loadMedianMs": 368.87,
+        "peakRequestedBytes": 27533245,
+        "retainedRequestedBytes": 23296986,
+        "queryMeanMicroseconds": 5.0,
+        "groupQueryMeanMicroseconds": 5.7,
+        "outcomes": {
+          "empty result": 532,
+          "OutsideProject": 0,
+          "InvalidPosition": 0,
+          "UnsupportedTarget": 293,
+          "UnresolvedTarget": 0,
+          "positions": 2000,
+          "groupQueries": 1175,
+          "groups": 1175
+        }
+      },
+      "single-file": {
+        "loadMedianMs": 465.89,
+        "peakRequestedBytes": 61944794,
+        "retainedRequestedBytes": 54460711,
+        "queryMeanMicroseconds": 5.0,
+        "groupQueryMeanMicroseconds": 6.0,
+        "outcomes": {
+          "empty result": 1076,
+          "OutsideProject": 0,
+          "InvalidPosition": 0,
+          "UnsupportedTarget": 154,
+          "UnresolvedTarget": 0,
+          "positions": 2000,
+          "groupQueries": 770,
+          "groups": 770
+        }
+      },
+      "corpus": {
+        "loadMedianMs": 31465.44,
+        "peakRequestedBytes": 5275826717,
+        "retainedRequestedBytes": 4491446176,
+        "queryMeanMicroseconds": 286.0,
+        "groupQueryMeanMicroseconds": 1180.2,
+        "outcomes": {
+          "empty result": 1145,
+          "OutsideProject": 9,
+          "InvalidPosition": 0,
+          "UnsupportedTarget": 373,
+          "UnresolvedTarget": 0,
+          "positions": 2000,
+          "groupQueries": 473,
+          "groups": 473
+        }
+      }
+    },
+    "storage": {
+      "generated": {
+        "loadMedianMs": 292.82,
+        "peakRequestedBytes": 23838381,
+        "retainedRequestedBytes": 12827044,
+        "queryMeanMicroseconds": 4.3,
+        "groupQueryMeanMicroseconds": 4.8,
+        "outcomes": {
+          "empty result": 532,
+          "OutsideProject": 0,
+          "InvalidPosition": 0,
+          "UnsupportedTarget": 293,
+          "UnresolvedTarget": 0,
+          "positions": 2000,
+          "groupQueries": 1175,
+          "groups": 1175
+        }
+      },
+      "single-file": {
+        "loadMedianMs": 337.92,
+        "peakRequestedBytes": 61453500,
+        "retainedRequestedBytes": 31635963,
+        "queryMeanMicroseconds": 5.2,
+        "groupQueryMeanMicroseconds": 6.1,
+        "outcomes": {
+          "empty result": 1076,
+          "OutsideProject": 0,
+          "InvalidPosition": 0,
+          "UnsupportedTarget": 154,
+          "UnresolvedTarget": 0,
+          "positions": 2000,
+          "groupQueries": 770,
+          "groups": 770
+        }
+      },
+      "corpus": {
+        "loadMedianMs": 71364.94,
+        "peakRequestedBytes": 4342576535,
+        "retainedRequestedBytes": 2369621470,
+        "queryMeanMicroseconds": 500.9,
+        "groupQueryMeanMicroseconds": 1993.5,
+        "outcomes": {
+          "empty result": 1145,
+          "OutsideProject": 9,
+          "InvalidPosition": 0,
+          "UnsupportedTarget": 373,
+          "UnresolvedTarget": 0,
+          "positions": 2000,
+          "groupQueries": 473,
+          "groups": 473
+        }
+      }
+    },
+    "before-quiet": {
+      "generated": {
+        "loadMedianMs": 225.4,
+        "peakRequestedBytes": 27532848,
+        "retainedRequestedBytes": 23296986,
+        "queryMeanMicroseconds": 3.7,
+        "groupQueryMeanMicroseconds": 4.2,
+        "outcomes": {
+          "empty result": 532,
+          "OutsideProject": 0,
+          "InvalidPosition": 0,
+          "UnsupportedTarget": 293,
+          "UnresolvedTarget": 0,
+          "positions": 2000,
+          "groupQueries": 1175,
+          "groups": 1175
+        }
+      },
+      "single-file": {
+        "loadMedianMs": 338.01,
+        "peakRequestedBytes": 61944794,
+        "retainedRequestedBytes": 54460711,
+        "queryMeanMicroseconds": 4.9,
+        "groupQueryMeanMicroseconds": 5.9,
+        "outcomes": {
+          "empty result": 1076,
+          "OutsideProject": 0,
+          "InvalidPosition": 0,
+          "UnsupportedTarget": 154,
+          "UnresolvedTarget": 0,
+          "positions": 2000,
+          "groupQueries": 770,
+          "groups": 770
+        }
+      },
+      "corpus": {
+        "loadMedianMs": 41936.84,
+        "peakRequestedBytes": 5275826717,
+        "retainedRequestedBytes": 4491446176,
+        "queryMeanMicroseconds": 472.8,
+        "groupQueryMeanMicroseconds": 1942.5,
+        "outcomes": {
+          "empty result": 1145,
+          "OutsideProject": 9,
+          "InvalidPosition": 0,
+          "UnsupportedTarget": 373,
+          "UnresolvedTarget": 0,
+          "positions": 2000,
+          "groupQueries": 473,
+          "groups": 473
+        }
+      }
+    },
+    "after": {
+      "generated": {
+        "loadMedianMs": 229.81,
+        "peakRequestedBytes": 23838288,
+        "retainedRequestedBytes": 12827044,
+        "queryMeanMicroseconds": 3.4,
+        "groupQueryMeanMicroseconds": 4.0,
+        "outcomes": {
+          "empty result": 532,
+          "OutsideProject": 0,
+          "InvalidPosition": 0,
+          "UnsupportedTarget": 293,
+          "UnresolvedTarget": 0,
+          "positions": 2000,
+          "groupQueries": 1175,
+          "groups": 1175
+        }
+      },
+      "single-file": {
+        "loadMedianMs": 354.56,
+        "peakRequestedBytes": 61453500,
+        "retainedRequestedBytes": 31635963,
+        "queryMeanMicroseconds": 4.0,
+        "groupQueryMeanMicroseconds": 4.9,
+        "outcomes": {
+          "empty result": 1076,
+          "OutsideProject": 0,
+          "InvalidPosition": 0,
+          "UnsupportedTarget": 154,
+          "UnresolvedTarget": 0,
+          "positions": 2000,
+          "groupQueries": 770,
+          "groups": 770
+        }
+      },
+      "corpus": {
+        "loadMedianMs": 36270.68,
+        "peakRequestedBytes": 4342352013,
+        "retainedRequestedBytes": 2369621470,
+        "queryMeanMicroseconds": 283.5,
+        "groupQueryMeanMicroseconds": 1176.9,
+        "outcomes": {
+          "empty result": 1145,
+          "OutsideProject": 9,
+          "InvalidPosition": 0,
+          "UnsupportedTarget": 373,
+          "UnresolvedTarget": 0,
+          "positions": 2000,
+          "groupQueries": 473,
+          "groups": 473
+        }
+      }
+    }
+  },
+  "journeys": {
+    "outline": {
+      "baseline": {
+        "exitCode": 0,
+        "elapsedSeconds": 30.01396800599997,
+        "time": [
+          30.0,
+          22.47,
+          5.3
+        ],
+        "maxRssBytes": 5166018560,
+        "stdoutSha256": "c6992510fd49370edcd35507329884afaad4937a81ecbd0c9b473af6ca1de29b"
+      },
+      "final": {
+        "exitCode": 0,
+        "elapsedSeconds": 48.92027780500001,
+        "time": [
+          48.91,
+          33.62,
+          9.88
+        ],
+        "maxRssBytes": 3716493312,
+        "stdoutSha256": "c6992510fd49370edcd35507329884afaad4937a81ecbd0c9b473af6ca1de29b"
+      },
+      "stdoutEqual": true,
+      "diagnosticStderrEqual": true,
+      "exitEqual": true
+    },
+    "type-annotated": {
+      "baseline": {
+        "exitCode": 0,
+        "elapsedSeconds": 26.04672999600001,
+        "time": [
+          26.03,
+          21.7,
+          4.29
+        ],
+        "maxRssBytes": 5165580288,
+        "stdoutSha256": "6aa74ee0e875ebf6126aaf6b9e927ec603ee0eeaf349d93dde758fd52a390ad2"
+      },
+      "final": {
+        "exitCode": 0,
+        "elapsedSeconds": 53.77459508999999,
+        "time": [
+          53.76,
+          33.29,
+          12.81
+        ],
+        "maxRssBytes": 3768262656,
+        "stdoutSha256": "6aa74ee0e875ebf6126aaf6b9e927ec603ee0eeaf349d93dde758fd52a390ad2"
+      },
+      "stdoutEqual": true,
+      "diagnosticStderrEqual": true,
+      "exitEqual": true
+    },
+    "type-contextual": {
+      "baseline": {
+        "exitCode": 0,
+        "elapsedSeconds": 26.459315001999983,
+        "time": [
+          26.45,
+          22.0,
+          4.38
+        ],
+        "maxRssBytes": 5174132736,
+        "stdoutSha256": "7f37f35b6d738751adffcc72c8c91a00bced18885320396fb1c5a2c9d2c623b7"
+      },
+      "final": {
+        "exitCode": 0,
+        "elapsedSeconds": 48.966214949999994,
+        "time": [
+          48.95,
+          35.34,
+          10.25
+        ],
+        "maxRssBytes": 3526090752,
+        "stdoutSha256": "7f37f35b6d738751adffcc72c8c91a00bced18885320396fb1c5a2c9d2c623b7"
+      },
+      "stdoutEqual": true,
+      "diagnosticStderrEqual": true,
+      "exitEqual": true
+    },
+    "type-factory": {
+      "baseline": {
+        "exitCode": 0,
+        "elapsedSeconds": 36.46390312,
+        "time": [
+          36.45,
+          27.32,
+          7.14
+        ],
+        "maxRssBytes": 4184760320,
+        "stdoutSha256": "eb6cc3813bdb5785c319babe1db57023e5d4304b2d4253b1a4b98f1217ca45c5"
+      },
+      "final": {
+        "exitCode": 0,
+        "elapsedSeconds": 51.63684516,
+        "time": [
+          51.62,
+          38.55,
+          10.09
+        ],
+        "maxRssBytes": 3976855552,
+        "stdoutSha256": "eb6cc3813bdb5785c319babe1db57023e5d4304b2d4253b1a4b98f1217ca45c5"
+      },
+      "stdoutEqual": true,
+      "diagnosticStderrEqual": true,
+      "exitEqual": true
+    },
+    "type-jsx": {
+      "baseline": {
+        "exitCode": 0,
+        "elapsedSeconds": 26.05763871800002,
+        "time": [
+          26.04,
+          21.67,
+          4.36
+        ],
+        "maxRssBytes": 5166800896,
+        "stdoutSha256": "b3ed12183c4559b6b542379de1edb14baa738bd630d0add4db5d99a09d9a26b7"
+      },
+      "final": {
+        "exitCode": 0,
+        "elapsedSeconds": 33.378634780999995,
+        "time": [
+          33.37,
+          27.03,
+          6.27
+        ],
+        "maxRssBytes": 4100640768,
+        "stdoutSha256": "b3ed12183c4559b6b542379de1edb14baa738bd630d0add4db5d99a09d9a26b7"
+      },
+      "stdoutEqual": true,
+      "diagnosticStderrEqual": true,
+      "exitEqual": true
+    },
+    "type-predicate": {
+      "baseline": {
+        "exitCode": 0,
+        "elapsedSeconds": 27.943069948000016,
+        "time": [
+          27.91,
+          22.33,
+          4.83
+        ],
+        "maxRssBytes": 4758704128,
+        "stdoutSha256": "343791a8f13ae964900f468212bfdcb1485d7875c3111d3dbf4ebc5b056b9d56"
+      },
+      "final": {
+        "exitCode": 0,
+        "elapsedSeconds": 35.397459721999994,
+        "time": [
+          35.39,
+          28.16,
+          6.73
+        ],
+        "maxRssBytes": 4094914560,
+        "stdoutSha256": "343791a8f13ae964900f468212bfdcb1485d7875c3111d3dbf4ebc5b056b9d56"
+      },
+      "stdoutEqual": true,
+      "diagnosticStderrEqual": true,
+      "exitEqual": true
+    },
+    "refs-annotated": {
+      "baseline": {
+        "exitCode": 2,
+        "elapsedSeconds": 35.42559105700002,
+        "time": [
+          35.41,
+          28.22,
+          5.97
+        ],
+        "maxRssBytes": 4523905024,
+        "stdoutSha256": "8deea75c643b586b6240d818950bdf402cf0ea9fdf0535cf184735d292c28329"
+      },
+      "final": {
+        "exitCode": 2,
+        "elapsedSeconds": 38.905162778999994,
+        "time": [
+          38.9,
+          32.12,
+          6.68
+        ],
+        "maxRssBytes": 4093169664,
+        "stdoutSha256": "8deea75c643b586b6240d818950bdf402cf0ea9fdf0535cf184735d292c28329"
+      },
+      "stdoutEqual": true,
+      "diagnosticStderrEqual": true,
+      "exitEqual": true
+    },
+    "refs-contextual": {
+      "baseline": {
+        "exitCode": 2,
+        "elapsedSeconds": 40.05233254000001,
+        "time": [
+          40.04,
+          30.95,
+          6.71
+        ],
+        "maxRssBytes": 4977340416,
+        "stdoutSha256": "8deea75c643b586b6240d818950bdf402cf0ea9fdf0535cf184735d292c28329"
+      },
+      "final": {
+        "exitCode": 2,
+        "elapsedSeconds": 38.851421988,
+        "time": [
+          38.84,
+          32.02,
+          6.72
+        ],
+        "maxRssBytes": 4107919360,
+        "stdoutSha256": "8deea75c643b586b6240d818950bdf402cf0ea9fdf0535cf184735d292c28329"
+      },
+      "stdoutEqual": true,
+      "diagnosticStderrEqual": true,
+      "exitEqual": true
+    },
+    "refs-jsx": {
+      "baseline": {
+        "exitCode": 2,
+        "elapsedSeconds": 41.35708819800004,
+        "time": [
+          41.34,
+          32.21,
+          6.95
+        ],
+        "maxRssBytes": 4931149824,
+        "stdoutSha256": "8deea75c643b586b6240d818950bdf402cf0ea9fdf0535cf184735d292c28329"
+      },
+      "final": {
+        "exitCode": 2,
+        "elapsedSeconds": 38.10262659,
+        "time": [
+          38.09,
+          31.27,
+          6.71
+        ],
+        "maxRssBytes": 4098560000,
+        "stdoutSha256": "8deea75c643b586b6240d818950bdf402cf0ea9fdf0535cf184735d292c28329"
+      },
+      "stdoutEqual": true,
+      "diagnosticStderrEqual": true,
+      "exitEqual": true
+    }
+  },
+  "interleavedOutline": {
+    "runs": {
+      "1-before": {
+        "exitCode": 0,
+        "elapsedSeconds": 31.12012591,
+        "time": [
+          31.11,
+          25.13,
+          5.87
+        ],
+        "maxRssBytes": 5157543936,
+        "stdoutSha256": "c6992510fd49370edcd35507329884afaad4937a81ecbd0c9b473af6ca1de29b"
+      },
+      "2-storage": {
+        "exitCode": 0,
+        "elapsedSeconds": 24.775942953,
+        "time": [
+          24.77,
+          20.67,
+          4.03
+        ],
+        "maxRssBytes": 4108410880,
+        "stdoutSha256": "c6992510fd49370edcd35507329884afaad4937a81ecbd0c9b473af6ca1de29b"
+      },
+      "3-after": {
+        "exitCode": 0,
+        "elapsedSeconds": 23.242408463000004,
+        "time": [
+          23.23,
+          19.18,
+          4.04
+        ],
+        "maxRssBytes": 4125560832,
+        "stdoutSha256": "c6992510fd49370edcd35507329884afaad4937a81ecbd0c9b473af6ca1de29b"
+      },
+      "4-after": {
+        "exitCode": 0,
+        "elapsedSeconds": 23.329905570999998,
+        "time": [
+          23.32,
+          19.3,
+          4.01
+        ],
+        "maxRssBytes": 4112580608,
+        "stdoutSha256": "c6992510fd49370edcd35507329884afaad4937a81ecbd0c9b473af6ca1de29b"
+      },
+      "5-storage": {
+        "exitCode": 0,
+        "elapsedSeconds": 28.299814276000006,
+        "time": [
+          28.2,
+          23.31,
+          4.83
+        ],
+        "maxRssBytes": 4109680640,
+        "stdoutSha256": "c6992510fd49370edcd35507329884afaad4937a81ecbd0c9b473af6ca1de29b"
+      },
+      "6-before": {
+        "exitCode": 0,
+        "elapsedSeconds": 28.22699977100001,
+        "time": [
+          28.19,
+          22.19,
+          5.0
+        ],
+        "maxRssBytes": 5157756928,
+        "stdoutSha256": "c6992510fd49370edcd35507329884afaad4937a81ecbd0c9b473af6ca1de29b"
+      }
+    },
+    "variants": {
+      "before": {
+        "wallMedianSeconds": 29.673562840500004,
+        "cpuMedianSeconds": 29.095,
+        "maxRssBytes": 5157756928
+      },
+      "storage": {
+        "wallMedianSeconds": 26.537878614500002,
+        "cpuMedianSeconds": 26.42,
+        "maxRssBytes": 4109680640
+      },
+      "after": {
+        "wallMedianSeconds": 23.286157017,
+        "cpuMedianSeconds": 23.265,
+        "maxRssBytes": 4125560832
+      }
+    }
+  },
+  "notes": [
+    "Storage-only corpus timings overlapped release compilation/oracle and validation work, with a one-second process sample. They are confounded and must not be used as speedup evidence.",
+    "before-quiet and after run after this session builds/validation finish; unrelated host activity is uncontrolled.",
+    "Interleaved outline order is before, storage, after, after, storage, before. Fresh processes; filesystem caches are warm, not flushed.",
+    "Requested heap is allocator-requested live/peak bytes during a separate Project::load, distinct from RSS and allocator overhead.",
+    "All lexical outcome counts and all nine CLI stdout, diagnostic stderr, and exit codes match. Known failed member searches remain failures."
+  ]
+}

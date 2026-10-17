@@ -156,7 +156,7 @@ fn indentation(text: &str, at: usize) -> &str {
 /// other statement start does, including `++`, `--`, `!`, and `.5`, nor
 /// does any start continue a type. The pinned syntax API confirms the set.
 fn continues_expression(text: &str, at: usize) -> bool {
-    let token = Lexer { src: text, pos: at }.next();
+    let token = Lexer::new(text, at).next();
     token.end > token.start
         && !text[token.start..].starts_with("++")
         && !text[token.start..].starts_with("--")
@@ -315,7 +315,7 @@ pub(super) fn after(ast: &Ast<'_>, statement: NodeId, fragment: &str, edit: usiz
 
 /// Whether `text` holds a token, rather than only whitespace and comments.
 fn has_token(text: &str) -> bool {
-    let token = Lexer { src: text, pos: 0 }.next();
+    let token = Lexer::new(text, 0).next();
     token.end > token.start
 }
 
@@ -662,12 +662,9 @@ impl Attachments {
         // trivia before it, and so the JSDoc it collects, may have changed.
         let mut checked = Vec::new();
         for region in composition.regions() {
-            let composed_next = Lexer {
-                src: composition.text(),
-                pos: region.composed.end,
-            }
-            .next()
-            .start;
+            let composed_next = Lexer::new(composition.text(), region.composed.end)
+                .next()
+                .start;
             let Origin::Preserved(next) = composition.origin(composed_next) else {
                 continue;
             };

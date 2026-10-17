@@ -1,0 +1,350 @@
+[
+  {
+    "name": "underNine",
+    "constituents": 9,
+    "codes": [],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 9,
+        "entries": 0,
+        "hasMap": false,
+        "tagName": false
+      }
+    ]
+  },
+  {
+    "name": "atTen",
+    "constituents": 10,
+    "codes": [
+      2304
+    ],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 10,
+        "entries": 0,
+        "hasMap": false,
+        "tagName": false
+      }
+    ]
+  },
+  {
+    "name": "overEleven",
+    "constituents": 11,
+    "codes": [
+      2304
+    ],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 11,
+        "entries": 0,
+        "hasMap": false,
+        "tagName": false
+      }
+    ]
+  },
+  {
+    "name": "healthyNine",
+    "constituents": 9,
+    "codes": [],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 9,
+        "entries": 0,
+        "hasMap": false,
+        "tagName": false
+      }
+    ]
+  },
+  {
+    "name": "healthyTen",
+    "constituents": 10,
+    "codes": [],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 10,
+        "entries": 10,
+        "hasMap": true,
+        "tagName": true
+      }
+    ]
+  },
+  {
+    "name": "healthyEleven",
+    "constituents": 11,
+    "codes": [],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 11,
+        "entries": 11,
+        "hasMap": true,
+        "tagName": true
+      }
+    ]
+  },
+  {
+    "name": "nonLiteralTen",
+    "constituents": 10,
+    "codes": [],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 10,
+        "entries": 0,
+        "hasMap": false,
+        "tagName": false
+      }
+    ]
+  },
+  {
+    "name": "duplicateTen",
+    "constituents": 10,
+    "codes": [],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 10,
+        "entries": 0,
+        "hasMap": false,
+        "tagName": false
+      }
+    ]
+  },
+  {
+    "name": "duplicateEleven",
+    "constituents": 11,
+    "codes": [],
+    "maps": [
+      {
+        "ambiguous": 1,
+        "constituents": 11,
+        "entries": 10,
+        "hasMap": true,
+        "tagName": true
+      }
+    ]
+  },
+  {
+    "name": "duplicateThird",
+    "constituents": 11,
+    "codes": [],
+    "maps": [
+      {
+        "ambiguous": 1,
+        "constituents": 11,
+        "entries": 9,
+        "hasMap": true,
+        "tagName": true
+      }
+    ]
+  },
+  {
+    "name": "aboveHalf",
+    "constituents": 19,
+    "codes": [],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 19,
+        "entries": 10,
+        "hasMap": true,
+        "tagName": true
+      }
+    ]
+  },
+  {
+    "name": "half",
+    "constituents": 20,
+    "codes": [],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 20,
+        "entries": 10,
+        "hasMap": true,
+        "tagName": true
+      }
+    ]
+  },
+  {
+    "name": "belowHalf",
+    "constituents": 21,
+    "codes": [],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 21,
+        "entries": 0,
+        "hasMap": false,
+        "tagName": false
+      }
+    ]
+  },
+  {
+    "name": "objectCountNine",
+    "constituents": 10,
+    "codes": [],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 10,
+        "entries": 0,
+        "hasMap": false,
+        "tagName": false
+      }
+    ]
+  },
+  {
+    "name": "emptyName",
+    "constituents": 10,
+    "codes": [],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 10,
+        "entries": 0,
+        "hasMap": false,
+        "tagName": false
+      }
+    ]
+  },
+  {
+    "name": "payloadUnderNine",
+    "constituents": 9,
+    "codes": [
+      2304
+    ],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 9,
+        "entries": 0,
+        "hasMap": false,
+        "tagName": false
+      }
+    ]
+  },
+  {
+    "name": "payloadAtTen",
+    "constituents": 10,
+    "codes": [],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 10,
+        "entries": 10,
+        "hasMap": true,
+        "tagName": true
+      }
+    ]
+  },
+  {
+    "name": "payloadOverEleven",
+    "constituents": 11,
+    "codes": [],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 11,
+        "entries": 11,
+        "hasMap": true,
+        "tagName": true
+      }
+    ]
+  },
+  {
+    "name": "payloadHalf",
+    "constituents": 20,
+    "codes": [],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 20,
+        "entries": 10,
+        "hasMap": true,
+        "tagName": true
+      }
+    ]
+  },
+  {
+    "name": "payloadBelowHalf",
+    "constituents": 21,
+    "codes": [
+      2304
+    ],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 21,
+        "entries": 0,
+        "hasMap": false,
+        "tagName": false
+      }
+    ]
+  },
+  {
+    "name": "payloadDuplicateTen",
+    "constituents": 10,
+    "codes": [
+      2304
+    ],
+    "maps": [
+      {
+        "ambiguous": 0,
+        "constituents": 10,
+        "entries": 0,
+        "hasMap": false,
+        "tagName": false
+      }
+    ]
+  },
+  {
+    "name": "payloadDuplicateEleven",
+    "constituents": 11,
+    "codes": [],
+    "maps": [
+      {
+        "ambiguous": 1,
+        "constituents": 11,
+        "entries": 10,
+        "hasMap": true,
+        "tagName": true
+      }
+    ]
+  },
+  {
+    "name": "payloadAmbiguous",
+    "constituents": 11,
+    "codes": [
+      2304
+    ],
+    "maps": [
+      {
+        "ambiguous": 1,
+        "constituents": 11,
+        "entries": 10,
+        "hasMap": true,
+        "tagName": true
+      }
+    ]
+  },
+  {
+    "name": "payloadThirdDuplicate",
+    "constituents": 11,
+    "codes": [],
+    "maps": [
+      {
+        "ambiguous": 1,
+        "constituents": 11,
+        "entries": 9,
+        "hasMap": true,
+        "tagName": true
+      }
+    ]
+  }
+]

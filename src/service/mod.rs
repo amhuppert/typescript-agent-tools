@@ -417,7 +417,27 @@ fn handle(
             false,
         ),
         Ok(Request { action, .. }) => match action {
-            Action::Query(request) => (Response::Query(session.execute(request)), false),
+            Action::Query(request) => {
+                let result = crate::process_limits::run(
+                    |failure| {
+                        // The query thread has not begun response delivery. A
+                        // limit response is the process's final socket write.
+                        let mut writer = BufWriter::new(&stream);
+                        let response = Response::Query(Err(failure.into_error()));
+                        if serde_json::to_writer(&mut writer, &response).is_ok() {
+                            let _ = writer.flush();
+                        }
+                        1
+                    },
+                    || session.execute(request),
+                );
+                match result {
+                    Ok(result) => (Response::Query(result), false),
+                    // Preserve setup failures instead of closing the socket
+                    // with no response. A misconfigured process is disposable.
+                    Err(error) => (Response::Failure(error.to_string()), true),
+                }
+            }
             Action::Status => (
                 Response::Status(Status {
                     running: true,

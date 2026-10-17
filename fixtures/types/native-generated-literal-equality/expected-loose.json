@@ -1,0 +1,38 @@
+[
+  {
+    "name": "wholeDistinct",
+    "summary": "[\"1\", \"2\", false]",
+    "identities": [
+      "1",
+      "2"
+    ],
+    "comparison": false,
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "adjacentPartition",
+    "summary": "[\"3\", \"4\", false]",
+    "identities": [
+      "3",
+      "4"
+    ],
+    "comparison": false,
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "suffixDecides",
+    "summary": "[\"5\", \"6\", false]",
+    "identities": [
+      "5",
+      "6"
+    ],
+    "comparison": false,
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  }
+]

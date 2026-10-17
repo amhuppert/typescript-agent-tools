@@ -131,6 +131,21 @@ impl Meanings {
         self
     }
 
+    /// Retain selected targets without changing the type-only provenance of
+    /// their routes. Native lookup flag eligibility is decided by the resolver.
+    pub(super) fn retain(mut self, mut keep: impl FnMut(SymbolId) -> bool) -> Self {
+        for meaning in EACH {
+            if self
+                .targets
+                .get(meaning)
+                .is_some_and(|symbol| !keep(symbol))
+            {
+                self.clear(meaning);
+            }
+        }
+        self
+    }
+
     /// Fill absent meanings from an alias without changing existing locals.
     pub(super) fn fill_missing(&mut self, alias: Self, mask: u8, type_context: bool) {
         let alias = alias.select(mask, type_context);

@@ -19,7 +19,7 @@ impl NodeId {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Span {
     /// Inclusive UTF-8 byte offset.
     pub start: usize,
@@ -74,6 +74,11 @@ pub struct Node<'src> {
     pub fields: Fields<'src>,
     pub(crate) syntax_kind: crate::syntax_kind::SyntaxKind,
     pub(crate) possible_top_level_await: bool,
+    // Native TS7 parser metadata is distinct from the public TS6 AST flags.
+    pub(crate) native_jsdoc: Option<crate::parser::jsdoc::Attachment>,
+    // Native scanner bytes only when the public UTF-16 projection loses their
+    // spelling. The parser owns this allocation.
+    pub(crate) native_literal_text: Option<Vec<u8>>,
 }
 
 /// Syntax fields, with one field stored inline to avoid allocating leaf nodes.
@@ -143,7 +148,7 @@ pub(crate) fn external_module(nodes: &[Node<'_>], statements: &[NodeId], flags: 
         _ => false,
     };
     flags & crate::compiler::node::POSSIBLY_CONTAINS_IMPORT_META != 0
-        || statements.iter().any(|&id| {
+        || statements.iter().any(|id| {
             let node = &nodes[id.0];
             match node.syntax_kind {
                 ImportDeclaration | ExportDeclaration | ExportAssignment => true,
@@ -194,28 +199,87 @@ impl<'src> Ast<'src> {
         let span = self.node(id).span;
         &self.source[span.start..span.end]
     }
+    /// Native scanner text of a string/template token, with no allocation or
+    /// re-decoding. Non-scalar bytes are retained by the parser; scalar Text
+    /// is already exact, including JSX's distinct raw attribute-string mode.
+    pub(crate) fn cooked_literal<'a>(&self, node: &'a Node<'_>) -> Option<&'a [u8]> {
+        if !matches!(
+            node.syntax_kind,
+            SyntaxKind::StringLiteral
+                | SyntaxKind::NoSubstitutionTemplateLiteral
+                | SyntaxKind::TemplateHead
+                | SyntaxKind::TemplateMiddle
+                | SyntaxKind::TemplateTail
+        ) {
+            return None;
+        }
+        if let Some(bytes) = &node.native_literal_text {
+            return Some(bytes);
+        }
+        match node.field("text") {
+            Some(Value::Text(text)) => Some(text.as_bytes()),
+            _ => None,
+        }
+    }
     /// A node's span without its preceding trivia: from the start of its first
     /// token to its end. For an identifier or literal, this is the exact token.
     pub fn token_span(&self, id: NodeId) -> Span {
         self.token_span_of(self.node(id))
     }
+    pub(crate) fn token_span_controlled(
+        &self,
+        id: NodeId,
+        control: &crate::resources::Control,
+    ) -> Result<Span, crate::resources::Stop> {
+        self.token_span_worker(self.node(id), Some(control))
+    }
     /// `token_span` for a node of this arena already in hand.
     pub(crate) fn token_span_of(&self, node: &Node<'src>) -> Span {
+        self.token_span_worker(node, None)
+            .expect("uncontrolled span lookup cannot stop")
+    }
+    fn token_span_worker(
+        &self,
+        node: &Node<'src>,
+        control: Option<&crate::resources::Control>,
+    ) -> Result<Span, crate::resources::Stop> {
         // JSX text has no trivia; text such as `// x` in it is not a comment.
         if matches!(
             node.syntax_kind,
             SyntaxKind::JsxText | SyntaxKind::JsxTextAllWhiteSpaces
         ) {
-            return node.span;
+            return Ok(node.span);
         }
-        let mut lexer = crate::lexer::Lexer {
-            src: self.source,
-            pos: node.span.start,
-        };
-        Span {
-            start: lexer.next().start.min(node.span.end),
+        Ok(Span {
+            start: self.first_token_span_worker(node, control)?.start,
             end: node.span.end,
-        }
+        })
+    }
+    /// TypeScript `getFirstToken`: the first token's exact lexical range after
+    /// leading trivia. The shared lexer owns trivia and token boundaries; a
+    /// structural node's remaining text is not part of this token.
+    pub(crate) fn first_token_span(&self, id: NodeId) -> Span {
+        self.first_token_span_worker(self.node(id), None)
+            .expect("uncontrolled span lookup cannot stop")
+    }
+    pub(crate) fn first_token_span_controlled(
+        &self,
+        id: NodeId,
+        control: &crate::resources::Control,
+    ) -> Result<Span, crate::resources::Stop> {
+        self.first_token_span_worker(self.node(id), Some(control))
+    }
+    fn first_token_span_worker(
+        &self,
+        node: &Node<'src>,
+        control: Option<&crate::resources::Control>,
+    ) -> Result<Span, crate::resources::Stop> {
+        let mut lexer = crate::lexer::Lexer::new(self.source, node.span.start);
+        let token = lexer.next_controlled(control)?;
+        Ok(Span {
+            start: token.start.min(node.span.end),
+            end: token.end.min(node.span.end),
+        })
     }
     /// An identifier's name. The compiler's `escapedText` field writes a name
     /// that begins with two underscores with a third; this undoes that.

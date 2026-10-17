@@ -1,0 +1,1512 @@
+[
+  {
+    "config": "tsconfig.json",
+    "name": "simple",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 5,
+        "column": 13
+      },
+      "properties": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+          "sha256": "ae2f2ecb6e10092dcb1639c69422f48eac7bb9518662d426a745ce4d9306c898"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Simple<string>",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "signatureId": 7,
+      "signatureTargetId": 5,
+      "signatureDefaults": [],
+      "beforeDefaults": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "afterDefaults": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "name": "genericString",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 10,
+        "column": 13
+      },
+      "properties": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+          "sha256": "ae2f2ecb6e10092dcb1639c69422f48eac7bb9518662d426a745ce4d9306c898"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Generic<string>",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "signatureId": 6,
+      "signatureTargetId": 5,
+      "signatureDefaults": [
+        {
+          "absent": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 14,
+          "parameterId": 70,
+          "summary": "string"
+        }
+      ],
+      "beforeDefaults": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "afterDefaults": {
+        "counters": {
+          "instantiationCount": 0,
+          "instantiationDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "counters": {
+        "instantiationCount": 0,
+        "instantiationDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "name": "genericNumber",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 11,
+        "column": 13
+      },
+      "properties": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+          "sha256": "ae2f2ecb6e10092dcb1639c69422f48eac7bb9518662d426a745ce4d9306c898"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Generic<number>",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "signatureId": 6,
+      "signatureTargetId": 5,
+      "signatureDefaults": [
+        {
+          "absent": false,
+          "errorType": false,
+          "flags": 64,
+          "id": 15,
+          "parameterId": 70,
+          "summary": "number"
+        }
+      ],
+      "beforeDefaults": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "afterDefaults": {
+        "counters": {
+          "instantiationCount": 0,
+          "instantiationDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "counters": {
+        "instantiationCount": 0,
+        "instantiationDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "name": "nested",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 16,
+        "column": 13
+      },
+      "properties": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+          "sha256": "ae2f2ecb6e10092dcb1639c69422f48eac7bb9518662d426a745ce4d9306c898"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Nested<number>",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "signatureId": 6,
+      "signatureTargetId": 5,
+      "signatureDefaults": [
+        {
+          "absent": true,
+          "parameterId": 71
+        },
+        {
+          "absent": false,
+          "errorType": false,
+          "flags": 524288,
+          "id": 71,
+          "parameterId": 72,
+          "summary": "U"
+        }
+      ],
+      "beforeDefaults": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "afterDefaults": {
+        "counters": {
+          "instantiationCount": 1,
+          "instantiationDepth": 1
+        },
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "counters": {
+        "instantiationCount": 1,
+        "instantiationDepth": 1
+      },
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "name": "shadow",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 21,
+        "column": 13
+      },
+      "properties": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+          "sha256": "ae2f2ecb6e10092dcb1639c69422f48eac7bb9518662d426a745ce4d9306c898"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Shadow<number>",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "signatureId": 6,
+      "signatureTargetId": 5,
+      "signatureDefaults": [
+        {
+          "absent": true,
+          "parameterId": 70
+        }
+      ],
+      "beforeDefaults": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "afterDefaults": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "tsconfig.json",
+    "name": "lazy",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 26,
+        "column": 13
+      },
+      "properties": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+          "sha256": "ae2f2ecb6e10092dcb1639c69422f48eac7bb9518662d426a745ce4d9306c898"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Lazy<string>",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "signatureId": 6,
+      "signatureTargetId": 5,
+      "signatureDefaults": [
+        {
+          "absent": false,
+          "errorType": true,
+          "flags": 1,
+          "id": 71,
+          "parameterId": 70,
+          "summary": "MissingDefault"
+        }
+      ],
+      "beforeDefaults": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "afterDefaults": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2304
+        ]
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2304
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "name": "simple",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 5,
+        "column": 13
+      },
+      "properties": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+          "sha256": "ae2f2ecb6e10092dcb1639c69422f48eac7bb9518662d426a745ce4d9306c898"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/loose.json",
+          "sha256": "41156ed0d344408f7cd9be939b86f360225945353589c28ec51bb0499ff94a7e"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Simple<string>",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "signatureId": 7,
+      "signatureTargetId": 5,
+      "signatureDefaults": [],
+      "beforeDefaults": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "afterDefaults": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "name": "genericString",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 10,
+        "column": 13
+      },
+      "properties": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+          "sha256": "ae2f2ecb6e10092dcb1639c69422f48eac7bb9518662d426a745ce4d9306c898"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/loose.json",
+          "sha256": "41156ed0d344408f7cd9be939b86f360225945353589c28ec51bb0499ff94a7e"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Generic<string>",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "signatureId": 6,
+      "signatureTargetId": 5,
+      "signatureDefaults": [
+        {
+          "absent": false,
+          "errorType": false,
+          "flags": 32,
+          "id": 16,
+          "parameterId": 71,
+          "summary": "string"
+        }
+      ],
+      "beforeDefaults": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "afterDefaults": {
+        "counters": {
+          "instantiationCount": 0,
+          "instantiationDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "counters": {
+        "instantiationCount": 0,
+        "instantiationDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "name": "genericNumber",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 11,
+        "column": 13
+      },
+      "properties": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+          "sha256": "ae2f2ecb6e10092dcb1639c69422f48eac7bb9518662d426a745ce4d9306c898"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/loose.json",
+          "sha256": "41156ed0d344408f7cd9be939b86f360225945353589c28ec51bb0499ff94a7e"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Generic<number>",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "signatureId": 6,
+      "signatureTargetId": 5,
+      "signatureDefaults": [
+        {
+          "absent": false,
+          "errorType": false,
+          "flags": 64,
+          "id": 17,
+          "parameterId": 71,
+          "summary": "number"
+        }
+      ],
+      "beforeDefaults": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "afterDefaults": {
+        "counters": {
+          "instantiationCount": 0,
+          "instantiationDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "counters": {
+        "instantiationCount": 0,
+        "instantiationDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "name": "nested",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 16,
+        "column": 13
+      },
+      "properties": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+          "sha256": "ae2f2ecb6e10092dcb1639c69422f48eac7bb9518662d426a745ce4d9306c898"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/loose.json",
+          "sha256": "41156ed0d344408f7cd9be939b86f360225945353589c28ec51bb0499ff94a7e"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Nested<number>",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "signatureId": 6,
+      "signatureTargetId": 5,
+      "signatureDefaults": [
+        {
+          "absent": true,
+          "parameterId": 72
+        },
+        {
+          "absent": false,
+          "errorType": false,
+          "flags": 524288,
+          "id": 72,
+          "parameterId": 73,
+          "summary": "U"
+        }
+      ],
+      "beforeDefaults": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "afterDefaults": {
+        "counters": {
+          "instantiationCount": 1,
+          "instantiationDepth": 1
+        },
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "counters": {
+        "instantiationCount": 1,
+        "instantiationDepth": 1
+      },
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "name": "shadow",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 21,
+        "column": 13
+      },
+      "properties": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+          "sha256": "ae2f2ecb6e10092dcb1639c69422f48eac7bb9518662d426a745ce4d9306c898"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/loose.json",
+          "sha256": "41156ed0d344408f7cd9be939b86f360225945353589c28ec51bb0499ff94a7e"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Shadow<number>",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "signatureId": 6,
+      "signatureTargetId": 5,
+      "signatureDefaults": [
+        {
+          "absent": true,
+          "parameterId": 71
+        }
+      ],
+      "beforeDefaults": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "afterDefaults": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/loose.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "name": "lazy",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 26,
+        "column": 13
+      },
+      "properties": false
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/cases.ts",
+          "sha256": "ae2f2ecb6e10092dcb1639c69422f48eac7bb9518662d426a745ce4d9306c898"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/loose.json",
+          "sha256": "41156ed0d344408f7cd9be939b86f360225945353589c28ec51bb0499ff94a7e"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/tsconfig.json",
+          "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+        }
+      ],
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "Lazy<string>",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "signatureId": 6,
+      "signatureTargetId": 5,
+      "signatureDefaults": [
+        {
+          "absent": false,
+          "errorType": true,
+          "flags": 1,
+          "id": 72,
+          "parameterId": 71,
+          "summary": "MissingDefault"
+        }
+      ],
+      "beforeDefaults": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318
+        ]
+      },
+      "afterDefaults": {
+        "counters": {},
+        "demandFailures": [],
+        "observations": {},
+        "diagnosticCodes": [
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2318,
+          2304
+        ]
+      },
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2304
+      ],
+      "compilerOptions": {
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": false,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-signature-mapper/loose.json"
+      }
+    }
+  }
+]

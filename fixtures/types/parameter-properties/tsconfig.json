@@ -1,0 +1,4 @@
+{
+  "compilerOptions": { "strict": true, "target": "esnext", "module": "esnext", "noEmit": true },
+  "files": ["cases.ts"]
+}

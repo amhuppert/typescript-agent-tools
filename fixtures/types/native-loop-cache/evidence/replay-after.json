@@ -1,0 +1,10 @@
+{
+  "tools/type-oracle.mjs": "2b88ee398209e24c9b3b28a6c39e9d6fbcb3c463f6902638c797e02ae3560b2e",
+  "tools/semantic-oracle.mjs": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597",
+  "tools/navigation-oracle.mjs": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3",
+  "tools/vendor-typescript-libs.mjs": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d",
+  ".cc/temp/types-loop-cache/checker-hook.go": "e2d5c10ae680c02f912cd1eff4d9b17dc922894559fea2028a82663d9a501419",
+  ".cc/temp/types-loop-cache/ls-hook.go": "73c9a52f43914571bdf7f29e8817720d0ff98bdb0aeb7cad183fa8397a848dce",
+  ".cc/temp/types-loop-cache/oracle-test.go": "737453c86a9f6a35bcdbcdb40831bf3e6e039492d7467d2c5b7be4074964b88b",
+  ".cc/temp/types-loop-cache/oracle.mjs": "9bd6ccc2101a00daff8d79f914817d69f24c36cf2bb72f92f2203ca4eb90e87c"
+}

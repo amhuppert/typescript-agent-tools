@@ -1,0 +1,62 @@
+func IsFunctionLikeKind(kind Kind) bool {
+	switch kind {
+	case KindMethodSignature,
+		KindCallSignature,
+		KindJSDocSignature,
+		KindConstructSignature,
+		KindIndexSignature,
+		KindFunctionType,
+		KindConstructorType:
+		return true
+	}
+	return isFunctionLikeDeclarationKind(kind)
+}
+
+// Determines if a node is function- or signature-like.
+
+func IsFunctionOrSourceFile(node *Node) bool {
+	return IsFunctionLike(node) || IsSourceFile(node)
+}
+
+
+func IsTypeNodeKind(kind Kind) bool {
+	switch kind {
+	case KindAnyKeyword,
+		KindUnknownKeyword,
+		KindNumberKeyword,
+		KindBigIntKeyword,
+		KindObjectKeyword,
+		KindBooleanKeyword,
+		KindStringKeyword,
+		KindSymbolKeyword,
+		KindVoidKeyword,
+		KindUndefinedKeyword,
+		KindNeverKeyword,
+		KindIntrinsicKeyword,
+		KindExpressionWithTypeArguments,
+		KindJSDocAllType,
+		KindJSDocNullableType,
+		KindJSDocNonNullableType,
+		KindJSDocOptionalType,
+		KindJSDocVariadicType:
+		return true
+	}
+	return kind >= KindFirstTypeNode && kind <= KindLastTypeNode
+}
+
+func IsTypeNode(node *Node) bool {
+	return IsTypeNodeKind(node.Kind)
+}
+
+
+func FindAncestor(node *Node, callback func(*Node) bool) *Node {
+	for node != nil {
+		if callback(node) {
+			return node
+		}
+		node = node.Parent
+	}
+	return nil
+}
+
+// Walks up the parents of a node to find the ancestor that matches the kind

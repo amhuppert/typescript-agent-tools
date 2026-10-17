@@ -1,0 +1,602 @@
+[
+  {
+    "mode": "good-bad",
+    "profile": "strict",
+    "config": "good-bad-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "importHelpers": true
+      },
+      "files": [
+        "globals.d.ts",
+        "good-bad.ts"
+      ]
+    },
+    "file": "good-bad.ts",
+    "source": "import { item as left } from \"./good/cell\";\nimport { item as right } from \"./bad/cell\";\nconst /*#chosen*/chosen = [left.read(), right.read()].length;\nlet healthy: number;\n",
+    "dependencies": [
+      {
+        "file": "good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      },
+      {
+        "file": "bad/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "bad/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(...args: [any, any, any, MissingGet]): any;\n"
+      },
+      {
+        "file": "other-good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "other-good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      }
+    ]
+  },
+  {
+    "mode": "good-bad",
+    "profile": "nocheck",
+    "config": "good-bad-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "importHelpers": true
+      },
+      "files": [
+        "globals.d.ts",
+        "good-bad.ts"
+      ]
+    },
+    "file": "good-bad.ts",
+    "source": "import { item as left } from \"./good/cell\";\nimport { item as right } from \"./bad/cell\";\nconst /*#chosen*/chosen = [left.read(), right.read()].length;\nlet healthy: number;\n",
+    "dependencies": [
+      {
+        "file": "good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      },
+      {
+        "file": "bad/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "bad/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(...args: [any, any, any, MissingGet]): any;\n"
+      },
+      {
+        "file": "other-good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "other-good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      }
+    ]
+  },
+  {
+    "mode": "good-bad",
+    "profile": "loose",
+    "config": "good-bad-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "importHelpers": true
+      },
+      "files": [
+        "globals.d.ts",
+        "good-bad.ts"
+      ]
+    },
+    "file": "good-bad.ts",
+    "source": "import { item as left } from \"./good/cell\";\nimport { item as right } from \"./bad/cell\";\nconst /*#chosen*/chosen = [left.read(), right.read()].length;\nlet healthy: number;\n",
+    "dependencies": [
+      {
+        "file": "good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      },
+      {
+        "file": "bad/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "bad/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(...args: [any, any, any, MissingGet]): any;\n"
+      },
+      {
+        "file": "other-good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "other-good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      }
+    ]
+  },
+  {
+    "mode": "good-bad",
+    "profile": "loose-nocheck",
+    "config": "good-bad-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "importHelpers": true
+      },
+      "files": [
+        "globals.d.ts",
+        "good-bad.ts"
+      ]
+    },
+    "file": "good-bad.ts",
+    "source": "import { item as left } from \"./good/cell\";\nimport { item as right } from \"./bad/cell\";\nconst /*#chosen*/chosen = [left.read(), right.read()].length;\nlet healthy: number;\n",
+    "dependencies": [
+      {
+        "file": "good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      },
+      {
+        "file": "bad/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "bad/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(...args: [any, any, any, MissingGet]): any;\n"
+      },
+      {
+        "file": "other-good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "other-good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      }
+    ]
+  },
+  {
+    "mode": "bad-good",
+    "profile": "strict",
+    "config": "bad-good-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "importHelpers": true
+      },
+      "files": [
+        "globals.d.ts",
+        "bad-good.ts"
+      ]
+    },
+    "file": "bad-good.ts",
+    "source": "import { item as left } from \"./bad/cell\";\nimport { item as right } from \"./good/cell\";\nconst /*#chosen*/chosen = [left.read(), right.read()].length;\nlet healthy: number;\n",
+    "dependencies": [
+      {
+        "file": "good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      },
+      {
+        "file": "bad/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "bad/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(...args: [any, any, any, MissingGet]): any;\n"
+      },
+      {
+        "file": "other-good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "other-good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      }
+    ]
+  },
+  {
+    "mode": "bad-good",
+    "profile": "nocheck",
+    "config": "bad-good-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "importHelpers": true
+      },
+      "files": [
+        "globals.d.ts",
+        "bad-good.ts"
+      ]
+    },
+    "file": "bad-good.ts",
+    "source": "import { item as left } from \"./bad/cell\";\nimport { item as right } from \"./good/cell\";\nconst /*#chosen*/chosen = [left.read(), right.read()].length;\nlet healthy: number;\n",
+    "dependencies": [
+      {
+        "file": "good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      },
+      {
+        "file": "bad/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "bad/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(...args: [any, any, any, MissingGet]): any;\n"
+      },
+      {
+        "file": "other-good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "other-good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      }
+    ]
+  },
+  {
+    "mode": "bad-good",
+    "profile": "loose",
+    "config": "bad-good-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "importHelpers": true
+      },
+      "files": [
+        "globals.d.ts",
+        "bad-good.ts"
+      ]
+    },
+    "file": "bad-good.ts",
+    "source": "import { item as left } from \"./bad/cell\";\nimport { item as right } from \"./good/cell\";\nconst /*#chosen*/chosen = [left.read(), right.read()].length;\nlet healthy: number;\n",
+    "dependencies": [
+      {
+        "file": "good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      },
+      {
+        "file": "bad/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "bad/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(...args: [any, any, any, MissingGet]): any;\n"
+      },
+      {
+        "file": "other-good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "other-good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      }
+    ]
+  },
+  {
+    "mode": "bad-good",
+    "profile": "loose-nocheck",
+    "config": "bad-good-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "importHelpers": true
+      },
+      "files": [
+        "globals.d.ts",
+        "bad-good.ts"
+      ]
+    },
+    "file": "bad-good.ts",
+    "source": "import { item as left } from \"./bad/cell\";\nimport { item as right } from \"./good/cell\";\nconst /*#chosen*/chosen = [left.read(), right.read()].length;\nlet healthy: number;\n",
+    "dependencies": [
+      {
+        "file": "good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      },
+      {
+        "file": "bad/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "bad/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(...args: [any, any, any, MissingGet]): any;\n"
+      },
+      {
+        "file": "other-good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "other-good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      }
+    ]
+  },
+  {
+    "mode": "both-good",
+    "profile": "strict",
+    "config": "both-good-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "importHelpers": true
+      },
+      "files": [
+        "globals.d.ts",
+        "both-good.ts"
+      ]
+    },
+    "file": "both-good.ts",
+    "source": "import { item as left } from \"./good/cell\";\nimport { item as right } from \"./other-good/cell\";\nconst /*#chosen*/chosen = [left.read(), right.read()].length;\nlet healthy: number;\n",
+    "dependencies": [
+      {
+        "file": "good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      },
+      {
+        "file": "bad/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "bad/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(...args: [any, any, any, MissingGet]): any;\n"
+      },
+      {
+        "file": "other-good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "other-good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      }
+    ]
+  },
+  {
+    "mode": "both-good",
+    "profile": "nocheck",
+    "config": "both-good-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "importHelpers": true
+      },
+      "files": [
+        "globals.d.ts",
+        "both-good.ts"
+      ]
+    },
+    "file": "both-good.ts",
+    "source": "import { item as left } from \"./good/cell\";\nimport { item as right } from \"./other-good/cell\";\nconst /*#chosen*/chosen = [left.read(), right.read()].length;\nlet healthy: number;\n",
+    "dependencies": [
+      {
+        "file": "good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      },
+      {
+        "file": "bad/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "bad/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(...args: [any, any, any, MissingGet]): any;\n"
+      },
+      {
+        "file": "other-good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "other-good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      }
+    ]
+  },
+  {
+    "mode": "both-good",
+    "profile": "loose",
+    "config": "both-good-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "importHelpers": true
+      },
+      "files": [
+        "globals.d.ts",
+        "both-good.ts"
+      ]
+    },
+    "file": "both-good.ts",
+    "source": "import { item as left } from \"./good/cell\";\nimport { item as right } from \"./other-good/cell\";\nconst /*#chosen*/chosen = [left.read(), right.read()].length;\nlet healthy: number;\n",
+    "dependencies": [
+      {
+        "file": "good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      },
+      {
+        "file": "bad/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "bad/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(...args: [any, any, any, MissingGet]): any;\n"
+      },
+      {
+        "file": "other-good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "other-good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      }
+    ]
+  },
+  {
+    "mode": "both-good",
+    "profile": "loose-nocheck",
+    "config": "both-good-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "importHelpers": true
+      },
+      "files": [
+        "globals.d.ts",
+        "both-good.ts"
+      ]
+    },
+    "file": "both-good.ts",
+    "source": "import { item as left } from \"./good/cell\";\nimport { item as right } from \"./other-good/cell\";\nconst /*#chosen*/chosen = [left.read(), right.read()].length;\nlet healthy: number;\n",
+    "dependencies": [
+      {
+        "file": "good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      },
+      {
+        "file": "bad/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "bad/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(...args: [any, any, any, MissingGet]): any;\n"
+      },
+      {
+        "file": "other-good/cell.ts",
+        "source": "class Cell { #value: number = 1; read() { return this.#value; } }\nexport declare const item: Cell;\n"
+      },
+      {
+        "file": "other-good/node_modules/tslib/index.d.ts",
+        "source": "export declare function __classPrivateFieldGet(a: any, b: any, c: any, d: any): any;\n"
+      }
+    ]
+  }
+]

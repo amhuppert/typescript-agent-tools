@@ -1,0 +1,8 @@
+[
+  "augmentation-before-script",
+  "scripts-forward",
+  "scripts-reverse",
+  "escaped-type-alias",
+  "value-alias",
+  "folded-case"
+]

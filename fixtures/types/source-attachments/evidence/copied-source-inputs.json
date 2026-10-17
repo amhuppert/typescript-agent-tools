@@ -1,0 +1,605 @@
+{
+  "purpose": "isolated exact source copy, capture measurement only; no production telemetry",
+  "files": [
+    {
+      "file": "src/analysis.rs",
+      "sha256": "4981fea4dc9aa7ba02ef3709460e22b1b42410cc1fff7a873d9f6bac552444de",
+      "bytes": 12713
+    },
+    {
+      "file": "src/ast.rs",
+      "sha256": "7f5f7f327ff5595d2df56b97f5aec09ee3af27adda9366fb4677e934b7bd7ced",
+      "bytes": 13511
+    },
+    {
+      "file": "src/cli/delivery.rs",
+      "sha256": "ab6b68285dd8e3fba44c2d3dec5c5fb7d6a185e6e1ccc15f95310bf29fbd2c9d",
+      "bytes": 13497
+    },
+    {
+      "file": "src/cli/editing.rs",
+      "sha256": "7679ff9d49c3a8901bfce2c1ba9e6d5f739fbdf759039cf6691ad850bc15739c",
+      "bytes": 27216
+    },
+    {
+      "file": "src/cli/mod.rs",
+      "sha256": "e15fcae95bb64e34fb1679af9c6c3c35e3153351360a1b7ce397b3e689cb0ead",
+      "bytes": 617
+    },
+    {
+      "file": "src/cli/navigation.rs",
+      "sha256": "5be695f959e0bdc6b707fe58db05944340e69ad811022c36842a8268edd67c23",
+      "bytes": 13415
+    },
+    {
+      "file": "src/cli/query.rs",
+      "sha256": "6a2446706f553941f6f6b2d83377a2a464660ead4a94c98ed6bcbf2155a9f5b3",
+      "bytes": 7216
+    },
+    {
+      "file": "src/cli/request.rs",
+      "sha256": "1a504916f55d2655aace7b6aa446ce7a7a38ff49d28ef3bf42b7532bf9fce10b",
+      "bytes": 25249
+    },
+    {
+      "file": "src/cli/types.rs",
+      "sha256": "d7f1d1765ee7d5edb7fb5b132597d81b18b049d8969e0fed5850400e7d592703",
+      "bytes": 14058
+    },
+    {
+      "file": "src/compiler.rs",
+      "sha256": "90abe754f18747809c04d89d679da88ce51b95d1869c583672136b16b37ec7b8",
+      "bytes": 1880
+    },
+    {
+      "file": "src/editing/apply.rs",
+      "sha256": "835803b04b6388d2bed89a4db73575322af3e5d6ee1937dc57e4c6daa10f263e",
+      "bytes": 6439
+    },
+    {
+      "file": "src/editing/compare.rs",
+      "sha256": "209fb9e69e4a55442ad66d6e0f12676e3cb8154306f309a07341ac980def42ba",
+      "bytes": 15361
+    },
+    {
+      "file": "src/editing/compose.rs",
+      "sha256": "c82bbdf71a9353d0b0a5ac46377741d026cc33a022e75b741aa226e8fdd8fb67",
+      "bytes": 8662
+    },
+    {
+      "file": "src/editing/diff.rs",
+      "sha256": "ba0042d4e28a451242e58f4d14aeeab0c89715c50042d2fd6ef9d901dc02f8a7",
+      "bytes": 9829
+    },
+    {
+      "file": "src/editing/file.rs",
+      "sha256": "710a95e0c67c3e31f56cce9e8c73935ddb776f527cf43cbfca592f8f8c586b00",
+      "bytes": 38661
+    },
+    {
+      "file": "src/editing/mod.rs",
+      "sha256": "fc1a3cc871d1dcd51ea5e14da2f3c532ffe654cddda1e56ff4b1cd8edd10cc92",
+      "bytes": 23084
+    },
+    {
+      "file": "src/editing/plan.rs",
+      "sha256": "c301e8c279aca7fa508212fd264117f0d3c9f653afccc954fb8ebc6ace5350cb",
+      "bytes": 6942
+    },
+    {
+      "file": "src/editing/policy.rs",
+      "sha256": "2ec05356f8fb9a44cd81f5777d3ad8a36fd4cd7a6e61e15ecad7c20e5e1f6dc5",
+      "bytes": 7789
+    },
+    {
+      "file": "src/editing/prepare.rs",
+      "sha256": "56e44ae4b76c106b120eb42ff83ddbcb33254bcf68594c402ad96999066fb024",
+      "bytes": 13382
+    },
+    {
+      "file": "src/editing/seam.rs",
+      "sha256": "00ba44d2764d0e3a97efa4c2478b663f3754ccec84aeda0aba56c9f3eac14ffe",
+      "bytes": 28014
+    },
+    {
+      "file": "src/identifier_exclusions.rs",
+      "sha256": "dc743f2c76fbde90d6e3485f29dfecfe721585f3bb1e669136cc67ff9027b95c",
+      "bytes": 4411
+    },
+    {
+      "file": "src/input.rs",
+      "sha256": "7b12b19c6cd4597ffa3882243f7e7f18fedb96b9e93502d7bb79e9dcd08e05b7",
+      "bytes": 7836
+    },
+    {
+      "file": "src/json.rs",
+      "sha256": "d909ff3ae217081b4b5f33ac5308bc8e6f8bb0b96b513b1d0f5a2a2a916e4902",
+      "bytes": 4525
+    },
+    {
+      "file": "src/lexer.rs",
+      "sha256": "99f7d4aab1d942a3a6dd276fa774d5fea78097b1abefca1dc8c279d88853fc3c",
+      "bytes": 20977
+    },
+    {
+      "file": "src/lib.rs",
+      "sha256": "294440eb5924f1f2ffe140fbc4c71d7828dfd5d0b6f28ff9bb2034cee1161e9f",
+      "bytes": 5082
+    },
+    {
+      "file": "src/main.rs",
+      "sha256": "73ac336c6eb442539238f09bcc88ac418f7b57a9925f9dc244823fb1dd3cc58e",
+      "bytes": 11720
+    },
+    {
+      "file": "src/navigation/catalog.rs",
+      "sha256": "6f5bb4bbeb6905b5e3cc64c05ea013bf61a45898294899e47e2e43dbc8558186",
+      "bytes": 16348
+    },
+    {
+      "file": "src/navigation/file.rs",
+      "sha256": "4753d356e07ae3e7c3c5f984bb6d103dce1319490ab169196416d160590b1bf0",
+      "bytes": 3459
+    },
+    {
+      "file": "src/navigation/mod.rs",
+      "sha256": "59e15813e06fcc9c6e51854494f52ae8ba2d9cc533be571befa89b8393a52146",
+      "bytes": 11263
+    },
+    {
+      "file": "src/navigation/names.rs",
+      "sha256": "31564db8063cd3f5b47be2faf24c5f628290403163f5fd45885d690bf5775ca2",
+      "bytes": 6890
+    },
+    {
+      "file": "src/navigation/projection.rs",
+      "sha256": "9854e39cf5172772f6d9ff595f387cdf8869f3d44ea492ffff6d2040094b0674",
+      "bytes": 40887
+    },
+    {
+      "file": "src/navigation/signature.rs",
+      "sha256": "cc473413575e4747280caa227c9fddd65531c23793f164d523a09a3031b12a5a",
+      "bytes": 4877
+    },
+    {
+      "file": "src/parser/angles.rs",
+      "sha256": "e4c677079474af3ac978556813183f14293348cde45f6a55b1b630b587c1e6f5",
+      "bytes": 7164
+    },
+    {
+      "file": "src/parser/context.rs",
+      "sha256": "0b5c817e95eb45d762283e60cbe71c5c100e3e86529c90550575dfdf9678992d",
+      "bytes": 2229
+    },
+    {
+      "file": "src/parser/expressions.rs",
+      "sha256": "4b08f6434144042bcb4515a805e3aa3a568973040249f6935751f3c41e441e9b",
+      "bytes": 43303
+    },
+    {
+      "file": "src/parser/json.rs",
+      "sha256": "b4e54d917a7159677c6dad6df237539e3934b91d8733814d122947c99b9280e0",
+      "bytes": 24889
+    },
+    {
+      "file": "src/parser/jsx.rs",
+      "sha256": "390c6652db441613e486e5c46116603c1ba750c118903a6fc2dfb57c3a37d4d8",
+      "bytes": 12688
+    },
+    {
+      "file": "src/parser/literals.rs",
+      "sha256": "44759e38b5009e035e9e7117aa01d23ed913822982c2b50bd1b258f42cf48416",
+      "bytes": 5127
+    },
+    {
+      "file": "src/parser/mod.rs",
+      "sha256": "412a11979d44d6e07fc20b5da188795def4f7984e902ca15e30f903bc36f7f5d",
+      "bytes": 44490
+    },
+    {
+      "file": "src/parser/statements.rs",
+      "sha256": "8abd90bd54889ff7228bd40d2b36f2892f60f83bf0d96efdd47eea5f72db7e07",
+      "bytes": 49261
+    },
+    {
+      "file": "src/parser/types.rs",
+      "sha256": "3cd20ebe3f12d069500c2f0e32c5f364fdf52ba6cd5ed80abdb70afba5e7d3a0",
+      "bytes": 37266
+    },
+    {
+      "file": "src/pragmas.rs",
+      "sha256": "229c89e1cbae8dd4ed7c69c20128ef978f3f587c990d69a74b36cda2fc911e32",
+      "bytes": 19779
+    },
+    {
+      "file": "src/printer.rs",
+      "sha256": "0c94f0958abf8a8f98cff0a30fee95d7d03fae44de32bc3c3df3e83d3a7d35e9",
+      "bytes": 3131
+    },
+    {
+      "file": "src/project/binding/collect.rs",
+      "sha256": "c9952d3b3e9ffd6d359539680137af946643471ecb9845e85d468fd7904de5ce",
+      "bytes": 97831
+    },
+    {
+      "file": "src/project/binding/flow/syntax.rs",
+      "sha256": "5a495dd1091d1ee7d6fc3646af1ca2a417317e80cea024ce9b56d408bd304f60",
+      "bytes": 19432
+    },
+    {
+      "file": "src/project/binding/flow/try_flow.rs",
+      "sha256": "dd624678a314acfe66115bdbaa48b256a858bf0e257e7f95e12ab74b25fb9005",
+      "bytes": 5077
+    },
+    {
+      "file": "src/project/binding/flow.rs",
+      "sha256": "054e90712808e435975e3878898894bc5bdce5baf162bdd66a074f4cbfa1c6aa",
+      "bytes": 54862
+    },
+    {
+      "file": "src/project/binding/ids.rs",
+      "sha256": "49fe0ec53f3be7a51416b08281245620b0d4ec64fb38770de05d17c7a7516135",
+      "bytes": 985
+    },
+    {
+      "file": "src/project/binding/index.rs",
+      "sha256": "dac67c541c91def69f42849076a1ef65a5009fad5fc22b4c8a8ce5f113efb1fe",
+      "bytes": 8811
+    },
+    {
+      "file": "src/project/binding/instances.rs",
+      "sha256": "173977d84810c6fe9667bf014f9267f71940b058b8259e4b2b9bcc17487401f2",
+      "bytes": 13567
+    },
+    {
+      "file": "src/project/binding/json.rs",
+      "sha256": "280675b3651ec791acaa2da57eb4fcecf617b2598d59356e6ee5c0790a7d0ec0",
+      "bytes": 23651
+    },
+    {
+      "file": "src/project/binding/link.rs",
+      "sha256": "01033e1d571d4cdbc1d6d32dd782e719ac69394ff919d28748d453b5e2861524",
+      "bytes": 163278
+    },
+    {
+      "file": "src/project/binding/member.rs",
+      "sha256": "a4b9e4824114aefef1b2e8cfc6ccae10042cf4a8b7094d5666dc8c2906f81b64",
+      "bytes": 4160
+    },
+    {
+      "file": "src/project/binding/mod.rs",
+      "sha256": "164bc0e8b3784219d9351d3306e7f171a6a65efacb23d69fff13733185380900",
+      "bytes": 8668
+    },
+    {
+      "file": "src/project/binding/retained.rs",
+      "sha256": "b3ebea0ccc949e1bd9a2f673f18349559bf1edb08c6c8460e8e6b0b9461b2f05",
+      "bytes": 24929
+    },
+    {
+      "file": "src/project/binding/semantic.rs",
+      "sha256": "4a7b0577e219ef1f411d1c54e04b62265d4db532fec6754d0facc1e0cbc79d23",
+      "bytes": 35522
+    },
+    {
+      "file": "src/project/binding/semantic_flow.rs",
+      "sha256": "7c4f3ca4e3eeef55d5a560fee5f6261e2d52d4f941a2cec7ea0af217c223e6e0",
+      "bytes": 940
+    },
+    {
+      "file": "src/project/binding/store.rs",
+      "sha256": "67f74ea7e76cb6fa70c9e1f02f970c34fd7433597a3080caeb6d902f4634a911",
+      "bytes": 24701
+    },
+    {
+      "file": "src/project/binding/targets.rs",
+      "sha256": "1cc015bf2f36f42aca7e14586f70f9dcafed3517ed6b4e2c5e200762467a90dd",
+      "bytes": 6948
+    },
+    {
+      "file": "src/project/binding/text.rs",
+      "sha256": "d4f6c893646577c35fff7ddde69c14392ce985f82138802e875f7aa5841ff86d",
+      "bytes": 1234
+    },
+    {
+      "file": "src/project/editing.rs",
+      "sha256": "ade0c85c46a3bd28f2309d8d3c58e921220c24c54d2d341308d4af726cd40eb1",
+      "bytes": 3465
+    },
+    {
+      "file": "src/project/mod.rs",
+      "sha256": "37aa6312a5defa38304b858557802270a840b7a544d4e231ce46db5b81bdd931",
+      "bytes": 11684
+    },
+    {
+      "file": "src/project/navigation.rs",
+      "sha256": "6310d70af076e6a3f891215a2701c3f71610204c7bdd29cf2764d1b36a0fcc3b",
+      "bytes": 12083
+    },
+    {
+      "file": "src/project/pattern.rs",
+      "sha256": "4c5f257736abd627a80fbc2583f4bc81a94fd6fbbf47cf8ab962fe8860994739",
+      "bytes": 2051
+    },
+    {
+      "file": "src/project/program/config.rs",
+      "sha256": "1713a964b27457c35f0c0faa25d52bb36e5ef87406c7ff78eb131bad6d52a85d",
+      "bytes": 80387
+    },
+    {
+      "file": "src/project/program/diagnostics.rs",
+      "sha256": "f06465c5ac68134fc66a65df135550687a29caaccecd835a6a3ed82273b5466a",
+      "bytes": 5522
+    },
+    {
+      "file": "src/project/program/directives.rs",
+      "sha256": "a828eaf5c84821acf368f7a4510ba09500ef0c2e4b254050425a97b992e9c170",
+      "bytes": 3313
+    },
+    {
+      "file": "src/project/program/disk.rs",
+      "sha256": "fefb50a351618c7e070191219e3b907b158f822d7fe5bcd02ec63040867cf5fb",
+      "bytes": 7178
+    },
+    {
+      "file": "src/project/program/files.rs",
+      "sha256": "6c9178fa7389e0474fdaf980b0c4e1b7937e2d82a9e561ffc38f57742461707c",
+      "bytes": 26022
+    },
+    {
+      "file": "src/project/program/libraries.rs",
+      "sha256": "e869d1edecb8cd4124866375ccda023f2f8326032d180599bcee6c8d2e158a9d",
+      "bytes": 20595
+    },
+    {
+      "file": "src/project/program/manifest.rs",
+      "sha256": "ea990ef6758ce42e8561b962540574407077c03810e060785d509209e4df9dbe",
+      "bytes": 13628
+    },
+    {
+      "file": "src/project/program/mod.rs",
+      "sha256": "1de4a5b52b927fbea954fa9bfe392f1c637c6514a50457f6031a3b9a1c2c9e7f",
+      "bytes": 37176
+    },
+    {
+      "file": "src/project/program/paths.rs",
+      "sha256": "639b5963ed1d7a796c9e1283ff17b501c16d1369c355aa0cb9b36d1f1185643b",
+      "bytes": 10940
+    },
+    {
+      "file": "src/project/program/resolve.rs",
+      "sha256": "792d04e65e312cad4b3a4b94b51e7d9efc6f996480bea3ca542a27bcbac89ecb",
+      "bytes": 61194
+    },
+    {
+      "file": "src/project/program/tests.rs",
+      "sha256": "6e5dc1887c704d9cc39d39f30f71e367a893a0c3896d09552c74e2929e3a5b63",
+      "bytes": 147043
+    },
+    {
+      "file": "src/project/program/version.rs",
+      "sha256": "5a5eb9e01ba0ebb86fa7e6e0980051b10ea5d2f22a58e1b5550b0c6ab141e923",
+      "bytes": 11041
+    },
+    {
+      "file": "src/project/references.rs",
+      "sha256": "957eb6f820bc75f013aa0b470c98c429b61758b21b92c69d94c6e153ea7c14cc",
+      "bytes": 7075
+    },
+    {
+      "file": "src/project/semantic/constants.rs",
+      "sha256": "139a391b840b0b829f6ada1df906208dab439e335907614d1e47d6f08d795492",
+      "bytes": 1369
+    },
+    {
+      "file": "src/project/semantic/evaluation/calls.rs",
+      "sha256": "dd72e27bc00e409e06c9e54be0872d9f72c16d25855e76c52e7c205301f0b5e8",
+      "bytes": 18201
+    },
+    {
+      "file": "src/project/semantic/evaluation/constraints.rs",
+      "sha256": "8c4f2009697a7df38e71f229734f42f2028d47287ff85d88add4ee3e4776ab1a",
+      "bytes": 12165
+    },
+    {
+      "file": "src/project/semantic/evaluation/declared.rs",
+      "sha256": "de65a5df87b722f0f3b2318ae2c4f8ca2071a1d93e863afecb083867641d9cdf",
+      "bytes": 7428
+    },
+    {
+      "file": "src/project/semantic/evaluation/effects.rs",
+      "sha256": "bc4fff25862af20c57e2d97bca6ecbeae2c092dc53fb7a9413791d9816199a4e",
+      "bytes": 9282
+    },
+    {
+      "file": "src/project/semantic/evaluation/expression.rs",
+      "sha256": "b27b3b03d60b251400c6c470f3010d301e60841c0f38b8c98500a61863753a70",
+      "bytes": 7140
+    },
+    {
+      "file": "src/project/semantic/evaluation/facts.rs",
+      "sha256": "683b9bd10edbfebfc33d836e41969171315f7d9b6b07f205499cff798539a1b5",
+      "bytes": 10385
+    },
+    {
+      "file": "src/project/semantic/evaluation/generics.rs",
+      "sha256": "faed83fc05a8713a8927a608d2fd4aff2d40711a5b84761cb650d5a45c97314e",
+      "bytes": 45075
+    },
+    {
+      "file": "src/project/semantic/evaluation/globals.rs",
+      "sha256": "bc2bc8e47d2c784028e9f56c6f1f826167ea27863142cb6fe5cff4f6d7e5e0cc",
+      "bytes": 5191
+    },
+    {
+      "file": "src/project/semantic/evaluation/json.rs",
+      "sha256": "7be3a370b6edf87cb860811841c749eda159f4a5008618aecb9419bb270a36a6",
+      "bytes": 7596
+    },
+    {
+      "file": "src/project/semantic/evaluation/members.rs",
+      "sha256": "33dd9ff35b2d014b44e759ce27af52e5e1a5f8d8df4bc113f8117a776bf85e98",
+      "bytes": 1964
+    },
+    {
+      "file": "src/project/semantic/evaluation/reads/reachability.rs",
+      "sha256": "f684ba2e34d90d20c28c93f63b3dd112c2a4985a64434a6ac1b567bbca89663a",
+      "bytes": 7615
+    },
+    {
+      "file": "src/project/semantic/evaluation/reads.rs",
+      "sha256": "052ed649d3fee707307ffacbccd37fd55877e3bd6478f12d07b212f1813419eb",
+      "bytes": 55940
+    },
+    {
+      "file": "src/project/semantic/evaluation/resolution.rs",
+      "sha256": "437feb5f96a9da7bac283b82374d501a5c84189ca70038a1a411ddcc5772a4be",
+      "bytes": 2319
+    },
+    {
+      "file": "src/project/semantic/evaluation/returns.rs",
+      "sha256": "a49c1c921c170b3a402775859566376752633baef66a86ff778e7536da58125f",
+      "bytes": 9013
+    },
+    {
+      "file": "src/project/semantic/evaluation/signatures.rs",
+      "sha256": "cd20b5567abd6dea13f8e088dff2481018e1bf2515503709534b9bd6dfb2d178",
+      "bytes": 20160
+    },
+    {
+      "file": "src/project/semantic/evaluation.rs",
+      "sha256": "92a5be81cdacc8ad0a9dd7ea9f8118501303706cb9e2283615ebf7046b8879e5",
+      "bytes": 19273
+    },
+    {
+      "file": "src/project/semantic/mod.rs",
+      "sha256": "bc87d3ed595a736c48b4a38c24a2e99353d6e043aa9c4264204a721aba4821e4",
+      "bytes": 6864
+    },
+    {
+      "file": "src/project/semantic/model.rs",
+      "sha256": "519f9574d92374162c7d2ab5365e5e8d6695891f86de63a9a12e263dbdf8ac23",
+      "bytes": 62434
+    },
+    {
+      "file": "src/project/semantic/presentation.rs",
+      "sha256": "61b3d93c5790b5a30a11697bebb0700138122f5f3c449308fa82aa897b1874c8",
+      "bytes": 65500
+    },
+    {
+      "file": "src/project/semantic/selection.rs",
+      "sha256": "9118a04d4eb9b7e5ab540a04f9994ba05a68124ff3e5d5d18e2a3f304d4462d8",
+      "bytes": 16119
+    },
+    {
+      "file": "src/project/semantic/source/calls.rs",
+      "sha256": "356aae367fc4ea625e89eeb54f15e4e93358104cb353de5050daf9d93768e380",
+      "bytes": 4381
+    },
+    {
+      "file": "src/project/semantic/source/effects.rs",
+      "sha256": "e558226958bc4fcb04890d2c7da71361976b9d6201bdf5bdbd8155afe5261fc8",
+      "bytes": 3944
+    },
+    {
+      "file": "src/project/semantic/source/generics.rs",
+      "sha256": "00e5004c04600b08d7cba17d786ed4dc50f5418f8adbff39369d6e473aaae962",
+      "bytes": 14983
+    },
+    {
+      "file": "src/project/semantic/source/members.rs",
+      "sha256": "947f19f829e60b669e2718251007346360dc779680c2dbedfeeb5f3699789cf6",
+      "bytes": 7833
+    },
+    {
+      "file": "src/project/semantic/source/reads.rs",
+      "sha256": "0585d99437061e275e6a46ff8d5cbf5e31dc7dcb1d2ad0c61397579c6aff0836",
+      "bytes": 5899
+    },
+    {
+      "file": "src/project/semantic/source/returns.rs",
+      "sha256": "7102877f803c661eaa554c07e527d91eb32a2191a4dfcba50ce1ae0a6027006a",
+      "bytes": 4051
+    },
+    {
+      "file": "src/project/semantic/source/symbols.rs",
+      "sha256": "e4da496bfd765be1f75bd4bbb85e3c10e13ecf89adc62b47d1b4cca8002e0870",
+      "bytes": 4845
+    },
+    {
+      "file": "src/project/semantic/source.rs",
+      "sha256": "104774d02426941fefb17de3b6e47a50f6aab08d229d7db4c8bdc72d7346044b",
+      "bytes": 65489
+    },
+    {
+      "file": "src/project/session.rs",
+      "sha256": "b4b61deac044ee10dbb5249c5b522914fbe446697e4f0b1d515a7b6aad0adfce",
+      "bytes": 3557
+    },
+    {
+      "file": "src/project/sources.rs",
+      "sha256": "55137ffe79df5e3d2f98ea3912d907ef9cd23f2374419b036b70479e5de3e96c",
+      "bytes": 2732
+    },
+    {
+      "file": "src/references.rs",
+      "sha256": "80d86394d7504fb9bf55e6366ae1642fe43f0fa7cdbf6a0a2d9fba2f9c25418b",
+      "bytes": 6280
+    },
+    {
+      "file": "src/service/lease.rs",
+      "sha256": "b13f9847bb0cafb2b211d961f079d5745c5f348967a997d1b757840a3f254052",
+      "bytes": 1389
+    },
+    {
+      "file": "src/service/mod.rs",
+      "sha256": "4833eb981c74eacda5d746aded8cb5637168ee43f6269ac4698460b1943cc926",
+      "bytes": 15439
+    },
+    {
+      "file": "src/source.rs",
+      "sha256": "269252657d8cadf524dc4173a8c5cdad399d0f1c4bedd9ac4325d20b12e7e2c4",
+      "bytes": 10771
+    },
+    {
+      "file": "src/syntax/assignment.rs",
+      "sha256": "2c2c31ed536d2ec434ab2e011343c5fecfda9721f9f49a29b5240554c521c92e",
+      "bytes": 4001
+    },
+    {
+      "file": "src/syntax/expression.rs",
+      "sha256": "24b6265af88367630d40a9fa76377f8b4419fd6f39f5802d02098204ec88329f",
+      "bytes": 11552
+    },
+    {
+      "file": "src/syntax/modifiers.rs",
+      "sha256": "acaf0fed79fbe4a41383e7018c950a11aa1ca06b34dff43d44e94b9c13f917a1",
+      "bytes": 1151
+    },
+    {
+      "file": "src/syntax/optional.rs",
+      "sha256": "575ac8d58cd85612c37bd739fbaca0b7f8dd61e327249015c58e7c5c8696bd06",
+      "bytes": 1830
+    },
+    {
+      "file": "src/syntax/returns.rs",
+      "sha256": "719579e143b20112ca5e8215ca41c1686e5e3dddfec7d9d888fc5decd6e5190b",
+      "bytes": 2944
+    },
+    {
+      "file": "src/syntax.rs",
+      "sha256": "7341eee5df521c20bff129dac1bc1ea73b8c9dbb1460f000b30cb499f78554ec",
+      "bytes": 14678
+    },
+    {
+      "file": "src/syntax_kind.rs",
+      "sha256": "52e025f32ddf10377063acc9c20bdd220429cbcaaad8ffa0f05affd1454d8950",
+      "bytes": 30426
+    },
+    {
+      "file": "src/types.rs",
+      "sha256": "5f4c9b2a3ab7d327bd89bcfb4e5750c84399928682ee91ebcaca5b624bf47bae",
+      "bytes": 14421
+    }
+  ]
+}

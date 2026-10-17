@@ -1,0 +1,770 @@
+[
+  {
+    "mode": "success",
+    "width": 16,
+    "profile": "strict",
+    "file": "success-16.ts",
+    "config": "success-16-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "success-16.ts"
+      ]
+    },
+    "expected": "\"match\""
+  },
+  {
+    "mode": "success",
+    "width": 16,
+    "profile": "nocheck",
+    "file": "success-16.ts",
+    "config": "success-16-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "success-16.ts"
+      ]
+    },
+    "expected": "\"match\""
+  },
+  {
+    "mode": "success",
+    "width": 16,
+    "profile": "loose",
+    "file": "success-16.ts",
+    "config": "success-16-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "success-16.ts"
+      ]
+    },
+    "expected": "\"match\""
+  },
+  {
+    "mode": "success",
+    "width": 16,
+    "profile": "loose-nocheck",
+    "file": "success-16.ts",
+    "config": "success-16-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "success-16.ts"
+      ]
+    },
+    "expected": "\"match\""
+  },
+  {
+    "mode": "success",
+    "width": 64,
+    "profile": "strict",
+    "file": "success-64.ts",
+    "config": "success-64-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "success-64.ts"
+      ]
+    },
+    "expected": "\"match\""
+  },
+  {
+    "mode": "success",
+    "width": 64,
+    "profile": "nocheck",
+    "file": "success-64.ts",
+    "config": "success-64-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "success-64.ts"
+      ]
+    },
+    "expected": "\"match\""
+  },
+  {
+    "mode": "success",
+    "width": 64,
+    "profile": "loose",
+    "file": "success-64.ts",
+    "config": "success-64-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "success-64.ts"
+      ]
+    },
+    "expected": "\"match\""
+  },
+  {
+    "mode": "success",
+    "width": 64,
+    "profile": "loose-nocheck",
+    "file": "success-64.ts",
+    "config": "success-64-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "success-64.ts"
+      ]
+    },
+    "expected": "\"match\""
+  },
+  {
+    "mode": "failure",
+    "width": 16,
+    "profile": "strict",
+    "file": "failure-16.ts",
+    "config": "failure-16-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "failure-16.ts"
+      ]
+    },
+    "expected": "\"fallback\""
+  },
+  {
+    "mode": "failure",
+    "width": 16,
+    "profile": "nocheck",
+    "file": "failure-16.ts",
+    "config": "failure-16-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "failure-16.ts"
+      ]
+    },
+    "expected": "\"fallback\""
+  },
+  {
+    "mode": "failure",
+    "width": 16,
+    "profile": "loose",
+    "file": "failure-16.ts",
+    "config": "failure-16-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "failure-16.ts"
+      ]
+    },
+    "expected": "\"fallback\""
+  },
+  {
+    "mode": "failure",
+    "width": 16,
+    "profile": "loose-nocheck",
+    "file": "failure-16.ts",
+    "config": "failure-16-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "failure-16.ts"
+      ]
+    },
+    "expected": "\"fallback\""
+  },
+  {
+    "mode": "failure",
+    "width": 64,
+    "profile": "strict",
+    "file": "failure-64.ts",
+    "config": "failure-64-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "failure-64.ts"
+      ]
+    },
+    "expected": "\"fallback\""
+  },
+  {
+    "mode": "failure",
+    "width": 64,
+    "profile": "nocheck",
+    "file": "failure-64.ts",
+    "config": "failure-64-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "failure-64.ts"
+      ]
+    },
+    "expected": "\"fallback\""
+  },
+  {
+    "mode": "failure",
+    "width": 64,
+    "profile": "loose",
+    "file": "failure-64.ts",
+    "config": "failure-64-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "failure-64.ts"
+      ]
+    },
+    "expected": "\"fallback\""
+  },
+  {
+    "mode": "failure",
+    "width": 64,
+    "profile": "loose-nocheck",
+    "file": "failure-64.ts",
+    "config": "failure-64-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "failure-64.ts"
+      ]
+    },
+    "expected": "\"fallback\""
+  },
+  {
+    "mode": "success-failure",
+    "width": 16,
+    "profile": "strict",
+    "file": "success-failure-16.ts",
+    "config": "success-failure-16-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "success-failure-16.ts"
+      ]
+    },
+    "expected": "\"fallback\""
+  },
+  {
+    "mode": "success-failure",
+    "width": 16,
+    "profile": "nocheck",
+    "file": "success-failure-16.ts",
+    "config": "success-failure-16-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "success-failure-16.ts"
+      ]
+    },
+    "expected": "\"fallback\""
+  },
+  {
+    "mode": "success-failure",
+    "width": 16,
+    "profile": "loose",
+    "file": "success-failure-16.ts",
+    "config": "success-failure-16-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "success-failure-16.ts"
+      ]
+    },
+    "expected": "\"fallback\""
+  },
+  {
+    "mode": "success-failure",
+    "width": 16,
+    "profile": "loose-nocheck",
+    "file": "success-failure-16.ts",
+    "config": "success-failure-16-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "success-failure-16.ts"
+      ]
+    },
+    "expected": "\"fallback\""
+  },
+  {
+    "mode": "success-failure",
+    "width": 64,
+    "profile": "strict",
+    "file": "success-failure-64.ts",
+    "config": "success-failure-64-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "success-failure-64.ts"
+      ]
+    },
+    "expected": "\"fallback\""
+  },
+  {
+    "mode": "success-failure",
+    "width": 64,
+    "profile": "nocheck",
+    "file": "success-failure-64.ts",
+    "config": "success-failure-64-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "success-failure-64.ts"
+      ]
+    },
+    "expected": "\"fallback\""
+  },
+  {
+    "mode": "success-failure",
+    "width": 64,
+    "profile": "loose",
+    "file": "success-failure-64.ts",
+    "config": "success-failure-64-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "success-failure-64.ts"
+      ]
+    },
+    "expected": "\"fallback\""
+  },
+  {
+    "mode": "success-failure",
+    "width": 64,
+    "profile": "loose-nocheck",
+    "file": "success-failure-64.ts",
+    "config": "success-failure-64-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "success-failure-64.ts"
+      ]
+    },
+    "expected": "\"fallback\""
+  },
+  {
+    "mode": "failure-success",
+    "width": 16,
+    "profile": "strict",
+    "file": "failure-success-16.ts",
+    "config": "failure-success-16-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "failure-success-16.ts"
+      ]
+    },
+    "expected": "\"match\""
+  },
+  {
+    "mode": "failure-success",
+    "width": 16,
+    "profile": "nocheck",
+    "file": "failure-success-16.ts",
+    "config": "failure-success-16-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "failure-success-16.ts"
+      ]
+    },
+    "expected": "\"match\""
+  },
+  {
+    "mode": "failure-success",
+    "width": 16,
+    "profile": "loose",
+    "file": "failure-success-16.ts",
+    "config": "failure-success-16-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "failure-success-16.ts"
+      ]
+    },
+    "expected": "\"match\""
+  },
+  {
+    "mode": "failure-success",
+    "width": 16,
+    "profile": "loose-nocheck",
+    "file": "failure-success-16.ts",
+    "config": "failure-success-16-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "failure-success-16.ts"
+      ]
+    },
+    "expected": "\"match\""
+  },
+  {
+    "mode": "failure-success",
+    "width": 64,
+    "profile": "strict",
+    "file": "failure-success-64.ts",
+    "config": "failure-success-64-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "failure-success-64.ts"
+      ]
+    },
+    "expected": "\"match\""
+  },
+  {
+    "mode": "failure-success",
+    "width": 64,
+    "profile": "nocheck",
+    "file": "failure-success-64.ts",
+    "config": "failure-success-64-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "failure-success-64.ts"
+      ]
+    },
+    "expected": "\"match\""
+  },
+  {
+    "mode": "failure-success",
+    "width": 64,
+    "profile": "loose",
+    "file": "failure-success-64.ts",
+    "config": "failure-success-64-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "failure-success-64.ts"
+      ]
+    },
+    "expected": "\"match\""
+  },
+  {
+    "mode": "failure-success",
+    "width": 64,
+    "profile": "loose-nocheck",
+    "file": "failure-success-64.ts",
+    "config": "failure-success-64-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "failure-success-64.ts"
+      ]
+    },
+    "expected": "\"match\""
+  }
+]

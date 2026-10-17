@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "noLib": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "noCheck": false,
+    "target": "ESNext"
+  },
+  "files": [
+    "globals.d.ts",
+    "signatures.ts"
+  ]
+}

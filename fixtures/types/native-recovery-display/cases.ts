@@ -1,0 +1,16 @@
+declare const many: number & { first: MissingFirstDisplay; second: MissingSecondDisplay };
+declare const right: bigint & { last: MissingLastDisplay };
+declare const accessor: { get p(): MissingRead; set p(value: MissingWrite); q: MissingTail };
+declare const healthyAccessor: { get p(): number; set p(value: string); q: boolean };
+declare const anyAccessor: { get p(): any; set p(value: string); q: boolean };
+declare const missingRead: { get p(): MissingReadOnly; set p(value: string); q: MissingReadTail };
+declare const missingWrite: { get p(): number; set p(value: MissingWriteOnly); q: MissingWriteTail };
+declare const ordinary: { p: MissingOrdinary; q: MissingOrdinaryTail };
+const /*#manyDisplays*/manyDisplays = many - right;
+const /*#accessorDisplays*/accessorDisplays = accessor === 0;
+const /*#healthyAccessor*/healthyAccessorResult = healthyAccessor === 0;
+const /*#anyAccessor*/anyAccessorResult = anyAccessor === 0;
+const /*#missingRead*/missingReadResult = missingRead === 0;
+const /*#missingWrite*/missingWriteResult = missingWrite === 0;
+const /*#ordinary*/ordinaryResult = ordinary === 0;
+const /*#healthyAfter*/healthyAfter = 1 as number;

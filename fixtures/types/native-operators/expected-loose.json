@@ -1,0 +1,1043 @@
+[
+  {
+    "name": "multiply",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "multiplyBig",
+    "kind": "value",
+    "summary": "bigint",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "power",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "powerBig",
+    "kind": "value",
+    "summary": "bigint",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "divide",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "divideBig",
+    "kind": "value",
+    "summary": "bigint",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "remainder",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "remainderBig",
+    "kind": "value",
+    "summary": "bigint",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "subtract",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "subtractBig",
+    "kind": "value",
+    "summary": "bigint",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "shiftLeft",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "shiftLeftBig",
+    "kind": "value",
+    "summary": "bigint",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "shiftRight",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "shiftRightBig",
+    "kind": "value",
+    "summary": "bigint",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "shiftUnsigned",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "shiftUnsignedBig",
+    "kind": "value",
+    "summary": "bigint",
+    "errorType": false,
+    "codes": [
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "bitOr",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "bitOrBig",
+    "kind": "value",
+    "summary": "bigint",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "bitXor",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "bitXorBig",
+    "kind": "value",
+    "summary": "bigint",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "bitAnd",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "bitAndBig",
+    "kind": "value",
+    "summary": "bigint",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "add",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "addBig",
+    "kind": "value",
+    "summary": "bigint",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "mixedSubtract",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "unknownSubtract",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2362
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "anySubtract",
+    "kind": "value",
+    "summary": "bigint",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "neverSubtract",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "nullSubtract",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "stringSubtract",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2362
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "promiseSubtract",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2362
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "anyPair",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "bigNumberUnion",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "booleanAnd",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2447
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "booleanOr",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2447
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "booleanXor",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2447
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "stringAdd",
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "numberStringAdd",
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "anyAdd",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "unknownAdd",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "badAdd",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "hidden"
+    }
+  },
+  {
+    "name": "symbolAdd",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "bigNumberAdd",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "bigUnsigned",
+    "kind": "value",
+    "summary": "bigint",
+    "errorType": false,
+    "codes": [
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "less",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "lessBad",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "hidden"
+    }
+  },
+  {
+    "name": "lessSymbol",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2469
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "greater",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "greaterBad",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "hidden"
+    }
+  },
+  {
+    "name": "greaterSymbol",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2469
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "lessEqual",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "lessEqualBad",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "hidden"
+    }
+  },
+  {
+    "name": "lessEqualSymbol",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2469
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "greaterEqual",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "greaterEqualBad",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "hidden"
+    }
+  },
+  {
+    "name": "greaterEqualSymbol",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2469
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "plusLiteral",
+    "kind": "value",
+    "summary": "1",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "minusLiteral",
+    "kind": "value",
+    "summary": "-1",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "plusParen",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "minusParen",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "minusBig",
+    "kind": "value",
+    "summary": "-1n",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "plusBig",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2736
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "minusUnion",
+    "kind": "value",
+    "summary": "number | bigint",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "tildeUnion",
+    "kind": "value",
+    "summary": "number | bigint",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "minusAny",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "minusUnknown",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "minusNullable",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "minusSymbol",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2469
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "notUnknown",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "notNever",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "notTrue",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "notFalse",
+    "kind": "value",
+    "summary": "true",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "notObject",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "notNull",
+    "kind": "value",
+    "summary": "true",
+    "errorType": false,
+    "codes": [
+      2873
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "voidMissing",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "compoundmultiply",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "compoundpower",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "compounddivide",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "compoundremainder",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "compoundsubtract",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "compoundshiftLeft",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "compoundshiftRight",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "compoundshiftUnsigned",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "compoundbitOr",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "compoundbitXor",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "compoundbitAnd",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "compoundadd",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "assignand",
+    "kind": "value",
+    "summary": "0 | 1",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "assignor",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "assignnullish",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "assignplain",
+    "kind": "value",
+    "summary": "1",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "prefixIncrement",
+    "kind": "value",
+    "summary": "number | bigint",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "prefixDecrement",
+    "kind": "value",
+    "summary": "number | bigint",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "postfixIncrement",
+    "kind": "value",
+    "summary": "number | bigint",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "postfixDecrement",
+    "kind": "value",
+    "summary": "number | bigint",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "nanLeft",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2845
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "nanRight",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2845
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "nanBoth",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2845
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "comma",
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": [
+      2695
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "constantMultiply",
+    "kind": "value",
+    "summary": "\"12\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "constantPower",
+    "kind": "value",
+    "summary": "\"1024\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "constantShift",
+    "kind": "value",
+    "summary": "\"2147483647\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "constantNegativeShift",
+    "kind": "value",
+    "summary": "\"-1\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "constantOverflow",
+    "kind": "value",
+    "summary": "\"Infinity\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "constantNaN",
+    "kind": "value",
+    "summary": "\"NaN\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "constantNegZero",
+    "kind": "value",
+    "summary": "\"0\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "constantConcat",
+    "kind": "value",
+    "summary": "\"a3\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  }
+]

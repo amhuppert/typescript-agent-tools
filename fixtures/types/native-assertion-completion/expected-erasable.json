@@ -1,0 +1,13 @@
+[
+  {
+    "name": "angleHealthy",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      1294
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  }
+]

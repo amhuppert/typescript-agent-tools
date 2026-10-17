@@ -1,0 +1,375 @@
+[
+  {
+    "name": "unchanged",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "narrowed",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "falseArm",
+    "summary": "string",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "annotated",
+    "summary": "string | number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "mutableAlias",
+    "summary": "string | number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "uninitialized",
+    "summary": "string | number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "assignedParameter",
+    "summary": "string | number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "unusedAlias",
+    "summary": "string | number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "constReference",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "mutableReference",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "assignedReference",
+    "summary": "string | number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "readonlyReference",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "mutableProperty",
+    "summary": "string | number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "parenthesized",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "satisfied",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "negated",
+    "summary": "string",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "joined",
+    "summary": "string | number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "recovery",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [
+      {
+        "name": "localRecovery",
+        "file": "cases.ts"
+      }
+    ],
+    "codes": [
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "hiddenRecovery",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "destructured",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "crossNarrowed",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "crossUnchanged",
+    "summary": "string | number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "crossFailed",
+    "summary": "string | number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [
+      {
+        "name": "crossRecovery",
+        "file": "conditions.ts"
+      }
+    ],
+    "codes": [
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "depth4",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "depth5",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "depth6",
+    "summary": "string | number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "importedAlias",
+    "summary": "string | number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "siblingUnwind",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [
+      {
+        "name": "siblingFirst",
+        "file": "cases.ts"
+      },
+      {
+        "name": "siblingSecond",
+        "file": "cases.ts"
+      }
+    ],
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "crossProperty",
+    "summary": "{ kind: \"a\"; value: number; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "crossPredicateCall",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "crossUnrelatedCall",
+    "summary": "string | number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "crossDestructuring",
+    "summary": "string | number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "recoveryDepth5",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [
+      {
+        "name": "depth5",
+        "file": "cases.ts"
+      }
+    ],
+    "codes": [
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "recoveryDepth6",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [],
+    "demandFailures": []
+  }
+]

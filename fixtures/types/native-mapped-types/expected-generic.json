@@ -1,0 +1,284 @@
+[
+  {
+    "config": "tsconfig",
+    "name": "genericPick",
+    "summary": "Pick<T, K>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "genericOmit",
+    "summary": "Omit<T, K>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "genericRenamed",
+    "summary": "ExceptFields<T, K>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "plusModifiers",
+    "summary": "{ +readonly [P in keyof T]+?: T[P] | undefined; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "minusModifiers",
+    "summary": "{ -readonly [P in keyof T]-?: T[P]; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "genericName",
+    "summary": "{ [P in keyof T as `get${P & string}`]: T[P]; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "genericIndex",
+    "summary": "{ [P in K]: T[P]; }[K]",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "genericKeyof",
+    "summary": "keyof { [P in keyof T as `get${P & string}`]: T[P]; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "standardRest",
+    "summary": "Omit<T, \"drop\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "T[\"keep\"] | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "generic.ts",
+              "start": {
+                "line": 13,
+                "column": 50
+              },
+              "end": {
+                "line": 13,
+                "column": 54
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "genericPick",
+    "summary": "Pick<T, K>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "genericOmit",
+    "summary": "Omit<T, K>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "genericRenamed",
+    "summary": "ExceptFields<T, K>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "plusModifiers",
+    "summary": "{ +readonly [P in keyof T]+?: T[P]; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "minusModifiers",
+    "summary": "{ -readonly [P in keyof T]-?: T[P]; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "genericName",
+    "summary": "{ [P in keyof T as `get${P & string}`]: T[P]; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "genericIndex",
+    "summary": "{ [P in K]: T[P]; }[K]",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "genericKeyof",
+    "summary": "keyof { [P in keyof T as `get${P & string}`]: T[P]; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "standardRest",
+    "summary": "Omit<T, \"drop\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "T[\"keep\"]",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "generic.ts",
+              "start": {
+                "line": 13,
+                "column": 50
+              },
+              "end": {
+                "line": 13,
+                "column": 54
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "genericPick",
+    "summary": "Pick<T, K>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "genericOmit",
+    "summary": "Omit<T, K>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "genericRenamed",
+    "summary": "ExceptFields<T, K>",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "plusModifiers",
+    "summary": "{ +readonly [P in keyof T]+?: T[P]; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "minusModifiers",
+    "summary": "{ -readonly [P in keyof T]-?: T[P]; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "genericName",
+    "summary": "{ [P in keyof T as `get${P & string}`]: T[P]; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "genericIndex",
+    "summary": "{ [P in K]: T[P]; }[K]",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "genericKeyof",
+    "summary": "keyof { [P in keyof T as `get${P & string}`]: T[P]; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "standardRest",
+    "summary": "Omit<T, \"drop\">",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "keep",
+        "summary": "T[\"keep\"] | undefined",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "generic.ts",
+              "start": {
+                "line": 13,
+                "column": 50
+              },
+              "end": {
+                "line": 13,
+                "column": 54
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

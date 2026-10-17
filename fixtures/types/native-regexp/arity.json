@@ -1,0 +1,1 @@
+{"compilerOptions": {"strict": true, "noLib": true, "types": []}, "files": ["arity.d.ts", "cases.ts"]}

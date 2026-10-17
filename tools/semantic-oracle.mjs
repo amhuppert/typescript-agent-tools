@@ -140,7 +140,9 @@ export async function loadSemanticApi({ api = process.env.TYPE_SCRIPT_SEMANTIC_A
   const sync = await import(pathToFileURL(path.join(directory, 'dist/api/sync/api.js')).href);
   const ast = await import(pathToFileURL(path.join(directory, 'dist/ast/index.js')).href);
   return { version, nativeVersion, binary, API: sync.API, SymbolFlags: sync.SymbolFlags, ModifierFlags: sync.ModifierFlags,
-    SyntaxKind: ast.SyntaxKind, NodeFlags: ast.NodeFlags, skipTrivia: ast.skipTrivia };
+    SyntaxKind: ast.SyntaxKind, NodeFlags: ast.NodeFlags, skipTrivia: ast.skipTrivia,
+    getTokenAtPosition: ast.getTokenAtPosition, isTypeNode: ast.isTypeNode,
+    isExpression: ast.isExpression, TypeFlags: sync.TypeFlags, SignatureKind: sync.SignatureKind };
 }
 
 // ---------------------------------------------------------------------------
@@ -170,9 +172,16 @@ export function position(starts, offset) {
 export const locationKey = location => `${location.file}:${location.start.line}:${location.start.column}`;
 export const describeLocation = location =>
   `${location.file}:${location.start.line}:${location.start.column}-${location.end.line}:${location.end.column}`;
+// Pinned native CompareStringsCaseSensitive uses strings.Compare on UTF-8;
+// normalized source paths use the same exact order as final Rust Location Ord.
+export function compareExactText(a, b) {
+  if (!a.isWellFormed() || !b.isWellFormed())
+    throw new Error('Unsupported exact text comparison: unpaired UTF-16 identity');
+  return Buffer.compare(Buffer.from(a, 'utf8'), Buffer.from(b, 'utf8'));
+}
 export function compareLocations(a, b) {
-  return a.file < b.file ? -1 : a.file > b.file ? 1
-    : a.start.line - b.start.line || a.start.column - b.start.column || a.end.line - b.end.line || a.end.column - b.end.column;
+  return compareExactText(a.file, b.file)
+    || a.start.line - b.start.line || a.start.column - b.start.column || a.end.line - b.end.line || a.end.column - b.end.column;
 }
 
 // The vendored copy of a standard library the compiler read from its own

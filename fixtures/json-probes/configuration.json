@@ -723,6 +723,12 @@
         "diagnostics": [
           "TS5023 tsconfig.json:1:34"
         ]
+      },
+      "tool": {
+        "error": [
+          "Unsupported",
+          "TS5023"
+        ]
       }
     },
     {
@@ -753,6 +759,12 @@
         "diagnostics": [
           "TS5023 tsconfig.json:1:34",
           "TS5023 tsconfig.json:1:50"
+        ]
+      },
+      "tool": {
+        "error": [
+          "Config",
+          "TS5023"
         ]
       }
     },

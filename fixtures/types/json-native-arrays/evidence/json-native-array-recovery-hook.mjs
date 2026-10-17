@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { compilerHookOracle } from '../../tools/type-oracle.mjs';
+import { lineStarts, position } from '../../tools/semantic-oracle.mjs';
+const directory=path.resolve('fixtures/types/json-native-arrays');
+const source=fs.readFileSync(path.join(directory,'consumer.ts'),'utf8');
+const annotation='/*#numbers*/';
+const at={file:'consumer.ts',...position(lineStarts(source),source.indexOf(annotation)+annotation.length)};
+const answer=await compilerHookOracle(path.join(directory,'strict-1-exact-0-unchecked-0.json'),{at});
+fs.writeFileSync('.cc/temp/json-native-array-recovery-hook.json',JSON.stringify({at,answer},null,2)+'\n');
+console.log(JSON.stringify({kind:answer.kind,summary:answer.summary,errorType:answer.errorType,before:answer.beforeSummary.diagnosticCodes,after:answer.diagnosticCodes}));

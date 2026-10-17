@@ -1,0 +1,246 @@
+[
+  {
+    "name": "andTrue",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [
+      "andFirst",
+      "andSecond"
+    ],
+    "codes": [
+      2318,
+      2318,
+      2304,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "orFalse",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [
+      "orFirst",
+      "orSecond"
+    ],
+    "codes": [
+      2318,
+      2318,
+      2304,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "orTrue",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [
+      "orTrueFirst"
+    ],
+    "codes": [
+      2318,
+      2318,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "andFalse",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [
+      "andFalseFirst"
+    ],
+    "codes": [
+      2318,
+      2318,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "nestedBoolean",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [
+      2318,
+      2318
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "assertionAnd",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [
+      "assertionFirst",
+      "assertionSecond"
+    ],
+    "codes": [
+      2318,
+      2318,
+      2304,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "assertionOr",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [
+      "assertionOrFirst",
+      "assertionOrSecond"
+    ],
+    "codes": [
+      2318,
+      2318,
+      2304,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "switchCases",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [
+      "caseFirst",
+      "caseSecond"
+    ],
+    "codes": [
+      2318,
+      2318,
+      2304,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "switchDefault",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [
+      "defaultFirst",
+      "defaultSecond"
+    ],
+    "codes": [
+      2318,
+      2318,
+      2304,
+      2304
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "healthyLogical",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [
+      2318,
+      2318
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "healthyAssertion",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [
+      2318,
+      2318
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "healthySwitch",
+    "summary": "number",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [
+      2318,
+      2318
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "optionalSatisfied",
+    "summary": "{ p: number; } | undefined",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [
+      2318,
+      2318
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "optionalAssigned",
+    "summary": "{ p: number; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [
+      2318,
+      2318
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "optionalSatisfiedEquality",
+    "summary": "{ p: number; }",
+    "errorType": false,
+    "sameDeclared": false,
+    "sameInitial": false,
+    "acquired": [],
+    "codes": [
+      2318,
+      2318
+    ],
+    "demandFailures": []
+  },
+  {
+    "name": "optionalAssignedEquality",
+    "summary": "{ p: number; } | undefined",
+    "errorType": false,
+    "sameDeclared": true,
+    "sameInitial": true,
+    "acquired": [],
+    "codes": [
+      2318,
+      2318
+    ],
+    "demandFailures": []
+  }
+]

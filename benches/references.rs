@@ -213,9 +213,11 @@ fn main() {
                 QueryErrorKind::InvalidPosition => outcomes.invalid_position += 1,
                 QueryErrorKind::UnsupportedTarget => outcomes.unsupported_target += 1,
                 QueryErrorKind::UnresolvedTarget => outcomes.unresolved_target += 1,
+                QueryErrorKind::InvalidRequest => panic!("{error}"),
             },
             // Queries name the captured files exactly.
             Err(AnalysisError::Input(error)) => panic!("{error}"),
+            Err(AnalysisError::Semantic(error)) => panic!("{error}"),
         }
     }
     drop(project);

@@ -1,0 +1,250 @@
+[
+  {
+    "name": "missing",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      7017,
+      7017
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 111551,
+        "name": "globalThis",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 33555968,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 111551,
+        "name": "globalThis",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 33555968,
+        "tracked": 0
+      }
+    ]
+  },
+  {
+    "name": "lexicalLet",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2339,
+      2339
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 111551,
+        "name": "globalThis",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 33555968,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 111551,
+        "name": "globalThis",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 33555968,
+        "tracked": 0
+      }
+    ]
+  },
+  {
+    "name": "lexicalConst",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2339,
+      2339
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 111551,
+        "name": "globalThis",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 33555968,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 111551,
+        "name": "globalThis",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 33555968,
+        "tracked": 0
+      }
+    ]
+  },
+  {
+    "name": "lexicalClass",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2339,
+      2339
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 111551,
+        "name": "globalThis",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 33555968,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 111551,
+        "name": "globalThis",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 33555968,
+        "tracked": 0
+      }
+    ]
+  },
+  {
+    "name": "typeOnly",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      7017,
+      7017
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 111551,
+        "name": "globalThis",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 33555968,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 111551,
+        "name": "globalThis",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 33555968,
+        "tracked": 0
+      }
+    ]
+  },
+  {
+    "name": "visibleEnum",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2339,
+      2339
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 111551,
+        "name": "globalThis",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 33555968,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 111551,
+        "name": "globalThis",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 33555968,
+        "tracked": 0
+      }
+    ]
+  },
+  {
+    "name": "actualValue",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "actualFunction",
+    "summary": "() => string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "genuineAny",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "displayEvents": []
+  },
+  {
+    "name": "repeatMissing",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      7017,
+      7017
+    ],
+    "demandFailures": [],
+    "displayEvents": [
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 111551,
+        "name": "globalThis",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 33555968,
+        "tracked": 0
+      },
+      {
+        "disabled": false,
+        "event": "track",
+        "meaning": 111551,
+        "name": "globalThis",
+        "scope": 0,
+        "symbol": 1,
+        "symbolFlags": 33555968,
+        "tracked": 0
+      }
+    ]
+  }
+]

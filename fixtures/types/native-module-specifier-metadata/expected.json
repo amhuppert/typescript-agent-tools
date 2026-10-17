@@ -1,0 +1,458 @@
+[
+  {
+    "name": "dependencies",
+    "file": "main.cts",
+    "display": "\"./index\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "peerDependencies",
+    "file": "main.cts",
+    "display": "\"./index\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "optionalDependencies",
+    "file": "main.cts",
+    "display": "\"./index\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "devDependencies",
+    "file": "main.cts",
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "invalidAfter",
+    "file": "main.cts",
+    "display": "\"./index\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "invalidBefore",
+    "file": "main.cts",
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "invalidPackageValue",
+    "file": "main.cts",
+    "display": "\"./index\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "nullPackageValue",
+    "file": "main.cts",
+    "display": "\"./index\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "nonobjectRuntimeMap",
+    "file": "main.cts",
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "noEmit",
+    "file": "main.cts",
+    "display": "\"./index\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "declarationOnly",
+    "file": "main.d.cts",
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "physicalSymlink",
+    "file": "main.cts",
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "physical/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "physical/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "physical/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "duplicateInvalidThenValid",
+    "file": "main.cts",
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "duplicateValidThenPackage",
+    "file": "main.cts",
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "duplicatePackage",
+    "file": "main.cts",
+    "display": "\"./index\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "repeatedMapRetains",
+    "file": "main.cts",
+    "display": "\"./index\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "repeatedMapNullClears",
+    "file": "main.cts",
+    "display": "\"pkg\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "repeatedMapInvalidRetains",
+    "file": "main.cts",
+    "display": "\"./index\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  },
+  {
+    "name": "repeatedMapAfterInvalid",
+    "file": "main.cts",
+    "display": "\"./index\"",
+    "defaultMode": 1,
+    "resolvedPath": "node_modules/pkg/index.d.ts",
+    "imports": [
+      {
+        "mode": 1,
+        "resolvedPath": "index.d.ts",
+        "text": "./index"
+      },
+      {
+        "mode": 1,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      },
+      {
+        "mode": 99,
+        "resolvedPath": "node_modules/pkg/index.d.ts",
+        "text": "pkg"
+      }
+    ]
+  }
+]

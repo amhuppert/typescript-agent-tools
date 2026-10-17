@@ -1,0 +1,152 @@
+[
+  {
+    "name": "plain",
+    "kind": "value",
+    "summary": "\"tag\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "empty",
+    "kind": "value",
+    "summary": "\"tag\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "number",
+    "kind": "value",
+    "summary": "1",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "string",
+    "kind": "value",
+    "summary": "\"text\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "restNumbers",
+    "kind": "value",
+    "summary": "1 | 2",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "overloadString",
+    "kind": "value",
+    "summary": "\"string\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "overloadNumber",
+    "kind": "value",
+    "summary": "\"number\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "anyPlain",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "anySubstitution",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "functionPlain",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "method",
+    "kind": "value",
+    "summary": "\"method\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "contextualCallback",
+    "kind": "value",
+    "summary": "\"context\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "explicitArgument",
+    "kind": "value",
+    "summary": "\"written\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "uncallable",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2349
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "untypedMissing",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "arrayUncallable",
+    "kind": "value",
+    "summary": "any[]",
+    "errorType": false,
+    "codes": [
+      2796
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  }
+]

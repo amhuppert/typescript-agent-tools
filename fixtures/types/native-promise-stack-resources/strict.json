@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "strictNullChecks": true,
+    "noCheck": false,
+    "noLib": true,
+    "target": "ESNext"
+  },
+  "files": [
+    "globals.d.ts",
+    "small.ts",
+    "deep.ts",
+    "union-small.ts",
+    "union-deep.ts"
+  ]
+}

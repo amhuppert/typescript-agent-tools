@@ -1,0 +1,194 @@
+[
+  {
+    "file": "cases.ts",
+    "name": "module",
+    "summary": "undefined",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "moduleArrow",
+    "summary": "() => undefined",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "getter",
+    "summary": "{ self: this; }",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "method",
+    "summary": "() => this",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "arrow",
+    "summary": "() => () => this",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "staticMethod",
+    "summary": "() => typeof Instance",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "staticArrow",
+    "summary": "() => () => typeof Instance",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "parameter",
+    "summary": "(value?: this) => this",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "pattern",
+    "summary": "({ value }?: { value?: this | undefined; }) => this",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "nested",
+    "summary": "() => any",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "explicit",
+    "summary": "(this: { tag: \"explicit\"; }) => { tag: \"explicit\"; }",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "ordinary",
+    "summary": "() => any",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "parameterOrdinary",
+    "summary": "(value?: any) => any",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "contextual",
+    "summary": "(this: { tag: \"contextual\"; }) => unknown",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "literal",
+    "summary": "() => any",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "thisType",
+    "summary": "() => any",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "beforeSuper",
+    "summary": "this",
+    "errorType": false,
+    "before": [
+      17009
+    ],
+    "after": [
+      17009
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "extendsNull",
+    "summary": "this",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "cases.ts",
+    "name": "namespace",
+    "summary": "any",
+    "errorType": false,
+    "before": [
+      2331
+    ],
+    "after": [
+      2331
+    ]
+  },
+  {
+    "file": "cases.ts",
+    "name": "outerThisType",
+    "summary": "() => any",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "script.ts",
+    "name": "script",
+    "summary": "typeof globalThis",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "script.ts",
+    "name": "scriptArrow",
+    "summary": "() => typeof globalThis",
+    "errorType": false,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "script.ts",
+    "name": "scriptFunction",
+    "summary": "() => any",
+    "errorType": false,
+    "before": [],
+    "after": []
+  }
+]

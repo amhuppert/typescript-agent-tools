@@ -1,0 +1,1 @@
+{"compilerOptions":{"strict":true,"target":"esnext","noLib":true,"types":[]},"files":["globals.d.ts","cases.ts"]}

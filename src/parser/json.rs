@@ -8,7 +8,7 @@
 //! validation then accepts only JSON values, as the compiler's does.
 //!
 //! The result is lossless: every value and key keeps its span, keys keep
-//! their exact cooked UTF-16 text, including unpaired surrogates, and every
+//! their exact cooked native bytes, including unpaired surrogates, and every
 //! repeated property stays in source order. Consumers apply their own
 //! conversion policy above it: configuration keeps the last value of a
 //! repeated key, while a JSON module accepts any root value.
@@ -21,7 +21,7 @@
 //! `MAX_JSON_DEPTH` containers deep is `JsonErrorKind::TooDeep`, a limit of
 //! this tool rather than a property of the text: TypeScript has none.
 
-use super::{Parser, Result};
+use super::{Failure, Parser, Result};
 use crate::lexer::{Kind, Lexer};
 use crate::syntax_kind::SyntaxKind::*;
 use crate::{Ast, NodeId, ParseOptions, Span, Value};
@@ -42,6 +42,9 @@ pub(crate) struct JsonText {
 
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct JsonValue {
+    /// The actual source AST node range, including leading trivia. Synthetic
+    /// configuration defaults have no source node.
+    pub(crate) native_span: Option<Span>,
     /// The value's tokens, without leading trivia: a negative number
     /// includes its `-`, and a string its quotes.
     pub(crate) span: Span,
@@ -63,6 +66,8 @@ pub(crate) enum JsonKind {
 
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct JsonProperty {
+    /// Actual PropertyAssignment range retained from the common AST reader.
+    pub(crate) native_span: Span,
     pub(crate) key: JsonString,
     /// The key's string literal, including its quotes.
     pub(crate) key_span: Span,
@@ -72,20 +77,19 @@ pub(crate) struct JsonProperty {
     pub(crate) value: JsonValue,
 }
 
-/// A string's cooked value. JavaScript strings may hold unpaired UTF-16
-/// surrogates, which a Rust string cannot: those keep their code units, so
-/// they equal no other text.
+/// A string's exact native scanner value. Non-scalar bytes retain their
+/// spelling and cannot be projected into a Rust identity string.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) enum JsonString {
     Text(String),
-    Utf16(Vec<u16>),
+    NonScalar(Vec<u8>),
 }
 
 impl JsonString {
     pub(crate) fn as_str(&self) -> Option<&str> {
         match self {
             Self::Text(text) => Some(text),
-            Self::Utf16(_) => None,
+            Self::NonScalar(_) => None,
         }
     }
 }
@@ -179,7 +183,7 @@ pub(crate) fn parse_json_text(
     let mut parser = Parser::new(text, options);
     let root = match parser.json_root() {
         Ok(root) => root,
-        Err(error) => {
+        Err(Failure::Syntax(error)) => {
             let kind = if parser.exhausted.is_some() {
                 JsonErrorKind::TooDeep
             } else {
@@ -195,6 +199,7 @@ pub(crate) fn parse_json_text(
                 offset: error.span.start,
             });
         }
+        Err(Failure::Interrupted(_)) => unreachable!("uncontrolled JSON parser cannot stop"),
     };
     let ast = Ast {
         source: text,
@@ -233,12 +238,12 @@ impl Parser<'_> {
                 self.token_node()?
             }
             Kind::Punct
-                if self.at("-") && numeric(self.peek()) && self.peek_second().raw != ":" =>
+                if self.at("-") && numeric(self.peek()?) && self.peek_second()?.raw != ":" =>
             {
                 self.unary_expression(false, false)?
             }
-            Kind::String if !self.peek_at(":") => self.literal()?,
-            Kind::Number if numeric(self.current) && !self.peek_at(":") => self.literal()?,
+            Kind::String if !self.peek_at(":")? => self.literal()?,
+            Kind::Number if numeric(self.current) && !self.peek_at(":")? => self.literal()?,
             _ => self.object_literal()?,
         };
         self.check_token()?;
@@ -260,11 +265,13 @@ struct Converter<'a, 'src> {
 /// what it has so far.
 enum Frame {
     Array {
+        native_span: Span,
         span: Span,
         elements: std::vec::IntoIter<NodeId>,
         items: Vec<JsonValue>,
     },
     Object {
+        native_span: Span,
         span: Span,
         properties: std::vec::IntoIter<NodeId>,
         members: Vec<JsonProperty>,
@@ -275,6 +282,7 @@ enum Frame {
 
 /// A property's key, read before its value.
 struct Key {
+    native_span: Span,
     text: JsonString,
     span: Span,
     question: Option<usize>,
@@ -314,6 +322,7 @@ impl Converter<'_, '_> {
                         } => {
                             let key = pending.take().expect("a property's value follows its key");
                             members.push(JsonProperty {
+                                native_span: key.native_span,
                                 key: key.text,
                                 key_span: key.span,
                                 question: key.question,
@@ -344,11 +353,23 @@ impl Converter<'_, '_> {
                     }
                     None => {
                         complete = Some(match stack.pop().expect("a frame is open") {
-                            Frame::Array { span, items, .. } => JsonValue {
+                            Frame::Array {
+                                span,
+                                native_span,
+                                items,
+                                ..
+                            } => JsonValue {
+                                native_span: Some(native_span),
                                 span,
                                 kind: JsonKind::Array(items),
                             },
-                            Frame::Object { span, members, .. } => JsonValue {
+                            Frame::Object {
+                                span,
+                                native_span,
+                                members,
+                                ..
+                            } => JsonValue {
+                                native_span: Some(native_span),
                                 span,
                                 kind: JsonKind::Object(members),
                             },
@@ -395,12 +416,14 @@ impl Converter<'_, '_> {
                 let children = children.clone();
                 return Ok(Step::Open(if node.syntax_kind == ArrayLiteralExpression {
                     Frame::Array {
+                        native_span: node.span,
                         span,
                         elements: children.into_iter(),
                         items: Vec::new(),
                     }
                 } else {
                     Frame::Object {
+                        native_span: node.span,
                         span,
                         properties: children.into_iter(),
                         members: Vec::new(),
@@ -410,7 +433,11 @@ impl Converter<'_, '_> {
             }
             _ => return Err(self.invalid(id, INVALID_VALUE)),
         };
-        Ok(Step::Scalar(JsonValue { span, kind }))
+        Ok(Step::Scalar(JsonValue {
+            native_span: Some(node.span),
+            span,
+            kind,
+        }))
     }
 
     /// `validateJsonObjectLiteral` for one member: a property assignment
@@ -429,6 +456,7 @@ impl Converter<'_, '_> {
             return Err(self.invalid(name, DOUBLE_QUOTES));
         }
         let key = Key {
+            native_span: node.span,
             text: self.string(name)?,
             span: self.ast.token_span(name),
             question: child("questionToken").map(|token| self.ast.token_span(token).start),
@@ -443,10 +471,13 @@ impl Converter<'_, '_> {
         if self.ast.source().as_bytes().get(span.start) != Some(&b'"') {
             return Err(self.invalid(id, DOUBLE_QUOTES));
         }
-        Ok(match self.ast.node(id).field("text") {
-            Some(Value::Text(text)) => JsonString::Text(text.clone().into_owned()),
-            Some(Value::Utf16(units)) => JsonString::Utf16(units.clone()),
-            _ => unreachable!("string literals have text"),
+        let bytes = self
+            .ast
+            .cooked_literal(self.ast.node(id))
+            .expect("string literal token");
+        Ok(match std::str::from_utf8(bytes) {
+            Ok(text) => JsonString::Text(text.to_owned()),
+            Err(_) => JsonString::NonScalar(bytes.to_vec()),
         })
     }
 
@@ -454,12 +485,7 @@ impl Converter<'_, '_> {
     /// `getErrorSpanForNode` places it.
     fn invalid(&self, id: NodeId, message: &str) -> JsonError {
         let node = self.ast.node(id);
-        let offset = Lexer {
-            src: self.ast.source(),
-            pos: node.span.start,
-        }
-        .next()
-        .start;
+        let offset = Lexer::new(self.ast.source(), node.span.start).next().start;
         JsonError {
             kind: JsonErrorKind::Syntax,
             message: message.into(),
@@ -512,7 +538,7 @@ mod tests {
             keys,
             [
                 &JsonString::Text("a".into()),
-                &JsonString::Utf16(vec![0xd800]),
+                &JsonString::NonScalar(vec![0xed, 0xa0, 0x80]),
                 &JsonString::Text("a".into()),
                 &JsonString::Text("😀".into()),
             ]

@@ -1,0 +1,562 @@
+{
+  "description": "Exact scanner cooked bytes in config and JSON source versus the separate native strict package.json reader. Line continuations are literal source bytes; paired/scalar and replacement-path controls expose accidental normalization.",
+  "config": "{\"compilerOptions\":{\"noLib\":true,\"module\":\"ESNext\",\"moduleResolution\":\"Bundler\",\"resolveJsonModule\":true},\"files\":[\"main.ts\"]}",
+  "cases": [
+    {
+      "name": "config-high",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true},\"files\":[\"main.ts\",\"\\uD800.ts\"]}",
+        "main.ts": "export {};\n",
+        "𐀀.ts": "export const paired = 1;\n",
+        "�.ts": "export const replacement = 1;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6053 -"
+        ]
+      }
+    },
+    {
+      "name": "json-high",
+      "files": {
+        "main.ts": "import { \"𐀀\" as selected } from \"./data.json\";\nexport { selected };\n",
+        "data.json": "{\"𐀀\":1,\"\\uD800\":true}\n"
+      },
+      "watch": [
+        "selected"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:18 selected -> Property|Transient [data.json:1:2 PropertyAssignment]",
+          "2:10 selected -> Property|Transient [data.json:1:2 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "manifest-high",
+      "files": {
+        "main.ts": "import { value as selected } from \"pkg\";\nexport { selected };\n",
+        "node_modules/pkg/package.json": "{\"types\":\"./\\uD800.d.ts\"}",
+        "node_modules/pkg/𐀀.d.ts": "export const value: 1;\n",
+        "node_modules/pkg/�.d.ts": "export const value: 2;\n",
+        "node_modules/pkg/index.d.ts": "export const value: 3;\n"
+      },
+      "watch": [
+        "selected"
+      ],
+      "native": {
+        "program": [
+          "node_modules/pkg/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:19 selected -> BlockScopedVariable [node_modules/pkg/index.d.ts:1:14 VariableDeclaration]",
+          "2:10 selected -> BlockScopedVariable [node_modules/pkg/index.d.ts:1:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "config-low",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true},\"files\":[\"main.ts\",\"\\uDC00.ts\"]}",
+        "main.ts": "export {};\n",
+        "𐀀.ts": "export const paired = 1;\n",
+        "�.ts": "export const replacement = 1;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6053 -"
+        ]
+      }
+    },
+    {
+      "name": "json-low",
+      "files": {
+        "main.ts": "import { \"𐀀\" as selected } from \"./data.json\";\nexport { selected };\n",
+        "data.json": "{\"𐀀\":1,\"\\uDC00\":true}\n"
+      },
+      "watch": [
+        "selected"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:18 selected -> Property|Transient [data.json:1:2 PropertyAssignment]",
+          "2:10 selected -> Property|Transient [data.json:1:2 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "manifest-low",
+      "files": {
+        "main.ts": "import { value as selected } from \"pkg\";\nexport { selected };\n",
+        "node_modules/pkg/package.json": "{\"types\":\"./\\uDC00.d.ts\"}",
+        "node_modules/pkg/𐀀.d.ts": "export const value: 1;\n",
+        "node_modules/pkg/�.d.ts": "export const value: 2;\n",
+        "node_modules/pkg/index.d.ts": "export const value: 3;\n"
+      },
+      "watch": [
+        "selected"
+      ],
+      "native": {
+        "program": [
+          "node_modules/pkg/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:19 selected -> BlockScopedVariable [node_modules/pkg/index.d.ts:1:14 VariableDeclaration]",
+          "2:10 selected -> BlockScopedVariable [node_modules/pkg/index.d.ts:1:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "config-lf",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true},\"files\":[\"main.ts\",\"\\uD800\\\n\\uDC00.ts\"]}",
+        "main.ts": "export {};\n",
+        "𐀀.ts": "export const paired = 1;\n",
+        "�.ts": "export const replacement = 1;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6053 -"
+        ]
+      }
+    },
+    {
+      "name": "json-lf",
+      "files": {
+        "main.ts": "import { \"𐀀\" as selected } from \"./data.json\";\nexport { selected };\n",
+        "data.json": "{\"𐀀\":1,\"\\uD800\\\n\\uDC00\":true}\n"
+      },
+      "watch": [
+        "selected"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:18 selected -> Property|Transient [data.json:1:2 PropertyAssignment]",
+          "2:10 selected -> Property|Transient [data.json:1:2 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "manifest-lf",
+      "files": {
+        "main.ts": "import { value as selected } from \"pkg\";\nexport { selected };\n",
+        "node_modules/pkg/package.json": "{\"types\":\"./\\uD800\\\n\\uDC00.d.ts\"}",
+        "node_modules/pkg/𐀀.d.ts": "export const value: 1;\n",
+        "node_modules/pkg/�.d.ts": "export const value: 2;\n",
+        "node_modules/pkg/index.d.ts": "export const value: 3;\n"
+      },
+      "watch": [
+        "selected"
+      ],
+      "native": {
+        "program": [
+          "node_modules/pkg/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:19 selected -> BlockScopedVariable [node_modules/pkg/index.d.ts:1:14 VariableDeclaration]",
+          "2:10 selected -> BlockScopedVariable [node_modules/pkg/index.d.ts:1:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "config-cr",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true},\"files\":[\"main.ts\",\"\\uD800\\\r\\uDC00.ts\"]}",
+        "main.ts": "export {};\n",
+        "𐀀.ts": "export const paired = 1;\n",
+        "�.ts": "export const replacement = 1;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6053 -"
+        ]
+      }
+    },
+    {
+      "name": "json-cr",
+      "files": {
+        "main.ts": "import { \"𐀀\" as selected } from \"./data.json\";\nexport { selected };\n",
+        "data.json": "{\"𐀀\":1,\"\\uD800\\\r\\uDC00\":true}\n"
+      },
+      "watch": [
+        "selected"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:18 selected -> Property|Transient [data.json:1:2 PropertyAssignment]",
+          "2:10 selected -> Property|Transient [data.json:1:2 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "manifest-cr",
+      "files": {
+        "main.ts": "import { value as selected } from \"pkg\";\nexport { selected };\n",
+        "node_modules/pkg/package.json": "{\"types\":\"./\\uD800\\\r\\uDC00.d.ts\"}",
+        "node_modules/pkg/𐀀.d.ts": "export const value: 1;\n",
+        "node_modules/pkg/�.d.ts": "export const value: 2;\n",
+        "node_modules/pkg/index.d.ts": "export const value: 3;\n"
+      },
+      "watch": [
+        "selected"
+      ],
+      "native": {
+        "program": [
+          "node_modules/pkg/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:19 selected -> BlockScopedVariable [node_modules/pkg/index.d.ts:1:14 VariableDeclaration]",
+          "2:10 selected -> BlockScopedVariable [node_modules/pkg/index.d.ts:1:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "config-crlf",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true},\"files\":[\"main.ts\",\"\\uD800\\\r\n\\uDC00.ts\"]}",
+        "main.ts": "export {};\n",
+        "𐀀.ts": "export const paired = 1;\n",
+        "�.ts": "export const replacement = 1;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6053 -"
+        ]
+      }
+    },
+    {
+      "name": "json-crlf",
+      "files": {
+        "main.ts": "import { \"𐀀\" as selected } from \"./data.json\";\nexport { selected };\n",
+        "data.json": "{\"𐀀\":1,\"\\uD800\\\r\n\\uDC00\":true}\n"
+      },
+      "watch": [
+        "selected"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:18 selected -> Property|Transient [data.json:1:2 PropertyAssignment]",
+          "2:10 selected -> Property|Transient [data.json:1:2 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "manifest-crlf",
+      "files": {
+        "main.ts": "import { value as selected } from \"pkg\";\nexport { selected };\n",
+        "node_modules/pkg/package.json": "{\"types\":\"./\\uD800\\\r\n\\uDC00.d.ts\"}",
+        "node_modules/pkg/𐀀.d.ts": "export const value: 1;\n",
+        "node_modules/pkg/�.d.ts": "export const value: 2;\n",
+        "node_modules/pkg/index.d.ts": "export const value: 3;\n"
+      },
+      "watch": [
+        "selected"
+      ],
+      "native": {
+        "program": [
+          "node_modules/pkg/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:19 selected -> BlockScopedVariable [node_modules/pkg/index.d.ts:1:14 VariableDeclaration]",
+          "2:10 selected -> BlockScopedVariable [node_modules/pkg/index.d.ts:1:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "config-ls",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true},\"files\":[\"main.ts\",\"\\uD800\\ \\uDC00.ts\"]}",
+        "main.ts": "export {};\n",
+        "𐀀.ts": "export const paired = 1;\n",
+        "�.ts": "export const replacement = 1;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6053 -"
+        ]
+      }
+    },
+    {
+      "name": "json-ls",
+      "files": {
+        "main.ts": "import { \"𐀀\" as selected } from \"./data.json\";\nexport { selected };\n",
+        "data.json": "{\"𐀀\":1,\"\\uD800\\ \\uDC00\":true}\n"
+      },
+      "watch": [
+        "selected"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:18 selected -> Property|Transient [data.json:1:2 PropertyAssignment]",
+          "2:10 selected -> Property|Transient [data.json:1:2 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "manifest-ls",
+      "files": {
+        "main.ts": "import { value as selected } from \"pkg\";\nexport { selected };\n",
+        "node_modules/pkg/package.json": "{\"types\":\"./\\uD800\\ \\uDC00.d.ts\"}",
+        "node_modules/pkg/𐀀.d.ts": "export const value: 1;\n",
+        "node_modules/pkg/�.d.ts": "export const value: 2;\n",
+        "node_modules/pkg/index.d.ts": "export const value: 3;\n"
+      },
+      "watch": [
+        "selected"
+      ],
+      "native": {
+        "program": [
+          "node_modules/pkg/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:19 selected -> BlockScopedVariable [node_modules/pkg/index.d.ts:1:14 VariableDeclaration]",
+          "2:10 selected -> BlockScopedVariable [node_modules/pkg/index.d.ts:1:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "config-ps",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true},\"files\":[\"main.ts\",\"\\uD800\\ \\uDC00.ts\"]}",
+        "main.ts": "export {};\n",
+        "𐀀.ts": "export const paired = 1;\n",
+        "�.ts": "export const replacement = 1;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts"
+        ],
+        "diagnostics": [
+          "TS6053 -"
+        ]
+      }
+    },
+    {
+      "name": "json-ps",
+      "files": {
+        "main.ts": "import { \"𐀀\" as selected } from \"./data.json\";\nexport { selected };\n",
+        "data.json": "{\"𐀀\":1,\"\\uD800\\ \\uDC00\":true}\n"
+      },
+      "watch": [
+        "selected"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:18 selected -> Property|Transient [data.json:1:2 PropertyAssignment]",
+          "2:10 selected -> Property|Transient [data.json:1:2 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "manifest-ps",
+      "files": {
+        "main.ts": "import { value as selected } from \"pkg\";\nexport { selected };\n",
+        "node_modules/pkg/package.json": "{\"types\":\"./\\uD800\\ \\uDC00.d.ts\"}",
+        "node_modules/pkg/𐀀.d.ts": "export const value: 1;\n",
+        "node_modules/pkg/�.d.ts": "export const value: 2;\n",
+        "node_modules/pkg/index.d.ts": "export const value: 3;\n"
+      },
+      "watch": [
+        "selected"
+      ],
+      "native": {
+        "program": [
+          "node_modules/pkg/index.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:19 selected -> BlockScopedVariable [node_modules/pkg/index.d.ts:1:14 VariableDeclaration]",
+          "2:10 selected -> BlockScopedVariable [node_modules/pkg/index.d.ts:1:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "config-pair",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true},\"files\":[\"main.ts\",\"\\uD800\\uDC00.ts\"]}",
+        "main.ts": "export {};\n",
+        "𐀀.ts": "export const paired = 1;\n",
+        "�.ts": "export const replacement = 1;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts",
+          "𐀀.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "json-pair",
+      "files": {
+        "main.ts": "import { \"𐀀\" as selected } from \"./data.json\";\nexport { selected };\n",
+        "data.json": "{\"𐀀\":1,\"\\uD800\\uDC00\":true}\n"
+      },
+      "watch": [
+        "selected"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:18 selected -> Property|Transient [data.json:1:2 PropertyAssignment, data.json:1:9 PropertyAssignment]",
+          "2:10 selected -> Property|Transient [data.json:1:2 PropertyAssignment, data.json:1:9 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "manifest-pair",
+      "files": {
+        "main.ts": "import { value as selected } from \"pkg\";\nexport { selected };\n",
+        "node_modules/pkg/package.json": "{\"types\":\"./\\uD800\\uDC00.d.ts\"}",
+        "node_modules/pkg/𐀀.d.ts": "export const value: 1;\n",
+        "node_modules/pkg/�.d.ts": "export const value: 2;\n",
+        "node_modules/pkg/index.d.ts": "export const value: 3;\n"
+      },
+      "watch": [
+        "selected"
+      ],
+      "native": {
+        "program": [
+          "node_modules/pkg/𐀀.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:19 selected -> BlockScopedVariable [node_modules/pkg/𐀀.d.ts:1:14 VariableDeclaration]",
+          "2:10 selected -> BlockScopedVariable [node_modules/pkg/𐀀.d.ts:1:14 VariableDeclaration]"
+        ]
+      }
+    },
+    {
+      "name": "config-scalar",
+      "files": {
+        "tsconfig.json": "{\"compilerOptions\":{\"noLib\":true},\"files\":[\"main.ts\",\"𐀀.ts\"]}",
+        "main.ts": "export {};\n",
+        "𐀀.ts": "export const paired = 1;\n",
+        "�.ts": "export const replacement = 1;\n"
+      },
+      "native": {
+        "program": [
+          "main.ts",
+          "𐀀.ts"
+        ],
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "json-scalar",
+      "files": {
+        "main.ts": "import { \"𐀀\" as selected } from \"./data.json\";\nexport { selected };\n",
+        "data.json": "{\"𐀀\":1,\"𐀀\":true}\n"
+      },
+      "watch": [
+        "selected"
+      ],
+      "native": {
+        "program": [
+          "data.json",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:18 selected -> Property|Transient [data.json:1:2 PropertyAssignment, data.json:1:9 PropertyAssignment]",
+          "2:10 selected -> Property|Transient [data.json:1:2 PropertyAssignment, data.json:1:9 PropertyAssignment]"
+        ]
+      }
+    },
+    {
+      "name": "manifest-scalar",
+      "files": {
+        "main.ts": "import { value as selected } from \"pkg\";\nexport { selected };\n",
+        "node_modules/pkg/package.json": "{\"types\":\"./𐀀.d.ts\"}",
+        "node_modules/pkg/𐀀.d.ts": "export const value: 1;\n",
+        "node_modules/pkg/�.d.ts": "export const value: 2;\n",
+        "node_modules/pkg/index.d.ts": "export const value: 3;\n"
+      },
+      "watch": [
+        "selected"
+      ],
+      "native": {
+        "program": [
+          "node_modules/pkg/𐀀.d.ts (external)",
+          "main.ts"
+        ],
+        "diagnostics": [],
+        "names": [
+          "1:19 selected -> BlockScopedVariable [node_modules/pkg/𐀀.d.ts:1:14 VariableDeclaration]",
+          "2:10 selected -> BlockScopedVariable [node_modules/pkg/𐀀.d.ts:1:14 VariableDeclaration]"
+        ]
+      }
+    }
+  ]
+}

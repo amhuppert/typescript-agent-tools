@@ -1,0 +1,261 @@
+[
+  {
+    "name": "qualified",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 275,
+        "classPos": 24,
+        "end": 139,
+        "event": "members",
+        "found": false,
+        "pos": 119
+      },
+      {
+        "classEnd": 275,
+        "classPos": 24,
+        "end": 139,
+        "event": "exports",
+        "found": true,
+        "pos": 119
+      },
+      {
+        "ambient": false,
+        "enabled": false,
+        "end": 139,
+        "event": "linked",
+        "parentType": true,
+        "pos": 108,
+        "property": true
+      },
+      {
+        "end": 118,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 108,
+        "result": true
+      },
+      {
+        "classEnd": 275,
+        "classPos": 24,
+        "end": 139,
+        "event": "members",
+        "found": false,
+        "pos": 119
+      },
+      {
+        "classEnd": 275,
+        "classPos": 24,
+        "end": 139,
+        "event": "exports",
+        "found": true,
+        "pos": 119
+      },
+      {
+        "ambient": false,
+        "enabled": false,
+        "end": 139,
+        "event": "linked",
+        "parentType": true,
+        "pos": 108,
+        "property": true
+      },
+      {
+        "end": 118,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 108,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "module",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "ambient": false,
+        "enabled": false,
+        "end": 184,
+        "event": "linked",
+        "parentType": true,
+        "pos": 175,
+        "property": true
+      },
+      {
+        "end": 182,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 175,
+        "result": true
+      },
+      {
+        "classEnd": 275,
+        "classPos": 24,
+        "end": 202,
+        "event": "members",
+        "found": false,
+        "pos": 185
+      },
+      {
+        "classEnd": 275,
+        "classPos": 24,
+        "end": 202,
+        "event": "exports",
+        "found": true,
+        "pos": 185
+      },
+      {
+        "ambient": false,
+        "enabled": false,
+        "end": 202,
+        "event": "linked",
+        "parentType": true,
+        "pos": 175,
+        "property": true
+      },
+      {
+        "end": 184,
+        "event": "self",
+        "kind": 212,
+        "parent": true,
+        "pos": 175,
+        "result": false
+      },
+      {
+        "ambient": false,
+        "enabled": false,
+        "end": 184,
+        "event": "linked",
+        "parentType": true,
+        "pos": 175,
+        "property": true
+      },
+      {
+        "end": 182,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 175,
+        "result": true
+      },
+      {
+        "classEnd": 275,
+        "classPos": 24,
+        "end": 202,
+        "event": "members",
+        "found": false,
+        "pos": 185
+      },
+      {
+        "classEnd": 275,
+        "classPos": 24,
+        "end": 202,
+        "event": "exports",
+        "found": true,
+        "pos": 185
+      },
+      {
+        "ambient": false,
+        "enabled": false,
+        "end": 202,
+        "event": "linked",
+        "parentType": true,
+        "pos": 175,
+        "property": true
+      },
+      {
+        "end": 184,
+        "event": "self",
+        "kind": 212,
+        "parent": true,
+        "pos": 175,
+        "result": false
+      }
+    ]
+  },
+  {
+    "name": "chained",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "access": [
+      {
+        "classEnd": 275,
+        "classPos": 24,
+        "end": 266,
+        "event": "members",
+        "found": false,
+        "pos": 248
+      },
+      {
+        "classEnd": 275,
+        "classPos": 24,
+        "end": 266,
+        "event": "exports",
+        "found": true,
+        "pos": 248
+      },
+      {
+        "ambient": false,
+        "enabled": false,
+        "end": 266,
+        "event": "linked",
+        "parentType": true,
+        "pos": 239,
+        "property": true
+      },
+      {
+        "end": 247,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 239,
+        "result": true
+      },
+      {
+        "classEnd": 275,
+        "classPos": 24,
+        "end": 266,
+        "event": "members",
+        "found": false,
+        "pos": 248
+      },
+      {
+        "classEnd": 275,
+        "classPos": 24,
+        "end": 266,
+        "event": "exports",
+        "found": true,
+        "pos": 248
+      },
+      {
+        "ambient": false,
+        "enabled": false,
+        "end": 266,
+        "event": "linked",
+        "parentType": true,
+        "pos": 239,
+        "property": true
+      },
+      {
+        "end": 247,
+        "event": "self",
+        "kind": 79,
+        "parent": true,
+        "pos": 239,
+        "result": true
+      }
+    ]
+  }
+]

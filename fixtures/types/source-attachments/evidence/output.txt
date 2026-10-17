@@ -1,0 +1,63 @@
+
+running 1 test
+test project::semantic::source::isolated_attachment_measurement ... ATTACHMENT_MEASUREMENT [{"ambiguousRows":0,"arenaNodes":3020,"attachmentCapacity":3584,"attachmentRows":3023,"captureAllocationCalls":17,"captureNanosecondsInstrumented":8380211,"captureRequestedAllocationBytes":408404,"firstTokenRows":0,"keyBytes":24,"label":"depth-1999","nameRows":3,"nodeRows":3020,"parentCapacity":3020,"parentSlotBytes":16,"parentSlots":3020,"reachableNodes":3020,"retainedRequestedHeapBytes":216272,"sourceBytes":14097,"valueBytes":16},{"ambiguousRows":0,"arenaNodes":3020,"attachmentCapacity":3584,"attachmentRows":3023,"captureAllocationCalls":17,"captureNanosecondsInstrumented":7929234,"captureRequestedAllocationBytes":408428,"firstTokenRows":0,"keyBytes":24,"label":"depth-2000","nameRows":3,"nodeRows":3020,"parentCapacity":3020,"parentSlotBytes":16,"parentSlots":3020,"reachableNodes":3020,"retainedRequestedHeapBytes":216272,"sourceBytes":14096,"valueBytes":16},{"ambiguousRows":0,"arenaNodes":3023,"attachmentCapacity":3584,"attachmentRows":3026,"captureAllocationCalls":17,"captureNanosecondsInstrumented":8242217,"captureRequestedAllocationBytes":408500,"firstTokenRows":0,"keyBytes":24,"label":"depth-over","nameRows":3,"nodeRows":3023,"parentCapacity":3023,"parentSlotBytes":16,"parentSlots":3023,"reachableNodes":3023,"retainedRequestedHeapBytes":216320,"sourceBytes":14110,"valueBytes":16},{"ambiguousRows":0,"arenaNodes":20020,"attachmentCapacity":28672,"attachmentRows":20023,"captureAllocationCalls":20,"captureNanosecondsInstrumented":60408260,"captureRequestedAllocationBytes":3103580,"firstTokenRows":0,"keyBytes":24,"label":"flat-4000","nameRows":3,"nodeRows":20020,"parentCapacity":20020,"parentSlotBytes":16,"parentSlots":20020,"reachableNodes":20020,"retainedRequestedHeapBytes":1663824,"sourceBytes":44096,"valueBytes":16}]
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 111 filtered out; finished in 0.17s
+
+warning: fields `site` and `antecedent` are never read
+  --> src/project/binding/flow.rs:76:9
+   |
+75 |     Pending {
+   |     ------- fields in this variant
+76 |         site: Site,
+   |         ^^^^
+77 |         antecedent: FlowId,
+   |         ^^^^^^^^^^
+   |
+   = note: `Node` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `outer` is never read
+  --> src/project/binding/flow.rs:93:28
+   |
+90 | pub(in crate::project) struct Container {
+   |                               --------- field in this struct
+...
+93 |     pub(in crate::project) outer: Option<Read>,
+   |                            ^^^^^
+   |
+   = note: `Container` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `parameters` is never read
+   --> src/project/binding/semantic.rs:142:28
+    |
+140 | pub(in crate::project) struct BoundGlobalType {
+    |                               --------------- field in this struct
+141 |     pub(in crate::project) symbol: BoundSymbol,
+142 |     pub(in crate::project) parameters: Vec<BoundSymbol>,
+    |                            ^^^^^^^^^^
+
+warning: associated function `typeof_test` is never used
+  --> src/project/semantic/evaluation/facts.rs:31:19
+   |
+13 | impl TypeFacts {
+   | -------------- associated function in this implementation
+...
+31 |     pub(super) fn typeof_test(name: &str, equal: bool) -> Self {
+   |                   ^^^^^^^^^^^
+
+warning: field `kind` is never read
+   --> src/project/semantic/model.rs:312:16
+    |
+310 | pub(super) struct TargetView {
+    |                   ---------- field in this struct
+311 |     pub(super) target: TypeId,
+312 |     pub(super) kind: TargetKind,
+    |                ^^^^
+    |
+    = note: `TargetView` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: `typescript-parser` (lib test) generated 5 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s
+     Running unittests src/lib.rs (target/debug/deps/typescript_parser-7be894decab4eabf)

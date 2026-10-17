@@ -1,0 +1,1 @@
+enum Array { First }

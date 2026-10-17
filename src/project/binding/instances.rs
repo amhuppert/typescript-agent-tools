@@ -11,11 +11,17 @@ use std::collections::HashMap;
 /// TypeScript's module instance state of a namespace body or one of its
 /// statements. Combining states keeps the greatest.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub(super) enum Instance {
+pub(in crate::project) enum Instance {
     NonInstantiated,
     /// Only const enums, which still make a namespace a value.
     ConstEnumOnly,
     Instantiated,
+}
+
+/// Native `GetModuleInstanceState` for one declaration. Callers asking this
+/// syntax question must not infer it from a merged symbol's value flags.
+pub(in crate::project) fn module_instance_state(ast: &Ast<'_>, declaration: NodeId) -> Instance {
+    Instances::default().namespace(ast, declaration)
 }
 
 /// Whether namespace declarations create runtime values, decided as
@@ -236,7 +242,7 @@ impl Lookup {
         delivered: Option<Instance>,
         containers: &mut Option<HashMap<NodeId, NodeId>>,
     ) -> Step {
-        let name = exact_text(ast.node(self.name)).unwrap_or_default();
+        let name = exact_text(ast, ast.node(self.name)).unwrap_or_default();
         if let Some(state) = delivered {
             let found = self.found.map_or(state, |found| found.max(state));
             if found == Instance::Instantiated {
@@ -310,7 +316,7 @@ fn leaf_state<'s>(ast: &Ast<'s>, node: &Node<'s>) -> Option<Instance> {
 /// one of its variables, is the identifier `name`.
 fn has_name<'s>(ast: &Ast<'s>, statement: &Node<'s>, name: &str) -> bool {
     let named = |node: &Node<'s>| match child(ast, node, "name") {
-        Some(own) => own.syntax_kind == SyntaxKind::Identifier && is_text(own, name),
+        Some(own) => own.syntax_kind == SyntaxKind::Identifier && is_text(ast, own, name),
         None => false,
     };
     if field(statement, "name").is_some() {

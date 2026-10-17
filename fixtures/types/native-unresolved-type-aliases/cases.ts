@@ -1,0 +1,34 @@
+declare namespace Available { type Present = string; }
+type Pair<A, B> = [A, B];
+type Ignore<A, B> = number;
+type Defaults<A = /*@defaultLeft*/DefaultLeft, B = /*@defaultRight*/DefaultRight> = [A, B];
+type IgnoreDefaults<A = /*@ignoredDefaultLeft*/IgnoredDefaultLeft, B = /*@ignoredDefaultRight*/IgnoredDefaultRight> = number;
+type Wrong = number;
+
+type /*#plain*/Plain = /*@plain*/Missing;
+type /*#escaped*/Escaped = /*@escaped*/\u004dissing;
+type /*#qualified*/Qualified = /*@qualified*/Outer.Missing;
+type /*#deepQualified*/DeepQualified = /*@deepQualified*/Outer.Inner.Missing;
+type /*#existingNamespace*/ExistingNamespace = /*@existingNamespace*/Available.Missing;
+type /*#arguments*/Arguments = /*@arguments*/Missing</*@argumentLeft*/Left, /*@argumentRight*/Right>;
+type /*#nestedArguments*/NestedArguments = /*@outer*/Missing</*@inner*/Nested</*@leaf*/Leaf>, /*@sibling*/Sibling>;
+type /*#sameArguments*/SameArguments = /*@sameFirst*/Missing</*@sameFirstArgument*/Left> & /*@sameSecond*/Missing</*@sameSecondArgument*/Left>;
+type /*#sameName*/SameName = /*@sameNameFirst*/Missing | /*@sameNameSecond*/Missing;
+type /*#differentParents*/DifferentParents = /*@parentFirst*/First.Missing | /*@parentSecond*/Second.Missing;
+type /*#knownArguments*/KnownArguments = Pair</*@knownLeft*/KnownLeft, /*@knownRight*/KnownRight>;
+type /*#discardedArguments*/DiscardedArguments = Ignore</*@discardedLeft*/DiscardedLeft, /*@discardedRight*/DiscardedRight>;
+type /*#defaults*/Defaulted = Defaults;
+type /*#discardedDefaults*/DiscardedDefaults = IgnoreDefaults;
+type /*#partialDefaults*/PartialDefaults = Defaults<string>;
+type /*#suppliedDefaults*/SuppliedDefaults = Defaults<string, number>;
+type /*#suppliedDiscardedDefaults*/SuppliedDiscardedDefaults = IgnoreDefaults<string, number>;
+type /*#wrongNonGeneric*/WrongNonGeneric = /*@wrongNonGeneric*/Wrong</*@hiddenNonGeneric*/HiddenNonGeneric>;
+type /*#wrongFew*/WrongFew = /*@wrongFew*/Pair</*@hiddenFew*/HiddenFew>;
+type /*#wrongMany*/WrongMany = /*@wrongMany*/Pair</*@hiddenManyFirst*/HiddenManyFirst, /*@hiddenManySecond*/HiddenManySecond, /*@hiddenManyThird*/HiddenManyThird>;
+type /*#union*/Union = /*@unionFirst*/UnionFirst | /*@unionLast*/UnionLast;
+type /*#intersection*/Intersection = /*@intersectionFirst*/IntersectionFirst & /*@intersectionLast*/IntersectionLast;
+type /*#genuineAny*/GenuineAny = any;
+type /*#healthyPair*/HealthyPair = Pair<string, number>;
+type /*#healthyIgnoredAny*/HealthyIgnoredAny = Ignore<any, number>;
+type /*#healthyNamespace*/HealthyNamespace = Available.Present;
+type /*#healthyAfter*/HealthyAfter = boolean;

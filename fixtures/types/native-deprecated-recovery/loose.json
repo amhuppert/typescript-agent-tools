@@ -1,0 +1,1 @@
+{"compilerOptions": {"strict": false, "noLib": true, "types": []}, "files": ["../native-deprecated-signatures/globals.d.ts", "cases.ts"]}

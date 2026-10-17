@@ -18,6 +18,7 @@
 //!   still consumes a distinct `>` before that stop.
 
 use crate::lexer::{Kind, Lexer};
+use crate::resources::{Control, Stop};
 use std::collections::HashMap;
 
 /// What the scan established about a `<`.
@@ -41,15 +42,20 @@ pub(super) struct Angles {
 impl Angles {
     /// The facts for a `<` at `offset`, scanning from it when no earlier
     /// scan passed it.
-    pub(super) fn at(&mut self, src: &str, offset: usize) -> Angle {
+    pub(super) fn at(
+        &mut self,
+        src: &str,
+        offset: usize,
+        control: Option<&Control>,
+    ) -> Result<Angle, Stop> {
         if let Some(&angle) = self.angles.get(&offset) {
-            return angle;
+            return Ok(angle);
         }
-        self.scan(src, offset);
-        self.angles.get(&offset).copied().unwrap_or(Angle {
+        self.scan(src, offset, control)?;
+        Ok(self.angles.get(&offset).copied().unwrap_or(Angle {
             strict: false,
             stop: offset,
-        })
+        }))
     }
 
     /// The `>` characters after `from` and before `stop`: the most lists
@@ -60,20 +66,21 @@ impl Angles {
         end.saturating_sub(first)
     }
 
-    fn scan(&mut self, src: &str, start: usize) {
+    fn scan(&mut self, src: &str, start: usize, control: Option<&Control>) -> Result<(), Stop> {
         #[derive(PartialEq)]
         enum Bracket {
             Group(u8),
             Template,
         }
-        let mut lexer = Lexer { src, pos: start };
+        let mut lexer = Lexer::new(src, start);
         // Open `<` tokens not yet matched, with their bracket depth.
         let mut open: Vec<(usize, usize)> = Vec::new();
         // The `<` tokens opened at each bracket level, awaiting their stop.
-        let mut levels: Vec<Vec<usize>> = vec![Vec::new()];
+        let mut levels: Vec<Vec<usize>> = Vec::new();
+        levels.push(Vec::new());
         let mut brackets: Vec<Bracket> = Vec::new();
         let stop = loop {
-            let token = lexer.next();
+            let token = lexer.next_controlled(control)?;
             if token.error.is_some() || token.kind == Kind::Eof {
                 break token.start;
             }
@@ -88,7 +95,8 @@ impl Angles {
                 (Kind::Punct, "<" | "<<") => {
                     for offset in token.start..token.start + token.raw.len() {
                         open.push((offset, brackets.len()));
-                        levels.last_mut().unwrap().push(offset);
+                        (levels.last_mut().unwrap()).push(offset);
+                        self.angles.reserve(1);
                         self.angles.insert(
                             offset,
                             Angle {
@@ -111,7 +119,8 @@ impl Angles {
                     levels.push(Vec::new());
                 }
                 (Kind::Punct, "}") if brackets.last() == Some(&Bracket::Template) => {
-                    let continuation = lexer.template(token.start, true, false);
+                    let continuation =
+                        lexer.template_controlled(token.start, true, false, control)?;
                     if continuation.error.is_some() {
                         break token.start;
                     }
@@ -130,7 +139,7 @@ impl Angles {
                 (Kind::Punct, ";") if brackets.is_empty() => break token.start,
                 (Kind::Punct, raw) if raw.starts_with('>') => {
                     for (index, _) in raw.bytes().take_while(|&b| b == b'>').enumerate() {
-                        self.add_greater(token.start + index);
+                        self.add_greater(token.start + index)?;
                         if let Some((offset, _)) = open.pop() {
                             self.angles.get_mut(&offset).unwrap().strict = true;
                         }
@@ -158,16 +167,20 @@ impl Angles {
                 self.angles.get_mut(&offset).unwrap().stop = stop;
             }
         }
+        Ok(())
     }
 
-    fn add_greater(&mut self, offset: usize) {
+    fn add_greater(&mut self, offset: usize) -> Result<(), Stop> {
         match self.greater.last() {
             Some(&last) if last >= offset => {
                 if let Err(index) = self.greater.binary_search(&offset) {
+                    self.greater.reserve(1);
+
                     self.greater.insert(index, offset);
                 }
             }
             _ => self.greater.push(offset),
         }
+        Ok(())
     }
 }

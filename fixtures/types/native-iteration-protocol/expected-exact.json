@@ -1,0 +1,691 @@
+[
+  {
+    "name": "actualAny",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  },
+  {
+    "name": "fastIterable",
+    "kind": "value",
+    "summary": "number | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:144:176:193": {
+        "end": 176,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 144,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "iteratorObject",
+    "kind": "value",
+    "summary": "string | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:257:293:193": {
+        "end": 293,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 257,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "builtin",
+    "kind": "value",
+    "summary": "boolean | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:360:388:193": {
+        "end": 388,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 360,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "array",
+    "kind": "value",
+    "summary": "number | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:441:465:193": {
+        "end": 465,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 441,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "tuple",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:539:577:193": {
+        "end": 577,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 539,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "structural",
+    "kind": "value",
+    "summary": "number | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:680:714:193": {
+        "end": 714,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 680,
+        "use": 193
+      },
+      "iterationAwaitedRecovery:next:return": {
+        "fallbackAny": false
+      },
+      "iteratorMethod:next": {
+        "nextNil": false,
+        "returnAny": false,
+        "returnCount": 1,
+        "returnNil": false,
+        "yieldAny": false,
+        "yieldNil": false
+      }
+    }
+  },
+  {
+    "name": "doneUnion",
+    "kind": "value",
+    "summary": "number | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:842:868:193": {
+        "end": 868,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 842,
+        "use": 193
+      },
+      "iterationAwaitedRecovery:next:return": {
+        "fallbackAny": false
+      },
+      "iteratorMethod:next": {
+        "nextNil": false,
+        "returnAny": false,
+        "returnCount": 1,
+        "returnNil": false,
+        "yieldAny": false,
+        "yieldNil": false
+      }
+    }
+  },
+  {
+    "name": "nextInput",
+    "kind": "value",
+    "summary": "boolean | undefined",
+    "errorType": false,
+    "codes": [
+      2765
+    ],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:965:991:193": {
+        "end": 991,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 965,
+        "use": 193
+      },
+      "iterationAwaitedRecovery:next:return": {
+        "fallbackAny": false
+      },
+      "iteratorMethod:next": {
+        "nextNil": false,
+        "returnAny": false,
+        "returnCount": 1,
+        "returnNil": false,
+        "yieldAny": false,
+        "yieldNil": false
+      }
+    }
+  },
+  {
+    "name": "overloads",
+    "kind": "value",
+    "summary": "number | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:1131:1162:193": {
+        "end": 1162,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 1131,
+        "use": 193
+      },
+      "iterationAwaitedRecovery:next:return": {
+        "fallbackAny": false
+      },
+      "iteratorMethod:next": {
+        "nextNil": false,
+        "returnAny": false,
+        "returnCount": 1,
+        "returnNil": false,
+        "yieldAny": false,
+        "yieldNil": false
+      }
+    }
+  },
+  {
+    "name": "requiredArgument",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:1269:1309:193": {
+        "end": 1309,
+        "fallbackAny": true,
+        "inputAny": false,
+        "pos": 1269,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "optionalIterator",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:1411:1457:193": {
+        "end": 1457,
+        "fallbackAny": true,
+        "inputAny": false,
+        "pos": 1411,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "missingMethod",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:1536:1570:193": {
+        "end": 1570,
+        "fallbackAny": true,
+        "inputAny": false,
+        "pos": 1536,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "invalidResult",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2490
+    ],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:1651:1690:193": {
+        "end": 1690,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 1651,
+        "use": 193
+      },
+      "iterationAwaitedRecovery:next:return": {
+        "fallbackAny": false
+      },
+      "iteratorMethod:next": {
+        "nextNil": false,
+        "returnAny": true,
+        "returnCount": 1,
+        "returnNil": false,
+        "yieldAny": true,
+        "yieldNil": false
+      },
+      "iteratorMissingValue:next": {
+        "fallbackAny": true,
+        "inputFlags": 1048576
+      }
+    }
+  },
+  {
+    "name": "optionalNext",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:1785:1822:193": {
+        "end": 1822,
+        "fallbackAny": true,
+        "inputAny": false,
+        "pos": 1785,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "orderedMethods",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:1973:2009:193": {
+        "end": 2009,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 1973,
+        "use": 193
+      },
+      "iterationAwaitedRecovery:next:return": {
+        "fallbackAny": false
+      },
+      "iterationAwaitedRecovery:return:parameter": {
+        "fallbackAny": false
+      },
+      "iterationAwaitedRecovery:return:return": {
+        "fallbackAny": false
+      },
+      "iterationAwaitedRecovery:throw:return": {
+        "fallbackAny": false
+      },
+      "iteratorMethod:next": {
+        "nextNil": false,
+        "returnAny": true,
+        "returnCount": 1,
+        "returnNil": false,
+        "yieldAny": true,
+        "yieldNil": false
+      },
+      "iteratorMethod:return": {
+        "nextNil": true,
+        "returnAny": true,
+        "returnCount": 2,
+        "returnNil": false,
+        "yieldAny": true,
+        "yieldNil": false
+      },
+      "iteratorMethod:throw": {
+        "nextNil": true,
+        "returnAny": true,
+        "returnCount": 1,
+        "returnNil": false,
+        "yieldAny": true,
+        "yieldNil": false
+      }
+    }
+  },
+  {
+    "name": "doneRecovery",
+    "kind": "value",
+    "summary": "number | undefined",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:2114:2146:193": {
+        "end": 2146,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 2114,
+        "use": 193
+      },
+      "iterationAwaitedRecovery:next:return": {
+        "fallbackAny": false
+      },
+      "iteratorMethod:next": {
+        "nextNil": false,
+        "returnAny": false,
+        "returnCount": 1,
+        "returnNil": false,
+        "yieldAny": false,
+        "yieldNil": false
+      }
+    }
+  },
+  {
+    "name": "valueRecovery",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:2299:2333:193": {
+        "end": 2333,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 2299,
+        "use": 193
+      },
+      "iterationAwaitedRecovery:next:return": {
+        "fallbackAny": false
+      },
+      "iteratorMethod:next": {
+        "nextNil": false,
+        "returnAny": false,
+        "returnCount": 1,
+        "returnNil": false,
+        "yieldAny": false,
+        "yieldNil": false
+      }
+    }
+  },
+  {
+    "name": "union",
+    "kind": "value",
+    "summary": "string | number | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:2417:2441:193": {
+        "end": 2441,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 2417,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "unionMissing",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:2532:2564:193": {
+        "end": 2564,
+        "fallbackAny": true,
+        "inputAny": false,
+        "pos": 2532,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "never",
+    "kind": "value",
+    "summary": "never",
+    "errorType": false,
+    "codes": [
+      2488
+    ],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:2618:2642:193": {
+        "end": 2642,
+        "fallbackAny": true,
+        "inputAny": false,
+        "pos": 2618,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "asyncFast",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "asyncFromSyncIteration": {
+        "inputReturnAny": true,
+        "inputReturnNil": false,
+        "inputYieldAny": false,
+        "inputYieldNil": false,
+        "returnAny": true,
+        "returnNil": false,
+        "yieldAny": false,
+        "yieldNil": false
+      },
+      "checkedIteration:2758:2769:15": {
+        "end": 2769,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 2758,
+        "use": 15
+      },
+      "iterationAwaitedRecovery:sync:return": {
+        "fallbackAny": false
+      },
+      "iterationAwaitedRecovery:sync:yield": {
+        "fallbackAny": false
+      }
+    }
+  },
+  {
+    "name": "asyncFromSync",
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "asyncFromSyncIteration": {
+        "inputReturnAny": true,
+        "inputReturnNil": false,
+        "inputYieldAny": false,
+        "inputYieldNil": false,
+        "returnAny": true,
+        "returnNil": false,
+        "yieldAny": false,
+        "yieldNil": false
+      },
+      "checkedIteration:2880:2893:15": {
+        "end": 2893,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 2880,
+        "use": 15
+      },
+      "iterationAwaitedRecovery:sync:return": {
+        "fallbackAny": false
+      },
+      "iterationAwaitedRecovery:sync:yield": {
+        "fallbackAny": false
+      }
+    }
+  },
+  {
+    "name": "asyncSlow",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:3043:3059:15": {
+        "end": 3059,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 3043,
+        "use": 15
+      },
+      "iterationAwaitedRecovery:next:return": {
+        "fallbackAny": false
+      },
+      "iteratorMethod:next": {
+        "nextNil": false,
+        "returnAny": false,
+        "returnCount": 1,
+        "returnNil": false,
+        "yieldAny": false,
+        "yieldNil": false
+      }
+    }
+  },
+  {
+    "name": "after",
+    "kind": "value",
+    "summary": "number | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:3069:3087:193": {
+        "end": 3087,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 3069,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "onlyYield",
+    "kind": "value",
+    "summary": "number | undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:3179:3205:193": {
+        "end": 3205,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 3179,
+        "use": 193
+      },
+      "iterationAwaitedRecovery:next:return": {
+        "fallbackAny": false
+      },
+      "iteratorMethod:next": {
+        "nextNil": false,
+        "returnAny": false,
+        "returnCount": 1,
+        "returnNil": true,
+        "yieldAny": false,
+        "yieldNil": false
+      }
+    }
+  },
+  {
+    "name": "asyncOnlyReturn",
+    "nativePanic": "getAsyncFromSyncIterationTypes awaited nil yield",
+    "apiFrames": [
+      "isAwaitedTypeInstantiation:31142",
+      "getAwaitedTypeNoAliasEx:31032",
+      "getAwaitedTypeEx:31015",
+      "getAsyncFromSyncIterationTypes:6425",
+      "getIterationTypesOfIterableWorker:6318",
+      "getIterationTypesOfIterable:6259",
+      "getIteratedTypeOrElementType:6096",
+      "checkIteratedTypeOrElementType:6078",
+      "checkRightHandSideOfForOf:17593",
+      "getTypeForVariableLikeDeclaration:16582",
+      "getWidenedTypeForVariableLikeDeclaration:16561",
+      "getTypeOfVariableOrParameterOrPropertyWorker:16523",
+      "getTypeOfVariableOrParameterOrProperty:16460",
+      "getTypeOfSymbol:16423"
+    ]
+  },
+  {
+    "name": "asyncBadThen",
+    "nativePanic": "getAsyncFromSyncIterationTypes invalid thenable nil diagnostic",
+    "apiFrames": [
+      "getAwaitedTypeNoAliasEx:31133",
+      "getAwaitedTypeEx:31015",
+      "getAsyncFromSyncIterationTypes:6425",
+      "getIterationTypesOfIterableWorker:6288",
+      "getIterationTypesOfIterable:6259",
+      "getIteratedTypeOrElementType:6096",
+      "checkIteratedTypeOrElementType:6078",
+      "checkRightHandSideOfForOf:17593",
+      "getTypeForVariableLikeDeclaration:16582",
+      "getWidenedTypeForVariableLikeDeclaration:16561",
+      "getTypeOfVariableOrParameterOrPropertyWorker:16523",
+      "getTypeOfVariableOrParameterOrProperty:16460",
+      "getTypeOfSymbol:16423"
+    ]
+  },
+  {
+    "name": "asyncBadReturn",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      1320
+    ],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:3668:3683:15": {
+        "end": 3683,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 3668,
+        "use": 15
+      },
+      "iterationAwaitedRecovery:next:return": {
+        "fallbackAny": true
+      },
+      "iteratorMethod:next": {
+        "nextNil": false,
+        "returnAny": true,
+        "returnCount": 1,
+        "returnNil": false,
+        "yieldAny": true,
+        "yieldNil": false
+      }
+    }
+  }
+]

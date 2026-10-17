@@ -1,0 +1,21 @@
+type F = (x?: /* a */ MissingaA | MissingaB) => 17;
+const /*#chosen*/chosen = (
+  /* a */ (null! as F)(undefined),
+  /* a */ (null! as F)(undefined),
+  /* a */ (null! as F)(undefined),
+  /* a */ (null! as F)(undefined),
+  /* a */ (null! as F)(undefined),
+  /* a */ (null! as F)(undefined),
+  /* a */ (null! as F)(undefined),
+  /* a */ (null! as F)(undefined),
+  /* a */ (null! as F)(undefined),
+  /* a */ (null! as F)(undefined),
+  /* a */ (null! as F)(undefined),
+  /* a */ (null! as F)(undefined),
+  /* a */ (null! as F)(undefined),
+  /* a */ (null! as F)(undefined),
+  /* a */ (null! as F)(undefined),
+  /* a */ (null! as F)(undefined),
+  17
+);
+declare const healthy: number;

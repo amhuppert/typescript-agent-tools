@@ -1,0 +1,665 @@
+{
+  "source": "export declare const literalUnion: 0 | 1;\nexport declare const truthyUnion: 1 | 2;\nexport declare const primitiveUnion: string | number;\nexport declare const nullableUnion: null | undefined;\nexport declare const mixedUnion: number | undefined;\nexport declare const neverValue: never;\nexport const negatedLiteral = !literalUnion;\nexport const negatedTruthy = !truthyUnion;\nexport const negatedPrimitive = !primitiveUnion;\nexport const negatedNullable = !nullableUnion;\nexport const negatedMixed = !mixedUnion;\nexport const negatedNever = !neverValue;\n",
+  "answers": [
+    {
+      "strict": false,
+      "name": "negatedLiteral",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 7,
+          "column": 14
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "value",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 7,
+            "column": 14
+          },
+          "end": {
+            "line": 7,
+            "column": 28
+          }
+        },
+        "sourceHash": "5b1d311e0fd00e871437dbe286217775caf839302f03ec40781910a5f4488c11",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 7,
+                "column": 14
+              },
+              "end": {
+                "line": 7,
+                "column": 28
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "noLib": true,
+          "strict": false,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-facts-expressions/false.json"
+        }
+      }
+    },
+    {
+      "strict": false,
+      "name": "negatedTruthy",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 8,
+          "column": 14
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "value",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 8,
+            "column": 14
+          },
+          "end": {
+            "line": 8,
+            "column": 27
+          }
+        },
+        "sourceHash": "5b1d311e0fd00e871437dbe286217775caf839302f03ec40781910a5f4488c11",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 8,
+                "column": 14
+              },
+              "end": {
+                "line": 8,
+                "column": 27
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "noLib": true,
+          "strict": false,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-facts-expressions/false.json"
+        }
+      }
+    },
+    {
+      "strict": false,
+      "name": "negatedPrimitive",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 9,
+          "column": 14
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "value",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 9,
+            "column": 14
+          },
+          "end": {
+            "line": 9,
+            "column": 30
+          }
+        },
+        "sourceHash": "5b1d311e0fd00e871437dbe286217775caf839302f03ec40781910a5f4488c11",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 9,
+                "column": 14
+              },
+              "end": {
+                "line": 9,
+                "column": 30
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "noLib": true,
+          "strict": false,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-facts-expressions/false.json"
+        }
+      }
+    },
+    {
+      "strict": false,
+      "name": "negatedNullable",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 10,
+          "column": 14
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "value",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 10,
+            "column": 14
+          },
+          "end": {
+            "line": 10,
+            "column": 29
+          }
+        },
+        "sourceHash": "5b1d311e0fd00e871437dbe286217775caf839302f03ec40781910a5f4488c11",
+        "summary": "true",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 10,
+                "column": 14
+              },
+              "end": {
+                "line": 10,
+                "column": 29
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "noLib": true,
+          "strict": false,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-facts-expressions/false.json"
+        }
+      }
+    },
+    {
+      "strict": false,
+      "name": "negatedMixed",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 11,
+          "column": 14
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "value",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 11,
+            "column": 14
+          },
+          "end": {
+            "line": 11,
+            "column": 26
+          }
+        },
+        "sourceHash": "5b1d311e0fd00e871437dbe286217775caf839302f03ec40781910a5f4488c11",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 11,
+                "column": 14
+              },
+              "end": {
+                "line": 11,
+                "column": 26
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "noLib": true,
+          "strict": false,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-facts-expressions/false.json"
+        }
+      }
+    },
+    {
+      "strict": false,
+      "name": "negatedNever",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 12,
+          "column": 14
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "value",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 12,
+            "column": 14
+          },
+          "end": {
+            "line": 12,
+            "column": 26
+          }
+        },
+        "sourceHash": "5b1d311e0fd00e871437dbe286217775caf839302f03ec40781910a5f4488c11",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 12,
+                "column": 14
+              },
+              "end": {
+                "line": 12,
+                "column": 26
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "noLib": true,
+          "strict": false,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-facts-expressions/false.json"
+        }
+      }
+    },
+    {
+      "strict": true,
+      "name": "negatedLiteral",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 7,
+          "column": 14
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "value",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 7,
+            "column": 14
+          },
+          "end": {
+            "line": 7,
+            "column": 28
+          }
+        },
+        "sourceHash": "5b1d311e0fd00e871437dbe286217775caf839302f03ec40781910a5f4488c11",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 7,
+                "column": 14
+              },
+              "end": {
+                "line": 7,
+                "column": 28
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "noLib": true,
+          "strict": true,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-facts-expressions/true.json"
+        }
+      }
+    },
+    {
+      "strict": true,
+      "name": "negatedTruthy",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 8,
+          "column": 14
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "value",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 8,
+            "column": 14
+          },
+          "end": {
+            "line": 8,
+            "column": 27
+          }
+        },
+        "sourceHash": "5b1d311e0fd00e871437dbe286217775caf839302f03ec40781910a5f4488c11",
+        "summary": "false",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 8,
+                "column": 14
+              },
+              "end": {
+                "line": 8,
+                "column": 27
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "noLib": true,
+          "strict": true,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-facts-expressions/true.json"
+        }
+      }
+    },
+    {
+      "strict": true,
+      "name": "negatedPrimitive",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 9,
+          "column": 14
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "value",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 9,
+            "column": 14
+          },
+          "end": {
+            "line": 9,
+            "column": 30
+          }
+        },
+        "sourceHash": "5b1d311e0fd00e871437dbe286217775caf839302f03ec40781910a5f4488c11",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 9,
+                "column": 14
+              },
+              "end": {
+                "line": 9,
+                "column": 30
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "noLib": true,
+          "strict": true,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-facts-expressions/true.json"
+        }
+      }
+    },
+    {
+      "strict": true,
+      "name": "negatedNullable",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 10,
+          "column": 14
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "value",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 10,
+            "column": 14
+          },
+          "end": {
+            "line": 10,
+            "column": 29
+          }
+        },
+        "sourceHash": "5b1d311e0fd00e871437dbe286217775caf839302f03ec40781910a5f4488c11",
+        "summary": "true",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 10,
+                "column": 14
+              },
+              "end": {
+                "line": 10,
+                "column": 29
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "noLib": true,
+          "strict": true,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-facts-expressions/true.json"
+        }
+      }
+    },
+    {
+      "strict": true,
+      "name": "negatedMixed",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 11,
+          "column": 14
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "value",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 11,
+            "column": 14
+          },
+          "end": {
+            "line": 11,
+            "column": 26
+          }
+        },
+        "sourceHash": "5b1d311e0fd00e871437dbe286217775caf839302f03ec40781910a5f4488c11",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 11,
+                "column": 14
+              },
+              "end": {
+                "line": 11,
+                "column": 26
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "noLib": true,
+          "strict": true,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-facts-expressions/true.json"
+        }
+      }
+    },
+    {
+      "strict": true,
+      "name": "negatedNever",
+      "request": {
+        "at": {
+          "file": "cases.ts",
+          "line": 12,
+          "column": 14
+        },
+        "properties": false
+      },
+      "answer": {
+        "compiler": "7.0.2",
+        "history": "baseline",
+        "kind": "value",
+        "location": {
+          "file": "cases.ts",
+          "start": {
+            "line": 12,
+            "column": 14
+          },
+          "end": {
+            "line": 12,
+            "column": 26
+          }
+        },
+        "sourceHash": "5b1d311e0fd00e871437dbe286217775caf839302f03ec40781910a5f4488c11",
+        "summary": "boolean",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "cases.ts",
+              "start": {
+                "line": 12,
+                "column": 14
+              },
+              "end": {
+                "line": 12,
+                "column": 26
+              }
+            }
+          }
+        ],
+        "properties": [],
+        "prelude": [],
+        "diagnostics": [],
+        "compilerOptions": {
+          "noLib": true,
+          "strict": true,
+          "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-facts-expressions/true.json"
+        }
+      }
+    }
+  ]
+}

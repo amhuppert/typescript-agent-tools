@@ -1,0 +1,62 @@
+{
+  "artifacts": [
+    {
+      "file": "input-manifest.json",
+      "sha256": "b1664a530e0485856b9b08908017f33004ce8979922708e56b2092c2ed8fe039"
+    },
+    {
+      "file": "member-observations.json",
+      "sha256": "502fe4ea9108ade8c05f429d9d0a2fddc749ca284b5089c48b42c5f5fa7dd9d3"
+    }
+  ],
+  "toolkit": [
+    {
+      "file": "fixtures/types/command-center/freeze.mjs",
+      "sha256": "3ba5226e412c6005c92661662fc3860df50c505f91dee9baf3a8275e7c645339"
+    },
+    {
+      "file": "fixtures/types/command-center/member-probe.mjs",
+      "sha256": "1e46aef98a62bde9f71bf50ed165a13a9df84bdc6f77267eb65edf9c67245843"
+    },
+    {
+      "file": "tools/type-oracle.mjs",
+      "sha256": "9165969a20c6ef8ad056a99fd58b2c596dabefd25d595d222c30f6c2f1171ddf"
+    },
+    {
+      "file": "tools/type-corpus-capture.mjs",
+      "sha256": "18bf979691eac86df3096e710c57f57fe93e2d60d08685e88b912ffa6818078b"
+    },
+    {
+      "file": "tools/type-command-center-capture.test.mjs",
+      "sha256": "2f7eb7cef897383c472d1505d3bd20a715facdd6d60c4810269711c94f699017"
+    },
+    {
+      "file": "tools/semantic-oracle.mjs",
+      "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+    },
+    {
+      "file": "tools/navigation-oracle.mjs",
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+    },
+    {
+      "file": "tools/corpus-selection.mjs",
+      "sha256": "132d08e26e251c0d55cb39ce8d15b59735524bdd4e03fe1d5c691643abc3afa5"
+    },
+    {
+      "file": "tools/vendor-typescript-libs.mjs",
+      "sha256": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d"
+    },
+    {
+      "file": "fixtures/types/compiler-hook/checker-hook.go",
+      "sha256": "581fc25188d3f24283c0da09c280fc413a72540ee5270de29a90d041b6a63fef"
+    },
+    {
+      "file": "fixtures/types/compiler-hook/ls-hook.go",
+      "sha256": "b9c73116cc961b3b94c0b32c3052bf9c47b3dbfd5fe991fddc917d54c2095b94"
+    },
+    {
+      "file": "fixtures/types/compiler-hook/oracle-test.go",
+      "sha256": "4e0f09d1b84eed6466a0c85ab9f1fbaaf18b801cf5878792b9b200a975db2d26"
+    }
+  ]
+}

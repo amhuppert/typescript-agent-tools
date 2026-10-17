@@ -1,0 +1,1 @@
+{"compilerOptions":{"strict":true,"noLib":true,"module":"CommonJS","target":"ES2015","strictNullChecks":true,"noCheck":false},"files":["globals.d.ts","factory.ts","default.ts","barrel.ts","use.ts","consumer.test.ts","padding-16.ts"]}

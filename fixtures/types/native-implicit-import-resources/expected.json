@@ -1,0 +1,1578 @@
+[
+  {
+    "config": "strict",
+    "file": "factory.ts",
+    "marker": "equalsMember",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "factory.ts",
+              "start": {
+                "line": 1,
+                "column": 37
+              },
+              "end": {
+                "line": 1,
+                "column": 40
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "factory.ts",
+            "start": {
+              "line": 1,
+              "column": 37
+            },
+            "end": {
+              "line": 1,
+              "column": 40
+            }
+          },
+          {
+            "file": "factory.ts",
+            "start": {
+              "line": 2,
+              "column": 31
+            },
+            "end": {
+              "line": 2,
+              "column": 34
+            }
+          },
+          {
+            "file": "types.ts",
+            "start": {
+              "line": 1,
+              "column": 43
+            },
+            "end": {
+              "line": 1,
+              "column": 52
+            }
+          }
+        ]
+      }
+    ],
+    "rawGroups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "factory.ts",
+              "start": {
+                "line": 1,
+                "column": 37
+              },
+              "end": {
+                "line": 1,
+                "column": 40
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "factory.ts",
+            "start": {
+              "line": 1,
+              "column": 37
+            },
+            "end": {
+              "line": 1,
+              "column": 40
+            }
+          },
+          {
+            "file": "factory.ts",
+            "start": {
+              "line": 2,
+              "column": 31
+            },
+            "end": {
+              "line": 2,
+              "column": 34
+            }
+          },
+          {
+            "file": "types.ts",
+            "start": {
+              "line": 1,
+              "column": 42
+            },
+            "end": {
+              "line": 1,
+              "column": 53
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "strict",
+    "file": "default.ts",
+    "marker": "defaultMember",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "default.ts",
+              "start": {
+                "line": 1,
+                "column": 38
+              },
+              "end": {
+                "line": 1,
+                "column": 41
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "default.ts",
+            "start": {
+              "line": 1,
+              "column": 38
+            },
+            "end": {
+              "line": 1,
+              "column": 41
+            }
+          },
+          {
+            "file": "default.ts",
+            "start": {
+              "line": 2,
+              "column": 38
+            },
+            "end": {
+              "line": 2,
+              "column": 41
+            }
+          }
+        ]
+      }
+    ],
+    "rawGroups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "default.ts",
+              "start": {
+                "line": 1,
+                "column": 38
+              },
+              "end": {
+                "line": 1,
+                "column": 41
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "default.ts",
+            "start": {
+              "line": 1,
+              "column": 38
+            },
+            "end": {
+              "line": 1,
+              "column": 41
+            }
+          },
+          {
+            "file": "default.ts",
+            "start": {
+              "line": 2,
+              "column": 38
+            },
+            "end": {
+              "line": 2,
+              "column": 41
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "strict",
+    "file": "ambient.d.ts",
+    "marker": "ambientMember",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "ambient.d.ts",
+              "start": {
+                "line": 2,
+                "column": 40
+              },
+              "end": {
+                "line": 2,
+                "column": 43
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "ambient.d.ts",
+            "start": {
+              "line": 2,
+              "column": 40
+            },
+            "end": {
+              "line": 2,
+              "column": 43
+            }
+          },
+          {
+            "file": "ambient.d.ts",
+            "start": {
+              "line": 3,
+              "column": 40
+            },
+            "end": {
+              "line": 3,
+              "column": 43
+            }
+          }
+        ]
+      }
+    ],
+    "rawGroups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "ambient.d.ts",
+              "start": {
+                "line": 2,
+                "column": 40
+              },
+              "end": {
+                "line": 2,
+                "column": 43
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "ambient.d.ts",
+            "start": {
+              "line": 2,
+              "column": 40
+            },
+            "end": {
+              "line": 2,
+              "column": 43
+            }
+          },
+          {
+            "file": "ambient.d.ts",
+            "start": {
+              "line": 3,
+              "column": 40
+            },
+            "end": {
+              "line": 3,
+              "column": 43
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "strict",
+    "file": "global-module.d.ts",
+    "marker": "globalExport",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "FunctionDeclaration",
+            "location": {
+              "file": "global-module.d.ts",
+              "start": {
+                "line": 2,
+                "column": 34
+              },
+              "end": {
+                "line": 2,
+                "column": 37
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "global-module.d.ts",
+            "start": {
+              "line": 2,
+              "column": 34
+            },
+            "end": {
+              "line": 2,
+              "column": 37
+            }
+          },
+          {
+            "file": "global-use.ts",
+            "start": {
+              "line": 1,
+              "column": 14
+            },
+            "end": {
+              "line": 1,
+              "column": 17
+            }
+          }
+        ]
+      }
+    ],
+    "rawGroups": [
+      {
+        "origins": [
+          {
+            "kind": "FunctionDeclaration",
+            "location": {
+              "file": "global-module.d.ts",
+              "start": {
+                "line": 2,
+                "column": 34
+              },
+              "end": {
+                "line": 2,
+                "column": 37
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "global-module.d.ts",
+            "start": {
+              "line": 2,
+              "column": 34
+            },
+            "end": {
+              "line": 2,
+              "column": 37
+            }
+          },
+          {
+            "file": "global-use.ts",
+            "start": {
+              "line": 1,
+              "column": 14
+            },
+            "end": {
+              "line": 1,
+              "column": 17
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "nocheck",
+    "file": "factory.ts",
+    "marker": "equalsMember",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "factory.ts",
+              "start": {
+                "line": 1,
+                "column": 37
+              },
+              "end": {
+                "line": 1,
+                "column": 40
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "factory.ts",
+            "start": {
+              "line": 1,
+              "column": 37
+            },
+            "end": {
+              "line": 1,
+              "column": 40
+            }
+          },
+          {
+            "file": "factory.ts",
+            "start": {
+              "line": 2,
+              "column": 31
+            },
+            "end": {
+              "line": 2,
+              "column": 34
+            }
+          },
+          {
+            "file": "types.ts",
+            "start": {
+              "line": 1,
+              "column": 43
+            },
+            "end": {
+              "line": 1,
+              "column": 52
+            }
+          }
+        ]
+      }
+    ],
+    "rawGroups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "factory.ts",
+              "start": {
+                "line": 1,
+                "column": 37
+              },
+              "end": {
+                "line": 1,
+                "column": 40
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "factory.ts",
+            "start": {
+              "line": 1,
+              "column": 37
+            },
+            "end": {
+              "line": 1,
+              "column": 40
+            }
+          },
+          {
+            "file": "factory.ts",
+            "start": {
+              "line": 2,
+              "column": 31
+            },
+            "end": {
+              "line": 2,
+              "column": 34
+            }
+          },
+          {
+            "file": "types.ts",
+            "start": {
+              "line": 1,
+              "column": 42
+            },
+            "end": {
+              "line": 1,
+              "column": 53
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "nocheck",
+    "file": "default.ts",
+    "marker": "defaultMember",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "default.ts",
+              "start": {
+                "line": 1,
+                "column": 38
+              },
+              "end": {
+                "line": 1,
+                "column": 41
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "default.ts",
+            "start": {
+              "line": 1,
+              "column": 38
+            },
+            "end": {
+              "line": 1,
+              "column": 41
+            }
+          },
+          {
+            "file": "default.ts",
+            "start": {
+              "line": 2,
+              "column": 38
+            },
+            "end": {
+              "line": 2,
+              "column": 41
+            }
+          }
+        ]
+      }
+    ],
+    "rawGroups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "default.ts",
+              "start": {
+                "line": 1,
+                "column": 38
+              },
+              "end": {
+                "line": 1,
+                "column": 41
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "default.ts",
+            "start": {
+              "line": 1,
+              "column": 38
+            },
+            "end": {
+              "line": 1,
+              "column": 41
+            }
+          },
+          {
+            "file": "default.ts",
+            "start": {
+              "line": 2,
+              "column": 38
+            },
+            "end": {
+              "line": 2,
+              "column": 41
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "nocheck",
+    "file": "ambient.d.ts",
+    "marker": "ambientMember",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "ambient.d.ts",
+              "start": {
+                "line": 2,
+                "column": 40
+              },
+              "end": {
+                "line": 2,
+                "column": 43
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "ambient.d.ts",
+            "start": {
+              "line": 2,
+              "column": 40
+            },
+            "end": {
+              "line": 2,
+              "column": 43
+            }
+          },
+          {
+            "file": "ambient.d.ts",
+            "start": {
+              "line": 3,
+              "column": 40
+            },
+            "end": {
+              "line": 3,
+              "column": 43
+            }
+          }
+        ]
+      }
+    ],
+    "rawGroups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "ambient.d.ts",
+              "start": {
+                "line": 2,
+                "column": 40
+              },
+              "end": {
+                "line": 2,
+                "column": 43
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "ambient.d.ts",
+            "start": {
+              "line": 2,
+              "column": 40
+            },
+            "end": {
+              "line": 2,
+              "column": 43
+            }
+          },
+          {
+            "file": "ambient.d.ts",
+            "start": {
+              "line": 3,
+              "column": 40
+            },
+            "end": {
+              "line": 3,
+              "column": 43
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "nocheck",
+    "file": "global-module.d.ts",
+    "marker": "globalExport",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "FunctionDeclaration",
+            "location": {
+              "file": "global-module.d.ts",
+              "start": {
+                "line": 2,
+                "column": 34
+              },
+              "end": {
+                "line": 2,
+                "column": 37
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "global-module.d.ts",
+            "start": {
+              "line": 2,
+              "column": 34
+            },
+            "end": {
+              "line": 2,
+              "column": 37
+            }
+          },
+          {
+            "file": "global-use.ts",
+            "start": {
+              "line": 1,
+              "column": 14
+            },
+            "end": {
+              "line": 1,
+              "column": 17
+            }
+          }
+        ]
+      }
+    ],
+    "rawGroups": [
+      {
+        "origins": [
+          {
+            "kind": "FunctionDeclaration",
+            "location": {
+              "file": "global-module.d.ts",
+              "start": {
+                "line": 2,
+                "column": 34
+              },
+              "end": {
+                "line": 2,
+                "column": 37
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "global-module.d.ts",
+            "start": {
+              "line": 2,
+              "column": 34
+            },
+            "end": {
+              "line": 2,
+              "column": 37
+            }
+          },
+          {
+            "file": "global-use.ts",
+            "start": {
+              "line": 1,
+              "column": 14
+            },
+            "end": {
+              "line": 1,
+              "column": 17
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "file": "factory.ts",
+    "marker": "equalsMember",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "factory.ts",
+              "start": {
+                "line": 1,
+                "column": 37
+              },
+              "end": {
+                "line": 1,
+                "column": 40
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "factory.ts",
+            "start": {
+              "line": 1,
+              "column": 37
+            },
+            "end": {
+              "line": 1,
+              "column": 40
+            }
+          },
+          {
+            "file": "factory.ts",
+            "start": {
+              "line": 2,
+              "column": 31
+            },
+            "end": {
+              "line": 2,
+              "column": 34
+            }
+          },
+          {
+            "file": "types.ts",
+            "start": {
+              "line": 1,
+              "column": 43
+            },
+            "end": {
+              "line": 1,
+              "column": 52
+            }
+          }
+        ]
+      }
+    ],
+    "rawGroups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "factory.ts",
+              "start": {
+                "line": 1,
+                "column": 37
+              },
+              "end": {
+                "line": 1,
+                "column": 40
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "factory.ts",
+            "start": {
+              "line": 1,
+              "column": 37
+            },
+            "end": {
+              "line": 1,
+              "column": 40
+            }
+          },
+          {
+            "file": "factory.ts",
+            "start": {
+              "line": 2,
+              "column": 31
+            },
+            "end": {
+              "line": 2,
+              "column": 34
+            }
+          },
+          {
+            "file": "types.ts",
+            "start": {
+              "line": 1,
+              "column": 42
+            },
+            "end": {
+              "line": 1,
+              "column": 53
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "file": "default.ts",
+    "marker": "defaultMember",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "default.ts",
+              "start": {
+                "line": 1,
+                "column": 38
+              },
+              "end": {
+                "line": 1,
+                "column": 41
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "default.ts",
+            "start": {
+              "line": 1,
+              "column": 38
+            },
+            "end": {
+              "line": 1,
+              "column": 41
+            }
+          },
+          {
+            "file": "default.ts",
+            "start": {
+              "line": 2,
+              "column": 38
+            },
+            "end": {
+              "line": 2,
+              "column": 41
+            }
+          }
+        ]
+      }
+    ],
+    "rawGroups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "default.ts",
+              "start": {
+                "line": 1,
+                "column": 38
+              },
+              "end": {
+                "line": 1,
+                "column": 41
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "default.ts",
+            "start": {
+              "line": 1,
+              "column": 38
+            },
+            "end": {
+              "line": 1,
+              "column": 41
+            }
+          },
+          {
+            "file": "default.ts",
+            "start": {
+              "line": 2,
+              "column": 38
+            },
+            "end": {
+              "line": 2,
+              "column": 41
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "file": "ambient.d.ts",
+    "marker": "ambientMember",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "ambient.d.ts",
+              "start": {
+                "line": 2,
+                "column": 40
+              },
+              "end": {
+                "line": 2,
+                "column": 43
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "ambient.d.ts",
+            "start": {
+              "line": 2,
+              "column": 40
+            },
+            "end": {
+              "line": 2,
+              "column": 43
+            }
+          },
+          {
+            "file": "ambient.d.ts",
+            "start": {
+              "line": 3,
+              "column": 40
+            },
+            "end": {
+              "line": 3,
+              "column": 43
+            }
+          }
+        ]
+      }
+    ],
+    "rawGroups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "ambient.d.ts",
+              "start": {
+                "line": 2,
+                "column": 40
+              },
+              "end": {
+                "line": 2,
+                "column": 43
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "ambient.d.ts",
+            "start": {
+              "line": 2,
+              "column": 40
+            },
+            "end": {
+              "line": 2,
+              "column": 43
+            }
+          },
+          {
+            "file": "ambient.d.ts",
+            "start": {
+              "line": 3,
+              "column": 40
+            },
+            "end": {
+              "line": 3,
+              "column": 43
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "file": "global-module.d.ts",
+    "marker": "globalExport",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "FunctionDeclaration",
+            "location": {
+              "file": "global-module.d.ts",
+              "start": {
+                "line": 2,
+                "column": 34
+              },
+              "end": {
+                "line": 2,
+                "column": 37
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "global-module.d.ts",
+            "start": {
+              "line": 2,
+              "column": 34
+            },
+            "end": {
+              "line": 2,
+              "column": 37
+            }
+          },
+          {
+            "file": "global-use.ts",
+            "start": {
+              "line": 1,
+              "column": 14
+            },
+            "end": {
+              "line": 1,
+              "column": 17
+            }
+          }
+        ]
+      }
+    ],
+    "rawGroups": [
+      {
+        "origins": [
+          {
+            "kind": "FunctionDeclaration",
+            "location": {
+              "file": "global-module.d.ts",
+              "start": {
+                "line": 2,
+                "column": 34
+              },
+              "end": {
+                "line": 2,
+                "column": 37
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "global-module.d.ts",
+            "start": {
+              "line": 2,
+              "column": 34
+            },
+            "end": {
+              "line": 2,
+              "column": 37
+            }
+          },
+          {
+            "file": "global-use.ts",
+            "start": {
+              "line": 1,
+              "column": 14
+            },
+            "end": {
+              "line": 1,
+              "column": 17
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose-nocheck",
+    "file": "factory.ts",
+    "marker": "equalsMember",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "factory.ts",
+              "start": {
+                "line": 1,
+                "column": 37
+              },
+              "end": {
+                "line": 1,
+                "column": 40
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "factory.ts",
+            "start": {
+              "line": 1,
+              "column": 37
+            },
+            "end": {
+              "line": 1,
+              "column": 40
+            }
+          },
+          {
+            "file": "factory.ts",
+            "start": {
+              "line": 2,
+              "column": 31
+            },
+            "end": {
+              "line": 2,
+              "column": 34
+            }
+          },
+          {
+            "file": "types.ts",
+            "start": {
+              "line": 1,
+              "column": 43
+            },
+            "end": {
+              "line": 1,
+              "column": 52
+            }
+          }
+        ]
+      }
+    ],
+    "rawGroups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "factory.ts",
+              "start": {
+                "line": 1,
+                "column": 37
+              },
+              "end": {
+                "line": 1,
+                "column": 40
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "factory.ts",
+            "start": {
+              "line": 1,
+              "column": 37
+            },
+            "end": {
+              "line": 1,
+              "column": 40
+            }
+          },
+          {
+            "file": "factory.ts",
+            "start": {
+              "line": 2,
+              "column": 31
+            },
+            "end": {
+              "line": 2,
+              "column": 34
+            }
+          },
+          {
+            "file": "types.ts",
+            "start": {
+              "line": 1,
+              "column": 42
+            },
+            "end": {
+              "line": 1,
+              "column": 53
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose-nocheck",
+    "file": "default.ts",
+    "marker": "defaultMember",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "default.ts",
+              "start": {
+                "line": 1,
+                "column": 38
+              },
+              "end": {
+                "line": 1,
+                "column": 41
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "default.ts",
+            "start": {
+              "line": 1,
+              "column": 38
+            },
+            "end": {
+              "line": 1,
+              "column": 41
+            }
+          },
+          {
+            "file": "default.ts",
+            "start": {
+              "line": 2,
+              "column": 38
+            },
+            "end": {
+              "line": 2,
+              "column": 41
+            }
+          }
+        ]
+      }
+    ],
+    "rawGroups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "default.ts",
+              "start": {
+                "line": 1,
+                "column": 38
+              },
+              "end": {
+                "line": 1,
+                "column": 41
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "default.ts",
+            "start": {
+              "line": 1,
+              "column": 38
+            },
+            "end": {
+              "line": 1,
+              "column": 41
+            }
+          },
+          {
+            "file": "default.ts",
+            "start": {
+              "line": 2,
+              "column": 38
+            },
+            "end": {
+              "line": 2,
+              "column": 41
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose-nocheck",
+    "file": "ambient.d.ts",
+    "marker": "ambientMember",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "ambient.d.ts",
+              "start": {
+                "line": 2,
+                "column": 40
+              },
+              "end": {
+                "line": 2,
+                "column": 43
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "ambient.d.ts",
+            "start": {
+              "line": 2,
+              "column": 40
+            },
+            "end": {
+              "line": 2,
+              "column": 43
+            }
+          },
+          {
+            "file": "ambient.d.ts",
+            "start": {
+              "line": 3,
+              "column": 40
+            },
+            "end": {
+              "line": 3,
+              "column": 43
+            }
+          }
+        ]
+      }
+    ],
+    "rawGroups": [
+      {
+        "origins": [
+          {
+            "kind": "MethodDeclaration",
+            "location": {
+              "file": "ambient.d.ts",
+              "start": {
+                "line": 2,
+                "column": 40
+              },
+              "end": {
+                "line": 2,
+                "column": 43
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "ambient.d.ts",
+            "start": {
+              "line": 2,
+              "column": 40
+            },
+            "end": {
+              "line": 2,
+              "column": 43
+            }
+          },
+          {
+            "file": "ambient.d.ts",
+            "start": {
+              "line": 3,
+              "column": 40
+            },
+            "end": {
+              "line": 3,
+              "column": 43
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose-nocheck",
+    "file": "global-module.d.ts",
+    "marker": "globalExport",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "FunctionDeclaration",
+            "location": {
+              "file": "global-module.d.ts",
+              "start": {
+                "line": 2,
+                "column": 34
+              },
+              "end": {
+                "line": 2,
+                "column": 37
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "global-module.d.ts",
+            "start": {
+              "line": 2,
+              "column": 34
+            },
+            "end": {
+              "line": 2,
+              "column": 37
+            }
+          },
+          {
+            "file": "global-use.ts",
+            "start": {
+              "line": 1,
+              "column": 14
+            },
+            "end": {
+              "line": 1,
+              "column": 17
+            }
+          }
+        ]
+      }
+    ],
+    "rawGroups": [
+      {
+        "origins": [
+          {
+            "kind": "FunctionDeclaration",
+            "location": {
+              "file": "global-module.d.ts",
+              "start": {
+                "line": 2,
+                "column": 34
+              },
+              "end": {
+                "line": 2,
+                "column": 37
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "global-module.d.ts",
+            "start": {
+              "line": 2,
+              "column": 34
+            },
+            "end": {
+              "line": 2,
+              "column": 37
+            }
+          },
+          {
+            "file": "global-use.ts",
+            "start": {
+              "line": 1,
+              "column": 14
+            },
+            "end": {
+              "line": 1,
+              "column": 17
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

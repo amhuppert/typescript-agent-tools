@@ -282,6 +282,27 @@ impl Index {
             .collect()
     }
 
+    /// The existing catalog's member declarations with this exact decoded key.
+    /// Product advisory only: no semantic resolution, inferred members, or
+    /// fabricated selectors for unspellable keys/ancestors. Multiple syntax
+    /// sites may intentionally report the same display selector. This is a
+    /// different question from `select_name`: an empty key is a valid member
+    /// identity even though the selector language cannot spell it.
+    pub(crate) fn member_candidates(&self, name: &str, file: &str) -> Vec<Candidate> {
+        self.sites
+            .iter()
+            .enumerate()
+            .filter(|(_, site)| {
+                site.key.as_ref() == name
+                    && matches!(
+                        site.kind,
+                        Kind::Method | Kind::Accessor | Kind::Property | Kind::EnumMember
+                    )
+            })
+            .map(|(site, _)| self.candidate(site, file))
+            .collect()
+    }
+
     fn matches(&self, site: usize, segments: &[&str]) -> bool {
         let mut remaining = segments;
         let mut current = Some(site);

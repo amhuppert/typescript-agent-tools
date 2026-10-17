@@ -1,0 +1,177 @@
+{
+  "version": "7.0.2",
+  "answers": [
+    {
+      "family": "merged",
+      "config": "tsconfig.json",
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "before": {
+        "summary": "number[]",
+        "errorType": false,
+        "id": 73,
+        "isArray": true,
+        "arguments": [
+          {
+            "summary": "number",
+            "errorType": false,
+            "id": 15
+          }
+        ]
+      },
+      "indexes": [
+        {
+          "key": {
+            "summary": "number",
+            "errorType": false,
+            "id": 15
+          },
+          "value": {
+            "summary": "number",
+            "errorType": false,
+            "id": 15
+          },
+          "readonly": false
+        }
+      ],
+      "after": {
+        "summary": "number[]",
+        "errorType": false,
+        "id": 73
+      }
+    },
+    {
+      "family": "merged",
+      "config": "loose.json",
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "before": {
+        "summary": "number[]",
+        "errorType": false,
+        "id": 74,
+        "isArray": true,
+        "arguments": [
+          {
+            "summary": "number",
+            "errorType": false,
+            "id": 17
+          }
+        ]
+      },
+      "indexes": [
+        {
+          "key": {
+            "summary": "number",
+            "errorType": false,
+            "id": 17
+          },
+          "value": {
+            "summary": "number",
+            "errorType": false,
+            "id": 17
+          },
+          "readonly": false
+        }
+      ],
+      "after": {
+        "summary": "number[]",
+        "errorType": false,
+        "id": 74
+      }
+    },
+    {
+      "family": "invalid-index",
+      "config": "tsconfig.json",
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "before": {
+        "summary": "number[]",
+        "errorType": false,
+        "id": 73,
+        "isArray": true,
+        "arguments": [
+          {
+            "summary": "number",
+            "errorType": false,
+            "id": 15
+          }
+        ]
+      },
+      "indexes": [
+        {
+          "key": {
+            "summary": "number",
+            "errorType": false,
+            "id": 15
+          },
+          "value": {
+            "summary": "MissingType",
+            "errorType": true,
+            "id": 77
+          },
+          "readonly": false
+        }
+      ],
+      "after": {
+        "summary": "number[]",
+        "errorType": false,
+        "id": 73
+      }
+    },
+    {
+      "family": "invalid-index",
+      "config": "loose.json",
+      "inputDiagnostics": [
+        [],
+        [],
+        [],
+        []
+      ],
+      "before": {
+        "summary": "number[]",
+        "errorType": false,
+        "id": 74,
+        "isArray": true,
+        "arguments": [
+          {
+            "summary": "number",
+            "errorType": false,
+            "id": 17
+          }
+        ]
+      },
+      "indexes": [
+        {
+          "key": {
+            "summary": "number",
+            "errorType": false,
+            "id": 17
+          },
+          "value": {
+            "summary": "MissingType",
+            "errorType": true,
+            "id": 78
+          },
+          "readonly": false
+        }
+      ],
+      "after": {
+        "summary": "number[]",
+        "errorType": false,
+        "id": 74
+      }
+    }
+  ]
+}

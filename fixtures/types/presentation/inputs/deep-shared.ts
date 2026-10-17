@@ -1,0 +1,1 @@
+export const current = { deep: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: { a: 1 } } } } } } } } } } } } } } } } } } } } } } } } } } } } } } }, sibling: 2 };

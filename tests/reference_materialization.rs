@@ -8,7 +8,8 @@ mod allocations;
 use allocations::counted;
 use support::{Expect, Fixture, project};
 use typescript_parser::references::{
-    NamedLocation, Occurrence, ReferenceGroup, ReferenceQuery, ReferenceResult, Role,
+    NamedLocation, Occurrence, ReferenceBaseline, ReferenceCoverage, ReferenceGroup,
+    ReferenceOperation, ReferenceOutcome, ReferenceQuery, ReferenceResult, Role,
 };
 use typescript_parser::source::SourcePosition;
 
@@ -170,8 +171,17 @@ fn shared_type_and_value_targets_return_exact_ordered_groups_from_both_entry_poi
         });
     }
     let expected = ReferenceResult {
+        operation: ReferenceOperation::References,
+        outcome: ReferenceOutcome::Complete,
+        filters: Default::default(),
         project: fixture.path("tsconfig.json"),
         groups,
+        coverage: ReferenceCoverage {
+            baseline: ReferenceBaseline::Lexical,
+            status: ReferenceOutcome::Complete,
+            gaps: Vec::new(),
+        },
+        unsearched_members: Default::default(),
     };
     let shared = markers
         .iter()

@@ -1,0 +1,146 @@
+[
+  {
+    "name": "externalShapeValue",
+    "file": "cases.ts",
+    "kind": "value",
+    "summary": "new () => Shape",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "externalCodeValue",
+    "file": "cases.ts",
+    "kind": "value",
+    "summary": "() => 12",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "externalClass",
+    "file": "cases.ts",
+    "kind": "value",
+    "summary": "typeof Preferred",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "externalEnum",
+    "file": "cases.ts",
+    "kind": "value",
+    "summary": "typeof State",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "externalNamespace",
+    "file": "cases.ts",
+    "kind": "value",
+    "summary": "typeof Bag",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "valueOnlyExcluded",
+    "file": "cases.ts",
+    "kind": "value",
+    "summary": "16",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "externalShapeType",
+    "file": "cases.ts",
+    "kind": "declared",
+    "summary": "Shape",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "externalCodeType",
+    "file": "cases.ts",
+    "kind": "declared",
+    "summary": "12",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "propertyExportEquals",
+    "file": "cases.ts",
+    "kind": "value",
+    "summary": "typeof PropertyClass",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "pureExportEquals",
+    "file": "cases.ts",
+    "kind": "value",
+    "summary": "31",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "rawAliasExcluded",
+    "file": "cases.ts",
+    "kind": "value",
+    "summary": "42",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "ambientShapeValue",
+    "file": "cases.ts",
+    "kind": "value",
+    "summary": "new () => AmbientShape",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "ambientClass",
+    "file": "cases.ts",
+    "kind": "value",
+    "summary": "typeof AmbientClass",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "laterAmbientEnum",
+    "file": "cases.ts",
+    "kind": "value",
+    "summary": "typeof Later",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "ambientShapeType",
+    "file": "cases.ts",
+    "kind": "declared",
+    "summary": "AmbientShape",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "ordinaryNamespaceKeys",
+    "file": "namespace.cts",
+    "kind": "declared",
+    "summary": "never",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  }
+]

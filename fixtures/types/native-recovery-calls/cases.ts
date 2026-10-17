@@ -1,0 +1,16 @@
+export {};
+declare const anyCall: any;
+declare const right: { value: MissingRightCall };
+declare const tail: { value: MissingTailCall };
+declare const objectCall: { hidden: MissingCalleeDisplay };
+declare function returned(): MissingCallReturn;
+const /*#untypedMany*/untypedMany = anyCall(1 - 1n, right.value, tail.value);
+const /*#errorCallee*/errorCallee = (1 - 1n)(right.value, tail.value);
+const /*#uncallableDisplay*/uncallableDisplay = objectCall(right.value, tail.value);
+const /*#returnedThenOperand*/returnedThenOperand = returned() + right.value;
+const /*#newAny*/newAny = new anyCall(1 - 1n, right.value, tail.value);
+const /*#newError*/newError = new (1 - 1n)(right.value, tail.value);
+const /*#taggedAny*/taggedAny = anyCall`${1 - 1n}${right.value}${tail.value}`;
+const /*#taggedError*/taggedError = objectCall`${right.value}${tail.value}`;
+const /*#healthyAny*/healthyAny = anyCall(1 + true, 2);
+const /*#healthyAfter*/healthyAfter = 1 + 2;

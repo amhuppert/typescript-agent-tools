@@ -1,0 +1,6 @@
+{
+  "extends": "./strict.json",
+  "files": [
+    "cases.ts"
+  ]
+}

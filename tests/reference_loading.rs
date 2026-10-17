@@ -39,7 +39,9 @@ fn unsupported_reference_paths_fail_only_project_files() {
             "/// <reference path=\"./x.js\" />\ndeclare const a: number;\n",
         ),
     ]);
-    let error = Project::load(&project.path("tsconfig.json")).unwrap_err();
+    let error = Project::load(&project.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_err();
     assert_eq!(error.kind, InputErrorKind::Unsupported, "{error}");
     assert!(error.path.unwrap().ends_with("app.d.ts"));
 }
@@ -103,7 +105,9 @@ fn unreadable_package_metadata_is_an_io_error_not_a_missing_manifest() {
         );
         return; // Permissions are not enforced, as for the superuser.
     }
-    let error = Project::load(&fixture.path("tsconfig.json")).unwrap_err();
+    let error = Project::load(&fixture.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_err();
     assert_eq!(error.kind, InputErrorKind::Io, "{error}");
     assert!(error.path.unwrap().ends_with("package.json"));
 }
@@ -126,7 +130,9 @@ fn unreadable_type_roots_are_io_errors() {
         );
         return;
     }
-    let error = Project::load(&fixture.path("tsconfig.json")).unwrap_err();
+    let error = Project::load(&fixture.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_err();
     assert_eq!(error.kind, InputErrorKind::Io, "{error}");
 }
 
@@ -169,7 +175,9 @@ fn an_uninspectable_nearer_package_is_an_io_error_not_a_fallback() {
         );
         return; // Permissions are not enforced, as for the superuser.
     }
-    let error = Project::load(&fixture.path("tsconfig.json")).unwrap_err();
+    let error = Project::load(&fixture.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_err();
     assert_eq!(error.kind, InputErrorKind::Io, "{error}");
     let path = error.path.unwrap();
     assert!(
@@ -199,7 +207,9 @@ fn uninspectable_directory_entries_are_io_errors() {
         );
         return;
     }
-    let error = Project::load(&roots.path("tsconfig.json")).unwrap_err();
+    let error = Project::load(&roots.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_err();
     assert_eq!(error.kind, InputErrorKind::Io, "{error}");
 
     let types = Fixture::new(&[
@@ -217,7 +227,9 @@ fn uninspectable_directory_entries_are_io_errors() {
         );
         return;
     }
-    let error = Project::load(&types.path("tsconfig.json")).unwrap_err();
+    let error = Project::load(&types.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_err();
     assert_eq!(error.kind, InputErrorKind::Io, "{error}");
 }
 
@@ -261,7 +273,9 @@ fn literal_inputs_with_unsupported_extensions_fail_by_where_they_are_written() {
         ),
         ("style.css", ""),
     ]);
-    let error = Project::load(&listed.path("tsconfig.json")).unwrap_err();
+    let error = Project::load(&listed.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_err();
     assert_eq!(error.kind, InputErrorKind::Config, "{error}");
     assert!(error.message.contains("unsupported extension"), "{error}");
 
@@ -273,7 +287,9 @@ fn literal_inputs_with_unsupported_extensions_fail_by_where_they_are_written() {
             "/// <reference path=\"./style.css\" />\nexport const a = 1;\n",
         ),
     ]);
-    let error = Project::load(&referenced.path("tsconfig.json")).unwrap_err();
+    let error = Project::load(&referenced.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_err();
     assert_eq!(error.kind, InputErrorKind::Unsupported, "{error}");
     assert_eq!(
         error.message,
@@ -287,7 +303,9 @@ fn literal_inputs_with_unsupported_extensions_fail_by_where_they_are_written() {
         let mut files = vec![("tsconfig.json", JSON_OFF), ("a.ts", "export {};\n")];
         files.extend(data.map(|data| ("data.json", data)));
         let listed = Fixture::new(&files);
-        let error = Project::load(&listed.path("tsconfig.json")).unwrap_err();
+        let error = Project::load(&listed.path("tsconfig.json"))
+            .map_err(support::input_error)
+            .unwrap_err();
         assert_eq!(error.kind, InputErrorKind::Config, "{error}");
         assert!(error.message.contains("unsupported extension"), "{error}");
     }
@@ -302,7 +320,9 @@ fn literal_inputs_with_unsupported_extensions_fail_by_where_they_are_written() {
             "/// <reference path=\"./data.json\" />\nexport const a = 1;\n",
         ),
     ]);
-    let error = Project::load(&referenced.path("tsconfig.json")).unwrap_err();
+    let error = Project::load(&referenced.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_err();
     assert_eq!(
         (error.kind, error.message.as_str()),
         (
@@ -381,30 +401,56 @@ fn jsx_text_that_looks_like_a_comment_is_not_a_directive() {
             "export const a = <div>// @ts-ignore\n{import(\"./missing\")}</div>;\n",
         ),
     ]);
-    let error = Project::load(&fixture.path("tsconfig.json")).unwrap_err();
+    let error = Project::load(&fixture.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_err();
     assert_eq!(error.kind, InputErrorKind::UnresolvedImport, "{error}");
 }
 
 #[cfg(unix)]
 #[test]
 fn files_in_drive_like_directories_keep_their_spelling_through_a_link() {
-    // On Unix, `A:` is an ordinary directory name, not a drive.
-    let fixture = Fixture::new(&[
-        ("real/tsconfig.json", SKIP_LIB_CHECK),
-        ("real/A:/x.ts", "export const x = 1;\n"),
-    ]);
-    std::os::unix::fs::symlink(fixture.path("real"), fixture.path("link")).unwrap();
-    let project = Project::load(&fixture.path("link/tsconfig.json")).unwrap();
-    let result = project
-        .find_references(typescript_parser::references::ReferenceQuery::At {
-            file: fixture.path("link/A:/x.ts"),
-            position: typescript_parser::source::SourcePosition {
-                line: 1,
-                column: 14,
-            },
-        })
-        .unwrap_or_else(|error| panic!("{error}"));
-    assert_eq!(result.groups.len(), 1);
+    // Native globVisitor.visit appends an entry without applying standalone
+    // DOS-root rules. The maintained native-entry-paths matrix also checks
+    // literal file selection and real/symlink spellings for these names.
+    for directory in ["A:", "z:", "1:", "AA:", "A:child", "é:"] {
+        for access in ["real", "link"] {
+            for literal in [false, true] {
+                let mut config: serde_json::Value = serde_json::from_str(SKIP_LIB_CHECK).unwrap();
+                if literal {
+                    config["files"] = serde_json::json!([format!("./{directory}/x.ts")]);
+                }
+                let config = config.to_string();
+                let file = format!("real/{directory}/x.ts");
+                let fixture = Fixture::new(&[
+                    ("real/tsconfig.json", &config),
+                    (&file, "export const x = 1;\n"),
+                ]);
+                std::os::unix::fs::symlink(fixture.path("real"), fixture.path("link")).unwrap();
+                let config_path = fixture.path(&format!("{access}/tsconfig.json"));
+                let project = Project::load(&config_path).unwrap_or_else(|error| {
+                    panic!("{directory}/{access}/literal={literal}: {error}")
+                });
+                let result = project
+                    .find_references(ReferenceQuery::At {
+                        file: fixture.path(&format!("{access}/{directory}/x.ts")),
+                        position: SourcePosition {
+                            line: 1,
+                            column: 14,
+                        },
+                    })
+                    .unwrap_or_else(|error| {
+                        panic!("{directory}/{access}/literal={literal}: {error}")
+                    });
+                assert_eq!(result.groups.len(), 1);
+                assert_eq!(result.groups[0].declarations.len(), 1);
+                assert_eq!(
+                    result.groups[0].declarations[0].location.file,
+                    format!("{directory}/x.ts"),
+                );
+            }
+        }
+    }
 }
 
 #[test]
@@ -473,7 +519,7 @@ fn comment_directives_follow_only_spaces_and_tabs() {
             let source =
                 format!("{comment}\nimport {{ x }} from \"./missing\";\nexport const y = x;\n");
             let fixture = Fixture::new(&[("tsconfig.json", SKIP_LIB_CHECK), ("a.ts", &source)]);
-            match Project::load(&fixture.path("tsconfig.json")) {
+            match Project::load(&fixture.path("tsconfig.json")).map_err(support::input_error) {
                 Ok(_) => assert!(directive, "{comment:?} suppressed the error"),
                 Err(error) => {
                     assert!(!directive, "{comment:?}: {error}");
@@ -576,7 +622,9 @@ fn reference_outcome(directive: &str) -> Result<usize, InputErrorKind> {
         ("dep.ts", "declare const depValue: number;\n"),
         ("app.ts", &app),
     ]);
-    let project = Project::load(&fixture.path("tsconfig.json")).map_err(|e| e.kind)?;
+    let project = Project::load(&fixture.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .map_err(|e| e.kind)?;
     let result = project
         .find_references(ReferenceQuery::Name {
             name: "depValue".into(),
@@ -718,7 +766,7 @@ fn jsx_pragmas_separate_their_parts_with_spaces_and_tabs_only() {
                 &format!("{pragma}\nexport const view = <div />;\n"),
             ),
         ]);
-        let loaded = Project::load(&fixture.path("tsconfig.json"));
+        let loaded = Project::load(&fixture.path("tsconfig.json")).map_err(support::input_error);
         match loaded {
             Ok(_) => assert!(!reads, "{pragma:?} was not read"),
             Err(error) => {
@@ -749,7 +797,8 @@ fn manifest_outcome(manifest: &str) -> Result<String, typescript_parser::analysi
         ),
         ("main.ts", "import { value } from \"pkg\";\nvalue;\n"),
     ]);
-    let result = Project::load(&fixture.path("tsconfig.json"))?
+    let result = Project::load(&fixture.path("tsconfig.json"))
+        .map_err(support::input_error)?
         .find_references(ReferenceQuery::Name {
             name: "value".into(),
             file: None,
@@ -860,7 +909,9 @@ fn json_nested_past_the_reader_limit_fails_the_load() {
     }
     for depth in [129, 10_000] {
         let fixture = module(depth);
-        let error = Project::load(&fixture.path("tsconfig.json")).unwrap_err();
+        let error = Project::load(&fixture.path("tsconfig.json"))
+            .map_err(support::input_error)
+            .unwrap_err();
         assert_eq!(error.kind, InputErrorKind::Unsupported, "{depth}: {error}");
         assert!(error.path.as_ref().unwrap().ends_with("data.json"));
     }
@@ -868,7 +919,9 @@ fn json_nested_past_the_reader_limit_fails_the_load() {
 
 fn load_error_with_config(config: &str) -> typescript_parser::analysis::InputError {
     let fixture = Fixture::new(&[("tsconfig.json", config), ("a.ts", "export {};\n")]);
-    Project::load(&fixture.path("tsconfig.json")).unwrap_err()
+    Project::load(&fixture.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_err()
 }
 
 #[test]
@@ -898,11 +951,12 @@ fn tsconfig_line_comments_end_at_every_line_break() {
 #[test]
 fn tsconfig_strings_use_javascript_escapes_and_keep_unpaired_surrogates() {
     // `\x61` is `a`. An unpaired surrogate names no file, so a `files` entry
-    // holding one is unsupported, while one in an unread option is harmless.
+    // holding one is unsupported. An unread top-level tool option is harmless,
+    // while an unknown compiler option reports TS5023.
     let fixture = Fixture::new(&[
         (
             "tsconfig.json",
-            r#"{ "compilerOptions": { "noLib": true, "unknownOption": "\ud800" }, "files": ["\x61.ts"] }"#,
+            r#"{ "compilerOptions": { "noLib": true }, "toolOption": "\ud800", "files": ["\x61.ts"] }"#,
         ),
         ("a.ts", "export const value = 1;\n"),
     ]);
@@ -914,6 +968,18 @@ fn tsconfig_strings_use_javascript_escapes_and_keep_unpaired_surrogates() {
         })
         .unwrap();
     assert_eq!(result.groups.len(), 1);
+    let config = r#"{ "compilerOptions": { "noLib": true, "unknownOption": "\ud800" }, "files": ["\x61.ts"] }"#;
+    let error = load_error_with_config(config);
+    assert_eq!(
+        (error.kind, error.position),
+        (
+            InputErrorKind::Config,
+            Some(support::position(
+                config,
+                config.find("\"unknownOption\"").unwrap()
+            ))
+        )
+    );
     let error = load_error_with_config(
         r#"{ "compilerOptions": { "noLib": true }, "files": ["\ud800.ts"] }"#,
     );
@@ -948,7 +1014,7 @@ fn imports_chain_outcome(
         ),
         ("main.ts", "import { x } from \"pkg\";\nx;\n"),
     ]);
-    Project::load(&fixture.path("tsconfig.json"))
+    Project::load(&fixture.path("tsconfig.json")).map_err(support::input_error)
 }
 
 #[test]
@@ -1016,7 +1082,9 @@ fn a_missing_javascript_input_is_unsupported_wherever_it_is_named() {
         ),
         ("app.ts", "export {};\n"),
     ]);
-    let error = Project::load(&error.path("tsconfig.json")).unwrap_err();
+    let error = Project::load(&error.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_err();
     assert_eq!(error.kind, InputErrorKind::Unsupported, "{error}");
     let error = load_error(&[(
         "app.ts",
@@ -1039,6 +1107,8 @@ fn an_included_file_without_a_unicode_name_is_unsupported() {
         );
         return;
     }
-    let error = Project::load(&fixture.path("tsconfig.json")).unwrap_err();
+    let error = Project::load(&fixture.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_err();
     assert_eq!(error.kind, InputErrorKind::Unsupported, "{error}");
 }

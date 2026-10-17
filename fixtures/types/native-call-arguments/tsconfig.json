@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noLib": true
+  },
+  "files": [
+    "functions.ts",
+    "consumer.ts",
+    "relations.ts"
+  ]
+}

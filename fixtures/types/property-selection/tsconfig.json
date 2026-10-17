@@ -1,0 +1,1 @@
+{"compilerOptions":{"strict":true,"noLib":true,"module":"commonjs","noEmit":true},"files":["cases.ts","model.ts"]}

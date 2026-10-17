@@ -1,0 +1,1 @@
+type NoInfer<T> = intrinsic;

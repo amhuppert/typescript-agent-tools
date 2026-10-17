@@ -1,0 +1,39 @@
+[
+  {
+    "name": "namespaceLocal",
+    "summary": "Local",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "namespaceAliasFallback",
+    "summary": "Remote",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "namespaceMeaningFallback",
+    "summary": "TypeMember",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "namespaceOwnWins",
+    "summary": "\"local\"",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "namespaceMissing",
+    "summary": "Combined.Absent",
+    "errorType": true,
+    "codes": [
+      2694
+    ],
+    "demandFailures": []
+  }
+]

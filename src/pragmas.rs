@@ -11,6 +11,7 @@
 use crate::Span;
 pub(crate) use crate::lexer::Comment;
 use crate::lexer::{comments, line_break, shebang_end};
+use crate::resources::{Control, Stop};
 
 /// Space and tab: the only whitespace TypeScript 7 accepts between a pragma's
 /// or comment directive's parts, and at the start of a blank line a
@@ -22,8 +23,13 @@ fn pragma_space(c: char) -> bool {
 
 /// A tag or attribute name: ASCII letters and `-`, as in `no-default-lib`.
 fn pragma_name(text: &str) -> usize {
-    text.find(|c: char| !(c.is_ascii_alphabetic() || c == '-'))
-        .unwrap_or(text.len())
+    pragma_name_controlled(text).expect("uncontrolled pragma name")
+}
+
+fn pragma_name_controlled(text: &str) -> Result<usize, Stop> {
+    Ok(text
+        .find(|c: char| !(c.is_ascii_alphabetic() || c == '-'))
+        .unwrap_or(text.len()))
 }
 
 /// The comments before the first token, after a leading `#!` line.
@@ -49,7 +55,47 @@ struct Attribute<'s> {
 
 /// The reference directives among the leading comments, in source order.
 pub(crate) fn references(text: &str) -> impl Iterator<Item = Reference<'_>> {
-    leading_comments(text).filter_map(Reference::parse)
+    references_controlled(text, None).map(|result| result.expect("uncontrolled pragma scan"))
+}
+
+pub(crate) fn references_controlled<'s>(
+    text: &'s str,
+    control: Option<&'s Control>,
+) -> impl Iterator<Item = Result<Reference<'s>, Stop>> + 's {
+    let mut comments = None;
+    let mut stopped = false;
+    std::iter::from_fn(move || {
+        if stopped {
+            return None;
+        }
+        if comments.is_none() {
+            let start = match crate::lexer::shebang_end_controlled(text, control) {
+                Ok(start) => start,
+                Err(stop) => {
+                    stopped = true;
+                    return Some(Err(stop));
+                }
+            };
+            comments = Some(crate::lexer::comments_controlled(text, start, control));
+        }
+        loop {
+            let comment = match comments.as_mut().expect("initialized comments").next()? {
+                Ok(comment) => comment,
+                Err(stop) => {
+                    stopped = true;
+                    return Some(Err(stop));
+                }
+            };
+            match Reference::parse(comment, control) {
+                Ok(Some(reference)) => return Some(Ok(reference)),
+                Ok(None) => {}
+                Err(stop) => {
+                    stopped = true;
+                    return Some(Err(stop));
+                }
+            }
+        }
+    })
 }
 
 impl<'s> Reference<'s> {
@@ -57,28 +103,28 @@ impl<'s> Reference<'s> {
     /// case. Attributes follow as `name = "value"` or `name = 'value'`, with
     /// optional spaces or tabs around each part, until the first text that is
     /// not one; the rest of the comment, including any `/>`, is ignored.
-    fn parse(comment: Comment<'s>) -> Option<Self> {
-        let tag = comment
-            .text
-            .strip_prefix("///")?
-            .trim_start_matches(pragma_space)
-            .strip_prefix('<')?;
-        let name = pragma_name(tag);
+    fn parse(comment: Comment<'s>, _control: Option<&Control>) -> Result<Option<Self>, Stop> {
+        let Some(body) = comment.text.strip_prefix("///") else {
+            return Ok(None);
+        };
+        let body = body.trim_start_matches(pragma_space);
+        let Some(tag) = body.strip_prefix('<') else {
+            return Ok(None);
+        };
+        let name = pragma_name_controlled(tag)?;
         if !tag[..name].eq_ignore_ascii_case("reference") {
-            return None;
+            return Ok(None);
         }
         let mut attributes = Vec::new();
         let mut rest = &tag[name..];
         loop {
             let text = rest.trim_start_matches(pragma_space);
-            let name = &text[..pragma_name(text)];
+            let name = &text[..pragma_name_controlled(text)?];
             if name.is_empty() {
                 break;
             }
-            let Some(value) = text[name.len()..]
-                .trim_start_matches(pragma_space)
-                .strip_prefix('=')
-            else {
+            let tail = text[name.len()..].trim_start_matches(pragma_space);
+            let Some(value) = tail.strip_prefix('=') else {
                 break;
             };
             let value = value.trim_start_matches(pragma_space);
@@ -95,10 +141,10 @@ impl<'s> Reference<'s> {
             });
             rest = &value[length + 2..];
         }
-        Some(Self {
+        Ok(Some(Self {
             comment,
             attributes,
-        })
+        }))
     }
 
     /// The directive's comment, for diagnostics.
@@ -111,12 +157,22 @@ impl<'s> Reference<'s> {
 
     /// The value of the last attribute named `name`, matched without case,
     /// with its byte offset in the file.
+    #[cfg(test)]
     pub(crate) fn attribute(&self, name: &str) -> Option<(&'s str, usize)> {
-        self.attributes
-            .iter()
-            .rev()
-            .find(|attribute| attribute.name.eq_ignore_ascii_case(name))
-            .map(|attribute| (attribute.value, attribute.offset))
+        self.attribute_controlled(name)
+            .expect("uncontrolled pragma attribute")
+    }
+
+    pub(crate) fn attribute_controlled(
+        &self,
+        name: &str,
+    ) -> Result<Option<(&'s str, usize)>, Stop> {
+        for attribute in self.attributes.iter().rev() {
+            if attribute.name.eq_ignore_ascii_case(name) {
+                return Ok(Some((attribute.value, attribute.offset)));
+            }
+        }
+        Ok(None)
     }
 
     /// Which reference this directive makes, by TypeScript 7's
@@ -128,28 +184,33 @@ impl<'s> Reference<'s> {
     /// one rule; `no-default-lib` has no other effect, on library selection
     /// or anything else.
     pub(crate) fn directive(&self) -> Directive<'s> {
+        self.directive_controlled()
+            .expect("uncontrolled pragma directive")
+    }
+
+    pub(crate) fn directive_controlled(&self) -> Result<Directive<'s>, Stop> {
         if self
-            .attribute("no-default-lib")
+            .attribute_controlled("no-default-lib")?
             .is_some_and(|(value, _)| value == "true")
         {
-            return Directive::Ignored;
+            return Ok(Directive::Ignored);
         }
-        if let Some((name, offset)) = self.attribute("types") {
-            let mode = match self.attribute("resolution-mode") {
+        if let Some((name, offset)) = self.attribute_controlled("types")? {
+            let mode = match self.attribute_controlled("resolution-mode")? {
                 None => TypesMode::Unset,
                 Some(("import", _)) => TypesMode::Import,
                 Some(("require", _)) => TypesMode::Require,
                 Some(_) => TypesMode::Invalid,
             };
-            return Directive::Types(name, offset, mode);
+            return Ok(Directive::Types(name, offset, mode));
         }
-        if let Some((name, offset)) = self.attribute("lib") {
-            return Directive::Lib(name, offset);
+        if let Some((name, offset)) = self.attribute_controlled("lib")? {
+            return Ok(Directive::Lib(name, offset));
         }
-        if let Some((name, offset)) = self.attribute("path") {
-            return Directive::Path(name, offset);
+        if let Some((name, offset)) = self.attribute_controlled("path")? {
+            return Ok(Directive::Path(name, offset));
         }
-        Directive::Invalid
+        Ok(Directive::Invalid)
     }
 }
 

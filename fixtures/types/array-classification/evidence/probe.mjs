@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { compilerHookOracle } from './oracle.mjs';
+import { lineStarts, position } from '../../../tools/semantic-oracle.mjs';
+const directory = path.resolve('fixtures/types/json-array-targets/valid-members');
+const text = fs.readFileSync(path.join(directory, 'consumer.ts'), 'utf8');
+const offset = text.indexOf('/*#numbers*/') + '/*#numbers*/'.length;
+const request = { at: { file: 'consumer.ts', ...position(lineStarts(text), offset) }, properties: false };
+const answer = await compilerHookOracle(path.join(directory, 'strict-1-exact-0-unchecked-0.json'), request);
+fs.writeFileSync(new URL('answers.json', import.meta.url), JSON.stringify({ question: 'native mutable JSON array target with missing ReadonlyArray', request, answer }, null, 2) + '\n');
+console.log(JSON.stringify({ summary: answer.summary, errorType: answer.errorType, arrayClassification: answer.arrayClassification }));

@@ -1,0 +1,342 @@
+[
+  {
+    "name": "never",
+    "kind": "value",
+    "summary": "never",
+    "errorType": false,
+    "codes": [],
+    "filter": []
+  },
+  {
+    "name": "scalar",
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "filter": [
+      {
+        "branch": "scalar-kept",
+        "normalizedPredicates": 1,
+        "normalizedRemoved": 0,
+        "originCount": 0,
+        "originKind": "none",
+        "originPredicates": 0,
+        "originRemoved": 0,
+        "sameInput": true
+      }
+    ]
+  },
+  {
+    "name": "scalarRemoved",
+    "kind": "value",
+    "summary": "undefined",
+    "errorType": false,
+    "codes": [],
+    "filter": [
+      {
+        "branch": "scalar-removed",
+        "normalizedPredicates": 1,
+        "normalizedRemoved": 1,
+        "originCount": 0,
+        "originKind": "none",
+        "originPredicates": 0,
+        "originRemoved": 0,
+        "sameInput": false
+      }
+    ]
+  },
+  {
+    "name": "plainUnchanged",
+    "kind": "value",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "filter": [
+      {
+        "branch": "union-unchanged",
+        "normalizedPredicates": 2,
+        "normalizedRemoved": 0,
+        "originCount": 0,
+        "originKind": "none",
+        "originPredicates": 0,
+        "originRemoved": 0,
+        "sameInput": true
+      }
+    ]
+  },
+  {
+    "name": "plainRemoved",
+    "kind": "value",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "filter": [
+      {
+        "branch": "union-unchanged",
+        "normalizedPredicates": 2,
+        "normalizedRemoved": 0,
+        "originCount": 0,
+        "originKind": "none",
+        "originPredicates": 0,
+        "originRemoved": 0,
+        "sameInput": true
+      }
+    ]
+  },
+  {
+    "name": "singletonOrigin",
+    "kind": "value",
+    "summary": "Pair",
+    "errorType": false,
+    "codes": [],
+    "filter": [
+      {
+        "branch": "union-unchanged",
+        "normalizedPredicates": 2,
+        "normalizedRemoved": 0,
+        "originCount": 0,
+        "originKind": "none",
+        "originPredicates": 0,
+        "originRemoved": 0,
+        "sameInput": true
+      }
+    ]
+  },
+  {
+    "name": "rebuiltOrigin",
+    "kind": "value",
+    "summary": "boolean | Pair",
+    "errorType": false,
+    "codes": [],
+    "filter": [
+      {
+        "branch": "union-unchanged",
+        "normalizedPredicates": 4,
+        "normalizedRemoved": 0,
+        "originCount": 0,
+        "originKind": "none",
+        "originPredicates": 0,
+        "originRemoved": 0,
+        "sameInput": true
+      }
+    ]
+  },
+  {
+    "name": "twoOrigins",
+    "kind": "value",
+    "summary": "Other | Pair",
+    "errorType": false,
+    "codes": [],
+    "filter": [
+      {
+        "branch": "union-unchanged",
+        "normalizedPredicates": 4,
+        "normalizedRemoved": 0,
+        "originCount": 0,
+        "originKind": "none",
+        "originPredicates": 0,
+        "originRemoved": 0,
+        "sameInput": true
+      }
+    ]
+  },
+  {
+    "name": "discardInnerOrigin",
+    "kind": "value",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "filter": [
+      {
+        "branch": "union-unchanged",
+        "normalizedPredicates": 2,
+        "normalizedRemoved": 0,
+        "originCount": 0,
+        "originKind": "none",
+        "originPredicates": 0,
+        "originRemoved": 0,
+        "sameInput": true
+      }
+    ]
+  },
+  {
+    "name": "discardInnerAndOuter",
+    "kind": "value",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "filter": [
+      {
+        "branch": "union-unchanged",
+        "normalizedPredicates": 2,
+        "normalizedRemoved": 0,
+        "originCount": 0,
+        "originKind": "none",
+        "originPredicates": 0,
+        "originRemoved": 0,
+        "sameInput": true
+      }
+    ]
+  },
+  {
+    "name": "overlappingAliases",
+    "kind": "value",
+    "summary": "string | number | boolean",
+    "errorType": false,
+    "codes": [],
+    "filter": [
+      {
+        "branch": "union-unchanged",
+        "normalizedPredicates": 4,
+        "normalizedRemoved": 0,
+        "originCount": 0,
+        "originKind": "none",
+        "originPredicates": 0,
+        "originRemoved": 0,
+        "sameInput": true
+      }
+    ]
+  },
+  {
+    "name": "intersectionChanged",
+    "kind": "value",
+    "summary": "Product",
+    "errorType": false,
+    "codes": [],
+    "filter": [
+      {
+        "branch": "union-unchanged",
+        "normalizedPredicates": 4,
+        "normalizedRemoved": 0,
+        "originCount": 0,
+        "originKind": "none",
+        "originPredicates": 0,
+        "originRemoved": 0,
+        "sameInput": true
+      }
+    ]
+  },
+  {
+    "name": "intersectionUnchanged",
+    "kind": "value",
+    "summary": "Product",
+    "errorType": false,
+    "codes": [],
+    "filter": [
+      {
+        "branch": "union-unchanged",
+        "normalizedPredicates": 4,
+        "normalizedRemoved": 0,
+        "originCount": 0,
+        "originKind": "none",
+        "originPredicates": 0,
+        "originRemoved": 0,
+        "sameInput": true
+      }
+    ]
+  },
+  {
+    "name": "equalityFilter",
+    "kind": "expression",
+    "summary": "Pair",
+    "errorType": false,
+    "codes": [],
+    "filter": []
+  },
+  {
+    "name": "discriminantFilter",
+    "kind": "expression",
+    "summary": "Tagged",
+    "errorType": false,
+    "codes": [],
+    "filter": [
+      {
+        "branch": "origin-discarded",
+        "normalizedPredicates": 3,
+        "normalizedRemoved": 1,
+        "originCount": 0,
+        "originKind": "none",
+        "originPredicates": 0,
+        "originRemoved": 0,
+        "sameInput": false
+      },
+      {
+        "branch": "origin-singleton",
+        "normalizedPredicates": 3,
+        "normalizedRemoved": 1,
+        "originCount": 2,
+        "originKind": "union",
+        "originPredicates": 1,
+        "originRemoved": 1,
+        "sameInput": false
+      }
+    ]
+  },
+  {
+    "name": "assignmentFilter",
+    "kind": "expression",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "filter": [
+      {
+        "branch": "origin-discarded",
+        "normalizedPredicates": 2,
+        "normalizedRemoved": 1,
+        "originCount": 0,
+        "originKind": "none",
+        "originPredicates": 0,
+        "originRemoved": 0,
+        "sameInput": false
+      }
+    ]
+  },
+  {
+    "name": "switchFilter",
+    "kind": "expression",
+    "summary": "Pair",
+    "errorType": false,
+    "codes": [],
+    "filter": [
+      {
+        "branch": "union-unchanged",
+        "normalizedPredicates": 2,
+        "normalizedRemoved": 0,
+        "originCount": 0,
+        "originKind": "none",
+        "originPredicates": 0,
+        "originRemoved": 0,
+        "sameInput": true
+      }
+    ]
+  },
+  {
+    "name": "intersectionOriginFilter",
+    "kind": "expression",
+    "summary": "({ a: 0; } & { b: 0; }) | ({ a: 0; } & { b: 1; })",
+    "errorType": false,
+    "codes": [],
+    "filter": [
+      {
+        "branch": "origin-discarded",
+        "normalizedPredicates": 2,
+        "normalizedRemoved": 1,
+        "originCount": 0,
+        "originKind": "none",
+        "originPredicates": 0,
+        "originRemoved": 0,
+        "sameInput": false
+      },
+      {
+        "branch": "origin-discarded",
+        "normalizedPredicates": 4,
+        "normalizedRemoved": 2,
+        "originCount": 0,
+        "originKind": "intersection",
+        "originPredicates": 0,
+        "originRemoved": 0,
+        "sameInput": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,364 @@
+{
+  "rows": [
+    {
+      "name": "base",
+      "summary": "Base",
+      "errorType": false
+    },
+    {
+      "name": "derived",
+      "summary": "Derived",
+      "errorType": false
+    },
+    {
+      "name": "merged",
+      "summary": "Merged",
+      "errorType": false
+    },
+    {
+      "name": "staticSide",
+      "summary": "typeof Base",
+      "errorType": false
+    },
+    {
+      "name": "namedExpression",
+      "summary": "Named",
+      "errorType": false
+    },
+    {
+      "name": "anonymousMember",
+      "summary": "number",
+      "errorType": false
+    },
+    {
+      "name": "outer",
+      "summary": "Outer",
+      "errorType": false
+    },
+    {
+      "name": "local",
+      "summary": "Local",
+      "errorType": false
+    }
+  ],
+  "inventories": [
+    {
+      "name": "Base",
+      "properties": [
+        {
+          "kind": "private",
+          "name": "#access",
+          "summary": "string",
+          "origins": [
+            {
+              "line": 6,
+              "column": 9,
+              "end": {
+                "line": 6,
+                "column": 16
+              }
+            },
+            {
+              "line": 7,
+              "column": 9,
+              "end": {
+                "line": 7,
+                "column": 16
+              }
+            }
+          ],
+          "graphOrigin": null
+        },
+        {
+          "kind": "private",
+          "name": "#same",
+          "summary": "number",
+          "origins": [
+            {
+              "line": 3,
+              "column": 5,
+              "end": {
+                "line": 3,
+                "column": 10
+              }
+            }
+          ],
+          "graphOrigin": null
+        },
+        {
+          "kind": "string",
+          "name": "#same",
+          "summary": "string",
+          "origins": [
+            {
+              "line": 4,
+              "column": 5,
+              "end": {
+                "line": 4,
+                "column": 12
+              }
+            }
+          ],
+          "graphOrigin": null
+        },
+        {
+          "kind": "string",
+          "name": "method",
+          "summary": "() => number",
+          "origins": [
+            {
+              "line": 8,
+              "column": 5,
+              "end": {
+                "line": 8,
+                "column": 11
+              }
+            }
+          ],
+          "graphOrigin": null
+        }
+      ]
+    },
+    {
+      "name": "typeof Base",
+      "properties": [
+        {
+          "kind": "private",
+          "name": "#static",
+          "summary": "boolean",
+          "origins": [
+            {
+              "line": 5,
+              "column": 12,
+              "end": {
+                "line": 5,
+                "column": 19
+              }
+            }
+          ],
+          "graphOrigin": null
+        },
+        {
+          "kind": "string",
+          "name": "prototype",
+          "summary": "Base",
+          "origins": [],
+          "graphOrigin": {
+            "file": "cases.ts",
+            "line": 2,
+            "column": 16
+          }
+        }
+      ]
+    },
+    {
+      "name": "Derived",
+      "properties": [
+        {
+          "kind": "private",
+          "name": "#access",
+          "summary": "string",
+          "origins": [
+            {
+              "line": 6,
+              "column": 9,
+              "end": {
+                "line": 6,
+                "column": 16
+              }
+            },
+            {
+              "line": 7,
+              "column": 9,
+              "end": {
+                "line": 7,
+                "column": 16
+              }
+            }
+          ],
+          "graphOrigin": null
+        },
+        {
+          "kind": "private",
+          "name": "#same",
+          "summary": "number",
+          "origins": [
+            {
+              "line": 3,
+              "column": 5,
+              "end": {
+                "line": 3,
+                "column": 10
+              }
+            }
+          ],
+          "graphOrigin": null
+        },
+        {
+          "kind": "private",
+          "name": "#same",
+          "summary": "string",
+          "origins": [
+            {
+              "line": 10,
+              "column": 42,
+              "end": {
+                "line": 10,
+                "column": 47
+              }
+            }
+          ],
+          "graphOrigin": null
+        },
+        {
+          "kind": "string",
+          "name": "#same",
+          "summary": "string",
+          "origins": [
+            {
+              "line": 4,
+              "column": 5,
+              "end": {
+                "line": 4,
+                "column": 12
+              }
+            }
+          ],
+          "graphOrigin": null
+        },
+        {
+          "kind": "string",
+          "name": "method",
+          "summary": "() => number",
+          "origins": [
+            {
+              "line": 8,
+              "column": 5,
+              "end": {
+                "line": 8,
+                "column": 11
+              }
+            }
+          ],
+          "graphOrigin": null
+        }
+      ]
+    },
+    {
+      "name": "Merged",
+      "properties": [
+        {
+          "kind": "private",
+          "name": "#secret",
+          "summary": "number",
+          "origins": [
+            {
+              "line": 11,
+              "column": 27,
+              "end": {
+                "line": 11,
+                "column": 34
+              }
+            }
+          ],
+          "graphOrigin": null
+        },
+        {
+          "kind": "string",
+          "name": "public",
+          "summary": "boolean",
+          "origins": [
+            {
+              "line": 12,
+              "column": 20,
+              "end": {
+                "line": 12,
+                "column": 26
+              }
+            }
+          ],
+          "graphOrigin": null
+        }
+      ]
+    },
+    {
+      "name": "Named",
+      "properties": [
+        {
+          "kind": "private",
+          "name": "#same",
+          "summary": "string",
+          "origins": [
+            {
+              "line": 14,
+              "column": 54,
+              "end": {
+                "line": 14,
+                "column": 59
+              }
+            }
+          ],
+          "graphOrigin": null
+        }
+      ]
+    },
+    {
+      "name": "Outer",
+      "properties": [
+        {
+          "kind": "private",
+          "name": "#same",
+          "summary": "number",
+          "origins": [
+            {
+              "line": 17,
+              "column": 5,
+              "end": {
+                "line": 17,
+                "column": 10
+              }
+            }
+          ],
+          "graphOrigin": null
+        },
+        {
+          "kind": "string",
+          "name": "method",
+          "summary": "() => typeof Local",
+          "origins": [
+            {
+              "line": 18,
+              "column": 5,
+              "end": {
+                "line": 18,
+                "column": 11
+              }
+            }
+          ],
+          "graphOrigin": null
+        }
+      ]
+    },
+    {
+      "name": "Local",
+      "properties": [
+        {
+          "kind": "private",
+          "name": "#same",
+          "summary": "boolean",
+          "origins": [
+            {
+              "line": 19,
+              "column": 33,
+              "end": {
+                "line": 19,
+                "column": 38
+              }
+            }
+          ],
+          "graphOrigin": null
+        }
+      ]
+    }
+  ]
+}

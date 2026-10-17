@@ -51,9 +51,12 @@ export function languageId(file) {
 // and `sys.readFile` drop a leading byte order mark, and editors open
 // documents without it, so first-line positions count from the character
 // after it.
-export function sourceText(file) {
-  const text = fs.readFileSync(file, 'utf8');
+export function compilerText(text) {
   return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
+}
+
+export function sourceText(file) {
+  return compilerText(fs.readFileSync(file, 'utf8'));
 }
 
 // The UTF-16 offsets where lines start. ECMAScript lines, which `tsc` and

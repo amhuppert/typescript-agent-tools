@@ -1,0 +1,44 @@
+[
+  {
+    "name": "plainRemote",
+    "summary": "Remote",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "plainFirst",
+    "summary": "First",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "plainSecond",
+    "summary": "Second",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "typeRemote",
+    "summary": "Remote",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "typeFirst",
+    "summary": "First",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "typeSecond",
+    "summary": "Second",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  }
+]

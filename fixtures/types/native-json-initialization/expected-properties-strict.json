@@ -1,0 +1,210 @@
+[
+  {
+    "name": "own-direct",
+    "summary": "{ nested: number; }",
+    "errorType": false,
+    "properties": [
+      {
+        "name": "nested",
+        "origins": [
+          {
+            "file": "data.json",
+            "start": {
+              "line": 1,
+              "column": 7
+            },
+            "end": {
+              "line": 1,
+              "column": 15
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "own-star",
+    "summary": "{ nested: number; }",
+    "errorType": false,
+    "properties": [
+      {
+        "name": "nested",
+        "origins": [
+          {
+            "file": "data.json",
+            "start": {
+              "line": 1,
+              "column": 7
+            },
+            "end": {
+              "line": 1,
+              "column": 15
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "duplicate-last-object",
+    "summary": "{ first: number; }",
+    "errorType": false,
+    "properties": [
+      {
+        "name": "first",
+        "origins": [
+          {
+            "file": "data.json",
+            "start": {
+              "line": 1,
+              "column": 7
+            },
+            "end": {
+              "line": 1,
+              "column": 14
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "duplicate-last-scalar",
+    "summary": "{ first: number; }",
+    "errorType": false,
+    "properties": [
+      {
+        "name": "first",
+        "origins": [
+          {
+            "file": "data.json",
+            "start": {
+              "line": 1,
+              "column": 7
+            },
+            "end": {
+              "line": 1,
+              "column": 14
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "nullable",
+    "summary": "{ value: null; }",
+    "errorType": false,
+    "properties": [
+      {
+        "name": "value",
+        "origins": [
+          {
+            "file": "data.json",
+            "start": {
+              "line": 1,
+              "column": 7
+            },
+            "end": {
+              "line": 1,
+              "column": 14
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "array-valid",
+    "summary": "number[]",
+    "errorType": false,
+    "properties": [
+      {
+        "name": "length",
+        "origins": [
+          {
+            "file": "globals.d.ts",
+            "start": {
+              "line": 11,
+              "column": 22
+            },
+            "end": {
+              "line": 11,
+              "column": 28
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "array-missing",
+    "summary": "{}",
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "name": "array-wrong-arity",
+    "summary": "{}",
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "name": "nested-array",
+    "summary": "{ entries: (number | { deep: number; } | null)[]; }",
+    "errorType": false,
+    "properties": [
+      {
+        "name": "entries",
+        "origins": [
+          {
+            "file": "data.json",
+            "start": {
+              "line": 1,
+              "column": 7
+            },
+            "end": {
+              "line": 1,
+              "column": 16
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "primitive-member",
+    "summary": "number",
+    "errorType": false,
+    "properties": []
+  },
+  {
+    "name": "whole-object",
+    "summary": "{ a: { nested: number; }; }",
+    "errorType": false,
+    "properties": [
+      {
+        "name": "a",
+        "origins": [
+          {
+            "file": "data.json",
+            "start": {
+              "line": 1,
+              "column": 2
+            },
+            "end": {
+              "line": 1,
+              "column": 5
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "whole-string",
+    "summary": "string",
+    "errorType": false,
+    "properties": []
+  }
+]

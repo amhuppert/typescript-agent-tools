@@ -15,7 +15,7 @@ impl<'src> Parser<'src> {
                         ("operatorToken", operator.into()),
                         ("right", right.into()),
                     ],
-                );
+                )?;
             }
             Ok(left)
         })
@@ -49,7 +49,7 @@ impl<'src> Parser<'src> {
                             ("colonToken", colon.into()),
                             ("whenFalse", when_false.into()),
                         ],
-                    );
+                    )?;
                     return Ok(left);
                 }
                 let Some((precedence, right_associative)) = binary_precedence(p.current.raw) else {
@@ -109,7 +109,7 @@ impl<'src> Parser<'src> {
                         kind,
                         p.start(left),
                         fields![("expression", left.into()), ("type", type_node.into())],
-                    );
+                    )?;
                     continue;
                 }
                 let operator = p.token_node()?;
@@ -125,7 +125,7 @@ impl<'src> Parser<'src> {
                         ("operatorToken", operator.into()),
                         ("right", right.into()),
                     ],
-                );
+                )?;
                 if precedence == 2 {
                     return Ok(left);
                 }
@@ -142,7 +142,7 @@ impl<'src> Parser<'src> {
         let potential_arrow = self.at("(")
             || self.at("<")
             || self.at("async")
-            || (self.current.kind == Kind::Word && self.peek_at("=>"));
+            || (self.current.kind == Kind::Word && self.peek_at("=>")?);
         if allow_assignment && potential_arrow {
             if let Some(arrow) = self.probe_cached(
                 ProbeKind::Arrow {
@@ -154,7 +154,7 @@ impl<'src> Parser<'src> {
             }
         }
         let next = if self.at("await") || self.at("yield") {
-            Some(self.peek())
+            Some(self.peek()?)
         } else {
             None
         };
@@ -175,7 +175,7 @@ impl<'src> Parser<'src> {
                     return Err(self.error("Expected an expression after 'yield *'"));
                 }
             }
-            return Ok(self.finish(YieldExpression, start, fields));
+            return self.finish(YieldExpression, start, fields);
         }
         if matches!(
             self.current.raw,
@@ -204,26 +204,26 @@ impl<'src> Parser<'src> {
                     ],
                 ),
             };
-            return Ok(self.finish(kind, start, fields));
+            return self.finish(kind, start, fields);
         }
         if self.at("<") && !self.options.jsx {
             self.bump()?;
             let type_node = self.type_node()?;
             self.expect_type_close()?;
             let expression = self.nest(|p| p.unary_expression(false, allow_arrow_return_type))?;
-            return Ok(self.finish(
+            return self.finish(
                 TypeAssertionExpression,
                 start,
                 fields![
                     ("type", type_node.into()),
                     ("expression", expression.into()),
                 ],
-            ));
+            );
         }
         let operand = self.postfix_expression(false)?;
         if !self.current.newline && matches!(self.current.raw, "++" | "--") {
             let operator = self.bump()?;
-            return Ok(self.finish(
+            return self.finish(
                 PostfixUnaryExpression,
                 self.start(operand),
                 fields![
@@ -233,7 +233,7 @@ impl<'src> Parser<'src> {
                         Value::Number(token_kind(operator.raw, operator.kind).number()),
                     ),
                 ],
-            ));
+            );
         }
         Ok(operand)
     }
@@ -247,15 +247,19 @@ impl<'src> Parser<'src> {
             let ambiguous_return_type = !fields.iter().any(|(key, _)| *key == "typeParameters")
                 && match fields.iter().find(|(key, _)| *key == "parameters") {
                     Some((_, Value::Nodes(parameters))) => {
-                        !parameters.is_empty()
-                            && parameters.iter().all(|id| {
-                                !p.nodes[id.0].fields.iter().any(|(key, _)| {
-                                    matches!(
-                                        *key,
-                                        "type" | "questionToken" | "dotDotDotToken" | "modifiers"
-                                    )
-                                })
-                            })
+                        let mut all = !parameters.is_empty();
+                        for id in parameters {
+                            if p.nodes[id.0].fields.iter().any(|(key, _)| {
+                                matches!(
+                                    *key,
+                                    "type" | "questionToken" | "dotDotDotToken" | "modifiers"
+                                )
+                            }) {
+                                all = false;
+                                break;
+                            }
+                        }
+                        all
                     }
                     _ => false,
                 };
@@ -265,9 +269,7 @@ impl<'src> Parser<'src> {
             let conditional_boundary =
                 !allow_arrow_return_type && has_return_type && ambiguous_return_type;
             committed = !conditional_boundary;
-            let async_function = modifiers
-                .iter()
-                .any(|id| p.nodes[id.0].syntax_kind == AsyncKeyword);
+            let async_function = p.has_modifier(&modifiers, AsyncKeyword)?;
             let body = p.in_context(p.context.function(async_function, false), |p| {
                 if p.at("{") {
                     p.block(Block)
@@ -278,9 +280,9 @@ impl<'src> Parser<'src> {
             if conditional_boundary && !p.at(":") {
                 return Ok(None);
             }
-            let id = p.finish(ArrowFunction, start, fields);
-            p.field(id, "body", body);
-            p.attach_modifiers(id, modifiers);
+            let id = p.finish_native_jsdoc(ArrowFunction, start, fields)?;
+            p.field(id, "body", body)?;
+            p.attach_modifiers(id, modifiers)?;
             Ok(Some(id))
         });
         if committed {
@@ -294,7 +296,7 @@ impl<'src> Parser<'src> {
         let start = self.pos();
         let mut fields: Fields<'src> = Fields::new();
         let mut modifiers = vec![];
-        if self.at("async") && !self.peek_at("=>") {
+        if self.at("async") && !self.peek_at("=>")? {
             modifiers.push(self.token_node()?);
             if self.current.newline {
                 return Err(self.error("Line break after async"));
@@ -305,7 +307,7 @@ impl<'src> Parser<'src> {
             let type_parameters = self.type_parameters()?;
             if self.options.jsx
                 && type_parameters.len() == 1
-                && !self.lexer.src[generic_start..self.end].contains(',')
+                && !self.lexer.src[generic_start..self.end].contains(",")
                 && self.nodes[type_parameters[0].0]
                     .field("constraint")
                     .is_none()
@@ -319,9 +321,7 @@ impl<'src> Parser<'src> {
         }
         let simple_parameter = !self.at("(");
         let parameters = if self.at("(") {
-            let async_function = modifiers
-                .iter()
-                .any(|id| self.nodes[id.0].syntax_kind == AsyncKeyword);
+            let async_function = self.has_modifier(&modifiers, AsyncKeyword)?;
             self.parameters_with_context(async_function, false)?
         } else {
             let pos = self.pos();
@@ -331,7 +331,7 @@ impl<'src> Parser<'src> {
                 return Err(self.error("Expected an arrow parameter identifier"));
             }
             let name = self.binding_identifier()?;
-            vec![self.finish(Parameter, pos, fields![("name", name.into())])]
+            Vec::from([self.finish(Parameter, pos, fields![("name", name.into())])?])
         };
         fields.push(("parameters", parameters.into()));
         if self.eat(":")? {
@@ -411,7 +411,7 @@ impl<'src> Parser<'src> {
                     fields.push(("name", self.identifier()?.into()));
                     PropertyAccessExpression
                 };
-                expression = self.finish(kind, start, fields);
+                expression = self.finish(kind, start, fields)?;
                 if chain {
                     self.nodes[expression.0].flags |= node_flags::OPTIONAL_CHAIN;
                 }
@@ -426,7 +426,7 @@ impl<'src> Parser<'src> {
                         ("expression", expression.into()),
                         ("argumentExpression", argument.into()),
                     ],
-                );
+                )?;
                 if chain {
                     self.nodes[expression.0].flags |= node_flags::OPTIONAL_CHAIN;
                 }
@@ -440,7 +440,7 @@ impl<'src> Parser<'src> {
                         ("expression", expression.into()),
                         ("arguments", arguments.into()),
                     ],
-                );
+                )?;
                 if chain {
                     self.nodes[expression.0].flags |= node_flags::OPTIONAL_CHAIN;
                 }
@@ -469,7 +469,7 @@ impl<'src> Parser<'src> {
                 } else {
                     ExpressionWithTypeArguments
                 };
-                expression = self.finish(kind, start, fields);
+                expression = self.finish(kind, start, fields)?;
                 if kind == CallExpression && chain
                     || kind == TaggedTemplateExpression && optional_chain
                 {
@@ -484,7 +484,7 @@ impl<'src> Parser<'src> {
                     TaggedTemplateExpression,
                     start,
                     fields![("tag", expression.into()), ("template", template.into())],
-                );
+                )?;
                 if optional_chain {
                     self.nodes[expression.0].flags |= node_flags::OPTIONAL_CHAIN;
                 }
@@ -494,7 +494,7 @@ impl<'src> Parser<'src> {
                     NonNullExpression,
                     start,
                     fields![("expression", expression.into())],
-                );
+                )?;
             } else {
                 break;
             }
@@ -529,7 +529,9 @@ impl<'src> Parser<'src> {
     fn expression_type_arguments(&mut self, no_call: bool) -> Result<Option<Vec<NodeId>>> {
         // Attempts that `angles` rules out could only fail, so skipping them
         // changes no result.
-        let angle = self.angles.at(self.lexer.src, self.current.start);
+        let angle = self
+            .angles
+            .at(self.lexer.src, self.current.start, self.control.as_ref())?;
         if angle.strict {
             let strict = self.speculate(angle.stop, |p| {
                 p.probe(|p| {
@@ -555,7 +557,7 @@ impl<'src> Parser<'src> {
             })
         });
         match self.matched(recovered)?.flatten() {
-            Some(error) => Err(error),
+            Some(error) => Err(error.into()),
             None => Ok(None),
         }
     }
@@ -600,7 +602,9 @@ impl<'src> Parser<'src> {
         match p.current.kind {
             Kind::Number | Kind::String => return p.literal(),
             Kind::TemplateHead | Kind::NoSubstitutionTemplate => return p.template(false),
-            Kind::Eof => return Err(p.error("Expected expression, found end of input")),
+            Kind::Eof => return if p.context.contains(node_flags::JSDOC) {
+                p.missing_jsdoc_identifier("Expected expression, found end of input")
+            } else { Err(p.error("Expected expression, found end of input")) },
             _ => {}
         }
         match p.current.raw {
@@ -608,11 +612,11 @@ impl<'src> Parser<'src> {
                 p.bump()?;
                 let expression = p.expression_allow_in()?;
                 p.expect(")")?;
-                Ok(p.finish(
+                Ok(p.finish_native_jsdoc(
                     ParenthesizedExpression,
                     start,
                     fields![("expression", expression.into())],
-                ))
+                )?)
             }
             "[" => {
                 p.bump()?;
@@ -621,7 +625,7 @@ impl<'src> Parser<'src> {
                     let pos = p.pos();
                     if p.at(",") {
                         p.bump()?;
-                        elements.push(p.make(OmittedExpression, pos, pos, vec![]));
+                        elements.push(p.make(OmittedExpression, pos, pos, vec![])?);
                         continue;
                     }
                     if p.eat("...")? {
@@ -630,7 +634,7 @@ impl<'src> Parser<'src> {
                             SpreadElement,
                             pos,
                             fields![("expression", expression.into())],
-                        ));
+                        )?);
                     } else {
                         elements.push(p.assignment_expression()?);
                     }
@@ -643,13 +647,13 @@ impl<'src> Parser<'src> {
                     ArrayLiteralExpression,
                     start,
                     fields![("elements", elements.into())],
-                ))
+                )?)
             }
             "{" => p.object_literal(),
             "function" => p.function(start, FunctionExpression, vec![]),
-            "async" if p.peek_at("function") && !p.peek().newline => {
+            "async" if p.peek_at("function")? && !p.peek()?.newline => {
                 let modifier = p.token_node()?;
-                p.function(start, FunctionExpression, vec![modifier])
+                p.function(start, FunctionExpression, Vec::from([modifier]))
             }
             "class" => p.class(start, ClassExpression, vec![]),
             "@" => {
@@ -660,7 +664,7 @@ impl<'src> Parser<'src> {
                 p.class(start, ClassExpression, modifiers)
             }
             "new" => p.new_expression(),
-            "import" if p.peek_at(".") => {
+            "import" if p.peek_at(".")? => {
                 p.bump()?;
                 p.expect(".")?;
                 let name = p.identifier()?;
@@ -679,17 +683,17 @@ impl<'src> Parser<'src> {
                         ("keywordToken", Value::Number(ImportKeyword.number())),
                         ("name", name.into())
                     ],
-                ))
+                )?)
             }
             "super" => {
-                if !matches!(p.peek().raw, "(" | "." | "[") {
+                if !matches!(p.peek()?.raw, "(" | "." | "[") {
                     return Err(p.error("'super' must be followed by a call or member access"));
                 }
                 p.token_node()
             }
             "null" | "true" | "false" | "this" => p.token_node(),
             "/" | "/=" => {
-                let token = p.lexer.regex(p.current.start);
+                let token = p.lexer.regex_controlled(p.current.start, p.control.as_ref())?;
                 if let Some(error) = token.error {
                     return Err(Diagnostic {
                         message: error.into(),
@@ -697,16 +701,16 @@ impl<'src> Parser<'src> {
                             start: token.start,
                             end: token.end,
                         },
-                    });
+                    }.into());
                 }
                 p.end = token.end;
-                p.current = p.lexer.next();
+                p.current = p.lexer.next_controlled(p.control.as_ref())?;
                 Ok(p.make(
                     RegularExpressionLiteral,
                     start,
                     token.end,
                     fields![("text", token.raw.into())],
-                ))
+                )?)
             }
             "<" if p.options.jsx => p.jsx_element(),
             "await" if p.context.contains(AWAIT) => {
@@ -716,7 +720,7 @@ impl<'src> Parser<'src> {
                 Err(p.error("Expected a left-hand-side expression before yield"))
             }
             "import" => {
-                if matches!(p.peek().raw, "(" | "<" | "<<") {
+                if matches!(p.peek()?.raw, "(" | "<" | "<<") {
                     p.source_flags |= node_flags::POSSIBLY_CONTAINS_DYNAMIC_IMPORT;
                     return p.token_node();
                 }
@@ -749,7 +753,9 @@ impl<'src> Parser<'src> {
                         | "with"
                         | "enum"
                 ) {
-                    return Err(p.error("Unexpected keyword in expression"));
+                    return if p.context.contains(node_flags::JSDOC) {
+                        p.missing_jsdoc_identifier("Unexpected keyword in expression")
+                    } else { Err(p.error("Unexpected keyword in expression")) };
                 }
                 if p.current.kind == Kind::Private {
                     p.identifier()
@@ -757,6 +763,7 @@ impl<'src> Parser<'src> {
                     p.binding_identifier()
                 }
             }
+            _ if p.context.contains(node_flags::JSDOC) => p.missing_jsdoc_identifier("Expected expression"),
             _ => Err(p.error(format!("Expected expression, found '{}'", p.current.raw))),
         }
         })
@@ -775,7 +782,7 @@ impl<'src> Parser<'src> {
                             SpreadElement,
                             start,
                             fields![("expression", expression.into())],
-                        ));
+                        )?);
                     } else {
                         arguments.push(p.assignment_expression()?);
                     }
@@ -795,25 +802,25 @@ impl<'src> Parser<'src> {
             p.expect("new")?;
             if p.eat(".")? {
                 let name = p.identifier()?;
-                return Ok(p.finish(
+                return p.finish(
                     MetaProperty,
                     start,
                     fields![
                         ("keywordToken", Value::Number(NewKeyword.number())),
                         ("name", name.into())
                     ],
-                ));
+                );
             }
             let expression = p.postfix_expression(true)?;
             let mut fields = if p.nodes[expression.0].syntax_kind == ExpressionWithTypeArguments {
-                p.nodes[expression.0].fields.clone()
+                p.clone_fields(expression)?
             } else {
                 fields![("expression", expression.into())]
             };
             if p.at("(") {
                 fields.push(("arguments", p.arguments()?.into()));
             }
-            Ok(p.finish(NewExpression, start, fields))
+            p.finish(NewExpression, start, fields)
         })
     }
     pub(super) fn object_literal(&mut self) -> Result<NodeId> {
@@ -836,18 +843,18 @@ impl<'src> Parser<'src> {
             let pos = self.pos();
             if self.eat("...")? {
                 let expression = self.assignment_expression()?;
-                properties.push(self.finish(
+                properties.push(self.finish_native_jsdoc(
                     SpreadAssignment,
                     pos,
                     fields![("expression", expression.into())],
-                ));
+                )?);
             } else {
                 let modifiers = self.modifiers(true)?;
                 let accessor = if matches!(self.current.raw, "get" | "set")
                     && (matches!(
-                        self.peek().kind,
+                        self.peek()?.kind,
                         Kind::Word | Kind::Private | Kind::String | Kind::Number
-                    ) || self.peek_at("["))
+                    ) || self.peek_at("[")?)
                 {
                     Some(self.bump()?.raw)
                 } else {
@@ -870,10 +877,8 @@ impl<'src> Parser<'src> {
                     if self.at("<") {
                         fields.push(("typeParameters", self.type_parameters()?.into()));
                     }
-                    let async_function = accessor.is_none()
-                        && modifiers
-                            .iter()
-                            .any(|id| self.nodes[id.0].syntax_kind == AsyncKeyword);
+                    let async_function =
+                        accessor.is_none() && self.has_modifier(&modifiers, AsyncKeyword)?;
                     let generator = generator && accessor.is_none();
                     fields.push((
                         "parameters",
@@ -917,8 +922,8 @@ impl<'src> Parser<'src> {
                     }
                     ShorthandPropertyAssignment
                 };
-                let id = self.finish(kind, pos, fields);
-                self.attach_modifiers(id, modifiers);
+                let id = self.finish_native_jsdoc(kind, pos, fields)?;
+                self.attach_modifiers(id, modifiers)?;
                 properties.push(id);
             }
             if !self.eat(",")? {
@@ -926,11 +931,11 @@ impl<'src> Parser<'src> {
             }
         }
         self.expect("}")?;
-        Ok(self.finish(
+        self.finish(
             ObjectLiteralExpression,
             start,
             fields![("properties", properties.into())],
-        ))
+        )
     }
     pub(super) fn template(&mut self, type_context: bool) -> Result<NodeId> {
         self.template_inner(type_context, false)
@@ -945,7 +950,7 @@ impl<'src> Parser<'src> {
             if p.current.kind == Kind::NoSubstitutionTemplate {
                 let literal = p.literal_mode(tagged)?;
                 return if type_context {
-                    Ok(p.finish(LiteralType, start, fields![("literal", literal.into())]))
+                    Ok(p.finish(LiteralType, start, fields![("literal", literal.into())])?)
                 } else {
                     Ok(literal)
                 };
@@ -965,7 +970,12 @@ impl<'src> Parser<'src> {
                     return Err(p.error("Expected '}' in template substitution"));
                 }
                 let full_start = p.current.full_start;
-                p.current = p.lexer.template(p.current.start, true, false);
+                p.current = p.lexer.template_controlled(
+                    p.current.start,
+                    true,
+                    false,
+                    p.control.as_ref(),
+                )?;
                 p.current.full_start = full_start;
                 p.check_token()?;
                 let tail = p.current.kind == Kind::TemplateTail;
@@ -984,12 +994,12 @@ impl<'src> Parser<'src> {
                         ),
                         ("literal", literal.into()),
                     ],
-                ));
+                )?);
                 if tail {
                     break;
                 }
             }
-            Ok(p.finish(
+            p.finish(
                 if type_context {
                     TemplateLiteralType
                 } else {
@@ -997,7 +1007,7 @@ impl<'src> Parser<'src> {
                 },
                 start,
                 fields![("head", head.into()), ("templateSpans", spans.into())],
-            ))
+            )
         })
     }
 }

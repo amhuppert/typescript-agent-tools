@@ -1,0 +1,10 @@
+[
+  "basic",
+  "unused-constraint",
+  "unused-default",
+  "unused-member",
+  "unused-base",
+  "merged-later-constraint",
+  "merged-later-default",
+  "valid-class"
+]

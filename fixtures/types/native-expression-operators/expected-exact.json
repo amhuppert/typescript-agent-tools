@@ -1,0 +1,297 @@
+[
+  {
+    "name": "conditionalUnion",
+    "kind": "value",
+    "summary": "\"x\" | 1",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "conditionalIdentical",
+    "kind": "value",
+    "summary": "1",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "conditionalSubtype",
+    "kind": "value",
+    "summary": "{ a: number; b?: never; } | { a: number; b: string; }",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "conditionalBothArms",
+    "kind": "value",
+    "summary": "1 | { unvisited: Missing; }",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "conditionalNullable",
+    "kind": "value",
+    "summary": "1 | null",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "conditionalUnknown",
+    "kind": "value",
+    "summary": "1 | 2",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "conditionalNested",
+    "kind": "value",
+    "summary": "1 | 2 | 3",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "deleteProperty",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2790
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "deleteOptional",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "deleteReadonly",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2704
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "deleteElement",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2790
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "deleteWrapped",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2790
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "deleteChain",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2790
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "deleteInvalid",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2703
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "deleteHidden",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "deleteAny",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "inString",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "inNumber",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "inSymbol",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "inAny",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "inInvalidKey",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "inInvalidReceiver",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "inNullReceiver",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      18047
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "inUnknownReceiver",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      18046
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "inUnknownKey",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      18046
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "inHiddenKey",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      2304,
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "unvisited"
+    }
+  },
+  {
+    "name": "inHiddenReceiver",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "inNullKey",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [
+      18047
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "inEmptyReceiver",
+    "kind": "value",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  }
+]

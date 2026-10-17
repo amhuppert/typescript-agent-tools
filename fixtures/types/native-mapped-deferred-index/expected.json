@@ -1,0 +1,26 @@
+[
+  {
+    "name": "literal",
+    "summary": "2",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "text",
+    "summary": "2",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "positive",
+    "summary": "1",
+    "errorType": false,
+    "codes": []
+  },
+  {
+    "name": "negative",
+    "summary": "2",
+    "errorType": false,
+    "codes": []
+  }
+]

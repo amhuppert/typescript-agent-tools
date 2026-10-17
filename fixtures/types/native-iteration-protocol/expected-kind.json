@@ -1,0 +1,98 @@
+[
+  {
+    "name": "legacyArray",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:49:79:193": {
+        "end": 79,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 49,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "legacyTuple",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:134:164:193": {
+        "end": 164,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 134,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "legacyString",
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:244:249:13": {
+        "end": 249,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 244,
+        "use": 13
+      }
+    }
+  },
+  {
+    "name": "legacyUnion",
+    "kind": "value",
+    "summary": "string | number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:339:349:13": {
+        "end": 349,
+        "fallbackAny": false,
+        "inputAny": false,
+        "pos": 339,
+        "use": 13
+      }
+    }
+  },
+  {
+    "name": "legacyMissing",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2461
+    ],
+    "demandFailures": [],
+    "iteration": {
+      "checkedIteration:400:434:193": {
+        "end": 434,
+        "fallbackAny": true,
+        "inputAny": false,
+        "pos": 400,
+        "use": 193
+      }
+    }
+  },
+  {
+    "name": "legacyAny",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "iteration": {}
+  }
+]

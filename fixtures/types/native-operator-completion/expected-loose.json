@@ -1,0 +1,316 @@
+{
+  "queries": [
+    {
+      "name": "unaryPlus",
+      "summary": "number",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304,
+        2695
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 23,
+          "end": 40
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 51,
+          "end": 69
+        }
+      ]
+    },
+    {
+      "name": "unaryMinus",
+      "summary": "number",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304,
+        2695
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 162,
+          "end": 180
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 191,
+          "end": 210
+        }
+      ]
+    },
+    {
+      "name": "unaryTilde",
+      "summary": "number",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304,
+        2695
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 304,
+          "end": 322
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 333,
+          "end": 352
+        }
+      ]
+    },
+    {
+      "name": "unaryNot",
+      "summary": "boolean",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304,
+        2695,
+        2873,
+        2873
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 451,
+          "end": 467
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 478,
+          "end": 495
+        }
+      ]
+    },
+    {
+      "name": "prefixUpdate",
+      "summary": "number",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304,
+        2357,
+        2357
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 594,
+          "end": 613
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 624,
+          "end": 644
+        }
+      ]
+    },
+    {
+      "name": "postfixUpdate",
+      "summary": "number",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304,
+        2357,
+        2357
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 750,
+          "end": 770
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 781,
+          "end": 802
+        }
+      ]
+    },
+    {
+      "name": "arithmetic",
+      "summary": "number",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 906,
+          "end": 929
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 940,
+          "end": 964
+        }
+      ]
+    },
+    {
+      "name": "addition",
+      "summary": "number",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 1058,
+          "end": 1079
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 1090,
+          "end": 1112
+        }
+      ]
+    },
+    {
+      "name": "relational",
+      "summary": "boolean",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 1206,
+          "end": 1229
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 1240,
+          "end": 1264
+        }
+      ]
+    },
+    {
+      "name": "equality",
+      "summary": "61",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304,
+        2367
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 1358,
+          "end": 1379
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 1390,
+          "end": 1412
+        }
+      ]
+    },
+    {
+      "name": "equalityInitializer",
+      "summary": "boolean",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304,
+        2367
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 1559,
+          "end": 1583
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 1594,
+          "end": 1619
+        }
+      ]
+    },
+    {
+      "name": "compound",
+      "summary": "number",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 1724,
+          "end": 1745
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 1779,
+          "end": 1800
+        }
+      ]
+    },
+    {
+      "name": "numberLiteral",
+      "summary": "-1",
+      "errorType": false,
+      "codes": [],
+      "demandFailures": [],
+      "errors": []
+    },
+    {
+      "name": "bigintLiteral",
+      "summary": "-1n",
+      "errorType": false,
+      "codes": [],
+      "demandFailures": [],
+      "errors": []
+    },
+    {
+      "name": "booleanBitwise",
+      "summary": "number",
+      "errorType": false,
+      "codes": [
+        2447
+      ],
+      "demandFailures": [],
+      "errors": []
+    },
+    {
+      "name": "symbolShortCircuit",
+      "summary": "boolean",
+      "errorType": false,
+      "codes": [
+        2469
+      ],
+      "demandFailures": [],
+      "errors": []
+    }
+  ]
+}

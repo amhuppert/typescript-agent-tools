@@ -1,0 +1,94 @@
+{
+  "nativeVersion": "7.0.2",
+  "goCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "kind": "bounded same-checker actual GetDefaultFromTypeParameter observations",
+  "sessions": 12,
+  "semanticDiagnosticPrelude": false,
+  "initializationDiagnosticCodes": [
+    2318,
+    2318,
+    2318,
+    2318,
+    2318,
+    2318,
+    2318,
+    2318,
+    2318,
+    2318
+  ],
+  "nativePublicApiValidation": "vrun-d1d65aa9-92c9-4f9e-944a-7cec2f828ba0",
+  "observationsSha256": "2dfe581e53739fe854b7e788cc4a97423604e9607ad0520ca1dc9eefc3e0d4dd",
+  "files": [
+    {
+      "source": ".cc/temp/types-signature-default/setup.mjs",
+      "captured": "fixtures/types/native-signature-mapper/evidence/captured-tooling/setup.mjs",
+      "sha256": "0fcfd0504451c7d7a0aa2b826cce08fb21c5a3e40840847cd7c9a264b19af823"
+    },
+    {
+      "source": ".cc/temp/types-signature-default/probe.mjs",
+      "captured": "fixtures/types/native-signature-mapper/evidence/captured-tooling/probe.mjs",
+      "sha256": "539d37b0cedc845682a3b936a44d56488e582e5fa46aa6fa2e2b5eeab874517d"
+    },
+    {
+      "source": ".cc/temp/types-signature-default/oracle.mjs",
+      "captured": "fixtures/types/native-signature-mapper/evidence/captured-tooling/oracle.mjs",
+      "sha256": "6e782c416d6eb5644e3e7dfd056d9d88a81195deb35473fd6af45f3817b04a1c"
+    },
+    {
+      "source": ".cc/temp/types-signature-default/checker-hook.go",
+      "captured": "fixtures/types/native-signature-mapper/evidence/captured-tooling/checker-hook.go",
+      "sha256": "e2d5c10ae680c02f912cd1eff4d9b17dc922894559fea2028a82663d9a501419"
+    },
+    {
+      "source": ".cc/temp/types-signature-default/ls-hook.go",
+      "captured": "fixtures/types/native-signature-mapper/evidence/captured-tooling/ls-hook.go",
+      "sha256": "73c9a52f43914571bdf7f29e8817720d0ff98bdb0aeb7cad183fa8397a848dce"
+    },
+    {
+      "source": ".cc/temp/types-signature-default/oracle-test.go",
+      "captured": "fixtures/types/native-signature-mapper/evidence/captured-tooling/oracle-test.go",
+      "sha256": "853a705daede47ad7deca503e73a5e435e9a16842c7b5fef9f2084ca221361e6"
+    },
+    {
+      "source": "fixtures/types/native-signature-mapper/cases.ts",
+      "captured": "fixtures/types/native-signature-mapper/evidence/captured-inputs/cases.ts",
+      "sha256": "ae2f2ecb6e10092dcb1639c69422f48eac7bb9518662d426a745ce4d9306c898"
+    },
+    {
+      "source": "fixtures/types/native-signature-mapper/tsconfig.json",
+      "captured": "fixtures/types/native-signature-mapper/evidence/captured-inputs/tsconfig.json",
+      "sha256": "63a5c04ec099c3c3611daefc95f0601a95018dfcb3e4a31102b7ce9e164033ca"
+    },
+    {
+      "source": "fixtures/types/native-signature-mapper/loose.json",
+      "captured": "fixtures/types/native-signature-mapper/evidence/captured-inputs/loose.json",
+      "sha256": "41156ed0d344408f7cd9be939b86f360225945353589c28ec51bb0499ff94a7e"
+    },
+    {
+      "source": "tools/type-oracle.mjs",
+      "captured": "fixtures/types/native-signature-mapper/evidence/captured-tooling/type-oracle.mjs",
+      "sha256": "376e301e6b34121739d920339ffca505b445c20432ff80fad77df43c1ca252ce"
+    },
+    {
+      "source": "tools/semantic-oracle.mjs",
+      "captured": "fixtures/types/native-signature-mapper/evidence/captured-tooling/semantic-oracle.mjs",
+      "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+    },
+    {
+      "source": "tools/vendor-typescript-libs.mjs",
+      "captured": "fixtures/types/native-signature-mapper/evidence/captured-tooling/vendor-typescript-libs.mjs",
+      "sha256": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d"
+    },
+    {
+      "source": "tools/navigation-oracle.mjs",
+      "captured": "fixtures/types/native-signature-mapper/evidence/captured-tooling/navigation-oracle.mjs",
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+    },
+    {
+      "source": "tools/type-signature-mapper-oracle.test.mjs",
+      "captured": "fixtures/types/native-signature-mapper/evidence/captured-tooling/type-signature-mapper-oracle.test.mjs",
+      "sha256": "31e36b0f25a2593292b0fd12fd6c95007c35465ca4f945e3a0a4cb568f27c87a"
+    }
+  ],
+  "limits": "No production-checker, full generic, performance or guard completion proof. Initial missing-global 2318 codes retained separately; lazy missing default introduces2304 only on default demand. Captured oracle imports live owners by original absolute paths; hashes freeze reviewed dependencies, not a standalone replay bundle."
+}

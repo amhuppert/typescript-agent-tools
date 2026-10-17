@@ -1,0 +1,18 @@
+export {};
+declare function quickCall(value: MissingQuickParameter): number;
+declare const promised: Promise<number>;
+declare const scalar: number;
+declare const bad: { then(): void };
+const /*#literal*/literal = 1;
+const /*#boolean*/boolean = true;
+const /*#parenthesized*/parenthesized = ((1));
+const /*#assertion*/assertion = MissingQuickOperand as number;
+const /*#parenthesizedAssertion*/parenthesizedAssertion = ((MissingParenthesizedOperand as string));
+const /*#call*/call = quickCall(MissingQuickArgument);
+const /*#awaitLiteral*/awaitLiteral = await 1;
+const /*#awaitAssertion*/awaitAssertion = await (MissingAwaitOperand as string);
+const /*#awaitCall*/awaitCall = await quickCall(MissingAwaitArgument);
+const /*#awaitPromise*/awaitPromise = await promised;
+const /*#awaitScalar*/awaitScalar = await scalar;
+const /*#awaitBad*/awaitBad = await bad;
+const /*#constFailure*/constFailure = MissingConstOperand as const;

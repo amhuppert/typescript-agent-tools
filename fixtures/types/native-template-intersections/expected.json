@@ -1,0 +1,518 @@
+{
+  "tsconfig.json": [
+    {
+      "marker": "match",
+      "summary": "\"getX\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "reverse",
+      "summary": "\"getX\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "miss",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "upper",
+      "summary": "\"ABC\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "upperMiss",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "nested",
+      "summary": "\"ABC\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "multiple",
+      "summary": "\"ab\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "multipleMiss",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "primitive",
+      "summary": "\"a1\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "union",
+      "summary": "Union",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "numberSpelling",
+      "summary": "\"0x10\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "numberMiss",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "anyMiss",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "never",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "unknown",
+      "summary": "\"getX\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "nullable",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "substituted",
+      "summary": "\"getX\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "substitutedMiss",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "deferred",
+      "summary": "<T extends string>() => `get${T}` & \"getX\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "missing",
+      "summary": "\"getX\"",
+      "errorType": false,
+      "codes": [
+        2304
+      ],
+      "failures": []
+    },
+    {
+      "marker": "qualified",
+      "summary": "Uppercase<string>",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "distinctMappings",
+      "summary": "DistinctMappings",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "versionLower",
+      "summary": "\"ꟋꟌꟚ\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "versionUpper",
+      "summary": "\"ɤꟍꟛ\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    }
+  ],
+  "loose.json": [
+    {
+      "marker": "match",
+      "summary": "\"getX\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "reverse",
+      "summary": "\"getX\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "miss",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "upper",
+      "summary": "\"ABC\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "upperMiss",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "nested",
+      "summary": "\"ABC\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "multiple",
+      "summary": "\"ab\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "multipleMiss",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "primitive",
+      "summary": "\"a1\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "union",
+      "summary": "Union",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "numberSpelling",
+      "summary": "\"0x10\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "numberMiss",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "anyMiss",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "never",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "unknown",
+      "summary": "\"getX\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "nullable",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "substituted",
+      "summary": "\"getX\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "substitutedMiss",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "deferred",
+      "summary": "<T extends string>() => `get${T}` & \"getX\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "missing",
+      "summary": "\"getX\"",
+      "errorType": false,
+      "codes": [
+        2304
+      ],
+      "failures": []
+    },
+    {
+      "marker": "qualified",
+      "summary": "Uppercase<string>",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "distinctMappings",
+      "summary": "DistinctMappings",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "versionLower",
+      "summary": "\"ꟋꟌꟚ\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "versionUpper",
+      "summary": "\"ɤꟍꟛ\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    }
+  ],
+  "exact.json": [
+    {
+      "marker": "match",
+      "summary": "\"getX\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "reverse",
+      "summary": "\"getX\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "miss",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "upper",
+      "summary": "\"ABC\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "upperMiss",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "nested",
+      "summary": "\"ABC\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "multiple",
+      "summary": "\"ab\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "multipleMiss",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "primitive",
+      "summary": "\"a1\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "union",
+      "summary": "Union",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "numberSpelling",
+      "summary": "\"0x10\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "numberMiss",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "anyMiss",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "never",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "unknown",
+      "summary": "\"getX\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "nullable",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "substituted",
+      "summary": "\"getX\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "substitutedMiss",
+      "summary": "never",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "deferred",
+      "summary": "<T extends string>() => `get${T}` & \"getX\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "missing",
+      "summary": "\"getX\"",
+      "errorType": false,
+      "codes": [
+        2304
+      ],
+      "failures": []
+    },
+    {
+      "marker": "qualified",
+      "summary": "Uppercase<string>",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "distinctMappings",
+      "summary": "DistinctMappings",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "versionLower",
+      "summary": "\"ꟋꟌꟚ\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    },
+    {
+      "marker": "versionUpper",
+      "summary": "\"ɤꟍꟛ\"",
+      "errorType": false,
+      "codes": [],
+      "failures": []
+    }
+  ]
+}

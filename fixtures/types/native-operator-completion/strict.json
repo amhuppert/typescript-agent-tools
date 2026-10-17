@@ -1,0 +1,4 @@
+{
+  "compilerOptions": { "strict": true, "noLib": true, "target": "ESNext" },
+  "files": ["../native-operators/globals.d.ts", "cases.ts"]
+}

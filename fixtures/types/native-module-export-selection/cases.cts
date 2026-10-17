@@ -1,0 +1,12 @@
+import * as /*#classLateAlias*/classLate from "./class-late.mjs";
+const classLateValue = /*#classLateValue*/classLate;
+import * as /*#classEarlyAlias*/classEarly from "./class-early.mjs";
+const classEarlyValue = /*#classEarlyValue*/classEarly;
+import * as /*#classOnlyAlias*/classOnly from "./class-only.mjs";
+const classOnlyValue = /*#classOnlyValue*/classOnly;
+import * as /*#classStarAlias*/classStar from "./class-star.mjs";
+const classStarValue = /*#classStarValue*/classStar;
+import * as /*#functionStarAlias*/functionStar from "./function-star.mjs";
+const functionStarValue = /*#functionStarValue*/functionStar;
+import * as /*#moduleStarAlias*/moduleStar from "./module-star.mjs";
+const moduleStarValue = /*#moduleStarValue*/moduleStar;

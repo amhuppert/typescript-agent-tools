@@ -1,0 +1,223 @@
+{
+  "schema": 1,
+  "purpose": "Fresh pinned TypeReference count/default controls; not a complete hook replay or whole-checker proof",
+  "nativeCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "files": [
+    {
+      "path": "answers-alias-context.json",
+      "sha256": "7276fd9abe4aa33fd16912695c2ab7570dfe37d477610c9d00d056522ae6a7f9",
+      "bytes": 2244
+    },
+    {
+      "path": "answers-extra.json",
+      "sha256": "c9f54073922ca7cb3955f11120e5e31615a7a00ace239a3b46fb3f007a8b60dd",
+      "bytes": 5276
+    },
+    {
+      "path": "answers.json",
+      "sha256": "e2f0a2704a46d991f82b22a902b1de2e6d926d6b8a6621eda412b82fccba20c6",
+      "bytes": 2315
+    },
+    {
+      "path": "inputs/circular-default-reference/globals.ts",
+      "sha256": "db53426e11075c9abca944542f03750236cd02321ab5ad4670666825f12d1460",
+      "bytes": 86
+    },
+    {
+      "path": "inputs/circular-default-reference/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967",
+      "bytes": 72
+    },
+    {
+      "path": "inputs/default/globals.ts",
+      "sha256": "0ce6db810e24aa963587296313549ca52269f7b2dade0f705f27211bbca78b3b",
+      "bytes": 77
+    },
+    {
+      "path": "inputs/default/tsconfig.json",
+      "sha256": "21625e60dc1b8ef839c54f2b589739490c3e48a34ab13a3e5fefd74b0f322a3b",
+      "bytes": 58
+    },
+    {
+      "path": "inputs/earlier-default-reference/globals.ts",
+      "sha256": "df81a6e79e416436707bc943ecc5fe2f25eef816ea0d134243662627627335f7",
+      "bytes": 91
+    },
+    {
+      "path": "inputs/earlier-default-reference/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967",
+      "bytes": 72
+    },
+    {
+      "path": "inputs/explicit-default-reference/globals.ts",
+      "sha256": "c4847536abec7e47bff5f5d85c3b887bd0ef38d3694d4843b755965f2bcfaed4",
+      "bytes": 90
+    },
+    {
+      "path": "inputs/explicit-default-reference/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967",
+      "bytes": 72
+    },
+    {
+      "path": "inputs/extra/globals.ts",
+      "sha256": "8786781d420d244b193efd7c4d29fd0d471f26bf0078e1e94bd1e3d1367f92d5",
+      "bytes": 84
+    },
+    {
+      "path": "inputs/extra/tsconfig.json",
+      "sha256": "21625e60dc1b8ef839c54f2b589739490c3e48a34ab13a3e5fefd74b0f322a3b",
+      "bytes": 58
+    },
+    {
+      "path": "inputs/forward-default-reference/globals.ts",
+      "sha256": "0a8e48d9c8bb29b040f83cdfe7005bad97aec7911b6ed15b933fc0af4c45cb2b",
+      "bytes": 91
+    },
+    {
+      "path": "inputs/forward-default-reference/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967",
+      "bytes": 72
+    },
+    {
+      "path": "inputs/invalid-constraint-unused/globals.ts",
+      "sha256": "1de2e5f11d0fe425ab1813b61b80a07a1df90dca11adaf2a9789598722bb0f22",
+      "bytes": 101
+    },
+    {
+      "path": "inputs/invalid-constraint-unused/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967",
+      "bytes": 72
+    },
+    {
+      "path": "inputs/invalid-default/globals.ts",
+      "sha256": "c2e15627d4c0765c21460c0997d2c8372982e5141c44e085e56683acdaf637df",
+      "bytes": 85
+    },
+    {
+      "path": "inputs/invalid-default/tsconfig.json",
+      "sha256": "21625e60dc1b8ef839c54f2b589739490c3e48a34ab13a3e5fefd74b0f322a3b",
+      "bytes": 58
+    },
+    {
+      "path": "inputs/merged-default/globals.ts",
+      "sha256": "4001efb3404067bed5e2b62194c83787575835fbeb8159a2ca4fd46d6617604e",
+      "bytes": 97
+    },
+    {
+      "path": "inputs/merged-default/tsconfig.json",
+      "sha256": "21625e60dc1b8ef839c54f2b589739490c3e48a34ab13a3e5fefd74b0f322a3b",
+      "bytes": 58
+    },
+    {
+      "path": "inputs/missing/globals.ts",
+      "sha256": "3bdf8b958dc4b5ab6be132a4ed7e5eeb503ef118f31b3ed945253cea54eaa0c2",
+      "bytes": 68
+    },
+    {
+      "path": "inputs/missing/tsconfig.json",
+      "sha256": "21625e60dc1b8ef839c54f2b589739490c3e48a34ab13a3e5fefd74b0f322a3b",
+      "bytes": 58
+    },
+    {
+      "path": "inputs/nongeneric-extra/globals.ts",
+      "sha256": "4656d775349d0f4a0deae9f36024401f29e9994abb139d82cfc33acba3134d22",
+      "bytes": 77
+    },
+    {
+      "path": "inputs/nongeneric-extra/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967",
+      "bytes": 72
+    },
+    {
+      "path": "inputs/parameter-extra/globals.ts",
+      "sha256": "501b5569e2c9605933818c916a9d2e5c533019c521138e359305b6302475a426",
+      "bytes": 49
+    },
+    {
+      "path": "inputs/parameter-extra/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967",
+      "bytes": 72
+    },
+    {
+      "path": "inputs/partial/globals.ts",
+      "sha256": "854e58745163419fb00280546832cc98bdf525d90bd1a4cef38fb64131900a10",
+      "bytes": 88
+    },
+    {
+      "path": "inputs/partial/tsconfig.json",
+      "sha256": "21625e60dc1b8ef839c54f2b589739490c3e48a34ab13a3e5fefd74b0f322a3b",
+      "bytes": 58
+    },
+    {
+      "path": "inputs/required-after-default/globals.ts",
+      "sha256": "c0c90ba981febbaee0de6b4c4f8b302f6419ade99be97dbf6fbc454187af4476",
+      "bytes": 87
+    },
+    {
+      "path": "inputs/required-after-default/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967",
+      "bytes": 72
+    },
+    {
+      "path": "inputs/self-default-reference/globals.ts",
+      "sha256": "818ae321cb7290f16d562ba20c7352c17bde90f14bce14432fdc50e35896c2ee",
+      "bytes": 71
+    },
+    {
+      "path": "inputs/self-default-reference/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967",
+      "bytes": 72
+    },
+    {
+      "path": "inputs/unused-invalid-default/globals.ts",
+      "sha256": "699fdf6510b9a3972a07c325e0cfc754660a42489ef989c8a9e676354aced484",
+      "bytes": 92
+    },
+    {
+      "path": "inputs/unused-invalid-default/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967",
+      "bytes": 72
+    },
+    {
+      "path": "inputs/wrongarity-invalid-argument/globals.ts",
+      "sha256": "04f2a6a42aa57bc89577df5098b600e9ea7df5ebf20bc7653339c08bfafe6378",
+      "bytes": 92
+    },
+    {
+      "path": "inputs/wrongarity-invalid-argument/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967",
+      "bytes": 72
+    },
+    {
+      "path": "inputs/wrongarity-invalid-default/globals.ts",
+      "sha256": "f4ae9095156f164ed4bce8a705fa437ec06ca8bd5480dc97d59d248d1dd8ddc6",
+      "bytes": 95
+    },
+    {
+      "path": "inputs/wrongarity-invalid-default/tsconfig.json",
+      "sha256": "c7c914b4fcc54158bdf14c3497a674d26ca1f571faf2433a8135052350b2d967",
+      "bytes": 72
+    },
+    {
+      "path": "probe-extra.mjs",
+      "sha256": "ad79ff0317646a39054bd130619d5c74449577843b0753a04c2f2ac13ea43e06",
+      "bytes": 2108
+    },
+    {
+      "path": "probe.mjs",
+      "sha256": "a08a8616a0da710faaede9f17729c267413b7edf44635e5a3cb445d286f2d2b9",
+      "bytes": 1851
+    }
+  ],
+  "inspectionOwners": [
+    {
+      "path": "tools/semantic-oracle.mjs",
+      "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+    },
+    {
+      "path": "/Users/alex/github/typescript-agent-tools/.cache/typescript-go-7.0.2/internal/checker/checker.go",
+      "sha256": "32384dde486c33c59c5695505f4c951c3009c6d7e50589cb5b18d0ea92cbf161"
+    }
+  ],
+  "provenance": "Answers retain exact API SourceFile text; copied source equals that text. Input config and owner hashes recorded after measurement, not complete atomic native input capture. Alias-context answers preserve their source inline; their original configs/source paths were later reused by the variable-annotation controls."
+}

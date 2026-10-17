@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "noLib": true,
+    "types": [],
+    "strict": true
+  },
+  "files": [
+    "globals.d.ts",
+    "cases.ts"
+  ]
+}

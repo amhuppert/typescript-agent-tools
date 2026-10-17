@@ -1,0 +1,248 @@
+{
+  "queries": [
+    {
+      "name": "equalSpans",
+      "summary": "11",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 41,
+          "end": 60
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 71,
+          "end": 90
+        }
+      ]
+    },
+    {
+      "name": "equalSpansTwo",
+      "summary": "12",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304,
+        2304,
+        2304
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 261,
+          "end": 280
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 328,
+          "end": 347
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 292,
+          "end": 312
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 359,
+          "end": 379
+        }
+      ]
+    },
+    {
+      "name": "crossingSpans",
+      "summary": "13",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304,
+        2345
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 568,
+          "end": 587
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 598,
+          "end": 617
+        }
+      ]
+    },
+    {
+      "name": "inferSame",
+      "summary": "21",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 874,
+          "end": 893
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 793,
+          "end": 812
+        }
+      ]
+    },
+    {
+      "name": "inferCross",
+      "summary": "22",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 1014,
+          "end": 1038
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 1115,
+          "end": 1139
+        }
+      ]
+    },
+    {
+      "name": "mapping",
+      "summary": "31",
+      "errorType": false,
+      "codes": [
+        2304
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 1249,
+          "end": 1270
+        }
+      ]
+    },
+    {
+      "name": "mappingFixed",
+      "summary": "41",
+      "errorType": false,
+      "codes": [],
+      "demandFailures": [],
+      "errors": []
+    },
+    {
+      "name": "mappingChanges",
+      "summary": "42",
+      "errorType": false,
+      "codes": [],
+      "demandFailures": [],
+      "errors": []
+    },
+    {
+      "name": "mappingNestedFixed",
+      "summary": "43",
+      "errorType": false,
+      "codes": [],
+      "demandFailures": [],
+      "errors": []
+    },
+    {
+      "name": "mappingNestedChanges",
+      "summary": "44",
+      "errorType": false,
+      "codes": [],
+      "demandFailures": [],
+      "errors": []
+    },
+    {
+      "name": "healthySplit",
+      "summary": "[\"first\", \"second\"]",
+      "errorType": false,
+      "codes": [],
+      "demandFailures": [],
+      "errors": []
+    },
+    {
+      "name": "healthy",
+      "summary": "45",
+      "errorType": false,
+      "codes": [],
+      "demandFailures": [],
+      "errors": []
+    },
+    {
+      "name": "equalReject",
+      "summary": "51",
+      "errorType": false,
+      "codes": [
+        2304,
+        2304,
+        2345
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 2270,
+          "end": 2292
+        },
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 2303,
+          "end": 2325
+        }
+      ]
+    },
+    {
+      "name": "validationReject",
+      "summary": "52",
+      "errorType": false,
+      "codes": [
+        2304,
+        2345
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 2672,
+          "end": 2693
+        }
+      ]
+    },
+    {
+      "name": "validationContinue",
+      "summary": "53",
+      "errorType": false,
+      "codes": [
+        2304,
+        2345
+      ],
+      "demandFailures": [],
+      "errors": [
+        {
+          "operation": "getTypeFromTypeNode",
+          "pos": 2856,
+          "end": 2877
+        }
+      ]
+    }
+  ]
+}

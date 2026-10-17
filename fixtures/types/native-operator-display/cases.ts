@@ -1,0 +1,21 @@
+export {};
+declare function consume(value: boolean): "checked";
+declare const bad: { tag: 0; hidden?: Missing };
+consume(bad === 1 /*#left*/);
+consume(1 === bad /*#right*/);
+consume(bad !== 1 /*#notEqual*/);
+consume(bad == 1 /*#looseEqual*/);
+consume(bad != 1 /*#looseNotEqual*/);
+consume(bad === bad /*#same*/);
+consume(1 === 2 /*#literals*/);
+const /*#initializer*/initializer = bad === 1;
+const /*#quick*/quick = consume(bad === 1);
+declare const optionalOnly: { hidden?: MissingOptional };
+consume(optionalOnly === 1 /*#optionalOnly*/);
+declare const healthy: { tag: 0; hidden?: string };
+consume(healthy === 1 /*#healthy*/);
+interface Promise<T> { then(onfulfilled: (value: T) => unknown): Promise<unknown> }
+declare const promised: Promise<{ tag: 0; hidden?: MissingAwaited }>;
+declare const plain: { tag: 0 };
+consume(promised === plain /*#awaited*/);
+consume(plain === promised /*#awaitedReverse*/);

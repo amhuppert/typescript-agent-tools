@@ -1,0 +1,186 @@
+[
+  {
+    "file": "named.ts",
+    "name": "exportedInterface",
+    "summary": "11",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "named.ts",
+    "name": "exportedAlias",
+    "summary": "12",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "named.ts",
+    "name": "exportedClass",
+    "summary": "13",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "named.ts",
+    "name": "exportedValue",
+    "summary": "14",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "named.ts",
+    "name": "exportedNamespace",
+    "summary": "15",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "named.ts",
+    "name": "exactName",
+    "summary": "16",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "named.ts",
+    "name": "caseSensitive",
+    "summary": "75",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "named.ts",
+    "name": "localsFirst",
+    "summary": "19",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "named.ts",
+    "name": "importEqualsInScope",
+    "summary": "77",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "named.ts",
+    "name": "namespaceExport",
+    "summary": "20",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "named.ts",
+    "name": "namespaceImportEquals",
+    "summary": "77",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "default-interface.ts",
+    "name": "defaultInterface",
+    "summary": "31",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "default-class.ts",
+    "name": "defaultClass",
+    "summary": "32",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "default-function.ts",
+    "name": "defaultFunction",
+    "summary": "33",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "reexports.ts",
+    "name": "pureValueAlias",
+    "summary": "71",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "reexports.ts",
+    "name": "pureTypeAlias",
+    "summary": "72",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "reexports.ts",
+    "name": "pureNamespaceAlias",
+    "summary": "73",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "reexports.ts",
+    "name": "starIsNotScope",
+    "summary": "74",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "reexports.ts",
+    "name": "mixedAliasRetained",
+    "summary": "41",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "reexports.ts",
+    "name": "mixedAliasValue",
+    "summary": "81",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "ambient.ts",
+    "name": "ambientInterface",
+    "summary": "51",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "ambient.ts",
+    "name": "ambientDefault",
+    "summary": "52",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "file": "ambient.ts",
+    "name": "ambientPureAlias",
+    "summary": "76",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": []
+  }
+]

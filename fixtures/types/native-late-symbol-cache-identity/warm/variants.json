@@ -1,0 +1,290 @@
+[
+  {
+    "order": "outer-inner",
+    "profile": "strict",
+    "file": "outer-inner.ts",
+    "config": "outer-inner-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "outer-inner.ts"
+      ]
+    },
+    "expected": "62",
+    "evaluation": "warm-call"
+  },
+  {
+    "order": "outer-inner",
+    "profile": "nocheck",
+    "file": "outer-inner.ts",
+    "config": "outer-inner-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "outer-inner.ts"
+      ]
+    },
+    "expected": "62",
+    "evaluation": "warm-call"
+  },
+  {
+    "order": "outer-inner",
+    "profile": "loose",
+    "file": "outer-inner.ts",
+    "config": "outer-inner-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "outer-inner.ts"
+      ]
+    },
+    "expected": "62",
+    "evaluation": "warm-call"
+  },
+  {
+    "order": "outer-inner",
+    "profile": "loose-nocheck",
+    "file": "outer-inner.ts",
+    "config": "outer-inner-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "outer-inner.ts"
+      ]
+    },
+    "expected": "62",
+    "evaluation": "warm-call"
+  },
+  {
+    "order": "inner-outer",
+    "profile": "strict",
+    "file": "inner-outer.ts",
+    "config": "inner-outer-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "inner-outer.ts"
+      ]
+    },
+    "expected": "61",
+    "evaluation": "warm-call"
+  },
+  {
+    "order": "inner-outer",
+    "profile": "nocheck",
+    "file": "inner-outer.ts",
+    "config": "inner-outer-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "inner-outer.ts"
+      ]
+    },
+    "expected": "61",
+    "evaluation": "warm-call"
+  },
+  {
+    "order": "inner-outer",
+    "profile": "loose",
+    "file": "inner-outer.ts",
+    "config": "inner-outer-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "inner-outer.ts"
+      ]
+    },
+    "expected": "61",
+    "evaluation": "warm-call"
+  },
+  {
+    "order": "inner-outer",
+    "profile": "loose-nocheck",
+    "file": "inner-outer.ts",
+    "config": "inner-outer-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "inner-outer.ts"
+      ]
+    },
+    "expected": "61",
+    "evaluation": "warm-call"
+  },
+  {
+    "order": "equal",
+    "profile": "strict",
+    "file": "equal.ts",
+    "config": "equal-strict.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "equal.ts"
+      ]
+    },
+    "expected": "61",
+    "evaluation": "warm-call"
+  },
+  {
+    "order": "equal",
+    "profile": "nocheck",
+    "file": "equal.ts",
+    "config": "equal-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": true,
+        "strictNullChecks": true,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "equal.ts"
+      ]
+    },
+    "expected": "61",
+    "evaluation": "warm-call"
+  },
+  {
+    "order": "equal",
+    "profile": "loose",
+    "file": "equal.ts",
+    "config": "equal-loose.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": false,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "equal.ts"
+      ]
+    },
+    "expected": "61",
+    "evaluation": "warm-call"
+  },
+  {
+    "order": "equal",
+    "profile": "loose-nocheck",
+    "file": "equal.ts",
+    "config": "equal-loose-nocheck.json",
+    "configuration": {
+      "compilerOptions": {
+        "strict": false,
+        "strictNullChecks": false,
+        "noCheck": true,
+        "noLib": true,
+        "types": [],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "files": [
+        "globals.d.ts",
+        "equal.ts"
+      ]
+    },
+    "expected": "61",
+    "evaluation": "warm-call"
+  }
+]

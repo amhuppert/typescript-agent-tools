@@ -1,0 +1,32 @@
+{
+  "compiler": "7.0.2",
+  "answers": [
+    {
+      "count": 1998,
+      "flags": 134217728,
+      "errorType": false,
+      "alternatives": 1998,
+      "first": "0",
+      "last": "1997",
+      "sourceSha256": "98517f38e4a7ccb071ef288f580443eeab5e4bb5ef001afe22ac472ab428f99a"
+    },
+    {
+      "count": 1999,
+      "flags": 134217728,
+      "errorType": false,
+      "alternatives": 1999,
+      "first": "0",
+      "last": "1998",
+      "sourceSha256": "adaf3abc02181ae7b5cf812ce5acae2a336a783c8a6a4335e17ac80caa8fc80c"
+    },
+    {
+      "count": 2000,
+      "flags": 134217728,
+      "errorType": false,
+      "alternatives": 2000,
+      "first": "0",
+      "last": "1999",
+      "sourceSha256": "96ac2617f9ad4ed94ded2a0e8d13d36ad0c9127a14ef33bead76040806ff764d"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noCheck": true,
+    "noLib": true
+  },
+  "files": [
+    "small.ts",
+    "wide.ts"
+  ]
+}

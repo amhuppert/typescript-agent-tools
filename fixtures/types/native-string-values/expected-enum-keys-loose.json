@@ -1,0 +1,614 @@
+[
+  {
+    "name": "keyHigh",
+    "summary": "\"one\"",
+    "errorType": false,
+    "location": {
+      "file": "enum-keys.ts",
+      "start": {
+        "line": 4,
+        "column": 27
+      },
+      "end": {
+        "line": 4,
+        "column": 37
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "enum-keys.ts",
+          "start": {
+            "line": 4,
+            "column": 27
+          },
+          "end": {
+            "line": 4,
+            "column": 37
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "keyLow",
+    "summary": "\"one\"",
+    "errorType": false,
+    "location": {
+      "file": "enum-keys.ts",
+      "start": {
+        "line": 7,
+        "column": 26
+      },
+      "end": {
+        "line": 7,
+        "column": 35
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "enum-keys.ts",
+          "start": {
+            "line": 7,
+            "column": 26
+          },
+          "end": {
+            "line": 7,
+            "column": 35
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "keyLF",
+    "summary": "\"one\"",
+    "errorType": false,
+    "location": {
+      "file": "enum-keys.ts",
+      "start": {
+        "line": 12,
+        "column": 25
+      },
+      "end": {
+        "line": 12,
+        "column": 33
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "enum-keys.ts",
+          "start": {
+            "line": 12,
+            "column": 25
+          },
+          "end": {
+            "line": 12,
+            "column": 33
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "keyCR",
+    "summary": "\"one\"",
+    "errorType": false,
+    "location": {
+      "file": "enum-keys.ts",
+      "start": {
+        "line": 17,
+        "column": 25
+      },
+      "end": {
+        "line": 17,
+        "column": 33
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "enum-keys.ts",
+          "start": {
+            "line": 17,
+            "column": 25
+          },
+          "end": {
+            "line": 17,
+            "column": 33
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "keyCRLF",
+    "summary": "\"one\"",
+    "errorType": false,
+    "location": {
+      "file": "enum-keys.ts",
+      "start": {
+        "line": 22,
+        "column": 27
+      },
+      "end": {
+        "line": 22,
+        "column": 37
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "enum-keys.ts",
+          "start": {
+            "line": 22,
+            "column": 27
+          },
+          "end": {
+            "line": 22,
+            "column": 37
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "keyLS",
+    "summary": "\"one\"",
+    "errorType": false,
+    "location": {
+      "file": "enum-keys.ts",
+      "start": {
+        "line": 27,
+        "column": 25
+      },
+      "end": {
+        "line": 27,
+        "column": 33
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "enum-keys.ts",
+          "start": {
+            "line": 27,
+            "column": 25
+          },
+          "end": {
+            "line": 27,
+            "column": 33
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "keyPS",
+    "summary": "\"one\"",
+    "errorType": false,
+    "location": {
+      "file": "enum-keys.ts",
+      "start": {
+        "line": 32,
+        "column": 25
+      },
+      "end": {
+        "line": 32,
+        "column": 33
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "enum-keys.ts",
+          "start": {
+            "line": 32,
+            "column": 25
+          },
+          "end": {
+            "line": 32,
+            "column": 33
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "keyPair",
+    "summary": "\"one\"",
+    "errorType": false,
+    "location": {
+      "file": "enum-keys.ts",
+      "start": {
+        "line": 35,
+        "column": 27
+      },
+      "end": {
+        "line": 35,
+        "column": 37
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "enum-keys.ts",
+          "start": {
+            "line": 35,
+            "column": 27
+          },
+          "end": {
+            "line": 35,
+            "column": 37
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "keyScalar",
+    "summary": "\"one\"",
+    "errorType": false,
+    "location": {
+      "file": "enum-keys.ts",
+      "start": {
+        "line": 38,
+        "column": 29
+      },
+      "end": {
+        "line": 38,
+        "column": 41
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "enum-keys.ts",
+          "start": {
+            "line": 38,
+            "column": 29
+          },
+          "end": {
+            "line": 38,
+            "column": 41
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "keyTemplateHigh",
+    "summary": "\"one\"",
+    "errorType": false,
+    "location": {
+      "file": "enum-keys.ts",
+      "start": {
+        "line": 40,
+        "column": 35
+      },
+      "end": {
+        "line": 40,
+        "column": 53
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "enum-keys.ts",
+          "start": {
+            "line": 40,
+            "column": 35
+          },
+          "end": {
+            "line": 40,
+            "column": 53
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "keyTemplateLow",
+    "summary": "\"one\"",
+    "errorType": false,
+    "location": {
+      "file": "enum-keys.ts",
+      "start": {
+        "line": 42,
+        "column": 34
+      },
+      "end": {
+        "line": 42,
+        "column": 51
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "enum-keys.ts",
+          "start": {
+            "line": 42,
+            "column": 34
+          },
+          "end": {
+            "line": 42,
+            "column": 51
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "keyTemplateLF",
+    "summary": "\"one\"",
+    "errorType": false,
+    "location": {
+      "file": "enum-keys.ts",
+      "start": {
+        "line": 45,
+        "column": 33
+      },
+      "end": {
+        "line": 45,
+        "column": 49
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "enum-keys.ts",
+          "start": {
+            "line": 45,
+            "column": 33
+          },
+          "end": {
+            "line": 45,
+            "column": 49
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "keyTemplateCR",
+    "summary": "\"one\"",
+    "errorType": false,
+    "location": {
+      "file": "enum-keys.ts",
+      "start": {
+        "line": 48,
+        "column": 33
+      },
+      "end": {
+        "line": 48,
+        "column": 49
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "enum-keys.ts",
+          "start": {
+            "line": 48,
+            "column": 33
+          },
+          "end": {
+            "line": 48,
+            "column": 49
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "keyTemplateCRLF",
+    "summary": "\"one\"",
+    "errorType": false,
+    "location": {
+      "file": "enum-keys.ts",
+      "start": {
+        "line": 51,
+        "column": 35
+      },
+      "end": {
+        "line": 51,
+        "column": 53
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "enum-keys.ts",
+          "start": {
+            "line": 51,
+            "column": 35
+          },
+          "end": {
+            "line": 51,
+            "column": 53
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "keyTemplateLS",
+    "summary": "\"one\"",
+    "errorType": false,
+    "location": {
+      "file": "enum-keys.ts",
+      "start": {
+        "line": 54,
+        "column": 33
+      },
+      "end": {
+        "line": 54,
+        "column": 49
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "enum-keys.ts",
+          "start": {
+            "line": 54,
+            "column": 33
+          },
+          "end": {
+            "line": 54,
+            "column": 49
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "keyTemplatePS",
+    "summary": "\"one\"",
+    "errorType": false,
+    "location": {
+      "file": "enum-keys.ts",
+      "start": {
+        "line": 57,
+        "column": 33
+      },
+      "end": {
+        "line": 57,
+        "column": 49
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "enum-keys.ts",
+          "start": {
+            "line": 57,
+            "column": 33
+          },
+          "end": {
+            "line": 57,
+            "column": 49
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "keyTemplatePair",
+    "summary": "\"one\"",
+    "errorType": false,
+    "location": {
+      "file": "enum-keys.ts",
+      "start": {
+        "line": 59,
+        "column": 35
+      },
+      "end": {
+        "line": 59,
+        "column": 53
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "enum-keys.ts",
+          "start": {
+            "line": 59,
+            "column": 35
+          },
+          "end": {
+            "line": 59,
+            "column": 53
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "keyTemplateScalar",
+    "summary": "\"one\"",
+    "errorType": false,
+    "location": {
+      "file": "enum-keys.ts",
+      "start": {
+        "line": 61,
+        "column": 37
+      },
+      "end": {
+        "line": 61,
+        "column": 57
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "enum-keys.ts",
+          "start": {
+            "line": 61,
+            "column": 37
+          },
+          "end": {
+            "line": 61,
+            "column": 57
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  }
+]

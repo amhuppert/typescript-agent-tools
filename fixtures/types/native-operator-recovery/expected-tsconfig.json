@@ -1,0 +1,101 @@
+[
+  {
+    "name": "mixedSetter",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "mixedValidSetter",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "mixedShiftSetter",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "mixedPlainShift",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "validNumericSetter",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "genuineAnyPlus",
+    "kind": "value",
+    "summary": "any",
+    "errorType": false,
+    "codes": [
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "brandedMixedSetter",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "hidden"
+    }
+  },
+  {
+    "name": "brandedMixedPlain",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2304,
+      2365
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "hidden"
+    }
+  }
+]

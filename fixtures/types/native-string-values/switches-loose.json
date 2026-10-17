@@ -1,0 +1,1 @@
+{"compilerOptions": {"strict": false, "noLib": true, "target": "ESNext", "jsx": "preserve"}, "files": ["../native-generated-literal-context/globals.d.ts", "switches.ts", "dialects.tsx"]}

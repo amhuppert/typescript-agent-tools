@@ -1,0 +1,55 @@
+	// The declaration container is the innermost function that encloses the declaration of the variable
+	// or parameter. The flow container is the innermost function starting with which we analyze the control
+	// flow graph to determine the control flow based type.
+	isParameter := ast.GetRootDeclaration(declaration).Kind == ast.KindParameter
+	declarationContainer := c.getControlFlowContainer(declaration)
+	flowContainer := c.getControlFlowContainer(node)
+	isOuterVariable := flowContainer != declarationContainer
+	isSpreadDestructuringAssignmentTarget := node.Parent != nil && node.Parent.Parent != nil && ast.IsSpreadAssignment(node.Parent) && c.isDestructuringAssignmentTarget(node.Parent.Parent)
+	isModuleExports := symbol.Flags&ast.SymbolFlagsModuleExports != 0
+	typeIsAutomatic := t == c.autoType || t == c.autoArrayType
+	isAutomaticTypeInNonNull := typeIsAutomatic && node.Parent.Kind == ast.KindNonNullExpression
+	// When the control flow originates in a function expression, arrow function, method, or accessor, and
+	// we are referencing a closed-over const variable or parameter or mutable local variable past its last
+	// assignment, we extend the origin of the control flow analysis to include the immediately enclosing
+	// control flow container.
+	for flowContainer != declarationContainer &&
+		(ast.IsFunctionExpressionOrArrowFunction(flowContainer) || ast.IsObjectLiteralOrClassExpressionMethodOrAccessor(flowContainer)) &&
+		(c.isConstantVariable(localOrExportSymbol) && t != c.autoArrayType || c.isParameterOrMutableLocalVariable(localOrExportSymbol) && c.isPastLastAssignment(localOrExportSymbol, node)) {
+		flowContainer = c.getControlFlowContainer(flowContainer)
+	}
+	// We only look for uninitialized variables in strict null checking mode, and only when we can analyze
+	// the entire control flow graph from the variable's declaration (i.e. when the flow container and
+	// declaration container are the same).
+	isNeverInitialized := immediateDeclaration != nil && ast.IsVariableDeclaration(immediateDeclaration) && !ast.IsForInOrOfStatement(immediateDeclaration.Parent.Parent) &&
+		immediateDeclaration.Initializer() == nil && immediateDeclaration.AsVariableDeclaration().ExclamationToken == nil &&
+		c.isMutableLocalVariableDeclaration(immediateDeclaration) && !c.isSymbolAssignedDefinitely(symbol)
+	assumeInitialized := isParameter ||
+		isAlias ||
+		(isOuterVariable && !isNeverInitialized) ||
+		isSpreadDestructuringAssignmentTarget ||
+		isModuleExports ||
+		c.isSameScopedBindingElement(node, declaration) ||
+		t != c.autoType && t != c.autoArrayType && (!c.strictNullChecks || t.flags&(TypeFlagsAnyOrUnknown|TypeFlagsVoid) != 0 || IsInTypeQuery(node) || c.isInAmbientOrTypeNode(node) || node.Parent.Kind == ast.KindExportSpecifier) ||
+		ast.IsNonNullExpression(node.Parent) ||
+		ast.IsVariableDeclaration(declaration) && declaration.AsVariableDeclaration().ExclamationToken != nil ||
+		declaration.Flags&ast.NodeFlagsAmbient != 0
+	var initialType *Type
+	switch {
+	case isAutomaticTypeInNonNull:
+		initialType = c.undefinedType
+	case assumeInitialized && isParameter:
+		initialType = c.removeOptionalityFromDeclaredType(t, declaration)
+	case assumeInitialized:
+		initialType = t
+	case typeIsAutomatic:
+		initialType = c.undefinedType
+	default:
+		initialType = c.getOptionalType(t, false /*isProperty*/)
+	}
+	var flowType *Type
+	if isAutomaticTypeInNonNull {
+		flowType = c.GetNonNullableType(c.getFlowTypeOfReferenceEx(node, t, initialType, flowContainer, nil))
+	} else {
+		flowType = c.getFlowTypeOfReferenceEx(node, t, initialType, flowContainer, nil)
+	}

@@ -1,0 +1,1530 @@
+[
+  {
+    "config": "tsconfig",
+    "name": "reverseObject",
+    "summary": "{ readonly a: string; b: number; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "a",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 9,
+                "column": 39
+              },
+              "end": {
+                "line": 9,
+                "column": 40
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "b",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 9,
+                "column": 61
+              },
+              "end": {
+                "line": 9,
+                "column": 62
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "reverseArray",
+    "summary": "string[]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "../native-variable-patterns/globals.d.ts",
+              "start": {
+                "line": 10,
+                "column": 31
+              },
+              "end": {
+                "line": 10,
+                "column": 37
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "reverseReadonly",
+    "summary": "readonly string[]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "../native-variable-patterns/globals.d.ts",
+              "start": {
+                "line": 11,
+                "column": 39
+              },
+              "end": {
+                "line": 11,
+                "column": 45
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "reverseTuple",
+    "summary": "readonly [first: string, second?: number | undefined]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number | undefined",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "1 | 2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "reverseRest",
+    "summary": "[first: string, ...tail: number[]]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "reverseOptional",
+    "summary": "readonly [first: string, second: number]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "reverseReadonlyMask",
+    "summary": "{ a: string; b: number; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "a",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 9,
+                "column": 39
+              },
+              "end": {
+                "line": 9,
+                "column": 40
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "b",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 9,
+                "column": 61
+              },
+              "end": {
+                "line": 9,
+                "column": 62
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "reverseIndex",
+    "summary": "{ [x: string]: ...; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "reversePick",
+    "summary": "{ readonly a: { value: string; }; b: { value: number; }; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "a",
+        "summary": "{ value: string; }",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 9,
+                "column": 39
+              },
+              "end": {
+                "line": 9,
+                "column": 40
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "b",
+        "summary": "{ value: number; }",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 9,
+                "column": 61
+              },
+              "end": {
+                "line": 9,
+                "column": 62
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "recordProperties",
+    "summary": "[\"a\" | \"b\", number]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "\"a\" | \"b\"",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "recordIndex",
+    "summary": "[string | number, { value: boolean; }]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string | number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "{ value: boolean; }",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "limited",
+    "summary": "{ a: string; b: number; }",
+    "errorType": false,
+    "codes": [
+      2353
+    ],
+    "properties": [
+      {
+        "name": "a",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 26,
+                "column": 40
+              },
+              "end": {
+                "line": 26,
+                "column": 41
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "b",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 26,
+                "column": 59
+              },
+              "end": {
+                "line": 26,
+                "column": 60
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "priority",
+    "summary": "{ a: string; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "a",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 27,
+                "column": 43
+              },
+              "end": {
+                "line": 27,
+                "column": 44
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "partial",
+    "summary": "{ a: number; b: (x: any) => any; }",
+    "errorType": false,
+    "codes": [
+      7006
+    ],
+    "properties": [
+      {
+        "name": "a",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 28,
+                "column": 37
+              },
+              "end": {
+                "line": 28,
+                "column": 38
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "b",
+        "summary": "(x: any) => any",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 28,
+                "column": 54
+              },
+              "end": {
+                "line": 28,
+                "column": 55
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "tsconfig",
+    "name": "reverseIndexRead",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "reverseObjectRead",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "reverseTupleRead",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "reverseObject",
+    "summary": "{ readonly a: string; b: number; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "a",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 9,
+                "column": 39
+              },
+              "end": {
+                "line": 9,
+                "column": 40
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "b",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 9,
+                "column": 61
+              },
+              "end": {
+                "line": 9,
+                "column": 62
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "reverseArray",
+    "summary": "string[]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "../native-variable-patterns/globals.d.ts",
+              "start": {
+                "line": 10,
+                "column": 31
+              },
+              "end": {
+                "line": 10,
+                "column": 37
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "reverseReadonly",
+    "summary": "readonly string[]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "../native-variable-patterns/globals.d.ts",
+              "start": {
+                "line": 11,
+                "column": 39
+              },
+              "end": {
+                "line": 11,
+                "column": 45
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "reverseTuple",
+    "summary": "readonly [first: string, second?: number]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "1 | 2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "reverseRest",
+    "summary": "[first: string, ...tail: number[]]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "reverseOptional",
+    "summary": "readonly [first: string, second: number]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "reverseReadonlyMask",
+    "summary": "{ a: string; b: number; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "a",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 9,
+                "column": 39
+              },
+              "end": {
+                "line": 9,
+                "column": 40
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "b",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 9,
+                "column": 61
+              },
+              "end": {
+                "line": 9,
+                "column": 62
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "reverseIndex",
+    "summary": "{ [x: string]: ...; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "reversePick",
+    "summary": "{ readonly a: { value: string; }; b: { value: number; }; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "a",
+        "summary": "{ value: string; }",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 9,
+                "column": 39
+              },
+              "end": {
+                "line": 9,
+                "column": 40
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "b",
+        "summary": "{ value: number; }",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 9,
+                "column": 61
+              },
+              "end": {
+                "line": 9,
+                "column": 62
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "recordProperties",
+    "summary": "[\"a\" | \"b\", number]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "\"a\" | \"b\"",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "recordIndex",
+    "summary": "[string | number, { value: boolean; }]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string | number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "{ value: boolean; }",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "limited",
+    "summary": "{ a: string; b: number; }",
+    "errorType": false,
+    "codes": [
+      2353
+    ],
+    "properties": [
+      {
+        "name": "a",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 26,
+                "column": 40
+              },
+              "end": {
+                "line": 26,
+                "column": 41
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "b",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 26,
+                "column": 59
+              },
+              "end": {
+                "line": 26,
+                "column": 60
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "priority",
+    "summary": "{ a: string; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "a",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 27,
+                "column": 43
+              },
+              "end": {
+                "line": 27,
+                "column": 44
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "partial",
+    "summary": "{ a: number; b: (x: any) => any; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "a",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 28,
+                "column": 37
+              },
+              "end": {
+                "line": 28,
+                "column": 38
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "b",
+        "summary": "(x: any) => any",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 28,
+                "column": 54
+              },
+              "end": {
+                "line": 28,
+                "column": 55
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "loose",
+    "name": "reverseIndexRead",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "reverseObjectRead",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "reverseTupleRead",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "reverseObject",
+    "summary": "{ readonly a: string; b: number; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "a",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 9,
+                "column": 39
+              },
+              "end": {
+                "line": 9,
+                "column": 40
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "b",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 9,
+                "column": 61
+              },
+              "end": {
+                "line": 9,
+                "column": 62
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "reverseArray",
+    "summary": "string[]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "../native-variable-patterns/globals.d.ts",
+              "start": {
+                "line": 10,
+                "column": 31
+              },
+              "end": {
+                "line": 10,
+                "column": 37
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "reverseReadonly",
+    "summary": "readonly string[]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "../native-variable-patterns/globals.d.ts",
+              "start": {
+                "line": 11,
+                "column": 39
+              },
+              "end": {
+                "line": 11,
+                "column": 45
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "reverseTuple",
+    "summary": "readonly [first: string, second?: number]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number | undefined",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "1 | 2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "reverseRest",
+    "summary": "[first: string, ...tail: number[]]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "reverseOptional",
+    "summary": "readonly [first: string, second: number]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "reverseReadonlyMask",
+    "summary": "{ a: string; b: number; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "a",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 9,
+                "column": 39
+              },
+              "end": {
+                "line": 9,
+                "column": 40
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "b",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 9,
+                "column": 61
+              },
+              "end": {
+                "line": 9,
+                "column": 62
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "reverseIndex",
+    "summary": "{ [x: string]: ...; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "reversePick",
+    "summary": "{ readonly a: { value: string; }; b: { value: number; }; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "a",
+        "summary": "{ value: string; }",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 9,
+                "column": 39
+              },
+              "end": {
+                "line": 9,
+                "column": 40
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "b",
+        "summary": "{ value: number; }",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 9,
+                "column": 61
+              },
+              "end": {
+                "line": 9,
+                "column": 62
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "recordProperties",
+    "summary": "[\"a\" | \"b\", number]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "\"a\" | \"b\"",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "recordIndex",
+    "summary": "[string | number, { value: boolean; }]",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "0",
+        "summary": "string | number",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "1",
+        "summary": "{ value: boolean; }",
+        "errorType": false,
+        "origins": []
+      },
+      {
+        "name": "length",
+        "summary": "2",
+        "errorType": false,
+        "origins": []
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "limited",
+    "summary": "{ a: string; b: number; }",
+    "errorType": false,
+    "codes": [
+      2353
+    ],
+    "properties": [
+      {
+        "name": "a",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 26,
+                "column": 40
+              },
+              "end": {
+                "line": 26,
+                "column": 41
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "b",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 26,
+                "column": 59
+              },
+              "end": {
+                "line": 26,
+                "column": 60
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "priority",
+    "summary": "{ a: string; }",
+    "errorType": false,
+    "codes": [],
+    "properties": [
+      {
+        "name": "a",
+        "summary": "string",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 27,
+                "column": 43
+              },
+              "end": {
+                "line": 27,
+                "column": 44
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "partial",
+    "summary": "{ a: number; b: (x: any) => any; }",
+    "errorType": false,
+    "codes": [
+      7006
+    ],
+    "properties": [
+      {
+        "name": "a",
+        "summary": "number",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 28,
+                "column": 37
+              },
+              "end": {
+                "line": 28,
+                "column": 38
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "b",
+        "summary": "(x: any) => any",
+        "errorType": false,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "inference.ts",
+              "start": {
+                "line": 28,
+                "column": 54
+              },
+              "end": {
+                "line": 28,
+                "column": 55
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "config": "exact",
+    "name": "reverseIndexRead",
+    "summary": "boolean",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "reverseObjectRead",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "reverseTupleRead",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  }
+]

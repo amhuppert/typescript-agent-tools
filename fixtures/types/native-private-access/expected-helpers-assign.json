@@ -1,0 +1,393 @@
+[
+  {
+    "name": "get",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "enabled": true,
+        "end": 92,
+        "event": "helpers",
+        "helpers": 8192,
+        "pos": 72
+      },
+      {
+        "classEnd": 381,
+        "classPos": 10,
+        "end": 92,
+        "event": "members",
+        "found": true,
+        "pos": 78
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 92,
+        "event": "linked",
+        "parentType": true,
+        "pos": 72,
+        "property": true
+      },
+      {
+        "end": 77,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 72,
+        "result": true
+      },
+      {
+        "enabled": true,
+        "end": 92,
+        "event": "helpers",
+        "helpers": 8192,
+        "pos": 72
+      },
+      {
+        "classEnd": 381,
+        "classPos": 10,
+        "end": 92,
+        "event": "members",
+        "found": true,
+        "pos": 78
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 92,
+        "event": "linked",
+        "parentType": true,
+        "pos": 72,
+        "property": true
+      },
+      {
+        "end": 77,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 72,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "set",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "enabled": true,
+        "end": 129,
+        "event": "helpers",
+        "helpers": 16384,
+        "pos": 109
+      },
+      {
+        "classEnd": 381,
+        "classPos": 10,
+        "end": 129,
+        "event": "members",
+        "found": true,
+        "pos": 115
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 129,
+        "event": "linked",
+        "parentType": true,
+        "pos": 109,
+        "property": true
+      },
+      {
+        "end": 114,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 109,
+        "result": true
+      },
+      {
+        "enabled": true,
+        "end": 129,
+        "event": "helpers",
+        "helpers": 16384,
+        "pos": 109
+      },
+      {
+        "classEnd": 381,
+        "classPos": 10,
+        "end": 129,
+        "event": "members",
+        "found": true,
+        "pos": 115
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 129,
+        "event": "linked",
+        "parentType": true,
+        "pos": 109,
+        "property": true
+      },
+      {
+        "end": 114,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 109,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "setThenGet",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "enabled": true,
+        "end": 180,
+        "event": "helpers",
+        "helpers": 16384,
+        "pos": 153
+      },
+      {
+        "enabled": true,
+        "end": 180,
+        "event": "helpers",
+        "helpers": 8192,
+        "pos": 153
+      },
+      {
+        "classEnd": 381,
+        "classPos": 10,
+        "end": 180,
+        "event": "members",
+        "found": true,
+        "pos": 159
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 180,
+        "event": "linked",
+        "parentType": true,
+        "pos": 153,
+        "property": true
+      },
+      {
+        "end": 158,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 153,
+        "result": true
+      },
+      {
+        "enabled": true,
+        "end": 180,
+        "event": "helpers",
+        "helpers": 16384,
+        "pos": 153
+      },
+      {
+        "enabled": true,
+        "end": 180,
+        "event": "helpers",
+        "helpers": 8192,
+        "pos": 153
+      },
+      {
+        "classEnd": 381,
+        "classPos": 10,
+        "end": 180,
+        "event": "members",
+        "found": true,
+        "pos": 159
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 180,
+        "event": "linked",
+        "parentType": true,
+        "pos": 153,
+        "property": true
+      },
+      {
+        "end": 158,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 153,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "repeatedGet",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2304
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "enabled": true,
+        "end": 247,
+        "event": "helpers",
+        "helpers": 8192,
+        "pos": 236
+      },
+      {
+        "classEnd": 381,
+        "classPos": 10,
+        "end": 247,
+        "event": "members",
+        "found": true,
+        "pos": 241
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 247,
+        "event": "linked",
+        "parentType": true,
+        "pos": 236,
+        "property": true
+      },
+      {
+        "end": 240,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 236,
+        "result": true
+      },
+      {
+        "enabled": true,
+        "end": 260,
+        "event": "helpers",
+        "helpers": 8192,
+        "pos": 248
+      },
+      {
+        "classEnd": 381,
+        "classPos": 10,
+        "end": 260,
+        "event": "members",
+        "found": true,
+        "pos": 254
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 260,
+        "event": "linked",
+        "parentType": true,
+        "pos": 248,
+        "property": true
+      },
+      {
+        "end": 253,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 248,
+        "result": true
+      }
+    ]
+  },
+  {
+    "name": "writeThenRead",
+    "summary": "number",
+    "errorType": false,
+    "codes": [
+      2304,
+      2304
+    ],
+    "demandFailures": [],
+    "access": [
+      {
+        "enabled": true,
+        "end": 343,
+        "event": "helpers",
+        "helpers": 16384,
+        "pos": 332
+      },
+      {
+        "classEnd": 381,
+        "classPos": 10,
+        "end": 343,
+        "event": "members",
+        "found": true,
+        "pos": 337
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 343,
+        "event": "linked",
+        "parentType": true,
+        "pos": 332,
+        "property": true
+      },
+      {
+        "end": 336,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 332,
+        "result": true
+      },
+      {
+        "enabled": true,
+        "end": 360,
+        "event": "helpers",
+        "helpers": 8192,
+        "pos": 348
+      },
+      {
+        "classEnd": 381,
+        "classPos": 10,
+        "end": 360,
+        "event": "members",
+        "found": true,
+        "pos": 354
+      },
+      {
+        "ambient": false,
+        "enabled": true,
+        "end": 360,
+        "event": "linked",
+        "parentType": true,
+        "pos": 348,
+        "property": true
+      },
+      {
+        "end": 353,
+        "event": "self",
+        "kind": 109,
+        "parent": false,
+        "pos": 348,
+        "result": true
+      }
+    ]
+  }
+]

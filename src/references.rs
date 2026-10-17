@@ -34,13 +34,152 @@ pub enum ReferenceQuery {
     Name { name: String, file: Option<PathBuf> },
 }
 
+/// Reporting filters; selection, loading and declaration origins are unaffected.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ReferenceFilters {
+    pub calls: bool,
+    pub exclude_tests: bool,
+}
+
+/// A reference query with explicit reporting filters.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ReferenceRequest {
+    pub query: ReferenceQuery,
+    pub filters: ReferenceFilters,
+}
+
+/// A selected search or an absent/ambiguous declaration selector. The flat
+/// JSON documents are shared by the direct API, CLI and project service.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum ReferenceAnswer {
+    Selected(ReferenceResult),
+    Unselected(ReferenceSelection),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ReferenceSelection {
+    pub operation: ReferenceOperation,
+    pub project: PathBuf,
+    pub selection: ReferenceQuery,
+    #[serde(flatten)]
+    pub outcome: ReferenceSelectionFailure,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "outcome", rename_all = "snake_case")]
+pub enum ReferenceSelectionFailure {
+    NotFound { candidates: Vec<ReferenceCandidate> },
+    Ambiguous { candidates: Vec<ReferenceCandidate> },
+}
+
+/// The anchor replays this same symbol and reference operation. It may differ
+/// from Q2's display anchor, notably for parameter-property modifiers.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ReferenceCandidate {
+    pub selector: Option<String>,
+    pub file: String,
+    pub question: ReferenceBaseline,
+    pub declarations: Vec<NamedLocation>,
+    pub anchor: ReferenceAnchor,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ReferenceResult {
+    pub operation: ReferenceOperation,
+    pub outcome: ReferenceOutcome,
     /// The selected configuration file, in the canonical form of its
     /// directory, which every `Location::file` is relative to.
     pub project: PathBuf,
     /// Separate symbols, ordered by their earliest declaration.
     pub groups: Vec<ReferenceGroup>,
+    pub filters: ReferenceFilters,
+    pub coverage: ReferenceCoverage,
+    /// Catalog declarations omitted by lexical search. These are suggestions,
+    /// not semantically resolved members or a complete inferred-member catalog.
+    pub unsearched_members: UnsearchedMembers,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ReferenceOperation {
+    References,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ReferenceOutcome {
+    Complete,
+    Partial,
+}
+
+/// The question whose candidate accounting the result describes.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ReferenceBaseline {
+    Lexical,
+    Member,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ReferenceCoverage {
+    pub baseline: ReferenceBaseline,
+    pub status: ReferenceOutcome,
+    pub gaps: Vec<ReferenceGap>,
+}
+
+/// A candidate whose semantic dependencies could not establish a reference.
+/// Resource and internal failures abort a query; they are never coverage gaps.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ReferenceGap {
+    pub reason: ReferenceGapReason,
+    pub location: Location,
+    pub message: String,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub causes: Vec<ReferenceCause>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub omitted_causes: Option<usize>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ReferenceCause {
+    pub reason: ReferenceGapReason,
+    /// Compiler global dependencies can have no declaration site. The gap's
+    /// candidate location must not be substituted for an absent cause site.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location: Option<Location>,
+    pub message: String,
+}
+
+/// The shared unsupported/invalid vocabulary. A lexical query produces no
+/// semantic gaps and does not run semantic checking.
+pub use crate::analysis::SemanticFailureReason as ReferenceGapReason;
+
+#[derive(Debug, Default, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct UnsearchedMembers {
+    pub count: usize,
+    pub selectors: Vec<MemberSuggestion>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MemberSuggestion {
+    pub file: String,
+    /// Absent when the existing selector language cannot spell an ancestor
+    /// key. The catalog anchor still identifies the declaration for Q2.
+    pub selector: Option<String>,
+    /// Q2's declaration anchor. A parameter-property name addresses its
+    /// lexical parameter; a semantic member modifier anchor is a separate role.
+    pub anchor: ReferenceAnchor,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ReferenceAnchor {
+    pub file: String,
+    #[serde(flatten)]
+    pub position: SourcePosition,
 }
 
 /// Every searched occurrence of one underlying symbol.
@@ -83,3 +222,5 @@ pub enum Role {
     Import,
     Export,
 }
+
+pub(crate) mod metadata;

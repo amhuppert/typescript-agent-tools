@@ -1,0 +1,170 @@
+[
+  {
+    "config": "strict.json",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 4,
+        "column": 93
+      }
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "value",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 4,
+          "column": 93
+        },
+        "end": {
+          "line": 4,
+          "column": 97
+        }
+      },
+      "sourceHash": "52a2ad4b910b05767a29133d6aadd1783c8ebfb955f3e83dc26792889fdce6d2",
+      "summary": "Missing",
+      "errorType": true,
+      "origins": [
+        {
+          "kind": "Parameter",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 4,
+              "column": 93
+            },
+            "end": {
+              "line": 4,
+              "column": 97
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "exactOptionalPropertyTypes": false,
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-display/strict.json"
+      }
+    }
+  },
+  {
+    "config": "exact.json",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 4,
+        "column": 93
+      }
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "value",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 4,
+          "column": 93
+        },
+        "end": {
+          "line": 4,
+          "column": 97
+        }
+      },
+      "sourceHash": "52a2ad4b910b05767a29133d6aadd1783c8ebfb955f3e83dc26792889fdce6d2",
+      "summary": "Missing",
+      "errorType": true,
+      "origins": [
+        {
+          "kind": "Parameter",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 4,
+              "column": 93
+            },
+            "end": {
+              "line": 4,
+              "column": 97
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "exactOptionalPropertyTypes": true,
+        "module": 99,
+        "noLib": true,
+        "strict": true,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-display/exact.json"
+      }
+    }
+  },
+  {
+    "config": "loose.json",
+    "request": {
+      "at": {
+        "file": "cases.ts",
+        "line": 4,
+        "column": 93
+      }
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "history": "baseline",
+      "kind": "value",
+      "location": {
+        "file": "cases.ts",
+        "start": {
+          "line": 4,
+          "column": 93
+        },
+        "end": {
+          "line": 4,
+          "column": 97
+        }
+      },
+      "sourceHash": "52a2ad4b910b05767a29133d6aadd1783c8ebfb955f3e83dc26792889fdce6d2",
+      "summary": "Missing",
+      "errorType": true,
+      "origins": [
+        {
+          "kind": "Parameter",
+          "location": {
+            "file": "cases.ts",
+            "start": {
+              "line": 4,
+              "column": 93
+            },
+            "end": {
+              "line": 4,
+              "column": 97
+            }
+          }
+        }
+      ],
+      "properties": [],
+      "prelude": [],
+      "diagnostics": [],
+      "compilerOptions": {
+        "exactOptionalPropertyTypes": false,
+        "module": 99,
+        "noLib": true,
+        "strict": false,
+        "target": 99,
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-member-display/loose.json"
+      }
+    }
+  }
+]

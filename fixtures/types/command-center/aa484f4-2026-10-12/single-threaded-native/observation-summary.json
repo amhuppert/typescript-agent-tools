@@ -1,0 +1,153 @@
+{
+  "schema": 1,
+  "captureComplete": true,
+  "normalization": "raw native observations; product normalization/filter schedules and Rust/service acceptance remain unproved",
+  "rows": [
+    {
+      "id": "annotated-member",
+      "operation": "member",
+      "candidateInventory": 124,
+      "candidateDemands": 119,
+      "groups": 1,
+      "occurrences": 7,
+      "callOccurrences": 3,
+      "startupDiagnosticCodes": [
+        2300,
+        2300
+      ],
+      "demandFailures": [],
+      "nativeCaptureMilliseconds": 48301.718508,
+      "nativeProgramSources": 7639,
+      "consumedRawInputs": 7968
+    },
+    {
+      "id": "contextual-member",
+      "operation": "member",
+      "candidateInventory": 124,
+      "candidateDemands": 119,
+      "groups": 1,
+      "occurrences": 7,
+      "callOccurrences": 3,
+      "startupDiagnosticCodes": [
+        2300,
+        2300
+      ],
+      "demandFailures": [],
+      "nativeCaptureMilliseconds": 41870.065436,
+      "nativeProgramSources": 7639,
+      "consumedRawInputs": 7968
+    },
+    {
+      "id": "jsx-member",
+      "operation": "member",
+      "candidateInventory": 12,
+      "candidateDemands": 12,
+      "groups": 2,
+      "occurrences": 9,
+      "callOccurrences": 0,
+      "startupDiagnosticCodes": [
+        2300,
+        2300
+      ],
+      "demandFailures": [],
+      "nativeCaptureMilliseconds": 40098.08170299999,
+      "nativeProgramSources": 7639,
+      "consumedRawInputs": 7968
+    },
+    {
+      "id": "annotated-member",
+      "operation": "type",
+      "kind": "value",
+      "summary": "(target: SpecWorkflowCleanupTarget) => Promise<SpecWorkflowCleanupObservation>",
+      "errorType": false,
+      "startupDiagnosticCodes": [
+        2300,
+        2300
+      ],
+      "finalDiagnosticCodes": [
+        2300,
+        2300
+      ],
+      "demandFailures": [],
+      "nativeCaptureMilliseconds": 27438.802354,
+      "nativeProgramSources": 7639,
+      "consumedRawInputs": 7968
+    },
+    {
+      "id": "contextual-member",
+      "operation": "type",
+      "kind": "value",
+      "summary": "(target: SpecWorkflowCleanupTarget) => Promise<GraphWorkflowExecutionPlacement>",
+      "errorType": false,
+      "startupDiagnosticCodes": [
+        2300,
+        2300
+      ],
+      "finalDiagnosticCodes": [
+        2300,
+        2300
+      ],
+      "demandFailures": [],
+      "nativeCaptureMilliseconds": 29189.559859000005,
+      "nativeProgramSources": 7639,
+      "consumedRawInputs": 7968
+    },
+    {
+      "id": "inferred-factory",
+      "operation": "type",
+      "kind": "value",
+      "summary": "(deps?: AgentGatewayDeps) => { handshakeGET: (request: Request) => Promise<Response>; identityGET: () => Promise<Response>; }",
+      "errorType": false,
+      "startupDiagnosticCodes": [
+        2300,
+        2300
+      ],
+      "finalDiagnosticCodes": [
+        2300,
+        2300
+      ],
+      "demandFailures": [],
+      "nativeCaptureMilliseconds": 27907.533704999994,
+      "nativeProgramSources": 7639,
+      "consumedRawInputs": 7968
+    },
+    {
+      "id": "jsx-member",
+      "operation": "type",
+      "kind": "value",
+      "summary": "number | undefined",
+      "errorType": false,
+      "startupDiagnosticCodes": [
+        2300,
+        2300
+      ],
+      "finalDiagnosticCodes": [
+        2300,
+        2300
+      ],
+      "demandFailures": [],
+      "nativeCaptureMilliseconds": 40623.843316,
+      "nativeProgramSources": 7639,
+      "consumedRawInputs": 7968
+    },
+    {
+      "id": "predicate-callback",
+      "operation": "type",
+      "kind": "expression",
+      "summary": "{ <S extends \"append-only\" | \"full-edit\" | \"read-only\">(predicate: (value: \"append-only\" | \"full-edit\" | \"read-only\", index: number, array: (\"append-only\" | \"full-edit\" | \"read-only\")[]) => value is S, thisArg?: any): S[]; (predicate: (value: \"append-only\" | \"full-edit\" | \"read-only\", index: number, array: (\"append-...",
+      "errorType": false,
+      "startupDiagnosticCodes": [
+        2300,
+        2300
+      ],
+      "finalDiagnosticCodes": [
+        2300,
+        2300
+      ],
+      "demandFailures": [],
+      "nativeCaptureMilliseconds": 30807.135874,
+      "nativeProgramSources": 7639,
+      "consumedRawInputs": 7968
+    }
+  ]
+}

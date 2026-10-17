@@ -1,0 +1,292 @@
+[
+  {
+    "marker": "name0",
+    "name": "0",
+    "numeric": true
+  },
+  {
+    "marker": "name1",
+    "name": "1",
+    "numeric": true
+  },
+  {
+    "marker": "name2",
+    "name": "-1",
+    "numeric": true
+  },
+  {
+    "marker": "name3",
+    "name": "0.5",
+    "numeric": true
+  },
+  {
+    "marker": "name4",
+    "name": "-0.5",
+    "numeric": true
+  },
+  {
+    "marker": "name5",
+    "name": "0.000001",
+    "numeric": true
+  },
+  {
+    "marker": "name6",
+    "name": "1e-7",
+    "numeric": true
+  },
+  {
+    "marker": "name7",
+    "name": "1e+21",
+    "numeric": true
+  },
+  {
+    "marker": "name8",
+    "name": "100000000000000000000",
+    "numeric": true
+  },
+  {
+    "marker": "name9",
+    "name": "Infinity",
+    "numeric": true
+  },
+  {
+    "marker": "name10",
+    "name": "-Infinity",
+    "numeric": true
+  },
+  {
+    "marker": "name11",
+    "name": "NaN",
+    "numeric": true
+  },
+  {
+    "marker": "name12",
+    "name": "9007199254740992",
+    "numeric": true
+  },
+  {
+    "marker": "name13",
+    "name": "5e-324",
+    "numeric": true
+  },
+  {
+    "marker": "name14",
+    "name": "1.7976931348623157e+308",
+    "numeric": true
+  },
+  {
+    "marker": "name15",
+    "name": "",
+    "numeric": false
+  },
+  {
+    "marker": "name16",
+    "name": " ",
+    "numeric": false
+  },
+  {
+    "marker": "name17",
+    "name": "\t",
+    "numeric": false
+  },
+  {
+    "marker": "name18",
+    "name": "\n",
+    "numeric": false
+  },
+  {
+    "marker": "name19",
+    "name": "\r",
+    "numeric": false
+  },
+  {
+    "marker": "name20",
+    "name": "\r\n",
+    "numeric": false
+  },
+  {
+    "marker": "name21",
+    "name": "\u2028",
+    "numeric": false
+  },
+  {
+    "marker": "name22",
+    "name": "\u2029",
+    "numeric": false
+  },
+  {
+    "marker": "name23",
+    "name": "\u00a0",
+    "numeric": false
+  },
+  {
+    "marker": "name24",
+    "name": "\ufeff",
+    "numeric": false
+  },
+  {
+    "marker": "name25",
+    "name": " 1",
+    "numeric": false
+  },
+  {
+    "marker": "name26",
+    "name": "1 ",
+    "numeric": false
+  },
+  {
+    "marker": "name27",
+    "name": "\t1",
+    "numeric": false
+  },
+  {
+    "marker": "name28",
+    "name": "\u00a01",
+    "numeric": false
+  },
+  {
+    "marker": "name29",
+    "name": "\ufeff1",
+    "numeric": false
+  },
+  {
+    "marker": "name30",
+    "name": "-0",
+    "numeric": false
+  },
+  {
+    "marker": "name31",
+    "name": "00",
+    "numeric": false
+  },
+  {
+    "marker": "name32",
+    "name": "01",
+    "numeric": false
+  },
+  {
+    "marker": "name33",
+    "name": "+1",
+    "numeric": false
+  },
+  {
+    "marker": "name34",
+    "name": "1.0",
+    "numeric": false
+  },
+  {
+    "marker": "name35",
+    "name": ".5",
+    "numeric": false
+  },
+  {
+    "marker": "name36",
+    "name": "0x10",
+    "numeric": false
+  },
+  {
+    "marker": "name37",
+    "name": "0X10",
+    "numeric": false
+  },
+  {
+    "marker": "name38",
+    "name": "0b10",
+    "numeric": false
+  },
+  {
+    "marker": "name39",
+    "name": "0o10",
+    "numeric": false
+  },
+  {
+    "marker": "name40",
+    "name": "1e21",
+    "numeric": false
+  },
+  {
+    "marker": "name41",
+    "name": "1e+20",
+    "numeric": false
+  },
+  {
+    "marker": "name42",
+    "name": "1e-07",
+    "numeric": false
+  },
+  {
+    "marker": "name43",
+    "name": "+Infinity",
+    "numeric": false
+  },
+  {
+    "marker": "name44",
+    "name": "infinity",
+    "numeric": false
+  },
+  {
+    "marker": "name45",
+    "name": "nan",
+    "numeric": false
+  },
+  {
+    "marker": "name46",
+    "name": "9007199254740993",
+    "numeric": false
+  },
+  {
+    "marker": "name47",
+    "name": "1_000",
+    "numeric": false
+  },
+  {
+    "marker": "name48",
+    "name": "__@user",
+    "numeric": false
+  },
+  {
+    "marker": "name49",
+    "name": "true",
+    "numeric": false
+  },
+  {
+    "marker": "name50",
+    "name": "2.9802322387695312e-8",
+    "numeric": true
+  },
+  {
+    "marker": "name51",
+    "name": "2.9802322387695313e-8",
+    "numeric": false
+  },
+  {
+    "marker": "name52",
+    "name": "-21098088986959630",
+    "numeric": true
+  },
+  {
+    "marker": "name53",
+    "name": "-21098088986959632",
+    "numeric": false
+  },
+  {
+    "marker": "name54",
+    "name": "\u000b",
+    "numeric": false
+  },
+  {
+    "marker": "name55",
+    "name": "\f",
+    "numeric": false
+  },
+  {
+    "marker": "name56",
+    "name": "\u000b1",
+    "numeric": false
+  },
+  {
+    "marker": "name57",
+    "name": "\f1",
+    "numeric": false
+  }
+]

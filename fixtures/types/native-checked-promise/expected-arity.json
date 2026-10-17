@@ -1,0 +1,48 @@
+[
+  {
+    "name": "checked",
+    "kind": "value",
+    "summary": "() => number",
+    "errorType": false,
+    "codes": [
+      2322,
+      2317
+    ],
+    "demandFailures": [],
+    "factory": {
+      "emptyRecovery": true
+    }
+  },
+  {
+    "name": "quiet",
+    "kind": "value",
+    "summary": "number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "factory": null
+  },
+  {
+    "name": "compatible",
+    "kind": "value",
+    "summary": "() => number",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "factory": null
+  },
+  {
+    "name": "quietThenChecked",
+    "kind": "value",
+    "summary": "() => number",
+    "errorType": false,
+    "codes": [
+      2322,
+      2317
+    ],
+    "demandFailures": [],
+    "factory": {
+      "emptyRecovery": true
+    }
+  }
+]

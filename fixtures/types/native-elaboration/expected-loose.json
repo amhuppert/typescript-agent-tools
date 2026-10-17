@@ -1,0 +1,431 @@
+[
+  {
+    "name": "objectMismatch",
+    "kind": "value",
+    "summary": "{ a: number; }",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "objectNested",
+    "kind": "value",
+    "summary": "{ a: { b: number; }; }",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "objectShorthand",
+    "kind": "value",
+    "summary": "{ value: number; }",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "objectMethod",
+    "kind": "value",
+    "summary": "{ a(): number; }",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "objectGetter",
+    "kind": "value",
+    "summary": "{ readonly a: number; }",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "objectComputedLiteral",
+    "kind": "value",
+    "summary": "{ a: number; }",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "objectComputedName",
+    "kind": "value",
+    "summary": "{ a: number; }",
+    "errorType": false,
+    "codes": [
+      2418
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "objectComputedDynamic",
+    "kind": "value",
+    "summary": "{ [x: string]: number; }",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "objectSpread",
+    "kind": "value",
+    "summary": "{ a: number; b: string; }",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "objectPrimitive",
+    "kind": "value",
+    "summary": "{ a: number; }",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "objectNoMissingDemand",
+    "kind": "value",
+    "summary": "{ a: number; ignored: { unvisited: Missing; }; }",
+    "errorType": false,
+    "codes": [
+      2304,
+      2353
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "unvisited"
+    }
+  },
+  {
+    "name": "objectMissingDemand",
+    "kind": "value",
+    "summary": "{ a: { unvisited: Missing; }; }",
+    "errorType": false,
+    "codes": [
+      2304,
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "unvisited"
+    }
+  },
+  {
+    "name": "arrayMismatch",
+    "kind": "value",
+    "summary": "[number, string]",
+    "errorType": false,
+    "codes": [
+      2322,
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "arrayContext",
+    "kind": "value",
+    "summary": "number[]",
+    "errorType": false,
+    "codes": [
+      2322,
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "arrayOmitted",
+    "kind": "value",
+    "summary": "[any, number]",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "arrayTooLong",
+    "kind": "value",
+    "summary": "[number, number, number]",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "arrayNested",
+    "kind": "value",
+    "summary": "[{ a: number; }]",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "arrayWrapped",
+    "kind": "value",
+    "summary": "[number]",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "constWrapper",
+    "kind": "value",
+    "summary": "{ readonly a: 1; }",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "ordinaryAssertion",
+    "kind": "value",
+    "summary": "{ a: number; }",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "commaWrapper",
+    "kind": "value",
+    "summary": "{ a: number; }",
+    "errorType": false,
+    "codes": [
+      2695,
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "assignmentWrapper",
+    "kind": "value",
+    "summary": "1",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "callSuggestion",
+    "kind": "value",
+    "summary": "() => { a: number; }",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "constructSuggestion",
+    "kind": "value",
+    "summary": "new () => { a: number; }",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "arrowReturn",
+    "kind": "value",
+    "summary": "() => number",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "arrowObject",
+    "kind": "value",
+    "summary": "() => { a: number; }",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "arrowArray",
+    "kind": "value",
+    "summary": "() => [number]",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "arrowAnnotated",
+    "kind": "value",
+    "summary": "(x: number) => number",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "arrowBlock",
+    "kind": "value",
+    "summary": "() => number",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "arrowPromiseSuggestion",
+    "kind": "value",
+    "summary": "() => number",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "arrowMissingReturn",
+    "kind": "value",
+    "summary": "() => { unvisited: Missing; }",
+    "errorType": false,
+    "codes": [
+      2304,
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": {
+      "instantiated": false,
+      "name": "unvisited"
+    }
+  },
+  {
+    "name": "assignObject",
+    "kind": "value",
+    "summary": "{ a: number; }",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "assignTuple",
+    "kind": "value",
+    "summary": "[number, string]",
+    "errorType": false,
+    "codes": [
+      2322,
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "assignOptional",
+    "kind": "value",
+    "summary": "undefined",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "satisfiesOptional",
+    "kind": "value",
+    "summary": "{ a: undefined; }",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "compoundGetterSetter",
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": [],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "compoundParenthesizedGetterSetter",
+    "kind": "value",
+    "summary": "string",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  },
+  {
+    "name": "compoundReadonly",
+    "kind": "value",
+    "summary": "any",
+    "errorType": true,
+    "codes": [
+      2540,
+      2540
+    ],
+    "demandFailures": [],
+    "symbolError": null
+  }
+]

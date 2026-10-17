@@ -1,0 +1,444 @@
+[
+  {
+    "name": "firstVar",
+    "summary": "number",
+    "errorType": false,
+    "symbolFlags": 2097153,
+    "flows": [
+      {
+        "declaredFlags": 64,
+        "errorType": false,
+        "referenceEnd": 476,
+        "referencePos": 454,
+        "resultFlags": 64,
+        "sameDeclared": true,
+        "sameInitial": true
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "firstLet",
+    "summary": "number",
+    "errorType": false,
+    "symbolFlags": 2097154,
+    "flows": [
+      {
+        "declaredFlags": 64,
+        "errorType": false,
+        "referenceEnd": 499,
+        "referencePos": 477,
+        "resultFlags": 64,
+        "sameDeclared": true,
+        "sameInitial": true
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "firstConst",
+    "summary": "number",
+    "errorType": false,
+    "symbolFlags": 2097154,
+    "flows": [
+      {
+        "declaredFlags": 64,
+        "errorType": false,
+        "referenceEnd": 526,
+        "referencePos": 500,
+        "resultFlags": 64,
+        "sameDeclared": true,
+        "sameInitial": true
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "firstUninitialized",
+    "summary": "number",
+    "errorType": false,
+    "symbolFlags": 2097154,
+    "flows": [
+      {
+        "declaredFlags": 64,
+        "errorType": false,
+        "referenceEnd": 569,
+        "referencePos": 527,
+        "resultFlags": 64,
+        "sameDeclared": true,
+        "sameInitial": true
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "lastVar",
+    "summary": "number",
+    "errorType": false,
+    "symbolFlags": 2097153,
+    "flows": [
+      {
+        "declaredFlags": 64,
+        "errorType": false,
+        "referenceEnd": 833,
+        "referencePos": 813,
+        "resultFlags": 64,
+        "sameDeclared": true,
+        "sameInitial": true
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "lastLet",
+    "summary": "number",
+    "errorType": false,
+    "symbolFlags": 2097154,
+    "flows": [
+      {
+        "declaredFlags": 64,
+        "errorType": false,
+        "referenceEnd": 854,
+        "referencePos": 834,
+        "resultFlags": 64,
+        "sameDeclared": true,
+        "sameInitial": true
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "lastConst",
+    "summary": "number",
+    "errorType": false,
+    "symbolFlags": 2097154,
+    "flows": [
+      {
+        "declaredFlags": 64,
+        "errorType": false,
+        "referenceEnd": 879,
+        "referencePos": 855,
+        "resultFlags": 64,
+        "sameDeclared": true,
+        "sameInitial": true
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "lastUninitialized",
+    "summary": "number",
+    "errorType": false,
+    "symbolFlags": 2097154,
+    "flows": [
+      {
+        "declaredFlags": 64,
+        "errorType": false,
+        "referenceEnd": 920,
+        "referencePos": 880,
+        "resultFlags": 64,
+        "sameDeclared": true,
+        "sameInitial": true
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "directInitialized",
+    "summary": "number",
+    "errorType": false,
+    "symbolFlags": 2,
+    "flows": [
+      {
+        "declaredFlags": 64,
+        "errorType": false,
+        "referenceEnd": 1030,
+        "referencePos": 990,
+        "resultFlags": 64,
+        "sameDeclared": true,
+        "sameInitial": true
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "directUninitialized",
+    "summary": "number",
+    "errorType": false,
+    "symbolFlags": 2,
+    "flows": [
+      {
+        "declaredFlags": 64,
+        "errorType": false,
+        "referenceEnd": 1075,
+        "referencePos": 1031,
+        "resultFlags": 64,
+        "sameDeclared": true,
+        "sameInitial": true
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "captureBefore",
+    "summary": "string | number",
+    "errorType": false,
+    "symbolFlags": 2097154,
+    "flows": [
+      {
+        "declaredFlags": 134217728,
+        "errorType": false,
+        "referenceEnd": 1160,
+        "referencePos": 1133,
+        "resultFlags": 134217728,
+        "sameDeclared": true,
+        "sameInitial": true
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "captureAfter",
+    "summary": "string",
+    "errorType": false,
+    "symbolFlags": 2097154,
+    "flows": [
+      {
+        "declaredFlags": 134217728,
+        "errorType": false,
+        "referenceEnd": 1227,
+        "referencePos": 1201,
+        "resultFlags": 32,
+        "sameDeclared": false,
+        "sameInitial": false
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "nestedAssignment",
+    "summary": "string | number",
+    "errorType": false,
+    "symbolFlags": 2097154,
+    "flows": [
+      {
+        "declaredFlags": 134217728,
+        "errorType": false,
+        "referenceEnd": 1361,
+        "referencePos": 1333,
+        "resultFlags": 134217728,
+        "sameDeclared": true,
+        "sameInitial": true
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "exportedAssignment",
+    "summary": "string | number",
+    "errorType": false,
+    "symbolFlags": 2097154,
+    "flows": [
+      {
+        "declaredFlags": 134217728,
+        "errorType": false,
+        "referenceEnd": 1457,
+        "referencePos": 1425,
+        "resultFlags": 134217728,
+        "sameDeclared": true,
+        "sameInitial": true
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "stableConstElement",
+    "summary": "string",
+    "errorType": false,
+    "symbolFlags": 2,
+    "flows": [
+      {
+        "declaredFlags": 32,
+        "errorType": false,
+        "referenceEnd": 1612,
+        "referencePos": 1601,
+        "resultFlags": 32,
+        "sameDeclared": true,
+        "sameInitial": true
+      },
+      {
+        "declaredFlags": 1048576,
+        "errorType": false,
+        "referenceEnd": 1791,
+        "referencePos": 1783,
+        "resultFlags": 1048576,
+        "sameDeclared": true,
+        "sameInitial": true
+      },
+      {
+        "declaredFlags": 134217728,
+        "errorType": false,
+        "referenceEnd": 1804,
+        "referencePos": 1783,
+        "resultFlags": 32,
+        "sameDeclared": false,
+        "sameInitial": false
+      },
+      {
+        "declaredFlags": 32,
+        "errorType": false,
+        "referenceEnd": 1803,
+        "referencePos": 1792,
+        "resultFlags": 32,
+        "sameDeclared": true,
+        "sameInitial": true
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "stableLetElement",
+    "summary": "string",
+    "errorType": false,
+    "symbolFlags": 2,
+    "flows": [
+      {
+        "declaredFlags": 1048576,
+        "errorType": false,
+        "referenceEnd": 1905,
+        "referencePos": 1897,
+        "resultFlags": 1048576,
+        "sameDeclared": true,
+        "sameInitial": true
+      },
+      {
+        "declaredFlags": 134217728,
+        "errorType": false,
+        "referenceEnd": 1916,
+        "referencePos": 1897,
+        "resultFlags": 32,
+        "sameDeclared": false,
+        "sameInitial": false
+      },
+      {
+        "declaredFlags": 32,
+        "errorType": false,
+        "referenceEnd": 1915,
+        "referencePos": 1906,
+        "resultFlags": 32,
+        "sameDeclared": true,
+        "sameInitial": true
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "assignedLetElement",
+    "summary": "string | number",
+    "errorType": false,
+    "symbolFlags": 2,
+    "flows": [
+      {
+        "declaredFlags": 1048576,
+        "errorType": false,
+        "referenceEnd": 2057,
+        "referencePos": 2049,
+        "resultFlags": 1048576,
+        "sameDeclared": true,
+        "sameInitial": true
+      },
+      {
+        "declaredFlags": 134217728,
+        "errorType": false,
+        "referenceEnd": 2070,
+        "referencePos": 2049,
+        "resultFlags": 134217728,
+        "sameDeclared": true,
+        "sameInitial": true
+      },
+      {
+        "declaredFlags": 32,
+        "errorType": false,
+        "referenceEnd": 2069,
+        "referencePos": 2058,
+        "resultFlags": 32,
+        "sameDeclared": true,
+        "sameInitial": true
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "mutableAliasCondition",
+    "summary": "string",
+    "errorType": false,
+    "symbolFlags": 2097154,
+    "flows": [
+      {
+        "declaredFlags": 134217728,
+        "errorType": false,
+        "referenceEnd": 2156,
+        "referencePos": 2150,
+        "resultFlags": 134217728,
+        "sameDeclared": true,
+        "sameInitial": true
+      },
+      {
+        "declaredFlags": 134217728,
+        "errorType": false,
+        "referenceEnd": 2265,
+        "referencePos": 2220,
+        "resultFlags": 32,
+        "sameDeclared": false,
+        "sameInitial": false
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  },
+  {
+    "name": "assignedAliasCondition",
+    "summary": "string | number",
+    "errorType": false,
+    "symbolFlags": 2097154,
+    "flows": [
+      {
+        "declaredFlags": 134217728,
+        "errorType": false,
+        "referenceEnd": 2400,
+        "referencePos": 2394,
+        "resultFlags": 134217728,
+        "sameDeclared": true,
+        "sameInitial": true
+      },
+      {
+        "declaredFlags": 134217728,
+        "errorType": false,
+        "referenceEnd": 2468,
+        "referencePos": 2419,
+        "resultFlags": 134217728,
+        "sameDeclared": true,
+        "sameInitial": true
+      }
+    ],
+    "codes": [],
+    "demandFailures": []
+  }
+]

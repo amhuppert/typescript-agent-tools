@@ -1,0 +1,42 @@
+{
+  "fixed": "\"fixed\"",
+  "spreadFixed": "\"fixed\"",
+  "readonlyFixed": "\"fixed\"",
+  "optionalOne": "\"optional\"",
+  "optionalTwo": "\"optional\"",
+  "optionalSpread": "\"optional\"",
+  "arraySpread": "\"array\"",
+  "readonlyArraySpread": "\"array\"",
+  "empty": "[]",
+  "scalar": "[number, string, boolean]",
+  "labels": "[count: number, label: string]",
+  "readonlyLabels": "[count: 1, label: \"one\"]",
+  "optionalLabels": {
+    "tsconfig.json": "[count: number, label: string | undefined]",
+    "loose.json": "[count: number, label: string]",
+    "exact.json": "[count: number, label: string | undefined]"
+  },
+  "restLabels": "[flag: boolean, ...values: number[]]",
+  "multiple": "[number, count: number, label: string, ...number[], boolean]",
+  "array": "number[]",
+  "constScalar": "readonly [1, \"one\", true]",
+  "constArray": "number[]",
+  "mutableConst": "[1, \"one\", true]",
+  "middle": "[string, number]",
+  "middleSpread": "[body: string]",
+  "optionalTail": "[string, number]",
+  "leading": "[\"one\", 2]",
+  "trailing": "[\"one\", 2]",
+  "callback": {
+    "tsconfig.json": "[first: string, second?: number | undefined]",
+    "loose.json": "[first: string, second?: number]",
+    "exact.json": "[first: string, second?: number | undefined]"
+  },
+  "constCallback": "readonly [first: string, second: number]",
+  "parts": "[[first: string, second: number], unknown[]]",
+  "tupleArgument": "[body: string]",
+  "tupleRest": "string",
+  "emptySpread": "[]",
+  "aritySkipped": "\"zero\"",
+  "badSpread": "[number, MissingRestDependency]"
+}

@@ -1,0 +1,1918 @@
+[
+  {
+    "name": "classLateAlias",
+    "summary": "{ \"module.exports\": 71; readonly namespaceValue: 72; prototype: Late; }",
+    "errorType": false,
+    "location": {
+      "file": "cases.cts",
+      "start": {
+        "line": 1,
+        "column": 32
+      },
+      "end": {
+        "line": 1,
+        "column": 41
+      }
+    },
+    "origins": [
+      {
+        "kind": "PropertyDeclaration",
+        "location": {
+          "file": "class-late.d.mts",
+          "start": {
+            "line": 2,
+            "column": 29
+          },
+          "end": {
+            "line": 2,
+            "column": 34
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 77,
+        "declarationPos": 36,
+        "depth": 0,
+        "event": "enter",
+        "name": "Late",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 77,
+        "declarationPos": 36,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Late",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 35,
+        "declarationPos": 13,
+        "depth": 0,
+        "event": "enter",
+        "name": "key",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 35,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 18
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 35,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 18,
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 35,
+        "declarationPos": 13,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "name": "key",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 75,
+        "declarationPos": 57,
+        "depth": 0,
+        "event": "enter",
+        "name": "module.exports",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 75,
+        "declarationPos": 57,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "module.exports",
+        "operation": "getTypeOfSymbol",
+        "type": 87
+      }
+    ]
+  },
+  {
+    "name": "classLateValue",
+    "summary": "{ \"module.exports\": 71; readonly namespaceValue: 72; prototype: Late; }",
+    "errorType": false,
+    "location": {
+      "file": "cases.cts",
+      "start": {
+        "line": 2,
+        "column": 43
+      },
+      "end": {
+        "line": 2,
+        "column": 52
+      }
+    },
+    "origins": [
+      {
+        "kind": "NamespaceImport",
+        "location": {
+          "file": "cases.cts",
+          "start": {
+            "line": 1,
+            "column": 32
+          },
+          "end": {
+            "line": 1,
+            "column": 41
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 77,
+        "declarationPos": 36,
+        "depth": 0,
+        "event": "enter",
+        "name": "Late",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 77,
+        "declarationPos": 36,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Late",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 35,
+        "declarationPos": 13,
+        "depth": 0,
+        "event": "enter",
+        "name": "key",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 35,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 18
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 35,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 18,
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 35,
+        "declarationPos": 13,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "name": "key",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 77,
+        "declarationPos": 36,
+        "depth": 0,
+        "event": "enter",
+        "name": "Late",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 77,
+        "declarationPos": 36,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Late",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "classLate",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 77,
+        "declarationPos": 36,
+        "depth": 1,
+        "event": "enter",
+        "name": "Late",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 77,
+        "declarationPos": 36,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Late",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 75,
+        "declarationPos": 57,
+        "depth": 1,
+        "event": "enter",
+        "name": "module.exports",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 75,
+        "declarationPos": 57,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "module.exports",
+        "operation": "getTypeOfSymbol",
+        "type": 87
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "classLate",
+        "operation": "getTypeOfSymbol",
+        "type": 87
+      }
+    ]
+  },
+  {
+    "name": "classEarlyAlias",
+    "summary": "{ \"module.exports\": 73; readonly namespaceValue: 74; prototype: Early; }",
+    "errorType": false,
+    "location": {
+      "file": "cases.cts",
+      "start": {
+        "line": 3,
+        "column": 33
+      },
+      "end": {
+        "line": 3,
+        "column": 43
+      }
+    },
+    "origins": [
+      {
+        "kind": "PropertyDeclaration",
+        "location": {
+          "file": "class-early.d.mts",
+          "start": {
+            "line": 1,
+            "column": 30
+          },
+          "end": {
+            "line": 1,
+            "column": 46
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 52,
+        "declarationPos": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "Early",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 52,
+        "declarationPos": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Early",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 50,
+        "declarationPos": 21,
+        "depth": 0,
+        "event": "enter",
+        "name": "module.exports",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 50,
+        "declarationPos": 21,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "module.exports",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      }
+    ]
+  },
+  {
+    "name": "classEarlyValue",
+    "summary": "{ \"module.exports\": 73; readonly namespaceValue: 74; prototype: Early; }",
+    "errorType": false,
+    "location": {
+      "file": "cases.cts",
+      "start": {
+        "line": 4,
+        "column": 45
+      },
+      "end": {
+        "line": 4,
+        "column": 55
+      }
+    },
+    "origins": [
+      {
+        "kind": "NamespaceImport",
+        "location": {
+          "file": "cases.cts",
+          "start": {
+            "line": 3,
+            "column": 33
+          },
+          "end": {
+            "line": 3,
+            "column": 43
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 52,
+        "declarationPos": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "Early",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 52,
+        "declarationPos": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Early",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 52,
+        "declarationPos": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "Early",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 52,
+        "declarationPos": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Early",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "classEarly",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 52,
+        "declarationPos": 0,
+        "depth": 1,
+        "event": "enter",
+        "name": "Early",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 52,
+        "declarationPos": 0,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Early",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 50,
+        "declarationPos": 21,
+        "depth": 1,
+        "event": "enter",
+        "name": "module.exports",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 50,
+        "declarationPos": 21,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "module.exports",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "classEarly",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      }
+    ]
+  },
+  {
+    "name": "classOnlyAlias",
+    "summary": "typeof Alone",
+    "errorType": false,
+    "location": {
+      "file": "cases.cts",
+      "start": {
+        "line": 5,
+        "column": 32
+      },
+      "end": {
+        "line": 5,
+        "column": 41
+      }
+    },
+    "origins": [
+      {
+        "kind": "ClassDeclaration",
+        "location": {
+          "file": "class-only.d.mts",
+          "start": {
+            "line": 2,
+            "column": 15
+          },
+          "end": {
+            "line": 2,
+            "column": 20
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 78,
+        "declarationPos": 36,
+        "depth": 0,
+        "event": "enter",
+        "name": "Alone",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 78,
+        "declarationPos": 36,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Alone",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 35,
+        "declarationPos": 13,
+        "depth": 0,
+        "event": "enter",
+        "name": "key",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 35,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 18
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 35,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 18,
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 35,
+        "declarationPos": 13,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "name": "key",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 94,
+        "declarationPos": 78,
+        "depth": 0,
+        "event": "enter",
+        "name": "export=",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 78,
+        "declarationPos": 36,
+        "depth": 1,
+        "event": "enter",
+        "name": "Alone",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 78,
+        "declarationPos": 36,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Alone",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 94,
+        "declarationPos": 78,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "export=",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 94,
+        "declarationPos": 78,
+        "depth": 0,
+        "event": "enter",
+        "name": "export=",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 94,
+        "declarationPos": 78,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "export=",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 78,
+        "declarationPos": 36,
+        "depth": 0,
+        "event": "enter",
+        "name": "Alone",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 78,
+        "declarationPos": 36,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Alone",
+        "operation": "getTypeOfSymbol",
+        "type": 90
+      }
+    ]
+  },
+  {
+    "name": "classOnlyValue",
+    "summary": "typeof Alone",
+    "errorType": false,
+    "location": {
+      "file": "cases.cts",
+      "start": {
+        "line": 6,
+        "column": 43
+      },
+      "end": {
+        "line": 6,
+        "column": 52
+      }
+    },
+    "origins": [
+      {
+        "kind": "NamespaceImport",
+        "location": {
+          "file": "cases.cts",
+          "start": {
+            "line": 5,
+            "column": 32
+          },
+          "end": {
+            "line": 5,
+            "column": 41
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 78,
+        "declarationPos": 36,
+        "depth": 0,
+        "event": "enter",
+        "name": "Alone",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 78,
+        "declarationPos": 36,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Alone",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 35,
+        "declarationPos": 13,
+        "depth": 0,
+        "event": "enter",
+        "name": "key",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 35,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 18
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 35,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 18,
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 35,
+        "declarationPos": 13,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1024,
+        "name": "key",
+        "operation": "getTypeOfSymbol",
+        "type": 85
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 94,
+        "declarationPos": 78,
+        "depth": 0,
+        "event": "enter",
+        "name": "export=",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 78,
+        "declarationPos": 36,
+        "depth": 1,
+        "event": "enter",
+        "name": "Alone",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 78,
+        "declarationPos": 36,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Alone",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 94,
+        "declarationPos": 78,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "export=",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 94,
+        "declarationPos": 78,
+        "depth": 0,
+        "event": "enter",
+        "name": "export=",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 94,
+        "declarationPos": 78,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "export=",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 78,
+        "declarationPos": 36,
+        "depth": 0,
+        "event": "enter",
+        "name": "Alone",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 78,
+        "declarationPos": 36,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Alone",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "classOnly",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 78,
+        "declarationPos": 36,
+        "depth": 1,
+        "event": "enter",
+        "name": "Alone",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 78,
+        "declarationPos": 36,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Alone",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 78,
+        "declarationPos": 36,
+        "depth": 1,
+        "event": "enter",
+        "name": "Alone",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 78,
+        "declarationPos": 36,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "Alone",
+        "operation": "getTypeOfSymbol",
+        "type": 90
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "classOnly",
+        "operation": "getTypeOfSymbol",
+        "type": 90
+      }
+    ]
+  },
+  {
+    "name": "classStarAlias",
+    "summary": "typeof ClassStar",
+    "errorType": false,
+    "location": {
+      "file": "cases.cts",
+      "start": {
+        "line": 7,
+        "column": 32
+      },
+      "end": {
+        "line": 7,
+        "column": 41
+      }
+    },
+    "origins": [
+      {
+        "kind": "ClassDeclaration",
+        "location": {
+          "file": "class-star.d.mts",
+          "start": {
+            "line": 1,
+            "column": 15
+          },
+          "end": {
+            "line": 1,
+            "column": 24
+          }
+        }
+      },
+      {
+        "kind": "ModuleDeclaration",
+        "location": {
+          "file": "class-star.d.mts",
+          "start": {
+            "line": 2,
+            "column": 19
+          },
+          "end": {
+            "line": 2,
+            "column": 28
+          }
+        }
+      }
+    ],
+    "codes": [
+      2307
+    ],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "ClassStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "ClassStar",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 113,
+        "declarationPos": 93,
+        "depth": 0,
+        "event": "enter",
+        "name": "export=",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 0,
+        "depth": 1,
+        "event": "enter",
+        "name": "ClassStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 0,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "ClassStar",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 113,
+        "declarationPos": 93,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "export=",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 113,
+        "declarationPos": 93,
+        "depth": 0,
+        "event": "enter",
+        "name": "export=",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 113,
+        "declarationPos": 93,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "export=",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "ClassStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "ClassStar",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      }
+    ]
+  },
+  {
+    "name": "classStarValue",
+    "summary": "typeof ClassStar",
+    "errorType": false,
+    "location": {
+      "file": "cases.cts",
+      "start": {
+        "line": 8,
+        "column": 43
+      },
+      "end": {
+        "line": 8,
+        "column": 52
+      }
+    },
+    "origins": [
+      {
+        "kind": "NamespaceImport",
+        "location": {
+          "file": "cases.cts",
+          "start": {
+            "line": 7,
+            "column": 32
+          },
+          "end": {
+            "line": 7,
+            "column": 41
+          }
+        }
+      }
+    ],
+    "codes": [
+      2307
+    ],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "ClassStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "ClassStar",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 113,
+        "declarationPos": 93,
+        "depth": 0,
+        "event": "enter",
+        "name": "export=",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 0,
+        "depth": 1,
+        "event": "enter",
+        "name": "ClassStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 0,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "ClassStar",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 113,
+        "declarationPos": 93,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "export=",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 113,
+        "declarationPos": 93,
+        "depth": 0,
+        "event": "enter",
+        "name": "export=",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 113,
+        "declarationPos": 93,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "export=",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "ClassStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "ClassStar",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "classStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 0,
+        "depth": 1,
+        "event": "enter",
+        "name": "ClassStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 0,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "ClassStar",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 0,
+        "depth": 1,
+        "event": "enter",
+        "name": "ClassStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 0,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "ClassStar",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "classStar",
+        "operation": "getTypeOfSymbol",
+        "type": 88
+      }
+    ]
+  },
+  {
+    "name": "functionStarAlias",
+    "summary": "typeof FunctionStar",
+    "errorType": false,
+    "location": {
+      "file": "cases.cts",
+      "start": {
+        "line": 9,
+        "column": 35
+      },
+      "end": {
+        "line": 9,
+        "column": 47
+      }
+    },
+    "origins": [
+      {
+        "kind": "FunctionDeclaration",
+        "location": {
+          "file": "function-star.d.mts",
+          "start": {
+            "line": 1,
+            "column": 18
+          },
+          "end": {
+            "line": 1,
+            "column": 30
+          }
+        }
+      },
+      {
+        "kind": "ModuleDeclaration",
+        "location": {
+          "file": "function-star.d.mts",
+          "start": {
+            "line": 2,
+            "column": 19
+          },
+          "end": {
+            "line": 2,
+            "column": 31
+          }
+        }
+      }
+    ],
+    "codes": [
+      2307
+    ],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 36,
+        "declarationPos": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "FunctionStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 36,
+        "declarationPos": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "FunctionStar",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 129,
+        "declarationPos": 106,
+        "depth": 0,
+        "event": "enter",
+        "name": "export=",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 36,
+        "declarationPos": 0,
+        "depth": 1,
+        "event": "enter",
+        "name": "FunctionStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 36,
+        "declarationPos": 0,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "FunctionStar",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 129,
+        "declarationPos": 106,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "export=",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 129,
+        "declarationPos": 106,
+        "depth": 0,
+        "event": "enter",
+        "name": "export=",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 129,
+        "declarationPos": 106,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "export=",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 36,
+        "declarationPos": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "FunctionStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 36,
+        "declarationPos": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "FunctionStar",
+        "operation": "getTypeOfSymbol",
+        "type": 86
+      }
+    ]
+  },
+  {
+    "name": "functionStarValue",
+    "summary": "typeof FunctionStar",
+    "errorType": false,
+    "location": {
+      "file": "cases.cts",
+      "start": {
+        "line": 10,
+        "column": 49
+      },
+      "end": {
+        "line": 10,
+        "column": 61
+      }
+    },
+    "origins": [
+      {
+        "kind": "NamespaceImport",
+        "location": {
+          "file": "cases.cts",
+          "start": {
+            "line": 9,
+            "column": 35
+          },
+          "end": {
+            "line": 9,
+            "column": 47
+          }
+        }
+      }
+    ],
+    "codes": [
+      2307
+    ],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 36,
+        "declarationPos": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "FunctionStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 36,
+        "declarationPos": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "FunctionStar",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 129,
+        "declarationPos": 106,
+        "depth": 0,
+        "event": "enter",
+        "name": "export=",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 36,
+        "declarationPos": 0,
+        "depth": 1,
+        "event": "enter",
+        "name": "FunctionStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 36,
+        "declarationPos": 0,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "FunctionStar",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 129,
+        "declarationPos": 106,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "export=",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 129,
+        "declarationPos": 106,
+        "depth": 0,
+        "event": "enter",
+        "name": "export=",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 129,
+        "declarationPos": 106,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "export=",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 36,
+        "declarationPos": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "FunctionStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 36,
+        "declarationPos": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "FunctionStar",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "functionStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 36,
+        "declarationPos": 0,
+        "depth": 1,
+        "event": "enter",
+        "name": "FunctionStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 36,
+        "declarationPos": 0,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "FunctionStar",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 36,
+        "declarationPos": 0,
+        "depth": 1,
+        "event": "enter",
+        "name": "FunctionStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 36,
+        "declarationPos": 0,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "FunctionStar",
+        "operation": "getTypeOfSymbol",
+        "type": 86
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "functionStar",
+        "operation": "getTypeOfSymbol",
+        "type": 86
+      }
+    ]
+  },
+  {
+    "name": "moduleStarAlias",
+    "summary": "81",
+    "errorType": false,
+    "location": {
+      "file": "cases.cts",
+      "start": {
+        "line": 11,
+        "column": 33
+      },
+      "end": {
+        "line": 11,
+        "column": 43
+      }
+    },
+    "origins": [
+      {
+        "kind": "VariableDeclaration",
+        "location": {
+          "file": "remote.d.mts",
+          "start": {
+            "line": 1,
+            "column": 15
+          },
+          "end": {
+            "line": 1,
+            "column": 23
+          }
+        }
+      }
+    ],
+    "codes": [],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 35,
+        "declarationPos": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "\"/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-module-export-selection/module-star\"",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 35,
+        "declarationPos": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "\"/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-module-export-selection/module-star\"",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 13,
+        "depth": 0,
+        "event": "enter",
+        "name": "selected",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 26,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 23
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 1,
+        "end": 26,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 23,
+        "type": 83
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 13,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "selected",
+        "operation": "getTypeOfSymbol",
+        "type": 83
+      }
+    ]
+  },
+  {
+    "name": "moduleStarValue",
+    "summary": "81",
+    "errorType": false,
+    "location": {
+      "file": "cases.cts",
+      "start": {
+        "line": 12,
+        "column": 45
+      },
+      "end": {
+        "line": 12,
+        "column": 55
+      }
+    },
+    "origins": [
+      {
+        "kind": "NamespaceImport",
+        "location": {
+          "file": "cases.cts",
+          "start": {
+            "line": 11,
+            "column": 33
+          },
+          "end": {
+            "line": 11,
+            "column": 43
+          }
+        }
+      }
+    ],
+    "codes": [
+      1362
+    ],
+    "demandFailures": [],
+    "acquisitions": [
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 35,
+        "declarationPos": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "\"/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-module-export-selection/module-star\"",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 35,
+        "declarationPos": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "\"/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-module-export-selection/module-star\"",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 35,
+        "declarationPos": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "\"/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-module-export-selection/module-star\"",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 35,
+        "declarationPos": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "\"/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-module-export-selection/module-star\"",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "event": "enter",
+        "name": "moduleStar",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 35,
+        "declarationPos": 0,
+        "depth": 1,
+        "event": "enter",
+        "name": "\"/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-module-export-selection/module-star\"",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 35,
+        "declarationPos": 0,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 1048576,
+        "name": "\"/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-module-export-selection/module-star\"",
+        "operation": "getTypeOfSymbol",
+        "type": 82
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 13,
+        "depth": 1,
+        "event": "enter",
+        "name": "selected",
+        "operation": "getTypeOfSymbol"
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 26,
+        "event": "enter",
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 23
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 2,
+        "end": 26,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "kind": 202,
+        "operation": "getTypeFromTypeNode",
+        "pos": 23,
+        "type": 83
+      },
+      {
+        "cacheEvents": 0,
+        "declarationEnd": 26,
+        "declarationPos": 13,
+        "depth": 1,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "selected",
+        "operation": "getTypeOfSymbol",
+        "type": 83
+      },
+      {
+        "cacheEvents": 0,
+        "depth": 0,
+        "errorType": false,
+        "event": "exit",
+        "flags": 2048,
+        "name": "moduleStar",
+        "operation": "getTypeOfSymbol",
+        "type": 83
+      }
+    ]
+  }
+]

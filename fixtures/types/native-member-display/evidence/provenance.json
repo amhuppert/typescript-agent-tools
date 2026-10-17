@@ -1,0 +1,110 @@
+{
+  "scope": "Original observed inline-display API/hook sessions and separately registered formal native suite",
+  "registeredRun": "vrun-06824310-0f87-4728-aa41-94cfbc8ccf10",
+  "nativeVersion": "7.0.2",
+  "nativeCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "inputs": [
+    {
+      "file": "cases.ts",
+      "bytes": 329,
+      "sha256": "52a2ad4b910b05767a29133d6aadd1783c8ebfb955f3e83dc26792889fdce6d2"
+    },
+    {
+      "file": "strict.json",
+      "bytes": 191,
+      "sha256": "1cdf508c8cd32dce5902d838c740ce20312dc66c354cf9ace0ef9b2a3a57c08d"
+    },
+    {
+      "file": "exact.json",
+      "bytes": 190,
+      "sha256": "e19f1fe326ebe2fbee5b0ed8ca82a0f763d9a5cdb58d40b20b1e49c30464258d"
+    },
+    {
+      "file": "loose.json",
+      "bytes": 192,
+      "sha256": "25f730b22229970a0f601530ce1d0a5be4ddf08da06b0a484d62b1bfdf29597b"
+    }
+  ],
+  "files": [
+    {
+      "file": "README.md",
+      "bytes": 1906,
+      "sha256": "d4032cd780a7c60413f92b97b57c66b028a295f26adf8153d8242fb30c838ed2"
+    },
+    {
+      "file": "capture.mjs",
+      "bytes": 2260,
+      "sha256": "2f5ecb8f178eda4792ef7ef6a61961ae33af029ce05595e8e4372052c5a4d2e0"
+    },
+    {
+      "file": "captured-tooling/fixtures/types/compiler-hook/checker-hook.go",
+      "bytes": 2773,
+      "sha256": "e2d5c10ae680c02f912cd1eff4d9b17dc922894559fea2028a82663d9a501419"
+    },
+    {
+      "file": "captured-tooling/fixtures/types/compiler-hook/ls-hook.go",
+      "bytes": 5896,
+      "sha256": "73c9a52f43914571bdf7f29e8817720d0ff98bdb0aeb7cad183fa8397a848dce"
+    },
+    {
+      "file": "captured-tooling/fixtures/types/compiler-hook/oracle-test.go",
+      "bytes": 11245,
+      "sha256": "eeea4327d99fa38e1030d229a92905e6955d2fbfad5d2384eef7ed761e566535"
+    },
+    {
+      "file": "captured-tooling/tools/corpus-selection.mjs",
+      "bytes": 2003,
+      "sha256": "132d08e26e251c0d55cb39ce8d15b59735524bdd4e03fe1d5c691643abc3afa5"
+    },
+    {
+      "file": "captured-tooling/tools/navigation-oracle.mjs",
+      "bytes": 15291,
+      "sha256": "cd8133627283f6e6bdb41ea9ac6ed9118b0c138f0f066110f305c08dc98a32c3"
+    },
+    {
+      "file": "captured-tooling/tools/semantic-oracle.mjs",
+      "bytes": 49378,
+      "sha256": "3517bbb6964c5df5d8b0c040bdbd5b60ec27568df66106be756628d527e34597"
+    },
+    {
+      "file": "captured-tooling/tools/type-member-display-oracle.test.mjs",
+      "bytes": 3727,
+      "sha256": "4d12c3f184d881388a5daae31044635f83f6e4194f932792f02733f28472c5d6"
+    },
+    {
+      "file": "captured-tooling/tools/type-oracle.mjs",
+      "bytes": 39604,
+      "sha256": "2b88ee398209e24c9b3b28a6c39e9d6fbcb3c463f6902638c797e02ae3560b2e"
+    },
+    {
+      "file": "captured-tooling/tools/vendor-typescript-libs.mjs",
+      "bytes": 8387,
+      "sha256": "454d888da9657ab1be7e80594cf0b21a97af9b320b95a66710954c88d711da1d"
+    },
+    {
+      "file": "research-answers.json",
+      "bytes": 52791,
+      "sha256": "22296a357f3899d35990fe1d8307e550abdfff0a1d32c300ed12f45c9a1c7d1c"
+    },
+    {
+      "file": "research-child-answers.json",
+      "bytes": 4100,
+      "sha256": "9f9112a95fd1151ed00226fefb99caa9fae9c0fb6b89206de79e578ada367d03"
+    },
+    {
+      "file": "research-child.mjs",
+      "bytes": 882,
+      "sha256": "7dc2972e961fb1c0c5a8234c450ba0d3824da9e11221a0cb30a119556f425b39"
+    },
+    {
+      "file": "research-probe.mjs",
+      "bytes": 2676,
+      "sha256": "158cfcef1babc2a73ea15bd49fe6fc41d8a9997328f838f158843519b9a5d9c1"
+    },
+    {
+      "file": "research-provenance.json",
+      "bytes": 1875,
+      "sha256": "7cd2fdcafe57c7763ff9ad59a65795949a18da3f1e957e973d091c299d5ab4d4"
+    }
+  ]
+}

@@ -1,0 +1,4022 @@
+[
+  {
+    "variant": {
+      "order": "outer-inner",
+      "profile": "strict",
+      "file": "outer-inner.ts",
+      "config": "outer-inner-strict.json",
+      "configuration": {
+        "compilerOptions": {
+          "strict": true,
+          "strictNullChecks": true,
+          "noCheck": false,
+          "noLib": true,
+          "types": [],
+          "target": "ESNext",
+          "module": "ESNext",
+          "moduleResolution": "Bundler"
+        },
+        "files": [
+          "globals.d.ts",
+          "outer-inner.ts"
+        ]
+      },
+      "expected": "62",
+      "evaluation": "warm-call"
+    },
+    "source": "export {};\ndeclare function warm(value: 0): 0;\ndeclare function warm(value: unknown): 0;\ndeclare const key: \"value\";\nclass Outer {\n    get [key]() { return 61 as const; }\n    set [key](outerInput) {\n        class Inner {\n            get [key]() { return 62 as const; }\n            set [key](innerInput) {\n                const /*#chosen*/chosen = (warm(outerInput), innerInput);\n                let healthy: number;\n            }\n        }\n    }\n}\n",
+    "at": {
+      "file": "outer-inner.ts",
+      "line": 11,
+      "column": 34
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner-strict.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner-strict.json",
+          "sha256": "82614d60eda0ffeb57bf67e2f2537be899bc6cd21571d971c0f9b75f5f7f728c"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts",
+          "sha256": "71c415e3f93a9795ea5bc3cad5922cc17eba117c9fe62142b6e79abd63ea3320"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts",
+          "sourceTextSha256": "71c415e3f93a9795ea5bc3cad5922cc17eba117c9fe62142b6e79abd63ea3320"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "62",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:102:115": {
+            "deprecated": false,
+            "end": 115,
+            "kind": 261,
+            "pos": 102
+          },
+          "deprecatedConfirmation:10:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 263,
+            "pos": 10
+          },
+          "deprecatedConfirmation:185:195": {
+            "deprecated": false,
+            "end": 195,
+            "kind": 170,
+            "pos": 185
+          },
+          "deprecatedConfirmation:291:301": {
+            "deprecated": false,
+            "end": 301,
+            "kind": 170,
+            "pos": 291
+          },
+          "deprecatedConfirmation:46:88": {
+            "deprecated": false,
+            "end": 88,
+            "kind": 263,
+            "pos": 46
+          },
+          "referenceFlow:140:143": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 143,
+            "referencePos": 140,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:180:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 180,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:238:241": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 241,
+            "referencePos": 238,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:286:289": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 289,
+            "referencePos": 286,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:353:363": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 363,
+            "referencePos": 353,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:365:376": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 376,
+            "referencePos": 365,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "signatureReturn:178:130:170": {
+            "end": 170,
+            "errorType": false,
+            "kind": 178,
+            "pos": 130
+          },
+          "signatureReturn:178:220:268": {
+            "end": 268,
+            "errorType": false,
+            "kind": 178,
+            "pos": 220
+          },
+          "signatureReturn:263:46:88": {
+            "end": 88,
+            "errorType": false,
+            "kind": 263,
+            "pos": 46
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:102:115": {
+          "deprecated": false,
+          "end": 115,
+          "kind": 261,
+          "pos": 102
+        },
+        "deprecatedConfirmation:10:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 263,
+          "pos": 10
+        },
+        "deprecatedConfirmation:185:195": {
+          "deprecated": false,
+          "end": 195,
+          "kind": 170,
+          "pos": 185
+        },
+        "deprecatedConfirmation:291:301": {
+          "deprecated": false,
+          "end": 301,
+          "kind": 170,
+          "pos": 291
+        },
+        "deprecatedConfirmation:46:88": {
+          "deprecated": false,
+          "end": 88,
+          "kind": 263,
+          "pos": 46
+        },
+        "referenceFlow:140:143": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 143,
+          "referencePos": 140,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:180:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 180,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:238:241": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 241,
+          "referencePos": 238,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:286:289": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 289,
+          "referencePos": 286,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:353:363": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 363,
+          "referencePos": 353,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:365:376": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 376,
+          "referencePos": 365,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "signatureReturn:178:130:170": {
+          "end": 170,
+          "errorType": false,
+          "kind": 178,
+          "pos": 130
+        },
+        "signatureReturn:178:220:268": {
+          "end": 268,
+          "errorType": false,
+          "kind": 178,
+          "pos": 220
+        },
+        "signatureReturn:263:46:88": {
+          "end": 88,
+          "errorType": false,
+          "kind": 263,
+          "pos": 46
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "module": 99,
+        "moduleResolution": 100,
+        "noCheck": false,
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "target": 99,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner-strict.json"
+      }
+    }
+  },
+  {
+    "variant": {
+      "order": "outer-inner",
+      "profile": "nocheck",
+      "file": "outer-inner.ts",
+      "config": "outer-inner-nocheck.json",
+      "configuration": {
+        "compilerOptions": {
+          "strict": true,
+          "strictNullChecks": true,
+          "noCheck": true,
+          "noLib": true,
+          "types": [],
+          "target": "ESNext",
+          "module": "ESNext",
+          "moduleResolution": "Bundler"
+        },
+        "files": [
+          "globals.d.ts",
+          "outer-inner.ts"
+        ]
+      },
+      "expected": "62",
+      "evaluation": "warm-call"
+    },
+    "source": "export {};\ndeclare function warm(value: 0): 0;\ndeclare function warm(value: unknown): 0;\ndeclare const key: \"value\";\nclass Outer {\n    get [key]() { return 61 as const; }\n    set [key](outerInput) {\n        class Inner {\n            get [key]() { return 62 as const; }\n            set [key](innerInput) {\n                const /*#chosen*/chosen = (warm(outerInput), innerInput);\n                let healthy: number;\n            }\n        }\n    }\n}\n",
+    "at": {
+      "file": "outer-inner.ts",
+      "line": 11,
+      "column": 34
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner-nocheck.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner-nocheck.json",
+          "sha256": "f382b2d617444286f916bfe1ec850a7f6615108d181c2cee89cebca7b845469c"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts",
+          "sha256": "71c415e3f93a9795ea5bc3cad5922cc17eba117c9fe62142b6e79abd63ea3320"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts",
+          "sourceTextSha256": "71c415e3f93a9795ea5bc3cad5922cc17eba117c9fe62142b6e79abd63ea3320"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "62",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:102:115": {
+            "deprecated": false,
+            "end": 115,
+            "kind": 261,
+            "pos": 102
+          },
+          "deprecatedConfirmation:10:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 263,
+            "pos": 10
+          },
+          "deprecatedConfirmation:185:195": {
+            "deprecated": false,
+            "end": 195,
+            "kind": 170,
+            "pos": 185
+          },
+          "deprecatedConfirmation:291:301": {
+            "deprecated": false,
+            "end": 301,
+            "kind": 170,
+            "pos": 291
+          },
+          "deprecatedConfirmation:46:88": {
+            "deprecated": false,
+            "end": 88,
+            "kind": 263,
+            "pos": 46
+          },
+          "referenceFlow:140:143": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 143,
+            "referencePos": 140,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:180:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 180,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:238:241": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 241,
+            "referencePos": 238,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:286:289": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 289,
+            "referencePos": 286,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:353:363": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 363,
+            "referencePos": 353,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:365:376": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 376,
+            "referencePos": 365,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "signatureReturn:178:130:170": {
+            "end": 170,
+            "errorType": false,
+            "kind": 178,
+            "pos": 130
+          },
+          "signatureReturn:178:220:268": {
+            "end": 268,
+            "errorType": false,
+            "kind": 178,
+            "pos": 220
+          },
+          "signatureReturn:263:46:88": {
+            "end": 88,
+            "errorType": false,
+            "kind": 263,
+            "pos": 46
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:102:115": {
+          "deprecated": false,
+          "end": 115,
+          "kind": 261,
+          "pos": 102
+        },
+        "deprecatedConfirmation:10:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 263,
+          "pos": 10
+        },
+        "deprecatedConfirmation:185:195": {
+          "deprecated": false,
+          "end": 195,
+          "kind": 170,
+          "pos": 185
+        },
+        "deprecatedConfirmation:291:301": {
+          "deprecated": false,
+          "end": 301,
+          "kind": 170,
+          "pos": 291
+        },
+        "deprecatedConfirmation:46:88": {
+          "deprecated": false,
+          "end": 88,
+          "kind": 263,
+          "pos": 46
+        },
+        "referenceFlow:140:143": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 143,
+          "referencePos": 140,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:180:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 180,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:238:241": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 241,
+          "referencePos": 238,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:286:289": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 289,
+          "referencePos": 286,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:353:363": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 363,
+          "referencePos": 353,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:365:376": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 376,
+          "referencePos": 365,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "signatureReturn:178:130:170": {
+          "end": 170,
+          "errorType": false,
+          "kind": 178,
+          "pos": 130
+        },
+        "signatureReturn:178:220:268": {
+          "end": 268,
+          "errorType": false,
+          "kind": 178,
+          "pos": 220
+        },
+        "signatureReturn:263:46:88": {
+          "end": 88,
+          "errorType": false,
+          "kind": 263,
+          "pos": 46
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "module": 99,
+        "moduleResolution": 100,
+        "noCheck": true,
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "target": 99,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner-nocheck.json"
+      }
+    }
+  },
+  {
+    "variant": {
+      "order": "outer-inner",
+      "profile": "loose",
+      "file": "outer-inner.ts",
+      "config": "outer-inner-loose.json",
+      "configuration": {
+        "compilerOptions": {
+          "strict": false,
+          "strictNullChecks": false,
+          "noCheck": false,
+          "noLib": true,
+          "types": [],
+          "target": "ESNext",
+          "module": "ESNext",
+          "moduleResolution": "Bundler"
+        },
+        "files": [
+          "globals.d.ts",
+          "outer-inner.ts"
+        ]
+      },
+      "expected": "62",
+      "evaluation": "warm-call"
+    },
+    "source": "export {};\ndeclare function warm(value: 0): 0;\ndeclare function warm(value: unknown): 0;\ndeclare const key: \"value\";\nclass Outer {\n    get [key]() { return 61 as const; }\n    set [key](outerInput) {\n        class Inner {\n            get [key]() { return 62 as const; }\n            set [key](innerInput) {\n                const /*#chosen*/chosen = (warm(outerInput), innerInput);\n                let healthy: number;\n            }\n        }\n    }\n}\n",
+    "at": {
+      "file": "outer-inner.ts",
+      "line": 11,
+      "column": 34
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner-loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner-loose.json",
+          "sha256": "3031c3c2125861d250dd1ccabff3bbef2feb57aa857079ae66c355574a67a6cb"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts",
+          "sha256": "71c415e3f93a9795ea5bc3cad5922cc17eba117c9fe62142b6e79abd63ea3320"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts",
+          "sourceTextSha256": "71c415e3f93a9795ea5bc3cad5922cc17eba117c9fe62142b6e79abd63ea3320"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "62",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:102:115": {
+            "deprecated": false,
+            "end": 115,
+            "kind": 261,
+            "pos": 102
+          },
+          "deprecatedConfirmation:10:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 263,
+            "pos": 10
+          },
+          "deprecatedConfirmation:185:195": {
+            "deprecated": false,
+            "end": 195,
+            "kind": 170,
+            "pos": 185
+          },
+          "deprecatedConfirmation:291:301": {
+            "deprecated": false,
+            "end": 301,
+            "kind": 170,
+            "pos": 291
+          },
+          "deprecatedConfirmation:46:88": {
+            "deprecated": false,
+            "end": 88,
+            "kind": 263,
+            "pos": 46
+          },
+          "referenceFlow:140:143": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 143,
+            "referencePos": 140,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:180:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 180,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:238:241": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 241,
+            "referencePos": 238,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:286:289": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 289,
+            "referencePos": 286,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:353:363": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 363,
+            "referencePos": 353,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:365:376": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 376,
+            "referencePos": 365,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "signatureReturn:178:130:170": {
+            "end": 170,
+            "errorType": false,
+            "kind": 178,
+            "pos": 130
+          },
+          "signatureReturn:178:220:268": {
+            "end": 268,
+            "errorType": false,
+            "kind": 178,
+            "pos": 220
+          },
+          "signatureReturn:263:46:88": {
+            "end": 88,
+            "errorType": false,
+            "kind": 263,
+            "pos": 46
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:102:115": {
+          "deprecated": false,
+          "end": 115,
+          "kind": 261,
+          "pos": 102
+        },
+        "deprecatedConfirmation:10:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 263,
+          "pos": 10
+        },
+        "deprecatedConfirmation:185:195": {
+          "deprecated": false,
+          "end": 195,
+          "kind": 170,
+          "pos": 185
+        },
+        "deprecatedConfirmation:291:301": {
+          "deprecated": false,
+          "end": 301,
+          "kind": 170,
+          "pos": 291
+        },
+        "deprecatedConfirmation:46:88": {
+          "deprecated": false,
+          "end": 88,
+          "kind": 263,
+          "pos": 46
+        },
+        "referenceFlow:140:143": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 143,
+          "referencePos": 140,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:180:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 180,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:238:241": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 241,
+          "referencePos": 238,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:286:289": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 289,
+          "referencePos": 286,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:353:363": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 363,
+          "referencePos": 353,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:365:376": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 376,
+          "referencePos": 365,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "signatureReturn:178:130:170": {
+          "end": 170,
+          "errorType": false,
+          "kind": 178,
+          "pos": 130
+        },
+        "signatureReturn:178:220:268": {
+          "end": 268,
+          "errorType": false,
+          "kind": 178,
+          "pos": 220
+        },
+        "signatureReturn:263:46:88": {
+          "end": 88,
+          "errorType": false,
+          "kind": 263,
+          "pos": 46
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "module": 99,
+        "moduleResolution": 100,
+        "noCheck": false,
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "target": 99,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner-loose.json"
+      }
+    }
+  },
+  {
+    "variant": {
+      "order": "outer-inner",
+      "profile": "loose-nocheck",
+      "file": "outer-inner.ts",
+      "config": "outer-inner-loose-nocheck.json",
+      "configuration": {
+        "compilerOptions": {
+          "strict": false,
+          "strictNullChecks": false,
+          "noCheck": true,
+          "noLib": true,
+          "types": [],
+          "target": "ESNext",
+          "module": "ESNext",
+          "moduleResolution": "Bundler"
+        },
+        "files": [
+          "globals.d.ts",
+          "outer-inner.ts"
+        ]
+      },
+      "expected": "62",
+      "evaluation": "warm-call"
+    },
+    "source": "export {};\ndeclare function warm(value: 0): 0;\ndeclare function warm(value: unknown): 0;\ndeclare const key: \"value\";\nclass Outer {\n    get [key]() { return 61 as const; }\n    set [key](outerInput) {\n        class Inner {\n            get [key]() { return 62 as const; }\n            set [key](innerInput) {\n                const /*#chosen*/chosen = (warm(outerInput), innerInput);\n                let healthy: number;\n            }\n        }\n    }\n}\n",
+    "at": {
+      "file": "outer-inner.ts",
+      "line": 11,
+      "column": 34
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner-loose-nocheck.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner-loose-nocheck.json",
+          "sha256": "77f620d02c6f2a6fb91da641e0378dbf5d17f0175cc52b6274901d62baf870f6"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts",
+          "sha256": "71c415e3f93a9795ea5bc3cad5922cc17eba117c9fe62142b6e79abd63ea3320"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts",
+          "sourceTextSha256": "71c415e3f93a9795ea5bc3cad5922cc17eba117c9fe62142b6e79abd63ea3320"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "62",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:102:115": {
+            "deprecated": false,
+            "end": 115,
+            "kind": 261,
+            "pos": 102
+          },
+          "deprecatedConfirmation:10:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 263,
+            "pos": 10
+          },
+          "deprecatedConfirmation:185:195": {
+            "deprecated": false,
+            "end": 195,
+            "kind": 170,
+            "pos": 185
+          },
+          "deprecatedConfirmation:291:301": {
+            "deprecated": false,
+            "end": 301,
+            "kind": 170,
+            "pos": 291
+          },
+          "deprecatedConfirmation:46:88": {
+            "deprecated": false,
+            "end": 88,
+            "kind": 263,
+            "pos": 46
+          },
+          "referenceFlow:140:143": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 143,
+            "referencePos": 140,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:180:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 180,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:238:241": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 241,
+            "referencePos": 238,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:286:289": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 289,
+            "referencePos": 286,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:353:363": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 363,
+            "referencePos": 353,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:365:376": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 376,
+            "referencePos": 365,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "signatureReturn:178:130:170": {
+            "end": 170,
+            "errorType": false,
+            "kind": 178,
+            "pos": 130
+          },
+          "signatureReturn:178:220:268": {
+            "end": 268,
+            "errorType": false,
+            "kind": 178,
+            "pos": 220
+          },
+          "signatureReturn:263:46:88": {
+            "end": 88,
+            "errorType": false,
+            "kind": 263,
+            "pos": 46
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:102:115": {
+          "deprecated": false,
+          "end": 115,
+          "kind": 261,
+          "pos": 102
+        },
+        "deprecatedConfirmation:10:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 263,
+          "pos": 10
+        },
+        "deprecatedConfirmation:185:195": {
+          "deprecated": false,
+          "end": 195,
+          "kind": 170,
+          "pos": 185
+        },
+        "deprecatedConfirmation:291:301": {
+          "deprecated": false,
+          "end": 301,
+          "kind": 170,
+          "pos": 291
+        },
+        "deprecatedConfirmation:46:88": {
+          "deprecated": false,
+          "end": 88,
+          "kind": 263,
+          "pos": 46
+        },
+        "referenceFlow:140:143": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 143,
+          "referencePos": 140,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:180:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 180,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:238:241": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 241,
+          "referencePos": 238,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:286:289": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 289,
+          "referencePos": 286,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:353:363": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 363,
+          "referencePos": 353,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:365:376": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 376,
+          "referencePos": 365,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "signatureReturn:178:130:170": {
+          "end": 170,
+          "errorType": false,
+          "kind": 178,
+          "pos": 130
+        },
+        "signatureReturn:178:220:268": {
+          "end": 268,
+          "errorType": false,
+          "kind": 178,
+          "pos": 220
+        },
+        "signatureReturn:263:46:88": {
+          "end": 88,
+          "errorType": false,
+          "kind": 263,
+          "pos": 46
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "module": 99,
+        "moduleResolution": 100,
+        "noCheck": true,
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "target": 99,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/outer-inner-loose-nocheck.json"
+      }
+    }
+  },
+  {
+    "variant": {
+      "order": "inner-outer",
+      "profile": "strict",
+      "file": "inner-outer.ts",
+      "config": "inner-outer-strict.json",
+      "configuration": {
+        "compilerOptions": {
+          "strict": true,
+          "strictNullChecks": true,
+          "noCheck": false,
+          "noLib": true,
+          "types": [],
+          "target": "ESNext",
+          "module": "ESNext",
+          "moduleResolution": "Bundler"
+        },
+        "files": [
+          "globals.d.ts",
+          "inner-outer.ts"
+        ]
+      },
+      "expected": "61",
+      "evaluation": "warm-call"
+    },
+    "source": "export {};\ndeclare function warm(value: 0): 0;\ndeclare function warm(value: unknown): 0;\ndeclare const key: \"value\";\nclass Outer {\n    get [key]() { return 61 as const; }\n    set [key](outerInput) {\n        class Inner {\n            get [key]() { return 62 as const; }\n            set [key](innerInput) {\n                const /*#chosen*/chosen = (warm(innerInput), outerInput);\n                let healthy: number;\n            }\n        }\n    }\n}\n",
+    "at": {
+      "file": "inner-outer.ts",
+      "line": 11,
+      "column": 34
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer-strict.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer-strict.json",
+          "sha256": "f8830136ad5fc18ab21d3815b45e6a0b2f92110c48bf7f0e54d0fed792bd340d"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts",
+          "sha256": "69ccaf223c239d27d5b407003ab4cb301f19c87936e70d19838bab63eef20362"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts",
+          "sourceTextSha256": "69ccaf223c239d27d5b407003ab4cb301f19c87936e70d19838bab63eef20362"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "61",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:102:115": {
+            "deprecated": false,
+            "end": 115,
+            "kind": 261,
+            "pos": 102
+          },
+          "deprecatedConfirmation:10:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 263,
+            "pos": 10
+          },
+          "deprecatedConfirmation:185:195": {
+            "deprecated": false,
+            "end": 195,
+            "kind": 170,
+            "pos": 185
+          },
+          "deprecatedConfirmation:291:301": {
+            "deprecated": false,
+            "end": 301,
+            "kind": 170,
+            "pos": 291
+          },
+          "deprecatedConfirmation:46:88": {
+            "deprecated": false,
+            "end": 88,
+            "kind": 263,
+            "pos": 46
+          },
+          "referenceFlow:140:143": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 143,
+            "referencePos": 140,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:180:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 180,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:238:241": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 241,
+            "referencePos": 238,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:286:289": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 289,
+            "referencePos": 286,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:353:363": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 363,
+            "referencePos": 353,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:365:376": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 376,
+            "referencePos": 365,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "signatureReturn:178:130:170": {
+            "end": 170,
+            "errorType": false,
+            "kind": 178,
+            "pos": 130
+          },
+          "signatureReturn:178:220:268": {
+            "end": 268,
+            "errorType": false,
+            "kind": 178,
+            "pos": 220
+          },
+          "signatureReturn:263:46:88": {
+            "end": 88,
+            "errorType": false,
+            "kind": 263,
+            "pos": 46
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:102:115": {
+          "deprecated": false,
+          "end": 115,
+          "kind": 261,
+          "pos": 102
+        },
+        "deprecatedConfirmation:10:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 263,
+          "pos": 10
+        },
+        "deprecatedConfirmation:185:195": {
+          "deprecated": false,
+          "end": 195,
+          "kind": 170,
+          "pos": 185
+        },
+        "deprecatedConfirmation:291:301": {
+          "deprecated": false,
+          "end": 301,
+          "kind": 170,
+          "pos": 291
+        },
+        "deprecatedConfirmation:46:88": {
+          "deprecated": false,
+          "end": 88,
+          "kind": 263,
+          "pos": 46
+        },
+        "referenceFlow:140:143": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 143,
+          "referencePos": 140,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:180:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 180,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:238:241": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 241,
+          "referencePos": 238,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:286:289": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 289,
+          "referencePos": 286,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:353:363": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 363,
+          "referencePos": 353,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:365:376": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 376,
+          "referencePos": 365,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "signatureReturn:178:130:170": {
+          "end": 170,
+          "errorType": false,
+          "kind": 178,
+          "pos": 130
+        },
+        "signatureReturn:178:220:268": {
+          "end": 268,
+          "errorType": false,
+          "kind": 178,
+          "pos": 220
+        },
+        "signatureReturn:263:46:88": {
+          "end": 88,
+          "errorType": false,
+          "kind": 263,
+          "pos": 46
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "module": 99,
+        "moduleResolution": 100,
+        "noCheck": false,
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "target": 99,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer-strict.json"
+      }
+    }
+  },
+  {
+    "variant": {
+      "order": "inner-outer",
+      "profile": "nocheck",
+      "file": "inner-outer.ts",
+      "config": "inner-outer-nocheck.json",
+      "configuration": {
+        "compilerOptions": {
+          "strict": true,
+          "strictNullChecks": true,
+          "noCheck": true,
+          "noLib": true,
+          "types": [],
+          "target": "ESNext",
+          "module": "ESNext",
+          "moduleResolution": "Bundler"
+        },
+        "files": [
+          "globals.d.ts",
+          "inner-outer.ts"
+        ]
+      },
+      "expected": "61",
+      "evaluation": "warm-call"
+    },
+    "source": "export {};\ndeclare function warm(value: 0): 0;\ndeclare function warm(value: unknown): 0;\ndeclare const key: \"value\";\nclass Outer {\n    get [key]() { return 61 as const; }\n    set [key](outerInput) {\n        class Inner {\n            get [key]() { return 62 as const; }\n            set [key](innerInput) {\n                const /*#chosen*/chosen = (warm(innerInput), outerInput);\n                let healthy: number;\n            }\n        }\n    }\n}\n",
+    "at": {
+      "file": "inner-outer.ts",
+      "line": 11,
+      "column": 34
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer-nocheck.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer-nocheck.json",
+          "sha256": "c60c0138140530005704dbc026c5ab936831cfa0bab4b4285a0ab1ffd54b05be"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts",
+          "sha256": "69ccaf223c239d27d5b407003ab4cb301f19c87936e70d19838bab63eef20362"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts",
+          "sourceTextSha256": "69ccaf223c239d27d5b407003ab4cb301f19c87936e70d19838bab63eef20362"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "61",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:102:115": {
+            "deprecated": false,
+            "end": 115,
+            "kind": 261,
+            "pos": 102
+          },
+          "deprecatedConfirmation:10:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 263,
+            "pos": 10
+          },
+          "deprecatedConfirmation:185:195": {
+            "deprecated": false,
+            "end": 195,
+            "kind": 170,
+            "pos": 185
+          },
+          "deprecatedConfirmation:291:301": {
+            "deprecated": false,
+            "end": 301,
+            "kind": 170,
+            "pos": 291
+          },
+          "deprecatedConfirmation:46:88": {
+            "deprecated": false,
+            "end": 88,
+            "kind": 263,
+            "pos": 46
+          },
+          "referenceFlow:140:143": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 143,
+            "referencePos": 140,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:180:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 180,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:238:241": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 241,
+            "referencePos": 238,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:286:289": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 289,
+            "referencePos": 286,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:353:363": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 363,
+            "referencePos": 353,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:365:376": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 376,
+            "referencePos": 365,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "signatureReturn:178:130:170": {
+            "end": 170,
+            "errorType": false,
+            "kind": 178,
+            "pos": 130
+          },
+          "signatureReturn:178:220:268": {
+            "end": 268,
+            "errorType": false,
+            "kind": 178,
+            "pos": 220
+          },
+          "signatureReturn:263:46:88": {
+            "end": 88,
+            "errorType": false,
+            "kind": 263,
+            "pos": 46
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:102:115": {
+          "deprecated": false,
+          "end": 115,
+          "kind": 261,
+          "pos": 102
+        },
+        "deprecatedConfirmation:10:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 263,
+          "pos": 10
+        },
+        "deprecatedConfirmation:185:195": {
+          "deprecated": false,
+          "end": 195,
+          "kind": 170,
+          "pos": 185
+        },
+        "deprecatedConfirmation:291:301": {
+          "deprecated": false,
+          "end": 301,
+          "kind": 170,
+          "pos": 291
+        },
+        "deprecatedConfirmation:46:88": {
+          "deprecated": false,
+          "end": 88,
+          "kind": 263,
+          "pos": 46
+        },
+        "referenceFlow:140:143": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 143,
+          "referencePos": 140,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:180:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 180,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:238:241": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 241,
+          "referencePos": 238,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:286:289": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 289,
+          "referencePos": 286,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:353:363": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 363,
+          "referencePos": 353,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:365:376": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 376,
+          "referencePos": 365,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "signatureReturn:178:130:170": {
+          "end": 170,
+          "errorType": false,
+          "kind": 178,
+          "pos": 130
+        },
+        "signatureReturn:178:220:268": {
+          "end": 268,
+          "errorType": false,
+          "kind": 178,
+          "pos": 220
+        },
+        "signatureReturn:263:46:88": {
+          "end": 88,
+          "errorType": false,
+          "kind": 263,
+          "pos": 46
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "module": 99,
+        "moduleResolution": 100,
+        "noCheck": true,
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "target": 99,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer-nocheck.json"
+      }
+    }
+  },
+  {
+    "variant": {
+      "order": "inner-outer",
+      "profile": "loose",
+      "file": "inner-outer.ts",
+      "config": "inner-outer-loose.json",
+      "configuration": {
+        "compilerOptions": {
+          "strict": false,
+          "strictNullChecks": false,
+          "noCheck": false,
+          "noLib": true,
+          "types": [],
+          "target": "ESNext",
+          "module": "ESNext",
+          "moduleResolution": "Bundler"
+        },
+        "files": [
+          "globals.d.ts",
+          "inner-outer.ts"
+        ]
+      },
+      "expected": "61",
+      "evaluation": "warm-call"
+    },
+    "source": "export {};\ndeclare function warm(value: 0): 0;\ndeclare function warm(value: unknown): 0;\ndeclare const key: \"value\";\nclass Outer {\n    get [key]() { return 61 as const; }\n    set [key](outerInput) {\n        class Inner {\n            get [key]() { return 62 as const; }\n            set [key](innerInput) {\n                const /*#chosen*/chosen = (warm(innerInput), outerInput);\n                let healthy: number;\n            }\n        }\n    }\n}\n",
+    "at": {
+      "file": "inner-outer.ts",
+      "line": 11,
+      "column": 34
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer-loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer-loose.json",
+          "sha256": "296ea1822392d58c05faf03a92bc69858ef49c3c3be4385d012f96bf676be136"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts",
+          "sha256": "69ccaf223c239d27d5b407003ab4cb301f19c87936e70d19838bab63eef20362"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts",
+          "sourceTextSha256": "69ccaf223c239d27d5b407003ab4cb301f19c87936e70d19838bab63eef20362"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "61",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:102:115": {
+            "deprecated": false,
+            "end": 115,
+            "kind": 261,
+            "pos": 102
+          },
+          "deprecatedConfirmation:10:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 263,
+            "pos": 10
+          },
+          "deprecatedConfirmation:185:195": {
+            "deprecated": false,
+            "end": 195,
+            "kind": 170,
+            "pos": 185
+          },
+          "deprecatedConfirmation:291:301": {
+            "deprecated": false,
+            "end": 301,
+            "kind": 170,
+            "pos": 291
+          },
+          "deprecatedConfirmation:46:88": {
+            "deprecated": false,
+            "end": 88,
+            "kind": 263,
+            "pos": 46
+          },
+          "referenceFlow:140:143": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 143,
+            "referencePos": 140,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:180:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 180,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:238:241": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 241,
+            "referencePos": 238,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:286:289": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 289,
+            "referencePos": 286,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:353:363": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 363,
+            "referencePos": 353,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:365:376": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 376,
+            "referencePos": 365,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "signatureReturn:178:130:170": {
+            "end": 170,
+            "errorType": false,
+            "kind": 178,
+            "pos": 130
+          },
+          "signatureReturn:178:220:268": {
+            "end": 268,
+            "errorType": false,
+            "kind": 178,
+            "pos": 220
+          },
+          "signatureReturn:263:46:88": {
+            "end": 88,
+            "errorType": false,
+            "kind": 263,
+            "pos": 46
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:102:115": {
+          "deprecated": false,
+          "end": 115,
+          "kind": 261,
+          "pos": 102
+        },
+        "deprecatedConfirmation:10:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 263,
+          "pos": 10
+        },
+        "deprecatedConfirmation:185:195": {
+          "deprecated": false,
+          "end": 195,
+          "kind": 170,
+          "pos": 185
+        },
+        "deprecatedConfirmation:291:301": {
+          "deprecated": false,
+          "end": 301,
+          "kind": 170,
+          "pos": 291
+        },
+        "deprecatedConfirmation:46:88": {
+          "deprecated": false,
+          "end": 88,
+          "kind": 263,
+          "pos": 46
+        },
+        "referenceFlow:140:143": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 143,
+          "referencePos": 140,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:180:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 180,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:238:241": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 241,
+          "referencePos": 238,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:286:289": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 289,
+          "referencePos": 286,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:353:363": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 363,
+          "referencePos": 353,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:365:376": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 376,
+          "referencePos": 365,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "signatureReturn:178:130:170": {
+          "end": 170,
+          "errorType": false,
+          "kind": 178,
+          "pos": 130
+        },
+        "signatureReturn:178:220:268": {
+          "end": 268,
+          "errorType": false,
+          "kind": 178,
+          "pos": 220
+        },
+        "signatureReturn:263:46:88": {
+          "end": 88,
+          "errorType": false,
+          "kind": 263,
+          "pos": 46
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "module": 99,
+        "moduleResolution": 100,
+        "noCheck": false,
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "target": 99,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer-loose.json"
+      }
+    }
+  },
+  {
+    "variant": {
+      "order": "inner-outer",
+      "profile": "loose-nocheck",
+      "file": "inner-outer.ts",
+      "config": "inner-outer-loose-nocheck.json",
+      "configuration": {
+        "compilerOptions": {
+          "strict": false,
+          "strictNullChecks": false,
+          "noCheck": true,
+          "noLib": true,
+          "types": [],
+          "target": "ESNext",
+          "module": "ESNext",
+          "moduleResolution": "Bundler"
+        },
+        "files": [
+          "globals.d.ts",
+          "inner-outer.ts"
+        ]
+      },
+      "expected": "61",
+      "evaluation": "warm-call"
+    },
+    "source": "export {};\ndeclare function warm(value: 0): 0;\ndeclare function warm(value: unknown): 0;\ndeclare const key: \"value\";\nclass Outer {\n    get [key]() { return 61 as const; }\n    set [key](outerInput) {\n        class Inner {\n            get [key]() { return 62 as const; }\n            set [key](innerInput) {\n                const /*#chosen*/chosen = (warm(innerInput), outerInput);\n                let healthy: number;\n            }\n        }\n    }\n}\n",
+    "at": {
+      "file": "inner-outer.ts",
+      "line": 11,
+      "column": 34
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer-loose-nocheck.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer-loose-nocheck.json",
+          "sha256": "f36d6b8c59b7fd26f0d78f36c8fe20e85b1732d2db883d86207c6ba521e0f799"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts",
+          "sha256": "69ccaf223c239d27d5b407003ab4cb301f19c87936e70d19838bab63eef20362"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts",
+          "sourceTextSha256": "69ccaf223c239d27d5b407003ab4cb301f19c87936e70d19838bab63eef20362"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "61",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:102:115": {
+            "deprecated": false,
+            "end": 115,
+            "kind": 261,
+            "pos": 102
+          },
+          "deprecatedConfirmation:10:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 263,
+            "pos": 10
+          },
+          "deprecatedConfirmation:185:195": {
+            "deprecated": false,
+            "end": 195,
+            "kind": 170,
+            "pos": 185
+          },
+          "deprecatedConfirmation:291:301": {
+            "deprecated": false,
+            "end": 301,
+            "kind": 170,
+            "pos": 291
+          },
+          "deprecatedConfirmation:46:88": {
+            "deprecated": false,
+            "end": 88,
+            "kind": 263,
+            "pos": 46
+          },
+          "referenceFlow:140:143": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 143,
+            "referencePos": 140,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:180:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 180,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:238:241": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 241,
+            "referencePos": 238,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:286:289": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 289,
+            "referencePos": 286,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:353:363": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 363,
+            "referencePos": 353,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:365:376": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 376,
+            "referencePos": 365,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "signatureReturn:178:130:170": {
+            "end": 170,
+            "errorType": false,
+            "kind": 178,
+            "pos": 130
+          },
+          "signatureReturn:178:220:268": {
+            "end": 268,
+            "errorType": false,
+            "kind": 178,
+            "pos": 220
+          },
+          "signatureReturn:263:46:88": {
+            "end": 88,
+            "errorType": false,
+            "kind": 263,
+            "pos": 46
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:102:115": {
+          "deprecated": false,
+          "end": 115,
+          "kind": 261,
+          "pos": 102
+        },
+        "deprecatedConfirmation:10:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 263,
+          "pos": 10
+        },
+        "deprecatedConfirmation:185:195": {
+          "deprecated": false,
+          "end": 195,
+          "kind": 170,
+          "pos": 185
+        },
+        "deprecatedConfirmation:291:301": {
+          "deprecated": false,
+          "end": 301,
+          "kind": 170,
+          "pos": 291
+        },
+        "deprecatedConfirmation:46:88": {
+          "deprecated": false,
+          "end": 88,
+          "kind": 263,
+          "pos": 46
+        },
+        "referenceFlow:140:143": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 143,
+          "referencePos": 140,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:180:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 180,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:238:241": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 241,
+          "referencePos": 238,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:286:289": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 289,
+          "referencePos": 286,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:353:363": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 363,
+          "referencePos": 353,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:365:376": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 376,
+          "referencePos": 365,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "signatureReturn:178:130:170": {
+          "end": 170,
+          "errorType": false,
+          "kind": 178,
+          "pos": 130
+        },
+        "signatureReturn:178:220:268": {
+          "end": 268,
+          "errorType": false,
+          "kind": 178,
+          "pos": 220
+        },
+        "signatureReturn:263:46:88": {
+          "end": 88,
+          "errorType": false,
+          "kind": 263,
+          "pos": 46
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "module": 99,
+        "moduleResolution": 100,
+        "noCheck": true,
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "target": 99,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/inner-outer-loose-nocheck.json"
+      }
+    }
+  },
+  {
+    "variant": {
+      "order": "equal",
+      "profile": "strict",
+      "file": "equal.ts",
+      "config": "equal-strict.json",
+      "configuration": {
+        "compilerOptions": {
+          "strict": true,
+          "strictNullChecks": true,
+          "noCheck": false,
+          "noLib": true,
+          "types": [],
+          "target": "ESNext",
+          "module": "ESNext",
+          "moduleResolution": "Bundler"
+        },
+        "files": [
+          "globals.d.ts",
+          "equal.ts"
+        ]
+      },
+      "expected": "61",
+      "evaluation": "warm-call"
+    },
+    "source": "export {};\ndeclare function warm(value: 0): 0;\ndeclare function warm(value: unknown): 0;\ndeclare const key: \"value\";\nclass Outer {\n    get [key]() { return 61 as const; }\n    set [key](outerInput) {\n        class Inner {\n            get [key]() { return 61 as const; }\n            set [key](innerInput) {\n                const /*#chosen*/chosen = (warm(outerInput), innerInput);\n                let healthy: number;\n            }\n        }\n    }\n}\n",
+    "at": {
+      "file": "equal.ts",
+      "line": 11,
+      "column": 34
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal-strict.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal-strict.json",
+          "sha256": "588312b4bbbe3f954b0a0ba83c2e190f2a5a6746d026d0c72121de98238f83d1"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+          "sha256": "e42ecc33e830a654eec218e5f5e13362a642f4e247c8d44a25bc445eec640851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+          "sourceTextSha256": "e42ecc33e830a654eec218e5f5e13362a642f4e247c8d44a25bc445eec640851"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "61",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:102:115": {
+            "deprecated": false,
+            "end": 115,
+            "kind": 261,
+            "pos": 102
+          },
+          "deprecatedConfirmation:10:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 263,
+            "pos": 10
+          },
+          "deprecatedConfirmation:185:195": {
+            "deprecated": false,
+            "end": 195,
+            "kind": 170,
+            "pos": 185
+          },
+          "deprecatedConfirmation:291:301": {
+            "deprecated": false,
+            "end": 301,
+            "kind": 170,
+            "pos": 291
+          },
+          "deprecatedConfirmation:46:88": {
+            "deprecated": false,
+            "end": 88,
+            "kind": 263,
+            "pos": 46
+          },
+          "referenceFlow:140:143": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 143,
+            "referencePos": 140,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:180:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 180,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:238:241": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 241,
+            "referencePos": 238,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:286:289": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 289,
+            "referencePos": 286,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:353:363": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 363,
+            "referencePos": 353,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:365:376": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 376,
+            "referencePos": 365,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "signatureReturn:178:130:170": {
+            "end": 170,
+            "errorType": false,
+            "kind": 178,
+            "pos": 130
+          },
+          "signatureReturn:178:220:268": {
+            "end": 268,
+            "errorType": false,
+            "kind": 178,
+            "pos": 220
+          },
+          "signatureReturn:263:46:88": {
+            "end": 88,
+            "errorType": false,
+            "kind": 263,
+            "pos": 46
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:102:115": {
+          "deprecated": false,
+          "end": 115,
+          "kind": 261,
+          "pos": 102
+        },
+        "deprecatedConfirmation:10:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 263,
+          "pos": 10
+        },
+        "deprecatedConfirmation:185:195": {
+          "deprecated": false,
+          "end": 195,
+          "kind": 170,
+          "pos": 185
+        },
+        "deprecatedConfirmation:291:301": {
+          "deprecated": false,
+          "end": 301,
+          "kind": 170,
+          "pos": 291
+        },
+        "deprecatedConfirmation:46:88": {
+          "deprecated": false,
+          "end": 88,
+          "kind": 263,
+          "pos": 46
+        },
+        "referenceFlow:140:143": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 143,
+          "referencePos": 140,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:180:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 180,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:238:241": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 241,
+          "referencePos": 238,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:286:289": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 289,
+          "referencePos": 286,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:353:363": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 363,
+          "referencePos": 353,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:365:376": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 376,
+          "referencePos": 365,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "signatureReturn:178:130:170": {
+          "end": 170,
+          "errorType": false,
+          "kind": 178,
+          "pos": 130
+        },
+        "signatureReturn:178:220:268": {
+          "end": 268,
+          "errorType": false,
+          "kind": 178,
+          "pos": 220
+        },
+        "signatureReturn:263:46:88": {
+          "end": 88,
+          "errorType": false,
+          "kind": 263,
+          "pos": 46
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "module": 99,
+        "moduleResolution": 100,
+        "noCheck": false,
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "target": 99,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal-strict.json"
+      }
+    }
+  },
+  {
+    "variant": {
+      "order": "equal",
+      "profile": "nocheck",
+      "file": "equal.ts",
+      "config": "equal-nocheck.json",
+      "configuration": {
+        "compilerOptions": {
+          "strict": true,
+          "strictNullChecks": true,
+          "noCheck": true,
+          "noLib": true,
+          "types": [],
+          "target": "ESNext",
+          "module": "ESNext",
+          "moduleResolution": "Bundler"
+        },
+        "files": [
+          "globals.d.ts",
+          "equal.ts"
+        ]
+      },
+      "expected": "61",
+      "evaluation": "warm-call"
+    },
+    "source": "export {};\ndeclare function warm(value: 0): 0;\ndeclare function warm(value: unknown): 0;\ndeclare const key: \"value\";\nclass Outer {\n    get [key]() { return 61 as const; }\n    set [key](outerInput) {\n        class Inner {\n            get [key]() { return 61 as const; }\n            set [key](innerInput) {\n                const /*#chosen*/chosen = (warm(outerInput), innerInput);\n                let healthy: number;\n            }\n        }\n    }\n}\n",
+    "at": {
+      "file": "equal.ts",
+      "line": 11,
+      "column": 34
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal-nocheck.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal-nocheck.json",
+          "sha256": "cb51494b09aaaf5cccec29f2655742f6e258f04f9f267e7fb0f63b19962aca83"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+          "sha256": "e42ecc33e830a654eec218e5f5e13362a642f4e247c8d44a25bc445eec640851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+          "sourceTextSha256": "e42ecc33e830a654eec218e5f5e13362a642f4e247c8d44a25bc445eec640851"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "61",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:102:115": {
+            "deprecated": false,
+            "end": 115,
+            "kind": 261,
+            "pos": 102
+          },
+          "deprecatedConfirmation:10:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 263,
+            "pos": 10
+          },
+          "deprecatedConfirmation:185:195": {
+            "deprecated": false,
+            "end": 195,
+            "kind": 170,
+            "pos": 185
+          },
+          "deprecatedConfirmation:291:301": {
+            "deprecated": false,
+            "end": 301,
+            "kind": 170,
+            "pos": 291
+          },
+          "deprecatedConfirmation:46:88": {
+            "deprecated": false,
+            "end": 88,
+            "kind": 263,
+            "pos": 46
+          },
+          "referenceFlow:140:143": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 143,
+            "referencePos": 140,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:180:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 180,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:238:241": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 241,
+            "referencePos": 238,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:286:289": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 289,
+            "referencePos": 286,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:353:363": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 363,
+            "referencePos": 353,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:365:376": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 376,
+            "referencePos": 365,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "signatureReturn:178:130:170": {
+            "end": 170,
+            "errorType": false,
+            "kind": 178,
+            "pos": 130
+          },
+          "signatureReturn:178:220:268": {
+            "end": 268,
+            "errorType": false,
+            "kind": 178,
+            "pos": 220
+          },
+          "signatureReturn:263:46:88": {
+            "end": 88,
+            "errorType": false,
+            "kind": 263,
+            "pos": 46
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:102:115": {
+          "deprecated": false,
+          "end": 115,
+          "kind": 261,
+          "pos": 102
+        },
+        "deprecatedConfirmation:10:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 263,
+          "pos": 10
+        },
+        "deprecatedConfirmation:185:195": {
+          "deprecated": false,
+          "end": 195,
+          "kind": 170,
+          "pos": 185
+        },
+        "deprecatedConfirmation:291:301": {
+          "deprecated": false,
+          "end": 301,
+          "kind": 170,
+          "pos": 291
+        },
+        "deprecatedConfirmation:46:88": {
+          "deprecated": false,
+          "end": 88,
+          "kind": 263,
+          "pos": 46
+        },
+        "referenceFlow:140:143": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 143,
+          "referencePos": 140,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:180:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 180,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:238:241": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 241,
+          "referencePos": 238,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:286:289": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 289,
+          "referencePos": 286,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:353:363": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 363,
+          "referencePos": 353,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:365:376": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 376,
+          "referencePos": 365,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "signatureReturn:178:130:170": {
+          "end": 170,
+          "errorType": false,
+          "kind": 178,
+          "pos": 130
+        },
+        "signatureReturn:178:220:268": {
+          "end": 268,
+          "errorType": false,
+          "kind": 178,
+          "pos": 220
+        },
+        "signatureReturn:263:46:88": {
+          "end": 88,
+          "errorType": false,
+          "kind": 263,
+          "pos": 46
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "module": 99,
+        "moduleResolution": 100,
+        "noCheck": true,
+        "noLib": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "target": 99,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal-nocheck.json"
+      }
+    }
+  },
+  {
+    "variant": {
+      "order": "equal",
+      "profile": "loose",
+      "file": "equal.ts",
+      "config": "equal-loose.json",
+      "configuration": {
+        "compilerOptions": {
+          "strict": false,
+          "strictNullChecks": false,
+          "noCheck": false,
+          "noLib": true,
+          "types": [],
+          "target": "ESNext",
+          "module": "ESNext",
+          "moduleResolution": "Bundler"
+        },
+        "files": [
+          "globals.d.ts",
+          "equal.ts"
+        ]
+      },
+      "expected": "61",
+      "evaluation": "warm-call"
+    },
+    "source": "export {};\ndeclare function warm(value: 0): 0;\ndeclare function warm(value: unknown): 0;\ndeclare const key: \"value\";\nclass Outer {\n    get [key]() { return 61 as const; }\n    set [key](outerInput) {\n        class Inner {\n            get [key]() { return 61 as const; }\n            set [key](innerInput) {\n                const /*#chosen*/chosen = (warm(outerInput), innerInput);\n                let healthy: number;\n            }\n        }\n    }\n}\n",
+    "at": {
+      "file": "equal.ts",
+      "line": 11,
+      "column": 34
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal-loose.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal-loose.json",
+          "sha256": "e4946017ab3537be7cfa4b27d19ebed3a60cc6a71a3058fc6784125792c38662"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+          "sha256": "e42ecc33e830a654eec218e5f5e13362a642f4e247c8d44a25bc445eec640851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+          "sourceTextSha256": "e42ecc33e830a654eec218e5f5e13362a642f4e247c8d44a25bc445eec640851"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "61",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:102:115": {
+            "deprecated": false,
+            "end": 115,
+            "kind": 261,
+            "pos": 102
+          },
+          "deprecatedConfirmation:10:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 263,
+            "pos": 10
+          },
+          "deprecatedConfirmation:185:195": {
+            "deprecated": false,
+            "end": 195,
+            "kind": 170,
+            "pos": 185
+          },
+          "deprecatedConfirmation:291:301": {
+            "deprecated": false,
+            "end": 301,
+            "kind": 170,
+            "pos": 291
+          },
+          "deprecatedConfirmation:46:88": {
+            "deprecated": false,
+            "end": 88,
+            "kind": 263,
+            "pos": 46
+          },
+          "referenceFlow:140:143": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 143,
+            "referencePos": 140,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:180:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 180,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:238:241": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 241,
+            "referencePos": 238,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:286:289": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 289,
+            "referencePos": 286,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:353:363": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 363,
+            "referencePos": 353,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:365:376": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 376,
+            "referencePos": 365,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "signatureReturn:178:130:170": {
+            "end": 170,
+            "errorType": false,
+            "kind": 178,
+            "pos": 130
+          },
+          "signatureReturn:178:220:268": {
+            "end": 268,
+            "errorType": false,
+            "kind": 178,
+            "pos": 220
+          },
+          "signatureReturn:263:46:88": {
+            "end": 88,
+            "errorType": false,
+            "kind": 263,
+            "pos": 46
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:102:115": {
+          "deprecated": false,
+          "end": 115,
+          "kind": 261,
+          "pos": 102
+        },
+        "deprecatedConfirmation:10:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 263,
+          "pos": 10
+        },
+        "deprecatedConfirmation:185:195": {
+          "deprecated": false,
+          "end": 195,
+          "kind": 170,
+          "pos": 185
+        },
+        "deprecatedConfirmation:291:301": {
+          "deprecated": false,
+          "end": 301,
+          "kind": 170,
+          "pos": 291
+        },
+        "deprecatedConfirmation:46:88": {
+          "deprecated": false,
+          "end": 88,
+          "kind": 263,
+          "pos": 46
+        },
+        "referenceFlow:140:143": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 143,
+          "referencePos": 140,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:180:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 180,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:238:241": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 241,
+          "referencePos": 238,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:286:289": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 289,
+          "referencePos": 286,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:353:363": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 363,
+          "referencePos": 353,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:365:376": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 376,
+          "referencePos": 365,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "signatureReturn:178:130:170": {
+          "end": 170,
+          "errorType": false,
+          "kind": 178,
+          "pos": 130
+        },
+        "signatureReturn:178:220:268": {
+          "end": 268,
+          "errorType": false,
+          "kind": 178,
+          "pos": 220
+        },
+        "signatureReturn:263:46:88": {
+          "end": 88,
+          "errorType": false,
+          "kind": 263,
+          "pos": 46
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "module": 99,
+        "moduleResolution": 100,
+        "noCheck": false,
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "target": 99,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal-loose.json"
+      }
+    }
+  },
+  {
+    "variant": {
+      "order": "equal",
+      "profile": "loose-nocheck",
+      "file": "equal.ts",
+      "config": "equal-loose-nocheck.json",
+      "configuration": {
+        "compilerOptions": {
+          "strict": false,
+          "strictNullChecks": false,
+          "noCheck": true,
+          "noLib": true,
+          "types": [],
+          "target": "ESNext",
+          "module": "ESNext",
+          "moduleResolution": "Bundler"
+        },
+        "files": [
+          "globals.d.ts",
+          "equal.ts"
+        ]
+      },
+      "expected": "61",
+      "evaluation": "warm-call"
+    },
+    "source": "export {};\ndeclare function warm(value: 0): 0;\ndeclare function warm(value: unknown): 0;\ndeclare const key: \"value\";\nclass Outer {\n    get [key]() { return 61 as const; }\n    set [key](outerInput) {\n        class Inner {\n            get [key]() { return 61 as const; }\n            set [key](innerInput) {\n                const /*#chosen*/chosen = (warm(outerInput), innerInput);\n                let healthy: number;\n            }\n        }\n    }\n}\n",
+    "at": {
+      "file": "equal.ts",
+      "line": 11,
+      "column": 34
+    },
+    "answer": {
+      "compiler": "7.0.2",
+      "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+      "history": "baseline",
+      "status": "observed",
+      "checkerCount": 1,
+      "inputFiles": [
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal-loose-nocheck.json",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+        "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts"
+      ],
+      "inputHashes": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal-loose-nocheck.json",
+          "sha256": "770f88bdbc217728b034e8f8b4ed233852c3b32613ecbe9043d85a839e8bdccf"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+          "sha256": "e42ecc33e830a654eec218e5f5e13362a642f4e247c8d44a25bc445eec640851"
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        }
+      ],
+      "programFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "nativeProgramFiles": [
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "sourceTextSha256": "23134a0027c527f206b9d07d0747a8c456a39492b173f5d7660cbf2b02cc8a42"
+        },
+        {
+          "defaultLibrary": false,
+          "externalLibrary": false,
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+          "sourceTextSha256": "e42ecc33e830a654eec218e5f5e13362a642f4e247c8d44a25bc445eec640851"
+        }
+      ],
+      "apiProgramFiles": [
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/globals.d.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        },
+        {
+          "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal.ts",
+          "defaultLibrary": false,
+          "externalLibrary": false
+        }
+      ],
+      "fileSystemReplay": {
+        "additionalOperations": []
+      },
+      "kind": "value",
+      "symbolFlags": 2,
+      "symbolMode": "",
+      "summary": "61",
+      "errorType": false,
+      "beforeSummary": {
+        "counters": {
+          "flowDepth": 0
+        },
+        "demandFailures": [],
+        "observations": {
+          "deprecatedConfirmation:102:115": {
+            "deprecated": false,
+            "end": 115,
+            "kind": 261,
+            "pos": 102
+          },
+          "deprecatedConfirmation:10:46": {
+            "deprecated": false,
+            "end": 46,
+            "kind": 263,
+            "pos": 10
+          },
+          "deprecatedConfirmation:185:195": {
+            "deprecated": false,
+            "end": 195,
+            "kind": 170,
+            "pos": 185
+          },
+          "deprecatedConfirmation:291:301": {
+            "deprecated": false,
+            "end": 301,
+            "kind": 170,
+            "pos": 291
+          },
+          "deprecatedConfirmation:46:88": {
+            "deprecated": false,
+            "end": 88,
+            "kind": 263,
+            "pos": 46
+          },
+          "referenceFlow:140:143": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 143,
+            "referencePos": 140,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:180:183": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 183,
+            "referencePos": 180,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:238:241": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 241,
+            "referencePos": 238,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:286:289": {
+            "declaredFlags": 1024,
+            "errorType": false,
+            "referenceEnd": 289,
+            "referencePos": 286,
+            "resultFlags": 1024,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:353:363": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 363,
+            "referencePos": 353,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "referenceFlow:365:376": {
+            "declaredFlags": 2048,
+            "errorType": false,
+            "referenceEnd": 376,
+            "referencePos": 365,
+            "resultFlags": 2048,
+            "sameDeclared": true,
+            "sameInitial": true
+          },
+          "signatureReturn:178:130:170": {
+            "end": 170,
+            "errorType": false,
+            "kind": 178,
+            "pos": 130
+          },
+          "signatureReturn:178:220:268": {
+            "end": 268,
+            "errorType": false,
+            "kind": 178,
+            "pos": 220
+          },
+          "signatureReturn:263:46:88": {
+            "end": 88,
+            "errorType": false,
+            "kind": 263,
+            "pos": 46
+          }
+        },
+        "diagnosticCodes": []
+      },
+      "counters": {
+        "flowDepth": 0
+      },
+      "demandFailures": [],
+      "observations": {
+        "deprecatedConfirmation:102:115": {
+          "deprecated": false,
+          "end": 115,
+          "kind": 261,
+          "pos": 102
+        },
+        "deprecatedConfirmation:10:46": {
+          "deprecated": false,
+          "end": 46,
+          "kind": 263,
+          "pos": 10
+        },
+        "deprecatedConfirmation:185:195": {
+          "deprecated": false,
+          "end": 195,
+          "kind": 170,
+          "pos": 185
+        },
+        "deprecatedConfirmation:291:301": {
+          "deprecated": false,
+          "end": 301,
+          "kind": 170,
+          "pos": 291
+        },
+        "deprecatedConfirmation:46:88": {
+          "deprecated": false,
+          "end": 88,
+          "kind": 263,
+          "pos": 46
+        },
+        "referenceFlow:140:143": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 143,
+          "referencePos": 140,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:180:183": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 183,
+          "referencePos": 180,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:238:241": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 241,
+          "referencePos": 238,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:286:289": {
+          "declaredFlags": 1024,
+          "errorType": false,
+          "referenceEnd": 289,
+          "referencePos": 286,
+          "resultFlags": 1024,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:353:363": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 363,
+          "referencePos": 353,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "referenceFlow:365:376": {
+          "declaredFlags": 2048,
+          "errorType": false,
+          "referenceEnd": 376,
+          "referencePos": 365,
+          "resultFlags": 2048,
+          "sameDeclared": true,
+          "sameInitial": true
+        },
+        "signatureReturn:178:130:170": {
+          "end": 170,
+          "errorType": false,
+          "kind": 178,
+          "pos": 130
+        },
+        "signatureReturn:178:220:268": {
+          "end": 268,
+          "errorType": false,
+          "kind": 178,
+          "pos": 220
+        },
+        "signatureReturn:263:46:88": {
+          "end": 88,
+          "errorType": false,
+          "kind": 263,
+          "pos": 46
+        }
+      },
+      "diagnosticCodes": [],
+      "compilerOptions": {
+        "module": 99,
+        "moduleResolution": 100,
+        "noCheck": true,
+        "noLib": true,
+        "strict": false,
+        "strictNullChecks": false,
+        "target": 99,
+        "types": [],
+        "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/native-late-symbol-cache-identity/warm/equal-loose-nocheck.json"
+      }
+    }
+  }
+]

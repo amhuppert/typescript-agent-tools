@@ -1,0 +1,90 @@
+{
+  "compilerVersion": "7.0.2",
+  "history": "fresh native API demand per input; no semantic diagnostics or LS search",
+  "logicalSourceFile": "value.ts",
+  "summaries": [
+    {
+      "valueBytes": 509,
+      "summaryBytes": 511,
+      "nativeFlags": 1024,
+      "nativeError": false,
+      "sourceSha256": "4f828d6a575fb1a9b927a65dd9104f1157b75647a8aebdeffdd0a6e79d420a45",
+      "input": "inputs/summary-ascii-511.ts"
+    },
+    {
+      "valueBytes": 510,
+      "summaryBytes": 512,
+      "nativeFlags": 1024,
+      "nativeError": false,
+      "sourceSha256": "9ff5157bb162ae237243c0ec80b01fb84a589b1f5ee944d9c99cc34ffd3970a3",
+      "input": "inputs/summary-ascii-512.ts"
+    },
+    {
+      "valueBytes": 511,
+      "summaryBytes": 513,
+      "nativeFlags": 1024,
+      "nativeError": false,
+      "sourceSha256": "89a7aa1062f25593a79830e3cfcee46cf801ceb365187c73fda73378f250a211",
+      "input": "inputs/summary-ascii-513.ts"
+    },
+    {
+      "valueBytes": 509,
+      "summaryBytes": 511,
+      "nativeFlags": 1024,
+      "nativeError": false,
+      "sourceSha256": "40fa833be8c8ff2887df84c9565dc15d0140f6a810befe8f8ea0437cf02b7718",
+      "input": "inputs/summary-unicode-511.ts"
+    },
+    {
+      "valueBytes": 510,
+      "summaryBytes": 512,
+      "nativeFlags": 1024,
+      "nativeError": false,
+      "sourceSha256": "863d239916a1c987f7af30bb3c024e77abc78e3d287ffdc2e7e70145cd834aaa",
+      "input": "inputs/summary-unicode-512.ts"
+    },
+    {
+      "valueBytes": 511,
+      "summaryBytes": 513,
+      "nativeFlags": 1024,
+      "nativeError": false,
+      "sourceSha256": "17110b1a014f6aef0753e1c0e77e7cdf691e6b71976034ccd749ff047c6d9ea0",
+      "input": "inputs/summary-unicode-513.ts"
+    }
+  ],
+  "deep": {
+    "version": "7.0.2",
+    "sourceSha256": "854dd96e775e17dc7d5c1cbd4227d8336bb95804455d15a92332666a953199ae",
+    "rootError": false,
+    "leafSummary": "number",
+    "siblingSummary": "number",
+    "sharedIdentity": true,
+    "input": "inputs/deep-shared.ts"
+  },
+  "objects": [
+    {
+      "mode": "wide",
+      "sourceSha256": "8da8f28f277e90a68918c45751e1f4cd1f6cf1d77b901dfa09a893d769ffd618",
+      "sourceBytes": 18917,
+      "rootError": false,
+      "propertyCount": 2000,
+      "firstNameBytes": 2,
+      "lastNameBytes": 5,
+      "readType": "number",
+      "allReadIdentityShared": true,
+      "input": "inputs/wide.ts"
+    },
+    {
+      "mode": "long",
+      "sourceSha256": "24660795f753135718646d855c781e46b7f8bed9fc681677af17e9d7b109e4f3",
+      "sourceBytes": 261532,
+      "rootError": false,
+      "propertyCount": 1,
+      "firstNameBytes": 261500,
+      "lastNameBytes": 261500,
+      "readType": "number",
+      "allReadIdentityShared": true,
+      "input": "inputs/long.ts"
+    }
+  ]
+}

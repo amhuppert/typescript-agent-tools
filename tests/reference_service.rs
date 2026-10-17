@@ -270,7 +270,10 @@ fn protocol_request_limit_accepts_under_and_at_limit_and_rejects_over_it() {
             assert!(write.is_ok(), "size {size}: {write:?}");
             read.unwrap();
             let response: Value = serde_json::from_str(&response).unwrap();
-            assert_eq!(response["Query"]["Ok"]["References"], expected);
+            assert_eq!(
+                response["Query"]["Ok"]["References"], expected,
+                "size {size}: full response {response}"
+            );
         } else {
             // A peer may reset on close with an unread suffix. Either outcome is
             // a failed request, and must not kill or rebuild the project service.

@@ -1,0 +1,100 @@
+{
+  "question": "native mutable JSON array target with missing ReadonlyArray",
+  "request": {
+    "at": {
+      "file": "consumer.ts",
+      "line": 1,
+      "column": 65
+    },
+    "properties": false
+  },
+  "answer": {
+    "compiler": "7.0.2",
+    "sourceCommit": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+    "history": "baseline",
+    "status": "observed",
+    "inputFiles": [
+      "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-array-targets/valid-members/consumer.ts",
+      "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-array-targets/valid-members/data.json",
+      "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-array-targets/valid-members/globals.ts",
+      "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-array-targets/valid-members/strict-1-exact-0-unchecked-0.json",
+      "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-array-targets/valid-members/tsconfig.json"
+    ],
+    "inputHashes": [
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-array-targets/valid-members/consumer.ts",
+        "sha256": "84f86fdf9705f2083660b0e2b5dce9c6519cce470f669e094ce3a0c4b8b9d4b2"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-array-targets/valid-members/data.json",
+        "sha256": "6fcb43778f5d358313c51104af2f6ccc78d5db3b037fff91b31c7994e289fbd5"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-array-targets/valid-members/globals.ts",
+        "sha256": "87e205245c589082aa37a87a198fbc53a14544921f194600e06669ef09f66984"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-array-targets/valid-members/strict-1-exact-0-unchecked-0.json",
+        "sha256": "b8d2e9f6f4f5198191fb7ebe59fc22d759e587491294ee3948282a53a9c365cc"
+      },
+      {
+        "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-array-targets/valid-members/tsconfig.json",
+        "sha256": "f26c18fd1bdfd04aaa2993b2adcc5ff1a229e40f9a9491a40b43d5692de2295f"
+      }
+    ],
+    "kind": "value",
+    "symbolFlags": 33554436,
+    "symbolMode": "alias",
+    "summary": "number[]",
+    "errorType": false,
+    "beforeSummary": {
+      "counters": {},
+      "demandFailures": [],
+      "observations": {},
+      "diagnosticCodes": [
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318,
+        2318
+      ]
+    },
+    "arrayClassification": {
+      "isArray": true,
+      "nativeReadonly": true,
+      "targetIsArray": true,
+      "targetIsReadonly": true
+    },
+    "counters": {},
+    "demandFailures": [],
+    "observations": {},
+    "diagnosticCodes": [
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318,
+      2318
+    ],
+    "compilerOptions": {
+      "exactOptionalPropertyTypes": false,
+      "module": 99,
+      "moduleResolution": 100,
+      "noLib": true,
+      "noUncheckedIndexedAccess": false,
+      "resolveJsonModule": true,
+      "strict": true,
+      "strictNullChecks": true,
+      "target": 99,
+      "esModuleInterop": true,
+      "configFilePath": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/fixtures/types/json-array-targets/valid-members/strict-1-exact-0-unchecked-0.json"
+    }
+  }
+}

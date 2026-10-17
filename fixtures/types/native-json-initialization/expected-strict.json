@@ -1,0 +1,1525 @@
+[
+  {
+    "name": "own-direct",
+    "actual": {
+      "flags": 33554500,
+      "checkFlags": 0,
+      "declarations": [
+        {
+          "file": "data.json",
+          "kind": "PropertyAssignment",
+          "pos": 1,
+          "end": 17
+        },
+        {
+          "file": "augment.ts",
+          "kind": "InterfaceDeclaration",
+          "pos": 38,
+          "end": 68
+        }
+      ],
+      "valueDeclaration": {
+        "file": "data.json",
+        "kind": "PropertyAssignment",
+        "pos": 1,
+        "end": 17
+      },
+      "summary": "{ nested: number; }",
+      "errorType": false
+    },
+    "queries": [
+      {
+        "name": "alias",
+        "kind": "value",
+        "summary": "{ nested: number; }",
+        "errorType": false,
+        "flags": 33554500,
+        "origins": [
+          {
+            "kind": "InterfaceDeclaration",
+            "location": {
+              "file": "augment.ts",
+              "start": {
+                "line": 1,
+                "column": 50
+              },
+              "end": {
+                "line": 1,
+                "column": 51
+              }
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 2
+              },
+              "end": {
+                "line": 1,
+                "column": 5
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "detail",
+        "kind": "expression",
+        "summary": "number",
+        "errorType": false,
+        "flags": 33554436,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 7
+              },
+              "end": {
+                "line": 1,
+                "column": 15
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "healthy",
+        "kind": "value",
+        "summary": "44",
+        "errorType": false,
+        "flags": 2,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "main.ts",
+              "start": {
+                "line": 3,
+                "column": 26
+              },
+              "end": {
+                "line": 3,
+                "column": 33
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      }
+    ]
+  },
+  {
+    "name": "own-star",
+    "actual": {
+      "flags": 33554500,
+      "checkFlags": 0,
+      "declarations": [
+        {
+          "file": "data.json",
+          "kind": "PropertyAssignment",
+          "pos": 1,
+          "end": 17
+        },
+        {
+          "file": "augment.ts",
+          "kind": "InterfaceDeclaration",
+          "pos": 38,
+          "end": 68
+        }
+      ],
+      "valueDeclaration": {
+        "file": "data.json",
+        "kind": "PropertyAssignment",
+        "pos": 1,
+        "end": 17
+      },
+      "summary": "{ nested: number; }",
+      "errorType": false
+    },
+    "queries": [
+      {
+        "name": "alias",
+        "kind": "value",
+        "summary": "{ nested: number; }",
+        "errorType": false,
+        "flags": 33554500,
+        "origins": [
+          {
+            "kind": "InterfaceDeclaration",
+            "location": {
+              "file": "augment.ts",
+              "start": {
+                "line": 1,
+                "column": 50
+              },
+              "end": {
+                "line": 1,
+                "column": 51
+              }
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 2
+              },
+              "end": {
+                "line": 1,
+                "column": 5
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "detail",
+        "kind": "expression",
+        "summary": "number",
+        "errorType": false,
+        "flags": 33554436,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 7
+              },
+              "end": {
+                "line": 1,
+                "column": 15
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "healthy",
+        "kind": "value",
+        "summary": "44",
+        "errorType": false,
+        "flags": 2,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "main.ts",
+              "start": {
+                "line": 3,
+                "column": 26
+              },
+              "end": {
+                "line": 3,
+                "column": 33
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      }
+    ]
+  },
+  {
+    "name": "duplicate-last-object",
+    "actual": {
+      "flags": 33554500,
+      "checkFlags": 0,
+      "declarations": [
+        {
+          "file": "data.json",
+          "kind": "PropertyAssignment",
+          "pos": 1,
+          "end": 16
+        },
+        {
+          "file": "data.json",
+          "kind": "PropertyAssignment",
+          "pos": 17,
+          "end": 36
+        },
+        {
+          "file": "augment.ts",
+          "kind": "InterfaceDeclaration",
+          "pos": 38,
+          "end": 68
+        }
+      ],
+      "valueDeclaration": {
+        "file": "data.json",
+        "kind": "PropertyAssignment",
+        "pos": 1,
+        "end": 16
+      },
+      "summary": "{ first: number; }",
+      "errorType": false
+    },
+    "queries": [
+      {
+        "name": "alias",
+        "kind": "value",
+        "summary": "{ first: number; }",
+        "errorType": false,
+        "flags": 33554500,
+        "origins": [
+          {
+            "kind": "InterfaceDeclaration",
+            "location": {
+              "file": "augment.ts",
+              "start": {
+                "line": 1,
+                "column": 50
+              },
+              "end": {
+                "line": 1,
+                "column": 51
+              }
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 2
+              },
+              "end": {
+                "line": 1,
+                "column": 5
+              }
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 18
+              },
+              "end": {
+                "line": 1,
+                "column": 21
+              }
+            }
+          }
+        ],
+        "codes": [
+          1117
+        ],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "detail",
+        "kind": "expression",
+        "summary": "any",
+        "errorType": true,
+        "flags": 0,
+        "origins": [],
+        "codes": [
+          1117,
+          2339
+        ],
+        "demandFailures": [],
+        "errors": [
+          {
+            "operation": "getTypeOfSymbol",
+            "declarationPos": 5,
+            "declarationEnd": 16,
+            "name": "�object"
+          },
+          {
+            "operation": "checkExpressionEx",
+            "pos": 39,
+            "end": 57
+          }
+        ]
+      },
+      {
+        "name": "healthy",
+        "kind": "value",
+        "summary": "44",
+        "errorType": false,
+        "flags": 2,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "main.ts",
+              "start": {
+                "line": 3,
+                "column": 26
+              },
+              "end": {
+                "line": 3,
+                "column": 33
+              }
+            }
+          }
+        ],
+        "codes": [
+          1117
+        ],
+        "demandFailures": [],
+        "errors": []
+      }
+    ]
+  },
+  {
+    "name": "duplicate-last-scalar",
+    "actual": {
+      "flags": 33554500,
+      "checkFlags": 0,
+      "declarations": [
+        {
+          "file": "data.json",
+          "kind": "PropertyAssignment",
+          "pos": 1,
+          "end": 16
+        },
+        {
+          "file": "data.json",
+          "kind": "PropertyAssignment",
+          "pos": 17,
+          "end": 22
+        },
+        {
+          "file": "augment.ts",
+          "kind": "InterfaceDeclaration",
+          "pos": 38,
+          "end": 68
+        }
+      ],
+      "valueDeclaration": {
+        "file": "data.json",
+        "kind": "PropertyAssignment",
+        "pos": 1,
+        "end": 16
+      },
+      "summary": "{ first: number; }",
+      "errorType": false
+    },
+    "queries": [
+      {
+        "name": "alias",
+        "kind": "value",
+        "summary": "{ first: number; }",
+        "errorType": false,
+        "flags": 33554500,
+        "origins": [
+          {
+            "kind": "InterfaceDeclaration",
+            "location": {
+              "file": "augment.ts",
+              "start": {
+                "line": 1,
+                "column": 50
+              },
+              "end": {
+                "line": 1,
+                "column": 51
+              }
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 2
+              },
+              "end": {
+                "line": 1,
+                "column": 5
+              }
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 18
+              },
+              "end": {
+                "line": 1,
+                "column": 21
+              }
+            }
+          }
+        ],
+        "codes": [
+          1117
+        ],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "detail",
+        "kind": "expression",
+        "summary": "{ first: number; }",
+        "errorType": false,
+        "flags": 2097152,
+        "origins": [
+          {
+            "kind": "ImportSpecifier",
+            "location": {
+              "file": "main.ts",
+              "start": {
+                "line": 1,
+                "column": 20
+              },
+              "end": {
+                "line": 1,
+                "column": 21
+              }
+            }
+          }
+        ],
+        "codes": [
+          1117
+        ],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "healthy",
+        "kind": "value",
+        "summary": "44",
+        "errorType": false,
+        "flags": 2,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "main.ts",
+              "start": {
+                "line": 3,
+                "column": 26
+              },
+              "end": {
+                "line": 3,
+                "column": 33
+              }
+            }
+          }
+        ],
+        "codes": [
+          1117
+        ],
+        "demandFailures": [],
+        "errors": []
+      }
+    ]
+  },
+  {
+    "name": "nullable",
+    "actual": {
+      "flags": 33554500,
+      "checkFlags": 0,
+      "declarations": [
+        {
+          "file": "data.json",
+          "kind": "PropertyAssignment",
+          "pos": 1,
+          "end": 19
+        },
+        {
+          "file": "augment.ts",
+          "kind": "InterfaceDeclaration",
+          "pos": 38,
+          "end": 68
+        }
+      ],
+      "valueDeclaration": {
+        "file": "data.json",
+        "kind": "PropertyAssignment",
+        "pos": 1,
+        "end": 19
+      },
+      "summary": "{ value: null; }",
+      "errorType": false
+    },
+    "queries": [
+      {
+        "name": "alias",
+        "kind": "value",
+        "summary": "{ value: null; }",
+        "errorType": false,
+        "flags": 33554500,
+        "origins": [
+          {
+            "kind": "InterfaceDeclaration",
+            "location": {
+              "file": "augment.ts",
+              "start": {
+                "line": 1,
+                "column": 50
+              },
+              "end": {
+                "line": 1,
+                "column": 51
+              }
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 2
+              },
+              "end": {
+                "line": 1,
+                "column": 5
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "detail",
+        "kind": "expression",
+        "summary": "null",
+        "errorType": false,
+        "flags": 33554436,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 7
+              },
+              "end": {
+                "line": 1,
+                "column": 14
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "healthy",
+        "kind": "value",
+        "summary": "44",
+        "errorType": false,
+        "flags": 2,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "main.ts",
+              "start": {
+                "line": 3,
+                "column": 26
+              },
+              "end": {
+                "line": 3,
+                "column": 33
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      }
+    ]
+  },
+  {
+    "name": "array-valid",
+    "actual": {
+      "flags": 33554500,
+      "checkFlags": 0,
+      "declarations": [
+        {
+          "file": "data.json",
+          "kind": "PropertyAssignment",
+          "pos": 1,
+          "end": 10
+        },
+        {
+          "file": "augment.ts",
+          "kind": "InterfaceDeclaration",
+          "pos": 38,
+          "end": 68
+        }
+      ],
+      "valueDeclaration": {
+        "file": "data.json",
+        "kind": "PropertyAssignment",
+        "pos": 1,
+        "end": 10
+      },
+      "summary": "number[]",
+      "errorType": false
+    },
+    "queries": [
+      {
+        "name": "alias",
+        "kind": "value",
+        "summary": "number[]",
+        "errorType": false,
+        "flags": 33554500,
+        "origins": [
+          {
+            "kind": "InterfaceDeclaration",
+            "location": {
+              "file": "augment.ts",
+              "start": {
+                "line": 1,
+                "column": 50
+              },
+              "end": {
+                "line": 1,
+                "column": 51
+              }
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 2
+              },
+              "end": {
+                "line": 1,
+                "column": 5
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "detail",
+        "kind": "expression",
+        "summary": "number",
+        "errorType": false,
+        "flags": 0,
+        "origins": [],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "healthy",
+        "kind": "value",
+        "summary": "44",
+        "errorType": false,
+        "flags": 2,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "main.ts",
+              "start": {
+                "line": 3,
+                "column": 26
+              },
+              "end": {
+                "line": 3,
+                "column": 33
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      }
+    ]
+  },
+  {
+    "name": "array-missing",
+    "actual": {
+      "flags": 33554500,
+      "checkFlags": 0,
+      "declarations": [
+        {
+          "file": "data.json",
+          "kind": "PropertyAssignment",
+          "pos": 1,
+          "end": 10
+        },
+        {
+          "file": "augment.ts",
+          "kind": "InterfaceDeclaration",
+          "pos": 38,
+          "end": 68
+        }
+      ],
+      "valueDeclaration": {
+        "file": "data.json",
+        "kind": "PropertyAssignment",
+        "pos": 1,
+        "end": 10
+      },
+      "summary": "{}",
+      "errorType": false
+    },
+    "queries": [
+      {
+        "name": "alias",
+        "kind": "value",
+        "summary": "{}",
+        "errorType": false,
+        "flags": 33554500,
+        "origins": [
+          {
+            "kind": "InterfaceDeclaration",
+            "location": {
+              "file": "augment.ts",
+              "start": {
+                "line": 1,
+                "column": 50
+              },
+              "end": {
+                "line": 1,
+                "column": 51
+              }
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 2
+              },
+              "end": {
+                "line": 1,
+                "column": 5
+              }
+            }
+          }
+        ],
+        "codes": [
+          2318
+        ],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "detail",
+        "kind": "expression",
+        "summary": "{}",
+        "errorType": false,
+        "flags": 2097152,
+        "origins": [
+          {
+            "kind": "ImportSpecifier",
+            "location": {
+              "file": "main.ts",
+              "start": {
+                "line": 1,
+                "column": 20
+              },
+              "end": {
+                "line": 1,
+                "column": 21
+              }
+            }
+          }
+        ],
+        "codes": [
+          2318
+        ],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "healthy",
+        "kind": "value",
+        "summary": "44",
+        "errorType": false,
+        "flags": 2,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "main.ts",
+              "start": {
+                "line": 3,
+                "column": 26
+              },
+              "end": {
+                "line": 3,
+                "column": 33
+              }
+            }
+          }
+        ],
+        "codes": [
+          2318
+        ],
+        "demandFailures": [],
+        "errors": []
+      }
+    ]
+  },
+  {
+    "name": "array-wrong-arity",
+    "actual": {
+      "flags": 33554500,
+      "checkFlags": 0,
+      "declarations": [
+        {
+          "file": "data.json",
+          "kind": "PropertyAssignment",
+          "pos": 1,
+          "end": 10
+        },
+        {
+          "file": "augment.ts",
+          "kind": "InterfaceDeclaration",
+          "pos": 38,
+          "end": 68
+        }
+      ],
+      "valueDeclaration": {
+        "file": "data.json",
+        "kind": "PropertyAssignment",
+        "pos": 1,
+        "end": 10
+      },
+      "summary": "{}",
+      "errorType": false
+    },
+    "queries": [
+      {
+        "name": "alias",
+        "kind": "value",
+        "summary": "{}",
+        "errorType": false,
+        "flags": 33554500,
+        "origins": [
+          {
+            "kind": "InterfaceDeclaration",
+            "location": {
+              "file": "augment.ts",
+              "start": {
+                "line": 1,
+                "column": 50
+              },
+              "end": {
+                "line": 1,
+                "column": 51
+              }
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 2
+              },
+              "end": {
+                "line": 1,
+                "column": 5
+              }
+            }
+          }
+        ],
+        "codes": [
+          2317
+        ],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "detail",
+        "kind": "expression",
+        "summary": "{}",
+        "errorType": false,
+        "flags": 2097152,
+        "origins": [
+          {
+            "kind": "ImportSpecifier",
+            "location": {
+              "file": "main.ts",
+              "start": {
+                "line": 1,
+                "column": 20
+              },
+              "end": {
+                "line": 1,
+                "column": 21
+              }
+            }
+          }
+        ],
+        "codes": [
+          2317
+        ],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "healthy",
+        "kind": "value",
+        "summary": "44",
+        "errorType": false,
+        "flags": 2,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "main.ts",
+              "start": {
+                "line": 3,
+                "column": 26
+              },
+              "end": {
+                "line": 3,
+                "column": 33
+              }
+            }
+          }
+        ],
+        "codes": [
+          2317
+        ],
+        "demandFailures": [],
+        "errors": []
+      }
+    ]
+  },
+  {
+    "name": "nested-array",
+    "actual": {
+      "flags": 33554500,
+      "checkFlags": 0,
+      "declarations": [
+        {
+          "file": "data.json",
+          "kind": "PropertyAssignment",
+          "pos": 1,
+          "end": 36
+        },
+        {
+          "file": "augment.ts",
+          "kind": "InterfaceDeclaration",
+          "pos": 38,
+          "end": 68
+        }
+      ],
+      "valueDeclaration": {
+        "file": "data.json",
+        "kind": "PropertyAssignment",
+        "pos": 1,
+        "end": 36
+      },
+      "summary": "{ entries: (number | { deep: number; } | null)[]; }",
+      "errorType": false
+    },
+    "queries": [
+      {
+        "name": "alias",
+        "kind": "value",
+        "summary": "{ entries: (number | { deep: number; } | null)[]; }",
+        "errorType": false,
+        "flags": 33554500,
+        "origins": [
+          {
+            "kind": "InterfaceDeclaration",
+            "location": {
+              "file": "augment.ts",
+              "start": {
+                "line": 1,
+                "column": 50
+              },
+              "end": {
+                "line": 1,
+                "column": 51
+              }
+            }
+          },
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 2
+              },
+              "end": {
+                "line": 1,
+                "column": 5
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "detail",
+        "kind": "expression",
+        "summary": "(number | { deep: number; } | null)[]",
+        "errorType": false,
+        "flags": 33554436,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 7
+              },
+              "end": {
+                "line": 1,
+                "column": 16
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "healthy",
+        "kind": "value",
+        "summary": "44",
+        "errorType": false,
+        "flags": 2,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "main.ts",
+              "start": {
+                "line": 3,
+                "column": 26
+              },
+              "end": {
+                "line": 3,
+                "column": 33
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      }
+    ]
+  },
+  {
+    "name": "primitive-member",
+    "actual": {
+      "flags": 33554500,
+      "checkFlags": 0,
+      "declarations": [
+        {
+          "file": "globals.d.ts",
+          "kind": "PropertySignature",
+          "pos": 153,
+          "end": 178
+        },
+        {
+          "file": "augment.ts",
+          "kind": "InterfaceDeclaration",
+          "pos": 38,
+          "end": 68
+        }
+      ],
+      "valueDeclaration": {
+        "file": "globals.d.ts",
+        "kind": "PropertySignature",
+        "pos": 153,
+        "end": 178
+      },
+      "summary": "number",
+      "errorType": false
+    },
+    "queries": [
+      {
+        "name": "alias",
+        "kind": "value",
+        "summary": "number",
+        "errorType": false,
+        "flags": 33554500,
+        "origins": [
+          {
+            "kind": "InterfaceDeclaration",
+            "location": {
+              "file": "augment.ts",
+              "start": {
+                "line": 1,
+                "column": 50
+              },
+              "end": {
+                "line": 1,
+                "column": 51
+              }
+            }
+          },
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "globals.d.ts",
+              "start": {
+                "line": 5,
+                "column": 29
+              },
+              "end": {
+                "line": 5,
+                "column": 35
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "detail",
+        "kind": "expression",
+        "summary": "number",
+        "errorType": false,
+        "flags": 2097152,
+        "origins": [
+          {
+            "kind": "ImportSpecifier",
+            "location": {
+              "file": "main.ts",
+              "start": {
+                "line": 1,
+                "column": 20
+              },
+              "end": {
+                "line": 1,
+                "column": 21
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "healthy",
+        "kind": "value",
+        "summary": "44",
+        "errorType": false,
+        "flags": 2,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "main.ts",
+              "start": {
+                "line": 3,
+                "column": 26
+              },
+              "end": {
+                "line": 3,
+                "column": 33
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      }
+    ]
+  },
+  {
+    "name": "whole-object",
+    "actual": {
+      "flags": 33554500,
+      "checkFlags": 0,
+      "declarations": [
+        {
+          "file": "data.json",
+          "kind": "SourceFile",
+          "pos": 0,
+          "end": 19
+        },
+        {
+          "file": "augment.ts",
+          "kind": "InterfaceDeclaration",
+          "pos": 38,
+          "end": 68
+        }
+      ],
+      "valueDeclaration": {
+        "file": "data.json",
+        "kind": "SourceFile",
+        "pos": 0,
+        "end": 19
+      },
+      "summary": "{ a: { nested: number; }; }",
+      "errorType": false
+    },
+    "queries": [
+      {
+        "name": "alias",
+        "kind": "value",
+        "summary": "{ a: { nested: number; }; }",
+        "errorType": false,
+        "flags": 33554500,
+        "origins": [
+          {
+            "kind": "InterfaceDeclaration",
+            "location": {
+              "file": "augment.ts",
+              "start": {
+                "line": 1,
+                "column": 50
+              },
+              "end": {
+                "line": 1,
+                "column": 51
+              }
+            }
+          },
+          {
+            "kind": "SourceFile",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 1
+              },
+              "end": {
+                "line": 2,
+                "column": 1
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "detail",
+        "kind": "expression",
+        "summary": "{ nested: number; }",
+        "errorType": false,
+        "flags": 33554436,
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 2
+              },
+              "end": {
+                "line": 1,
+                "column": 5
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "healthy",
+        "kind": "value",
+        "summary": "44",
+        "errorType": false,
+        "flags": 2,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "main.ts",
+              "start": {
+                "line": 3,
+                "column": 26
+              },
+              "end": {
+                "line": 3,
+                "column": 33
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      }
+    ]
+  },
+  {
+    "name": "whole-string",
+    "actual": {
+      "flags": 33554500,
+      "checkFlags": 0,
+      "declarations": [
+        {
+          "file": "data.json",
+          "kind": "SourceFile",
+          "pos": 0,
+          "end": 7
+        },
+        {
+          "file": "augment.ts",
+          "kind": "InterfaceDeclaration",
+          "pos": 38,
+          "end": 68
+        }
+      ],
+      "valueDeclaration": {
+        "file": "data.json",
+        "kind": "SourceFile",
+        "pos": 0,
+        "end": 7
+      },
+      "summary": "string",
+      "errorType": false
+    },
+    "queries": [
+      {
+        "name": "alias",
+        "kind": "value",
+        "summary": "string",
+        "errorType": false,
+        "flags": 33554500,
+        "origins": [
+          {
+            "kind": "InterfaceDeclaration",
+            "location": {
+              "file": "augment.ts",
+              "start": {
+                "line": 1,
+                "column": 50
+              },
+              "end": {
+                "line": 1,
+                "column": 51
+              }
+            }
+          },
+          {
+            "kind": "SourceFile",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 1
+              },
+              "end": {
+                "line": 2,
+                "column": 1
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "detail",
+        "kind": "expression",
+        "summary": "number",
+        "errorType": false,
+        "flags": 4,
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "globals.d.ts",
+              "start": {
+                "line": 5,
+                "column": 29
+              },
+              "end": {
+                "line": 5,
+                "column": 35
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      },
+      {
+        "name": "healthy",
+        "kind": "value",
+        "summary": "44",
+        "errorType": false,
+        "flags": 2,
+        "origins": [
+          {
+            "kind": "VariableDeclaration",
+            "location": {
+              "file": "main.ts",
+              "start": {
+                "line": 3,
+                "column": 26
+              },
+              "end": {
+                "line": 3,
+                "column": 33
+              }
+            }
+          }
+        ],
+        "codes": [],
+        "demandFailures": [],
+        "errors": []
+      }
+    ]
+  }
+]

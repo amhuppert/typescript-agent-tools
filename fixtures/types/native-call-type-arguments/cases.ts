@@ -1,0 +1,17 @@
+type Rejected<T extends number> = T;
+type Hidden<T extends MissingCallConstraint> = number;
+type Later<A extends string, B extends MissingLaterCallConstraint> = number;
+declare function id<T>(value: T): T;
+declare function pair<A, B>(value: A): A;
+declare function scalar(value: number): number;
+declare const untyped: any;
+declare const tuple: [number];
+const /*#valid*/valid = id<Rejected<1>>(1);
+const /*#rejected*/rejected = id<Rejected<"wrong">>("wrong");
+const /*#hidden*/hidden = id<Hidden<1>>(1);
+const /*#later*/later = id<Later<1, 2>>(1);
+const /*#quick*/quick = scalar<Hidden<1>>(1);
+const /*#untypedHidden*/untypedHidden = untyped<Hidden<1>>(1);
+const /*#untypedValid*/untypedValid = untyped<Rejected<1>>(1);
+const /*#spreadHidden*/spreadHidden = id<Hidden<1>>(...tuple);
+const /*#firstFailure*/firstFailure = pair<Hidden<1>, MissingLaterArgument>(1);

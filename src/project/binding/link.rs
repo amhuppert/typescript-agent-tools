@@ -6,40 +6,48 @@
 //! Aliases and qualified references resolve on demand through one explicit
 //! task stack; cycles become unresolved targets rather than recursion.
 
+mod raw;
+
 use super::collect::{
-    AliasBind, AliasKind, DeclKind, Facts, Host, MisplacedModule, NameTarget, RefBase, ScopeKind,
+    AliasBind, AliasKind, BindingEntry, DeclKind, Facts, Host, MisplacedModule, NameTarget,
+    ScopeKind,
 };
 use super::ids::{
-    AliasId, DeclId, ModuleId, RefId, RequestId, ScopeId, SymbolId, TableId, TypeParameterListId,
+    AliasId, DeclId, ModuleId, NameId, RequestId, ScopeId, SymbolId, TableId, TypeParameterListId,
 };
 use super::index::{self, Index, Site, Target, Token};
 use super::instances::Instance;
+use super::member::{MemberKey, MemberKind};
+use super::resolution::{ExportLookup, Probe, RefRef, State, Step, Storage, Task};
+use super::retained::Linked;
 use super::store::{
-    AliasRef, Direction, GLOBAL, RequestTarget, StarRequest, Store, Symbol, TwoModules,
+    AliasRef, BindingTable, DeclaredSymbol, Direction, GLOBAL, RequestTarget, StarRequest, Store,
+    Symbol, TwoModules,
 };
-use super::targets::{Meanings, Reach, Slots, each};
+use super::targets::{Meanings, Slots, each};
 use super::{FileFacts, ModuleResolution, RequestKind, meaning};
 use crate::Span;
 use crate::analysis::{InputError, InputErrorKind};
 use crate::project;
 use crate::project::program::Program;
 use crate::project::sources::FileId;
+use crate::syntax_kind::SyntaxKind;
 use smallvec::SmallVec;
 use std::collections::{HashMap, HashSet};
 
 /// TypeScript symbol flags that decide which declarations may share a name.
-mod flags {
-    pub(super) const FUNCTION_SCOPED: u32 = 1;
-    pub(super) const BLOCK_SCOPED: u32 = 1 << 1;
-    pub(super) const FUNCTION: u32 = 1 << 2;
-    pub(super) const CLASS: u32 = 1 << 3;
-    pub(super) const INTERFACE: u32 = 1 << 4;
-    pub(super) const CONST_ENUM: u32 = 1 << 5;
-    pub(super) const REGULAR_ENUM: u32 = 1 << 6;
-    pub(super) const VALUE_MODULE: u32 = 1 << 7;
-    pub(super) const NAMESPACE_MODULE: u32 = 1 << 8;
-    pub(super) const TYPE_ALIAS: u32 = 1 << 9;
-    pub(super) const TYPE_PARAMETER: u32 = 1 << 10;
+pub(super) mod flags {
+    pub(in crate::project::binding) const FUNCTION_SCOPED: u32 = 1;
+    pub(in crate::project::binding) const BLOCK_SCOPED: u32 = 1 << 1;
+    pub(in crate::project::binding) const FUNCTION: u32 = 1 << 2;
+    pub(in crate::project::binding) const CLASS: u32 = 1 << 3;
+    pub(in crate::project::binding) const INTERFACE: u32 = 1 << 4;
+    pub(in crate::project::binding) const CONST_ENUM: u32 = 1 << 5;
+    pub(in crate::project::binding) const REGULAR_ENUM: u32 = 1 << 6;
+    pub(in crate::project::binding) const VALUE_MODULE: u32 = 1 << 7;
+    pub(in crate::project::binding) const NAMESPACE_MODULE: u32 = 1 << 8;
+    pub(in crate::project::binding) const TYPE_ALIAS: u32 = 1 << 9;
+    pub(in crate::project::binding) const TYPE_PARAMETER: u32 = 1 << 10;
     pub(super) const PARAMETER: u32 = 1 << 11;
     pub(super) const EXPRESSION: u32 = 1 << 12;
     /// A source file or ambient module. Its symbol also carries
@@ -54,21 +62,51 @@ mod flags {
     /// module's value or property, or a library interface's member, all
     /// properties or methods to TypeScript. Only a checker merge that meets
     /// one gives it a symbol (`Linker::value_symbol`).
-    pub(super) const PROPERTY: u32 = 1 << 17;
-    pub(super) const ENUM: u32 = CONST_ENUM | REGULAR_ENUM;
-    pub(super) const NAMESPACE: u32 = VALUE_MODULE | NAMESPACE_MODULE;
-    pub(super) const VALUE: u32 = FUNCTION_SCOPED
+    pub(in crate::project::binding) const PROPERTY: u32 = 1 << 17;
+    pub(in crate::project::binding) const METHOD: u32 = 1 << 18;
+    pub(in crate::project::binding) const GETTER: u32 = 1 << 19;
+    pub(in crate::project::binding) const SETTER: u32 = 1 << 20;
+    pub(in crate::project::binding) const SIGNATURE: u32 = 1 << 21;
+    pub(super) const CONSTRUCTOR: u32 = 1 << 22;
+    pub(in crate::project::binding) const OPTIONAL: u32 = 1 << 23;
+    pub(in crate::project::binding) const TYPE_LITERAL: u32 = 1 << 24;
+    pub(in crate::project::binding) const OBJECT_LITERAL: u32 = 1 << 25;
+    pub(in crate::project::binding) const PROTOTYPE: u32 = 1 << 26;
+    pub(in crate::project::binding) const ENUM_MEMBER: u32 = 1 << 27;
+    pub(in crate::project::binding) const EXPORT_VALUE: u32 = 1 << 28;
+    pub(in crate::project::binding) const ALIAS: u32 = 1 << 29;
+    pub(in crate::project::binding) const CONST_ENUM_ONLY_MODULE: u32 = 1 << 30;
+    pub(in crate::project::binding) const MODULE_EXPORTS: u32 = 1 << 31;
+    pub(in crate::project::binding) const ENUM: u32 = CONST_ENUM | REGULAR_ENUM;
+    pub(in crate::project::binding) const NAMESPACE: u32 = VALUE_MODULE | NAMESPACE_MODULE;
+    pub(in crate::project::binding) const VALUE: u32 = FUNCTION_SCOPED
         | BLOCK_SCOPED
         | FUNCTION
         | CLASS
         | ENUM
+        | ENUM_MEMBER
         | VALUE_MODULE
         | EXPRESSION
-        | PROPERTY;
-    pub(super) const TYPE: u32 = CLASS | INTERFACE | ENUM | TYPE_ALIAS | TYPE_PARAMETER;
+        | PROPERTY
+        | OBJECT_LITERAL
+        | METHOD
+        | GETTER
+        | SETTER;
+    /// Native SymbolFlagsModuleMember; excludes ordinary properties and enum members.
+    pub(in crate::project::binding) const MODULE_MEMBER: u32 = FUNCTION_SCOPED
+        | BLOCK_SCOPED
+        | FUNCTION
+        | CLASS
+        | INTERFACE
+        | ENUM
+        | NAMESPACE
+        | TYPE_ALIAS
+        | ALIAS;
+    pub(in crate::project::binding) const TYPE: u32 =
+        CLASS | INTERFACE | ENUM | ENUM_MEMBER | TYPE_ALIAS | TYPE_PARAMETER;
 }
 
-fn symbol_flags(kind: DeclKind) -> u32 {
+pub(super) fn symbol_flags(kind: DeclKind) -> u32 {
     use flags::*;
     match kind {
         DeclKind::Var => FUNCTION_SCOPED,
@@ -77,16 +115,53 @@ fn symbol_flags(kind: DeclKind) -> u32 {
         DeclKind::Function => FUNCTION,
         DeclKind::Class => CLASS,
         DeclKind::Interface => INTERFACE,
+        DeclKind::TypeLiteral => TYPE_LITERAL,
+        DeclKind::ObjectLiteral => OBJECT_LITERAL,
         DeclKind::TypeAlias => TYPE_ALIAS,
         DeclKind::Enum { constant: true } => CONST_ENUM,
         DeclKind::Enum { constant: false } => REGULAR_ENUM,
+        DeclKind::EnumMember => ENUM_MEMBER,
         DeclKind::Namespace {
             instance: Instance::NonInstantiated,
         } => NAMESPACE_MODULE,
         DeclKind::Namespace { .. } => VALUE_MODULE,
         DeclKind::TypeParameter => TYPE_PARAMETER,
+        DeclKind::Member(kind) => match kind {
+            MemberKind::Property | MemberKind::ParameterProperty => PROPERTY,
+            MemberKind::AutoAccessor => GETTER | SETTER,
+            MemberKind::Method => METHOD,
+            MemberKind::Getter => GETTER,
+            MemberKind::Setter => SETTER,
+            MemberKind::Call | MemberKind::Construct | MemberKind::Index => SIGNATURE,
+            MemberKind::Constructor => CONSTRUCTOR,
+        },
         DeclKind::Expression => EXPRESSION,
     }
+}
+
+/// Binder `bindWorker`'s actual SymbolFlags, without navigation's auxiliary
+/// declaration classes. An export-assignment expression declares a Property;
+/// Parameter/Module/implementation metadata are not independent native bits.
+pub(super) fn native_symbol_flags(projected: u32) -> u32 {
+    let expression = projected & flags::EXPRESSION != 0;
+    let flags = projected
+        & !(flags::PARAMETER
+            | flags::EXPRESSION
+            | flags::MODULE
+            | flags::IMPLEMENTED
+            | flags::AMBIENT_CLASS
+            | flags::CONCRETE_CLASS);
+    flags | if expression { flags::PROPERTY } else { 0 }
+}
+
+/// The complete native declaration exclusion question is separate from the
+/// navigation projection's duplicate-parameter classification. Export
+/// assignments use SymbolFlagsAll in `bindExportAssignment`.
+pub(super) fn native_declaration_excludes(projected: u32) -> u32 {
+    if projected & flags::EXPRESSION != 0 {
+        return u32::MAX;
+    }
+    excluded(native_symbol_flags(projected))
 }
 
 /// The meanings a symbol with `flags` has of its own: the one rule for a
@@ -94,7 +169,7 @@ fn symbol_flags(kind: DeclKind) -> u32 {
 /// A module is a value and a namespace. Contextual meanings stay with their
 /// rule: any export of a shorthand ambient module has every meaning, and a
 /// type-only route restricts the meanings it reaches (see `targets`).
-fn meanings(flags: u32) -> u8 {
+pub(super) fn meanings(flags: u32) -> u8 {
     let mut meanings = 0;
     if flags & (flags::VALUE | flags::MODULE) != 0 {
         meanings |= meaning::VALUE;
@@ -127,19 +202,21 @@ impl DeclKind {
             | DeclKind::Let
             | DeclKind::Function
             | DeclKind::Expression => VALUE,
-            DeclKind::Class | DeclKind::Enum { .. } => VALUE | TYPE,
+            DeclKind::Class | DeclKind::Enum { .. } | DeclKind::EnumMember => VALUE | TYPE,
             DeclKind::Interface | DeclKind::TypeAlias | DeclKind::TypeParameter => TYPE,
+            DeclKind::TypeLiteral | DeclKind::ObjectLiteral => 0,
             DeclKind::Namespace {
                 instance: Instance::NonInstantiated,
             } => NAMESPACE,
             DeclKind::Namespace { .. } => NAMESPACE | VALUE,
+            DeclKind::Member(kind) => meanings(symbol_flags(DeclKind::Member(kind))),
         }
     }
 }
 
 /// TypeScript's `getExcludedSymbolFlags`: the flags a symbol with `flags`
 /// cannot share a name with, each kind's `*Excludes` combined.
-fn excluded(flags: u32) -> u32 {
+pub(super) fn excluded(flags: u32) -> u32 {
     use flags::*;
     let kinds = [
         (FUNCTION_SCOPED, VALUE & !FUNCTION_SCOPED),
@@ -155,13 +232,18 @@ fn excluded(flags: u32) -> u32 {
             (VALUE | TYPE) & !(REGULAR_ENUM | VALUE_MODULE),
         ),
         (CONST_ENUM, (VALUE | TYPE) & !CONST_ENUM),
+        (ENUM_MEMBER, VALUE | TYPE),
         (
             VALUE_MODULE,
             VALUE & !(FUNCTION | CLASS | REGULAR_ENUM | VALUE_MODULE),
         ),
         (TYPE_ALIAS, TYPE),
+        (ALIAS, ALIAS),
         (TYPE_PARAMETER, TYPE & !TYPE_PARAMETER),
-        (PROPERTY, VALUE & !PROPERTY),
+        (PROPERTY, VALUE & !(PROPERTY | GETTER | SETTER)),
+        (METHOD, VALUE & !METHOD),
+        (GETTER, VALUE & !(SETTER | PROPERTY)),
+        (SETTER, VALUE & !(GETTER | PROPERTY)),
     ];
     kinds
         .into_iter()
@@ -213,38 +295,9 @@ fn distinct(slots: Slots) -> SmallVec<[SymbolId; 3]> {
     distinct
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-struct RefRef {
-    file: FileId,
-    id: RefId,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-enum Task {
-    Alias(AliasRef),
-    Ref(RefRef),
-}
-
-/// A task that another task waits for. `fill` marks an alias consulted only
-/// for meanings that same-named local declarations lack: TypeScript resolves
-/// such a name to its locals without following the alias, so a cycle through
-/// that edge is cut there rather than leaving every member unresolved.
-#[derive(Debug, Clone, Copy)]
-struct Need {
-    task: Task,
-    fill: bool,
-}
-
-impl Need {
-    fn required(task: Task) -> Self {
-        Self { task, fill: false }
-    }
-}
-
 #[derive(Debug, Clone, PartialEq, Eq)]
-enum Resolution {
+pub(super) enum Resolution {
     Found(Meanings),
-    GlobalThis,
     /// A value that is not a reference target but whose identity and
     /// properties linking still needs (`ValueTarget`). It has only the value
     /// meaning; `type_only` marks a type-only route, after which only a type
@@ -254,7 +307,43 @@ enum Resolution {
         type_only: bool,
     },
     NotReference(&'static str),
-    Unresolved(String),
+    Unresolved(ResolutionFailure),
+}
+
+/// `resolveEntityName(ignoreErrors)` suppresses only its own missing-name
+/// diagnostic. Errors acquired while resolving an Alias or module remain
+/// consumed dependencies, even when the final name lookup ignores errors.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(super) struct ResolutionFailure {
+    pub(super) reason: String,
+    pub(super) dependency: Option<(FileId, crate::Span)>,
+}
+impl ResolutionFailure {
+    pub(super) fn at_dependency(mut self, file: FileId, span: crate::Span) -> Self {
+        if self.dependency.is_none() {
+            self.dependency = Some((file, span));
+        }
+        self
+    }
+}
+impl From<String> for ResolutionFailure {
+    fn from(reason: String) -> Self {
+        Self {
+            reason,
+            dependency: None,
+        }
+    }
+}
+impl From<&str> for ResolutionFailure {
+    fn from(reason: &str) -> Self {
+        Self::from(reason.to_owned())
+    }
+}
+impl std::ops::Deref for ResolutionFailure {
+    type Target = str;
+    fn deref(&self) -> &str {
+        &self.reason
+    }
 }
 
 /// A value that linking follows but that is not a reference target: a JSON
@@ -265,10 +354,13 @@ enum Resolution {
 /// type's properties a later name selects (`Linker::value_property`). The
 /// index reports it as not a reference target (`Linker::target`).
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-enum ValueTarget {
+pub(super) enum ValueTarget {
     /// A value of a JSON file, by its index among the file's values
-    /// (`super::JsonModule`): `JsonModule::ROOT` is the file's value.
-    Json { file: FileId, value: u32 },
+    /// (`super::JsonFacts`): `JsonFacts::ROOT` is the file's value.
+    Json {
+        file: FileId,
+        value: super::JsonValueId,
+    },
     /// A member of a global library interface, by the interface's canonical
     /// symbol when found. Boxed, so a resolution, which every reference's
     /// state holds, is no larger for it.
@@ -278,28 +370,17 @@ enum ValueTarget {
 /// Whether a use with `mask` in a type context or not may select a value
 /// reached through a type-only route or not: the rule `Meanings::select`
 /// applies to a symbol's value meaning.
-fn selects_value(mask: u8, type_only: bool, type_context: bool) -> bool {
+pub(super) fn selects_value(mask: u8, type_only: bool, type_context: bool) -> bool {
     mask & meaning::VALUE != 0 && !(type_only && mask == meaning::VALUE && !type_context)
 }
 
-#[derive(Debug, Clone, Default)]
-enum State {
-    #[default]
-    Unvisited,
-    InProgress,
-    Done(Resolution),
-}
-
-enum Step<T> {
-    Done(T),
-    Need(Need),
-}
-
-/// The result of probing one table for a name.
-enum Probe {
-    Found(Resolution),
-    Need(Need),
-    Missing,
+/// `getResolvedSymbol` preserves a lexical alias symbol even when value
+/// resolution follows it. Direct slots and alias slots ask different native
+/// identifier setup and reference-identity questions.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) enum ValueOrigin {
+    Direct(SymbolId),
+    Alias(AliasRef),
 }
 
 /// What a name denotes where a checker merge meets it, TypeScript's one
@@ -336,18 +417,7 @@ struct TableMerge {
     from: TableId,
     direction: Direction,
     stars: Option<ModuleId>,
-}
-
-/// Where a scope's names are stored.
-#[derive(Debug, Clone, Copy)]
-enum Storage {
-    /// A script's top level: its own table, which merges into the global
-    /// table (`merge_globals`), where its names are looked up.
-    Script,
-    /// The member table shared by a class or interface's declarations.
-    Members(DeclId),
-    /// The scope's own table, which also sees the exports of a host.
-    Own(Option<Host>),
+    parent: Option<SymbolId>,
 }
 
 /// Where one of a script's ambient module declarations binds, as
@@ -357,7 +427,7 @@ enum Storage {
 /// own symbol and export table, which the checker merges into the module
 /// (`merge_globals`).
 #[derive(Debug, Clone, Copy)]
-enum AmbientHost {
+pub(super) enum AmbientHost {
     Module(ModuleId),
     /// An index into `Linker::fragments`.
     Fragment(usize),
@@ -365,16 +435,15 @@ enum AmbientHost {
 
 /// A later file's declarations of an ambient module (`AmbientHost`).
 #[derive(Debug)]
-struct Fragment {
+pub(super) struct Fragment {
     module: ModuleId,
-    symbol: SymbolId,
+    pub(super) symbol: SymbolId,
     /// The fragment's `export *` declarations, which the module gains when
     /// the fragment merges into it.
     stars: Vec<StarRequest>,
 }
 
-struct Linker<'p> {
-    program: &'p Program,
+pub(in crate::project) struct LinkState {
     /// Tables, symbols, modules, and request targets, whose writes
     /// invalidate resolutions made while merges still change them.
     store: Store,
@@ -382,6 +451,7 @@ struct Linker<'p> {
     /// The symbol each declaration created or merged into. It may since have
     /// merged into another, so readers canonicalize it with `find`.
     decl_symbols: Vec<Vec<Option<SymbolId>>>,
+    decl_local_symbols: Vec<Vec<Option<SymbolId>>>,
     file_modules: Vec<Option<ModuleId>>,
     ambient: HashMap<String, ModuleId>,
     /// By file, parallel to its ambient module declarations.
@@ -415,50 +485,88 @@ struct Linker<'p> {
     global_exports: Vec<Vec<(String, AliasRef)>>,
     alias_states: Vec<Vec<State>>,
     ref_states: Vec<Vec<State>>,
-    export_memo: HashMap<(ModuleId, String), Resolution>,
-    /// Tasks resolved while augmentations still change tables, which
-    /// `reset_resolutions` discards once the store has changed.
-    journal: Option<Vec<Task>>,
+    /// Parallel to reference states during linking, then moved into their
+    /// retained attachments. Only the existing lexical lookup supplies this
+    /// raw identity; qualified/module references require other native owners.
+    ref_origins: Vec<Vec<Option<ValueOrigin>>>,
+    ref_type_alias_origins: Vec<Vec<Option<AliasRef>>>,
+    /// The same lookup's raw identity for local export aliases, required by
+    /// native assignment marking without replaying lookup or following aliases.
+    alias_origins: Vec<Vec<Option<ValueOrigin>>>,
+    resolution: super::resolution::Runtime,
     /// The value each value symbol stands for (`value_symbol`), and the
     /// symbol of each value a checker merge met.
     values: HashMap<SymbolId, ValueTarget>,
     value_symbols: HashMap<ValueTarget, SymbolId>,
-    conflicts: Vec<(TableId, String, FileId, Span)>,
-    /// The task `force` is running, for `probe_entry` to consult `cuts`.
-    running: Option<Task>,
-    /// Fill edges that close a cycle: the waiting task resolves to its local
-    /// declarations without the alias.
-    cuts: HashSet<(Task, Task)>,
-    /// The waiting tasks of `cuts`, whose lookups are specific to them.
-    cut_tasks: HashSet<Task>,
+    conflicts: Vec<(TableId, String)>,
 }
 
-type Result<T> = std::result::Result<T, InputError>;
+struct Linker<'p, 'l> {
+    program: &'p Program,
+    state: &'l mut LinkState,
+    native_inputs: Option<super::NativeInputs<'l>>,
+    native_facts: Option<&'l dyn super::NativeFacts>,
+}
+
+type Result<T> = std::result::Result<T, crate::analysis::AnalysisError>;
 
 /// Why a JSON module's value is not a reference target.
 const JSON_VALUE: &str = "JSON module value";
 
-pub(super) fn link(program: &Program) -> Result<Index> {
-    let mut linker = Linker::new(program);
-    linker.check_mixed_exports()?;
-    linker.check_module_declarations()?;
-    linker.create_modules();
-    linker.create_augmentations();
-    linker.resolve_requests()?;
-    linker.declare_all()?;
-    linker.merge_augmentations()?;
-    linker.check_hoisting()?;
-    linker.check_merges()?;
-    let index = linker.resolve_and_index();
-    linker.check_conflicts()?;
-    Ok(index)
+pub(super) fn link(program: &Program, parser: &crate::analysis::Parser) -> Result<Linked> {
+    let mut state = LinkState::new(program);
+    let raw = {
+        let mut linker = Linker {
+            program,
+            state: &mut state,
+            native_inputs: None,
+            native_facts: None,
+        };
+        linker.check_mixed_exports()?;
+        linker.check_module_declarations()?;
+        linker.create_modules()?;
+        linker.create_augmentations();
+        linker.resolve_requests()?;
+        linker.declare_all()?;
+        linker.prepare_checker_inputs()?
+    };
+    let linked = super::super::semantic::initialize_loading(program, &raw, parser, &mut state)?;
+    Ok(state.complete(raw, linked))
 }
 
-impl<'p> Linker<'p> {
-    fn new(program: &'p Program) -> Self {
+pub(in crate::project) struct NativeLinkOutput {
+    index: Index,
+    reference_sources: Vec<Vec<super::ids::OccurrenceId>>,
+}
+
+pub(in crate::project) struct ProjectionObserver<'p, 'a> {
+    pub(in crate::project) program: &'p Program,
+    pub(in crate::project) raw: &'a super::raw::RawBindingSnapshot,
+    pub(in crate::project) state: &'a mut LinkState,
+}
+impl super::super::semantic::InitializationObserver for ProjectionObserver<'_, '_> {
+    fn observe(
+        &mut self,
+        step: super::super::semantic::InitializationStep,
+        facts: &dyn super::NativeFacts,
+    ) -> Result<()> {
+        Linker {
+            program: self.program,
+            state: self.state,
+            native_inputs: Some(super::NativeInputs::new(
+                super::inputs::BindingFiles::Loading(self.program),
+                self.raw,
+            )),
+            native_facts: Some(facts),
+        }
+        .observe_initialization(step)
+    }
+}
+
+impl LinkState {
+    fn new(program: &Program) -> Self {
         let files = &program.files;
         Self {
-            program,
             store: Store::new(),
             scope_tables: files
                 .iter()
@@ -467,6 +575,10 @@ impl<'p> Linker<'p> {
             decl_symbols: files
                 .iter()
                 .map(|f| vec![None; f.facts.facts.decls.len()])
+                .collect(),
+            decl_local_symbols: files
+                .iter()
+                .map(|file| vec![None; file.facts.facts.decls.len()])
                 .collect(),
             file_modules: vec![None; files.len()],
             ambient: HashMap::new(),
@@ -488,15 +600,217 @@ impl<'p> Linker<'p> {
                 .iter()
                 .map(|f| vec![State::Unvisited; f.facts.facts.refs.len()])
                 .collect(),
-            export_memo: HashMap::new(),
-            journal: Some(Vec::new()),
+            ref_origins: files
+                .iter()
+                .map(|f| vec![None; f.facts.facts.refs.len()])
+                .collect(),
+            ref_type_alias_origins: files
+                .iter()
+                .map(|f| vec![None; f.facts.facts.refs.len()])
+                .collect(),
+            alias_origins: files
+                .iter()
+                .map(|f| vec![None; f.facts.facts.aliases.len()])
+                .collect(),
+            resolution: super::resolution::Runtime::loading(),
             values: HashMap::new(),
             value_symbols: HashMap::new(),
             conflicts: Vec::new(),
-            running: None,
-            cuts: HashSet::new(),
-            cut_tasks: HashSet::new(),
         }
+    }
+
+    fn complete(self, raw: super::raw::RawBindingSnapshot, output: NativeLinkOutput) -> Linked {
+        assert!(
+            self.resolution.running.is_none(),
+            "completed linking has no active demand"
+        );
+        // Final publication must not hide an incomplete lexical task even
+        // though its working states no longer survive in the Project.
+        assert!(
+            self.alias_states
+                .iter()
+                .chain(&self.ref_states)
+                .flat_map(|states| states.iter())
+                .all(|state| !matches!(state, State::InProgress)),
+            "completed linking has no demand in progress"
+        );
+        Linked {
+            index: output.index,
+            reference_sources: output.reference_sources,
+            reference_origins: self.ref_origins,
+            reference_type_alias_origins: self.ref_type_alias_origins,
+            raw,
+        }
+    }
+    pub(in crate::project) fn finish_with_native_facts(
+        &mut self,
+        program: &Program,
+        raw: &super::raw::RawBindingSnapshot,
+        facts: &dyn super::NativeFacts,
+    ) -> Result<NativeLinkOutput> {
+        let mut linker = Linker {
+            program,
+            state: self,
+            native_inputs: Some(super::NativeInputs::new(
+                super::inputs::BindingFiles::Loading(program),
+                raw,
+            )),
+            native_facts: Some(facts),
+        };
+        linker.check_hoisting()?;
+        linker.check_merges()?;
+        let (index, reference_sources) = linker.resolve_and_index()?;
+        linker.check_conflicts()?;
+        Ok(NativeLinkOutput {
+            index,
+            reference_sources,
+        })
+    }
+}
+
+impl<'p> Linker<'p, '_> {
+    fn inputs(&self) -> super::resolution::Inputs<'_> {
+        super::resolution::Inputs {
+            files: super::resolution::Files::Loading(self.program),
+            hosts: super::resolution::ProjectedHosts::Loading {
+                ambient_hosts: &self.state.ambient_hosts,
+                fragments: &self.state.fragments,
+            },
+            store: &self.state.store,
+            scope_tables: &self.state.scope_tables,
+            decl_symbols: &self.state.decl_symbols,
+            file_modules: &self.state.file_modules,
+            augmentations: &self.state.augmentations,
+            global_augmentations: &self.state.global_augmentations,
+            values: &self.state.values,
+            native_inputs: self.native_inputs,
+            native_facts: self.native_facts,
+        }
+    }
+    fn resolver(&mut self) -> super::resolution::Resolver<'_> {
+        super::resolution::Resolver {
+            inputs: super::resolution::Inputs {
+                files: super::resolution::Files::Loading(self.program),
+                hosts: super::resolution::ProjectedHosts::Loading {
+                    ambient_hosts: &self.state.ambient_hosts,
+                    fragments: &self.state.fragments,
+                },
+                store: &self.state.store,
+                scope_tables: &self.state.scope_tables,
+                decl_symbols: &self.state.decl_symbols,
+                file_modules: &self.state.file_modules,
+                augmentations: &self.state.augmentations,
+                global_augmentations: &self.state.global_augmentations,
+                values: &self.state.values,
+                native_inputs: self.native_inputs,
+                native_facts: self.native_facts,
+            },
+            states: super::resolution::States::Loading {
+                aliases: &mut self.state.alias_states,
+                refs: &mut self.state.ref_states,
+                alias_origins: &mut self.state.alias_origins,
+                ref_origins: &mut self.state.ref_origins,
+                ref_type_alias_origins: &mut self.state.ref_type_alias_origins,
+            },
+            runtime: &mut self.state.resolution,
+        }
+    }
+    fn json_value(file: FileId) -> Resolution {
+        super::resolution::Resolver::json_value(file)
+    }
+    fn force(&mut self, task: Task) -> Result<Resolution> {
+        if self.state.store.take_changed() {
+            self.reset_resolutions();
+        }
+        self.resolver().force(task).map_err(|failure| {
+            let site = match task {
+                Task::Alias(alias) => (
+                    alias.file,
+                    self.facts(alias.file).aliases[alias.id.index()].span,
+                ),
+                Task::Ref(reference) => {
+                    let facts = self.facts(reference.file);
+                    let token = facts.refs[reference.id.index()].token;
+                    (reference.file, facts.names[token.index()].span)
+                }
+            };
+            self.lookup_failure(failure, Some(site))
+        })
+    }
+
+    /// The Project::load boundary for an incomplete native name observation.
+    /// Resolver failures stay typed until here; none become the navigation
+    /// domain's ordinary missing-name result or an ignored dependency.
+    fn lookup_failure(
+        &self,
+        failure: impl Into<super::LookupFailure>,
+        site: Option<(FileId, Span)>,
+    ) -> crate::analysis::AnalysisError {
+        use super::semantic::TypeBindingFailure;
+        let failure = match failure.into() {
+            super::LookupFailure::Binding(failure) => failure,
+            super::LookupFailure::Native(failure) => return failure,
+        };
+        let (kind, message, site) = match failure {
+            TypeBindingFailure::NotRetained => (
+                InputErrorKind::Binding,
+                "native name lookup invariant failed: required symbol metadata was not retained"
+                    .to_owned(),
+                site,
+            ),
+            TypeBindingFailure::Pending(reason) => (
+                InputErrorKind::Unsupported,
+                format!("native name lookup could not complete: {reason}"),
+                site,
+            ),
+            TypeBindingFailure::Unresolved(reason) => (
+                InputErrorKind::Binding,
+                format!("native name lookup failed: {reason}"),
+                site,
+            ),
+            TypeBindingFailure::ErrorType(reason) => (
+                InputErrorKind::Binding,
+                format!("native name lookup selected errorType: {reason}"),
+                site,
+            ),
+            TypeBindingFailure::Dependency { file, span, reason } => (
+                InputErrorKind::Binding,
+                format!("native name lookup dependency failed: {reason}"),
+                Some((file, span)),
+            ),
+        };
+        match site {
+            Some((file, span)) => self.error(kind, file, span, message).into(),
+            None => InputError {
+                kind,
+                message,
+                path: None,
+                position: None,
+            }
+            .into(),
+        }
+    }
+    fn probe_export(&mut self, module: ModuleId, name: &str) -> Probe<ExportLookup> {
+        self.resolver().probe_export(module, name)
+    }
+    fn star_export(&mut self, module: ModuleId, name: &str, type_only: bool) -> Step<ExportLookup> {
+        self.resolver().star_export(module, name, type_only)
+    }
+    fn request_module(
+        &self,
+        file: FileId,
+        request: RequestId,
+    ) -> std::result::Result<ModuleId, &'static str> {
+        self.inputs().request_module(file, request)
+    }
+    fn storage(&self, file: FileId, scope: ScopeId) -> Storage {
+        self.inputs().files.storage(file, scope)
+    }
+    fn exports_have(&self, module: ModuleId, name: &str) -> bool {
+        self.inputs().exports_have(module, name)
+    }
+    fn module_stars(&self, module: ModuleId) -> SmallVec<[(ModuleId, bool); 2]> {
+        self.inputs().module_stars(module)
     }
 
     fn file_ids(&self) -> impl Iterator<Item = FileId> + use<'p> {
@@ -528,21 +842,30 @@ impl<'p> Linker<'p> {
             position: Some(source.text.position(span.start)),
         }
     }
+    fn native_merge_failure(
+        &self,
+        failure: super::TypeBindingFailure,
+        _source: Option<super::ids::NativeHeaderId>,
+    ) -> crate::analysis::AnalysisError {
+        self.lookup_failure(failure, None)
+    }
 
     /// The canonical symbol after merges both ways.
     fn find(&self, id: SymbolId) -> SymbolId {
-        self.store.find(id)
+        self.state.store.find(id)
     }
     fn symbol(&self, id: SymbolId) -> &Symbol {
-        self.store.symbol(id)
+        self.state.store.symbol(id)
     }
 
     fn new_module(&mut self, site: Option<Site>, shorthand: bool, declaration: bool) -> ModuleId {
         let flags = flags::MODULE | flags::VALUE_MODULE;
-        self.store.new_module(flags, site, shorthand, declaration)
+        self.state
+            .store
+            .new_module(flags, site, shorthand, declaration)
     }
 
-    fn create_modules(&mut self) {
+    fn create_modules(&mut self) -> Result<()> {
         for file in self.file_ids() {
             if self.file(file).module {
                 let site = Site {
@@ -552,10 +875,39 @@ impl<'p> Linker<'p> {
                 };
                 let declaration = self.file(file).declaration;
                 let module = self.new_module(Some(site), false, declaration);
-                if self.file(file).json.is_some() {
-                    self.store.set_json(module, file);
+                // `bindSourceFileAsExternalModule` names the actual source
+                // module, separately from its project-relative navigation site.
+                let file_name =
+                    project::program::native_file_name(&self.program.sources.get(file).path)?;
+                let name = format!(
+                    "\"{}\"",
+                    project::program::remove_file_extension(&file_name)
+                );
+                self.state.store.set_native_name(
+                    self.state.store.module(module).symbol,
+                    super::ordering::NativeSymbolName::Bytes(name.into_bytes().into()),
+                );
+                self.state.store.add_source_file_declaration(
+                    self.state.store.module(module).symbol,
+                    file,
+                    Span {
+                        start: 0,
+                        end: self.program.sources.get(file).text.as_str().len(),
+                    },
+                );
+                if let Some(json) = &self.program.files[file.index()].facts.json {
+                    self.state.store.set_json(module, file);
+                    self.state.store.bind_json_symbols(
+                        module,
+                        file,
+                        Span {
+                            start: 0,
+                            end: self.program.sources.get(file).text.as_str().len(),
+                        },
+                        json,
+                    );
                 }
-                self.file_modules[file.index()] = Some(module);
+                self.state.file_modules[file.index()] = Some(module);
             }
             let mut own: HashMap<&'p str, AmbientHost> = HashMap::new();
             let mut hosts = Vec::new();
@@ -567,46 +919,53 @@ impl<'p> Linker<'p> {
                 };
                 let host = match own.get(ambient.name.as_str()) {
                     Some(&AmbientHost::Module(module)) => {
-                        self.store.redeclare_module(module, site);
+                        self.state.store.redeclare_module(module, site);
                         AmbientHost::Module(module)
                     }
                     Some(&AmbientHost::Fragment(index)) => {
-                        let symbol = self.fragments[index].symbol;
-                        self.store
-                            .declare_into(symbol, flags::MODULE | flags::VALUE_MODULE, site);
+                        let symbol = self.state.fragments[index].symbol;
+                        self.state.store.declare_into(
+                            symbol,
+                            flags::MODULE | flags::VALUE_MODULE,
+                            site,
+                        );
                         AmbientHost::Fragment(index)
                     }
-                    None => match self.ambient.get(&ambient.name) {
+                    None => match self.state.ambient.get(&ambient.name) {
                         // The first declaration decides whether the module is
                         // shorthand.
                         None => {
                             let module = self.new_module(Some(site), ambient.shorthand, true);
-                            self.ambient.insert(ambient.name.clone(), module);
+                            self.state.ambient.insert(ambient.name.clone(), module);
                             if super::super::pattern::parse(&ambient.name).is_some() {
-                                self.patterns.push((ambient.name.clone(), module));
+                                self.state.patterns.push((ambient.name.clone(), module));
                             }
                             AmbientHost::Module(module)
                         }
                         Some(&module) => {
                             let flags = flags::MODULE | flags::VALUE_MODULE;
-                            let symbol = self.store.new_symbol(flags, Some(site));
-                            self.store.export_table(symbol);
-                            self.fragments.push(Fragment {
+                            let symbol = self.state.store.new_symbol(flags, Some(site));
+                            self.state.store.export_table(symbol);
+                            self.state.fragments.push(Fragment {
                                 module,
                                 symbol,
                                 stars: Vec::new(),
                             });
-                            AmbientHost::Fragment(self.fragments.len() - 1)
+                            AmbientHost::Fragment(self.state.fragments.len() - 1)
                         }
                     },
                 };
                 own.insert(&ambient.name, host);
                 hosts.push(host);
             }
-            self.ambient_hosts.push(hosts);
+            self.state.ambient_hosts.push(hosts);
         }
+        Ok(())
     }
 
+    /// `resolveExternalModuleNameWorker` selects the raw module/script result
+    /// before this tool's diagnostic admission. A tolerated script augmentation
+    /// is ignored by lexical linking but remains Script in checker inputs.
     fn resolve_requests(&mut self) -> Result<()> {
         for file in self.file_ids() {
             let program_file = &self.program.files[file.index()];
@@ -615,30 +974,34 @@ impl<'p> Linker<'p> {
                 let resolution = &program_file.modules[index];
                 let relative = project::is_relative_name(&request.specifier);
                 let ambient = (!relative)
-                    .then(|| self.ambient.get(&request.specifier).copied())
+                    .then(|| self.state.ambient.get(&request.specifier).copied())
                     .flatten();
                 let span = request.span;
                 let augmentation = matches!(request.kind, RequestKind::Augmentation { .. });
                 let target = match (ambient, resolution) {
                     (Some(module), _) => RequestTarget::Module(module),
                     (None, ModuleResolution::File(target)) => {
-                        match self.file_modules[target.index()] {
+                        match self.state.file_modules[target.index()] {
                             Some(module) => RequestTarget::Module(module),
-                            // `merge_augmentations` decides what a module's
-                            // augmentation merges into; a script is no target.
-                            None if augmentation => {
-                                self.augmentation_target_failed(file, index, true)?
-                            }
                             None => RequestTarget::Script,
                         }
                     }
-                    (None, ModuleResolution::Unchecked) => RequestTarget::Ignored,
-                    (None, ModuleResolution::Missing | ModuleResolution::NotAdmitted(_)) => {
+                    (
+                        None,
+                        ModuleResolution::Missing
+                        | ModuleResolution::NotAdmitted(_)
+                        | ModuleResolution::Unchecked,
+                    ) => {
                         // Pattern ambient modules also match relative names.
                         match self.pattern(&request.specifier) {
                             Some(module) => {
-                                self.pattern_requests.push((file, RequestId::new(index)));
+                                self.state
+                                    .pattern_requests
+                                    .push((file, RequestId::new(index)));
                                 RequestTarget::Module(module)
+                            }
+                            None if matches!(resolution, ModuleResolution::Unchecked) => {
+                                RequestTarget::Ignored
                             }
                             None if augmentation => {
                                 self.augmentation_target_failed(file, index, false)?
@@ -651,12 +1014,9 @@ impl<'p> Linker<'p> {
                                     ModuleResolution::NotAdmitted(message) => message.clone(),
                                     _ => format!("cannot resolve module \"{}\"", request.specifier),
                                 };
-                                return Err(self.error(
-                                    InputErrorKind::UnresolvedImport,
-                                    file,
-                                    span,
-                                    message,
-                                ));
+                                return Err(self
+                                    .error(InputErrorKind::UnresolvedImport, file, span, message)
+                                    .into());
                             }
                         }
                     }
@@ -666,17 +1026,38 @@ impl<'p> Linker<'p> {
                         RequestTarget::Ignored
                     }
                     (None, ModuleResolution::Unsupported(reason)) => {
-                        return Err(self.error(
-                            InputErrorKind::Unsupported,
-                            file,
-                            span,
-                            format!("module \"{}\": {reason}", request.specifier),
-                        ));
+                        return Err(self
+                            .error(
+                                InputErrorKind::Unsupported,
+                                file,
+                                span,
+                                format!("module \"{}\": {reason}", request.specifier),
+                            )
+                            .into());
                     }
+                };
+                let raw_target = match target {
+                    // Final binder associations are installed by declare_all.
+                    // prepare_checker_inputs captures that header afterward.
+                    RequestTarget::Module(_) => None,
+                    RequestTarget::Script => Some(super::raw::RawModuleRequest::Script),
+                    RequestTarget::Ignored => Some(super::raw::RawModuleRequest::Ignored),
+                };
+                if let Some(raw_target) = raw_target {
+                    self.state.store.native_headers_mut().set_request(
+                        file,
+                        RequestId::new(index),
+                        raw_target,
+                    );
+                }
+                let target = if augmentation && matches!(target, RequestTarget::Script) {
+                    self.augmentation_target_failed(file, index, true)?
+                } else {
+                    target
                 };
                 modules.push(target);
             }
-            self.store.push_requests(modules);
+            self.state.store.push_requests(modules);
         }
         Ok(())
     }
@@ -709,32 +1090,21 @@ impl<'p> Linker<'p> {
         } else {
             format!("cannot resolve module \"{}\"", request.specifier)
         };
-        Err(self.error(
-            InputErrorKind::UnresolvedImport,
-            file,
-            request.span,
-            message,
-        ))
-    }
-
-    /// The module a request names, or why names imported through it are
-    /// unresolved.
-    fn request_module(
-        &self,
-        file: FileId,
-        request: RequestId,
-    ) -> std::result::Result<ModuleId, &'static str> {
-        match self.store.request(file, request) {
-            RequestTarget::Module(module) => Ok(module),
-            RequestTarget::Script => Err("imported file is not a module"),
-            RequestTarget::Ignored => Err("module is not resolved"),
-        }
+        Err(self
+            .error(
+                InputErrorKind::UnresolvedImport,
+                file,
+                request.span,
+                message,
+            )
+            .into())
     }
 
     /// The best-matching pattern ambient module, as TypeScript's
     /// `resolveExternalModule` chooses it.
     fn pattern(&self, specifier: &str) -> Option<ModuleId> {
         let patterns = self
+            .state
             .patterns
             .iter()
             .map(|(name, module)| (name.as_str(), *module));
@@ -746,20 +1116,7 @@ impl<'p> Linker<'p> {
     /// a later file's ambient module fragment, a module augmentation's own
     /// symbol, or a namespace's.
     fn host_symbol(&self, file: FileId, host: Host) -> Option<SymbolId> {
-        match host {
-            Host::File => {
-                self.file_modules[file.index()].map(|module| self.store.module(module).symbol)
-            }
-            Host::AmbientModule(index) => {
-                Some(match self.ambient_hosts[file.index()][index.index()] {
-                    AmbientHost::Module(module) => self.store.module(module).symbol,
-                    AmbientHost::Fragment(index) => self.fragments[index].symbol,
-                })
-            }
-            Host::Augmentation(request) => Some(self.augmentation(file, request)),
-            Host::Namespace(decl) => self.decl_symbols[file.index()][decl.index()],
-            Host::Global => self.global_augmentations[file.index()],
-        }
+        self.inputs().host_symbol(file, host)
     }
 
     /// Record each `export *` where its host's merges take it: on a file's
@@ -767,7 +1124,7 @@ impl<'p> Linker<'p> {
     /// on a later file's ambient module fragment or a module augmentation,
     /// when it merges (`merge_globals`, `merge_module_augmentation`). The
     /// module a star reaches is read through its request when used.
-    fn collect_stars(&mut self) {
+    fn collect_stars(&mut self) -> Result<()> {
         for file in self.file_ids() {
             for star in &self.facts(file).stars {
                 let request = StarRequest {
@@ -775,21 +1132,34 @@ impl<'p> Linker<'p> {
                     request: star.request,
                     type_only: star.type_only,
                 };
+                if let Some(owner) = self.host_symbol(file, star.host) {
+                    let owner = self.state.store.header_for_symbol(owner);
+                    self.state
+                        .store
+                        .native_headers_mut()
+                        .add_export_star(owner, file, star.request, star.declaration_span)
+                        .map_err(|failure| self.native_merge_failure(failure, Some(owner)))?;
+                }
                 match star.host {
                     Host::File => {
-                        if let Some(module) = self.file_modules[file.index()] {
-                            self.store.add_stars(module, &[request]);
+                        if let Some(module) = self.state.file_modules[file.index()] {
+                            self.state.store.add_stars(module, &[request]);
                         }
                     }
-                    Host::AmbientModule(index) => match self.ambient_hosts[file.index()]
-                        [index.index()]
-                    {
-                        AmbientHost::Module(module) => self.store.add_stars(module, &[request]),
-                        AmbientHost::Fragment(index) => self.fragments[index].stars.push(request),
-                    },
+                    Host::AmbientModule(index) => {
+                        match self.state.ambient_hosts[file.index()][index.index()] {
+                            AmbientHost::Module(module) => {
+                                self.state.store.add_stars(module, &[request])
+                            }
+                            AmbientHost::Fragment(index) => {
+                                self.state.fragments[index].stars.push(request)
+                            }
+                        }
+                    }
                     Host::Augmentation(augmented) => {
                         let symbol = self.augmentation(file, augmented);
-                        self.augmentation_stars
+                        self.state
+                            .augmentation_stars
                             .entry(symbol)
                             .or_default()
                             .push(request);
@@ -798,31 +1168,7 @@ impl<'p> Linker<'p> {
                 }
             }
         }
-    }
-
-    /// Where a scope stores its names. Every scope kind is decided here, for
-    /// both declaration and lookup.
-    fn storage(&self, file: FileId, scope: ScopeId) -> Storage {
-        match self.facts(file).scopes[scope.index()].kind {
-            ScopeKind::Root if !self.file(file).module => Storage::Script,
-            ScopeKind::Global => Storage::Own(Some(Host::Global)),
-            ScopeKind::Members { decl } => Storage::Members(decl),
-            ScopeKind::Namespace { decl } => Storage::Own(Some(Host::Namespace(decl))),
-            ScopeKind::AmbientModule { module } => Storage::Own(Some(Host::AmbientModule(module))),
-            ScopeKind::Augmentation { request } => Storage::Own(Some(Host::Augmentation(request))),
-            ScopeKind::Root
-            | ScopeKind::Unmerged
-            | ScopeKind::ScriptGlobal
-            | ScopeKind::Block
-            | ScopeKind::Catch
-            | ScopeKind::Signature { .. }
-            | ScopeKind::Body
-            | ScopeKind::ExpressionName
-            | ScopeKind::TypeParameters
-            | ScopeKind::Infer
-            | ScopeKind::InferConstraint { .. }
-            | ScopeKind::Enum { .. } => Storage::Own(None),
-        }
+        Ok(())
     }
 
     /// The table a scope declares into, created on first use.
@@ -830,21 +1176,64 @@ impl<'p> Linker<'p> {
         match self.storage(file, scope) {
             Storage::Members(decl) => {
                 let symbol = self.decl_symbol(file, decl);
-                self.store.member_table(symbol)
+                self.state.store.member_table(symbol)
             }
             Storage::Script | Storage::Own(_) => {
-                if let Some(table) = self.scope_tables[file.index()][scope.index()] {
+                if let Some(table) = self.state.scope_tables[file.index()][scope.index()] {
                     return table;
                 }
-                let table = self.store.new_table();
-                self.scope_tables[file.index()][scope.index()] = Some(table);
+                let table = self.state.store.new_table();
+                if let Some((kind, span)) = self.facts(file).scopes[scope.index()].native_owner {
+                    self.state.store.bind_locals_owner(table, file, kind, span);
+                }
+                self.state.scope_tables[file.index()][scope.index()] = Some(table);
                 table
             }
         }
     }
 
     fn decl_symbol(&self, file: FileId, decl: DeclId) -> SymbolId {
-        self.find(self.decl_symbols[file.index()][decl.index()].expect("declared before use"))
+        self.find(self.state.decl_symbols[file.index()][decl.index()].expect("declared before use"))
+    }
+
+    fn declared_symbol(&self, file: FileId, decl: DeclId) -> DeclaredSymbol {
+        DeclaredSymbol {
+            projection: self.decl_symbol(file, decl),
+            header: self
+                .state
+                .store
+                .declaration_header(file, decl)
+                .expect("native declaration precedes its children"),
+        }
+    }
+
+    fn scope_binding_table(&mut self, file: FileId, scope: ScopeId) -> BindingTable {
+        if let Storage::Members(decl) = self.storage(file, scope) {
+            return self
+                .state
+                .store
+                .binding_symbol_table(self.declared_symbol(file, decl), false);
+        }
+        let table = self.scope_table(file, scope);
+        self.state.store.binding_table(table)
+    }
+
+    fn host_binding_table(&mut self, file: FileId, host: Host) -> BindingTable {
+        self.host_table(file, host);
+        self.state.store.binding_symbol_table(
+            self.host_declared_symbol(file, host)
+                .expect("binder export host exists"),
+            true,
+        )
+    }
+
+    fn host_declared_symbol(&self, file: FileId, host: Host) -> Option<DeclaredSymbol> {
+        match host {
+            Host::Namespace(decl) => Some(self.declared_symbol(file, decl)),
+            _ => self
+                .host_symbol(file, host)
+                .map(|symbol| self.state.store.declaration_result(symbol)),
+        }
     }
 
     /// The export table of a host, created on first use. A module
@@ -854,43 +1243,29 @@ impl<'p> Linker<'p> {
         match host {
             Host::Namespace(decl) => {
                 let symbol = self.decl_symbol(file, decl);
-                self.store.export_table(symbol)
+                self.state.store.export_table(symbol)
             }
             Host::Augmentation(request) => {
                 let symbol = self.augmentation(file, request);
-                self.store.export_table(symbol)
+                self.state.store.export_table(symbol)
             }
             Host::Global => {
-                let symbol = match self.global_augmentations[file.index()] {
+                let symbol = match self.state.global_augmentations[file.index()] {
                     Some(symbol) => symbol,
                     None => {
-                        let symbol = self.store.new_symbol(flags::NAMESPACE_MODULE, None);
-                        self.global_augmentations[file.index()] = Some(symbol);
+                        let symbol = self.state.store.new_symbol(flags::NAMESPACE_MODULE, None);
+                        self.state.global_augmentations[file.index()] = Some(symbol);
                         symbol
                     }
                 };
-                self.store.export_table(symbol)
+                self.state.store.export_table(symbol)
             }
             Host::File | Host::AmbientModule(_) => {
                 let symbol = self
                     .host_symbol(file, host)
                     .expect("exporting files and ambient modules have symbols");
-                self.store.export_table(symbol)
+                self.state.store.export_table(symbol)
             }
-        }
-    }
-
-    /// The export table of a host whose members a scope sees, if it exists.
-    fn visible_exports(&self, file: FileId, host: Host) -> Option<TableId> {
-        match host {
-            Host::Namespace(decl) => self.decl_symbols[file.index()][decl.index()]
-                .and_then(|symbol| self.symbol(symbol).exports),
-            Host::Augmentation(request) => self.symbol(self.augmentation(file, request)).exports,
-            Host::Global => self.global_augmentations[file.index()]
-                .and_then(|symbol| self.symbol(symbol).exports),
-            Host::File | Host::AmbientModule(_) => self
-                .host_symbol(file, host)
-                .and_then(|symbol| self.symbol(symbol).exports),
         }
     }
 
@@ -900,18 +1275,96 @@ impl<'p> Linker<'p> {
     fn declare_all(&mut self) -> Result<()> {
         for file in self.file_ids() {
             let facts = self.facts(file);
-            for index in 0..facts.decls.len() {
-                self.declare(file, DeclId::new(index))?;
-            }
-            for index in 0..facts.aliases.len() {
-                self.bind_alias(file, AliasId::new(index))?;
+            for &entry in &facts.binding_order {
+                match entry {
+                    BindingEntry::Declaration(index) => self.declare(file, index)?,
+                    BindingEntry::Alias(index) => self.bind_alias(file, index)?,
+                    BindingEntry::Module(index) => self.bind_module_declaration(file, index)?,
+                    BindingEntry::CommonJsTypeExports(module) => {
+                        let span = match module {
+                            Some(module) => facts.module_declarations[module.index()].span,
+                            None => Span {
+                                start: 0,
+                                end: self.program.sources.get(file).text.as_str().len(),
+                            },
+                        };
+                        let declaration = match module {
+                            Some(_) => super::store::SymbolDeclaration::Module { file, span },
+                            None => super::store::SymbolDeclaration::SourceFile { file, span },
+                        };
+                        let owner = self
+                            .state
+                            .store
+                            .native_headers()
+                            .declaration_symbol(declaration)
+                            .ok_or_else(|| {
+                                self.lookup_failure(
+                                    super::semantic::TypeBindingFailure::NotRetained,
+                                    Some((file, span)),
+                                )
+                            })?;
+                        self.state
+                            .store
+                            .native_headers_mut()
+                            .bind_common_js_type_exports(owner)
+                            .map_err(|failure| self.lookup_failure(failure, Some((file, span))))?;
+                    }
+                }
             }
         }
+        self.state.store.finish_binding_headers();
+        Ok(())
+    }
+
+    fn bind_module_declaration(
+        &mut self,
+        file: FileId,
+        index: super::ids::ModuleDeclarationId,
+    ) -> Result<()> {
+        let declaration = &self.facts(file).module_declarations[index.index()];
+        let table = self.scope_binding_table(file, declaration.scope);
+        let preallocated = declaration.host.map(|host| {
+            self.host_table(file, host);
+            self.host_symbol(file, host)
+                .expect("module host was allocated")
+        });
+        let name = super::ordering::NativeSymbolName::module_declaration(
+            &declaration.name,
+            declaration.global,
+        );
+        let flags = if declaration.value {
+            flags::VALUE_MODULE
+        } else {
+            flags::NAMESPACE_MODULE
+        };
+        self.state
+            .store
+            .bind_module_declaration(table, preallocated, name, flags, file, declaration.span)
+            .map_err(|failure| {
+                self.error(
+                    InputErrorKind::Unsupported,
+                    file,
+                    declaration.span,
+                    format!("native module declaration: {failure:?}"),
+                )
+            })?;
         Ok(())
     }
 
     fn declare(&mut self, file: FileId, index: DeclId) -> Result<()> {
         let decl = &self.facts(file).decls[index.index()];
+        // `bindFunctionOrConstructorType` declares this intermediate
+        // Signature during its final TypeLiteral owner operation below.
+        if matches!(
+            decl.native_kind,
+            SyntaxKind::FunctionType | SyntaxKind::ConstructorType
+        ) && matches!(
+            decl.kind,
+            DeclKind::Member(MemberKind::Call | MemberKind::Construct)
+        ) {
+            assert!(self.state.decl_symbols[file.index()][index.index()].is_some());
+            return Ok(());
+        }
         let site = Site {
             file,
             span: decl.anchor,
@@ -928,35 +1381,448 @@ impl<'p> Linker<'p> {
                 flags::CONCRETE_CLASS
             };
         }
+        if decl.member.as_ref().is_some_and(|member| member.optional) {
+            flags |= flags::OPTIONAL;
+        }
         let declaring = Declaring {
             flags,
             list: decl.list.map(|list| (file, list)),
             site,
         };
-        let symbol = match (decl.lexical, &decl.export) {
-            (Some(scope), _) => {
-                let table = self.scope_table(file, scope);
-                let signature = self.signature_table(file, scope, decl.kind);
-                self.declare_in(table, signature, &decl.name, declaring)?
-            }
-            (None, Some((host, name))) => {
-                let table = self.host_table(file, *host);
-                self.declare_in(table, None, name, declaring)?
-            }
-            (None, None) => unreachable!("collect binds a declaration lexically or as an export"),
+        // `declareModuleMember` creates the local before the export, even
+        // when the navigation projection does not bind a namespace local.
+        let local = if let Some(scope) = decl.native_export_local {
+            Some(self.declare_export_local(file, index, scope, flags, declaring.site.clone())?)
+        } else {
+            None
         };
-        self.decl_symbols[file.index()][index.index()] = Some(symbol);
-        if !decl.members.is_empty() {
-            self.store.add_enum_members(symbol, &decl.members);
+        // `bindAnonymousDeclaration` associates the node without declaring
+        // a lexical/export name. Its children use this same Store symbol.
+        let declared_symbol =
+            if matches!(decl.kind, DeclKind::TypeLiteral | DeclKind::ObjectLiteral)
+                || matches!(
+                    decl.kind,
+                    DeclKind::Function | DeclKind::Parameter | DeclKind::Class
+                ) && decl.lexical.is_none()
+                    && decl.export.is_none()
+            {
+                // `bindFunctionOrConstructorType` allocates the Signature first,
+                // then the final node.Symbol. Both own the same AST declaration;
+                // a table attachment does not invent a native Signature.Parent.
+                let signature = self
+                    .facts(file)
+                    .anonymous_signatures
+                    .get(&index)
+                    .copied()
+                    .map(|signature| {
+                        let declaration = &self.facts(file).decls[signature.index()];
+                        let symbol = self.state.store.new_symbol(
+                            flags::SIGNATURE,
+                            Some(Site {
+                                file,
+                                span: declaration.anchor,
+                                name: declaration.name.clone(),
+                            }),
+                        );
+                        self.state.store.add_declaration(
+                            symbol,
+                            file,
+                            signature,
+                            declaration.native_kind,
+                            false,
+                        );
+                        self.state.store.set_native_name(
+                            symbol,
+                            super::ordering::NativeSymbolName::declaration(
+                                declaration,
+                                Default::default(),
+                            ),
+                        );
+                        self.state.decl_symbols[file.index()][signature.index()] = Some(symbol);
+                        (
+                            symbol,
+                            declaration
+                                .member
+                                .as_ref()
+                                .expect("reserved signature has its native table role")
+                                .key
+                                .clone(),
+                        )
+                    });
+                let symbol = self.state.store.new_symbol(flags, Some(declaring.site));
+                if let Some((signature, key)) = signature {
+                    let table = self
+                        .state
+                        .store
+                        .binding_symbol_table(self.state.store.declaration_result(symbol), false);
+                    self.state
+                        .store
+                        .hold_member(table.projection, &key, signature);
+                    self.state
+                        .store
+                        .bind_table_symbol(table, self.state.store.header_for_symbol(signature));
+                }
+                self.state.store.declaration_result(symbol)
+            } else if let Some(member) = &decl.member {
+                let owner = self.declared_symbol(file, member.owner);
+                if member.key == MemberKey::Dynamic {
+                    let symbol = self.state.store.new_symbol(flags, Some(declaring.site));
+                    self.state.store.add_late_member(owner, symbol);
+                    self.state.store.declaration_result(symbol)
+                } else if matches!(member.key, MemberKey::Private(_))
+                    && member.private_class.is_none()
+                {
+                    // `declareSymbolEx` never inserts InternalSymbolNameMissing
+                    // into a member table. Malformed private declarations outside
+                    // a class still have their distinct node.Symbol attachment.
+                    let symbol = self.state.store.new_symbol(flags, Some(declaring.site));
+                    self.state.store.declaration_result(symbol)
+                } else {
+                    let table = self
+                        .state
+                        .store
+                        .binding_symbol_table(owner, member.static_member);
+                    let context = super::ordering::NativeDeclarationNameContext {
+                        parent: Some(super::ordering::NativeSymbolIdentity::Bound(owner.header)),
+                        private_class: member.private_class.map(|class| {
+                            super::ordering::NativeSymbolIdentity::Bound(
+                                self.declared_symbol(file, class).header,
+                            )
+                        }),
+                    };
+                    let name = super::ordering::NativeSymbolName::declaration(decl, context);
+
+                    self.declare_member(table, &member.key, name, declaring)?
+                }
+            } else if let Some(scope) = decl
+                .lexical
+                .filter(|&scope| matches!(self.storage(file, scope), Storage::Members(_)))
+            {
+                let table = self.scope_binding_table(file, scope);
+                let name = super::ordering::NativeSymbolName::declaration(decl, Default::default());
+
+                self.declare_member(table, &MemberKey::Text(decl.name.clone()), name, declaring)?
+            } else if local.is_some() {
+                let (host, name) = decl
+                    .export
+                    .as_ref()
+                    .expect("paired local has an export placement");
+                let table = self.host_binding_table(file, *host);
+                self.declare_in(table, None, name, declaring)?
+            } else {
+                match (decl.lexical, &decl.export) {
+                    (Some(scope), _) => {
+                        let table = self.scope_binding_table(file, scope);
+                        let signature = self.signature_table(file, scope);
+                        self.declare_in(table, signature, &decl.name, declaring)?
+                    }
+                    (None, Some((host, name))) => {
+                        let table = self.host_binding_table(file, *host);
+                        self.declare_in(table, None, name, declaring)?
+                    }
+                    (None, None) => {
+                        unreachable!("collect binds a declaration lexically or as an export")
+                    }
+                }
+            };
+        let symbol = declared_symbol.projection;
+        self.state
+            .store
+            .add_declaration_flags(declared_symbol, flags);
+        self.state.decl_symbols[file.index()][index.index()] = Some(symbol);
+        if let Some(local) = local {
+            self.state
+                .store
+                .set_declaration_export(local, declared_symbol);
+            self.state.decl_local_symbols[file.index()][index.index()] = Some(local.projection);
+            // Navigation retains its established target/group projection;
+            // raw table readers see the independent local header at this key.
+            if let Some(scope) = decl.lexical {
+                let table = self.scope_table(file, scope);
+                self.occupy(table, &decl.name, symbol);
+            }
+        }
+        if let Some(member) = &decl.member {
+            self.state
+                .store
+                .set_declaration_parent(declared_symbol, self.declared_symbol(file, member.owner));
+        } else if let Some(Storage::Members(owner)) =
+            decl.lexical.map(|scope| self.storage(file, scope))
+        {
+            self.state
+                .store
+                .set_declaration_parent(declared_symbol, self.declared_symbol(file, owner));
+        } else if let Some((host, _)) = &decl.export {
+            if let Some(parent) = self.host_declared_symbol(file, *host) {
+                self.state
+                    .store
+                    .set_declaration_parent(declared_symbol, parent);
+            }
+        }
+        let name_context = super::ordering::NativeDeclarationNameContext {
+            parent: self
+                .state
+                .store
+                .native_header_parent(declared_symbol.header)
+                .map(super::ordering::NativeSymbolIdentity::Bound),
+            private_class: decl
+                .member
+                .as_ref()
+                .and_then(|member| member.private_class)
+                .map(|class| {
+                    super::ordering::NativeSymbolIdentity::Bound(
+                        self.declared_symbol(file, class).header,
+                    )
+                }),
+        };
+        self.state.store.set_declaration_name(
+            declared_symbol,
+            super::ordering::NativeSymbolName::declaration(decl, name_context),
+        );
+        self.state.store.add_declaration_to_header(
+            declared_symbol,
+            file,
+            index,
+            decl.native_kind,
+            flags & flags::VALUE != 0,
+        );
+        if let DeclKind::Namespace { instance } = decl.kind {
+            self.state
+                .store
+                .set_module_instance(declared_symbol, instance);
         }
         if let Some(members) = &decl.interface_members {
-            self.store.add_interface_members(symbol, members);
+            self.state.store.add_interface_members(symbol, members);
         }
-        if let (Some(_), Some((host, name))) = (decl.lexical, &decl.export) {
+        if local.is_none()
+            && let (Some(_), Some((host, name))) = (decl.lexical, &decl.export)
+        {
             let table = self.host_table(file, *host);
             self.export_symbol(table, name, symbol, decl.kind.meanings(), file, decl.anchor)?;
         }
+        if decl.kind == DeclKind::Class {
+            self.bind_class_prototype(declared_symbol)?;
+        }
         Ok(())
+    }
+
+    /// `declareModuleMember`'s local `declareSymbol` operation. Its Includes
+    /// are ExportValue/None while Excludes remain the original declaration's.
+    /// The table's raw header is independent from navigation's meaning slots.
+    fn declare_export_local(
+        &mut self,
+        file: FileId,
+        declaration: DeclId,
+        scope: ScopeId,
+        declaration_flags: u32,
+        site: Site,
+    ) -> Result<DeclaredSymbol> {
+        let binding_table = self.scope_binding_table(file, scope);
+        let table = binding_table.projection;
+        let name = site.name.clone();
+        let includes = if declaration_flags & flags::VALUE != 0 {
+            flags::EXPORT_VALUE
+        } else {
+            0
+        };
+        let decl = &self.facts(file).decls[declaration.index()];
+        let native_name = super::ordering::NativeSymbolName::declaration(decl, Default::default());
+        let header = self
+            .state
+            .store
+            .declare_native_symbol(
+                binding_table,
+                native_name,
+                includes,
+                native_declaration_excludes(declaration_flags),
+            )
+            .map_err(|failure| {
+                self.error(
+                    InputErrorKind::Unsupported,
+                    file,
+                    site.span,
+                    format!("native export-local table: {failure:?}"),
+                )
+            })?;
+        let entry = self.state.store.entry(table, &name);
+        let has_alias = entry.is_some_and(|entry| entry.alias.is_some());
+        let previous =
+            entry.and_then(|entry| entry.member.or_else(|| entry.slots.symbols().next()));
+        let symbol = if let Some(previous) = previous {
+            let previous = self.find(previous);
+            if self.symbol(previous).flags & excluded(declaration_flags) != 0 {
+                if let Some((file, span)) = self.reported(previous, (site.file, site.span)) {
+                    return Err(self
+                        .error(
+                            InputErrorKind::Binding,
+                            file,
+                            span,
+                            format!("duplicate declaration of `{name}`"),
+                        )
+                        .into());
+                }
+                // Native duplicate recovery gives the declaration a fresh
+                // header without replacing the table's original entry.
+                self.state
+                    .store
+                    .new_symbol_projection(includes, Some(site), header)
+            } else {
+                self.state.store.declare_into(previous, includes, site);
+                previous
+            }
+        } else {
+            let symbol = self
+                .state
+                .store
+                .new_symbol_projection(includes, Some(site), header);
+            self.state
+                .store
+                .hold_member(table, &MemberKey::Text(name.clone()), symbol);
+            symbol
+        };
+        if previous.is_some_and(|previous| self.find(previous) == symbol) {
+            self.state
+                .store
+                .hold_member(table, &MemberKey::Text(name), symbol);
+        }
+        let decl = &self.facts(file).decls[declaration.index()];
+        let declared = DeclaredSymbol {
+            projection: symbol,
+            header,
+        };
+        self.state.store.attach_projection(header, symbol);
+        self.state.store.set_declaration_name(
+            declared,
+            super::ordering::NativeSymbolName::declaration(decl, Default::default()),
+        );
+        self.state.store.add_declaration_to_header(
+            declared,
+            file,
+            declaration,
+            decl.native_kind,
+            false,
+        );
+        if has_alias {
+            self.state.conflicts.push((
+                table,
+                self.facts(file).decls[declaration.index()].name.clone(),
+            ));
+        }
+        Ok(declared)
+    }
+
+    /// `bindClassLikeDeclaration` installs a fresh prototype after declaring
+    /// the class symbol and before binding its children. Any existing export,
+    /// including a type-only declaration or alias, receives the duplicate
+    /// diagnostic before the entire table entry is replaced.
+    fn bind_class_prototype(&mut self, parent: DeclaredSymbol) -> Result<()> {
+        let exports = self
+            .state
+            .store
+            .binding_symbol_table(parent, true)
+            .projection;
+        let held = self.held(exports, "prototype");
+        let previous = if let Some(symbol) = distinct(held.slots).first() {
+            self.symbol(*symbol)
+                .sites
+                .first()
+                .map(|site| (site.file, site.span))
+        } else {
+            held.alias.map(|alias| self.alias_site(alias))
+        };
+        if let Some((file, span)) = previous.filter(|&(file, span)| self.reports(file, span.start))
+        {
+            return Err(self
+                .error(
+                    InputErrorKind::Binding,
+                    file,
+                    span,
+                    "export `prototype` conflicts with the class prototype".into(),
+                )
+                .into());
+        }
+        self.state
+            .store
+            .class_prototype(parent, flags::PROPERTY | flags::PROTOTYPE);
+        Ok(())
+    }
+
+    /// Native member `declareSymbol`: compatible roles at one key are one
+    /// symbol even when their lexical meanings differ. A suppressed excluded
+    /// declaration gets a separate symbol; the original table entry survives.
+    fn declare_member(
+        &mut self,
+        table: BindingTable,
+        key: &MemberKey,
+        name: super::ordering::NativeSymbolName,
+        declaring: Declaring,
+    ) -> Result<DeclaredSymbol> {
+        let Declaring {
+            flags: declared,
+            list,
+            site,
+        } = declaring;
+        let header = self
+            .state
+            .store
+            .declare_native_symbol(table, name, declared, native_declaration_excludes(declared))
+            .map_err(|failure| {
+                self.error(
+                    InputErrorKind::Unsupported,
+                    site.file,
+                    site.span,
+                    format!("native member table: {failure:?}"),
+                )
+            })?;
+        let table = table.projection;
+        let held = self.state.store.member(table, key);
+        let symbol = if let Some(symbol) = held {
+            let data = self.symbol(symbol);
+            let repeated = list.is_some_and(|list| data.lists.contains(&list));
+            if conflicts(data.flags, declared, repeated) {
+                if let Some((file, span)) = self.reported(symbol, (site.file, site.span)) {
+                    return Err(self
+                        .error(
+                            InputErrorKind::Binding,
+                            file,
+                            span,
+                            format!("duplicate member declaration of `{}`", site.name),
+                        )
+                        .into());
+                }
+                if data.flags & (flags::GETTER | flags::SETTER) != 0 {
+                    self.state
+                        .store
+                        .add_projection_flags(symbol, flags::GETTER | flags::SETTER);
+                }
+                self.state
+                    .store
+                    .new_symbol_projection(declared, Some(site), header)
+            } else {
+                self.state.store.declare_into(symbol, declared, site);
+                symbol
+            }
+        } else {
+            let symbol = self
+                .state
+                .store
+                .new_symbol_projection(declared, Some(site), header);
+            self.state.store.hold_member(table, key, symbol);
+            symbol
+        };
+        if let Some(list) = list {
+            self.state.store.add_list(symbol, list);
+        }
+        if held.is_none_or(|old| self.find(old) == self.find(symbol)) {
+            if let MemberKey::Text(name) = key {
+                self.occupy(table, name, symbol);
+            }
+        }
+        self.state.store.attach_projection(header, symbol);
+        Ok(DeclaredSymbol {
+            projection: symbol,
+            header,
+        })
     }
 
     /// Declarations of one name in one container must be all exported or
@@ -969,15 +1835,17 @@ impl<'p> Linker<'p> {
                 .iter()
                 .map(|&name| &facts.names[name.index()]);
             if let Some(name) = mixed.find(|name| self.reports(file, name.span.start)) {
-                return Err(self.error(
-                    InputErrorKind::Binding,
-                    file,
-                    name.span,
-                    format!(
-                        "declarations of one name must be all exported or all local: `{}`",
-                        name.text
-                    ),
-                ));
+                return Err(self
+                    .error(
+                        InputErrorKind::Binding,
+                        file,
+                        name.span,
+                        format!(
+                            "declarations of one name must be all exported or all local: `{}`",
+                            name.text
+                        ),
+                    )
+                    .into());
             }
         }
         Ok(())
@@ -1017,7 +1885,9 @@ impl<'p> Linker<'p> {
                         "a UMD global can only be declared in a declaration file"
                     }
                 };
-                return Err(self.error(InputErrorKind::Binding, file, span, message.into()));
+                return Err(self
+                    .error(InputErrorKind::Binding, file, span, message.into())
+                    .into());
             }
         }
         Ok(())
@@ -1053,26 +1923,26 @@ impl<'p> Linker<'p> {
                 };
                 let symbol = match by_name.get(request.specifier.as_str()) {
                     Some(&symbol) => {
-                        self.store.declare_into(symbol, flags, site);
+                        self.state.store.declare_into(symbol, flags, site);
                         symbol
                     }
                     None => {
-                        let symbol = self.store.new_symbol(flags, Some(site));
-                        self.store.export_table(symbol);
+                        let symbol = self.state.store.new_symbol(flags, Some(site));
+                        self.state.store.export_table(symbol);
                         by_name.insert(&request.specifier, symbol);
-                        self.augmentation_order.push((file, id, symbol));
+                        self.state.augmentation_order.push((file, id, symbol));
                         symbol
                     }
                 };
                 symbols[index] = Some(symbol);
             }
-            self.augmentations.push(symbols);
+            self.state.augmentations.push(symbols);
         }
     }
 
     /// The symbol of a module augmentation request.
     fn augmentation(&self, file: FileId, request: RequestId) -> SymbolId {
-        self.augmentations[file.index()][request.index()]
+        self.state.augmentations[file.index()][request.index()]
             .expect("an augmentation request has a symbol")
     }
 
@@ -1089,17 +1959,30 @@ impl<'p> Linker<'p> {
     /// aliases while later merges still change tables; the store marks every
     /// write, so a resolution made before one is redone (`force`), and every
     /// resolution is redone once merging ends, when the store is frozen.
-    fn merge_augmentations(&mut self) -> Result<()> {
-        self.collect_stars();
-        self.merge_globals()?;
-        for (file, request, augmentation) in std::mem::take(&mut self.augmentation_order) {
-            self.merge_module_augmentation(file, request, augmentation)?;
+    fn prepare_checker_inputs(&mut self) -> Result<super::raw::RawBindingSnapshot> {
+        self.collect_stars()?;
+        // Modules use their final binder header before exact_module redirects
+        // navigation requests. Script/Ignored were captured before lexical
+        // augmentation tolerance and must not be recaptured from that view.
+        for file in self.file_ids() {
+            for index in 0..self.file(file).requests.len() {
+                let request = RequestId::new(index);
+                if let RequestTarget::Module(module) = self.state.store.request(file, request) {
+                    let target = super::raw::RawModuleRequest::Module {
+                        header: self
+                            .state
+                            .store
+                            .header_for_symbol(self.state.store.module(module).symbol),
+                        pattern: self.state.pattern_requests.contains(&(file, request)),
+                    };
+                    self.state
+                        .store
+                        .native_headers_mut()
+                        .set_request(file, request, target);
+                }
+            }
         }
-        self.absorb_patterns()?;
-        self.reset_resolutions();
-        self.journal = None;
-        self.store.freeze();
-        Ok(())
+        Ok(self.capture_raw_bindings())
     }
 
     /// TypeScript's `initializeChecker` builds the global table before it
@@ -1117,51 +2000,78 @@ impl<'p> Linker<'p> {
     /// (`isShorthandAmbientModuleSymbol`). Declarations of one table, also
     /// one file's ambient modules of one name, were bound by the binder's
     /// rule (`combine`), as TypeScript's binder binds them.
-    fn merge_globals(&mut self) -> Result<()> {
-        for file in self.file_ids() {
-            if !self.file(file).module {
-                let script = self.scope_tables[file.index()].first().copied().flatten();
-                if let Some(from) = script {
-                    self.run_merges(vec![TableMerge {
+    fn observe_initialization(
+        &mut self,
+        step: super::super::semantic::InitializationStep,
+    ) -> Result<()> {
+        use super::super::semantic::InitializationStep as Step;
+        match step {
+            Step::GlobalThis => self.state.store.initialize_global_this(),
+            Step::Script(file) => {
+                if let Some(from) = self.state.scope_tables[file.index()]
+                    .first()
+                    .copied()
+                    .flatten()
+                {
+                    self.run_projected_merges(vec![TableMerge {
                         into: GLOBAL,
                         from,
                         direction: Direction::Both,
                         stars: None,
+                        parent: None,
                     }])?;
                 }
             }
-            for (name, alias) in std::mem::take(&mut self.global_exports[file.index()]) {
-                let taken = self
-                    .store
-                    .entry(GLOBAL, &name)
-                    .is_some_and(|entry| !entry.slots.is_empty() || entry.alias.is_some());
-                if !taken {
-                    self.store.set_alias(GLOBAL, &name, Some(alias));
+            Step::Umd(file) => {
+                for (name, alias) in std::mem::take(&mut self.state.global_exports[file.index()]) {
+                    let taken = self
+                        .state
+                        .store
+                        .entry(GLOBAL, &name)
+                        .is_some_and(|entry| !entry.slots.is_empty() || entry.alias.is_some());
+                    if !taken {
+                        self.state.store.set_alias(GLOBAL, &name, Some(alias));
+                    }
                 }
             }
-        }
-        for file in self.file_ids() {
-            let Some(symbol) = self.global_augmentations[file.index()] else {
-                continue;
-            };
-            let from = self.store.export_table(symbol);
-            self.run_merges(vec![TableMerge {
-                into: GLOBAL,
-                from,
-                direction: Direction::Both,
-                stars: None,
-            }])?;
-        }
-        for index in 0..self.fragments.len() {
-            let Fragment { module, symbol, .. } = self.fragments[index];
-            let stars = std::mem::take(&mut self.fragments[index].stars);
-            let target = self.store.module(module).symbol;
-            let target = Slots::only(self.meanings_of(target), target);
-            self.mark_merged_into(target);
-            let mut work = Vec::new();
-            self.merge_symbol(target, symbol, Direction::Both, None, &mut work)?;
-            self.run_merges(work)?;
-            self.store.add_stars(module, &stars);
+            Step::GlobalAugmentation(file) => {
+                if let Some(symbol) = self.state.global_augmentations[file.index()] {
+                    let from = self.state.store.export_table(symbol);
+                    self.run_projected_merges(vec![TableMerge {
+                        into: GLOBAL,
+                        from,
+                        direction: Direction::Both,
+                        stars: None,
+                        parent: None,
+                    }])?;
+                }
+            }
+            Step::Undefined => self.state.store.add_undefined_to_globals(),
+            Step::Ambient(source) => {
+                if let Some(index) = self.state.fragments.iter().position(|fragment| {
+                    self.state.store.raw_projection_header(fragment.symbol) == Some(source.0)
+                }) {
+                    let Fragment { module, symbol, .. } = self.state.fragments[index];
+                    let stars = std::mem::take(&mut self.state.fragments[index].stars);
+                    let target = self.state.store.module(module).symbol;
+                    let target = Slots::only(self.meanings_of(target), target);
+                    self.mark_merged_into(target);
+                    let mut work = Vec::new();
+                    self.merge_symbol(target, symbol, Direction::Both, None, &mut work)?;
+                    self.run_projected_merges(work)?;
+                    self.state.store.add_stars(module, &stars);
+                }
+            }
+            Step::Module(site) => {
+                let augmentation = self.augmentation(site.file, site.request);
+                self.merge_module_augmentation(site.file, site.request, augmentation)?;
+            }
+            Step::Complete => {
+                self.absorb_patterns()?;
+                self.reset_resolutions();
+                self.state.resolution.journal = None;
+                self.state.store.freeze();
+            }
         }
         Ok(())
     }
@@ -1185,21 +2095,21 @@ impl<'p> Linker<'p> {
             return Ok(());
         };
         let module = self.exact_module(file, request, module, augmentation);
-        if let Some(stars) = self.augmentation_stars.remove(&augmentation) {
-            self.store.add_stars(module, &stars);
+        if let Some(stars) = self.state.augmentation_stars.remove(&augmentation) {
+            self.state.store.add_stars(module, &stars);
         }
         let data = &self.file(file).requests[request.index()];
         // A JSON module's `export=` is its value, a property.
-        let json = self.store.module(module).json.is_some();
+        let json = self.state.store.module(module).json.is_some();
         let target = if json || self.exports_have(module, "export=") {
-            let resolution = if let Some(file) = self.store.module(module).json {
+            let resolution = if let Some(file) = self.state.store.module(module).json {
                 Self::json_value(file)
             } else {
                 self.settle(|linker| match linker.probe_export(module, "export=") {
-                    Probe::Found(resolution) => Step::Done(resolution),
+                    Probe::Found(found) => Step::Done(found.resolution),
                     Probe::Need(need) => Step::Need(need),
                     Probe::Missing => Step::Done(Resolution::Unresolved("no export =".into())),
-                })
+                })?
             };
             let target = match resolution {
                 Resolution::Found(found) => found.targets().map(|symbol| self.find(symbol)),
@@ -1209,19 +2119,21 @@ impl<'p> Linker<'p> {
                 if !self.reports(file, data.span.start) {
                     return Ok(());
                 }
-                return Err(self.error(
-                    InputErrorKind::Binding,
-                    file,
-                    data.span,
-                    format!(
-                        "cannot augment \"{}\" because it resolves to a non-module entity",
-                        data.specifier
-                    ),
-                ));
+                return Err(self
+                    .error(
+                        InputErrorKind::Binding,
+                        file,
+                        data.span,
+                        format!(
+                            "cannot augment \"{}\" because it resolves to a non-module entity",
+                            data.specifier
+                        ),
+                    )
+                    .into());
             }
             target
         } else {
-            let symbol = self.store.module(module).symbol;
+            let symbol = self.state.store.module(module).symbol;
             Slots::only(self.meanings_of(symbol), symbol)
         };
         if self.excluding(target, augmentation).is_some() {
@@ -1234,10 +2146,10 @@ impl<'p> Linker<'p> {
         // `export *` supplies names only to a module.
         let stars = target
             .container()
-            .and_then(|container| self.store.symbol(container).module);
+            .and_then(|container| self.state.store.symbol(container).module);
         let mut work = Vec::new();
         self.merge_symbol(target, augmentation, Direction::Both, stars, &mut work)?;
-        self.run_merges(work)
+        self.run_projected_merges(work)
     }
 
     /// The module an augmentation through `request` merges into, `module` as
@@ -1265,23 +2177,28 @@ impl<'p> Linker<'p> {
         augmentation: SymbolId,
     ) -> ModuleId {
         let pattern = module;
-        let matched = self.pattern_requests.contains(&(file, request))
-            && self.patterns.iter().any(|&(_, module)| module == pattern);
+        let matched = self.state.pattern_requests.contains(&(file, request))
+            && self
+                .state
+                .patterns
+                .iter()
+                .any(|&(_, module)| module == pattern);
         if !matched
-            || self.store.module(pattern).merged_into
+            || self.state.store.module(pattern).merged_into
             || self.exports_have(pattern, "export=")
         {
             return module;
         }
-        let shorthand = self.store.module(pattern).shorthand
-            && self.store.symbol(augmentation).flags & flags::VALUE_MODULE == 0;
+        let shorthand = self.state.store.module(pattern).shorthand
+            && self.state.store.symbol(augmentation).flags & flags::VALUE_MODULE == 0;
         let exact = self.new_module(None, shorthand, true);
-        self.store.set_pattern(exact, Some(pattern));
-        self.pattern_augmentations.push((exact, pattern));
+        self.state.store.set_pattern(exact, Some(pattern));
+        self.state.pattern_augmentations.push((exact, pattern));
         let specifier = &self.file(file).requests[request.index()].specifier;
-        for &(other, other_request) in &self.pattern_requests {
+        for &(other, other_request) in &self.state.pattern_requests {
             if self.file(other).requests[other_request.index()].specifier == *specifier {
-                self.store
+                self.state
+                    .store
                     .set_request(other, other_request, RequestTarget::Module(exact));
             }
         }
@@ -1292,8 +2209,8 @@ impl<'p> Linker<'p> {
     /// (`Module::merged_into`).
     fn mark_merged_into(&mut self, targets: Slots) {
         for symbol in distinct(targets) {
-            if let Some(module) = self.store.symbol(symbol).module {
-                self.store.set_merged_into(module);
+            if let Some(module) = self.state.store.symbol(symbol).module {
+                self.state.store.set_merged_into(module);
             }
         }
     }
@@ -1305,20 +2222,22 @@ impl<'p> Linker<'p> {
     /// the module's exports then no longer need the pattern to complete
     /// them.
     fn absorb_patterns(&mut self) -> Result<()> {
-        for (module, pattern) in std::mem::take(&mut self.pattern_augmentations) {
-            let stars = self.store.module(pattern).stars.clone();
-            self.store.add_stars(module, &stars);
-            let target = self.store.module(module).symbol;
-            let source = self.store.module(pattern).symbol;
+        for (module, pattern) in std::mem::take(&mut self.state.pattern_augmentations) {
+            let stars = self.state.store.module(pattern).stars.clone();
+            self.state.store.add_stars(module, &stars);
+            let target = self.state.store.module(module).symbol;
+            let source = self.state.store.module(pattern).symbol;
             let target = Slots::only(self.meanings_of(target), target);
             let mut work = Vec::new();
             self.merge_symbol(target, source, Direction::OneWay, None, &mut work)?;
-            self.run_merges(work)?;
-            self.store.set_pattern(module, None);
+            self.run_projected_merges(work)?;
+            self.state.store.set_pattern(module, None);
         }
         Ok(())
     }
 
+    /// Navigation's meaning-separated projection of completed native merge
+    /// work. It cannot supply input identities to the native checker driver.
     /// Merge the tables a checker merge queued (`mergeSymbolTable`), each
     /// entry of `from` into `into`, depth first as TypeScript recurses: the
     /// tables an entry's merge queues merge before the next entry. An
@@ -1327,19 +2246,28 @@ impl<'p> Linker<'p> {
     /// identity, and conflicts recorded against it are still checked. A pair
     /// of tables merges once, so tables that reach each other, as a namespace
     /// exporting an alias of itself can, still finish.
-    fn run_merges(&mut self, work: Vec<TableMerge>) -> Result<()> {
+    fn run_projected_merges(&mut self, work: Vec<TableMerge>) -> Result<()> {
         let mut merged = HashSet::new();
         let mut stack: Vec<(TableMerge, std::vec::IntoIter<(String, Held)>)> = Vec::new();
         let mut queued = work;
         loop {
-            for merge in queued.drain(..).rev() {
+            for merge in std::mem::take(&mut queued).into_iter().rev() {
                 if merge.into == merge.from || !merged.insert((merge.into, merge.from)) {
                     continue;
                 }
+                self.merge_native_members(
+                    merge.from,
+                    merge.into,
+                    merge.direction,
+                    merge.parent,
+                    &mut queued,
+                )?;
                 let mut entries: Vec<(String, Held)> = self
+                    .state
                     .store
                     .table(merge.from)
                     .iter()
+                    .filter(|(_, entry)| entry.member.is_none())
                     .map(|(name, entry)| {
                         let held = Held {
                             slots: entry.slots,
@@ -1356,14 +2284,7 @@ impl<'p> Linker<'p> {
             };
             let merge = *merge;
             match entries.next() {
-                Some((name, source)) => self.merge_entry(
-                    merge.into,
-                    &name,
-                    source,
-                    merge.direction,
-                    merge.stars,
-                    &mut queued,
-                )?,
+                Some((name, source)) => self.merge_entry(merge, &name, source, &mut queued)?,
                 None => {
                     stack.pop();
                 }
@@ -1403,20 +2324,25 @@ impl<'p> Linker<'p> {
     /// checked file, and otherwise TypeScript's choice of one side.
     fn merge_entry(
         &mut self,
-        into: TableId,
+        merge: TableMerge,
         name: &str,
         source: Held,
-        direction: Direction,
-        stars: Option<ModuleId>,
         work: &mut Vec<TableMerge>,
     ) -> Result<()> {
+        let TableMerge {
+            into,
+            direction,
+            stars,
+            parent,
+            ..
+        } = merge;
         let held = self.held(into, name);
         let source_slots = source.slots.map(|symbol| self.find(symbol));
         let alias_clash = source.alias.is_some() && held.alias.is_some();
         let (targets, origin) = if !held.slots.is_empty() || alias_clash {
             (held.slots, Origin::Declared)
         } else if let Some(alias) = held.alias {
-            match self.force(Task::Alias(alias)) {
+            match self.force(Task::Alias(alias))? {
                 Resolution::Found(found) => (
                     found.targets().map(|symbol| self.find(symbol)),
                     Origin::Alias(alias),
@@ -1428,7 +2354,11 @@ impl<'p> Linker<'p> {
                 _ => (Slots::default(), Origin::Unresolved),
             }
         } else if let Some(module) = stars.filter(|&module| !self.module_stars(module).is_empty()) {
-            match self.settle(|linker| linker.star_export(module, name, false)) {
+            match self.settle(|linker| {
+                linker
+                    .star_export(module, name, false)
+                    .map(|found| found.resolution)
+            })? {
                 Resolution::Found(found) => (
                     found.targets().map(|symbol| self.find(symbol)),
                     Origin::Star(module),
@@ -1448,6 +2378,15 @@ impl<'p> Linker<'p> {
                 .iter()
                 .any(|&symbol| self.excluding(targets, symbol).is_some())
         {
+            // `mergeSymbol` keeps the initialized globalThis header on a
+            // conflicting declaration. The separate 2397 diagnostic does
+            // not invalidate native lookup or the installed global type.
+            if targets
+                .symbols()
+                .any(|symbol| self.state.store.is_global_this(symbol))
+            {
+                return Ok(());
+            }
             let mut source_sites = self.sites_of(source_slots);
             source_sites.extend(source.alias.map(|alias| self.alias_site(alias)));
             let (target_sites, values) = match origin {
@@ -1466,25 +2405,28 @@ impl<'p> Linker<'p> {
             // TypeScript keeps a declared target; a resolved alias or star
             // export gives way to the source.
             if matches!(origin, Origin::Alias(_) | Origin::Star(_)) {
-                self.store.set_alias(into, name, source.alias);
+                self.state.store.set_alias(into, name, source.alias);
                 for meaning in each(meaning::ALL) {
                     if let Some(symbol) = source_slots.get(meaning) {
-                        self.store.hold(into, name, meaning, symbol);
+                        self.state.store.hold(into, name, meaning, symbol);
                     }
                 }
             }
             return Ok(());
         }
         self.mark_merged_into(targets);
+        // `mergeSymbol` combines one native name-table entry in actual
+        // target/source order, even if the lexical contract separates its
+        // compatible meanings. Source groups are already internally ordered.
         let reached = targets
             .symbols()
             .fold(0, |meanings, symbol| meanings | self.meanings_of(symbol));
         if !matches!(origin, Origin::Declared) {
             // TypeScript stores the merged symbol where the alias was.
-            self.store.set_alias(into, name, None);
+            self.state.store.set_alias(into, name, None);
             for meaning in each(meaning::ALL) {
                 if let Some(symbol) = targets.get(meaning) {
-                    self.store.hold(into, name, meaning, symbol);
+                    self.state.store.hold(into, name, meaning, symbol);
                 }
             }
         }
@@ -1496,19 +2438,24 @@ impl<'p> Linker<'p> {
             self.debug_assert_placed(into, name, brought, merged);
         }
         if let Some(alias) = source.alias {
-            self.store.set_alias(into, name, Some(alias));
+            self.state.store.set_alias(into, name, Some(alias));
             for symbol in distinct(self.held(into, name).slots) {
-                self.store.add_alias(symbol, alias);
+                self.state.store.add_alias(symbol, alias);
             }
             // The merged symbol is the alias's own, so TS2440 applies to it
             // as to a same-table alias; one way, the alias keeps its own.
             if direction == Direction::Both && !self.held(into, name).slots.is_empty() {
-                let site = self.alias_site(alias);
-                self.conflicts
-                    .push((into, name.to_string(), site.0, site.1));
+                self.state.conflicts.push((into, name.to_string()));
             }
         }
         let merged = self.held(into, name).slots;
+        if let Some(parent) = parent.filter(|_| !held.slots.is_empty()) {
+            for symbol in distinct(merged) {
+                if self.symbol(symbol).checker_merged {
+                    self.state.store.set_symbol_parent(symbol, parent);
+                }
+            }
+        }
         let meanings = each(meaning::ALL)
             .filter(|&meaning| merged.get(meaning).is_some())
             .fold(0, |meanings, meaning| meanings | meaning);
@@ -1531,10 +2478,17 @@ impl<'p> Linker<'p> {
         work: &mut Vec<TableMerge>,
     ) -> Result<SymbolId> {
         let source = self.find(source);
-        let flags = self.store.symbol(source).flags;
+        let flags = self.state.store.symbol(source).flags;
         let with: SmallVec<[SymbolId; 3]> = distinct(targets.map(|symbol| self.find(symbol)))
             .into_iter()
-            .filter(|&target| target != source && merges(self.store.symbol(target).flags, flags))
+            // The checker's initialized globalThis header is already mutable.
+            // All compatible declarations merge into that actual header,
+            // including roles the lexical projection otherwise keeps apart.
+            .filter(|&target| {
+                target != source
+                    && (self.state.store.is_global_this(target)
+                        || merges(self.state.store.symbol(target).flags, flags))
+            })
             .collect();
         let Some((&first, rest)) = with.split_first() else {
             return Ok(source);
@@ -1571,23 +2525,26 @@ impl<'p> Linker<'p> {
         if target == source {
             return Ok(());
         }
-        let (members, exports) = self.store.transfer(target, source, direction);
+        let (members, exports) = self.state.store.transfer(target, source, direction);
+        self.state.store.mark_checker_merged(target);
         if let Some(from) = members {
-            let into = self.store.member_table(target);
+            let into = self.state.store.member_table(target);
             work.push(TableMerge {
                 into,
                 from,
                 direction,
                 stars: None,
+                parent: None,
             });
         }
         if let Some(from) = exports {
-            let into = self.store.export_table(target);
+            let into = self.state.store.export_table(target);
             work.push(TableMerge {
                 into,
                 from,
                 direction,
                 stars,
+                parent: Some(target),
             });
         }
         Ok(())
@@ -1605,8 +2562,9 @@ impl<'p> Linker<'p> {
     fn propagate(&mut self, reached: Slots, merged: Slots) {
         let reached = distinct(reached.map(|symbol| self.find(symbol)));
         for &symbol in &reached {
-            for table in self.store.symbol(symbol).homes.clone() {
+            for table in self.state.store.symbol(symbol).homes.clone() {
                 let entries: Vec<(String, Slots)> = self
+                    .state
                     .store
                     .table(table)
                     .iter()
@@ -1620,16 +2578,16 @@ impl<'p> Linker<'p> {
                             .get(meaning)
                             .is_none_or(|other| self.meanings_of(other) & meaning == 0);
                         if let (true, Some(symbol)) = (free, merged.get(meaning)) {
-                            self.store.hold(table, &name, meaning, symbol);
+                            self.state.store.hold(table, &name, meaning, symbol);
                         }
                     }
                 }
             }
-            if let Some(module) = self.store.symbol(symbol).module {
+            if let Some(module) = self.state.store.symbol(symbol).module {
                 let own = self.meanings_of(symbol);
                 for meaning in each(meaning::ALL).filter(|&meaning| own & meaning == 0) {
                     if let Some(other) = merged.get(meaning) {
-                        self.store.set_merged(module, meaning, other);
+                        self.state.store.set_merged(module, meaning, other);
                     }
                 }
             }
@@ -1663,7 +2621,9 @@ impl<'p> Linker<'p> {
             .chain(others)
             .find(|&&(file, span)| self.reports(file, span.start))
         {
-            Some(&(file, span)) => Err(self.error(InputErrorKind::Binding, file, span, message)),
+            Some(&(file, span)) => Err(self
+                .error(InputErrorKind::Binding, file, span, message)
+                .into()),
             None => Ok(()),
         }
     }
@@ -1671,7 +2631,8 @@ impl<'p> Linker<'p> {
     /// The declared symbols and alias of `table`'s entry for `name`, with
     /// symbols canonical.
     fn held(&self, table: TableId, name: &str) -> Held {
-        self.store
+        self.state
+            .store
             .entry(table, name)
             .map(|entry| Held {
                 slots: entry.slots.map(|symbol| self.find(symbol)),
@@ -1696,7 +2657,7 @@ impl<'p> Linker<'p> {
             .symbols()
             .map(|symbol| self.find(symbol))
             .find(|&target| {
-                target != source && conflicts(self.store.symbol(target).flags, flags, false)
+                target != source && conflicts(self.state.store.symbol(target).flags, flags, false)
             })
     }
 
@@ -1704,7 +2665,7 @@ impl<'p> Linker<'p> {
     fn sites_of(&self, slots: Slots) -> Vec<(FileId, Span)> {
         distinct(slots.map(|symbol| self.find(symbol)))
             .into_iter()
-            .flat_map(|symbol| self.store.symbol(symbol).sites.iter())
+            .flat_map(|symbol| self.state.store.symbol(symbol).sites.iter())
             .map(|site| (site.file, site.span))
             .collect()
     }
@@ -1725,8 +2686,8 @@ impl<'p> Linker<'p> {
             if !seen.insert(star) {
                 continue;
             }
-            let exports = self.store.module(star).exports;
-            if let Some(entry) = self.store.entry(exports, name) {
+            let exports = self.state.store.module(star).exports;
+            if let Some(entry) = self.state.store.entry(exports, name) {
                 let mut sites = self.sites_of(entry.slots);
                 sites.extend(entry.alias.map(|alias| self.alias_site(alias)));
                 return sites;
@@ -1750,18 +2711,18 @@ impl<'p> Linker<'p> {
             },
             json => json,
         };
-        if let Some(&symbol) = self.value_symbols.get(&target) {
+        if let Some(&symbol) = self.state.value_symbols.get(&target) {
             return symbol;
         }
-        let symbol = self.store.new_symbol(flags::PROPERTY, None);
-        self.values.insert(symbol, target.clone());
-        self.value_symbols.insert(target, symbol);
+        let symbol = self.state.store.new_symbol(flags::PROPERTY, None);
+        self.state.values.insert(symbol, target.clone());
+        self.state.value_symbols.insert(target, symbol);
         symbol
     }
 
     /// The value a value symbol stands for (`value_symbol`).
     fn value_of(&self, symbol: SymbolId) -> Option<&ValueTarget> {
-        self.values.get(&self.find(symbol))
+        self.state.values.get(&self.find(symbol))
     }
 
     fn alias_site(&self, alias: AliasRef) -> (FileId, Span) {
@@ -1788,16 +2749,20 @@ impl<'p> Linker<'p> {
     }
 
     /// Run `step` to completion, resolving first each task it needs.
-    fn settle(&mut self, mut step: impl FnMut(&mut Self) -> Step<Resolution>) -> Resolution {
-        if self.store.take_changed() {
+    fn settle(
+        &mut self,
+        mut step: impl FnMut(&mut Self) -> Step<Resolution>,
+    ) -> Result<Resolution> {
+        if self.state.store.take_changed() {
             self.reset_resolutions();
         }
         loop {
             match step(self) {
-                Step::Done(resolution) => return resolution,
+                Step::Done(resolution) => return Ok(resolution),
                 Step::Need(need) => {
-                    self.force(need.task);
+                    self.force(need.task)?;
                 }
+                Step::Failed(failure) => return Err(self.lookup_failure(failure, None)),
             }
         }
     }
@@ -1805,8 +2770,10 @@ impl<'p> Linker<'p> {
     /// Discard every resolution made while augmentations change tables, so
     /// that each is redone against the tables as they now are.
     fn reset_resolutions(&mut self) {
-        self.store.take_changed();
+        self.state.store.take_changed();
         let tasks = self
+            .state
+            .resolution
             .journal
             .as_mut()
             .map(std::mem::take)
@@ -1814,14 +2781,19 @@ impl<'p> Linker<'p> {
         for task in tasks {
             match task {
                 Task::Alias(a) => {
-                    self.alias_states[a.file.index()][a.id.index()] = State::Unvisited
+                    self.state.alias_states[a.file.index()][a.id.index()] = State::Unvisited;
+                    self.state.alias_origins[a.file.index()][a.id.index()] = None;
                 }
-                Task::Ref(r) => self.ref_states[r.file.index()][r.id.index()] = State::Unvisited,
+                Task::Ref(r) => {
+                    self.state.ref_states[r.file.index()][r.id.index()] = State::Unvisited;
+                    self.state.ref_origins[r.file.index()][r.id.index()] = None;
+                    self.state.ref_type_alias_origins[r.file.index()][r.id.index()] = None;
+                }
             }
         }
-        self.export_memo.clear();
-        self.cuts.clear();
-        self.cut_tasks.clear();
+        self.state.resolution.export_memo.clear();
+        self.state.resolution.cuts.clear();
+        self.state.resolution.cut_tasks.clear();
     }
 
     /// A `var` hoisted out of a block may not share its name with that
@@ -1834,8 +2806,8 @@ impl<'p> Linker<'p> {
                     if facts.scopes[scope.index()].kind == ScopeKind::Catch {
                         continue;
                     }
-                    let blocked = self.scope_tables[file.index()][scope.index()]
-                        .and_then(|table| self.store.table(table).get(&decl.name))
+                    let blocked = self.state.scope_tables[file.index()][scope.index()]
+                        .and_then(|table| self.state.store.table(table).get(&decl.name))
                         .and_then(|entry| entry.slots.value())
                         .is_some_and(|symbol| self.symbol(symbol).flags & flags::BLOCK_SCOPED != 0);
                     if blocked && self.reports(file, decl.anchor.start) {
@@ -1847,7 +2819,7 @@ impl<'p> Linker<'p> {
                                 "`var {}` is hoisted past a block-scoped declaration of the same name",
                                 decl.name
                             ),
-                        ));
+                        ).into());
                     }
                 }
             }
@@ -1892,7 +2864,7 @@ impl<'p> Linker<'p> {
         for file in self.file_ids() {
             for (index, decl) in self.facts(file).decls.iter().enumerate() {
                 if merged(decl.kind)
-                    && self.decl_symbols[file.index()][index].is_some()
+                    && self.state.decl_symbols[file.index()][index].is_some()
                     && self.reports(file, decl.anchor.start)
                 {
                     let view = self.decl_symbol(file, DeclId::new(index));
@@ -1953,12 +2925,14 @@ impl<'p> Linker<'p> {
                 } else {
                     continue;
                 };
-                return Err(self.error(
-                    InputErrorKind::Binding,
-                    file,
-                    namespace.anchor,
-                    format!("{message}: `{}`", namespace.name),
-                ));
+                return Err(self
+                    .error(
+                        InputErrorKind::Binding,
+                        file,
+                        namespace.anchor,
+                        format!("{message}: `{}`", namespace.name),
+                    )
+                    .into());
             }
             let generic: Vec<((FileId, DeclId), Vec<TypeParameter<'_>>)> = list
                 .iter()
@@ -1967,7 +2941,7 @@ impl<'p> Linker<'p> {
                     let parameters = decl(key).type_parameters.as_deref()?;
                     let parameters = parameters
                         .iter()
-                        .map(|(name, default)| TypeParameter {
+                        .map(|(name, default, _)| TypeParameter {
                             symbol: self.type_parameter(key, name),
                             name,
                             default: *default,
@@ -1980,15 +2954,17 @@ impl<'p> Linker<'p> {
                 // TypeScript reports every declaration of the view.
                 if let Some(&((file, index), _)) = generic.iter().find(|(key, _)| selects(key)) {
                     let declaration = decl((file, index));
-                    return Err(self.error(
-                        InputErrorKind::Binding,
-                        file,
-                        declaration.anchor,
-                        format!(
-                            "all declarations of `{}` must have identical type parameters",
-                            declaration.name
-                        ),
-                    ));
+                    return Err(self
+                        .error(
+                            InputErrorKind::Binding,
+                            file,
+                            declaration.anchor,
+                            format!(
+                                "all declarations of `{}` must have identical type parameters",
+                                declaration.name
+                            ),
+                        )
+                        .into());
                 }
             }
         }
@@ -2000,59 +2976,75 @@ impl<'p> Linker<'p> {
     /// merged both ways share and a one-way merge keeps apart.
     fn type_parameter(&self, (file, decl): (FileId, DeclId), name: &str) -> Option<SymbolId> {
         let owner = self.decl_symbol(file, decl);
-        let members = self.store.symbol(owner).members?;
-        let entry = self.store.table(members).get(name)?;
-        entry
-            .slots
-            .get(meaning::TYPE)
-            .map(|symbol| self.find(symbol))
+        self.state.store.type_parameter(owner, name)
     }
 
-    /// The parameter table a body-level `var` may redeclare into. Collect
-    /// records a function's parameters before its body's declarations, so
-    /// the table exists by the time a body declaration asks for it.
-    fn signature_table(&self, file: FileId, scope: ScopeId, kind: DeclKind) -> Option<TableId> {
-        if kind.meanings() & meaning::VALUE == 0 {
-            return None;
-        }
+    /// Native function Locals combines its signature and body. Lookup keeps
+    /// these partitions separate, but declarations share the native table's
+    /// exclusion and identity rules in every meaning.
+    fn signature_table(&self, file: FileId, scope: ScopeId) -> Option<TableId> {
         let scopes = &self.facts(file).scopes;
         let ScopeKind::Body = scopes[scope.index()].kind else {
             return None;
         };
         let parent = scopes[scope.index()].parent?;
         matches!(scopes[parent.index()].kind, ScopeKind::Signature { .. })
-            .then(|| self.scope_tables[file.index()][parent.index()])
+            .then(|| self.state.scope_tables[file.index()][parent.index()])
             .flatten()
     }
 
     /// Declare into `table`, merging with compatible same-named declarations.
     fn declare_in(
         &mut self,
-        table: TableId,
+        binding_table: BindingTable,
         parameters: Option<TableId>,
         name: &str,
         declaring: Declaring,
-    ) -> Result<SymbolId> {
-        let entry = self.store.table(table).get(name);
+    ) -> Result<DeclaredSymbol> {
+        let table = binding_table.projection;
+        let entry = self.state.store.table(table).get(name);
         let has_alias = entry.is_some_and(|entry| entry.alias.is_some());
         let mut slots = entry.map(|entry| entry.slots).unwrap_or_default();
-        if slots.value().is_none() {
-            if let Some(parameter) = parameters
-                .and_then(|parameters| self.store.table(parameters).get(name))
-                .and_then(|entry| entry.slots.value())
-            {
-                slots.set(meaning::VALUE, parameter);
+        if let Some(parameters) =
+            parameters.and_then(|parameters| self.state.store.table(parameters).get(name))
+        {
+            for meaning in each(meaning::ALL) {
+                if slots.get(meaning).is_none()
+                    && let Some(parameter) = parameters.slots.get(meaning)
+                {
+                    slots.set(meaning, parameter);
+                }
             }
         }
-        let (file, span) = (declaring.site.file, declaring.site.span);
+        let header = self
+            .state
+            .store
+            .declare_native_symbol(
+                binding_table,
+                super::ordering::NativeSymbolName::Bytes(name.as_bytes().into()),
+                declaring.flags,
+                native_declaration_excludes(declaring.flags),
+            )
+            .map_err(|failure| {
+                self.error(
+                    InputErrorKind::Unsupported,
+                    declaring.site.file,
+                    declaring.site.span,
+                    format!("native declaration table: {failure:?}"),
+                )
+            })?;
         let brought = meanings(declaring.flags);
-        let symbol = self.combine(slots, name, declaring)?;
+        let symbol = self.combine(slots, name, declaring, header)?;
+        self.state.store.attach_projection(header, symbol);
         self.occupy(table, name, symbol);
         self.debug_assert_placed(table, name, brought, symbol);
         if has_alias {
-            self.conflicts.push((table, name.to_string(), file, span));
+            self.state.conflicts.push((table, name.to_string()));
         }
-        Ok(symbol)
+        Ok(DeclaredSymbol {
+            projection: symbol,
+            header,
+        })
     }
 
     /// The symbol a declaration of `name` forms with the same-named symbols
@@ -2062,7 +3054,13 @@ impl<'p> Linker<'p> {
     /// bindings are checked (TS2300, TS2451, TS2567); declarations of other
     /// meanings stay separate symbols. Module augmentations merge by the
     /// checker's rule instead (`merge_entry`).
-    fn combine(&mut self, existing: Slots, name: &str, declaring: Declaring) -> Result<SymbolId> {
+    fn combine(
+        &mut self,
+        existing: Slots,
+        name: &str,
+        declaring: Declaring,
+        header: super::ids::NativeHeaderId,
+    ) -> Result<SymbolId> {
         let Declaring {
             flags: declared,
             list,
@@ -2070,16 +3068,19 @@ impl<'p> Linker<'p> {
         } = declaring;
         let mut merge_with: SmallVec<[SymbolId; 3]> = SmallVec::new();
         for symbol in distinct(existing.map(|symbol| self.find(symbol))) {
-            let flags = self.store.symbol(symbol).flags;
-            let repeated = list.is_some_and(|list| self.store.symbol(symbol).lists.contains(&list));
+            let flags = self.state.store.symbol(symbol).flags;
+            let repeated =
+                list.is_some_and(|list| self.state.store.symbol(symbol).lists.contains(&list));
             if conflicts(flags, declared, repeated) {
                 if let Some((file, span)) = self.reported(symbol, (site.file, site.span)) {
-                    return Err(self.error(
-                        InputErrorKind::Binding,
-                        file,
-                        span,
-                        format!("duplicate declaration of `{name}`"),
-                    ));
+                    return Err(self
+                        .error(
+                            InputErrorKind::Binding,
+                            file,
+                            span,
+                            format!("duplicate declaration of `{name}`"),
+                        )
+                        .into());
                 }
                 merge_with.push(symbol);
             } else if merges(flags, declared) {
@@ -2087,18 +3088,21 @@ impl<'p> Linker<'p> {
             }
         }
         let symbol = match merge_with.split_first() {
-            None => self.store.new_symbol(declared, Some(site)),
+            None => self
+                .state
+                .store
+                .new_symbol_projection(declared, Some(site), header),
             Some((&first, rest)) => {
                 for &other in rest {
                     self.merge_symbols(first, other)?;
                 }
                 let first = self.find(first);
-                self.store.declare_into(first, declared, site);
+                self.state.store.declare_into(first, declared, site);
                 first
             }
         };
         if let Some(list) = list {
-            self.store.add_list(symbol, list);
+            self.state.store.add_list(symbol, list);
         }
         Ok(symbol)
     }
@@ -2116,7 +3120,7 @@ impl<'p> Linker<'p> {
                 .get(meaning)
                 .is_none_or(|other| other == symbol || self.meanings_of(other) & meaning == 0);
             if free {
-                self.store.hold(table, name, meaning, symbol);
+                self.state.store.hold(table, name, meaning, symbol);
             }
         }
     }
@@ -2144,7 +3148,8 @@ impl<'p> Linker<'p> {
 
     /// `Store::unite`, where two modules are unsupported.
     fn unite(&mut self, target: SymbolId, other: SymbolId) -> Result<Option<(SymbolId, SymbolId)>> {
-        self.store
+        self.state
+            .store
             .unite(target, other)
             .map_err(|TwoModules(other)| {
                 let site = &self.symbol(other).sites[0];
@@ -2154,6 +3159,7 @@ impl<'p> Linker<'p> {
                     site.span,
                     "merging two modules is unsupported".into(),
                 )
+                .into()
             })
     }
 
@@ -2167,13 +3173,13 @@ impl<'p> Linker<'p> {
             let Some((target, other)) = self.unite(target, other)? else {
                 continue;
             };
-            let (members, exports) = self.store.transfer(target, other, Direction::Both);
+            let (members, exports) = self.state.store.transfer(target, other, Direction::Both);
             if let Some(from) = exports {
-                let into = self.store.export_table(target);
+                let into = self.state.store.export_table(target);
                 self.merge_tables(from, into, &mut work)?;
             }
             if let Some(from) = members {
-                let into = self.store.member_table(target);
+                let into = self.state.store.member_table(target);
                 self.merge_tables(from, into, &mut work)?;
             }
         }
@@ -2188,16 +3194,31 @@ impl<'p> Linker<'p> {
         into: TableId,
         work: &mut Vec<(SymbolId, SymbolId)>,
     ) -> Result<()> {
-        let entries: Vec<(String, super::store::Entry)> = self.store.drain(from);
+        for (key, source) in self.state.store.member_entries(from) {
+            match self.state.store.member(into, &key) {
+                Some(target) => work.push((target, source)),
+                None => {
+                    self.state.store.hold_member(into, &key, source);
+                    if let MemberKey::Text(name) = &key {
+                        self.occupy(into, name, source);
+                    }
+                }
+            }
+        }
+        let entries: Vec<(String, super::store::Entry)> = self.state.store.drain(from);
         for (name, entry) in entries {
+            if entry.member.is_some() {
+                continue;
+            }
             for meaning in each(meaning::ALL) {
                 let held = self
+                    .state
                     .store
                     .entry(into, &name)
                     .and_then(|destination| destination.slots.get(meaning));
                 match (held, entry.slots.get(meaning)) {
                     (Some(a), Some(b)) => work.push((a, b)),
-                    (None, Some(b)) => self.store.hold(into, &name, meaning, b),
+                    (None, Some(b)) => self.state.store.hold(into, &name, meaning, b),
                     _ => {}
                 }
             }
@@ -2205,7 +3226,7 @@ impl<'p> Linker<'p> {
                 continue;
             };
             let Some(kept) = self.held(into, &name).alias else {
-                self.store.set_alias(into, &name, Some(alias));
+                self.state.store.set_alias(into, &name, Some(alias));
                 continue;
             };
             // TypeScript reports both declarations; the first export stays
@@ -2215,12 +3236,65 @@ impl<'p> Linker<'p> {
                 self.reports(alias.file, span.start)
             }) {
                 let span = self.facts(checked.file).aliases[checked.id.index()].span;
-                return Err(self.error(
-                    InputErrorKind::Binding,
-                    checked.file,
-                    span,
-                    format!("merged declarations both export `{name}`"),
-                ));
+                return Err(self
+                    .error(
+                        InputErrorKind::Binding,
+                        checked.file,
+                        span,
+                        format!("merged declarations both export `{name}`"),
+                    )
+                    .into());
+            }
+        }
+        Ok(())
+    }
+
+    /// `mergeSymbolTable` for the native member-key domain. Unlike lexical
+    /// meaning separation, compatible Property/TypeParameter/signature roles
+    /// at one key merge one way or both with the enclosing checker merge.
+    fn merge_native_members(
+        &mut self,
+        from: TableId,
+        into: TableId,
+        direction: Direction,
+        parent: Option<SymbolId>,
+        work: &mut Vec<TableMerge>,
+    ) -> Result<()> {
+        for (key, source) in self.state.store.member_entries(from) {
+            let source = self.find(source);
+            let target = self.state.store.member(into, &key);
+            let symbol = match target {
+                Some(target) if target == source => target,
+                Some(target) => {
+                    if self.symbol(target).flags & excluded(self.symbol(source).flags) != 0 {
+                        let source_sites: Vec<_> = self
+                            .symbol(source)
+                            .sites
+                            .iter()
+                            .map(|site| (site.file, site.span))
+                            .collect();
+                        let target_sites: Vec<_> = self
+                            .symbol(target)
+                            .sites
+                            .iter()
+                            .map(|site| (site.file, site.span))
+                            .collect();
+                        self.reject("member", &source_sites, &target_sites, false)?;
+                        continue;
+                    }
+                    self.merge_into(target, source, direction, None, work)?;
+                    self.find(target)
+                }
+                None => source,
+            };
+            if let Some(parent) = parent.filter(|_| target.is_some()) {
+                if self.symbol(symbol).checker_merged {
+                    self.state.store.set_symbol_parent(symbol, parent);
+                }
+            }
+            self.state.store.hold_member(into, &key, symbol);
+            if let MemberKey::Text(name) = &key {
+                self.occupy(into, name, symbol);
             }
         }
         Ok(())
@@ -2241,7 +3315,7 @@ impl<'p> Linker<'p> {
         let mut merge = Vec::new();
         for meaning in each(meanings) {
             match held.slots.get(meaning) {
-                None => self.store.hold(table, name, meaning, symbol),
+                None => self.state.store.hold(table, name, meaning, symbol),
                 Some(other) => merge.push(other),
             }
         }
@@ -2250,16 +3324,18 @@ impl<'p> Linker<'p> {
                 continue;
             }
             if let Some((file, span)) = self.reported(other, (file, span)) {
-                return Err(self.error(
-                    InputErrorKind::Binding,
-                    file,
-                    span,
-                    format!("duplicate export `{name}`"),
-                ));
+                return Err(self
+                    .error(
+                        InputErrorKind::Binding,
+                        file,
+                        span,
+                        format!("duplicate export `{name}`"),
+                    )
+                    .into());
             }
         }
         if held.alias.is_some() {
-            self.conflicts.push((table, name.to_string(), file, span));
+            self.state.conflicts.push((table, name.to_string()));
         }
         Ok(())
     }
@@ -2268,6 +3344,45 @@ impl<'p> Linker<'p> {
         let alias = &self.facts(file).aliases[index.index()];
         let reference = AliasRef { file, id: index };
         let span = alias.span;
+        // Native alias symbols are allocated once at their actual placement;
+        // AliasBind::Both adds a navigation local, not another native header.
+        let (native_table, native_parent, native_name) = match &alias.bind {
+            AliasBind::Lexical { scope, name } => (
+                self.scope_binding_table(file, *scope).native,
+                None,
+                name.as_str(),
+            ),
+            AliasBind::Export { host, name } | AliasBind::Both { host, name, .. } => {
+                let table = self.host_binding_table(file, *host);
+                (
+                    table.native,
+                    self.host_declared_symbol(file, *host),
+                    name.as_str(),
+                )
+            }
+            AliasBind::Global { name } => (
+                self.state.store.native_global_exports(file),
+                self.host_declared_symbol(file, Host::File),
+                name.as_str(),
+            ),
+        };
+        self.state
+            .store
+            .bind_native_alias(
+                native_table,
+                native_name,
+                reference,
+                native_parent,
+                alias.native_kind,
+            )
+            .map_err(|failure| {
+                self.error(
+                    InputErrorKind::Unsupported,
+                    file,
+                    span,
+                    format!("native alias table: {failure:?}"),
+                )
+            })?;
         let bind = |linker: &mut Self, table: TableId, name: &str| -> Result<()> {
             let held = linker.held(table, name);
             if let Some(kept) = held.alias {
@@ -2277,18 +3392,20 @@ impl<'p> Linker<'p> {
                     .into_iter()
                     .find(|&(file, span)| linker.reports(file, span.start))
                 {
-                    return Err(linker.error(
-                        InputErrorKind::Binding,
-                        file,
-                        span,
-                        format!("duplicate import or export `{name}`"),
-                    ));
+                    return Err(linker
+                        .error(
+                            InputErrorKind::Binding,
+                            file,
+                            span,
+                            format!("duplicate import or export `{name}`"),
+                        )
+                        .into());
                 }
                 return Ok(());
             }
-            linker.store.set_alias(table, name, Some(reference));
+            linker.state.store.set_alias(table, name, Some(reference));
             if !held.slots.is_empty() {
-                linker.conflicts.push((table, name.to_string(), file, span));
+                linker.state.conflicts.push((table, name.to_string()));
             }
             Ok(())
         };
@@ -2310,867 +3427,103 @@ impl<'p> Linker<'p> {
             // A UMD global binds into its file's own table, which joins the
             // global table as `merge_globals` builds it.
             AliasBind::Global { name } => {
-                let exports = &mut self.global_exports[file.index()];
+                let exports = &mut self.state.global_exports[file.index()];
                 if !exports.iter().any(|(other, _)| other == name) {
                     exports.push((name.clone(), reference));
                     return Ok(());
                 }
                 if self.reports(file, span.start) {
-                    return Err(self.error(
-                        InputErrorKind::Binding,
-                        file,
-                        span,
-                        format!("duplicate import or export `{name}`"),
-                    ));
+                    return Err(self
+                        .error(
+                            InputErrorKind::Binding,
+                            file,
+                            span,
+                            format!("duplicate import or export `{name}`"),
+                        )
+                        .into());
                 }
                 Ok(())
             }
         }
     }
 
-    // Resolution
-
-    fn state(&self, task: Task) -> &State {
-        match task {
-            Task::Alias(a) => &self.alias_states[a.file.index()][a.id.index()],
-            Task::Ref(r) => &self.ref_states[r.file.index()][r.id.index()],
-        }
-    }
-    fn set_state(&mut self, task: Task, state: State) {
-        if let Some(journal) = &mut self.journal {
-            journal.push(task);
-        }
-        match task {
-            Task::Alias(a) => self.alias_states[a.file.index()][a.id.index()] = state,
-            Task::Ref(r) => self.ref_states[r.file.index()][r.id.index()] = state,
-        }
-    }
-
-    /// Resolve `task` and everything it needs with an explicit stack. Each
-    /// task on the stack needs the one above it, so a task that needs one
-    /// still in progress closes a cycle through every task between them. All
-    /// of them are unresolved, whichever task resolution happened to start
-    /// from; deciding only the task that detects the cycle would let the
-    /// others' results depend on file order.
-    fn force(&mut self, task: Task) -> Resolution {
-        if self.store.take_changed() {
-            self.reset_resolutions();
-        }
-        // Each frame records whether a fill edge from the frame below pushed it.
-        let mut stack = vec![(task, false)];
-        while let Some(&(top, _)) = stack.last() {
-            if let State::Done(_) = self.state(top) {
-                stack.pop();
-                continue;
-            }
-            self.set_state(top, State::InProgress);
-            self.running = Some(top);
-            let step = match top {
-                Task::Alias(alias) => self.try_alias(alias),
-                Task::Ref(reference) => self.try_ref(reference),
-            };
-            self.running = None;
-            match step {
-                Step::Done(resolution) => {
-                    self.set_state(top, State::Done(resolution));
-                    stack.pop();
-                }
-                Step::Need(need) if matches!(self.state(need.task), State::InProgress) => {
-                    let start = stack
-                        .iter()
-                        .position(|&(task, _)| task == need.task)
-                        .expect("a task in progress is on the stack");
-                    // The cycle's edges: frame to frame, then `top` back to `start`.
-                    let mut fills = (start + 1..stack.len())
-                        .filter(|&index| stack[index].1)
-                        .map(|index| (index - 1, stack[index].0))
-                        .collect::<Vec<_>>();
-                    if need.fill {
-                        fills.push((stack.len() - 1, need.task));
-                    }
-                    let Some(&(lowest, _)) = fills.first() else {
-                        for (member, _) in stack.drain(start..) {
-                            self.set_state(
-                                member,
-                                State::Done(Resolution::Unresolved("circular alias".into())),
-                            );
-                        }
-                        continue;
-                    };
-                    for &(tail, head) in &fills {
-                        self.cuts.insert((stack[tail].0, head));
-                        self.cut_tasks.insert(stack[tail].0);
-                    }
-                    // Rerun from the lowest cut tail; tasks above it resume
-                    // when it needs them again.
-                    for (member, _) in stack.drain(lowest + 1..) {
-                        self.set_state(member, State::Unvisited);
-                    }
-                }
-                Step::Need(need) => stack.push((need.task, need.fill)),
-            }
-        }
-        match self.state(task) {
-            State::Done(resolution) => resolution.clone(),
-            _ => unreachable!("forced task is resolved"),
-        }
-    }
-
-    fn done(&self, task: Task) -> Option<&Resolution> {
-        match self.state(task) {
-            State::Done(resolution) => Some(resolution),
-            _ => None,
-        }
-    }
-
-    /// Probe one table for `name` in `mask`. A mask of every meaning returns
-    /// the first entry's meanings, as for export specifiers.
-    fn probe(&self, table: TableId, name: &str, mask: u8, type_context: bool) -> Probe {
-        self.probe_entry(table, name, mask, type_context, false)
-    }
-
-    /// `probe` for a lexical lookup, to which export specifiers are invisible
-    /// even in the export table of an enclosing namespace.
-    fn probe_lexical(&self, table: TableId, name: &str, mask: u8, type_context: bool) -> Probe {
-        self.probe_entry(table, name, mask, type_context, true)
-    }
-
-    fn probe_entry(
-        &self,
-        table: TableId,
-        name: &str,
-        mask: u8,
-        type_context: bool,
-        lexical: bool,
-    ) -> Probe {
-        let Some(entry) = self.store.table(table).get(name) else {
-            return Probe::Missing;
-        };
-        let mut found =
-            Meanings::new(entry.slots.map(|symbol| self.find(symbol))).select(mask, type_context);
-        let alias = entry.alias.filter(|alias| {
-            !lexical || !self.facts(alias.file).aliases[alias.id.index()].export_only
-        });
-        if let Some(alias) = alias {
-            let task = Task::Alias(alias);
-            let cut = !found.is_empty()
-                && self
-                    .running
-                    .is_some_and(|running| self.cuts.contains(&(running, task)));
-            if found.needs(mask) && !cut {
-                match self.done(task) {
-                    None => {
-                        return Probe::Need(Need {
-                            task,
-                            fill: !found.is_empty(),
-                        });
-                    }
-                    Some(Resolution::Found(targets)) => {
-                        found.fill_missing(*targets, mask, type_context)
-                    }
-                    // A value supplies no other meaning.
-                    Some(Resolution::Value { type_only, .. })
-                        if !selects_value(mask, *type_only, type_context) => {}
-                    Some(other) if found.is_empty() => return Probe::Found(other.clone()),
-                    Some(_) => {}
-                }
-            }
-        }
-        if found.is_empty() {
-            Probe::Missing
-        } else {
-            Probe::Found(Resolution::Found(found))
-        }
-    }
-
-    /// Tables consulted for a scope: its locals, then any export table whose
-    /// members are visible inside it.
-    fn lookup_tables(&self, file: FileId, scope: ScopeId) -> SmallVec<[TableId; 2]> {
-        let mut tables = SmallVec::new();
-        match self.storage(file, scope) {
-            Storage::Script => tables.push(GLOBAL),
-            Storage::Members(decl) => {
-                if let Some(symbol) = self.decl_symbols[file.index()][decl.index()] {
-                    tables.extend(self.symbol(symbol).members);
-                }
-            }
-            Storage::Own(host) => {
-                tables.extend(self.scope_tables[file.index()][scope.index()]);
-                tables.extend(host.and_then(|host| self.visible_exports(file, host)));
-            }
-        }
-        tables
-    }
-
-    /// Lexical lookup from `scope` outward to the global table.
-    fn lookup(
-        &self,
-        file: FileId,
-        scope: ScopeId,
-        name: &str,
-        mask: u8,
-        type_context: bool,
-    ) -> Step<Resolution> {
-        let facts = self.facts(file);
-        let mut current = Some(scope);
-        let mut global = false;
-        while let Some(index) = current {
-            let scope = &facts.scopes[index.index()];
-            // An infer constraint sees only its own declaration's name.
-            if let ScopeKind::InferConstraint { decl } = scope.kind {
-                let own = &facts.decls[decl.index()];
-                if own.name == name && mask & meaning::TYPE != 0 {
-                    if let Some(symbol) = self.decl_symbols[file.index()][decl.index()] {
-                        return Step::Done(Resolution::Found(Meanings::new(Slots::only(
-                            meaning::TYPE,
-                            self.find(symbol),
-                        ))));
-                    }
-                }
-            }
-            // Enum initializers see the enum's members, which are not targets.
-            if let ScopeKind::Enum { decl } = scope.kind {
-                let member = self.decl_symbols[file.index()][decl.index()].is_some_and(|symbol| {
-                    self.symbol(symbol).enum_members.iter().any(|m| m == name)
-                });
-                if member {
-                    return Step::Done(Resolution::NotReference("enum member"));
-                }
-            }
-            for table in self.lookup_tables(file, index) {
-                global |= table == GLOBAL;
-                match self.probe_lexical(table, name, mask, type_context) {
-                    Probe::Found(resolution) => return Step::Done(resolution),
-                    Probe::Need(task) => return Step::Need(task),
-                    Probe::Missing => {}
-                }
-            }
-            // A non-arrow function binds `arguments` around its parameters
-            // and body, before any outer declaration.
-            if scope.kind == (ScopeKind::Signature { arguments: true })
-                && name == "arguments"
-                && mask & meaning::VALUE != 0
-            {
-                return Step::Done(Resolution::NotReference("implicit arguments object"));
-            }
-            current = scope.parent;
-        }
-        if !global {
-            match self.probe_lexical(GLOBAL, name, mask, type_context) {
-                Probe::Found(resolution) => return Step::Done(resolution),
-                Probe::Need(task) => return Step::Need(task),
-                Probe::Missing => {}
-            }
-        }
-        Step::Done(match name {
-            "globalThis" => Resolution::GlobalThis,
-            "undefined" => Resolution::NotReference("built-in value"),
-            _ => Resolution::Unresolved(format!("cannot find `{name}`")),
-        })
-    }
-
-    /// An export of a module, following `export =`, local exports, and star
-    /// re-exports. Conflicting star exports are ambiguous.
-    fn resolve_export(&mut self, module: ModuleId, name: &str) -> Step<Resolution> {
-        // A task with cuts sees a lookup no other task shares.
-        let shared = !self
-            .running
-            .is_some_and(|task| self.cut_tasks.contains(&task));
-        if !shared {
-            return self.resolve_export_uncached(module, name);
-        }
-        if let Some(resolution) = self.export_memo.get(&(module, name.to_string())) {
-            return Step::Done(resolution.clone());
-        }
-        let step = self.resolve_export_uncached(module, name);
-        if let Step::Done(resolution) = &step {
-            self.export_memo
-                .insert((module, name.to_string()), resolution.clone());
-        }
-        step
-    }
-
-    fn resolve_export_uncached(&mut self, module: ModuleId, name: &str) -> Step<Resolution> {
-        let mut current = module;
-        let mut type_only = false;
-        let mut seen = HashSet::from([module]);
-        loop {
-            if let Some(file) = self.store.module(current).json {
-                return Step::Done(self.json_export(file, name));
-            }
-            // A shorthand module lists no exports, so each has whatever
-            // meaning its use asks for, unlike the module's own meanings.
-            if self.store.module(current).shorthand {
-                let module = self.store.module(current);
-                let mut slots = Slots::only(meaning::ALL, module.symbol);
-                for meaning in each(meaning::ALL) {
-                    if let Some(symbol) = module.merged.get(meaning) {
-                        slots.set(meaning, symbol);
-                    }
-                }
-                return Step::Done(Resolution::Found(Meanings::new(slots).restrict(type_only)));
-            }
-            // Explicit exports, including type exports beside `export =`.
-            if name != "export=" {
-                match self.probe_export(current, name) {
-                    Probe::Found(resolution) => return Step::Done(restrict(resolution, type_only)),
-                    Probe::Need(task) => return Step::Need(task),
-                    Probe::Missing => {}
-                }
-            }
-            if !self.exports_have(current, "export=") || name == "export=" {
-                break;
-            }
-            let found = match self.probe_export(current, "export=") {
-                Probe::Need(task) => return Step::Need(task),
-                Probe::Found(Resolution::Found(found)) => found,
-                // An `export =` of a value exposes its type's properties
-                // (`getExternalModuleMember`).
-                Probe::Found(Resolution::Value {
-                    target,
-                    type_only: value_type_only,
-                }) => {
-                    let type_only = type_only || value_type_only;
-                    if name == "default" {
-                        return Step::Done(Resolution::Value { target, type_only });
-                    }
-                    return Step::Done(
-                        self.value_property(&target, name, type_only)
-                            .unwrap_or_else(|| no_property(name)),
-                    );
-                }
-                Probe::Found(other) => return Step::Done(other),
-                Probe::Missing => unreachable!("entry exists"),
-            };
-            if name == "default" {
-                return Step::Done(Resolution::Found(found.restrict(type_only)));
-            }
-            type_only |= found.members_type_only(Reach::ExportAssignment);
-            // An `export =` of another module object exposes its exports.
-            let target = found
-                .container()
-                .and_then(|container| self.symbol(container).module);
-            if let Some(target) = target {
-                if !seen.insert(target) {
-                    return Step::Done(Resolution::Unresolved("circular export =".into()));
-                }
-                current = target;
-                continue;
-            }
-            return match self.member(found, name, meaning::ALL, true) {
-                Step::Done(resolution) => Step::Done(restrict(resolution, type_only)),
-                need => need,
-            };
-        }
-        if name == "default" {
-            return Step::Done(Resolution::Unresolved("no default export".into()));
-        }
-        self.star_export(current, name, type_only)
-    }
-
-    /// `probe` of a module's export table for every meaning of `name`. An
-    /// augmented specifier's module that has not yet absorbed its pattern
-    /// has the pattern's exports in the meanings it lacks, as TypeScript's
-    /// module for the specifier has them from its first augmentation on.
-    fn probe_export(&self, module: ModuleId, name: &str) -> Probe {
-        let data = self.store.module(module);
-        let own = self.probe(data.exports, name, meaning::ALL, true);
-        let Some(pattern) = data.pattern else {
-            return own;
-        };
-        let pattern = self.probe(self.store.module(pattern).exports, name, meaning::ALL, true);
-        match (own, pattern) {
-            (Probe::Need(need), _) | (_, Probe::Need(need)) => Probe::Need(need),
-            (Probe::Missing, pattern) => pattern,
-            (Probe::Found(Resolution::Found(mut found)), Probe::Found(Resolution::Found(more))) => {
-                found.fill_missing(more, meaning::ALL, true);
-                Probe::Found(Resolution::Found(found))
-            }
-            (own, _) => own,
-        }
-    }
-
-    /// Whether a module's export table, completed as `probe_export` completes
-    /// it, has an entry for `name`.
-    fn exports_have(&self, module: ModuleId, name: &str) -> bool {
-        let data = self.store.module(module);
-        self.store.table(data.exports).contains_key(name)
-            || data.pattern.is_some_and(|pattern| {
-                let exports = self.store.module(pattern).exports;
-                self.store.table(exports).contains_key(name)
-            })
-    }
-
-    /// A module's star exports, completed as `probe_export` completes its
-    /// exports, in declaration order.
-    fn module_stars(&self, module: ModuleId) -> SmallVec<[(ModuleId, bool); 2]> {
-        let data = self.store.module(module);
-        let pattern = data
-            .pattern
-            .map(|pattern| self.store.module(pattern).stars.iter());
-        data.stars
-            .iter()
-            .chain(pattern.into_iter().flatten())
-            .filter_map(|star| match self.store.request(star.file, star.request) {
-                RequestTarget::Module(target) => Some((target, star.type_only)),
-                RequestTarget::Script | RequestTarget::Ignored => None,
-            })
-            .collect()
-    }
-
-    /// A name reached through `export *`. Each module is searched by its most
-    /// accessible route, and routes to the same declarations are one target;
-    /// different declarations make the name ambiguous.
-    fn star_export(&self, module: ModuleId, name: &str, type_only: bool) -> Step<Resolution> {
-        let mut best: HashMap<ModuleId, bool> = HashMap::from([(module, type_only)]);
-        let mut stack: Vec<(ModuleId, bool)> = self
-            .module_stars(module)
-            .iter()
-            .rev()
-            .map(|&(star, star_type_only)| (star, type_only || star_type_only))
-            .collect();
-        let mut found: Vec<Meanings> = Vec::new();
-        // Values, each once with whether every route to it is type-only.
-        let mut values: Vec<(ValueTarget, bool)> = Vec::new();
-        // Routes whose export of `name` does not resolve. They still export
-        // the name, as TypeScript counts them: alone, the failure is the
-        // result; beside another route, the name is ambiguous (TS2308).
-        let mut failed: Vec<(ModuleId, Resolution)> = Vec::new();
-        while let Some((star, route_type_only)) = stack.pop() {
-            match best.get(&star) {
-                Some(&previous) if previous <= route_type_only => continue,
-                _ => {
-                    best.insert(star, route_type_only);
-                }
-            }
-            if self.store.module(star).shorthand {
-                continue;
-            }
-            match self.probe_export(star, name) {
-                Probe::Need(task) => return Step::Need(task),
-                Probe::Found(Resolution::Found(targets)) => {
-                    let targets = targets.restrict(route_type_only);
-                    match found
-                        .iter_mut()
-                        .find(|other| other.targets() == targets.targets())
-                    {
-                        Some(existing) => existing.merge_routes(targets),
-                        None => found.push(targets),
-                    }
-                }
-                Probe::Found(Resolution::Value { target, type_only }) => {
-                    let type_only = type_only || route_type_only;
-                    match values
-                        .iter_mut()
-                        .find(|(other, _)| self.same_value(other, &target))
-                    {
-                        Some((_, existing)) => *existing &= type_only,
-                        None => values.push((target, type_only)),
-                    }
-                }
-                Probe::Found(resolution) => {
-                    if !failed.iter().any(|(module, _)| *module == star) {
-                        failed.push((star, resolution));
-                    }
-                }
-                Probe::Missing => {
-                    for &(next, next_type_only) in self.module_stars(star).iter().rev() {
-                        stack.push((next, next_type_only || route_type_only));
-                    }
-                }
-            }
-        }
-        Step::Done(match (found.as_slice(), values.as_slice(), failed.len()) {
-            ([], [], 0) => Resolution::Unresolved(format!("`{name}` is not exported")),
-            ([targets], [], 0) => Resolution::Found(*targets),
-            ([], [(target, type_only)], 0) => Resolution::Value {
-                target: target.clone(),
-                type_only: *type_only,
-            },
-            ([], [], 1) => failed.pop().unwrap().1,
-            _ => Resolution::Unresolved(format!("`{name}` is ambiguous among star exports")),
-        })
-    }
-
-    /// Whether two values are one TypeScript symbol. A library member is one
-    /// symbol per interface and name, though TypeScript instantiates an
-    /// array's members per element type (see docs/references.md).
-    fn same_value(&self, a: &ValueTarget, b: &ValueTarget) -> bool {
-        match (a, b) {
-            (
-                ValueTarget::Member { interface, name },
-                ValueTarget::Member {
-                    interface: other,
-                    name: other_name,
-                },
-            ) => self.find(*interface) == self.find(*other) && name == other_name,
-            _ => a == b,
-        }
-    }
-
-    /// A member of the namespace-like target of `qualifier`: an export of a
-    /// module or a namespace. Other targets have properties or members, which
-    /// are not reference targets.
-    fn member(
-        &mut self,
-        qualifier: Meanings,
-        name: &str,
-        mask: u8,
-        type_context: bool,
-    ) -> Step<Resolution> {
-        let Some(container) = qualifier.container() else {
-            return Step::Done(Resolution::NotReference("property"));
-        };
-        // A value a merge met has its type's properties, as a value does.
-        if let Some(target) = self.value_of(container) {
-            let type_only = qualifier.members_type_only(Reach::ExportAssignment);
-            return Step::Done(
-                self.value_property(target, name, type_only)
-                    .unwrap_or(Resolution::NotReference("property")),
-            );
-        }
-        if let Some(module) = self.symbol(container).module {
-            return self.module_member(module, name);
-        }
-        // A same-named value beside a namespace has properties of its own.
-        let value = qualifier
-            .targets()
-            .value()
-            .filter(|&value| self.find(value) != self.find(container));
-        let symbol = self.symbol(container);
-        if let Some(exports) = symbol.exports {
-            match self.probe(exports, name, mask, type_context) {
-                Probe::Found(resolution) => return Step::Done(resolution),
-                Probe::Need(task) => return Step::Need(task),
-                Probe::Missing => {}
-            }
-        }
-        let member_kinds =
-            flags::CLASS | flags::FUNCTION | flags::FUNCTION_SCOPED | flags::BLOCK_SCOPED;
-        Step::Done(if symbol.flags & flags::ENUM != 0 {
-            Resolution::NotReference("enum member")
-        } else if symbol.flags & member_kinds != 0
-            || value.is_some()
-            // A namespace that exports nothing has no export table either.
-            || symbol.exports.is_none() && symbol.flags & flags::NAMESPACE == 0
-        {
-            Resolution::NotReference("property")
-        } else {
-            Resolution::Unresolved(format!("namespace has no exported member `{name}`"))
-        })
-    }
-
-    /// An export of a module named by a qualifier. A shorthand ambient
-    /// module does not list its exports.
-    fn module_member(&mut self, module: ModuleId, name: &str) -> Step<Resolution> {
-        if self.store.module(module).shorthand {
-            return Step::Done(Resolution::Unresolved(format!(
-                "`{name}` is a member of a shorthand ambient module"
-            )));
-        }
-        self.resolve_export(module, name)
-    }
-
-    /// A member of `globalThis`: a global type, or a global value other than
-    /// a block-scoped variable.
-    fn global_member(&self, name: &str, mask: u8, type_context: bool) -> Step<Resolution> {
-        let found = match self.probe(GLOBAL, name, mask, type_context) {
-            Probe::Need(task) => return Step::Need(task),
-            Probe::Found(Resolution::Found(found)) => Some(found),
-            _ => None,
-        };
-        let found = found
-            .map(|found| match found.targets().value() {
-                Some(value) if self.symbol(value).flags & flags::BLOCK_SCOPED != 0 => {
-                    found.without_value()
-                }
-                _ => found,
-            })
-            .filter(|found| !found.is_empty());
-        Step::Done(match found {
-            Some(found) => Resolution::Found(found),
-            None => Resolution::Unresolved(format!("`{name}` is not a global property")),
-        })
-    }
-
-    /// The value of a JSON module: its only export, `export=`
-    /// (`bindSourceFileIfExternalModule`).
-    fn json_value(file: FileId) -> Resolution {
-        Resolution::Value {
-            target: ValueTarget::Json {
-                file,
-                value: super::JsonModule::ROOT,
-            },
-            type_only: false,
-        }
-    }
-
-    /// An export of a JSON module as an import or export specifier names it
-    /// (`getExternalModuleMember`): `default` names the value, as its
-    /// synthetic default, even beside a `"default"` key, and any other name a
-    /// property of the value (`value_property`).
-    fn json_export(&self, file: FileId, name: &str) -> Resolution {
-        if matches!(name, "default" | "export=") {
-            return Self::json_value(file);
-        }
-        let value = ValueTarget::Json {
-            file,
-            value: super::JsonModule::ROOT,
-        };
-        self.value_property(&value, name, false)
-            .unwrap_or_else(|| no_property(name))
-    }
-
-    /// The property `name` of a value's type, as TypeScript selects it for
-    /// an import from a module whose `export =` is the value or for a
-    /// qualified name (`getPropertyOfType`, without `Object`'s members):
-    /// another value, or `None` when the type has no such property. An
-    /// object's properties are its keys. A string's, number's, boolean's, or
-    /// array's are the members of its global library interface, from every
-    /// declaration of it; when one extends other types, whose members it has
-    /// too, a name it does not declare is not decided here. A library
-    /// member's own type is not inferred, so its properties are not either.
-    fn value_property(
-        &self,
-        target: &ValueTarget,
-        name: &str,
-        type_only: bool,
-    ) -> Option<Resolution> {
-        let value = |target| Resolution::Value { target, type_only };
-        let (file, at) = match target {
-            ValueTarget::Json { file, value } => (*file, *value),
-            ValueTarget::Member { .. } => {
-                return Some(Resolution::NotReference(
-                    "property of a library member, whose type is not inferred",
-                ));
-            }
-        };
-        let json = self.file(file).json.as_ref().expect("a JSON module's file");
-        if let Some(child) = json.property(at, name) {
-            return Some(value(ValueTarget::Json { file, value: child }));
-        }
-        let interface = json.shape(at).interface()?;
-        let entry = self.store.table(GLOBAL).get(interface)?;
-        let symbol = self.find(entry.slots.get(meaning::TYPE)?);
-        let members = self.store.interface_members(symbol)?;
-        if members.names.iter().any(|member| member == name) {
-            return Some(value(ValueTarget::Member {
-                interface: symbol,
-                name: name.into(),
-            }));
-        }
-        members.inherits.then_some(Resolution::NotReference(
-            "possibly inherited member of a library interface",
-        ))
-    }
-
-    /// What a namespace import, `import = require`, or UMD global denotes:
-    /// the module's `export =` target, or the module itself.
-    fn module_object(&self, module: ModuleId) -> Step<Resolution> {
-        if let Some(file) = self.store.module(module).json {
-            return Step::Done(Self::json_value(file));
-        }
-        if !self.exports_have(module, "export=") {
-            let symbol = self.store.module(module).symbol;
-            let mut slots = Slots::only(self.meanings_of(symbol), symbol);
-            for meaning in each(meaning::ALL) {
-                if let (None, Some(merged)) = (
-                    slots.get(meaning),
-                    self.store.module(module).merged.get(meaning),
-                ) {
-                    slots.set(meaning, merged);
-                }
-            }
-            return Step::Done(Resolution::Found(Meanings::new(slots)));
-        }
-        match self.probe_export(module, "export=") {
-            Probe::Need(task) => Step::Need(task),
-            Probe::Found(resolution) => Step::Done(resolution),
-            Probe::Missing => unreachable!("entry exists"),
-        }
-    }
-
-    fn try_alias(&mut self, alias: AliasRef) -> Step<Resolution> {
-        let facts = self.facts(alias.file);
-        let data = &facts.aliases[alias.id.index()];
-        let step = match &data.kind {
-            AliasKind::Import { request, name } => {
-                match self.request_module(alias.file, *request) {
-                    Ok(module) => match self.resolve_export(module, name) {
-                        // A default import of a declaration module without a
-                        // default export or an `__esModule` marker is its module
-                        // object (synthetic default).
-                        Step::Done(Resolution::Unresolved(_))
-                            if name == "default"
-                                && self.store.module(module).declaration
-                                && !["default", "__esModule"]
-                                    .iter()
-                                    .any(|name| self.exports_have(module, name))
-                                && matches!(data.bind, AliasBind::Lexical { .. }) =>
-                        {
-                            self.module_object(module)
-                        }
-                        step => step,
-                    },
-                    Err(why) => Step::Done(Resolution::Unresolved(why.into())),
-                }
-            }
-            AliasKind::Namespace { request } => match self.request_module(alias.file, *request) {
-                Ok(module) => self.module_object(module),
-                Err(why) => Step::Done(Resolution::Unresolved(why.into())),
-            },
-            AliasKind::SelfModule => match self.file_modules[alias.file.index()] {
-                Some(module) => self.module_object(module),
-                None => Step::Done(Resolution::Unresolved("file is not a module".into())),
-            },
-            AliasKind::Lexical { scope, name } => {
-                self.lookup(alias.file, *scope, name, meaning::ALL, false)
-            }
-            AliasKind::Entity { reference, expand } => {
-                let task = Task::Ref(RefRef {
-                    file: alias.file,
-                    id: *reference,
-                });
-                match self.done(task) {
-                    Some(Resolution::Found(found)) if *expand => Step::Done(Resolution::Found(
-                        found.expanded(|symbol| self.meanings_of(symbol)),
-                    )),
-                    Some(resolution) => Step::Done(resolution.clone()),
-                    None => Step::Need(Need::required(task)),
-                }
-            }
-        };
-        match step {
-            Step::Done(resolution) => Step::Done(restrict(resolution, data.type_only)),
-            need => need,
-        }
-    }
-
-    fn try_ref(&mut self, reference: RefRef) -> Step<Resolution> {
-        let facts = self.facts(reference.file);
-        let data = &facts.refs[reference.id.index()];
-        let name = facts.names[data.token.index()].text.as_str();
-        let step = match data.base {
-            // Lookup already selects the meanings the reference needs from
-            // each table it probes, by the same rule as `mask_resolution`.
-            RefBase::Lexical(scope) => {
-                return self.lookup(reference.file, scope, name, data.meaning, data.type_context);
-            }
-            RefBase::Member(base) => {
-                let base = Task::Ref(RefRef {
-                    file: reference.file,
-                    id: base,
-                });
-                let qualifier = match self.done(base) {
-                    None => return Step::Need(Need::required(base)),
-                    Some(Resolution::Found(found)) => *found,
-                    Some(Resolution::GlobalThis) => {
-                        return self.global_member(name, data.meaning, data.type_context);
-                    }
-                    // A missing property of a value is still a property, as
-                    // the semantic oracle normalizes it (`unresolvedProperty`).
-                    Some(Resolution::Value { target, type_only }) => {
-                        let property = self
-                            .value_property(target, name, *type_only)
-                            .unwrap_or(Resolution::NotReference("property"));
-                        return Step::Done(mask_resolution(
-                            property,
-                            data.meaning,
-                            data.type_context,
-                            name,
-                        ));
-                    }
-                    Some(Resolution::NotReference(_)) => {
-                        return Step::Done(Resolution::NotReference("property"));
-                    }
-                    // A member of an unknown receiver is a property access,
-                    // unless its qualified name can only name a namespace.
-                    Some(Resolution::Unresolved(_)) if data.property => {
-                        return Step::Done(Resolution::NotReference("property"));
-                    }
-                    Some(Resolution::Unresolved(_)) => {
-                        return Step::Done(Resolution::Unresolved(format!(
-                            "the qualifier of `{name}` is unresolved"
-                        )));
-                    }
-                };
-                match self.member(qualifier, name, data.meaning, data.type_context) {
-                    Step::Done(resolution) => Step::Done(restrict(
-                        resolution,
-                        qualifier.members_type_only(Reach::Qualified),
-                    )),
-                    need => need,
-                }
-            }
-            RefBase::Module(request) => match self.request_module(reference.file, request) {
-                // An import type's qualifier names a property of a JSON
-                // module's value, with no synthetic default.
-                Ok(module) => match self.store.module(module).json {
-                    Some(file) => {
-                        let value = ValueTarget::Json {
-                            file,
-                            value: super::JsonModule::ROOT,
-                        };
-                        Step::Done(
-                            self.value_property(&value, name, false)
-                                .unwrap_or_else(|| no_property(name)),
-                        )
-                    }
-                    None => self.module_member(module, name),
-                },
-                Err(why) => Step::Done(Resolution::Unresolved(why.into())),
-            },
-        };
-        match step {
-            Step::Done(found) => Step::Done(mask_resolution(
-                found,
-                data.meaning,
-                data.type_context,
-                name,
-            )),
-            need => need,
-        }
-    }
-
-    /// Resolve every searched occurrence and freeze the index.
-    fn resolve_and_index(&mut self) -> Index {
+    /// Freeze one inventory for every captured file. Lexical resolution is
+    /// demanded only for searched files; dependency names stay cold until a
+    /// checker or import/export continuation actually asks for their symbols.
+    fn resolve_and_index(&mut self) -> Result<(Index, Vec<Vec<super::ids::OccurrenceId>>)> {
         let mut index = index::Builder::default();
+        let mut reference_sources = Vec::with_capacity(self.program.files.len());
         for file in self.file_ids() {
             let mut tokens = Vec::new();
-            if self.search(file) {
+            {
                 let names = &self.facts(file).names;
                 tokens.reserve(names.len());
-                for name in names {
-                    let target = match name.target {
-                        NameTarget::Decl(decl) => {
-                            Target::Symbols(SmallVec::from_elem(self.decl_symbol(file, decl), 1))
+                for (position, name) in names.iter().enumerate() {
+                    let target = if !self.search(file) {
+                        Target::Unsearched
+                    } else {
+                        match name.target {
+                            NameTarget::Decl(decl) => {
+                                // The checker may resolve a parameter Name as an
+                                // expression reference. Preserve that separate
+                                // lexical answer without replacing its public
+                                // declaring-symbol navigation association.
+                                if let Some(reference) =
+                                    self.facts(file).decls[decl.index()].name_reference
+                                {
+                                    self.force(Task::Ref(RefRef {
+                                        file,
+                                        id: reference,
+                                    }))?;
+                                }
+                                Target::Symbols(SmallVec::from_elem(
+                                    self.decl_symbol(file, decl),
+                                    1,
+                                ))
+                            }
+                            NameTarget::Ref(reference) => self.reference_target(
+                                RefRef {
+                                    file,
+                                    id: reference,
+                                },
+                                &mut index,
+                            )?,
+                            NameTarget::Alias(alias) => {
+                                let resolution =
+                                    self.force(Task::Alias(AliasRef { file, id: alias }))?;
+                                self.target(resolution, &mut index)
+                            }
+                            NameTarget::NotReference(why) => Target::NotReference(why),
+                            NameTarget::Unresolved(why) => Target::Unresolved(index.intern(why)),
                         }
-                        NameTarget::Ref(reference) => {
-                            let resolution = self.force(Task::Ref(RefRef {
-                                file,
-                                id: reference,
-                            }));
-                            self.target(resolution, &mut index)
-                        }
-                        NameTarget::Alias(alias) => {
-                            let resolution = self.force(Task::Alias(AliasRef { file, id: alias }));
-                            self.target(resolution, &mut index)
-                        }
-                        NameTarget::NotReference(why) => Target::NotReference(why),
-                        NameTarget::Unresolved(why) => Target::Unresolved(index.intern(why)),
                     };
                     tokens.push(Token {
+                        source: NameId::new(position),
                         span: name.span,
                         name: &name.text,
                         roles: name.roles,
+                        call: name.call,
                         candidate: name.candidate,
                         target,
+                        lexical: name.lexical,
+                        reference: name.reference.as_ref(),
                     });
                 }
             }
-            index.add_file(file, tokens);
+            let occurrences = index.add_file(file, self.search(file), tokens);
+            if let Some(json) = &self.program.files[file.index()].facts.json {
+                index.add_json(file, json);
+            }
+            reference_sources.push(
+                self.facts(file)
+                    .refs
+                    .iter()
+                    .map(|reference| occurrences[reference.token.index()])
+                    .collect(),
+            );
         }
         let aliased: Vec<SymbolId> = self
+            .state
             .store
             .canonical_symbols()
             .filter(|(_, symbol)| !symbol.aliases.is_empty())
@@ -3178,21 +3531,22 @@ impl<'p> Linker<'p> {
             .collect();
         let projected: HashMap<SymbolId, Vec<Site>> = aliased
             .into_iter()
-            .map(|symbol| (symbol, self.projected_sites(symbol)))
-            .collect();
-        index.finish(&self.program.sources, |symbol| {
+            .map(|symbol| self.projected_sites(symbol).map(|sites| (symbol, sites)))
+            .collect::<Result<_>>()?;
+        let index = index.finish(&self.program.sources, |symbol| {
             projected
                 .get(&symbol)
                 .cloned()
                 .unwrap_or_else(|| self.symbol(symbol).sites.clone())
-        })
+        });
+        Ok((index, reference_sources))
     }
 
     /// The declarations a group lists for `symbol`: its own, and those of
     /// what its alias declarations name that it may merge with, as
     /// TypeScript's queries follow an alias among a symbol's declarations to
     /// its target. One way, as the target's group does not list `symbol`'s.
-    fn projected_sites(&mut self, symbol: SymbolId) -> Vec<Site> {
+    fn projected_sites(&mut self, symbol: SymbolId) -> Result<Vec<Site>> {
         let symbol = self.find(symbol);
         let mut sites = self.symbol(symbol).sites.clone();
         let mut reached = vec![symbol];
@@ -3200,7 +3554,7 @@ impl<'p> Linker<'p> {
         while let Some(owner) = stack.pop() {
             let flags = self.symbol(owner).flags;
             for alias in self.symbol(owner).aliases.clone() {
-                let Resolution::Found(found) = self.force(Task::Alias(alias)) else {
+                let Resolution::Found(found) = self.force(Task::Alias(alias))? else {
                     continue;
                 };
                 for target in distinct(found.targets().map(|target| self.find(target))) {
@@ -3217,7 +3571,31 @@ impl<'p> Linker<'p> {
                 }
             }
         }
-        sites
+        Ok(sites)
+    }
+
+    /// Project `resolveEntityName` into the documented lexical query domain.
+    /// A value property of an unresolved receiver is outside Q1 even when
+    /// alias resolution retained a dependency failure for semantic consumers.
+    /// Normalize only this index entry; the completed binding stays intact.
+    fn reference_target(
+        &mut self,
+        reference: RefRef,
+        index: &mut index::Builder,
+    ) -> Result<Target> {
+        let resolution = self.force(Task::Ref(reference))?;
+        let facts = &self.facts(reference.file).refs[reference.id.index()];
+        if facts.property && matches!(resolution, Resolution::Unresolved(_)) {
+            if let super::collect::RefBase::Member(receiver) = facts.base {
+                if matches!(
+                    self.state.ref_states[reference.file.index()][receiver.index()],
+                    State::Done(Resolution::Unresolved(_))
+                ) {
+                    return Ok(Target::NotReference("property"));
+                }
+            }
+        }
+        Ok(self.target(resolution, index))
     }
 
     fn target(&self, resolution: Resolution, index: &mut index::Builder) -> Target {
@@ -3226,6 +3604,22 @@ impl<'p> Linker<'p> {
             // other meanings that a merge gave it, denotes no reference
             // target, as TypeScript's one symbol for them is a property.
             Resolution::Found(found) => {
+                if found.targets().symbols().any(|symbol| {
+                    self.symbol(symbol).intrinsic.is_some()
+                        || self.state.store.is_global_this(symbol)
+                }) {
+                    return Target::NotReference(
+                        if found
+                            .targets()
+                            .symbols()
+                            .any(|symbol| self.state.store.is_global_this(symbol))
+                        {
+                            "built-in globalThis"
+                        } else {
+                            "built-in value"
+                        },
+                    );
+                }
                 if let Some(value) = found.targets().symbols().find_map(|s| self.value_of(s)) {
                     return Target::NotReference(value_reason(value));
                 }
@@ -3238,22 +3632,45 @@ impl<'p> Linker<'p> {
                 }
                 Target::Symbols(symbols)
             }
-            Resolution::GlobalThis => Target::NotReference("built-in globalThis"),
             Resolution::Value { target, .. } => Target::NotReference(value_reason(&target)),
             Resolution::NotReference(why) => Target::NotReference(why),
             Resolution::Unresolved(why) => Target::Unresolved(index.intern(&why)),
         }
     }
 
-    /// An import alias may not share a meaning with a local declaration.
+    /// `checkAliasSymbol`: an import alias may not share a meaning with a
+    /// local declaration. The diagnostic and its suppression belong to the
+    /// actual alias node, independently of which declaration completed the
+    /// conflicting table entry first.
     fn check_conflicts(&mut self) -> Result<()> {
-        for (table, name, file, span) in std::mem::take(&mut self.conflicts) {
-            let Some(entry) = self.store.table(table).get(&name) else {
+        let mut conflicts = std::mem::take(&mut self.state.conflicts);
+        // `checkImportDeclaration`/`checkExportDeclaration` visit their alias
+        // nodes in source order. A later local completing a table entry must
+        // not reorder those checks.
+        conflicts.sort_by_key(|(table, name)| {
+            self.state
+                .store
+                .table(*table)
+                .get(name)
+                .and_then(|entry| entry.alias)
+                .map(|alias| {
+                    (
+                        alias.file.index(),
+                        self.facts(alias.file).aliases[alias.id.index()]
+                            .native_span
+                            .start,
+                    )
+                })
+        });
+        for (table, name) in conflicts {
+            let Some(entry) = self.state.store.table(table).get(&name) else {
                 continue;
             };
             let (Some(alias), slots) = (entry.alias, entry.slots) else {
                 continue;
             };
+            let file = alias.file;
+            let span = self.facts(file).aliases[alias.id.index()].conflict_span;
             // An export specifier of a local names that local; any other
             // alias conflicts on a shared meaning even when it resolves back
             // to the local itself, as an import cycling through its own
@@ -3262,7 +3679,7 @@ impl<'p> Linker<'p> {
                 self.facts(alias.file).aliases[alias.id.index()].kind,
                 AliasKind::Lexical { .. }
             );
-            let overlap = match self.force(Task::Alias(alias)) {
+            let overlap = match self.force(Task::Alias(alias))? {
                 Resolution::Found(found) => {
                     let targets = found.targets();
                     each(meaning::ALL).any(|meaning| {
@@ -3277,12 +3694,14 @@ impl<'p> Linker<'p> {
                 _ => false,
             };
             if overlap && self.reports(file, span.start) {
-                return Err(self.error(
-                    InputErrorKind::Binding,
-                    file,
-                    span,
-                    format!("import or export `{name}` conflicts with a local declaration"),
-                ));
+                return Err(self
+                    .error(
+                        InputErrorKind::Binding,
+                        file,
+                        span,
+                        format!("import or export `{name}` conflicts with a local declaration"),
+                    )
+                    .into());
             }
         }
         Ok(())
@@ -3354,7 +3773,7 @@ fn identical_type_parameters<'a>(
 }
 
 /// Mark a resolution reached through a type-only route.
-fn restrict(resolution: Resolution, type_only: bool) -> Resolution {
+pub(super) fn restrict(resolution: Resolution, type_only: bool) -> Resolution {
     match resolution {
         Resolution::Found(found) => Resolution::Found(found.restrict(type_only)),
         Resolution::Value {
@@ -3371,30 +3790,35 @@ fn restrict(resolution: Resolution, type_only: bool) -> Resolution {
 /// Why a value is not a reference target.
 fn value_reason(target: &ValueTarget) -> &'static str {
     match target {
-        ValueTarget::Json { value, .. } if *value == super::JsonModule::ROOT => JSON_VALUE,
+        ValueTarget::Json { value, .. } if *value == super::JsonFacts::ROOT => JSON_VALUE,
         ValueTarget::Json { .. } => "JSON property",
         ValueTarget::Member { .. } => "member of a library interface",
     }
 }
 
 /// A name that a value's type does not have as a property.
-fn no_property(name: &str) -> Resolution {
-    Resolution::Unresolved(format!("the value has no property `{name}`"))
+pub(super) fn no_property(name: &str) -> Resolution {
+    Resolution::Unresolved(format!("the value has no property `{name}`").into())
 }
 
 /// Select the meanings a reference needs, retaining each target's own access.
-fn mask_resolution(resolution: Resolution, mask: u8, type_context: bool, name: &str) -> Resolution {
+pub(super) fn mask_resolution(
+    resolution: Resolution,
+    mask: u8,
+    type_context: bool,
+    name: &str,
+) -> Resolution {
     match resolution {
         Resolution::Found(found) => {
             let selected = found.select(mask, type_context);
             if selected.is_empty() {
-                Resolution::Unresolved(format!("`{name}` has no matching meaning"))
+                Resolution::Unresolved(format!("`{name}` has no matching meaning").into())
             } else {
                 Resolution::Found(selected)
             }
         }
         Resolution::Value { type_only, .. } if !selects_value(mask, type_only, type_context) => {
-            Resolution::Unresolved(format!("`{name}` is a value with no matching meaning"))
+            Resolution::Unresolved(format!("`{name}` is a value with no matching meaning").into())
         }
         other => other,
     }

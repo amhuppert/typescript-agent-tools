@@ -1,0 +1,219 @@
+[
+  {
+    "config": "tsconfig",
+    "name": "checkedGood",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "checkedName",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      1360,
+      2304
+    ],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "checkedTemplate",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      1360,
+      2304
+    ],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "checkedConstraint",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      1360,
+      2304
+    ],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "checkedInvalidKey",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      1360,
+      2322
+    ],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "checkedInvalidName",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      1360,
+      2322
+    ],
+    "properties": []
+  },
+  {
+    "config": "tsconfig",
+    "name": "quickUnchecked",
+    "summary": "{ [x: string]: number; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "checkedGood",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "checkedName",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      1360,
+      2304
+    ],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "checkedTemplate",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      1360,
+      2304
+    ],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "checkedConstraint",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      1360,
+      2304
+    ],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "checkedInvalidKey",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "checkedInvalidName",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      2322
+    ],
+    "properties": []
+  },
+  {
+    "config": "loose",
+    "name": "quickUnchecked",
+    "summary": "{ [x: string]: number; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "checkedGood",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      1360
+    ],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "checkedName",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      1360,
+      2304
+    ],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "checkedTemplate",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      1360,
+      2304
+    ],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "checkedConstraint",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      1360,
+      2304
+    ],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "checkedInvalidKey",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      1360,
+      2322
+    ],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "checkedInvalidName",
+    "summary": "unknown",
+    "errorType": false,
+    "codes": [
+      1360,
+      2322
+    ],
+    "properties": []
+  },
+  {
+    "config": "exact",
+    "name": "quickUnchecked",
+    "summary": "{ [x: string]: number; }",
+    "errorType": false,
+    "codes": [],
+    "properties": []
+  }
+]

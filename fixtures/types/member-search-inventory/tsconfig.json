@@ -1,0 +1,1 @@
+{"compilerOptions":{"strict":true,"noLib":true,"target":"ES2022","module":"NodeNext","moduleResolution":"NodeNext","resolveJsonModule":true,"esModuleInterop":true,"jsx":"preserve"},"files":["globals.d.ts","roles.ts","view.tsx","scope.ts","json.ts","data.json"]}

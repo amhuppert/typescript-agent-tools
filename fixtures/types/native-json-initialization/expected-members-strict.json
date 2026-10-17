@@ -1,0 +1,386 @@
+[
+  {
+    "name": "own-direct",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 7
+              },
+              "end": {
+                "line": 1,
+                "column": 15
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "data.json",
+            "start": {
+              "line": 1,
+              "column": 8
+            },
+            "end": {
+              "line": 1,
+              "column": 14
+            }
+          },
+          {
+            "file": "main.ts",
+            "start": {
+              "line": 2,
+              "column": 14
+            },
+            "end": {
+              "line": 2,
+              "column": 20
+            }
+          }
+        ]
+      }
+    ],
+    "flags": 33554436,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "location": {
+          "file": "data.json",
+          "start": {
+            "line": 1,
+            "column": 7
+          },
+          "end": {
+            "line": 1,
+            "column": 15
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "own-star",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 7
+              },
+              "end": {
+                "line": 1,
+                "column": 15
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "data.json",
+            "start": {
+              "line": 1,
+              "column": 8
+            },
+            "end": {
+              "line": 1,
+              "column": 14
+            }
+          },
+          {
+            "file": "main.ts",
+            "start": {
+              "line": 2,
+              "column": 14
+            },
+            "end": {
+              "line": 2,
+              "column": 20
+            }
+          }
+        ]
+      }
+    ],
+    "flags": 33554436,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "location": {
+          "file": "data.json",
+          "start": {
+            "line": 1,
+            "column": 7
+          },
+          "end": {
+            "line": 1,
+            "column": 15
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "nullable",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 7
+              },
+              "end": {
+                "line": 1,
+                "column": 14
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "data.json",
+            "start": {
+              "line": 1,
+              "column": 8
+            },
+            "end": {
+              "line": 1,
+              "column": 13
+            }
+          },
+          {
+            "file": "main.ts",
+            "start": {
+              "line": 2,
+              "column": 14
+            },
+            "end": {
+              "line": 2,
+              "column": 19
+            }
+          }
+        ]
+      }
+    ],
+    "flags": 33554436,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "location": {
+          "file": "data.json",
+          "start": {
+            "line": 1,
+            "column": 7
+          },
+          "end": {
+            "line": 1,
+            "column": 14
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "nested-array",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 7
+              },
+              "end": {
+                "line": 1,
+                "column": 16
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "data.json",
+            "start": {
+              "line": 1,
+              "column": 8
+            },
+            "end": {
+              "line": 1,
+              "column": 15
+            }
+          },
+          {
+            "file": "main.ts",
+            "start": {
+              "line": 2,
+              "column": 14
+            },
+            "end": {
+              "line": 2,
+              "column": 21
+            }
+          }
+        ]
+      }
+    ],
+    "flags": 33554436,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "location": {
+          "file": "data.json",
+          "start": {
+            "line": 1,
+            "column": 7
+          },
+          "end": {
+            "line": 1,
+            "column": 16
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "whole-object",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "PropertyAssignment",
+            "location": {
+              "file": "data.json",
+              "start": {
+                "line": 1,
+                "column": 2
+              },
+              "end": {
+                "line": 1,
+                "column": 5
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "data.json",
+            "start": {
+              "line": 1,
+              "column": 3
+            },
+            "end": {
+              "line": 1,
+              "column": 4
+            }
+          },
+          {
+            "file": "main.ts",
+            "start": {
+              "line": 2,
+              "column": 14
+            },
+            "end": {
+              "line": 2,
+              "column": 15
+            }
+          }
+        ]
+      }
+    ],
+    "flags": 33554436,
+    "origins": [
+      {
+        "kind": "PropertyAssignment",
+        "location": {
+          "file": "data.json",
+          "start": {
+            "line": 1,
+            "column": 2
+          },
+          "end": {
+            "line": 1,
+            "column": 5
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "whole-string",
+    "groups": [
+      {
+        "origins": [
+          {
+            "kind": "PropertySignature",
+            "location": {
+              "file": "globals.d.ts",
+              "start": {
+                "line": 5,
+                "column": 29
+              },
+              "end": {
+                "line": 5,
+                "column": 35
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "file": "globals.d.ts",
+            "start": {
+              "line": 5,
+              "column": 29
+            },
+            "end": {
+              "line": 5,
+              "column": 35
+            }
+          },
+          {
+            "file": "main.ts",
+            "start": {
+              "line": 2,
+              "column": 14
+            },
+            "end": {
+              "line": 2,
+              "column": 20
+            }
+          }
+        ]
+      }
+    ],
+    "flags": 4,
+    "origins": [
+      {
+        "kind": "PropertySignature",
+        "location": {
+          "file": "globals.d.ts",
+          "start": {
+            "line": 5,
+            "column": 29
+          },
+          "end": {
+            "line": 5,
+            "column": 35
+          }
+        }
+      }
+    ]
+  }
+]

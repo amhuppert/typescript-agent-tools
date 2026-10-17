@@ -1,0 +1,181 @@
+{
+  "revision": "92fe6ab06fbea2c4b6a305689f8cf336173eef81",
+  "baselineManifest": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-baseline/command-center-manifest.json",
+  "sources": [
+    {
+      "file": "src/lib/specs/execution-service.ts",
+      "sha256": "5b097f165850936a775642e17ab9da2758a0da02e0cdacf1d14146ac2edb84a7",
+      "bytes": 101599,
+      "tracked": true,
+      "defaultLibrary": false,
+      "externalLibrary": false,
+      "captured": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/0",
+      "original": "/Users/alex/github/command-center/src/lib/specs/execution-service.ts"
+    },
+    {
+      "file": "src/lib/specs/workflow-cleanup-port.ts",
+      "sha256": "e8c64277a0fc46dd5aa76d909c7228b6cd6753ad8aa81ef6638fe15157047491",
+      "bytes": 1891,
+      "tracked": true,
+      "defaultLibrary": false,
+      "externalLibrary": false,
+      "captured": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/1",
+      "original": "/Users/alex/github/command-center/src/lib/specs/workflow-cleanup-port.ts"
+    },
+    {
+      "file": "src/lib/agent-gateway/route-handlers.ts",
+      "sha256": "bc78d61ff67550459d52e50b52b98530582de3501391af4e7673c6582b0d1939",
+      "bytes": 4130,
+      "tracked": true,
+      "defaultLibrary": false,
+      "externalLibrary": false,
+      "captured": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/2",
+      "original": "/Users/alex/github/command-center/src/lib/agent-gateway/route-handlers.ts"
+    },
+    {
+      "file": "src/components/CollapsibleText.tsx",
+      "sha256": "5a929889f25698f0e19bf71e40bf84c85b3266e0aa2248692c6ab48945f489d1",
+      "bytes": 1902,
+      "tracked": true,
+      "defaultLibrary": false,
+      "externalLibrary": false,
+      "captured": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/3",
+      "original": "/Users/alex/github/command-center/src/components/CollapsibleText.tsx"
+    },
+    {
+      "file": "src/lib/notepads/service.ts",
+      "sha256": "47e6f966c40d306c78d58ac436d0d4343a875c6af47c91937f10d1755e3ef5d0",
+      "bytes": 31656,
+      "tracked": true,
+      "defaultLibrary": false,
+      "externalLibrary": false,
+      "captured": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/4",
+      "original": "/Users/alex/github/command-center/src/lib/notepads/service.ts"
+    },
+    {
+      "file": "src/lib/workflow-graph/workflow-manager.test.ts",
+      "sha256": "a0ee3cc0ba6a7afb528490c61d53365673fff582ec9cb86d0ceb5cef6cf98c9b",
+      "bytes": 342467,
+      "tracked": true,
+      "defaultLibrary": false,
+      "externalLibrary": false,
+      "captured": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/5",
+      "original": "/Users/alex/github/command-center/src/lib/workflow-graph/workflow-manager.test.ts"
+    },
+    {
+      "file": "src/lib/workflow-graph/execution-loop.test.ts",
+      "sha256": "cfafc8a9306a63966f3bb54fcd294b07105912b7ce98a23ae3d7b2bc9cca572e",
+      "bytes": 318517,
+      "tracked": true,
+      "defaultLibrary": false,
+      "externalLibrary": false,
+      "captured": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/6",
+      "original": "/Users/alex/github/command-center/src/lib/workflow-graph/execution-loop.test.ts"
+    },
+    {
+      "file": "src/lib/workflow-graph/iteration-orchestrator.test.ts",
+      "sha256": "826eba4d2c41112703d174ec0ccb3bdfe744d537754c6783ebe3a03dfde6e374",
+      "bytes": 315399,
+      "tracked": true,
+      "defaultLibrary": false,
+      "externalLibrary": false,
+      "captured": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/7",
+      "original": "/Users/alex/github/command-center/src/lib/workflow-graph/iteration-orchestrator.test.ts"
+    },
+    {
+      "file": "src/features/tickets/components/TicketChildSummary.tsx",
+      "sha256": "0e1f0b3f4ff75ff28a94d0e22abd841f432152f814be3e38f11f45458d135fa7",
+      "bytes": 2052,
+      "tracked": true,
+      "defaultLibrary": false,
+      "externalLibrary": false,
+      "captured": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/8",
+      "original": "/Users/alex/github/command-center/src/features/tickets/components/TicketChildSummary.tsx"
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts",
+      "sha256": "d6b1eba8496bdd0eed6fc8a685768fe01b2da4a0388b5fe7df558290bffcf32f",
+      "bytes": 2349483,
+      "tracked": false,
+      "defaultLibrary": true,
+      "externalLibrary": false,
+      "captured": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/9",
+      "original": "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.dom.d.ts"
+    },
+    {
+      "file": "../typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts",
+      "sha256": "6388847232654d7fcbed7fe89ea511a65ad1f5104b41e905c43f90910e1408b6",
+      "bytes": 218947,
+      "tracked": false,
+      "defaultLibrary": true,
+      "externalLibrary": true,
+      "captured": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/10",
+      "original": "/Users/alex/github/typescript-agent-tools/.cache/compiler-oracles/typescript-darwin-x64-7.0.2/package/lib/lib.es5.d.ts"
+    },
+    {
+      "file": "node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts",
+      "sha256": "a6ab1871d46ed14e4ce86821419395f97d5b1ee9561caf875448b698ceeae340",
+      "bytes": 1860055,
+      "tracked": false,
+      "defaultLibrary": false,
+      "externalLibrary": true,
+      "captured": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/11",
+      "original": "/Users/alex/github/command-center/node_modules/@cursor/sdk/dist/esm/vendor/cursor-sdk-shared/delta-types.d.ts"
+    },
+    {
+      "file": ".next/types/validator.ts",
+      "sha256": "d6be539777f0effa658c0f0f821df7ac1c17f44b320c5b04b1672c36cb0ec5f0",
+      "bytes": 146385,
+      "tracked": false,
+      "defaultLibrary": false,
+      "externalLibrary": false,
+      "captured": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/12",
+      "original": "/Users/alex/github/command-center/.next/types/validator.ts"
+    },
+    {
+      "file": "synthetic-annotated.ts",
+      "captured": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/synthetic-annotated.ts",
+      "original": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/synthetic-annotated.ts",
+      "bytes": 520560,
+      "sha256": "ff184b9b966229b33e916d2ea4befb730362220b3e8c69866efdf747871da5f3",
+      "control": true
+    },
+    {
+      "file": "synthetic-shallow.ts",
+      "captured": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/synthetic-shallow.ts",
+      "original": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/synthetic-shallow.ts",
+      "bytes": 588961,
+      "sha256": "e1dfe882433c74b726996e7cb9866ced7e1644a9c12d39f69e6711b1240d790b",
+      "control": true
+    },
+    {
+      "file": "synthetic-deep.ts",
+      "captured": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/synthetic-deep.ts",
+      "original": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/synthetic-deep.ts",
+      "bytes": 317,
+      "sha256": "6b2cb9e40412802ec19eb1919a8a743d17d82f8d982779154f268bd9ca3b2d0f",
+      "control": true
+    },
+    {
+      "file": "synthetic-roles.ts",
+      "captured": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/synthetic-roles.ts",
+      "original": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/synthetic-roles.ts",
+      "bytes": 152,
+      "sha256": "88c8646ef5b15bb839fee95ff5afc4506c4830bcf9486a4f3b5a103711968d8f",
+      "control": true
+    },
+    {
+      "file": "synthetic-reparse.ts",
+      "captured": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/synthetic-reparse.ts",
+      "original": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/synthetic-reparse.ts",
+      "bytes": 51,
+      "sha256": "36bd34937f3f1e57fad95fc8bd8eda116eb78776c3f473842a0aea547792cf45",
+      "control": true
+    }
+  ],
+  "excludedControl": {
+    "file": "/Users/alex/github/typescript-agent-tools/.worktrees/ticket-proposal-typescript-navigation-analysis-and-editing-tools-for-agents-f03075/.cc/temp/types-representation/sources/over-budget.ts",
+    "sha256": "7beec34efd99db9530b78431617b08402452cce0cf3c3f5d6a819322bc72e103",
+    "reason": "Maximum syntax nesting depth exceeded under analysis budget; valid syntax, not a grammar rejection"
+  }
+}

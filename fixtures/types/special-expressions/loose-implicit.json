@@ -1,0 +1,4 @@
+{
+  "extends": "./loose.json",
+  "compilerOptions": { "noImplicitAny": true }
+}

@@ -1,0 +1,100 @@
+[
+  {
+    "name": "objectKeys",
+    "summary": "\"alpha\" | 7",
+    "errorType": false,
+    "codes": [],
+    "errors": []
+  },
+  {
+    "name": "unionKeys",
+    "summary": "\"shared\"",
+    "errorType": false,
+    "codes": [],
+    "errors": []
+  },
+  {
+    "name": "intersectionKeys",
+    "summary": "\"alpha\" | \"beta\"",
+    "errorType": false,
+    "codes": [],
+    "errors": []
+  },
+  {
+    "name": "anyKeys",
+    "summary": "string | number | symbol",
+    "errorType": false,
+    "codes": [],
+    "errors": []
+  },
+  {
+    "name": "unknownKeys",
+    "summary": "never",
+    "errorType": false,
+    "codes": [],
+    "errors": []
+  },
+  {
+    "name": "neverKeys",
+    "summary": "string | number | symbol",
+    "errorType": false,
+    "codes": [],
+    "errors": []
+  },
+  {
+    "name": "emptyKeys",
+    "summary": "never",
+    "errorType": false,
+    "codes": [],
+    "errors": []
+  },
+  {
+    "name": "symbolKeys",
+    "summary": "unique symbol",
+    "errorType": false,
+    "codes": [],
+    "errors": []
+  },
+  {
+    "name": "unusedMember",
+    "summary": "\"present\"",
+    "errorType": false,
+    "codes": [],
+    "errors": []
+  },
+  {
+    "name": "genericKeys",
+    "summary": "keyof T",
+    "errorType": false,
+    "codes": [],
+    "errors": []
+  },
+  {
+    "name": "chosen",
+    "summary": "1",
+    "errorType": false,
+    "codes": [],
+    "errors": []
+  },
+  {
+    "name": "rejected",
+    "summary": "2",
+    "errorType": false,
+    "codes": [],
+    "errors": []
+  },
+  {
+    "name": "ordinaryTrue",
+    "summary": "\"alpha\" | \"beta\"",
+    "errorType": false,
+    "codes": [],
+    "errors": []
+  },
+  {
+    "name": "ordinaryFalse",
+    "summary": "\"none\"",
+    "errorType": false,
+    "codes": [],
+    "errors": []
+  }
+]
