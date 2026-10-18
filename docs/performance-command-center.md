@@ -1,5 +1,9 @@
 # Command Center performance
 
+The [current performance report](reports/performance-current.html) shows only the
+latest build, with cold and warm command measurements, physical memory charts,
+and loading profiles. It includes downloadable measurement data.
+
 The latest follow-up, [unchanged-file and resolution reuse](performance-refresh-reuse.md),
 records refresh improvements and their retained-memory cost. It builds on
 [relative path preparation](performance-relative-paths.md). The tables below
