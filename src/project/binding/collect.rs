@@ -227,7 +227,8 @@ pub(super) struct Decl {
     /// `declareModuleMember` creates a raw local even where navigation resolves
     /// namespace names through exports instead of a projected lexical binding.
     pub(super) native_export_local: Option<ScopeId>,
-    pub(super) export: Option<(Host, String)>,
+    /// Out of line, as few declarations are exported.
+    pub(super) export: Option<Box<(Host, String)>>,
     /// A function declaration with a body.
     pub(super) implementation: bool,
     /// Declared in an ambient context.
@@ -237,11 +238,12 @@ pub(super) struct Decl {
     pub(super) list: Option<TypeParameterListId>,
     /// Blocks a `var` is hoisted out of, whose block-scoped bindings it may
     /// not share a name with.
-    pub(super) hoisted: Vec<ScopeId>,
+    pub(super) hoisted: Box<[ScopeId]>,
     /// Actual class/interface/alias parameter names, default presence and
     /// declaration anchors. Names/defaults serve merge checks; anchors retain
     /// getSymbolOfDeclaration identity for native local parameter acquisition.
-    pub(super) type_parameters: Option<Vec<(String, bool, Span)>>,
+    /// Out of line, as few declarations have them.
+    pub(super) type_parameters: Option<Box<Vec<(String, bool, Span)>>>,
     /// The members of an interface that may be a JSON value's apparent type
     /// (`super::APPARENT_INTERFACES`); other declarations record none.
     pub(super) interface_members: Option<Box<InterfaceMembers>>,
@@ -273,7 +275,7 @@ impl Default for Decl {
             implementation: false,
             ambient: false,
             list: None,
-            hoisted: Vec::new(),
+            hoisted: Box::default(),
             type_parameters: None,
             interface_members: None,
         }
@@ -1054,18 +1056,18 @@ impl<'a, 's> Collector<'a, 's> {
             member: None,
             lexical,
             native_export_local,
-            export,
+            export: export.map(Box::new),
             implementation: node.syntax_kind == SyntaxKind::FunctionDeclaration
                 && field(node, "body").is_some(),
             ambient: node.flags & node_flags::AMBIENT != 0
                 || has_modifier(self.ast, node, SyntaxKind::DeclareKeyword),
             list: None,
-            hoisted: self.hoisted(cx.scope, scope),
+            hoisted: self.hoisted(cx.scope, scope).into_boxed_slice(),
             type_parameters: matches!(
                 kind,
                 DeclKind::Class | DeclKind::Interface | DeclKind::TypeAlias
             )
-            .then(|| self.type_parameter_names(node)),
+            .then(|| Box::new(self.type_parameter_names(node))),
             interface_members,
         })
     }
@@ -1141,7 +1143,7 @@ impl<'a, 's> Collector<'a, 's> {
             // same declaration-owned list for a class expression and a class
             // declaration. An empty list is established data, not absence.
             type_parameters: (kind == DeclKind::Class)
-                .then(|| self.type_parameter_names(declaration)),
+                .then(|| Box::new(self.type_parameter_names(declaration))),
             ..Decl::default()
         })
     }
@@ -1994,7 +1996,7 @@ impl<'a, 's> Collector<'a, 's> {
     fn type_parameter_in(&mut self, id: NodeId, cx: Cx, scope: ScopeId, constraints: ScopeId) {
         let node = self.ast.node(id);
         if let Some(name) = field(node, "name") {
-            let list = Some(TypeParameterListId(self.lists));
+            let list = Some(TypeParameterListId::new(self.lists));
             self.declare_local(node, name, DeclKind::TypeParameter, scope, list);
             // `NameResolver.Resolve` reaches an infer's own parameter before
             // rejecting the conditional's locals outside its true branch.
@@ -2029,7 +2031,7 @@ impl<'a, 's> Collector<'a, 's> {
                 anchor: node.span,
                 kind: DeclKind::Class,
                 native_kind: node.syntax_kind,
-                type_parameters: Some(self.type_parameter_names(node)),
+                type_parameters: Some(Box::new(self.type_parameter_names(node))),
                 ..Decl::default()
             })
         };
@@ -2591,7 +2593,7 @@ impl<'a, 's> Collector<'a, 's> {
                     kind: DeclKind::Expression,
                     native_kind: SyntaxKind::ExportAssignment,
                     lexical: None,
-                    export: Some((host, name.into())),
+                    export: Some(Box::new((host, name.into()))),
                     ..Decl::default()
                 });
                 self.push(expression, cx);
@@ -2938,4 +2940,15 @@ fn resolution_mode<'s>(ast: &Ast<'s>, node: &Node<'s>) -> Option<ResolutionMode>
             _ => None,
         }
     })
+}
+
+#[cfg(test)]
+mod tests {
+    /// A project has about a million declarations: fields few of them use
+    /// stay out of line.
+    #[test]
+    fn declarations_stay_compact() {
+        let size = std::mem::size_of::<super::Decl>();
+        assert!(size <= 152, "{size}");
+    }
 }

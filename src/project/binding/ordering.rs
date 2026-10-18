@@ -214,7 +214,7 @@ impl NativeSymbolName {
         if context.parent.is_some()
             && declaration
                 .export
-                .as_ref()
+                .as_deref()
                 .is_some_and(|(_, name)| name == "default")
         {
             return Self::Bytes(b"default".as_slice().into());

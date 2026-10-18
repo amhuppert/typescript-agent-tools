@@ -22,7 +22,7 @@ mod native_facts;
 pub(super) use native_facts::{LookupFailure, NativeFacts, ScopeExportRead};
 pub(super) use resolution::names::{ScopeExportLookup, scope_export_lookup};
 mod native_symbol_table;
-pub(super) use native_symbol_table::NativeSymbolTable;
+pub(super) use native_symbol_table::{Entries as NativeTableEntries, NativeSymbolTable};
 pub(in crate::project) mod module_exports;
 pub(super) mod raw;
 mod reference_modules;

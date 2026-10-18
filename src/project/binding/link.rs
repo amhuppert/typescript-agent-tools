@@ -1516,12 +1516,12 @@ impl<'p> Linker<'p, '_> {
             } else if local.is_some() {
                 let (host, name) = decl
                     .export
-                    .as_ref()
+                    .as_deref()
                     .expect("paired local has an export placement");
                 let table = self.host_binding_table(file, *host);
                 self.declare_in(table, None, name, declaring)?
             } else {
-                match (decl.lexical, &decl.export) {
+                match (decl.lexical, decl.export.as_deref()) {
                     (Some(scope), _) => {
                         let table = self.scope_binding_table(file, scope);
                         let signature = self.signature_table(file, scope);
@@ -1563,7 +1563,7 @@ impl<'p> Linker<'p, '_> {
             self.state
                 .store
                 .set_declaration_parent(declared_symbol, self.declared_symbol(file, owner));
-        } else if let Some((host, _)) = &decl.export {
+        } else if let Some((host, _)) = decl.export.as_deref() {
             if let Some(parent) = self.host_declared_symbol(file, *host) {
                 self.state
                     .store
@@ -1606,7 +1606,7 @@ impl<'p> Linker<'p, '_> {
             self.state.store.add_interface_members(symbol, members);
         }
         if local.is_none()
-            && let (Some(_), Some((host, name))) = (decl.lexical, &decl.export)
+            && let (Some(_), Some((host, name))) = (decl.lexical, decl.export.as_deref())
         {
             let table = self.host_table(file, *host);
             self.export_symbol(table, name, symbol, decl.kind.meanings(), file, decl.anchor)?;

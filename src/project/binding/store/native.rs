@@ -14,7 +14,6 @@ use crate::project::binding::link::flags;
 use crate::project::binding::ordering::{NativePropertyKey, NativeSymbolName};
 use crate::project::binding::semantic::TypeBindingFailure;
 use smallvec::SmallVec;
-use std::collections::HashMap;
 
 /// The fields copied or mutated by native binder/checker symbol operations.
 /// `projection` is an association to navigation metadata, never the identity
@@ -39,7 +38,8 @@ pub(in crate::project::binding) struct NativeHeader {
     pub(in crate::project::binding) projection: Option<SymbolId>,
     /// Syntax associations for the native late-member worker, independent of
     /// navigation tables. They follow the owning declaration list in merges.
-    pub(in crate::project::binding) late_members: Vec<NativeHeaderId>,
+    /// Out of line: few headers have any.
+    pub(in crate::project::binding) late_members: Option<Box<Vec<NativeHeaderId>>>,
     not_const_enum_only: bool,
 }
 
@@ -125,6 +125,9 @@ impl NativeSymbols {
     pub(in crate::project::binding) fn freeze(&mut self) {
         self.headers.shrink_to_fit();
         self.tables.shrink_to_fit();
+        for table in &mut self.tables {
+            table.freeze();
+        }
         self.declarations.freeze();
     }
 
@@ -152,7 +155,7 @@ impl NativeSymbols {
             export_symbol: None,
             members: None,
             exports: None,
-            late_members: Vec::new(),
+            late_members: None,
             not_const_enum_only: false,
         });
         id
@@ -390,7 +393,7 @@ impl NativeSymbols {
     pub(in crate::project::binding) fn entries(
         &self,
         table: NativeTableId,
-    ) -> Result<&HashMap<NativePropertyKey, NativeHeaderId>, TypeBindingFailure> {
+    ) -> Result<super::super::NativeTableEntries<'_, NativeHeaderId>, TypeBindingFailure> {
         self.tables[table.index()].entries()
     }
 
@@ -524,5 +527,16 @@ impl DeclarationSymbols {
             symbols.shrink_to_fit();
         }
         self.bound.shrink_to_fit();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    /// A project has about a million headers: fields few of them use stay
+    /// out of line.
+    #[test]
+    fn headers_stay_compact() {
+        let size = std::mem::size_of::<super::NativeHeader>();
+        assert!(size <= 176, "{size}");
     }
 }

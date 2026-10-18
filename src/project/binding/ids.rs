@@ -43,11 +43,9 @@ ids!(
     StringId,
     SymbolId,
     NativeHeaderId,
-    NativeTableId
+    NativeTableId,
+    TypeParameterListId
 );
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(super) struct TypeParameterListId(pub(super) usize);
 
 impl TableId {
     pub(super) const fn new_const(index: u32) -> Self {

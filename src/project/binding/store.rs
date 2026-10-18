@@ -743,6 +743,7 @@ impl Store {
             .expect("binder arena before publication")
             .header_mut(owner.header)
             .late_members
+            .get_or_insert_default()
             .push(header);
         let owner = self.find(owner.projection);
         self.symbols[owner.index()].late_members.push(symbol);

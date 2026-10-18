@@ -47,7 +47,7 @@ impl RawDeclaration {
             super::store::SymbolDeclaration::Bound(file, id) => files.file(file).decls()
                 [id.index()]
             .export
-            .as_ref()
+            .as_deref()
             .is_some_and(|(_, name)| name == "default"),
             _ => false,
         }
@@ -64,7 +64,7 @@ impl<'p> NativeInputs<'p> {
         exports: bool,
     ) -> Result<Option<NativeTableId>, TypeBindingFailure> {
         let data = self.raw.native.header(symbol.0);
-        if !data.late_members.is_empty() {
+        if data.late_members.is_some() {
             return Err(TypeBindingFailure::Pending(
                 "native late member table resolution is pending",
             ));
