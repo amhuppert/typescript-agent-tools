@@ -120,8 +120,8 @@ impl NativeSymbols {
     }
 
     /// Published headers and tables never grow: release the capacity their
-    /// growth left. Ids and order are unchanged; table contents are not
-    /// rehashed.
+    /// growth left. Ids and contents are unchanged; a map-backed table may
+    /// be rehashed into a smaller one, as table order is no answer.
     pub(in crate::project::binding) fn freeze(&mut self) {
         self.headers.shrink_to_fit();
         self.tables.shrink_to_fit();

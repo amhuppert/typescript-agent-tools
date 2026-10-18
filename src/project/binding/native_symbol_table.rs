@@ -116,7 +116,16 @@ impl<'a, S> Iterator for EntriesIter<'a, S> {
             EntriesIter::Many(entries) => entries.next(),
         }
     }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        match self {
+            EntriesIter::Few(entries) => entries.size_hint(),
+            EntriesIter::Many(entries) => entries.size_hint(),
+        }
+    }
 }
+
+impl<S> ExactSizeIterator for EntriesIter<'_, S> {}
 
 impl<S: Copy> NativeSymbolTable<S> {
     /// `SymbolTable[name]` observes a known entry before a retained failed key.
@@ -265,6 +274,12 @@ mod tests {
                 .iter()
                 .map(|(key, &value)| (key.clone(), value))
                 .collect();
+            // Collecting an inventory allocates once.
+            assert_eq!(
+                table.entries().unwrap().iter().size_hint(),
+                (size, Some(size)),
+                "{size}"
+            );
             entries.sort_by_key(|&(_, value)| value);
             let expected: Vec<_> = (0..size).map(|index| (key(index), index + 100)).collect();
             assert_eq!(entries, expected, "{size}");
