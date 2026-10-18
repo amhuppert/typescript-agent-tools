@@ -591,11 +591,11 @@ impl<'s> CapturedSyntax<'s> {
         for _ in ast.nodes() {
             parents.push(None);
         }
+        // The final tree: the arena also holds nodes a reparse replaced.
+        let order: Vec<NodeId> = ast.walk().collect();
         // Three attachments per node, and a name or anchor for some.
-        let mut attachments = crate::hash::FastMap::with_capacity_and_hasher(
-            ast.nodes().len() / 2 * 7,
-            Default::default(),
-        );
+        let mut attachments =
+            crate::hash::FastMap::with_capacity_and_hasher(order.len() / 2 * 7, Default::default());
         let mut insert = |role, kind, span: Span, id| -> Result<(), crate::resources::Stop> {
             let key = AttachmentKey {
                 role,
@@ -621,7 +621,7 @@ impl<'s> CapturedSyntax<'s> {
             Some(control) => ast.first_token_span_controlled(id, control),
             None => Ok(ast.first_token_span(id)),
         };
-        for id in ast.walk() {
+        for id in order {
             let node = ast.node(id);
             insert(AttachmentRole::NativeNode, node.syntax_kind, node.span, id)?;
             insert(AttachmentRole::Node, node.syntax_kind, token_span(id)?, id)?;
@@ -796,28 +796,28 @@ impl<'p, 'w> Source<'p, 'w> {
     }
 
     fn syntax(&mut self, file: FileId) -> Result<&CapturedSyntax<'p>, AnalysisError> {
-        if !self.syntax.contains_key(&file) {
-            let input = self.inputs.sources.get(file);
-            // Loading already accepted this exact path as an identity.
-            let name = input
-                .path
-                .to_str()
-                .expect("captured input path is exact Unicode");
-            let ast = self
-                .parser
-                .parse_captured(input.text.as_str(), name, self.control.clone())
-                .map_err(|error| match error {
-                    crate::parser::Failure::Syntax(error) => {
-                        InputError::unparsable(error, &input.text, &input.path).into()
-                    }
-                    crate::parser::Failure::Interrupted(reason) => super::resource_failure(reason),
-                })?;
-            let captured =
-                CapturedSyntax::new(ast, self.control.as_ref()).map_err(super::resource_failure)?;
-            self.syntax.reserve(1);
-            self.syntax.insert(file, captured);
-        }
-        Ok(self.syntax.get(&file).expect("demanded syntax is captured"))
+        let entry = match self.syntax.entry(file) {
+            std::collections::hash_map::Entry::Occupied(entry) => return Ok(entry.into_mut()),
+            std::collections::hash_map::Entry::Vacant(entry) => entry,
+        };
+        let input = self.inputs.sources.get(file);
+        // Loading already accepted this exact path as an identity.
+        let name = input
+            .path
+            .to_str()
+            .expect("captured input path is exact Unicode");
+        let ast = self
+            .parser
+            .parse_captured(input.text.as_str(), name, self.control.clone())
+            .map_err(|error| match error {
+                crate::parser::Failure::Syntax(error) => {
+                    InputError::unparsable(error, &input.text, &input.path).into()
+                }
+                crate::parser::Failure::Interrupted(reason) => super::resource_failure(reason),
+            })?;
+        let captured =
+            CapturedSyntax::new(ast, self.control.as_ref()).map_err(super::resource_failure)?;
+        Ok(entry.insert(captured))
     }
 
     /// The request's `getResolvedSignature` prelude visits the selected site's
@@ -2045,5 +2045,36 @@ fn pending(
             reason,
             message: message.into(),
         },
+    }
+}
+
+#[cfg(test)]
+mod captured_syntax_tests {
+    use super::CapturedSyntax;
+
+    /// The attachment map is sized for the final tree, not for the parser's
+    /// arena, which also holds the statements a top-level await reparse
+    /// replaced; a file without the reparse is the control.
+    #[test]
+    fn attachments_are_sized_for_the_final_tree() {
+        for (statement, reparsed) in [("await(0);\n", true), ("void(0);\n", false)] {
+            let source = format!(
+                "export class C {{ run() {{}} }}\nnew C().run();\n{}",
+                statement.repeat(10_000)
+            );
+            let ast = crate::parse(&source).unwrap();
+            let reachable = ast.walk().count();
+            assert_eq!(
+                ast.nodes().len() > reachable * 3 / 2,
+                reparsed,
+                "{statement}"
+            );
+            let captured = CapturedSyntax::new(ast, None).unwrap();
+            let (len, capacity) = (captured.attachments.len(), captured.attachments.capacity());
+            assert!(
+                capacity <= 2 * len,
+                "{statement}: {capacity} slots for {len} attachments"
+            );
+        }
     }
 }
