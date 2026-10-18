@@ -183,6 +183,23 @@ pub(crate) struct Lexer<'src> {
 pub(crate) fn line_break(c: char) -> bool {
     matches!(c, '\n' | '\r' | '\u{2028}' | '\u{2029}')
 }
+
+// The ASCII members of `line_break`, `whitespace`, `id_start` and
+// `id_continue`, for the uncontrolled scans' per-byte fast paths: a byte is
+// a character only where it is ASCII, and each is false for any other byte.
+// `ascii_classes_are_their_owners` checks every byte against its owner.
+fn ascii_line_break(byte: u8) -> bool {
+    matches!(byte, b'\n' | b'\r')
+}
+fn ascii_whitespace(byte: u8) -> bool {
+    matches!(byte, b'\t' | 0x0B | 0x0C | b' ') || ascii_line_break(byte)
+}
+fn ascii_id_start(byte: u8) -> bool {
+    byte.is_ascii_alphabetic() || byte == b'$' || byte == b'_'
+}
+fn ascii_id_continue(byte: u8) -> bool {
+    byte.is_ascii_alphanumeric() || byte == b'$' || byte == b'_'
+}
 pub(crate) fn whitespace(c: char) -> bool {
     matches!(
         c,
@@ -285,8 +302,7 @@ fn whitespace_run(text: &str) -> (usize, bool) {
     let mut newline = false;
     for (at, &byte) in text.as_bytes().iter().enumerate() {
         match byte {
-            b' ' | b'\t' | 0x0B | 0x0C => {}
-            b'\n' | b'\r' => newline = true,
+            byte if ascii_whitespace(byte) => newline |= ascii_line_break(byte),
             byte if byte.is_ascii() => return (at, newline),
             _ => {
                 let rest = &text[at..];
@@ -520,14 +536,10 @@ fn identifier<'s>(input: &'s str, control: Option<&Control>) -> IResult<&'s str,
     // where the general scan below ends it.
     if control.is_none() {
         let bytes = input.as_bytes();
-        let part = |byte: u8| byte.is_ascii_alphanumeric() || byte == b'$' || byte == b'_';
-        if bytes
-            .first()
-            .is_some_and(|&byte| byte.is_ascii_alphabetic() || byte == b'$' || byte == b'_')
-        {
+        if bytes.first().copied().is_some_and(ascii_id_start) {
             let end = bytes
                 .iter()
-                .position(|&byte| !part(byte))
+                .position(|&byte| !ascii_id_continue(byte))
                 .unwrap_or(bytes.len());
             if bytes
                 .get(end)
@@ -1117,6 +1129,35 @@ mod tests {
                     .find(|&(_, c)| line_break(c))
                     .map(|(at, _)| at),
                 "{text:?}"
+            );
+        }
+    }
+
+    /// Each per-byte class is its owner's class of ASCII characters, and
+    /// holds no other byte.
+    #[test]
+    fn ascii_classes_are_their_owners() {
+        for byte in 0..=u8::MAX {
+            let owner = |class: fn(char) -> bool| byte.is_ascii() && class(byte as char);
+            assert_eq!(
+                super::ascii_line_break(byte),
+                owner(super::line_break),
+                "{byte:#x}"
+            );
+            assert_eq!(
+                super::ascii_whitespace(byte),
+                owner(super::whitespace),
+                "{byte:#x}"
+            );
+            assert_eq!(
+                super::ascii_id_start(byte),
+                owner(super::id_start),
+                "{byte:#x}"
+            );
+            assert_eq!(
+                super::ascii_id_continue(byte),
+                owner(super::id_continue),
+                "{byte:#x}"
             );
         }
     }
