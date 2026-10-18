@@ -237,22 +237,68 @@ fn scan_comment_end(text: &str, pos: usize, control: Option<&Control>) -> Option
     let rest = &text[pos..];
     if rest.starts_with("//") {
         Some(
-            pos + rest
-                .char_indices()
-                .find(|(_, c)| !scan_work(control) || line_break(*c))
-                .map_or(rest.len(), |(at, _)| at),
+            pos + match control {
+                None => first_line_break(rest).unwrap_or(rest.len()),
+                Some(_) => rest
+                    .char_indices()
+                    .find(|(_, c)| !scan_work(control) || line_break(*c))
+                    .map_or(rest.len(), |(at, _)| at),
+            },
         )
     } else if let Some(body) = rest.strip_prefix("/*") {
         Some(
-            pos + body
-                .as_bytes()
-                .windows(2)
-                .position(|pair| !scan_work(control) || pair == b"*/")?
-                + 4,
+            pos + match control {
+                None => body.find("*/")?,
+                Some(_) => body
+                    .as_bytes()
+                    .windows(2)
+                    .position(|pair| !scan_work(control) || pair == b"*/")?,
+            } + 4,
         )
     } else {
         None
     }
+}
+
+/// Where the first `line_break` of `text` is, found by bytes: `\n` and
+/// `\r` are bytes no other character contains, and U+2028 and U+2029 are the
+/// only line breaks whose encoding begins with 0xE2. The uncontrolled
+/// scans' fast path; a controlled scan polls at each character instead.
+pub(crate) fn first_line_break(text: &str) -> Option<usize> {
+    let bytes = text.as_bytes();
+    let mut from = 0;
+    while let Some(found) = memchr::memchr3(b'\n', b'\r', 0xE2, &bytes[from..]) {
+        let at = from + found;
+        let rest = &bytes[at + 1..];
+        if bytes[at] != 0xE2 || rest.starts_with(&[0x80, 0xA8]) || rest.starts_with(&[0x80, 0xA9]) {
+            return Some(at);
+        }
+        from = at + 1;
+    }
+    None
+}
+
+/// How long the `whitespace` run at the start of `text` is, and whether it
+/// holds a `line_break`: an uncontrolled scan's fast path over ASCII, which
+/// takes the general scan from the first other character.
+fn whitespace_run(text: &str) -> (usize, bool) {
+    let mut newline = false;
+    for (at, &byte) in text.as_bytes().iter().enumerate() {
+        match byte {
+            b' ' | b'\t' | 0x0B | 0x0C => {}
+            b'\n' | b'\r' => newline = true,
+            byte if byte.is_ascii() => return (at, newline),
+            _ => {
+                let rest = &text[at..];
+                let length = rest.find(|c| !whitespace(c)).unwrap_or(rest.len());
+                return (
+                    at + length,
+                    newline || rest[..length].chars().any(line_break),
+                );
+            }
+        }
+    }
+    (text.len(), newline)
 }
 
 /// One comment in trivia.
@@ -469,6 +515,28 @@ fn unicode_escape<'s>(input: &'s str, control: Option<&Control>) -> IResult<&'s 
 }
 
 fn identifier<'s>(input: &'s str, control: Option<&Control>) -> IResult<&'s str, &'s str> {
+    // An uncontrolled scan's fast path: an ASCII identifier followed by an
+    // ASCII character other than `\`, which could begin an escape, ends
+    // where the general scan below ends it.
+    if control.is_none() {
+        let bytes = input.as_bytes();
+        let part = |byte: u8| byte.is_ascii_alphanumeric() || byte == b'$' || byte == b'_';
+        if bytes
+            .first()
+            .is_some_and(|&byte| byte.is_ascii_alphabetic() || byte == b'$' || byte == b'_')
+        {
+            let end = bytes
+                .iter()
+                .position(|&byte| !part(byte))
+                .unwrap_or(bytes.len());
+            if bytes
+                .get(end)
+                .is_none_or(|&byte| byte.is_ascii() && byte != b'\\')
+            {
+                return Ok((&input[end..], &input[..end]));
+            }
+        }
+    }
     recognize(pair(
         alt((
             recognize(nom::character::complete::satisfy(id_start)),
@@ -576,12 +644,22 @@ impl<'src> Lexer<'src> {
                 return self.token(Kind::Eof, self.pos, self.pos, newline, None);
             }
             let rest = &self.src[self.pos..];
-            let (tail, space) = take_while::<_, _, nom::error::Error<&str>>(|c| {
-                scan_work(control) && whitespace(c)
-            })
-            .parse(rest)
-            .unwrap();
-            newline |= space.chars().any(|c| !scan_work(control) || line_break(c));
+            let tail = match control {
+                None => {
+                    let (length, line_break) = whitespace_run(rest);
+                    newline |= line_break;
+                    &rest[length..]
+                }
+                Some(_) => {
+                    let (tail, space) = take_while::<_, _, nom::error::Error<&str>>(|c| {
+                        scan_work(control) && whitespace(c)
+                    })
+                    .parse(rest)
+                    .unwrap();
+                    newline |= space.chars().any(|c| !scan_work(control) || line_break(c));
+                    tail
+                }
+            };
             self.pos = self.src.len() - tail.len();
             if self.pos <= 3
                 && tail.starts_with("#!")
@@ -593,9 +671,16 @@ impl<'src> Lexer<'src> {
                     if control.is_some_and(|control| control.poll().is_err()) {
                         return self.token(Kind::Eof, self.pos, self.pos, newline, None);
                     }
-                    newline |= self.src[self.pos..end]
-                        .chars()
-                        .any(|c| !scan_work(control) || line_break(c));
+                    newline |= match control {
+                        // A line comment ends before its line break.
+                        None => {
+                            tail.starts_with("/*")
+                                && first_line_break(&self.src[self.pos..end]).is_some()
+                        }
+                        Some(_) => self.src[self.pos..end]
+                            .chars()
+                            .any(|c| !scan_work(control) || line_break(c)),
+                    };
                     self.pos = end;
                 } else {
                     let start = self.pos;
@@ -944,6 +1029,98 @@ fn valid_digits(digits: &str, control: Option<&Control>) -> bool {
 
 #[cfg(test)]
 mod tests {
+    use super::{Lexer, line_break};
+
+    /// An uncontrolled scan takes the byte fast paths for whitespace,
+    /// comments and identifiers; a controlled one takes the general scan.
+    /// Both give the same tokens for text made of every character class the
+    /// rules separate: ASCII and other whitespace, each line break (CR, LF,
+    /// CRLF, U+2028, U+2029) and other characters encoded from 0xE2, a byte
+    /// order mark, comments, escapes and non-ASCII identifier characters.
+    #[test]
+    fn fast_scans_find_the_general_scans_tokens() {
+        const PIECES: &[&str] = &[
+            " ",
+            "\t",
+            "\u{b}",
+            "\u{c}",
+            "\n",
+            "\r",
+            "\r\n",
+            "\u{2028}",
+            "\u{2029}",
+            "\u{a0}",
+            "\u{feff}",
+            "\u{2000}",
+            "\u{2026}",
+            "\u{2030}",
+            "\u{20ac}",
+            "\u{2027}",
+            "//",
+            "/*",
+            "*/",
+            "*",
+            "/",
+            "a",
+            "Z",
+            "$",
+            "_",
+            "9",
+            "\u{e9}",
+            "\u{3bb}",
+            "\u{1f600}",
+            "\\u0061",
+            "\\u{62}",
+            "x\\u0063",
+            "\\",
+            "#",
+            "\"",
+            "'",
+            "`",
+            "=",
+            ".",
+            "#!",
+        ];
+        let control = crate::resources::Control::new(crate::resources::Limits::default(), None);
+        let mut state = 0x2545_f491_u32;
+        for case in 0..3_000 {
+            let mut text = String::new();
+            let length = (case % 41) + 1;
+            for _ in 0..length {
+                state ^= state << 13;
+                state ^= state >> 17;
+                state ^= state << 5;
+                text.push_str(PIECES[state as usize % PIECES.len()]);
+            }
+            let (mut fast, mut general) = (Lexer::new(&text, 0), Lexer::new(&text, 0));
+            for _ in 0..=text.len() {
+                let expected = general.next_controlled(Some(&control)).unwrap();
+                let actual = fast.next();
+                let facts = |token: super::Token<'_>| {
+                    (
+                        format!("{:?}", token.kind),
+                        token.start,
+                        token.full_start,
+                        token.end,
+                        token.newline,
+                        token.error,
+                    )
+                };
+                assert_eq!(facts(actual), facts(expected), "{text:?}");
+                if matches!(expected.kind, super::Kind::Eof) {
+                    break;
+                }
+            }
+            assert_eq!(
+                super::first_line_break(&text),
+                text.char_indices()
+                    .find(|&(_, c)| line_break(c))
+                    .map(|(at, _)| at),
+                "{text:?}"
+            );
+        }
+    }
+
     #[test]
     fn identifiers_match_the_native_compiler_across_unicode() {
         #[derive(serde::Deserialize)]

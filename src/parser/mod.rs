@@ -113,6 +113,10 @@ pub(crate) struct Parser<'src> {
     // interpretation. Rollback keeps it, so exhaustion always ends the parse.
     exhausted: Option<Diagnostic>,
     control: Option<Control>,
+    /// The caller drops the tree after one pass over it, as loading does:
+    /// it keeps the arena's spare capacity rather than copy every node to
+    /// shed it (`transient`).
+    transient: bool,
 }
 
 /// A speculative parse owns newly appended nodes. Existing nodes are read-only
@@ -164,10 +168,14 @@ impl<'src> Parser<'src> {
             });
         let track_await =
             jsdoc_start.is_none() && !options.declaration_file() && source.contains("await");
+        // Sources of Command Center's program have about one node per 9
+        // bytes, a quarter of them one per 7 or fewer: sized for those, most
+        // files' arenas never grow. Capacity that is never used is never
+        // touched.
         let nodes = Vec::with_capacity(if jsdoc_start.is_some() {
             0
         } else {
-            (source.len() / 16).min(16_384)
+            (source.len() / 7).min(1 << 21)
         });
         Ok(Self {
             lexer,
@@ -190,7 +198,14 @@ impl<'src> Parser<'src> {
             type_argument_frames: 0,
             exhausted: None,
             control,
+            transient: false,
         })
+    }
+
+    /// Parse a tree its caller drops after one pass (`Parser::transient`).
+    pub(crate) fn transient(mut self) -> Self {
+        self.transient = true;
+        self
     }
 
     pub fn parse(self) -> std::result::Result<Ast<'src>, Diagnostic> {
@@ -286,7 +301,9 @@ impl<'src> Parser<'src> {
                 }
             }
         }
-        if self.control.is_none() && self.nodes.capacity() > self.nodes.len() + self.nodes.len() / 2
+        if !self.transient
+            && self.control.is_none()
+            && self.nodes.capacity() > self.nodes.len() + self.nodes.len() / 2
         {
             self.nodes.shrink_to_fit();
         }
@@ -1423,4 +1440,42 @@ fn token_kind(raw: &str, kind: Kind) -> SyntaxKind {
 
 fn reserved_word(raw: &str) -> bool {
     crate::lexer::identifier_class(raw) == crate::lexer::IdentifierClass::ReservedWord
+}
+
+#[cfg(test)]
+mod arena_tests {
+    use super::Parser;
+    use crate::ParseOptions;
+
+    /// A typical source's arena never grows while parsing, and a tree parsed
+    /// for one pass keeps its spare capacity rather than copy its nodes to
+    /// shed it; a retained tree still sheds it.
+    #[test]
+    fn arenas_are_sized_once_and_shed_only_when_retained() {
+        // About one node per 9 bytes, as Command Center's median source.
+        let source = "/** The user's name, as the account page shows it. */\nexport function displayName(user: User): string {\n  return user.name;\n}\n".repeat(200);
+        let transient = Parser::new(&source, ParseOptions::default())
+            .transient()
+            .parse()
+            .unwrap();
+        let estimate = source.len() / 7;
+        assert!(
+            transient.nodes.len() <= estimate,
+            "{} nodes",
+            transient.nodes.len()
+        );
+        assert_eq!(transient.nodes.capacity(), estimate, "the arena never grew");
+        // A sparse source: a retained tree sheds the excess, a transient one
+        // keeps it.
+        let sparse = format!("/* {} */\nexport const value = 1;\n", "x".repeat(70_000));
+        let retained = Parser::new(&sparse, ParseOptions::default())
+            .parse()
+            .unwrap();
+        assert!(retained.nodes.capacity() <= retained.nodes.len() * 3 / 2);
+        let transient = Parser::new(&sparse, ParseOptions::default())
+            .transient()
+            .parse()
+            .unwrap();
+        assert_eq!(transient.nodes.capacity(), sparse.len() / 7);
+    }
 }

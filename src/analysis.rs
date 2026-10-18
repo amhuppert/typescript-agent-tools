@@ -73,8 +73,12 @@ impl Parser {
     /// Parse `text`, the analyzed text of the file named `file_name`, with
     /// the options TypeScript derives from that name
     /// (`ParseOptions::for_file`).
+    /// Loading collects facts from the tree and drops it, so it is parsed as
+    /// a transient tree.
     pub(crate) fn parse<'s>(&self, text: &'s str, file_name: &str) -> Result<Ast<'s>, Diagnostic> {
-        crate::parse_with_options(text, Self::options(file_name))
+        crate::parser::Parser::new(text, Self::options(file_name))
+            .transient()
+            .parse()
     }
 
     /// Read `text` as TypeScript reads JSON, the one reader for

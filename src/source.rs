@@ -89,17 +89,17 @@ pub(crate) fn decode_text(mut bytes: Vec<u8>) -> io::Result<String> {
 /// The ECMAScript line breaks in `text` as byte ranges, in order. CRLF is
 /// one break; CR, LF, U+2028, and U+2029 are also breaks.
 pub(crate) fn line_breaks(text: &str) -> impl Iterator<Item = std::ops::Range<usize>> + '_ {
-    let mut chars = text.char_indices().peekable();
+    let mut from = 0;
     std::iter::from_fn(move || {
-        loop {
-            let (index, c) = chars.next()?;
-            if c == '\r' && chars.next_if(|(_, next)| *next == '\n').is_some() {
-                return Some(index..index + 2);
-            }
-            if crate::lexer::line_break(c) {
-                return Some(index..index + c.len_utf8());
-            }
-        }
+        let at = from + crate::lexer::first_line_break(&text[from..])?;
+        let rest = &text[at..];
+        let length = if rest.starts_with("\r\n") {
+            2
+        } else {
+            rest.chars().next().map_or(0, char::len_utf8)
+        };
+        from = at + length;
+        Some(at..from)
     })
 }
 
@@ -255,6 +255,57 @@ impl SourceText {
 
 #[cfg(test)]
 mod tests {
+    /// Line breaks found by bytes are the characters' line breaks, CRLF as
+    /// one, for text of every class the rule separates: CR, LF, CRLF, LF CR,
+    /// U+2028, U+2029, other characters encoded from 0xE2, and none at all.
+    #[test]
+    fn line_breaks_by_bytes_are_the_characters_line_breaks() {
+        const PIECES: &[&str] = &[
+            "a",
+            " ",
+            "\n",
+            "\r",
+            "\r\n",
+            "\n\r",
+            "\u{2028}",
+            "\u{2029}",
+            "\u{2026}",
+            "\u{2030}",
+            "\u{20ac}",
+            "\u{feff}",
+            "\u{e9}",
+            "\u{1f600}",
+            "",
+        ];
+        let expected = |text: &str| {
+            let mut chars = text.char_indices().peekable();
+            let mut breaks = Vec::new();
+            while let Some((index, c)) = chars.next() {
+                if c == '\r' && chars.next_if(|(_, next)| *next == '\n').is_some() {
+                    breaks.push(index..index + 2);
+                } else if crate::lexer::line_break(c) {
+                    breaks.push(index..index + c.len_utf8());
+                }
+            }
+            breaks
+        };
+        let mut state = 0x9e37_79b9_u32;
+        for case in 0..2_000 {
+            let mut text = String::new();
+            for _ in 0..case % 23 {
+                state ^= state << 13;
+                state ^= state >> 17;
+                state ^= state << 5;
+                text.push_str(PIECES[state as usize % PIECES.len()]);
+            }
+            assert_eq!(
+                super::line_breaks(&text).collect::<Vec<_>>(),
+                expected(&text),
+                "{text:?}"
+            );
+        }
+    }
+
     use super::*;
 
     fn at(line: usize, column: usize) -> SourcePosition {
