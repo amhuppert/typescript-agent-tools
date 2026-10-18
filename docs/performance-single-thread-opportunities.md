@@ -1,11 +1,13 @@
 # Single-thread performance opportunities
 
-2026-10-17. An investigation, not a measurement of changes: nothing below has
-been implemented. It profiles the three workloads that matter on Command Center
-(a load, a warm member search, and the memory a loaded project retains), names
-the code responsible for each cost, and ranks what to do about it on one
-thread, before more threads are added. Each item notes how it fits a later move
-to more parallelism.
+2026-10-17. An investigation, written before any of it was implemented. It
+profiles the three workloads that matter on Command Center (a load, a warm
+member search, and the memory a loaded project retains), names the code
+responsible for each cost, and ranks what to do about it on one thread, before
+more threads are added. Each item notes how it fits a later move to more
+parallelism. [Implementation status](#implementation-status) at the end
+records what was then implemented, what was not and why, and the measured
+result.
 
 ## Summary
 
@@ -540,6 +542,100 @@ caches.
 - **Measure physical memory.** Requested-heap savings from freed capacity or
   smaller records do not all reach the footprint; report `footprint -p` and
   `time -l` alongside.
+
+## Implementation status
+
+Implemented the same day in seven milestones, each committed separately and
+reviewed adversarially by two models (Claude Fable and GPT-6 Astra, at extra
+high effort); every review finding was fixed in a follow-up commit or is
+recorded below. Behaviour is unchanged by construction and by test: the Rust
+suite (1,547 tests) passes, clippy and fmt are clean, the registered semantic
+oracle validation passes, the upstream corpora pass in full (14,920/14,920 API
+cases on positions, flags and scanner hints; 14,935/14,935 native acceptance
+cases), and every Command Center journey below produced byte-identical output.
+
+| Item | Status | Commit | Measured or established |
+| --- | --- | --- | --- |
+| C1 sized read buffers | Not done: premise false | — | Rust 1.96's `File::read_to_end` already reserves the file's remaining length from `fstat`. Reusing one buffer per worker saved about 5% of read time in a scratch benchmark (271 → 258 ms for 69 MB), not worth the code. |
+| C2 no navigation for unsearched files | Done | e4e1f96, 5538bb0 | A capture job guesses at reservation (not a library; a root, outside `node_modules`, or a reference path of an input guessed searched); the final program pass builds, and keeps for reuse, any catalog the guess left out. On a project referencing `@types/node` by path: 2.66 G → 2.34 G instructions. |
+| C3 one pass per file | Partly | e4e1f96 | Capture-time selection projections skip literal spans; module indicators skip the JSX walk for non-JSX files. A shared parent table and parser-recorded facts are not done (about 1–2% of capture by the profile). |
+| C4 node-indexed collector maps | Done | 7bf7f4a, f7c7b82, 83800d5 | Scope writes are logged and resolved once by `SiteMap::from_writes`; node sets and the reference-token node map are vectors. |
+| C5 `Name` shrink | Done (text); side tables not done | 7bf7f4a, f7c7b82 | Per-file text table; reference keys borrowed until interned. `Name` 168 → 136 bytes. Moving the reference and target payloads to side tables is not done. |
+| C6 parser arena | Partly | 999e437, 2a59e7c | Arena sized at one node per 7 bytes (Command Center median: 8.7); transient trees keep spare capacity. Node copies from growth and shedding: 1.46 → 0.22 per node. Buffer reuse across files (needs lifetime erasure) and removing the public `Node::kind` are not done. |
+| C7 lexer fast paths | Done | 999e437, 2a59e7c | Byte scans for whitespace, line breaks (memchr), block comment ends, ASCII identifiers, and line starts, for uncontrolled scans; tested against the general scan on every character class; upstream corpora 14,920/14,920 and 14,935/14,935. |
+| L1 positions and offset keys | Done | 2e20e2b | Sorted by byte offset (positional only where files share a display name); positions only for returned locations. `IndexedOccurrence` 48 → 12 bytes. |
+| L2 one allocation per name | Done; alias names not done | f7c7b82, 83800d5 | Declaration names, member keys, sites, table keys and native names share the file's stored name; fixed internal names shared per thread. |
+| L3 pre-sized symbol vectors, `Symbol` split | Done | e4e1f96, f7c7b82 | Symbol and header vectors reserved from declaration counts; one site inline, rare lists boxed. |
+| L4 loader filesystem | (b)–(d) done; (a) not done | e4e1f96 | Ancestor walks stop at the first walked ancestor; ASCII folding in place; symlink lookups return at once without symlinks. (a): absent manifests cost one stat either way, and a direct read would turn a directory named `package.json` into an I/O failure. |
+| L5 cached file view | Done | e4e1f96 | Two-pointer view with accessors. |
+| L6 exact slices, deferred drops | Done | e4e1f96 | Collector slices were already exact. Load-only state is returned as `LoadOnly`; `Project::load` frees it inline, sessions on a background thread. |
+| L7 per-file name interning | Done | 7bf7f4a | Each file's texts interned once. |
+| L8 FxHash on lookup maps | Done | e4e1f96 | Lexical tables and index maps; native tables became lists (M3). |
+| L9 relative paths | Not done | — | The report asked for a benchmark first. |
+| S1 syntax recovery | Done; cross-request cache not done | 399e7e6, 2538ae2 | Pre-sized FxHash attachment map from the final tree; FxHash syntax cache with one lookup. |
+| S2 sort without cloning | Done | 399e7e6 | Same comparison schedule, no clones (tested against the former algorithm). |
+| S3 property-evaluation churn | Not done | — | The profile shows it diffuse, about 1% per site. |
+| S5 work avoidance | Not done | — | Needs the candidate measurements the report asks for. |
+| M1 `Occurrence` | Done | 2e20e2b, cb0c5bd | 120 → 28-byte record plus packed spans (24 bytes). |
+| M2 `Decl` | Done | a011a70 | 216 → 152 bytes. |
+| M3 small native tables | Done | a011a70, 0ff29d3 | Lists up to 8 entries, then a map; 104 → 40 bytes per table. |
+| M4 `NativeHeader` | Partly | a011a70 | `late_members` boxed: 192 → 176 bytes. `SymbolDeclaration` (48 bytes, two header fields) not changed: a `Copy` value type compared by value at query time. |
+| M5 `ReferenceToken`, `Reference` | Tokens done; `Reference` not done | 2e20e2b, cb0c5bd | Stored tokens 32 → 12 bytes. `retained::Reference` (56 bytes) needs `flow::Read`'s packed form. |
+| M6 scope ranges | Not done | — | Medium–high effort in the per-node scope rule's owner. |
+| M7 shared session inventory | Not done | — | Medium–high; C5 shrank the inventory it would share. |
+| M8 flow read maps | Not done | — | The report asked for measurement first. |
+
+Command Center, release builds (thin LTO), the pre-effort revision f7a6351
+against the final one, 2a59e7c, interleaved on the shared host at a quiet
+moment (load average about 4). Instructions retired and memory are the stable
+measures; wall times are ranges of the interleaved samples.
+
+| Workload | Before | After |
+| --- | ---: | ---: |
+| Direct `--outline --project` load, wall | 8.5–9.3 s | 6.05–6.3 s (−32%) |
+| Same, user CPU | 14.2–15.3 s | 10.9 s |
+| Same, instructions retired | 101.4–101.9 G | 73.8–74.4 G (−27%) |
+| Same, peak physical footprint | 2.49–2.51 GiB | 1.94–1.95 GiB (−560 MiB) |
+| Same, page reclaims | 0.99–1.00 M | 0.75 M |
+| Service, first request (cold load) | 8.3–8.4 s | 5.9–6.4 s |
+| Service footprint after load | 2,107–2,133 MB | 1,563–1,591 MB (−25%) |
+| Warm references (`getTicketService`), median | 159–165 ms | 136 ms |
+| Warm type at a position, median | 172–174 ms | 148–155 ms |
+| Warm outline, median | 122–123 ms | 124–126 ms |
+| Warm member search (`AgentTaskRunner.run`) | 10.6–11.0 s | 9.5–9.6 s |
+| Refresh after a one-file edit (three edits) | 5.9–6.3 s | 4.2–4.5 s |
+| Service footprint after each refresh | 1,888–1,970 MB | 1,310–1,435 MB |
+
+Milestone by milestone (each interleaved with the previous milestone's
+binary, often on a busy host, where one binary's count varies by about 2 G),
+the direct load's instructions went 100.6 → 90.8 G (milestone 1) → 87.4 G (2)
+→ 87.6 G (3) → 81.0 G (5) → 77.7 G (6) → 74.1 G (7), and the peak footprint
+2.50 → 2.30 GiB (2) → 2.22 GiB (3) → 2.12 GiB (5) → 1.94 GiB (6); milestone 4
+changed the member search. Warm requests are dominated by freshness
+validation (about 110 ms of each), so the query work itself shrank more than
+the totals show; a service footprint measured
+immediately after a refresh can include the previous generation's load-only
+state still being freed on the release thread (L6), which the settled
+footprint excludes.
+
+A profile of 83800d5's load (the final revision but for the lexer's
+per-byte class names; the same no-LTO profiling build, macOS `sample` at
+1 ms, one run on a busy host) shows where the next round
+starts. The loader thread was busy for 4,212 of 6,159 samples, where it was
+busy for 8,497 of 10,919 before. Its largest cost is now filesystem probes:
+`stat` 779 samples (18.5%), 465 of them TypeScript's extension probing
+(`resolve::reuse::Memo::read` → `disk::entry`) and 157 the `package.json`
+existence checks, then recording observations (`Disk::record`'s path
+comparisons, 175) and `realpath` (131); copying 270-byte linker `Symbol`
+records into their vector is about 110. Both are the design changes the
+report set aside (L4's per-directory listings would change the observation
+model validation replays). On the capture workers, `read` is 14% of busy
+time and `nom`'s combinator overhead fell from 717 to 83 samples; collection
+(`Collector::run`, 10%) and the lexer's token loop (9%) lead what remains.
+Linking, the parallel target the report names, took 2,217 loader samples
+where it took 5,700 (53% of the busy thread, from 67%): `Linker::declare`
+1,069 from 2,105, the specifier environment 696 from 1,483,
+`retain_files` 1 from 305, and drops on the loader 29 from 343.
 
 ## Evidence
 
