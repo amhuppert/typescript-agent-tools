@@ -1853,7 +1853,7 @@ impl<'p> Linker<'p, '_> {
                         name.span,
                         format!(
                             "declarations of one name must be all exported or all local: `{}`",
-                            name.text
+                            facts.text(name.text)
                         ),
                     )
                     .into());
@@ -3467,7 +3467,9 @@ impl<'p> Linker<'p, '_> {
         for file in self.file_ids() {
             let mut tokens = Vec::new();
             {
-                let names = &self.facts(file).names;
+                let facts = self.facts(file);
+                let texts = index.intern_all(&facts.texts);
+                let names = &facts.names;
                 tokens.reserve(names.len());
                 for (position, name) in names.iter().enumerate() {
                     let target = if !self.search(file) {
@@ -3511,13 +3513,22 @@ impl<'p> Linker<'p, '_> {
                     tokens.push(Token {
                         source: NameId::new(position),
                         span: name.span,
-                        name: &name.text,
+                        name: texts[name.text.index()],
                         roles: name.roles,
                         call: name.call,
                         candidate: name.candidate,
                         target,
                         lexical: name.lexical,
-                        reference: name.reference.as_ref(),
+                        reference: name
+                            .reference
+                            .as_ref()
+                            .map(|reference| index::TokenReference {
+                                key: match &reference.key {
+                                    Ok(key) => Ok(texts[key.index()]),
+                                    Err(why) => Err(why.as_str()),
+                                },
+                                syntax: reference.syntax,
+                            }),
                     });
                 }
             }

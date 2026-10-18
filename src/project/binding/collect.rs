@@ -5,7 +5,7 @@
 //! Scope discovery happens here; lookup waits until every file is collected.
 
 use super::ids::{
-    AliasId, AmbientId, DeclId, ModuleDeclarationId, NameId, RefId, RequestId, ScopeId,
+    AliasId, AmbientId, DeclId, ModuleDeclarationId, NameId, RefId, RequestId, ScopeId, TextId,
     TypeParameterListId,
 };
 use super::instances::{Instance, Instances};
@@ -19,7 +19,7 @@ use crate::source::SourceText;
 use crate::syntax::{child, flag, has_modifier, id as field, ids, is_token, number};
 use crate::syntax_kind::SyntaxKind;
 use crate::{Ast, Node, NodeId, Span};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 mod facts;
 pub(super) use facts::{Facts, SharedFacts};
@@ -34,7 +34,8 @@ pub(crate) const EXPORT: u8 = 8;
 pub(super) struct Name {
     node: NodeId,
     pub(super) span: Span,
-    pub(super) text: String,
+    /// The decoded name, as a `Facts::text` string.
+    pub(super) text: TextId,
     pub(super) roles: u8,
     pub(super) call: bool,
     /// Declaration names, local import names, and exported alias names.
@@ -403,6 +404,8 @@ struct CollectedFacts {
     pub(super) conditional_scopes: HashMap<Span, ScopeId>,
     pub(super) flow: Option<super::flow::Graph>,
     pub(super) names: Vec<Name>,
+    /// Each distinct name and reference key of the file, once.
+    pub(super) texts: Vec<std::sync::Arc<str>>,
     pub(super) scopes: Vec<Scope>,
     pub(super) decls: Vec<Decl>,
     /// Binder visitation order across declarations and aliases. Native class
@@ -552,6 +555,43 @@ impl Cx {
     }
 }
 
+/// The lookup scope of each exact syntax site, as collection writes them:
+/// most writes replace a site's scope, and some keep one already written.
+/// Collection never reads them back, so the writes are logged and resolved
+/// once, each site's in the order they were made (`finish`).
+#[derive(Default)]
+struct ScopeSites(Vec<((SyntaxKind, Span), ScopeId, bool)>);
+
+impl ScopeSites {
+    /// `site`'s scope is now `scope`.
+    fn insert(&mut self, site: (SyntaxKind, Span), scope: ScopeId) {
+        self.0.push((site, scope, true));
+    }
+
+    /// `site`'s scope is `scope` unless one was already written.
+    fn first(&mut self, site: (SyntaxKind, Span), scope: ScopeId) {
+        self.0.push((site, scope, false));
+    }
+
+    fn finish(mut self) -> super::site_map::SiteMap<ScopeId> {
+        // Stable, so each site's writes keep their order.
+        self.0
+            .sort_by_key(|&((kind, span), _, _)| (span.start, span.end, kind.number()));
+        let mut sites: Vec<((SyntaxKind, Span), ScopeId)> = Vec::with_capacity(self.0.len());
+        for (site, scope, replaces) in self.0 {
+            match sites.last_mut() {
+                Some((last, current)) if *last == site => {
+                    if replaces {
+                        *current = scope;
+                    }
+                }
+                _ => sites.push((site, scope)),
+            }
+        }
+        super::site_map::SiteMap::from_entries(sites)
+    }
+}
+
 pub(super) struct Collector<'a, 's> {
     ast: &'a Ast<'s>,
     /// The parsed text, for error positions.
@@ -560,11 +600,15 @@ pub(super) struct Collector<'a, 's> {
     facts: CollectedFacts,
     // Scope capture mixes overwrite and first-write-only rules. Keep that
     // builder behavior intact, then compact its final associations once.
-    scope_sites: HashMap<(SyntaxKind, Span), ScopeId>,
+    scope_sites: ScopeSites,
     requests: Vec<ModuleRequest>,
     work: Vec<CollectWork>,
-    named: HashSet<NodeId>,
-    call_targets: HashSet<NodeId>,
+    /// By node: whether it is a recorded name.
+    named: Vec<bool>,
+    /// By node: whether it is a call's target (`syntax::call_target`).
+    call_targets: Vec<bool>,
+    /// The ids of `facts.texts`.
+    text_ids: crate::hash::FastMap<std::sync::Arc<str>, TextId>,
     /// Type parameter lists seen so far.
     lists: usize,
     /// The declarations of each name per container scope, for TS2395 and
@@ -601,14 +645,20 @@ impl<'a, 's> Collector<'a, 's> {
             source,
             module,
             facts: CollectedFacts::default(),
-            scope_sites: HashMap::new(),
+            scope_sites: ScopeSites::default(),
             requests: Vec::new(),
             work: Vec::new(),
-            named: HashSet::new(),
-            call_targets: ast
-                .walk()
-                .filter_map(|node| crate::syntax::call_target(ast, node))
-                .collect(),
+            named: vec![false; ast.nodes().len()],
+            call_targets: {
+                let mut targets = vec![false; ast.nodes().len()];
+                for node in ast.walk() {
+                    if let Some(target) = crate::syntax::call_target(ast, node) {
+                        targets[target.index()] = true;
+                    }
+                }
+                targets
+            },
+            text_ids: crate::hash::FastMap::default(),
             lists: 0,
             container_names: HashMap::new(),
             instances: Instances::default(),
@@ -665,8 +715,7 @@ impl<'a, 's> Collector<'a, 's> {
             alias.flow = capture.read(alias.span);
         }
         self.facts.flow = Some(capture.graph);
-        self.facts.lookup_scopes =
-            super::site_map::SiteMap::from_entries(self.scope_sites.into_iter().collect());
+        self.facts.lookup_scopes = self.scope_sites.finish();
         Ok((self.facts.into(), self.requests))
     }
 
@@ -719,7 +768,7 @@ impl<'a, 's> Collector<'a, 's> {
             if matches!(
                 node.syntax_kind,
                 SyntaxKind::Identifier | SyntaxKind::PrivateIdentifier
-            ) && !self.named.contains(&id)
+            ) && !self.named[id.index()]
             {
                 let parent = self.ast.node(parent).kind;
                 return Err(self.unsupported(node, &format!("identifier in {parent}")));
@@ -832,14 +881,15 @@ impl<'a, 's> Collector<'a, 's> {
     /// selects: declaration names, local import names, and exported alias
     /// names.
     fn name(&mut self, id: NodeId, target: NameTarget, roles: u8, candidate: bool) -> NameId {
-        let first = self.named.insert(id);
-        debug_assert!(first, "identifier {id:?} recorded twice");
+        debug_assert!(!self.named[id.index()], "identifier {id:?} recorded twice");
+        self.named[id.index()] = true;
+        let text = self.intern(self.decoded_str(id));
         self.facts.names.push(Name {
             node: id,
             span: self.token(id),
-            text: self.decoded(id),
+            text,
             roles,
-            call: self.call_targets.contains(&id),
+            call: self.call_targets[id.index()],
             candidate,
             target,
             flow: None,
@@ -858,33 +908,42 @@ impl<'a, 's> Collector<'a, 's> {
                 parents[child.index()] = Some(id);
             }
         }
-        let mut captured: HashMap<_, _> = self
-            .facts
-            .names
-            .iter()
-            .enumerate()
-            .map(|(index, name)| (name.node, index))
-            .collect();
+        // By node: its name's index plus one.
+        let mut captured = vec![0u32; self.ast.nodes().len()];
+        for (index, name) in self.facts.names.iter().enumerate() {
+            captured[name.node.index()] =
+                u32::try_from(index + 1).expect("semantic record count fits in u32");
+        }
         for id in self.ast.walk() {
-            let Some(reference) = super::reference_tokens::capture(self.ast, &parents, id) else {
+            let Some(captured_token) = super::reference_tokens::capture(self.ast, &parents, id)
+            else {
                 continue;
             };
-            if let Some(&index) = captured.get(&id) {
-                self.facts.names[index].reference = Some(reference);
+            let key = match captured_token.key {
+                Ok(key) => Ok(self.intern(&key)),
+                Err(why) => Err(why),
+            };
+            let reference = super::reference_tokens::CollectedReferenceToken {
+                key,
+                syntax: captured_token.syntax,
+            };
+            if let Some(index) = captured[id.index()].checked_sub(1) {
+                self.facts.names[index as usize].reference = Some(reference);
             } else {
                 // Lexical projection never observes this administrative name;
                 // an unavailable exact key remains retained in `reference`.
-                let text = match &reference.key {
-                    Ok(text) => text.clone(),
-                    Err(_) => String::new(),
+                let text = match reference.key {
+                    Ok(text) => text,
+                    Err(_) => self.intern(""),
                 };
-                captured.insert(id, self.facts.names.len());
+                captured[id.index()] = u32::try_from(self.facts.names.len() + 1)
+                    .expect("semantic record count fits in u32");
                 self.facts.names.push(Name {
                     node: id,
                     span: self.token(id),
                     text,
                     roles: 0,
-                    call: self.call_targets.contains(&id),
+                    call: self.call_targets[id.index()],
                     candidate: false,
                     target: NameTarget::NotReference("semantic reference anchor"),
                     flow: None,
@@ -971,9 +1030,7 @@ impl<'a, 's> Collector<'a, 's> {
         cx: Cx,
         scope: ScopeId,
     ) -> DeclId {
-        self.scope_sites
-            .entry((node.syntax_kind, node.span))
-            .or_insert(scope);
+        self.scope_sites.first((node.syntax_kind, node.span), scope);
         // The inner names of `namespace A.B` are exported from their parents.
         let exported = has_modifier(self.ast, node, SyntaxKind::ExportKeyword)
             || node.syntax_kind == SyntaxKind::ModuleDeclaration
@@ -1162,10 +1219,25 @@ impl<'a, 's> Collector<'a, 's> {
 
     /// The name of an identifier.
     fn decoded(&self, id: NodeId) -> String {
+        self.decoded_str(id).to_string()
+    }
+
+    fn decoded_str(&self, id: NodeId) -> &'a str {
         self.ast
             .identifier_name(id)
             .expect("an identifier has escapedText")
-            .to_string()
+    }
+
+    /// `text` as a `Facts::text` string of this file, stored once.
+    fn intern(&mut self, text: &str) -> TextId {
+        if let Some(&id) = self.text_ids.get(text) {
+            return id;
+        }
+        let id = TextId::new(self.facts.texts.len());
+        let text: std::sync::Arc<str> = text.into();
+        self.facts.texts.push(text.clone());
+        self.text_ids.insert(text, id);
+        id
     }
 
     /// Declare the identifiers of a binding name or pattern, visiting default
@@ -1234,8 +1306,7 @@ impl<'a, 's> Collector<'a, 's> {
         let ast = self.ast;
         let node = ast.node(id);
         self.scope_sites
-            .entry((node.syntax_kind, node.span))
-            .or_insert(cx.scope);
+            .first((node.syntax_kind, node.span), cx.scope);
         // `IsExpression`: expression subtrees use value-reference rules even
         // inside a type (computed names and declaration initializers). Entity
         // names of TypeReference/TypeQuery are captured by those branches,
@@ -2944,11 +3015,93 @@ fn resolution_mode<'s>(ast: &Ast<'s>, node: &Node<'s>) -> Option<ResolutionMode>
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     /// A project has about a million declarations: fields few of them use
     /// stay out of line.
     #[test]
     fn declarations_stay_compact() {
         let size = std::mem::size_of::<super::Decl>();
         assert!(size <= 152, "{size}");
+    }
+
+    /// A project has millions of names: each holds its text as an index.
+    #[test]
+    fn names_stay_compact() {
+        let size = std::mem::size_of::<super::Name>();
+        assert!(size <= 136, "{size}");
+    }
+
+    /// Logged scope writes resolve as the map they replace answered: a
+    /// replacing write overwrites a site's scope, and a first-only write
+    /// keeps one already written, in the order they were made.
+    #[test]
+    fn scope_site_writes_resolve_as_a_map_does() {
+        let mut state = 7u32;
+        let mut next = move || {
+            state = state.wrapping_mul(1_103_515_245).wrapping_add(12_345);
+            (state >> 16) as usize
+        };
+        let kinds = [SyntaxKind::Identifier, SyntaxKind::Block];
+        for _ in 0..64 {
+            let mut map = HashMap::new();
+            let mut log = ScopeSites::default();
+            for _ in 0..next() % 300 {
+                let start = next() % 8;
+                let site = (
+                    kinds[next() % 2],
+                    Span {
+                        start,
+                        end: start + next() % 3,
+                    },
+                );
+                let scope = ScopeId::new(next() % 5);
+                if next() % 3 == 0 {
+                    map.entry(site).or_insert(scope);
+                    log.first(site, scope);
+                } else {
+                    map.insert(site, scope);
+                    log.insert(site, scope);
+                }
+            }
+            let sites = log.finish();
+            for kind in kinds {
+                for start in 0..8 {
+                    for end in start..start + 3 {
+                        let site = (kind, Span { start, end });
+                        assert_eq!(sites.get(site), map.get(&site).copied(), "{site:?}");
+                    }
+                }
+            }
+        }
+    }
+
+    /// A file stores each distinct name once, however often it occurs.
+    #[test]
+    fn a_file_stores_each_name_once() {
+        let source = "let value = 1; value; value; value; let other = value;";
+        let ast = crate::parse(source).unwrap();
+        let text = SourceText::new(source.into());
+        let (facts, _) = Collector::new(&ast, &text, true).run().unwrap();
+        let spelled = |name: &str| {
+            facts
+                .names
+                .iter()
+                .filter(|occurrence| facts.text(occurrence.text) == name)
+                .map(|occurrence| occurrence.text)
+                .collect::<Vec<_>>()
+        };
+        let values = spelled("value");
+        assert_eq!(values.len(), 5);
+        assert!(values.iter().all(|&id| id == values[0]));
+        assert_eq!(
+            facts
+                .texts
+                .iter()
+                .filter(|text| &***text == "value")
+                .count(),
+            1
+        );
+        assert_eq!(spelled("other").len(), 1);
     }
 }

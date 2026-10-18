@@ -213,7 +213,7 @@ impl<'a> BindingFiles<'a> {
                 let facts = &program.files[id.file.index()].facts.facts;
                 let data = &facts.refs[id.id.index()];
                 Reference {
-                    name: &facts.names[data.token.index()].text,
+                    name: facts.text(facts.names[data.token.index()].text),
                     span: facts.names[data.token.index()].span,
                     base: data.base,
                     meaning: data.meaning,

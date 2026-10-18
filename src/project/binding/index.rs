@@ -10,8 +10,7 @@
 use super::ids::{NameId, OccurrenceId, StringId, SymbolId};
 use super::json::JsonPropertyId;
 use super::reference_tokens::{
-    CollectedReferenceToken, ReferenceSyntax, ReferenceToken, ReferenceTokenEntry,
-    ReferenceTokenRole,
+    ReferenceSyntax, ReferenceToken, ReferenceTokenEntry, ReferenceTokenRole,
 };
 use crate::Span;
 use crate::hash::FastMap;
@@ -407,7 +406,8 @@ pub(crate) struct Token<'a> {
     /// Its original file-local collected name, before position sorting.
     pub(crate) source: NameId,
     pub(crate) span: Span,
-    pub(crate) name: &'a str,
+    /// The decoded name, as an `Index::text` string (`Builder::intern_all`).
+    pub(crate) name: StringId,
     /// `collect` role bits.
     pub(crate) roles: u8,
     pub(crate) call: bool,
@@ -416,7 +416,14 @@ pub(crate) struct Token<'a> {
     pub(crate) candidate: bool,
     pub(crate) target: Target,
     pub(super) lexical: bool,
-    pub(super) reference: Option<&'a CollectedReferenceToken>,
+    pub(super) reference: Option<TokenReference<'a>>,
+}
+
+/// A token's reference-token facts: its exact key as an `Index::text`
+/// string, or why it has none.
+pub(crate) struct TokenReference<'a> {
+    pub(super) key: Result<StringId, &'a str>,
+    pub(super) syntax: ReferenceSyntax,
 }
 
 /// Append `value` to `key`'s list, allocating the key only for a new list.
@@ -440,6 +447,12 @@ pub(crate) struct Builder {
 }
 
 impl Builder {
+    /// Each of a file's names and keys as an `Index::text` string, by the
+    /// file's own text id: interned once per file, not per token.
+    pub(crate) fn intern_all(&mut self, texts: &[std::sync::Arc<str>]) -> Vec<StringId> {
+        texts.iter().map(|text| self.intern(text)).collect()
+    }
+
     /// Store `text` once, as an `Index::text` string.
     pub(crate) fn intern(&mut self, text: &str) -> StringId {
         if let Some(&id) = self.string_ids.get(text) {
@@ -484,14 +497,14 @@ impl Builder {
                 start: token.span.start,
                 end: token.span.start,
             };
-            let syntax = token.reference.map(|data| data.syntax);
+            let syntax = token.reference.as_ref().map(|data| data.syntax);
             let key = token.reference.map(|data| {
                 reference_positions.push(reference.id);
-                match &data.key {
+                match data.key {
                     Ok(key) => {
                         push_keyed(
                             &mut self.by_reference_name,
-                            key,
+                            &self.index.strings[key.index()],
                             (
                                 StoredToken {
                                     file,
@@ -500,7 +513,7 @@ impl Builder {
                                 token.span,
                             ),
                         );
-                        Ok(self.intern(key))
+                        Ok(key)
                     }
                     Err(why) => Err(self.intern(why)),
                 }
@@ -511,7 +524,11 @@ impl Builder {
                 }
             }
             if searched && token.candidate {
-                push_keyed(&mut self.index.by_name, token.name, reference);
+                push_keyed(
+                    &mut self.index.by_name,
+                    &self.index.strings[token.name.index()],
+                    reference,
+                );
             }
             let target = match token.target {
                 Target::Symbols(symbols) if symbols.len() == 1 => StoredTarget::Symbol(symbols[0]),
@@ -529,7 +546,7 @@ impl Builder {
             spans.push(syntax.map_or(empty, |syntax| syntax.native_span));
             spans.push(syntax.map_or(empty, |syntax| syntax.occurrence_span));
             records.push(Record {
-                name: self.intern(token.name),
+                name: token.name,
                 target,
                 key,
                 roles: token.roles,
@@ -708,7 +725,7 @@ mod tests {
         Token {
             source: NameId::new(0),
             span,
-            name: "value",
+            name: StringId::new(0),
             roles: crate::project::binding::collect::USE,
             call: false,
             candidate: false,

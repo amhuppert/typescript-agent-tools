@@ -10,6 +10,8 @@ use std::sync::Arc;
 pub(in crate::project::binding) struct Facts {
     pub(in crate::project::binding) shared: Arc<SharedFacts>,
     pub(in crate::project::binding) names: Box<[Name]>,
+    /// Each distinct name and reference key of the file (`Name::text`).
+    pub(in crate::project::binding) texts: Box<[std::sync::Arc<str>]>,
     pub(in crate::project::binding) refs: Box<[Ref]>,
     pub(in crate::project::binding) binding_order: Box<[BindingEntry]>,
     pub(in crate::project::binding) anonymous_signatures: HashMap<DeclId, DeclId>,
@@ -33,6 +35,13 @@ pub(in crate::project::binding) struct SharedFacts {
     pub(in crate::project::binding) instantiated_augmentations: Box<[RequestId]>,
 }
 
+impl Facts {
+    /// A name or reference key of the file.
+    pub(in crate::project::binding) fn text(&self, id: TextId) -> &str {
+        &self.texts[id.index()]
+    }
+}
+
 impl std::ops::Deref for Facts {
     type Target = SharedFacts;
 
@@ -49,6 +58,7 @@ impl From<CollectedFacts> for Facts {
             conditional_scopes,
             flow,
             names,
+            texts,
             scopes,
             decls,
             binding_order,
@@ -75,6 +85,7 @@ impl From<CollectedFacts> for Facts {
                 instantiated_augmentations: instantiated_augmentations.into_boxed_slice(),
             }),
             names: names.into_boxed_slice(),
+            texts: texts.into_boxed_slice(),
             refs: refs.into_boxed_slice(),
             binding_order: binding_order.into_boxed_slice(),
             anonymous_signatures,

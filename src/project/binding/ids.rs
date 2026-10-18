@@ -44,7 +44,8 @@ ids!(
     SymbolId,
     NativeHeaderId,
     NativeTableId,
-    TypeParameterListId
+    TypeParameterListId,
+    TextId
 );
 
 impl TableId {

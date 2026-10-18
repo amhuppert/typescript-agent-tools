@@ -163,7 +163,14 @@ impl super::Bindings {
 #[derive(Debug, Clone)]
 pub(super) struct CollectedReferenceToken {
     /// An unavailable exact key remains a failure at selection; its display
-    /// text is never inserted into a key index.
+    /// text is never inserted into a key index. A key is a `Facts::text`.
+    pub(super) key: Result<super::ids::TextId, String>,
+    pub(super) syntax: ReferenceSyntax,
+}
+
+/// A reference token as `capture` finds it, before collection stores its
+/// key (`CollectedReferenceToken`).
+pub(super) struct CapturedReferenceToken {
     pub(super) key: Result<String, String>,
     pub(super) syntax: ReferenceSyntax,
 }
@@ -185,7 +192,7 @@ pub(super) fn capture(
     ast: &Ast<'_>,
     parents: &[Option<NodeId>],
     id: NodeId,
-) -> Option<CollectedReferenceToken> {
+) -> Option<CapturedReferenceToken> {
     use ReferenceTokenRole as R;
     use SyntaxKind as K;
     let node = ast.node(id);
@@ -212,7 +219,7 @@ pub(super) fn capture(
             if name.syntax_kind != K::Identifier {
                 return None;
             }
-            return Some(CollectedReferenceToken {
+            return Some(CapturedReferenceToken {
                 key: super::text::exact_text(ast, name).map(|text| text.to_owned()),
                 syntax: ReferenceSyntax {
                     kind: node.syntax_kind,
@@ -232,7 +239,7 @@ pub(super) fn capture(
         let key = super::text::exact_text(ast, namespace).and_then(|namespace| {
             super::text::exact_text(ast, name).map(|name| format!("{namespace}:{name}"))
         });
-        return Some(CollectedReferenceToken {
+        return Some(CapturedReferenceToken {
             key,
             syntax: ReferenceSyntax {
                 kind: node.syntax_kind,
@@ -328,7 +335,7 @@ pub(super) fn capture(
     } else {
         super::collect::USE
     };
-    Some(CollectedReferenceToken {
+    Some(CapturedReferenceToken {
         key: super::text::exact_text(ast, node).map(|text| text.to_owned()),
         syntax: ReferenceSyntax {
             kind: node.syntax_kind,
