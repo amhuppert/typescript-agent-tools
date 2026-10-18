@@ -495,7 +495,8 @@ pub(super) struct Source<'p, 'w> {
     control: Option<crate::resources::Control>,
     // Immutable binder associations; all current checker state belongs to Evaluator.
     bindings: super::super::binding::NativeInputs<'p>,
-    syntax: HashMap<FileId, CapturedSyntax<'p>>,
+    /// Looked up at every syntax question, never iterated.
+    syntax: crate::hash::FastMap<FileId, CapturedSyntax<'p>>,
     array_spreads: HashMap<ExpressionRoot, arrays::SpreadIndices>,
     jsdoc_tags: HashMap<
         DeclarationIdentity,
@@ -507,7 +508,8 @@ struct CapturedSyntax<'s> {
     ast: Ast<'s>,
     control: Option<crate::resources::Control>,
     parents: Vec<Option<NodeId>>,
-    attachments: HashMap<AttachmentKey, Attachment>,
+    /// Only looked up.
+    attachments: crate::hash::FastMap<AttachmentKey, Attachment>,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
@@ -589,9 +591,12 @@ impl<'s> CapturedSyntax<'s> {
         for _ in ast.nodes() {
             parents.push(None);
         }
-        let mut attachments = HashMap::new();
+        // Three attachments per node, and a name or anchor for some.
+        let mut attachments = crate::hash::FastMap::with_capacity_and_hasher(
+            ast.nodes().len() / 2 * 7,
+            Default::default(),
+        );
         let mut insert = |role, kind, span: Span, id| -> Result<(), crate::resources::Stop> {
-            attachments.reserve(1);
             let key = AttachmentKey {
                 role,
                 kind,
@@ -784,7 +789,7 @@ impl<'p, 'w> Source<'p, 'w> {
                 inputs.bindings,
                 inputs.raw_bindings,
             ),
-            syntax: HashMap::new(),
+            syntax: crate::hash::FastMap::default(),
             jsdoc_tags: HashMap::new(),
             array_spreads: HashMap::new(),
         }

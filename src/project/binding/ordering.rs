@@ -605,7 +605,9 @@ impl IdentityOrder {
 /// Comparison failures cannot become Equal or another successful ordering.
 /// Native identity-tie order deliberately uses this deterministic schedule,
 /// rather than promising Go's process-global pdqsort comparison sequence.
-pub(in crate::project) fn try_sort_by<T: Clone, E>(
+/// The schedule sorts positions, so elements move once, never cloned; after
+/// a failed comparison, `values` keep their order.
+pub(in crate::project) fn try_sort_by<T, E>(
     values: &mut [T],
     compare: &impl Fn(&T, &T) -> Result<Ordering, E>,
 ) -> Result<(), E> {
@@ -613,6 +615,7 @@ pub(in crate::project) fn try_sort_by<T: Clone, E>(
     if length < 2 {
         return Ok(());
     }
+    let mut order: Vec<usize> = (0..length).collect();
     let mut width = 1usize;
     let mut merged = Vec::with_capacity(length);
     while width < length {
@@ -623,20 +626,32 @@ pub(in crate::project) fn try_sort_by<T: Clone, E>(
             let end = middle.saturating_add(width).min(length);
             let (mut left, mut right) = (start, middle);
             while left < middle && right < end {
-                if compare(&values[left], &values[right])? != Ordering::Greater {
-                    merged.push(values[left].clone());
+                if compare(&values[order[left]], &values[order[right]])? != Ordering::Greater {
+                    merged.push(order[left]);
                     left += 1;
                 } else {
-                    merged.push(values[right].clone());
+                    merged.push(order[right]);
                     right += 1;
                 }
             }
-            merged.extend_from_slice(&values[left..middle]);
-            merged.extend_from_slice(&values[right..end]);
+            merged.extend_from_slice(&order[left..middle]);
+            merged.extend_from_slice(&order[right..end]);
             start = end;
         }
-        values.clone_from_slice(&merged);
+        std::mem::swap(&mut order, &mut merged);
         width = width.saturating_mul(2);
+    }
+    // `order[i]` is the position whose element belongs at `i`: follow each
+    // cycle of the permutation, swapping elements into place.
+    for start in 0..length {
+        let mut current = start;
+        while order[current] != start {
+            let next = order[current];
+            values.swap(current, next);
+            order[current] = current;
+            current = next;
+        }
+        order[current] = current;
     }
     Ok(())
 }
@@ -947,6 +962,135 @@ mod identity_order_tests {
                     .unwrap(),
                 Ordering::Less
             );
+        }
+    }
+}
+
+#[cfg(test)]
+mod sort_schedule_tests {
+    use super::try_sort_by;
+    use std::cell::{Cell, RefCell};
+    use std::cmp::Ordering;
+
+    /// The schedule before elements moved by position: each merge level
+    /// cloned its elements. The current sort must ask the same comparisons,
+    /// in the same order, and give the same result.
+    fn cloning_sort<T: Clone, E>(
+        values: &mut [T],
+        compare: &impl Fn(&T, &T) -> Result<Ordering, E>,
+    ) -> Result<(), E> {
+        let length = values.len();
+        if length < 2 {
+            return Ok(());
+        }
+        let mut width = 1usize;
+        let mut merged = Vec::with_capacity(length);
+        while width < length {
+            merged.clear();
+            let mut start = 0usize;
+            while start < length {
+                let middle = start.saturating_add(width).min(length);
+                let end = middle.saturating_add(width).min(length);
+                let (mut left, mut right) = (start, middle);
+                while left < middle && right < end {
+                    if compare(&values[left], &values[right])? != Ordering::Greater {
+                        merged.push(values[left].clone());
+                        left += 1;
+                    } else {
+                        merged.push(values[right].clone());
+                        right += 1;
+                    }
+                }
+                merged.extend_from_slice(&values[left..middle]);
+                merged.extend_from_slice(&values[right..end]);
+                start = end;
+            }
+            values.clone_from_slice(&merged);
+            width = width.saturating_mul(2);
+        }
+        Ok(())
+    }
+
+    /// An element whose clones are counted; it sorts by `key`, and `id`
+    /// tells equal keys apart.
+    #[derive(Debug, PartialEq)]
+    struct Item<'c> {
+        key: u32,
+        id: usize,
+        clones: &'c Cell<usize>,
+    }
+
+    impl Clone for Item<'_> {
+        fn clone(&self) -> Self {
+            self.clones.set(self.clones.get() + 1);
+            Self { ..*self }
+        }
+    }
+
+    fn inputs() -> Vec<Vec<u32>> {
+        let mut inputs = vec![vec![], vec![1], vec![2, 1], vec![1, 1, 1], vec![3, 1, 2]];
+        let mut state = 0x9e37_79b9u32;
+        for length in [5, 8, 13, 64, 100] {
+            inputs.push(
+                (0..length)
+                    .map(|_| {
+                        state = state.wrapping_mul(1_103_515_245).wrapping_add(12_345);
+                        (state >> 16) % 7
+                    })
+                    .collect(),
+            );
+        }
+        inputs
+    }
+
+    #[test]
+    fn sorting_positions_keeps_the_cloning_schedule() {
+        for keys in inputs() {
+            // Fail at no comparison, at the first, and partway through.
+            for fail_at in [None, Some(0), Some(keys.len())] {
+                let clones = Cell::new(0);
+                let make = || -> Vec<Item<'_>> {
+                    keys.iter()
+                        .enumerate()
+                        .map(|(id, &key)| Item {
+                            key,
+                            id,
+                            clones: &clones,
+                        })
+                        .collect()
+                };
+                let run = |sort: &dyn Fn(
+                    &mut [Item<'_>],
+                    &dyn Fn(&Item<'_>, &Item<'_>) -> Result<Ordering, ()>,
+                ) -> Result<(), ()>| {
+                    let asked = RefCell::new(Vec::new());
+                    let mut values = make();
+                    let result = sort(&mut values, &|left, right| {
+                        let mut asked = asked.borrow_mut();
+                        if Some(asked.len()) == fail_at {
+                            return Err(());
+                        }
+                        asked.push((left.id, right.id));
+                        Ok(left.key.cmp(&right.key))
+                    });
+                    let order: Vec<usize> = values.iter().map(|item| item.id).collect();
+                    (result, asked.into_inner(), order)
+                };
+                let (expected, expected_asked, expected_order) =
+                    run(&|values, compare| cloning_sort(values, &|l, r| compare(l, r)));
+                clones.set(0);
+                let (result, asked, order) =
+                    run(&|values, compare| try_sort_by(values, &|l, r| compare(l, r)));
+                assert_eq!(result, expected, "{keys:?} failing at {fail_at:?}");
+                assert_eq!(asked, expected_asked, "{keys:?} failing at {fail_at:?}");
+                if result.is_ok() {
+                    assert_eq!(order, expected_order, "{keys:?}");
+                } else {
+                    // A failed sort leaves its elements in their order.
+                    assert_eq!(order, (0..keys.len()).collect::<Vec<_>>(), "{keys:?}");
+                }
+                assert_eq!(clones.get(), 0, "elements move, never cloned");
+            }
         }
     }
 }
