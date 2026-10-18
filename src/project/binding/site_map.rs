@@ -57,6 +57,29 @@ fn key((kind, span): Key) -> (usize, usize, u32) {
     (span.start, span.end, kind.number())
 }
 
+/// Sort `writes` by site, stably, and keep one write per site: the first,
+/// taking the value of each later write that `replaces` it, in order. The
+/// one write rule of both constructors.
+fn resolve<T>(
+    writes: &mut Vec<T>,
+    site: impl Fn(&T) -> Key,
+    replaces: impl Fn(&T) -> bool,
+    take: impl Fn(&mut T, &T),
+) {
+    writes.sort_by_key(|write| key(site(write)));
+    // dedup_by passes the later write first: update the kept one before
+    // removing the later slot.
+    writes.dedup_by(|later, kept| {
+        if site(later) != site(kept) {
+            return false;
+        }
+        if replaces(later) {
+            take(kept, later);
+        }
+        true
+    });
+}
+
 impl<V: PackedValue> Default for SiteMap<V> {
     fn default() -> Self {
         Self {
@@ -76,35 +99,24 @@ impl<V: PackedValue> SiteMap<V> {
     /// The map of `entries` in write order, each replacing any earlier
     /// value at its site.
     pub(super) fn from_entries(mut entries: Vec<(Key, V)>) -> Self {
-        // Stable sorting preserves binder write order within each exact site.
-        // dedup_by passes the later entry first, so replace the surviving
-        // earlier value before removing the later slot.
-        entries.sort_by_key(|&(site, _)| key(site));
-        entries.dedup_by(|later, earlier| {
-            if later.0 == earlier.0 {
-                earlier.1 = later.1;
-                true
-            } else {
-                false
-            }
-        });
+        resolve(
+            &mut entries,
+            |&(site, _)| site,
+            |_| true,
+            |kept, later| kept.1 = later.1,
+        );
         Self::sorted(entries)
     }
 
     /// The map of `writes` in write order: each replaces any earlier value
     /// at its site or keeps it, as its `Write` says.
     pub(super) fn from_writes(mut writes: Vec<(Key, V, Write)>) -> Self {
-        writes.sort_by_key(|&(site, _, _)| key(site));
-        writes.dedup_by(|later, earlier| {
-            if later.0 == earlier.0 {
-                if later.2 == Write::Replace {
-                    earlier.1 = later.1;
-                }
-                true
-            } else {
-                false
-            }
-        });
+        resolve(
+            &mut writes,
+            |&(site, _, _)| site,
+            |&(_, _, write)| write == Write::Replace,
+            |kept, later| kept.1 = later.1,
+        );
         Self::sorted(
             writes
                 .into_iter()

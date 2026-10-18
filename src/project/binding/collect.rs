@@ -245,7 +245,9 @@ pub(super) struct Decl {
     /// Actual class/interface/alias parameter names, default presence and
     /// declaration anchors. Names/defaults serve merge checks; anchors retain
     /// getSymbolOfDeclaration identity for native local parameter acquisition.
-    /// Out of line, as few declarations have them.
+    /// Out of line, as few declarations have them: one word when absent,
+    /// where a `Vec` is three. An empty list is established data.
+    #[allow(clippy::box_collection)]
     pub(super) type_parameters: Option<Box<Vec<(String, bool, Span)>>>,
     /// The members of an interface that may be a JSON value's apparent type
     /// (`super::APPARENT_INTERFACES`); other declarations record none.
@@ -260,10 +262,32 @@ pub(super) struct InterfaceMembers {
     pub(super) inherits: bool,
 }
 
+/// A fixed declaration name, shared by every declaration this thread names
+/// with it: `Decl::default()` makes the empty name for every declaration,
+/// which its caller then usually names, and many anonymous declarations are
+/// `__type`, `this` or `default`.
+fn fixed_text(text: &'static str) -> std::sync::Arc<str> {
+    thread_local! {
+        static TEXTS: std::cell::RefCell<crate::hash::FastMap<&'static str, std::sync::Arc<str>>> =
+            Default::default();
+    }
+    TEXTS.with(|texts| {
+        texts
+            .borrow_mut()
+            .entry(text)
+            .or_insert_with(|| text.into())
+            .clone()
+    })
+}
+
+fn empty_name() -> std::sync::Arc<str> {
+    fixed_text("")
+}
+
 impl Default for Decl {
     fn default() -> Self {
         Self {
-            name: "".into(),
+            name: empty_name(),
             anchor: Span { start: 0, end: 0 },
             name_reference: None,
             flow: None,
@@ -1048,9 +1072,9 @@ impl<'a, 's> Collector<'a, 's> {
         });
         // TypeScript requires merged declarations to be all exported or all
         // local within one container (`mixed_exports`).
-        if let (Some(container), Some(name), Some(token)) = (cx.container, name, token) {
+        if let (Some(container), Some(_), Some(token)) = (cx.container, name, token) {
             if !container.export_context {
-                let key = (cx.scope, self.intern(self.decoded_str(name)));
+                let key = (cx.scope, self.facts.names[token.index()].text);
                 let declared = self.container_names.entry(key).or_default();
                 let spaces = kind.declaration_spaces();
                 if export.is_some() {
@@ -1070,9 +1094,9 @@ impl<'a, 's> Collector<'a, 's> {
             Some(token) => self.facts.names[token.index()].span,
             None => default_keyword(self.ast, node),
         };
-        let name = match name {
-            Some(name) => self.shared(self.decoded_str(name)),
-            None => "default".into(),
+        let name = match token {
+            Some(token) => self.facts.texts[self.facts.names[token.index()].text.index()].clone(),
+            None => fixed_text("default"),
         };
         let interface_members = (kind == DeclKind::Interface
             && super::APPARENT_INTERFACES.contains(&&*name))
@@ -1219,6 +1243,18 @@ impl<'a, 's> Collector<'a, 's> {
         self.ast
             .identifier_name(id)
             .expect("an identifier has escapedText")
+    }
+
+    /// `text`, shared with the file's name table: the table's when it has
+    /// it, and otherwise `text` itself, stored there.
+    fn adopt(&mut self, text: std::sync::Arc<str>) -> std::sync::Arc<str> {
+        if let Some(&id) = self.text_ids.get(&*text) {
+            return self.facts.texts[id.index()].clone();
+        }
+        let id = TextId::new(self.facts.texts.len());
+        self.facts.texts.push(text.clone());
+        self.text_ids.insert(text.clone(), id);
+        text
     }
 
     /// `text`, shared with the file's name table.
@@ -1720,7 +1756,7 @@ impl<'a, 's> Collector<'a, 's> {
                     SyntaxKind::FunctionType | SyntaxKind::ConstructorType
                 ) {
                     let owner = self.declare(Decl {
-                        name: "__type".into(),
+                        name: fixed_text("__type"),
                         native_span: Some(node.span),
                         anchor: declaration_anchor(ast, id),
                         kind: DeclKind::TypeLiteral,
@@ -1793,7 +1829,7 @@ impl<'a, 's> Collector<'a, 's> {
             }
             SyntaxKind::TypeLiteral => {
                 let declaration = self.declare(Decl {
-                    name: "__type".into(),
+                    name: fixed_text("__type"),
                     native_span: Some(node.span),
                     anchor: declaration_anchor(ast, id),
                     kind: DeclKind::TypeLiteral,
@@ -1818,7 +1854,7 @@ impl<'a, 's> Collector<'a, 's> {
                 // bindAnonymousDeclaration(TypeLiteral): the mapped object owns
                 // an actual symbol even though its members are checker-created.
                 self.declare(Decl {
-                    name: "__type".into(),
+                    name: fixed_text("__type"),
                     native_span: Some(node.span),
                     anchor: declaration_anchor(ast, id),
                     kind: DeclKind::TypeLiteral,
@@ -1969,7 +2005,7 @@ impl<'a, 's> Collector<'a, 's> {
                 self.scope_sites
                     .insert((name_node.syntax_kind, name_node.span), signature);
                 self.declare(Decl {
-                    name: "this".into(),
+                    name: fixed_text("this"),
                     anchor: self.ast.token_span(name.expect("explicit this has a name")),
                     native_span: Some(parameter.span),
                     kind: DeclKind::Parameter,
@@ -2162,13 +2198,13 @@ impl<'a, 's> Collector<'a, 's> {
         let mut key = declaration_key(self.ast, node);
         // A member's key, its declaration's name, and its occurrence's text
         // are the file's one stored name.
-        if let super::member::MemberKey::Text(text) = &key {
-            key = super::member::MemberKey::Text(self.shared(text));
+        if let super::member::MemberKey::Text(text) = key {
+            key = super::member::MemberKey::Text(self.adopt(text));
         }
         let name = match &key {
             super::member::MemberKey::Text(name) => name.clone(),
             super::member::MemberKey::Private(name) => name.as_str().into(),
-            _ => "".into(),
+            _ => empty_name(),
         };
         self.declare(Decl {
             name,
@@ -3080,10 +3116,13 @@ mod tests {
     }
 
     /// A declaration's name is its file's stored name, not a copy, and so is
-    /// a member's key.
+    /// a member's key, whether an identifier, a quoted, numeric or signed
+    /// numeric literal, or a computed literal names it; an enum member's name
+    /// too.
     #[test]
     fn declarations_share_their_names() {
-        let source = "class Shape { size = 1; }\nconst shape = new Shape();\nshape.size;\n";
+        let source = "class Shape { size = 1; \"q\" = 2; 3 = 4; [\"x\"] = 5; [-6] = 7; }\n\
+                      const shape = new Shape();\nshape.size;\nenum Color { Red }\n";
         let ast = crate::parse(source).unwrap();
         let text = SourceText::new(source.into());
         let (facts, _) = Collector::new(&ast, &text, true).run().unwrap();
@@ -3092,28 +3131,35 @@ mod tests {
                 .texts
                 .iter()
                 .find(|text| &***text == name)
-                .unwrap()
+                .unwrap_or_else(|| panic!("{name} is stored"))
                 .clone()
         };
-        for name in ["Shape", "shape", "size"] {
-            let declaration = facts.decls.iter().find(|decl| &*decl.name == name).unwrap();
+        for name in [
+            "Shape", "shape", "size", "q", "3", "x", "-6", "Color", "Red",
+        ] {
+            let declaration = facts
+                .decls
+                .iter()
+                .find(|decl| &*decl.name == name)
+                .unwrap_or_else(|| panic!("{name} is declared"));
             assert!(
                 std::sync::Arc::ptr_eq(&declaration.name, &stored(name)),
                 "{name}"
             );
+            if let Some(binding) = &declaration.member
+                && let super::super::member::MemberKey::Text(key) = &binding.key
+            {
+                assert!(std::sync::Arc::ptr_eq(key, &declaration.name), "{name}");
+            }
         }
-        let member = facts
-            .decls
-            .iter()
-            .find(|decl| decl.member.is_some())
-            .unwrap();
-        let Some(binding) = &member.member else {
-            unreachable!()
-        };
-        let super::super::member::MemberKey::Text(key) = &binding.key else {
-            panic!("a named member's key is its text")
-        };
-        assert!(std::sync::Arc::ptr_eq(key, &member.name));
+    }
+
+    /// A default declaration's name is the shared empty name, not a new
+    /// allocation each caller discards.
+    #[test]
+    fn default_declarations_share_their_empty_name() {
+        let (first, second) = (Decl::default(), Decl::default());
+        assert!(std::sync::Arc::ptr_eq(&first.name, &second.name));
     }
 
     /// A file stores each distinct name once, however often it occurs.

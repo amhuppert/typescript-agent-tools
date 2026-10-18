@@ -143,7 +143,7 @@ pub(super) enum IntrinsicSymbol {
 /// A list most symbols leave empty, out of line, so that an empty one costs
 /// one word in every symbol.
 #[derive(Debug, Clone)]
-pub(super) struct RareList<T>(Option<Box<Vec<T>>>);
+pub(super) struct RareList<T>(#[allow(clippy::box_collection)] Option<Box<Vec<T>>>);
 
 impl<T> Default for RareList<T> {
     fn default() -> Self {
@@ -157,8 +157,10 @@ impl<T> RareList<T> {
     }
 
     pub(super) fn append(&mut self, other: Self) {
-        if let Some(other) = other.0 {
-            self.0.get_or_insert_default().extend(*other);
+        match (&mut self.0, other.0) {
+            (_, None) => {}
+            (None, other) => self.0 = other,
+            (Some(own), Some(other)) => own.extend(*other),
         }
     }
 
@@ -1170,13 +1172,36 @@ impl Store {
     /// the symbol's homes, whose entries `Linker::propagate` extends with the
     /// meanings later merges add.
     pub(super) fn hold(&mut self, table: TableId, name: &str, meaning: u8, symbol: SymbolId) {
+        self.hold_keyed(table, name, || name.into(), meaning, symbol);
+    }
+
+    /// `hold` for a name already shared, which keys a new entry without a
+    /// copy, as a merge of one table into another holds its names.
+    pub(super) fn hold_shared(
+        &mut self,
+        table: TableId,
+        name: &std::sync::Arc<str>,
+        meaning: u8,
+        symbol: SymbolId,
+    ) {
+        self.hold_keyed(table, name, || name.clone(), meaning, symbol);
+    }
+
+    fn hold_keyed(
+        &mut self,
+        table: TableId,
+        name: &str,
+        key: impl FnOnce() -> std::sync::Arc<str>,
+        meaning: u8,
+        symbol: SymbolId,
+    ) {
         self.write();
         match self.tables[table.index()].get_mut(name) {
             Some(entry) => entry.slots.set(meaning, symbol),
             None => {
                 let mut entry = Entry::default();
                 entry.slots.set(meaning, symbol);
-                self.tables[table.index()].insert(name.into(), entry);
+                self.tables[table.index()].insert(key(), entry);
             }
         }
         let symbol = self.find(symbol);
@@ -1188,6 +1213,26 @@ impl Store {
 
     /// Set or clear the alias of `table`'s entry for `name`.
     pub(super) fn set_alias(&mut self, table: TableId, name: &str, alias: Option<AliasRef>) {
+        self.set_alias_keyed(table, name, || name.into(), alias);
+    }
+
+    /// `set_alias` for a name already shared (`hold_shared`).
+    pub(super) fn set_alias_shared(
+        &mut self,
+        table: TableId,
+        name: &std::sync::Arc<str>,
+        alias: Option<AliasRef>,
+    ) {
+        self.set_alias_keyed(table, name, || name.clone(), alias);
+    }
+
+    fn set_alias_keyed(
+        &mut self,
+        table: TableId,
+        name: &str,
+        key: impl FnOnce() -> std::sync::Arc<str>,
+        alias: Option<AliasRef>,
+    ) {
         self.write();
         match (self.tables[table.index()].get_mut(name), alias) {
             (Some(entry), _) => entry.alias = alias,
@@ -1198,7 +1243,7 @@ impl Store {
                     alias,
                     member: None,
                 };
-                self.tables[table.index()].insert(name.into(), entry);
+                self.tables[table.index()].insert(key(), entry);
             }
         }
     }

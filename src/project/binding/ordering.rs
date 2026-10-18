@@ -174,9 +174,9 @@ pub(super) enum NativeSymbolName {
 /// symbol this thread names with it: binding names hundreds of thousands
 /// of symbols `__type`, `__object`, `__function`, `default` and the like.
 fn fixed_name(name: &'static [u8], internal: bool) -> Arc<[u8]> {
+    type Names = std::cell::RefCell<crate::hash::FastMap<(&'static [u8], bool), Arc<[u8]>>>;
     thread_local! {
-        static NAMES: std::cell::RefCell<crate::hash::FastMap<(&'static [u8], bool), Arc<[u8]>>> =
-            Default::default();
+        static NAMES: Names = Default::default();
     }
     NAMES.with(|names| {
         names
@@ -1032,6 +1032,12 @@ mod sort_schedule_tests {
         Ok(())
     }
 
+    /// A sort under test, given its comparison.
+    type Sort = dyn for<'c> Fn(
+        &mut [Item<'c>],
+        &dyn Fn(&Item<'c>, &Item<'c>) -> Result<Ordering, ()>,
+    ) -> Result<(), ()>;
+
     /// An element whose clones are counted; it sorts by `key`, and `id`
     /// tells equal keys apart.
     #[derive(Debug, PartialEq)]
@@ -1080,10 +1086,7 @@ mod sort_schedule_tests {
                         })
                         .collect()
                 };
-                let run = |sort: &dyn Fn(
-                    &mut [Item<'_>],
-                    &dyn Fn(&Item<'_>, &Item<'_>) -> Result<Ordering, ()>,
-                ) -> Result<(), ()>| {
+                let run = |sort: &Sort| {
                     let asked = RefCell::new(Vec::new());
                     let mut values = make();
                     let result = sort(&mut values, &|left, right| {

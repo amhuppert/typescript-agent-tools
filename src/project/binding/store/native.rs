@@ -38,7 +38,9 @@ pub(in crate::project::binding) struct NativeHeader {
     pub(in crate::project::binding) projection: Option<SymbolId>,
     /// Syntax associations for the native late-member worker, independent of
     /// navigation tables. They follow the owning declaration list in merges.
-    /// Out of line: few headers have any.
+    /// Out of line: few headers have any, and an absent list is one word
+    /// where a `Vec` is three.
+    #[allow(clippy::box_collection)]
     pub(in crate::project::binding) late_members: Option<Box<Vec<NativeHeaderId>>>,
     not_const_enum_only: bool,
 }

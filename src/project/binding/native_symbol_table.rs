@@ -85,7 +85,7 @@ impl<'a, S> Entries<'a, S> {
     }
 
     #[cfg(test)]
-    pub(in crate::project) fn is_empty(self) -> bool {
+    pub(in crate::project) fn is_empty(&self) -> bool {
         match self.0 {
             Stored::Few(entries) => entries.is_empty(),
             Stored::Many(entries) => entries.is_empty(),

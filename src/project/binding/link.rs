@@ -507,6 +507,9 @@ impl std::fmt::Debug for LinkState {
     }
 }
 
+/// A merge's remaining source entries, by name.
+type HeldEntries = std::vec::IntoIter<(std::sync::Arc<str>, Held)>;
+
 struct Linker<'p, 'l> {
     program: &'p Program,
     state: &'l mut LinkState,
@@ -2259,8 +2262,7 @@ impl<'p> Linker<'p, '_> {
     /// exporting an alias of itself can, still finish.
     fn run_projected_merges(&mut self, work: Vec<TableMerge>) -> Result<()> {
         let mut merged = HashSet::new();
-        let mut stack: Vec<(TableMerge, std::vec::IntoIter<(std::sync::Arc<str>, Held)>)> =
-            Vec::new();
+        let mut stack: Vec<(TableMerge, HeldEntries)> = Vec::new();
         let mut queued = work;
         loop {
             for merge in std::mem::take(&mut queued).into_iter().rev() {
@@ -2337,7 +2339,7 @@ impl<'p> Linker<'p, '_> {
     fn merge_entry(
         &mut self,
         merge: TableMerge,
-        name: &str,
+        name: &std::sync::Arc<str>,
         source: Held,
         work: &mut Vec<TableMerge>,
     ) -> Result<()> {
@@ -2417,10 +2419,10 @@ impl<'p> Linker<'p, '_> {
             // TypeScript keeps a declared target; a resolved alias or star
             // export gives way to the source.
             if matches!(origin, Origin::Alias(_) | Origin::Star(_)) {
-                self.state.store.set_alias(into, name, source.alias);
+                self.state.store.set_alias_shared(into, name, source.alias);
                 for meaning in each(meaning::ALL) {
                     if let Some(symbol) = source_slots.get(meaning) {
-                        self.state.store.hold(into, name, meaning, symbol);
+                        self.state.store.hold_shared(into, name, meaning, symbol);
                     }
                 }
             }
@@ -2435,10 +2437,10 @@ impl<'p> Linker<'p, '_> {
             .fold(0, |meanings, symbol| meanings | self.meanings_of(symbol));
         if !matches!(origin, Origin::Declared) {
             // TypeScript stores the merged symbol where the alias was.
-            self.state.store.set_alias(into, name, None);
+            self.state.store.set_alias_shared(into, name, None);
             for meaning in each(meaning::ALL) {
                 if let Some(symbol) = targets.get(meaning) {
-                    self.state.store.hold(into, name, meaning, symbol);
+                    self.state.store.hold_shared(into, name, meaning, symbol);
                 }
             }
         }
@@ -2450,7 +2452,7 @@ impl<'p> Linker<'p, '_> {
             self.debug_assert_placed(into, name, brought, merged);
         }
         if let Some(alias) = source.alias {
-            self.state.store.set_alias(into, name, Some(alias));
+            self.state.store.set_alias_shared(into, name, Some(alias));
             for symbol in distinct(self.held(into, name).slots) {
                 self.state.store.add_alias(symbol, alias);
             }
@@ -2590,7 +2592,7 @@ impl<'p> Linker<'p, '_> {
                             .get(meaning)
                             .is_none_or(|other| self.meanings_of(other) & meaning == 0);
                         if let (true, Some(symbol)) = (free, merged.get(meaning)) {
-                            self.state.store.hold(table, &name, meaning, symbol);
+                            self.state.store.hold_shared(table, &name, meaning, symbol);
                         }
                     }
                 }
@@ -3236,7 +3238,7 @@ impl<'p> Linker<'p, '_> {
                     .and_then(|destination| destination.slots.get(meaning));
                 match (held, entry.slots.get(meaning)) {
                     (Some(a), Some(b)) => work.push((a, b)),
-                    (None, Some(b)) => self.state.store.hold(into, &name, meaning, b),
+                    (None, Some(b)) => self.state.store.hold_shared(into, &name, meaning, b),
                     _ => {}
                 }
             }
@@ -3244,7 +3246,7 @@ impl<'p> Linker<'p, '_> {
                 continue;
             };
             let Some(kept) = self.held(into, &name).alias else {
-                self.state.store.set_alias(into, &name, Some(alias));
+                self.state.store.set_alias_shared(into, &name, Some(alias));
                 continue;
             };
             // TypeScript reports both declarations; the first export stays
