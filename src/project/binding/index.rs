@@ -25,7 +25,8 @@ use smallvec::SmallVec;
 pub(crate) struct Site {
     pub(crate) file: FileId,
     pub(crate) span: Span,
-    pub(crate) name: String,
+    /// Shared with the declaration (`collect::Decl::name`).
+    pub(crate) name: std::sync::Arc<str>,
 }
 
 /// Each file's place among the display names, which order public locations:
@@ -88,7 +89,7 @@ impl DisplayOrder {
 
 #[derive(Debug)]
 pub(crate) struct IndexedSite {
-    pub(crate) name: String,
+    pub(crate) name: std::sync::Arc<str>,
     pub(crate) file: FileId,
     pub(crate) span: Span,
 }
@@ -721,11 +722,11 @@ mod tests {
         }
     }
 
-    fn token(span: Span, target: Target) -> Token<'static> {
+    fn token(name: StringId, span: Span, target: Target) -> Token<'static> {
         Token {
             source: NameId::new(0),
             span,
-            name: StringId::new(0),
+            name,
             roles: crate::project::binding::collect::USE,
             call: false,
             candidate: false,
@@ -759,6 +760,7 @@ mod tests {
             );
         }
         let mut builder = Builder::default();
+        let value = builder.intern("value");
         let at = |text: &str| {
             let start = text.find('b').unwrap();
             Span {
@@ -769,9 +771,15 @@ mod tests {
         let ids: Vec<FileId> = sources.ids().collect();
         for (&id, text) in ids.iter().zip(texts) {
             let target = Target::Symbols(SmallVec::from_elem(symbol, 1));
-            builder.add_file(id, true, vec![token(at(text), target)]);
+            builder.add_file(id, true, vec![token(value, at(text), target)]);
         }
         let index = builder.finish(&sources, |_| Vec::new());
+        for indexed in index.occurrences_of(symbol) {
+            assert_eq!(
+                index.text(index.occurrence(indexed.occurrence).name),
+                "value"
+            );
+        }
         let order: Vec<(usize, usize)> = index
             .occurrences_of(symbol)
             .iter()
@@ -802,9 +810,10 @@ mod tests {
             );
         }
         let mut builder = Builder::default();
+        let value = builder.intern("value");
         for (id, text) in sources.ids().collect::<Vec<_>>().into_iter().zip(texts) {
             let target = Target::Symbols(SmallVec::from_elem(symbol, 1));
-            builder.add_file(id, true, vec![token(at(text), target)]);
+            builder.add_file(id, true, vec![token(value, at(text), target)]);
         }
         let index = builder.finish(&sources, |_| Vec::new());
         assert_eq!(index.occurrences_of(symbol).len(), 1);

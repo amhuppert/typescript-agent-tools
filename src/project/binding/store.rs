@@ -140,6 +140,33 @@ pub(super) enum IntrinsicSymbol {
     GlobalThis,
 }
 
+/// A list most symbols leave empty, out of line, so that an empty one costs
+/// one word in every symbol.
+#[derive(Debug, Clone)]
+pub(super) struct RareList<T>(Option<Box<Vec<T>>>);
+
+impl<T> Default for RareList<T> {
+    fn default() -> Self {
+        Self(None)
+    }
+}
+
+impl<T> RareList<T> {
+    pub(super) fn push(&mut self, value: T) {
+        self.0.get_or_insert_default().push(value);
+    }
+
+    pub(super) fn append(&mut self, other: Self) {
+        if let Some(other) = other.0 {
+            self.0.get_or_insert_default().extend(*other);
+        }
+    }
+
+    pub(super) fn as_slice(&self) -> &[T] {
+        self.0.as_deref().map_or(&[], Vec::as_slice)
+    }
+}
+
 #[derive(Debug, Default)]
 pub(super) struct Symbol {
     pub(super) flags: u32,
@@ -151,7 +178,7 @@ pub(super) struct Symbol {
     pub(super) quoted_module_name: bool,
     /// The symbol's own declarations: what it declares, and what merges gave
     /// it, one way or both. Compatibility checks read these.
-    pub(super) sites: Vec<Site>,
+    pub(super) sites: SmallVec<[Site; 1]>,
     /// Typed own declaration associations in native bind/merge order. Sites
     /// also contain synthetic lexical attachments and cannot supply this
     /// order. One-way merges copy the native target's declarations while the
@@ -162,14 +189,14 @@ pub(super) struct Symbol {
     /// alias target and never inferred from declarations after binding.
     pub(super) export_symbol: Option<SymbolId>,
     pub(super) checker_merged: bool,
-    pub(super) late_members: Vec<SymbolId>,
+    pub(super) late_members: RareList<SymbolId>,
     /// Alias declarations among the symbol's own, as TypeScript's merged
     /// symbol keeps an alias a checker merge met beside declarations. A
     /// group lists what they name as well (`Linker::projected_sites`), but
     /// nothing about those targets is merged into this symbol.
     pub(super) aliases: SmallVec<[AliasRef; 1]>,
     /// Type parameter lists that declare this type parameter.
-    pub(super) lists: Vec<(FileId, TypeParameterListId)>,
+    pub(super) lists: RareList<(FileId, TypeParameterListId)>,
     pub(super) exports: Option<TableId>,
     pub(super) members: Option<TableId>,
     pub(super) module: Option<ModuleId>,
@@ -256,7 +283,8 @@ pub(super) struct Store {
     /// Lookup tables: their order is the hasher's, so nothing that reaches
     /// output may follow it (`member_entries` and `drain` merge whatever
     /// order they meet).
-    tables: Vec<FastMap<String, Entry>>,
+    /// Keyed by shared names: a member's key is its declaration's name.
+    tables: Vec<FastMap<std::sync::Arc<str>, Entry>>,
     special_members: FastMap<TableId, FastMap<MemberKey, SymbolId>>,
     symbols: Vec<Symbol>,
     parents: Vec<SymbolId>,
@@ -676,7 +704,7 @@ impl Store {
 
     // Reads
 
-    pub(super) fn table(&self, table: TableId) -> &FastMap<String, Entry> {
+    pub(super) fn table(&self, table: TableId) -> &FastMap<std::sync::Arc<str>, Entry> {
         &self.tables[table.index()]
     }
 
@@ -717,12 +745,16 @@ impl Store {
     pub(super) fn hold_member(&mut self, table: TableId, key: &MemberKey, symbol: SymbolId) {
         self.write();
         match key {
-            MemberKey::Text(name) => {
-                self.tables[table.index()]
-                    .entry(name.clone())
-                    .or_default()
-                    .member = Some(symbol)
-            }
+            MemberKey::Text(name) => match self.tables[table.index()].get_mut(&**name) {
+                Some(entry) => entry.member = Some(symbol),
+                None => {
+                    let entry = Entry {
+                        member: Some(symbol),
+                        ..Entry::default()
+                    };
+                    self.tables[table.index()].insert(name.clone(), entry);
+                }
+            },
             MemberKey::Dynamic => {
                 unreachable!("dynamic names retain anonymous declarations outside the named table")
             }
@@ -1144,7 +1176,7 @@ impl Store {
             None => {
                 let mut entry = Entry::default();
                 entry.slots.set(meaning, symbol);
-                self.tables[table.index()].insert(name.to_string(), entry);
+                self.tables[table.index()].insert(name.into(), entry);
             }
         }
         let symbol = self.find(symbol);
@@ -1166,13 +1198,13 @@ impl Store {
                     alias,
                     member: None,
                 };
-                self.tables[table.index()].insert(name.to_string(), entry);
+                self.tables[table.index()].insert(name.into(), entry);
             }
         }
     }
 
     /// Take every entry of `table`, which the binder merges into another.
-    pub(super) fn drain(&mut self, table: TableId) -> Vec<(String, Entry)> {
+    pub(super) fn drain(&mut self, table: TableId) -> Vec<(std::sync::Arc<str>, Entry)> {
         self.write();
         self.tables[table.index()].drain().collect()
     }
@@ -1270,13 +1302,13 @@ impl Store {
         if to.intrinsic.is_none() {
             to.checker_merged |= moved.checker_merged;
         }
-        to.late_members.extend(moved.late_members);
+        to.late_members.append(moved.late_members);
         for alias in moved.aliases {
             if !to.aliases.contains(&alias) {
                 to.aliases.push(alias);
             }
         }
-        to.lists.extend(moved.lists);
+        to.lists.append(moved.lists);
         for table in moved.homes {
             if !to.homes.contains(&table) {
                 to.homes.push(table);

@@ -882,7 +882,7 @@ impl<'p> Linker<'p, '_> {
                 let site = Site {
                     file,
                     span: Span { start: 0, end: 0 },
-                    name: self.program.sources.get(file).display.clone(),
+                    name: self.program.sources.get(file).display.as_str().into(),
                 };
                 let declaration = self.file(file).declaration;
                 let module = self.new_module(Some(site), false, declaration);
@@ -926,7 +926,7 @@ impl<'p> Linker<'p, '_> {
                 let site = Site {
                     file,
                     span: ambient.span,
-                    name: ambient.name.clone(),
+                    name: ambient.name.as_str().into(),
                 };
                 let host = match own.get(ambient.name.as_str()) {
                     Some(&AmbientHost::Module(module)) => {
@@ -1716,7 +1716,7 @@ impl<'p> Linker<'p, '_> {
         if has_alias {
             self.state.conflicts.push((
                 table,
-                self.facts(file).decls[declaration.index()].name.clone(),
+                self.facts(file).decls[declaration.index()].name.to_string(),
             ));
         }
         Ok(declared)
@@ -1789,7 +1789,7 @@ impl<'p> Linker<'p, '_> {
         let held = self.state.store.member(table, key);
         let symbol = if let Some(symbol) = held {
             let data = self.symbol(symbol);
-            let repeated = list.is_some_and(|list| data.lists.contains(&list));
+            let repeated = list.is_some_and(|list| data.lists.as_slice().contains(&list));
             if conflicts(data.flags, declared, repeated) {
                 if let Some((file, span)) = self.reported(symbol, (site.file, site.span)) {
                     return Err(self
@@ -1930,7 +1930,7 @@ impl<'p> Linker<'p, '_> {
                 let site = Site {
                     file,
                     span: request.span,
-                    name: request.specifier.clone(),
+                    name: request.specifier.as_str().into(),
                 };
                 let symbol = match by_name.get(request.specifier.as_str()) {
                     Some(&symbol) => {
@@ -2259,7 +2259,8 @@ impl<'p> Linker<'p, '_> {
     /// exporting an alias of itself can, still finish.
     fn run_projected_merges(&mut self, work: Vec<TableMerge>) -> Result<()> {
         let mut merged = HashSet::new();
-        let mut stack: Vec<(TableMerge, std::vec::IntoIter<(String, Held)>)> = Vec::new();
+        let mut stack: Vec<(TableMerge, std::vec::IntoIter<(std::sync::Arc<str>, Held)>)> =
+            Vec::new();
         let mut queued = work;
         loop {
             for merge in std::mem::take(&mut queued).into_iter().rev() {
@@ -2273,7 +2274,7 @@ impl<'p> Linker<'p, '_> {
                     merge.parent,
                     &mut queued,
                 )?;
-                let mut entries: Vec<(String, Held)> = self
+                let mut entries: Vec<(std::sync::Arc<str>, Held)> = self
                     .state
                     .store
                     .table(merge.from)
@@ -2574,7 +2575,7 @@ impl<'p> Linker<'p, '_> {
         let reached = distinct(reached.map(|symbol| self.find(symbol)));
         for &symbol in &reached {
             for table in self.state.store.symbol(symbol).homes.clone() {
-                let entries: Vec<(String, Slots)> = self
+                let entries: Vec<(std::sync::Arc<str>, Slots)> = self
                     .state
                     .store
                     .table(table)
@@ -2818,7 +2819,7 @@ impl<'p> Linker<'p, '_> {
                         continue;
                     }
                     let blocked = self.state.scope_tables[file.index()][scope.index()]
-                        .and_then(|table| self.state.store.table(table).get(&decl.name))
+                        .and_then(|table| self.state.store.table(table).get(&*decl.name))
                         .and_then(|entry| entry.slots.value())
                         .is_some_and(|symbol| self.symbol(symbol).flags & flags::BLOCK_SCOPED != 0);
                     if blocked && self.reports(file, decl.anchor.start) {
@@ -3080,8 +3081,14 @@ impl<'p> Linker<'p, '_> {
         let mut merge_with: SmallVec<[SymbolId; 3]> = SmallVec::new();
         for symbol in distinct(existing.map(|symbol| self.find(symbol))) {
             let flags = self.state.store.symbol(symbol).flags;
-            let repeated =
-                list.is_some_and(|list| self.state.store.symbol(symbol).lists.contains(&list));
+            let repeated = list.is_some_and(|list| {
+                self.state
+                    .store
+                    .symbol(symbol)
+                    .lists
+                    .as_slice()
+                    .contains(&list)
+            });
             if conflicts(flags, declared, repeated) {
                 if let Some((file, span)) = self.reported(symbol, (site.file, site.span)) {
                     return Err(self
@@ -3216,7 +3223,7 @@ impl<'p> Linker<'p, '_> {
                 }
             }
         }
-        let entries: Vec<(String, super::store::Entry)> = self.state.store.drain(from);
+        let entries: Vec<(std::sync::Arc<str>, super::store::Entry)> = self.state.store.drain(from);
         for (name, entry) in entries {
             if entry.member.is_some() {
                 continue;
@@ -3559,7 +3566,7 @@ impl<'p> Linker<'p, '_> {
             projected
                 .get(&symbol)
                 .cloned()
-                .unwrap_or_else(|| self.symbol(symbol).sites.clone())
+                .unwrap_or_else(|| self.symbol(symbol).sites.to_vec())
         });
         Ok((index, reference_sources))
     }
@@ -3570,7 +3577,7 @@ impl<'p> Linker<'p, '_> {
     /// its target. One way, as the target's group does not list `symbol`'s.
     fn projected_sites(&mut self, symbol: SymbolId) -> Result<Vec<Site>> {
         let symbol = self.find(symbol);
-        let mut sites = self.symbol(symbol).sites.clone();
+        let mut sites = self.symbol(symbol).sites.to_vec();
         let mut reached = vec![symbol];
         let mut stack = vec![symbol];
         while let Some(owner) = stack.pop() {
@@ -3673,7 +3680,7 @@ impl<'p> Linker<'p, '_> {
             self.state
                 .store
                 .table(*table)
-                .get(name)
+                .get(name.as_str())
                 .and_then(|entry| entry.alias)
                 .map(|alias| {
                     (
@@ -3685,7 +3692,7 @@ impl<'p> Linker<'p, '_> {
                 })
         });
         for (table, name) in conflicts {
-            let Some(entry) = self.state.store.table(table).get(&name) else {
+            let Some(entry) = self.state.store.table(table).get(name.as_str()) else {
                 continue;
             };
             let (Some(alias), slots) = (entry.alias, entry.slots) else {

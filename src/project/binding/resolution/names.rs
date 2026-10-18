@@ -296,7 +296,7 @@ impl NativeInputs<'_> {
         for index in self.files.lookup_scope_chain(file, scope) {
             let plan = self.files.name_scope(file, index);
             if let Some(declaration) = plan.infer
-                && self.files.file(file).decls()[declaration.index()].name == name
+                && *self.files.file(file).decls()[declaration.index()].name == *name
                 && meaning.0 & flags::TYPE_PARAMETER != 0
             {
                 let raw = self

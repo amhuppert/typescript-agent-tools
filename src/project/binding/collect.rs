@@ -205,7 +205,9 @@ pub(super) enum Host {
 
 #[derive(Debug)]
 pub(super) struct Decl {
-    pub(super) name: String,
+    /// Shared with the file's name table (`Facts::texts`), its symbol's
+    /// sites, and its native symbol name.
+    pub(super) name: std::sync::Arc<str>,
     /// The declaring name token, or the anchor of a synthetic declaration.
     pub(super) anchor: Span,
     /// `getResolvedSymbol` can ask a parameter's actual declaring Name.
@@ -261,7 +263,7 @@ pub(super) struct InterfaceMembers {
 impl Default for Decl {
     fn default() -> Self {
         Self {
-            name: String::new(),
+            name: "".into(),
             anchor: Span { start: 0, end: 0 },
             name_reference: None,
             flow: None,
@@ -558,37 +560,24 @@ impl Cx {
 /// The lookup scope of each exact syntax site, as collection writes them:
 /// most writes replace a site's scope, and some keep one already written.
 /// Collection never reads them back, so the writes are logged and resolved
-/// once, each site's in the order they were made (`finish`).
+/// once, each site's in the order they were made (`SiteMap::from_writes`).
 #[derive(Default)]
-struct ScopeSites(Vec<((SyntaxKind, Span), ScopeId, bool)>);
+struct ScopeSites(Vec<((SyntaxKind, Span), ScopeId, super::site_map::Write)>);
 
 impl ScopeSites {
     /// `site`'s scope is now `scope`.
     fn insert(&mut self, site: (SyntaxKind, Span), scope: ScopeId) {
-        self.0.push((site, scope, true));
+        self.0.push((site, scope, super::site_map::Write::Replace));
     }
 
     /// `site`'s scope is `scope` unless one was already written.
     fn first(&mut self, site: (SyntaxKind, Span), scope: ScopeId) {
-        self.0.push((site, scope, false));
+        self.0
+            .push((site, scope, super::site_map::Write::KeepFirst));
     }
 
-    fn finish(mut self) -> super::site_map::SiteMap<ScopeId> {
-        // Stable, so each site's writes keep their order.
-        self.0
-            .sort_by_key(|&((kind, span), _, _)| (span.start, span.end, kind.number()));
-        let mut sites: Vec<((SyntaxKind, Span), ScopeId)> = Vec::with_capacity(self.0.len());
-        for (site, scope, replaces) in self.0 {
-            match sites.last_mut() {
-                Some((last, current)) if *last == site => {
-                    if replaces {
-                        *current = scope;
-                    }
-                }
-                _ => sites.push((site, scope)),
-            }
-        }
-        super::site_map::SiteMap::from_entries(sites)
+    fn finish(self) -> super::site_map::SiteMap<ScopeId> {
+        super::site_map::SiteMap::from_writes(self.0)
     }
 }
 
@@ -613,7 +602,7 @@ pub(super) struct Collector<'a, 's> {
     lists: usize,
     /// The declarations of each name per container scope, for TS2395 and
     /// TS2383.
-    container_names: HashMap<(ScopeId, String), ContainerName>,
+    container_names: crate::hash::FastMap<(ScopeId, TextId), ContainerName>,
     instances: Instances,
 }
 
@@ -660,7 +649,7 @@ impl<'a, 's> Collector<'a, 's> {
             },
             text_ids: crate::hash::FastMap::default(),
             lists: 0,
-            container_names: HashMap::new(),
+            container_names: crate::hash::FastMap::default(),
             instances: Instances::default(),
         }
     }
@@ -1061,7 +1050,7 @@ impl<'a, 's> Collector<'a, 's> {
         // local within one container (`mixed_exports`).
         if let (Some(container), Some(name), Some(token)) = (cx.container, name, token) {
             if !container.export_context {
-                let key = (cx.scope, self.decoded(name));
+                let key = (cx.scope, self.intern(self.decoded_str(name)));
                 let declared = self.container_names.entry(key).or_default();
                 let spaces = kind.declaration_spaces();
                 if export.is_some() {
@@ -1081,9 +1070,12 @@ impl<'a, 's> Collector<'a, 's> {
             Some(token) => self.facts.names[token.index()].span,
             None => default_keyword(self.ast, node),
         };
-        let name = name.map_or_else(|| "default".to_string(), |name| self.decoded(name));
+        let name = match name {
+            Some(name) => self.shared(self.decoded_str(name)),
+            None => "default".into(),
+        };
         let interface_members = (kind == DeclKind::Interface
-            && super::APPARENT_INTERFACES.contains(&name.as_str()))
+            && super::APPARENT_INTERFACES.contains(&&*name))
         .then(|| Box::new(self.interface_members(node)));
         let name_reference = token.filter(|_| kind == DeclKind::Parameter).map(|token| {
             let reference = RefId::new(self.facts.refs.len());
@@ -1183,8 +1175,9 @@ impl<'a, 's> Collector<'a, 's> {
             .insert((name_node.syntax_kind, name_node.span), scope);
         let decl = DeclId::new(self.facts.decls.len());
         let token = self.name(name, NameTarget::Decl(decl), DECLARATION, true);
+        let text = self.shared(self.decoded_str(name));
         self.declare(Decl {
-            name: self.decoded(name),
+            name: text,
             native_span: Some(declaration.span),
             anchor: self.facts.names[token.index()].span,
             kind,
@@ -1226,6 +1219,12 @@ impl<'a, 's> Collector<'a, 's> {
         self.ast
             .identifier_name(id)
             .expect("an identifier has escapedText")
+    }
+
+    /// `text`, shared with the file's name table.
+    fn shared(&mut self, text: &str) -> std::sync::Arc<str> {
+        let id = self.intern(text);
+        self.facts.texts[id.index()].clone()
     }
 
     /// `text` as a `Facts::text` string of this file, stored once.
@@ -1990,7 +1989,7 @@ impl<'a, 's> Collector<'a, 's> {
                     )
                 }) {
                     self.declare(Decl {
-                        name: format!("__{index}"),
+                        name: format!("__{index}").into(),
                         anchor: declaration_anchor(self.ast, parameter_id),
                         native_span: Some(parameter.span),
                         kind: DeclKind::Parameter,
@@ -2160,12 +2159,16 @@ impl<'a, 's> Collector<'a, 's> {
             return;
         };
         let node = self.ast.node(id);
-        let key = declaration_key(self.ast, node);
+        let mut key = declaration_key(self.ast, node);
+        // A member's key, its declaration's name, and its occurrence's text
+        // are the file's one stored name.
+        if let super::member::MemberKey::Text(text) = &key {
+            key = super::member::MemberKey::Text(self.shared(text));
+        }
         let name = match &key {
-            super::member::MemberKey::Text(name) | super::member::MemberKey::Private(name) => {
-                name.clone()
-            }
-            _ => String::new(),
+            super::member::MemberKey::Text(name) => name.clone(),
+            super::member::MemberKey::Private(name) => name.as_str().into(),
+            _ => "".into(),
         };
         self.declare(Decl {
             name,
@@ -3074,6 +3077,43 @@ mod tests {
                 }
             }
         }
+    }
+
+    /// A declaration's name is its file's stored name, not a copy, and so is
+    /// a member's key.
+    #[test]
+    fn declarations_share_their_names() {
+        let source = "class Shape { size = 1; }\nconst shape = new Shape();\nshape.size;\n";
+        let ast = crate::parse(source).unwrap();
+        let text = SourceText::new(source.into());
+        let (facts, _) = Collector::new(&ast, &text, true).run().unwrap();
+        let stored = |name: &str| {
+            facts
+                .texts
+                .iter()
+                .find(|text| &***text == name)
+                .unwrap()
+                .clone()
+        };
+        for name in ["Shape", "shape", "size"] {
+            let declaration = facts.decls.iter().find(|decl| &*decl.name == name).unwrap();
+            assert!(
+                std::sync::Arc::ptr_eq(&declaration.name, &stored(name)),
+                "{name}"
+            );
+        }
+        let member = facts
+            .decls
+            .iter()
+            .find(|decl| decl.member.is_some())
+            .unwrap();
+        let Some(binding) = &member.member else {
+            unreachable!()
+        };
+        let super::super::member::MemberKey::Text(key) = &binding.key else {
+            panic!("a named member's key is its text")
+        };
+        assert!(std::sync::Arc::ptr_eq(key, &member.name));
     }
 
     /// A file stores each distinct name once, however often it occurs.

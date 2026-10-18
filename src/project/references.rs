@@ -168,7 +168,7 @@ fn group(
         .sites(symbol)
         .iter()
         .map(|site| NamedLocation {
-            name: site.name.clone(),
+            name: site.name.to_string(),
             location: location(project, site.file, site.span),
         })
         .collect();

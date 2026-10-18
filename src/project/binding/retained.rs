@@ -666,7 +666,7 @@ mod tests {
                 })
                 .map(|declaration| {
                     (
-                        declaration.name.as_str(),
+                        &*declaration.name,
                         declaration
                             .contains_this
                             .expect("final interface flag is attached"),
@@ -766,7 +766,7 @@ mod tests {
                 let parameter = facts
                     .decls
                     .iter()
-                    .find(|declaration| declaration.name == "input")
+                    .find(|declaration| &*declaration.name == "input")
                     .unwrap();
                 let name_reference = parameter
                     .name_reference
@@ -977,7 +977,7 @@ mod tests {
         let declarations: Vec<_> = bindings.files[a.index()]
             .decls
             .iter()
-            .filter(|decl| decl.name == "Shape")
+            .filter(|decl| &*decl.name == "Shape")
             .collect();
         assert_eq!(declarations.len(), 2);
         let native = bindings.native_inputs();
@@ -1083,7 +1083,7 @@ mod tests {
             let declaration = bindings.files[id.index()]
                 .decls
                 .iter()
-                .find(|decl| decl.name == "X")
+                .find(|decl| &*decl.name == "X")
                 .unwrap();
             (
                 id,

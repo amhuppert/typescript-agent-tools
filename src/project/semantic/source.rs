@@ -2054,27 +2054,27 @@ mod captured_syntax_tests {
 
     /// The attachment map is sized for the final tree, not for the parser's
     /// arena, which also holds the statements a top-level await reparse
-    /// replaced; a file without the reparse is the control.
+    /// replaced: a file with the reparse gets the map of a file without it
+    /// whose final tree is the same size.
     #[test]
     fn attachments_are_sized_for_the_final_tree() {
-        for (statement, reparsed) in [("await(0);\n", true), ("void(0);\n", false)] {
+        let capture = |statement: &str| {
             let source = format!(
                 "export class C {{ run() {{}} }}\nnew C().run();\n{}",
                 statement.repeat(10_000)
             );
             let ast = crate::parse(&source).unwrap();
-            let reachable = ast.walk().count();
-            assert_eq!(
-                ast.nodes().len() > reachable * 3 / 2,
-                reparsed,
-                "{statement}"
-            );
+            let (reachable, arena) = (ast.walk().count(), ast.nodes().len());
             let captured = CapturedSyntax::new(ast, None).unwrap();
-            let (len, capacity) = (captured.attachments.len(), captured.attachments.capacity());
-            assert!(
-                capacity <= 2 * len,
-                "{statement}: {capacity} slots for {len} attachments"
-            );
-        }
+            (reachable, arena, captured.attachments.capacity())
+        };
+        let (reparsed, reparsed_arena, reparsed_capacity) = capture("await(0);\n");
+        let (control, control_arena, control_capacity) = capture("void(0);\n");
+        assert_eq!(reparsed, control, "both final trees have the same nodes");
+        assert!(
+            reparsed_arena > control_arena * 3 / 2,
+            "the reparse leaves replaced nodes"
+        );
+        assert_eq!(reparsed_capacity, control_capacity);
     }
 }

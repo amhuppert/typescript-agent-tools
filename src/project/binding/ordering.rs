@@ -170,6 +170,30 @@ pub(super) enum NativeSymbolName {
     Unavailable(&'static str),
 }
 
+/// A fixed native name, `0xfe` and `name` where `internal`, shared by every
+/// symbol this thread names with it: binding names hundreds of thousands
+/// of symbols `__type`, `__object`, `__function`, `default` and the like.
+fn fixed_name(name: &'static [u8], internal: bool) -> Arc<[u8]> {
+    thread_local! {
+        static NAMES: std::cell::RefCell<crate::hash::FastMap<(&'static [u8], bool), Arc<[u8]>>> =
+            Default::default();
+    }
+    NAMES.with(|names| {
+        names
+            .borrow_mut()
+            .entry((name, internal))
+            .or_insert_with(|| {
+                let mut bytes = Vec::with_capacity(name.len() + 1);
+                if internal {
+                    bytes.push(0xfe);
+                }
+                bytes.extend_from_slice(name);
+                Arc::from(bytes)
+            })
+            .clone()
+    })
+}
+
 /// `declareSymbolEx` observes its actual parent; `getDeclarationName` observes
 /// the nearest containing class independently of that parent. Neither name
 /// decision can be reconstructed from the declaration's export projection.
@@ -198,11 +222,8 @@ impl NativeSymbolName {
             Self::Bytes(format!("\"{name}\"").into_bytes().into())
         }
     }
-    fn internal(name: &[u8], _control: Option<&Control>) -> Self {
-        let mut bytes = Vec::new();
-        bytes.extend_from_slice(&[0xfe]);
-        bytes.extend_from_slice(name);
-        Self::Bytes(std::sync::Arc::from(bytes))
+    fn internal(name: &'static [u8], _control: Option<&Control>) -> Self {
+        Self::Bytes(fixed_name(name, true))
     }
 
     /// `declareSymbolEx` / `bindAnonymousDeclaration`: capture the native
@@ -217,7 +238,7 @@ impl NativeSymbolName {
                 .as_deref()
                 .is_some_and(|(_, name)| name == "default")
         {
-            return Self::Bytes(b"default".as_slice().into());
+            return Self::Bytes(fixed_name(b"default", false));
         }
         match declaration.kind {
             DeclKind::TypeLiteral => Self::internal(b"type", None),
@@ -227,7 +248,7 @@ impl NativeSymbolName {
             _ => {
                 if let Some(member) = &declaration.member {
                     return match &member.key {
-                        MemberKey::Text(name) => Self::Bytes(name.as_bytes().into()),
+                        MemberKey::Text(name) => Self::Bytes(Arc::from(name.clone())),
                         MemberKey::Reserved(kind) => Self::internal(
                             match kind {
                                 ReservedMember::Call => b"call",
@@ -253,8 +274,8 @@ impl NativeSymbolName {
                         ),
                     };
                 }
-                let name = declaration.name.as_str();
-                Self::Bytes(name.as_bytes().into())
+                // The declaration's own allocation: names are exact bytes.
+                Self::Bytes(std::sync::Arc::from(declaration.name.clone()))
             }
         }
     }

@@ -65,7 +65,16 @@ impl<V: PackedValue> Default for SiteMap<V> {
     }
 }
 
+/// How a write treats a value already written at its site.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) enum Write {
+    Replace,
+    KeepFirst,
+}
+
 impl<V: PackedValue> SiteMap<V> {
+    /// The map of `entries` in write order, each replacing any earlier
+    /// value at its site.
     pub(super) fn from_entries(mut entries: Vec<(Key, V)>) -> Self {
         // Stable sorting preserves binder write order within each exact site.
         // dedup_by passes the later entry first, so replace the surviving
@@ -79,6 +88,33 @@ impl<V: PackedValue> SiteMap<V> {
                 false
             }
         });
+        Self::sorted(entries)
+    }
+
+    /// The map of `writes` in write order: each replaces any earlier value
+    /// at its site or keeps it, as its `Write` says.
+    pub(super) fn from_writes(mut writes: Vec<(Key, V, Write)>) -> Self {
+        writes.sort_by_key(|&(site, _, _)| key(site));
+        writes.dedup_by(|later, earlier| {
+            if later.0 == earlier.0 {
+                if later.2 == Write::Replace {
+                    earlier.1 = later.1;
+                }
+                true
+            } else {
+                false
+            }
+        });
+        Self::sorted(
+            writes
+                .into_iter()
+                .map(|(site, value, _)| (site, value))
+                .collect(),
+        )
+    }
+
+    /// Entries sorted by `key`, one per site.
+    fn sorted(entries: Vec<(Key, V)>) -> Self {
         let compact = (|| {
             let mut compact = Vec::with_capacity(entries.len());
             for &(site, value) in &entries {

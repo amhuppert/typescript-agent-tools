@@ -811,7 +811,7 @@ impl<'a> Resolver<'a> {
             // An infer constraint sees only its own declaration's name.
             if let Some(decl) = plan.infer {
                 let own = &facts.decls()[decl.index()];
-                if own.name == name && requested.accepts(flags::TYPE_PARAMETER) {
+                if *own.name == *name && requested.accepts(flags::TYPE_PARAMETER) {
                     if let Some(symbol) = self.inputs.decl_symbols[file.index()][decl.index()] {
                         return Some(Step::Done(NameLookup::Resolved(LexicalLookup {
                             resolution: Resolution::Found(Meanings::new(Slots::only(

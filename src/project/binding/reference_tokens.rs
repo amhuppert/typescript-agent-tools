@@ -169,9 +169,10 @@ pub(super) struct CollectedReferenceToken {
 }
 
 /// A reference token as `capture` finds it, before collection stores its
-/// key (`CollectedReferenceToken`).
-pub(super) struct CapturedReferenceToken {
-    pub(super) key: Result<String, String>,
+/// key (`CollectedReferenceToken`): borrowed from the syntax tree unless it
+/// joins two names.
+pub(super) struct CapturedReferenceToken<'a> {
+    pub(super) key: Result<std::borrow::Cow<'a, str>, String>,
     pub(super) syntax: ReferenceSyntax,
 }
 
@@ -188,11 +189,11 @@ pub(in crate::project) struct ReferenceSyntax {
 /// Capture the decoded spelling and actual syntax role of a candidate. This
 /// does not evaluate a computed key: only its written identifier/literal is
 /// inventoried. `isValidReferencePosition` remains the searcher's question.
-pub(super) fn capture(
-    ast: &Ast<'_>,
+pub(super) fn capture<'a>(
+    ast: &'a Ast<'_>,
     parents: &[Option<NodeId>],
     id: NodeId,
-) -> Option<CapturedReferenceToken> {
+) -> Option<CapturedReferenceToken<'a>> {
     use ReferenceTokenRole as R;
     use SyntaxKind as K;
     let node = ast.node(id);
@@ -220,7 +221,7 @@ pub(super) fn capture(
                 return None;
             }
             return Some(CapturedReferenceToken {
-                key: super::text::exact_text(ast, name).map(|text| text.to_owned()),
+                key: super::text::exact_text(ast, name).map(std::borrow::Cow::Borrowed),
                 syntax: ReferenceSyntax {
                     kind: node.syntax_kind,
                     native_span: node.span,
@@ -237,7 +238,8 @@ pub(super) fn capture(
         let namespace = crate::syntax::child(ast, node, "namespace")?;
         let name = crate::syntax::child(ast, node, "name")?;
         let key = super::text::exact_text(ast, namespace).and_then(|namespace| {
-            super::text::exact_text(ast, name).map(|name| format!("{namespace}:{name}"))
+            super::text::exact_text(ast, name)
+                .map(|name| std::borrow::Cow::Owned(format!("{namespace}:{name}")))
         });
         return Some(CapturedReferenceToken {
             key,
@@ -336,7 +338,7 @@ pub(super) fn capture(
         super::collect::USE
     };
     Some(CapturedReferenceToken {
-        key: super::text::exact_text(ast, node).map(|text| text.to_owned()),
+        key: super::text::exact_text(ast, node).map(std::borrow::Cow::Borrowed),
         syntax: ReferenceSyntax {
             kind: node.syntax_kind,
             native_span: node.span,

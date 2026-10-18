@@ -33,7 +33,7 @@ pub(super) enum ReservedMember {
 /// typed partition prevents it from colliding with a legal quoted key.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(super) enum MemberKey {
-    Text(String),
+    Text(std::sync::Arc<str>),
     NonScalar(Vec<u8>),
     Private(String),
     Reserved(ReservedMember),
@@ -95,14 +95,17 @@ pub(super) fn declaration_key(ast: &Ast<'_>, node: &Node<'_>) -> MemberKey {
     {
         let text = super::text::exact_text(ast, operand)
             .expect("numeric literal payload has exact scalar text");
-        return MemberKey::Text(format!(
-            "{}{text}",
-            if operator == SyntaxKind::PlusToken.number() {
-                "+"
-            } else {
-                "-"
-            }
-        ));
+        return MemberKey::Text(
+            format!(
+                "{}{text}",
+                if operator == SyntaxKind::PlusToken.number() {
+                    "+"
+                } else {
+                    "-"
+                }
+            )
+            .into(),
+        );
     }
     MemberKey::Dynamic
 }
@@ -110,12 +113,12 @@ pub(super) fn declaration_key(ast: &Ast<'_>, node: &Node<'_>) -> MemberKey {
 fn literal_key(ast: &Ast<'_>, node: &Node<'_>) -> MemberKey {
     if let Some(bytes) = ast.cooked_literal(node) {
         return match std::str::from_utf8(bytes) {
-            Ok(text) => MemberKey::Text(text.to_owned()),
+            Ok(text) => MemberKey::Text(text.into()),
             Err(_) => MemberKey::NonScalar(bytes.to_vec()),
         };
     }
     match node.field("escapedText").or_else(|| node.field("text")) {
-        Some(Value::Text(text)) => MemberKey::Text(text.to_string()),
+        Some(Value::Text(text)) => MemberKey::Text(text.as_ref().into()),
         _ => unreachable!("accepted literal member key has its parsed exact payload"),
     }
 }
