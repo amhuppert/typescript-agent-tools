@@ -7,7 +7,6 @@
           "full": "scripts/validate/storage-benchmark-build-full.sh"
         },
         "cost": 2,
-        "timeoutMs": 1800000,
         "description": "Build the release CLI and reference storage benchmark with two jobs, without a release test harness",
         "pathArgs": "forbid"
       },
@@ -16,7 +15,6 @@
           "full": "scripts/validate/benchmark-build-full.sh"
         },
         "cost": 2,
-        "timeoutMs": 900000,
         "description": "Build release binaries, examples, and benchmarks with two jobs",
         "pathArgs": "forbid"
       },
@@ -43,7 +41,6 @@
           "changed": "scripts/validate/test-changed.sh"
         },
         "cost": 2,
-        "timeoutMs": 900000,
         "description": "Run Rust tests, explicit library/binary/integration roots, or one supported resource/reuse test module file with two build jobs and two test threads",
         "pathArgs": "paths"
       },
@@ -53,7 +50,6 @@
           "changed": "scripts/validate/harness-test-changed.sh"
         },
         "cost": 2,
-        "timeoutMs": 900000,
         "description": "Run Node harness tests or explicit existing tools/*.test.mjs files with two workers and report skipped tests; HARNESS_REQUIRE_COMPILERS=1 fails on skips",
         "pathArgs": "paths"
       },
@@ -62,7 +58,6 @@
           "full": "scripts/validate/semantic-full.sh"
         },
         "cost": 2,
-        "timeoutMs": 900000,
         "description": "Check fixtures/references against the pinned TypeScript 7.0.2 semantic oracle and fixtures/navigation against its document symbols; exit 2 means the compilers were not found",
         "pathArgs": "forbid"
       },
@@ -71,7 +66,6 @@
           "full": "scripts/validate/native-corpus-journeys-full.sh"
         },
         "cost": 2,
-        "timeoutMs": 1800000,
         "description": "Build the release CLI and compare eight frozen Command Center corpus journeys twice per path, recording CLI peak RSS and samples from one service generation",
         "pathArgs": "forbid"
       },
@@ -80,7 +74,6 @@
           "full": "scripts/validate/native-corpus-load-baseline-full.sh"
         },
         "cost": 1,
-        "timeoutMs": 600000,
         "description": "Measure two direct and two service lexical requests on the source-bound release corpus binary, including normal checker initialization but no member/type demand",
         "pathArgs": "forbid"
       }
