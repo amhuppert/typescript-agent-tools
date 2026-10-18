@@ -33,16 +33,19 @@ struct CompactSite {
     kind: SyntaxKind,
 }
 
+/// A span's offsets as `u32`, where both fit: the one packing rule of
+/// binding's frozen facts, whose owners keep full width where it fails.
+pub(super) fn pack_span(span: Span) -> Option<[u32; 2]> {
+    Some([
+        u32::try_from(span.start).ok()?,
+        u32::try_from(span.end).ok()?,
+    ])
+}
+
 impl CompactSite {
     fn pack((kind, span): Key) -> Option<Self> {
-        if span.start > u32::MAX as usize || span.end > u32::MAX as usize {
-            return None;
-        }
-        Some(Self {
-            start: span.start as u32,
-            end: span.end as u32,
-            kind,
-        })
+        let [start, end] = pack_span(span)?;
+        Some(Self { start, end, kind })
     }
 
     fn key(self) -> (usize, usize, u32) {

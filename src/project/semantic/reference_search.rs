@@ -373,11 +373,7 @@ impl SearchState<'_> {
                     .project
                     .bindings
                     .reference_tokens(&search.key, self.control.as_ref());
-                if require_name
-                    && !tokens.iter().any(|token| {
-                        self.project.bindings.reference_token_facts(token).file == file
-                    })
-                {
+                if require_name && !tokens.iter().any(|token| token.file() == file) {
                     return Ok(Vec::new());
                 }
                 let mut fresh = false;

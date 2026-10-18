@@ -16,6 +16,12 @@ pub(in crate::project) struct ReferenceToken {
     pub(super) entry: ReferenceTokenEntry,
 }
 
+impl ReferenceToken {
+    pub(in crate::project) fn file(self) -> FileId {
+        self.file
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub(super) enum ReferenceTokenEntry {
     Syntax(OccurrenceId),

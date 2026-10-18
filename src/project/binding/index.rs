@@ -3,8 +3,8 @@
 //! Occurrences are stored compactly, as many as a project has names: a
 //! record of small codes per occurrence, its spans in a per-file table, and
 //! the rare wide values (several symbols, reasons, unavailable keys) out of
-//! line. Readers see them through `Occurrence`, a view assembled on demand.
-//! Result orders are built from byte offsets; positions are computed only
+//! line, indexed within the file as every record is. Readers see them
+//! through `Occurrence`, a view assembled on demand. Result orders are built from byte offsets; positions are computed only
 //! for the locations a query returns.
 
 use super::ids::{NameId, OccurrenceId, StringId, SymbolId};
@@ -148,8 +148,8 @@ pub(crate) struct OccurrenceRef {
     pub(crate) id: OccurrenceId,
 }
 
-/// `Target`, stored: one symbol inline, several in `Index::several`, and
-/// reasons as `Index::text` strings.
+/// `Target`, stored: one symbol inline, several in its file's
+/// `FileOccurrences::several`, and reasons as `Index::text` strings.
 #[derive(Debug, Clone, Copy)]
 enum StoredTarget {
     Symbol(SymbolId),
@@ -176,8 +176,9 @@ struct Record {
     traversal_header: bool,
 }
 
-/// Spans packed to `u32` offsets where all of them fit, as `SiteMap` packs
-/// sites: never a truncated offset or a new input restriction.
+/// Spans packed to `u32` offsets where all of them fit
+/// (`site_map::pack_span`), as `SiteMap` packs sites: never a truncated
+/// offset or a new input restriction.
 #[derive(Debug)]
 enum Spans {
     Narrow(Box<[[u32; 2]]>),
@@ -188,12 +189,7 @@ impl Spans {
     fn new(spans: Vec<Span>) -> Self {
         let narrow: Option<Vec<[u32; 2]>> = spans
             .iter()
-            .map(|span| {
-                Some([
-                    u32::try_from(span.start).ok()?,
-                    u32::try_from(span.end).ok()?,
-                ])
-            })
+            .map(|&span| super::site_map::pack_span(span))
             .collect();
         match narrow {
             Some(narrow) => Spans::Narrow(narrow.into_boxed_slice()),
@@ -221,13 +217,18 @@ const NATIVE: usize = 1;
 const OCCURRENCE: usize = 2;
 const SPANS: usize = 3;
 
-/// One file's occurrences, ordered by start.
+/// One file's occurrences, ordered by start. Out-of-line values are the
+/// file's own, so their indices are file-local, like every record id.
 #[derive(Debug)]
 struct FileOccurrences {
     records: Box<[Record]>,
     /// `SPANS` per occurrence: its selection span, then its reference token's
     /// native and occurrence spans (empty without a token).
     spans: Spans,
+    /// The symbols of each occurrence that denotes more than one.
+    several: Box<[Box<[SymbolId]>]>,
+    /// The file's JSON keys among reference tokens.
+    json_keys: Box<[JsonPropertyId]>,
 }
 
 impl FileOccurrences {
@@ -241,7 +242,7 @@ impl FileOccurrences {
 }
 
 /// A stored reference token: `ReferenceToken` with its JSON key's identity
-/// out of line (`Index::json_keys`).
+/// out of line (`FileOccurrences::json_keys`).
 #[derive(Debug, Clone, Copy)]
 struct StoredToken {
     file: FileId,
@@ -258,17 +259,19 @@ enum StoredEntry {
 #[derive(Debug, Clone, Copy)]
 pub(in crate::project) struct ReferenceTokens<'a> {
     tokens: &'a [StoredToken],
-    json_keys: &'a [JsonPropertyId],
+    files: &'a [FileOccurrences],
 }
 
 impl<'a> ReferenceTokens<'a> {
     pub(in crate::project) fn iter(self) -> impl Iterator<Item = ReferenceToken> + 'a {
-        let json_keys = self.json_keys;
+        let files = self.files;
         self.tokens.iter().map(move |token| ReferenceToken {
             file: token.file,
             entry: match token.entry {
                 StoredEntry::Syntax(id) => ReferenceTokenEntry::Syntax(id),
-                StoredEntry::Json(key) => ReferenceTokenEntry::Json(json_keys[key as usize]),
+                StoredEntry::Json(key) => {
+                    ReferenceTokenEntry::Json(files[token.file.index()].json_keys[key as usize])
+                }
             },
         })
     }
@@ -289,10 +292,6 @@ pub(crate) struct Index {
     by_symbol: FastMap<SymbolId, Box<[IndexedOccurrence]>>,
     by_name: FastMap<String, Vec<OccurrenceRef>>,
     by_reference_name: FastMap<String, Box<[StoredToken]>>,
-    /// The symbols of each occurrence that denotes more than one.
-    several: Vec<Box<[SymbolId]>>,
-    /// The JSON keys among reference tokens.
-    json_keys: Vec<JsonPropertyId>,
     /// Names and reasons shared by many occurrences.
     strings: Vec<Box<str>>,
 }
@@ -320,7 +319,7 @@ impl Index {
                     OccurrenceTarget::Symbols(std::slice::from_ref(symbol))
                 }
                 StoredTarget::Several(index) => {
-                    OccurrenceTarget::Symbols(&self.several[*index as usize])
+                    OccurrenceTarget::Symbols(&file.several[*index as usize])
                 }
                 StoredTarget::Unsearched => OccurrenceTarget::Unsearched,
                 StoredTarget::NotReference(why) => OccurrenceTarget::NotReference(self.text(*why)),
@@ -373,7 +372,7 @@ impl Index {
         }
         ReferenceTokens {
             tokens,
-            json_keys: &self.json_keys,
+            files: &self.files,
         }
     }
 
@@ -469,6 +468,7 @@ impl Builder {
         let mut names = vec![OccurrenceId::new(0); tokens.len()];
         let mut records = Vec::with_capacity(tokens.len());
         let mut spans = Vec::with_capacity(tokens.len() * SPANS);
+        let mut several = Vec::new();
         let mut lexical_positions = Vec::new();
         let mut reference_positions = Vec::new();
         for (position, token) in tokens.into_iter().enumerate() {
@@ -516,11 +516,9 @@ impl Builder {
             let target = match token.target {
                 Target::Symbols(symbols) if symbols.len() == 1 => StoredTarget::Symbol(symbols[0]),
                 Target::Symbols(symbols) => {
-                    let index = u32::try_from(self.index.several.len())
-                        .expect("semantic record count fits in u32");
-                    self.index
-                        .several
-                        .push(symbols.into_vec().into_boxed_slice());
+                    let index =
+                        u32::try_from(several.len()).expect("semantic record count fits in u32");
+                    several.push(symbols.into_vec().into_boxed_slice());
                     StoredTarget::Several(index)
                 }
                 Target::Unsearched => StoredTarget::Unsearched,
@@ -545,6 +543,8 @@ impl Builder {
         self.index.files.push(FileOccurrences {
             records: records.into_boxed_slice(),
             spans: Spans::new(spans),
+            several: several.into_boxed_slice(),
+            json_keys: Box::default(),
         });
         self.index
             .lexical_positions
@@ -555,12 +555,19 @@ impl Builder {
         names
     }
 
+    /// Add the JSON keys of the file added last.
     pub(super) fn add_json(&mut self, file: FileId, json: &super::JsonFacts) {
+        assert_eq!(
+            file.index() + 1,
+            self.index.files.len(),
+            "a JSON file's keys follow the file"
+        );
+        let mut json_keys = Vec::new();
         for key in json.reference_keys() {
             if let Some(name) = key.key.as_str() {
-                let index = u32::try_from(self.index.json_keys.len())
-                    .expect("semantic record count fits in u32");
-                self.index.json_keys.push(key.id);
+                let index =
+                    u32::try_from(json_keys.len()).expect("semantic record count fits in u32");
+                json_keys.push(key.id);
                 push_keyed(
                     &mut self.by_reference_name,
                     name,
@@ -574,6 +581,7 @@ impl Builder {
                 );
             }
         }
+        self.index.files[file.index()].json_keys = json_keys.into_boxed_slice();
     }
 
     /// Freeze the index with the declarations of every symbol that an
@@ -760,23 +768,26 @@ mod tests {
         // other.ts first; then same.ts's two files by position.
         assert_eq!(order, [(2, 8), (1, 11), (0, 8)]);
 
-        // One position in two files of one display name is one location.
+        // One position in two files of one display name is one location,
+        // at different offsets: line 1, UTF-16 column 3, after two spaces
+        // in one file and after a four-byte, two-unit character in the other.
+        let texts = ["  b", "\u{1F600}b"];
         let mut sources = Sources::default();
-        for index in 0..2 {
+        for (index, text) in texts.iter().enumerate() {
             let id = sources.reserve();
             sources.capture(
                 id,
                 SourceFile {
                     path: PathBuf::from(format!("/p/{index}.ts")),
                     display: "same.ts".into(),
-                    text: Arc::new(SourceText::new("b".into())),
+                    text: Arc::new(SourceText::new((*text).into())),
                 },
             );
         }
         let mut builder = Builder::default();
-        for id in sources.ids() {
+        for (id, text) in sources.ids().collect::<Vec<_>>().into_iter().zip(texts) {
             let target = Target::Symbols(SmallVec::from_elem(symbol, 1));
-            builder.add_file(id, true, vec![token(Span { start: 0, end: 1 }, target)]);
+            builder.add_file(id, true, vec![token(at(text), target)]);
         }
         let index = builder.finish(&sources, |_| Vec::new());
         assert_eq!(index.occurrences_of(symbol).len(), 1);
