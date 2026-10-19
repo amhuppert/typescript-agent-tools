@@ -2,8 +2,7 @@
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
-target_branch="${TARGET_BRANCH:-main}"
-merge_base="$(git merge-base "$target_branch" HEAD 2>/dev/null || true)"
+merge_base="$(target_merge_base || true)"
 if [[ -z "$merge_base" ]]; then
   run_quiet cargo fmt --all -- --check --color never
   exit 0

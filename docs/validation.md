@@ -35,8 +35,8 @@ cctl validate run test --queue-if-busy --require-match -- src/project/semantic/r
 cctl validate run test --queue-if-busy --require-match -- src/project/semantic/resources_tests/literal_cache.rs
 ```
 
-This runs only that library module with the same two build jobs and two test
-threads. It rejects mixed paths and zero executed tests. Use `src/lib.rs` for
+This runs only that library module with the same resources as every Rust test
+run ([selecting Rust tests](#selecting-rust-tests)). It rejects mixed paths and zero executed tests. Use `src/lib.rs` for
 the complete library, explicit `tests/<target>.rs` paths for integrations, and
 `--scope full` for the complete Rust suite. Narrow resource checks do not replace
 the full delivery check.
@@ -120,7 +120,7 @@ cctl validate run test --queue-if-busy --require-match -- src/lib.rs tests/refer
 For the resolution tests alone, select
 `src/project/program/resolve/reuse_tests.rs`. This exact existing file is accepted
 only on its own and must execute at least one test; mixing it with another target
-fails before Cargo runs. It retains two build jobs and two test threads. Until
+fails before Cargo runs. It uses the same resources as every Rust test run. Until
 the wrapper change reaches the canonical checkout, exercise that new selector
 locally with `scripts/validate/test-changed.sh src/project/program/resolve/reuse_tests.rs`;
 Command Center resolves registered wrappers from the canonical checkout.
@@ -129,11 +129,40 @@ Command Center resolves registered wrappers from the canonical checkout.
 
 The registered `test` command accepts explicit Cargo test roots. Use
 `cctl validate run test --queue-if-busy --require-match -- src/lib.rs` for the
-library tests, or `tests/<target>.rs` for integration tests; the two can be
-combined. Apart from the explicitly supported resource and reuse test modules,
-other source paths are rejected before Cargo starts. With no explicit
-paths, the command retains the full suite. Both modes retain two build jobs and
-two test threads; merge validation still runs the full suite.
+library tests, `src/main.rs` for the binary's unit tests, or `tests/<target>.rs`
+for integration tests; they can be combined. Apart from the explicitly supported
+resource and reuse test modules, other source paths are rejected before Cargo
+starts. An explicit run records nothing.
+
+With no explicit paths, the changed command runs the targets that the changes
+since the last passing run can affect (`select_rust_tests` in
+`scripts/validate/common.sh`):
+
+| Changed path | Runs |
+| --- | --- |
+| `tests/<target>.rs` | that test; nothing once it is deleted |
+| `src/main.rs`, `src/cli/`, `src/service/`, `src/process_limits.rs` | the binary's unit tests and every test that runs the binary (`CARGO_BIN_EXE_tsparse` or `tests/support/service.rs`) |
+| `docs/`, `tools/`, `scripts/`, `memory-bank/`, `README.md`, `AGENTS.md`, `CommandCenter.json`, `LICENSE`, `.gitignore` | every test, and the binary's unit tests, whose source names that directory or file |
+| anything else: library sources, `tests/support/`, fixtures, `vendor/`, Cargo and build settings | every target, with the doc tests |
+
+The base is the last tree a run without explicit paths passed for, recorded in
+`target/validation/rust-tests-passed.tree`, or else the merge base with the
+target branch. A run records its tree only when it passed and no file changed
+while it ran. A binary module that the library also declares, a `#[path]` that
+reaches one, or a support module other than `service.rs` that runs the binary
+makes a binary change run every target. The full command runs every target and
+records its pass; merge validation still runs the full suite.
+
+Both commands build the selected targets once with four jobs
+(`cargo test --no-run`), then run four test executables at a time with one test
+thread each, longest first by their last durations
+(`target/validation/rust-test-durations`). Every executable runs even after one
+fails, and a failure replays the complete output of each failed executable. On
+the tree of 7d3abaf (285 test executables), the full suite took 316 s this way,
+against 734 s for `cargo test` running one executable at a time with two threads;
+a change to `src/cli/` alone took 35 s.
+
+s; merge validation still runs the full suite.
 
 ## Harness tests
 

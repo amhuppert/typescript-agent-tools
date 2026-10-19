@@ -86,36 +86,298 @@ find_semantic_compilers() {
   export TYPE_SCRIPT_SEMANTIC_API="$api" TYPE_SCRIPT_NATIVE="$native"
 }
 
-# Run Rust tests on WORKERS jobs and threads: run_rust_tests WORKERS [CARGO ARG...]
-# A test that cannot run on this platform, such as a permission test run as
-# the superuser, passes after printing a `SKIP name: reason` line. Failure
-# replays the complete output; success prints one line naming any skips.
+# The resource profile of Rust test validation, which the test command's
+# cost in CommandCenter.json reflects: build jobs, test executables run at
+# once, and test threads in each.
+export RUST_BUILD_JOBS=4 RUST_TEST_EXECUTABLES=4 RUST_TEST_THREADS=1
+
+# The merge base of HEAD and the target branch (TARGET_BRANCH, default
+# main) that changed-scope checks compare against. Fails without one.
+target_merge_base() {
+  local base
+  base="$(git merge-base "${TARGET_BRANCH:-main}" HEAD 2>/dev/null)" || return 1
+  [[ -n "$base" ]] || return 1
+  printf '%s\n' "$base"
+}
+
+# The tree of every file in the working tree that Git does not ignore,
+# committed or not, written to the object database through a copy of the
+# index, so the index itself is untouched. Fails outside a Git checkout.
+working_tree() {
+  local real index status=0
+  real="$(git rev-parse --git-path index 2>/dev/null)" || return 1
+  index="$(mktemp)" || return 1
+  if [[ -f "$real" ]]; then
+    cp "$real" "$index" || { rm -f "$index"; return 1; }
+  else
+    rm -f "$index"
+  fi
+  { GIT_INDEX_FILE="$index" git add -A >/dev/null 2>&1 && GIT_INDEX_FILE="$index" git write-tree; } || status=$?
+  rm -f "$index"
+  return "$status"
+}
+
+# Where Rust test validation keeps its state: each test executable's last
+# duration, which orders the next run, and the tree of the last run without
+# explicit targets that passed.
+rust_validation_dir() {
+  printf '%s/validation\n' "${CARGO_TARGET_DIR:-target}"
+}
+
+# Whether the binary crate's own modules (src/main.rs, src/cli/,
+# src/service/, src/process_limits.rs) reach only the binary's unit tests and
+# the integration tests that run the binary: the library declares none of
+# them, no `#[path]` reaches them or leaves its directory, and only the
+# service support module runs the binary for other tests.
+binary_crate_is_separate() {
+  local file
+  if grep -qE '^[[:space:]]*(pub(\([^)]*\))?[[:space:]]+)?mod[[:space:]]+(cli|service|process_limits)[[:space:]]*[;{]' src/lib.rs 2>/dev/null; then
+    return 1
+  fi
+  if grep -rhoE '#\[path[[:space:]]*=[[:space:]]*"[^"]*"' src 2>/dev/null | grep -qE '\.\.|cli/|service|process_limits|main\.rs'; then
+    return 1
+  fi
+  for file in tests/support/*.rs; do
+    [[ -f "$file" && "$file" != tests/support/service.rs ]] || continue
+    if grep -q 'CARGO_BIN_EXE_' "$file"; then return 1; fi
+  done
+  return 0
+}
+
+# Choose the Rust test targets that the changes since the last passing run
+# can affect. Sets RUST_SELECTION to `every`, `none`, or `targets`, with the
+# Cargo target arguments in RUST_SELECTED; RUST_SELECTION_REASON for the
+# report; and RUST_TREE, the working tree selected for (empty outside Git),
+# which record_rust_tests_passed takes once the run passes. The base is the
+# tree the last such run recorded while Git still holds it, else the target
+# branch's merge base. Each changed path selects what can read it:
+# - tests/NAME.rs: that test, or nothing once it is deleted;
+# - the binary crate's own modules: the binary's unit tests and every test
+#   that runs the binary (`CARGO_BIN_EXE_` or the service support module);
+# - a file no Rust target compiles (docs/, tools/, scripts/, memory-bank/,
+#   top-level documents and settings): every test, and the binary's unit
+#   tests, whose source names it;
+# - anything else, such as library sources, tests/support/, fixtures/,
+#   vendor/, and build settings: every target.
+select_rust_tests() {
+  RUST_SELECTION=every
+  RUST_SELECTED=()
+  RUST_SELECTION_REASON="the changes since ${TARGET_BRANCH:-main} could not be determined"
+  RUST_TREE=""
+  local recorded base since list path name file mention every="" binary=0 tests=() mentions=()
+  RUST_TREE="$(working_tree)" || { RUST_TREE=""; return 0; }
+  recorded="$(rust_validation_dir)/rust-tests-passed.tree"
+  if [[ -f "$recorded" ]] && base="$(head -n 1 "$recorded")" && [[ -n "$base" ]] \
+    && git cat-file -e "$base^{tree}" 2>/dev/null; then
+    since="the last passing run"
+  elif base="$(target_merge_base)"; then
+    since="${TARGET_BRANCH:-main}"
+  else
+    return 0
+  fi
+  list="$(mktemp)"
+  if ! git diff-tree -r --no-renames --name-only -z "$base" "$RUST_TREE" >"$list"; then
+    rm -f "$list"
+    return 0
+  fi
+  while IFS= read -r -d '' path; do
+    case "$path" in
+      tests/*/*) every="${every:-$path}" ;;
+      tests/*.rs) if [[ -f "$path" ]]; then tests+=("$(basename "$path" .rs)"); fi ;;
+      src/main.rs | src/cli/* | src/service/* | src/process_limits.rs) binary=1 ;;
+      docs/* | tools/* | scripts/* | memory-bank/*) mentions+=("${path%%/*}/") ;;
+      README.md | AGENTS.md | CommandCenter.json | LICENSE | .gitignore) mentions+=("$path") ;;
+      *) every="${every:-$path}" ;;
+    esac
+  done <"$list"
+  rm -f "$list"
+  if [[ -z "$every" ]] && (( binary )) && ! binary_crate_is_separate; then
+    every="a binary module that the library or another test helper shares"
+  fi
+  if [[ -n "$every" ]]; then
+    RUST_SELECTION_REASON="$every changed since $since"
+    return 0
+  fi
+  local run_binary=$binary
+  if (( binary )); then
+    for file in tests/*.rs; do
+      [[ -f "$file" ]] || continue
+      if grep -qE 'CARGO_BIN_EXE_|support::service|service::Service' "$file"; then
+        tests+=("$(basename "$file" .rs)")
+      fi
+    done
+  fi
+  for mention in ${mentions[@]+"${mentions[@]}"}; do
+    for file in tests/*.rs; do
+      [[ -f "$file" ]] || continue
+      if grep -qF -- "$mention" "$file"; then tests+=("$(basename "$file" .rs)"); fi
+    done
+    if grep -rqsF -- "$mention" src/main.rs src/cli src/service src/process_limits.rs; then
+      run_binary=1
+    fi
+  done
+  if (( run_binary )); then RUST_SELECTED+=(--bin tsparse); fi
+  while IFS= read -r name; do
+    [[ -n "$name" ]] && RUST_SELECTED+=(--test "$name")
+  done < <(printf '%s\n' ${tests[@]+"${tests[@]}"} | LC_ALL=C sort -u)
+  if (( ${#RUST_SELECTED[@]} == 0 )); then
+    RUST_SELECTION=none
+    RUST_SELECTION_REASON="no Rust test inputs changed since $since"
+  else
+    RUST_SELECTION=targets
+    RUST_SELECTION_REASON="changes since $since"
+  fi
+}
+
+# Record that the Rust tests a run selected for TREE passed, so the next
+# selection starts from TREE. Nothing is recorded when the working tree no
+# longer holds TREE: a file that changed during the run may or may not have
+# been compiled, so the run proves nothing about it.
+record_rust_tests_passed() {
+  local tree="$1" now directory
+  [[ -n "$tree" ]] || return 0
+  now="$(working_tree)" || return 0
+  [[ "$now" == "$tree" ]] || return 0
+  directory="$(rust_validation_dir)"
+  mkdir -p "$directory"
+  printf '%s\n' "$tree" >"$directory/rust-tests-passed.tree.$$"
+  mv "$directory/rust-tests-passed.tree.$$" "$directory/rust-tests-passed.tree"
+}
+
+# One test executable of run_rust_tests, given as INDEX<TAB>LABEL<TAB>EXECUTABLE:
+# its output goes to RUST_TEST_WORK/INDEX.out, and STATUS<TAB>SECONDS to
+# RUST_TEST_WORK/INDEX.status. The executable `doc` runs the doc tests.
+run_rust_test_executable() {
+  local index label executable started status=0
+  IFS=$'\t' read -r index label executable <<<"$1"
+  started=$SECONDS
+  if [[ "$executable" == doc ]]; then
+    cargo test --offline --jobs "$RUST_BUILD_JOBS" --doc -- --test-threads="$RUST_TEST_THREADS" --show-output \
+      </dev/null >"$RUST_TEST_WORK/$index.out" 2>&1 || status=$?
+  else
+    "$executable" --test-threads="$RUST_TEST_THREADS" --show-output ${RUST_TEST_FILTER:+"$RUST_TEST_FILTER"} \
+      </dev/null >"$RUST_TEST_WORK/$index.out" 2>&1 || status=$?
+  fi
+  printf '%s\t%s\n' "$status" "$(( SECONDS - started ))" >"$RUST_TEST_WORK/$index.status"
+}
+
+# Build the selected Rust test targets once, then run their test executables
+# RUST_TEST_EXECUTABLES at a time with RUST_TEST_THREADS threads each, the
+# longest first by their last durations; the build uses RUST_BUILD_JOBS jobs:
+# run_rust_tests [--require-executed] [--filter NAME] [CARGO TARGET ARG...]
+# Without a target argument every target runs, with the library's doc tests,
+# as `cargo test` does. NAME filters the tests each executable runs. A test
+# that cannot run on this platform, such as a permission test run as the
+# superuser, passes after printing a `SKIP name: reason` line. Every
+# executable runs even after one fails. A failed build replays its
+# diagnostics, and a failed executable its complete output; success prints
+# one line naming any skips.
 run_rust_tests() {
-  local workers="$1" output status=0 skips count require_executed=0
-  shift
-  if [[ "${1:-}" == --require-executed ]]; then
-    require_executed=1
-    shift
-  fi
-  output="$(mktemp)"
-  cargo test --offline --jobs "$workers" "$@" -- --test-threads="$workers" --show-output \
-    >"$output" 2>&1 || status=$?
-  if (( status == 0 && require_executed )) && ! awk '/^test result: ok\. [1-9][0-9]* passed;/ { found=1 } END { exit !found }' "$output"; then
-    printf 'validation: no tests executed in the selected Rust module\n' >&2
-    status=1
-  fi
+  local require_executed=0 filter="" work status=0 count index label executable
+  local seconds durations failed=() failed_labels=() first_status=0 executed=0 skips line
+  while (( $# > 0 )); do
+    case "$1" in
+      --require-executed) require_executed=1; shift ;;
+      --filter) filter="$2"; shift 2 ;;
+      *) break ;;
+    esac
+  done
+  work="$(mktemp -d)"
+  cargo test --offline --jobs "$RUST_BUILD_JOBS" --no-run --message-format=json-render-diagnostics "$@" \
+    >"$work/artifacts.json" 2>"$work/build.log" || status=$?
   if (( status != 0 )); then
-    cat "$output" >&2
-    rm -f "$output"
+    cat "$work/build.log" >&2
+    rm -rf "$work"
     return "$status"
   fi
-  skips="$(grep -E '^SKIP ' "$output" || true)"
-  rm -f "$output"
+  # LABEL<TAB>EXECUTABLE for each test executable Cargo built, sorted by label.
+  if ! {
+    if (( $# == 0 )); then printf 'doc tests\tdoc\n'; fi
+    node -e '
+      const fs = require("node:fs");
+      const path = require("node:path");
+      for (const line of fs.readFileSync(process.argv[1], "utf8").split("\n")) {
+        if (!line.startsWith("{")) continue;
+        const message = JSON.parse(line);
+        if (message.reason !== "compiler-artifact" || !message.executable || !message.profile?.test) continue;
+        console.log(path.relative(process.cwd(), message.target.src_path) + "\t" + message.executable);
+      }' "$work/artifacts.json"
+  } | LC_ALL=C sort >"$work/jobs"; then
+    printf 'validation: Cargo'"'"'s build messages could not be read\n' >&2
+    cat "$work/build.log" >&2
+    rm -rf "$work"
+    return 1
+  fi
+  count="$(wc -l <"$work/jobs" | tr -d ' ')"
+  if (( count == 0 )); then
+    printf 'validation: the build produced no test executables\n' >&2
+    cat "$work/build.log" >&2
+    rm -rf "$work"
+    return 1
+  fi
+  durations="$(rust_validation_dir)/rust-test-durations"
+  awk -F '\t' -v OFS='\t' -v durations="$durations" '
+    BEGIN { while ((getline line < durations) > 0) { split(line, field, "\t"); seconds[field[1]] = field[2] } }
+    { print (($1 in seconds) ? seconds[$1] : 1000000), NR, $1, $2 }' "$work/jobs" \
+    | sort -t "$(printf '\t')" -k1,1nr -k2,2n | cut -f 2- >"$work/order"
+  status=0
+  tr '\n' '\0' <"$work/order" \
+    | RUST_TEST_WORK="$work" RUST_TEST_FILTER="$filter" CARGO_MANIFEST_DIR="$PWD" \
+      xargs -0 -n 1 -P "$RUST_TEST_EXECUTABLES" \
+        bash -c "$(declare -f run_rust_test_executable)"'; run_rust_test_executable "$1"' run_rust_test_executable \
+    || status=$?
+  if (( status != 0 )); then
+    printf 'validation: the test executables could not be run (xargs exit %s)\n' "$status" >&2
+    rm -rf "$work"
+    return 1
+  fi
+  index=0
+  while IFS=$'\t' read -r label executable; do
+    index=$(( index + 1 ))
+    if ! IFS=$'\t' read -r status seconds <"$work/$index.status" 2>/dev/null; then
+      status=1 seconds=0
+      printf '%s did not report a result\n' "$label" >>"$work/$index.out"
+    fi
+    printf '%s\t%s\n' "$label" "$seconds" >>"$work/durations"
+    if (( status != 0 )); then
+      failed+=("$index")
+      failed_labels+=("$label")
+      if (( first_status == 0 )); then first_status=$status; fi
+    fi
+    if grep -qE '^test result: ok\. [1-9][0-9]* passed;' "$work/$index.out" 2>/dev/null; then
+      executed=1
+    fi
+  done <"$work/jobs"
+  mkdir -p "$(dirname "$durations")"
+  awk -F '\t' -v OFS='\t' -v previous="$durations" '
+    BEGIN { while ((getline line < previous) > 0) { split(line, field, "\t"); seconds[field[1]] = field[2] } }
+    { seconds[$1] = $2 }
+    END { for (label in seconds) print label, seconds[label] }' "$work/durations" \
+    | LC_ALL=C sort >"$durations.$$"
+  mv "$durations.$$" "$durations"
+  if (( ${#failed[@]} > 0 )); then
+    line="$(printf '%s, ' "${failed_labels[@]}")"
+    printf 'rust tests: %s of %s test executables failed: %s\n' "${#failed[@]}" "$count" "${line%, }" >&2
+    for index in "${failed[@]}"; do
+      printf '\n==== %s (exit %s)\n' "$(sed -n "${index}p" "$work/jobs" | cut -f 1)" \
+        "$(cut -f 1 "$work/$index.status" 2>/dev/null || printf 'none')" >&2
+      cat "$work/$index.out" >&2
+    done
+    rm -rf "$work"
+    return "$first_status"
+  fi
+  if (( require_executed && ! executed )); then
+    printf 'validation: no tests executed in the selected Rust module\n' >&2
+    for (( index = 1; index <= count; index++ )); do cat "$work/$index.out" >&2; done
+    rm -rf "$work"
+    return 1
+  fi
+  skips="$(for (( index = 1; index <= count; index++ )); do grep -E '^SKIP ' "$work/$index.out" || true; done)"
+  rm -rf "$work"
   if [[ -z "$skips" ]]; then
     printf 'rust tests: passed, 0 skipped\n'
   else
-    count="$(printf '%s\n' "$skips" | wc -l | tr -d ' ')"
-    printf 'rust tests: passed, %s skipped on this platform:\n%s\n' "$count" "$skips"
+    printf 'rust tests: passed, %s skipped on this platform:\n%s\n' "$(printf '%s\n' "$skips" | wc -l | tr -d ' ')" "$skips"
   fi
 }
 

@@ -40,9 +40,10 @@
           "full": "scripts/validate/test-full.sh",
           "changed": "scripts/validate/test-changed.sh"
         },
-        "cost": 2,
-        "description": "Run Rust tests, explicit library/binary/integration roots, or one supported resource/reuse test module file with two build jobs and two test threads",
-        "pathArgs": "paths"
+        "cost": 4,
+        "description": "Run the Rust tests that changes since the last passing run can affect (every target after a library or build change), explicit library/binary/integration roots, or one supported resource/reuse test module file; four build jobs and four test executables at once",
+        "pathArgs": "paths",
+        "timeoutMs": 3600000
       },
       "harness-test": {
         "command": {
