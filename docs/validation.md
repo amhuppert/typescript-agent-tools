@@ -145,28 +145,45 @@ since the last passing run can affect (`select_rust_tests` in
 | `docs/`, `tools/`, `scripts/`, `memory-bank/`, `README.md`, `AGENTS.md`, `CommandCenter.json`, `LICENSE`, `.gitignore` | every test, and the binary's unit tests, whose source names that directory or file |
 | anything else: library sources, `tests/support/`, fixtures, `vendor/`, Cargo and build settings | every target, with the doc tests |
 
-The base is the last tree a run without explicit paths passed for, recorded in
-`target/validation/rust-tests-passed.tree`, or else the merge base with the
-target branch. A run records its tree only when it passed and no file changed
-while it ran. A binary module that the library also declares, a `#[path]` that
+The base is the last tree a run without explicit paths passed for, recorded with
+the Rust toolchain (`rustc -Vv`) in `target/validation/rust-tests-passed.tree`,
+or else the merge base with the target branch; a different toolchain runs every
+target. A run records its tree only when it passed and no file changed while it
+ran. A binary module that the library also declares, a `#[path]` that
 reaches one, or a support module other than `service.rs` that runs the binary
 makes a binary change run every target. The full command runs every target and
 records its pass; merge validation still runs the full suite.
 
 Both commands build the selected targets once with four jobs
-(`cargo test --no-run`), then run four test executables at a time with one test
-thread each, longest first by their last durations
-(`target/validation/rust-test-durations`). Every executable runs even after one
-fails, and a failure replays the complete output of each failed executable. On
-the tree of 7d3abaf (285 test executables), the full suite took 316 s this way,
-against 734 s for `cargo test` running one executable at a time with two threads;
-a change to `src/cli/` alone took 35 s.
+(`cargo test --no-run`), then run four test executables at a time with two test
+threads each, longest first by their last durations
+(`target/validation/rust-test-durations`). An integration test whose file has a
+line beginning `// validation: run alone`, such as one that asserts wall-clock
+limits, runs after the others, one at a time. Every executable runs even after
+one fails, and a failure replays the complete output of each failed executable.
+On the tree of 7d3abaf (285 test executables), the full suite took 316 s with one
+thread per executable, against 734 s for `cargo test` running one executable at a
+time with two threads; a change to `src/cli/` alone took 35 s. On 2026-10-19,
+with 292 executables, two threads per executable took the full suite from 384 s
+to 273 s.
 
 s; merge validation still runs the full suite.
 
 ## Harness tests
 
-The registered `harness-test` command runs the Node tests in `tools/*.test.mjs` on two workers. `scripts/validate/harness-test-full.sh` runs all of them. `scripts/validate/harness-test-changed.sh` runs only the paths it is given, and without paths it runs the whole suite. Each path must name an existing `tools/<name>.test.mjs`. Any other path exits 2 before a test runs, because a runner such as `tools/robustness-corpus.mjs` would execute as a corpus tool and another module would pass trivially.
+The registered `harness-test` command runs the Node tests in `tools/*.test.mjs` on two workers. `scripts/validate/harness-test-full.sh` runs all of them and records its pass. `scripts/validate/harness-test-changed.sh` runs only the paths it is given; each must name an existing `tools/<name>.test.mjs`, and any other path exits 2 before a test runs, because a runner such as `tools/robustness-corpus.mjs` would execute as a corpus tool and another module would pass trivially. An explicit run records nothing.
+
+Without paths, the changed command runs the test files that the changes since the last passing run can affect, as [`tools/harness-selection.mjs`](../tools/harness-selection.mjs) decides from each test file's closure: the file and every module it reaches through a relative import or a module path it names.
+
+| Changed path | Runs |
+| --- | --- |
+| `tools/<name>.test.mjs` | that file |
+| another module under `tools/` | the test files whose closure holds it, and those that name `scripts/` when a validation script names it |
+| `src/`, `tests/`, `examples/`, `benches/`, `vendor/`, `build.rs`, `Cargo.toml`, `Cargo.lock`, `.cargo/` | the test files whose closure names the Rust tool, Cargo, a build directory, or a Rust path: 27 of 352 on 2026-10-19 |
+| `scripts/`, `docs/`, `memory-bank/`, `README.md`, `AGENTS.md`, `CommandCenter.json`, `LICENSE`, `.gitignore`, and other files under `tools/` | the test files whose closure names that directory or file |
+| anything else, such as `fixtures/` and package files | every test file |
+
+The base works as for Rust tests, recorded in `target/validation/harness-tests-passed.tree` with the Node version and each compiler variable's value, size, and time; a change to any of them runs every test file. Most harness tests check the pinned compilers, so their time is the compilers': in a 58-file sample, two workers took 607 s, four 564 s, and eight 384 s at a load near 13.
 
 Compiler variables that are set are used as they are. Unset ones are filled from the canonical checkout's `.cache/compiler-oracles`: `TYPE_SCRIPT_API` from `typescript-6.0.3/package/lib/typescript.js`, and the TypeScript 7.0.2 semantic API and native compiler as for the [`semantic` command](#reference-semantics). A test whose compiler is still missing skips with a stated reason. On success the wrapper prints one line, for example:
 
@@ -174,7 +191,7 @@ Compiler variables that are set are used as they are. Unset ones are filled from
 harness tests: 74 total, 67 executed, 67 passed, 7 skipped (HARNESS_REQUIRE_COMPILERS=1 fails on skips)
 ```
 
-A failure replays the complete test output, and a run in which no test executed fails. The Rust `test` command reports the same way: on success one line, `rust tests: passed, 0 skipped`, or the count followed by each `SKIP name: reason` line from a test that cannot run on this platform, such as a permission test run as the superuser or a case-policy test on a case-sensitive file system; a failure replays Cargo's output. `HARNESS_REQUIRE_COMPILERS=1` selects strict mode. In strict mode, a missing compiler exits 2 before any test runs and names what was not found, and any skipped test fails the run with a list of the skipped tests and their reasons. Values other than `1`, `0`, or unset exit 2.
+A failure replays the complete test output, and a run in which no test executed fails. The Rust `test` command reports the same way: on success one line, `rust tests: passed, 0 skipped`, or the count followed by each `SKIP name: reason` line from a test that cannot run on this platform, such as a permission test run as the superuser or a case-policy test on a case-sensitive file system; a failure replays Cargo's build diagnostics or each failed executable's output. A run without paths first prints which targets or files it selected and why. `HARNESS_REQUIRE_COMPILERS=1` selects strict mode. In strict mode, a missing compiler exits 2 before any test runs and names what was not found, and any skipped test fails the run with a list of the skipped tests and their reasons. Values other than `1`, `0`, or unset exit 2.
 
 ## Reference semantics
 

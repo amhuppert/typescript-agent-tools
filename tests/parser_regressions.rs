@@ -1,3 +1,4 @@
+// validation: run alone: it asserts that parses finish within ten seconds, which other test executables' load can break.
 use typescript_parser::{ParseOptions, Value, parse, parse_with_options};
 
 #[test]

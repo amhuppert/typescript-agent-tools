@@ -89,7 +89,7 @@ find_semantic_compilers() {
 # The resource profile of Rust test validation, which the test command's
 # cost in CommandCenter.json reflects: build jobs, test executables run at
 # once, and test threads in each.
-export RUST_BUILD_JOBS=4 RUST_TEST_EXECUTABLES=4 RUST_TEST_THREADS=1
+export RUST_BUILD_JOBS=4 RUST_TEST_EXECUTABLES=4 RUST_TEST_THREADS=2
 
 # The merge base of HEAD and the target branch (TARGET_BRANCH, default
 # main) that changed-scope checks compare against. Fails without one.
@@ -102,26 +102,92 @@ target_merge_base() {
 
 # The tree of every file in the working tree that Git does not ignore,
 # committed or not, written to the object database through a copy of the
-# index, so the index itself is untouched. Fails outside a Git checkout.
+# index, so the index itself is untouched. The copy keeps the index's time:
+# Git rehashes an entry no older than its index, so a file changed in the
+# second the index was written, at the same size, still counts as changed.
+# Fails outside a Git checkout.
 working_tree() {
   local real index status=0
   real="$(git rev-parse --git-path index 2>/dev/null)" || return 1
   index="$(mktemp)" || return 1
   if [[ -f "$real" ]]; then
-    cp "$real" "$index" || { rm -f "$index"; return 1; }
+    cp -p "$real" "$index" || { rm -f "$index"; return 1; }
   else
     rm -f "$index"
   fi
-  { GIT_INDEX_FILE="$index" git add -A >/dev/null 2>&1 && GIT_INDEX_FILE="$index" git write-tree; } || status=$?
+  # A build directory that Git does not ignore would be hashed as source.
+  # Naming an ignored one in a pathspec makes `git add` fail, so only an
+  # unignored one is excluded.
+  local skip=() target top relative
+  top="$(git rev-parse --show-toplevel 2>/dev/null)" || { rm -f "$index"; return 1; }
+  top="$(cd "$top" && pwd -P)"
+  target="$(cd "${CARGO_TARGET_DIR:-target}" 2>/dev/null && pwd -P)" || target=""
+  if [[ -n "$target" && "$target/" == "$top/"* ]]; then
+    relative="${target#"$top/"}"
+    if ! git check-ignore -q -- "$relative/" 2>/dev/null; then
+      skip=(":(exclude)$relative")
+    fi
+  fi
+  { GIT_INDEX_FILE="$index" git add -A -- . ${skip[@]+"${skip[@]}"} >/dev/null 2>&1 \
+      && GIT_INDEX_FILE="$index" git write-tree; } || status=$?
   rm -f "$index"
   return "$status"
 }
 
-# Where Rust test validation keeps its state: each test executable's last
-# duration, which orders the next run, and the tree of the last run without
-# explicit targets that passed.
+# Where test validation keeps its state: each Rust test executable's last
+# duration, which orders the next run, and the last pass each check recorded.
 rust_validation_dir() {
   printf '%s/validation\n' "${CARGO_TARGET_DIR:-target}"
+}
+
+# The toolchain a Rust test pass depended on besides the tree.
+rust_toolchain() {
+  rustc -Vv 2>/dev/null | cksum | cut -d ' ' -f 1
+}
+
+# The pass CHECK last recorded, as its tree and its toolchain fingerprint on
+# two lines, or nothing.
+recorded_pass() {
+  local file
+  file="$(rust_validation_dir)/$1-passed.tree"
+  [[ -f "$file" ]] && cat "$file"
+  return 0
+}
+
+# Record that CHECK passed for TREE under FINGERPRINT, so its next changed
+# selection starts from TREE. Nothing is recorded when the working tree no
+# longer holds TREE: a file that changed during the run may or may not have
+# been read, so the run proves nothing about it.
+record_pass() {
+  local check="$1" tree="$2" fingerprint="$3" now directory
+  [[ -n "$tree" ]] || return 0
+  now="$(working_tree)" || return 0
+  [[ "$now" == "$tree" ]] || return 0
+  directory="$(rust_validation_dir)"
+  mkdir -p "$directory"
+  printf '%s\n%s\n' "$tree" "$fingerprint" >"$directory/$check-passed.tree.$$"
+  mv "$directory/$check-passed.tree.$$" "$directory/$check-passed.tree"
+}
+
+# The base of a changed selection for CHECK under FINGERPRINT, printed as the
+# base and what it is on two lines: the tree CHECK last recorded while Git
+# still holds it and the fingerprint is unchanged, else the target branch's
+# merge base. Prints `changed` alone when the fingerprint changed, and fails
+# when there is no base.
+selection_base() {
+  local check="$1" fingerprint="$2" recorded base
+  recorded="$(recorded_pass "$check")"
+  base="$(printf '%s\n' "$recorded" | sed -n 1p)"
+  if [[ -n "$base" ]] && git cat-file -e "$base^{tree}" 2>/dev/null; then
+    if [[ "$(printf '%s\n' "$recorded" | sed -n 2p)" != "$fingerprint" ]]; then
+      printf 'changed\n'
+      return 0
+    fi
+    printf '%s\nthe last passing run\n' "$base"
+    return 0
+  fi
+  base="$(target_merge_base)" || return 1
+  printf '%s\n%s\n' "$base" "${TARGET_BRANCH:-main}"
 }
 
 # Whether the binary crate's own modules (src/main.rs, src/cli/,
@@ -147,10 +213,10 @@ binary_crate_is_separate() {
 # Choose the Rust test targets that the changes since the last passing run
 # can affect. Sets RUST_SELECTION to `every`, `none`, or `targets`, with the
 # Cargo target arguments in RUST_SELECTED; RUST_SELECTION_REASON for the
-# report; and RUST_TREE, the working tree selected for (empty outside Git),
-# which record_rust_tests_passed takes once the run passes. The base is the
-# tree the last such run recorded while Git still holds it, else the target
-# branch's merge base. Each changed path selects what can read it:
+# report; RUST_TREE, the working tree selected for (empty outside Git); and
+# RUST_FINGERPRINT, the toolchain, which record_pass takes once the run
+# passes. The base comes from selection_base; a toolchain change since the
+# recorded pass runs every target. Each changed path selects what can read it:
 # - tests/NAME.rs: that test, or nothing once it is deleted;
 # - the binary crate's own modules: the binary's unit tests and every test
 #   that runs the binary (`CARGO_BIN_EXE_` or the service support module);
@@ -164,17 +230,16 @@ select_rust_tests() {
   RUST_SELECTED=()
   RUST_SELECTION_REASON="the changes since ${TARGET_BRANCH:-main} could not be determined"
   RUST_TREE=""
-  local recorded base since list path name file mention every="" binary=0 tests=() mentions=()
+  local found base since list path name file mention every="" binary=0 tests=() mentions=()
+  RUST_FINGERPRINT="$(rust_toolchain)"
   RUST_TREE="$(working_tree)" || { RUST_TREE=""; return 0; }
-  recorded="$(rust_validation_dir)/rust-tests-passed.tree"
-  if [[ -f "$recorded" ]] && base="$(head -n 1 "$recorded")" && [[ -n "$base" ]] \
-    && git cat-file -e "$base^{tree}" 2>/dev/null; then
-    since="the last passing run"
-  elif base="$(target_merge_base)"; then
-    since="${TARGET_BRANCH:-main}"
-  else
+  found="$(selection_base rust-tests "$RUST_FINGERPRINT")" || return 0
+  if [[ "$found" == changed ]]; then
+    RUST_SELECTION_REASON="the Rust toolchain changed since the last passing run"
     return 0
   fi
+  base="$(printf '%s\n' "$found" | sed -n 1p)"
+  since="$(printf '%s\n' "$found" | sed -n 2p)"
   list="$(mktemp)"
   if ! git diff-tree -r --no-renames --name-only -z "$base" "$RUST_TREE" >"$list"; then
     rm -f "$list"
@@ -229,21 +294,6 @@ select_rust_tests() {
   fi
 }
 
-# Record that the Rust tests a run selected for TREE passed, so the next
-# selection starts from TREE. Nothing is recorded when the working tree no
-# longer holds TREE: a file that changed during the run may or may not have
-# been compiled, so the run proves nothing about it.
-record_rust_tests_passed() {
-  local tree="$1" now directory
-  [[ -n "$tree" ]] || return 0
-  now="$(working_tree)" || return 0
-  [[ "$now" == "$tree" ]] || return 0
-  directory="$(rust_validation_dir)"
-  mkdir -p "$directory"
-  printf '%s\n' "$tree" >"$directory/rust-tests-passed.tree.$$"
-  mv "$directory/rust-tests-passed.tree.$$" "$directory/rust-tests-passed.tree"
-}
-
 # One test executable of run_rust_tests, given as INDEX<TAB>LABEL<TAB>EXECUTABLE:
 # its output goes to RUST_TEST_WORK/INDEX.out, and STATUS<TAB>SECONDS to
 # RUST_TEST_WORK/INDEX.status. The executable `doc` runs the doc tests.
@@ -263,7 +313,10 @@ run_rust_test_executable() {
 
 # Build the selected Rust test targets once, then run their test executables
 # RUST_TEST_EXECUTABLES at a time with RUST_TEST_THREADS threads each, the
-# longest first by their last durations; the build uses RUST_BUILD_JOBS jobs:
+# longest first by their last durations; the build uses RUST_BUILD_JOBS jobs.
+# An integration test whose file has a line beginning
+# `// validation: run alone`, such as one that asserts wall-clock limits,
+# runs after the others, one at a time:
 # run_rust_tests [--require-executed] [--filter NAME] [CARGO TARGET ARG...]
 # Without a target argument every target runs, with the library's doc tests,
 # as `cargo test` does. NAME filters the tests each executable runs. A test
@@ -274,7 +327,7 @@ run_rust_test_executable() {
 # one line naming any skips.
 run_rust_tests() {
   local require_executed=0 filter="" work status=0 count index label executable
-  local seconds durations failed=() failed_labels=() first_status=0 executed=0 skips line
+  local seconds durations failed=() failed_labels=() first_status=0 executed=0 skips line batch at_once
   while (( $# > 0 )); do
     case "$1" in
       --require-executed) require_executed=1; shift ;;
@@ -320,12 +373,24 @@ run_rust_tests() {
     BEGIN { while ((getline line < durations) > 0) { split(line, field, "\t"); seconds[field[1]] = field[2] } }
     { print (($1 in seconds) ? seconds[$1] : 1000000), NR, $1, $2 }' "$work/jobs" \
     | sort -t "$(printf '\t')" -k1,1nr -k2,2n | cut -f 2- >"$work/order"
+  : >"$work/together"
+  : >"$work/alone"
+  while IFS=$'\t' read -r index label executable; do
+    if [[ "$label" == tests/*.rs ]] && grep -qE '^[[:space:]]*//!?[[:space:]]*validation: run alone' "$label" 2>/dev/null; then
+      printf '%s\t%s\t%s\n' "$index" "$label" "$executable" >>"$work/alone"
+    else
+      printf '%s\t%s\t%s\n' "$index" "$label" "$executable" >>"$work/together"
+    fi
+  done <"$work/order"
   status=0
-  tr '\n' '\0' <"$work/order" \
-    | RUST_TEST_WORK="$work" RUST_TEST_FILTER="$filter" CARGO_MANIFEST_DIR="$PWD" \
-      xargs -0 -n 1 -P "$RUST_TEST_EXECUTABLES" \
-        bash -c "$(declare -f run_rust_test_executable)"'; run_rust_test_executable "$1"' run_rust_test_executable \
-    || status=$?
+  for batch in together alone; do
+    if [[ "$batch" == together ]]; then at_once="$RUST_TEST_EXECUTABLES"; else at_once=1; fi
+    tr '\n' '\0' <"$work/$batch" \
+      | RUST_TEST_WORK="$work" RUST_TEST_FILTER="$filter" CARGO_MANIFEST_DIR="$PWD" \
+        xargs -0 -r -n 1 -P "$at_once" \
+          bash -c "$(declare -f run_rust_test_executable)"'; run_rust_test_executable "$1"' run_rust_test_executable \
+      || status=$?
+  done
   if (( status != 0 )); then
     printf 'validation: the test executables could not be run (xargs exit %s)\n' "$status" >&2
     rm -rf "$work"
@@ -378,6 +443,77 @@ run_rust_tests() {
     printf 'rust tests: passed, 0 skipped\n'
   else
     printf 'rust tests: passed, %s skipped on this platform:\n%s\n' "$(printf '%s\n' "$skips" | wc -l | tr -d ' ')" "$skips"
+  fi
+}
+
+# The Node and compilers a harness pass depended on besides the tree: the
+# Node version and each compiler variable's value, size, and time, as the
+# find_* functions resolve them.
+harness_toolchain() {
+  local name value
+  find_syntax_api >/dev/null 2>&1 || true
+  find_semantic_compilers >/dev/null 2>&1 || true
+  {
+    node -v 2>/dev/null
+    for name in TYPE_SCRIPT_API TYPE_SCRIPT_SEMANTIC_API TYPE_SCRIPT_NATIVE; do
+      value="${!name:-}"
+      printf '%s=%s\n' "$name" "$value"
+      if [[ -n "$value" ]]; then ls -ld "$value" "$value/package.json" 2>/dev/null || true; fi
+    done
+  } | cksum | cut -d ' ' -f 1
+}
+
+# Choose the harness test files that the changes since the last passing run
+# can affect (tools/harness-selection.mjs owns the rules). Sets
+# HARNESS_SELECTION to `every`, `none`, or `files`, with the files in
+# HARNESS_SELECTED; HARNESS_SELECTION_REASON for the report; and HARNESS_TREE
+# and HARNESS_FINGERPRINT, which record_pass takes once the run passes. The
+# base comes from selection_base; a Node or compiler change since the
+# recorded pass runs every test. Fails when the selection itself fails.
+select_harness_tests() {
+  HARNESS_SELECTION=every
+  HARNESS_SELECTED=()
+  HARNESS_SELECTION_REASON="the changes since ${TARGET_BRANCH:-main} could not be determined"
+  HARNESS_TREE=""
+  local found base since list selection file
+  HARNESS_FINGERPRINT="$(harness_toolchain)"
+  HARNESS_TREE="$(working_tree)" || { HARNESS_TREE=""; return 0; }
+  found="$(selection_base harness-tests "$HARNESS_FINGERPRINT")" || return 0
+  if [[ "$found" == changed ]]; then
+    HARNESS_SELECTION_REASON="Node or a compiler changed since the last passing run"
+    return 0
+  fi
+  base="$(printf '%s\n' "$found" | sed -n 1p)"
+  since="$(printf '%s\n' "$found" | sed -n 2p)"
+  list="$(mktemp)"
+  if ! git diff-tree -r --no-renames --name-only -z "$base" "$HARNESS_TREE" >"$list"; then
+    rm -f "$list"
+    return 0
+  fi
+  selection="$(mktemp)"
+  if ! node "$(dirname "${BASH_SOURCE[0]}")/../../tools/harness-selection.mjs" "$list" >"$selection"; then
+    printf 'validation: the harness test selection failed\n' >&2
+    rm -f "$list" "$selection"
+    return 1
+  fi
+  rm -f "$list"
+  if [[ "$(head -c 6 "$selection")" == every$'\t' ]]; then
+    HARNESS_SELECTION_REASON="$(cut -f 2 "$selection" | head -n 1) changed since $since"
+    rm -f "$selection"
+    return 0
+  fi
+  while IFS= read -r file; do
+    [[ -n "$file" ]] && HARNESS_SELECTED+=("$file")
+  done <"$selection"
+  rm -f "$selection"
+  if (( ${#HARNESS_SELECTED[@]} == 0 )); then
+    HARNESS_SELECTION=none
+    HARNESS_SELECTION_REASON="no harness test inputs changed since $since"
+  elif (( ${#HARNESS_SELECTED[@]} < $(ls tools/*.test.mjs | wc -l) )); then
+    HARNESS_SELECTION=files
+    HARNESS_SELECTION_REASON="changes since $since"
+  else
+    HARNESS_SELECTED=()
   fi
 }
 

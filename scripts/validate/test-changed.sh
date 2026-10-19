@@ -19,7 +19,7 @@ if (( $# == 0 )); then
       printf 'rust tests: selected %s (%s)\n' "${RUST_SELECTED[*]}" "$RUST_SELECTION_REASON"
       run_rust_tests "${RUST_SELECTED[@]}" ;;
   esac
-  record_rust_tests_passed "$RUST_TREE"
+  record_pass rust-tests "$RUST_TREE" "$RUST_FINGERPRINT"
   exit 0
 fi
 

@@ -1,3 +1,4 @@
+// validation: run alone: it asserts that service requests finish within five seconds, which other test executables' load can break.
 //! Independent CLI processes share an index and its lifecycle.
 #![cfg(unix)]
 mod support;

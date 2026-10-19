@@ -245,7 +245,7 @@ fn a_removed_working_directory_fails_every_operand_alike_in_both_entries() {
             .args(args)
             .args(["--project", config])
             .env("TSPARSE_SERVICE_DIR", &service.runtime)
-            .env("TSPARSE_SERVICE_IDLE_SECS", "60")
+            .env("TSPARSE_SERVICE_IDLE_SECS", support::service::IDLE_SECS)
             .stdin(std::process::Stdio::null());
         let output = command.output().unwrap();
         assert!(!gone.exists());

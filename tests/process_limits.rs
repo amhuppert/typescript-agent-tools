@@ -1,3 +1,4 @@
+// validation: run alone: its queries race a three-second deadline, which other test executables' load can break.
 //! A failed read-only query may discard its process and warm project cache.
 #![cfg(unix)]
 mod support;

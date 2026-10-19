@@ -6,6 +6,13 @@ use serde_json::Value;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output, Stdio};
 
+/// The idle time of a test's service. Drop stops the service, so this only
+/// has to outlast the test, and a loaded machine must never stop a service
+/// between two requests a test expects one generation to answer: a test that
+/// sends its service nothing for minutes, such as one checking that help
+/// never reaches it, still finds it running.
+pub const IDLE_SECS: &str = "3600";
+
 pub struct Service {
     pub fixture: Fixture,
     pub runtime: PathBuf,
@@ -29,15 +36,13 @@ impl Service {
     }
 
     /// `tsparse` in the project directory, using this service's runtime
-    /// directory. Drop stops the service, so its idle timeout only has to
-    /// outlast the test: a loaded machine must never stop a service between
-    /// two requests a test expects one generation to answer.
+    /// directory, with the service idle time `IDLE_SECS`.
     pub fn command(&self) -> Command {
         let mut command = Command::new(env!("CARGO_BIN_EXE_tsparse"));
         command
             .current_dir(&self.fixture.root)
             .env("TSPARSE_SERVICE_DIR", &self.runtime)
-            .env("TSPARSE_SERVICE_IDLE_SECS", "60")
+            .env("TSPARSE_SERVICE_IDLE_SECS", IDLE_SECS)
             .stdin(Stdio::null());
         command
     }

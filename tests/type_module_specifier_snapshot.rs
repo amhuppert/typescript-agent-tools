@@ -116,7 +116,7 @@ fn unavailable_cwd_is_demanded_only_by_spelling_and_frozen_by_the_service() {
                 .arg("--project")
                 .arg(&config)
                 .env("TSPARSE_SERVICE_DIR", &service.runtime)
-                .env("TSPARSE_SERVICE_IDLE_SECS", "60")
+                .env("TSPARSE_SERVICE_IDLE_SECS", support::service::IDLE_SECS)
                 .stdin(std::process::Stdio::null())
                 .output()
                 .unwrap()

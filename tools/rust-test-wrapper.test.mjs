@@ -11,7 +11,7 @@ const fullWrapper = fileURLToPath(new URL('../scripts/validate/test-full.sh', im
 
 // The resource profile both wrappers pin.
 const JOBS = '4';
-const THREADS = '1';
+const THREADS = '2';
 const BUILD = ['test', '--offline', '--jobs', JOBS, '--no-run', '--message-format=json-render-diagnostics'];
 const DOC = ['test', '--offline', '--jobs', JOBS, '--doc', '--', `--test-threads=${THREADS}`, '--show-output'];
 const RUN = [`--test-threads=${THREADS}`, '--show-output'];
@@ -117,7 +117,7 @@ function workspace(t, files) {
         TSPARSE_WRAPPER_SLEEP_MS: String(options.sleep ?? 0),
         TSPARSE_WRAPPER_TOUCH: options.touch ?? '',
         TARGET_BRANCH: 'main',
-        CARGO_TARGET_DIR: '',
+        CARGO_TARGET_DIR: options.targetDir ?? '',
         RUST_TEST_THREADS: '99',
         NODE_OPTIONS: '--max-old-space-size=8192',
         FORCE_COLOR: '1',
@@ -578,9 +578,51 @@ test('a passing full run is recorded for the changed wrapper', t => {
 test('a recorded run that Git no longer holds falls back to the target branch', t => {
   const project = repository(t);
   fs.mkdirSync(path.join(project.repository, 'target/validation'), { recursive: true });
-  fs.writeFileSync(path.join(project.repository, 'target/validation/rust-tests-passed.tree'), '0'.repeat(40) + '\n');
+  fs.writeFileSync(path.join(project.repository, 'target/validation/rust-tests-passed.tree'), '0'.repeat(40) + '\nany\n');
   project.write('tests/literals.rs', '// changed\n');
   const result = project.run([]);
   assertCalls(result, [build('--test', 'literals')]);
   assert.match(result.stdout, /changes since main/);
+});
+
+test('a test file marked to run alone runs after the others, one at a time', t => {
+  const { run } = workspace(t, {
+    ...PLAIN_FILES,
+    'tests/literals.rs': '// validation: run alone: it asserts elapsed time\n',
+    'tests/timing.rs': '//! validation: run alone\n',
+  });
+  const result = run(['src/lib.rs', 'src/main.rs', 'tests/cli.rs', 'tests/literals.rs', 'tests/timing.rs'], { sleep: 300 });
+  assert.equal(result.status, 0, result.stderr);
+  const alone = result.runs.filter(entry => ['tests/literals.rs', 'tests/timing.rs'].includes(entry.tool));
+  const together = result.runs.filter(entry => !alone.includes(entry));
+  assert.equal(alone.length, 2);
+  assert.equal(together.length, 3);
+  const lastTogether = Math.max(...together.map(entry => entry.ended));
+  for (const entry of alone) assert.ok(entry.started >= lastTogether, `${entry.tool} started before the others ended`);
+  const [first, second] = alone.sort((a, b) => a.started - b.started);
+  assert.ok(second.started >= first.ended, 'the run-alone executables overlapped');
+});
+
+test('a toolchain change since the recorded pass runs every target', t => {
+  const project = repository(t);
+  project.write('tests/literals.rs', '// changed\n');
+  assert.equal(project.run([]).status, 0);
+  const recorded = path.join(project.repository, 'target/validation/rust-tests-passed.tree');
+  const [tree] = fs.readFileSync(recorded, 'utf8').split('\n');
+  fs.writeFileSync(recorded, `${tree}\nanother toolchain\n`);
+  project.write('tests/cli.rs', '// changed\n');
+  const result = project.run([]);
+  assert.equal(result.status, 0, result.stderr);
+  assertCalls(result, [build(), { args: DOC, ...PROFILE }]);
+  assert.equal(result.stdout,
+    'rust tests: every target (the Rust toolchain changed since the last passing run)\nrust tests: passed, 0 skipped\n');
+});
+
+test('a build directory that Git does not ignore is not a change', t => {
+  const project = repository(t);
+  project.write('build/debug/deps/cli-0123', 'artifact\n');
+  const result = project.run([], { targetDir: 'build' });
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(result.calls, []);
+  assert.equal(result.stdout, 'rust tests: no Rust test inputs changed since main\n');
 });

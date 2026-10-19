@@ -6,9 +6,22 @@ readonly TEST_WORKERS=2
 readonly TEST_HEAP_MB=2048
 export NODE_OPTIONS="--max-old-space-size=${TEST_HEAP_MB}"
 
-# Without explicit test files, changes can affect the entire harness suite.
+# Without explicit test files, run what the changes since the last passing
+# run can affect (select_harness_tests), and record a pass for the next
+# selection. Explicit files prove nothing about other changes and record none.
 if (( $# == 0 )); then
-  run_harness_tests "$TEST_WORKERS" tools/*.test.mjs
+  select_harness_tests
+  case "$HARNESS_SELECTION" in
+    none) printf 'harness tests: %s\n' "$HARNESS_SELECTION_REASON" ;;
+    every) run_harness_tests "$TEST_WORKERS" tools/*.test.mjs ;;
+    files)
+      printf 'harness tests: selected %s of %s files (%s)\n' "${#HARNESS_SELECTED[@]}" \
+        "$(ls tools/*.test.mjs | wc -l | tr -d ' ')" "$HARNESS_SELECTION_REASON"
+      workers=${#HARNESS_SELECTED[@]}
+      if (( workers > TEST_WORKERS )); then workers=$TEST_WORKERS; fi
+      run_harness_tests "$workers" "${HARNESS_SELECTED[@]}" ;;
+  esac
+  record_pass harness-tests "$HARNESS_TREE" "$HARNESS_FINGERPRINT"
   exit 0
 fi
 
