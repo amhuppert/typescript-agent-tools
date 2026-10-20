@@ -12,6 +12,13 @@ fn fixture() -> Service {
     fixture_with_padding(1000)
 }
 
+/// A project whose loading keeps the process above a one-megabyte memory
+/// threshold for several of the watchdog's 25-millisecond samples, even in
+/// an optimized build, where the ordinary fixture loads within one.
+fn memory_fixture() -> Service {
+    fixture_with_padding(100_000)
+}
+
 fn fixture_with_padding(count: usize) -> Service {
     let mut source = String::from("export const value = 1;\n");
     for i in 0..count {
@@ -60,7 +67,7 @@ fn healthy(output: Output) -> Value {
 
 #[test]
 fn direct_memory_threshold_fails_the_query_and_a_new_process_succeeds() {
-    let service = fixture();
+    let service = memory_fixture();
     limited(
         query(&service, true, Some(("TSPARSE_MAX_MEMORY_MB", "1"))),
         "semantic_memory_limit",
@@ -80,7 +87,7 @@ fn direct_timeout_fails_the_query_and_a_new_process_succeeds() {
 
 #[test]
 fn service_memory_failure_discards_cache_and_next_request_restarts() {
-    let service = fixture();
+    let service = memory_fixture();
     limited(
         query(&service, false, Some(("TSPARSE_MAX_MEMORY_MB", "1"))),
         "semantic_memory_limit",
