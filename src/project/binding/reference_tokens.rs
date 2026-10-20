@@ -31,7 +31,10 @@ pub(super) enum ReferenceTokenEntry {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(in crate::project) enum ReferenceTokenRole {
     Name,
+    /// The name of a property, method, accessor, or enum member declaration.
     MemberName,
+    /// The name of a namespace or module declaration.
+    NamespaceName,
     LiteralKey,
     BindingProperty,
     Shorthand,
@@ -325,6 +328,8 @@ pub(super) fn capture<'a>(
         R::LiteralKey
     } else if node.syntax_kind == K::PrivateIdentifier {
         R::PrivateName
+    } else if declared && parent.syntax_kind == K::ModuleDeclaration {
+        R::NamespaceName
     } else if declared {
         R::MemberName
     } else {

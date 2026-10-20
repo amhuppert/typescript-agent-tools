@@ -1,31 +1,44 @@
 //! Text and JSON layout of the same bounded type description. Semantic
-//! selection, graph traversal and display budgets belong to the library.
+//! selection, graph traversal and display budgets belong to the library;
+//! an ambiguous selection shows at most its cap of candidates
+//! (`super::delivery::Cap`).
 
-use super::delivery::Delivery;
-use std::{collections::HashMap, fmt::Write, io};
+use super::delivery::{self, Delivery, Display, write_displayed, write_document};
+use super::registry::{CANDIDATES, FlagId};
+use std::{collections::HashMap, fmt::Write};
 use typescript_parser::types::{
     SelectionFailure, TypeAnswer, TypeDescription, TypeKey, TypeMembers, TypeNodeData, TypeOutcome,
     TypeParameter, TypeRef, TypeResult, TypeSignature,
 };
 
-pub(crate) fn answer(answer: &TypeAnswer) -> Delivery<'_> {
+pub(crate) fn answer<'a>(answer: &'a TypeAnswer, display: &'a Display) -> Delivery<'a> {
+    let cap = display.cap(&CANDIDATES);
     let code = match answer {
         TypeAnswer::Selected(result) => match result.outcome {
             TypeOutcome::Found => 0,
-            TypeOutcome::Partial => 1,
+            TypeOutcome::Partial => delivery::PARTIAL,
         },
-        TypeAnswer::Unselected(_) => 1,
+        TypeAnswer::Unselected(_) => delivery::UNSELECTED,
     };
     Delivery {
         code,
         text_is_result: matches!(answer, TypeAnswer::Selected(_)),
-        document: Box::new(move |writer, pretty| {
-            if pretty {
-                serde_json::to_writer_pretty(writer, answer)
-            } else {
-                serde_json::to_writer(writer, answer)
-            }
-            .map_err(io::Error::other)
+        document: Box::new(move |writer, pretty| match answer {
+            TypeAnswer::Unselected(selection) => match &selection.outcome {
+                SelectionFailure::Ambiguous { candidates } => {
+                    let returned = cap.shown(candidates.len());
+                    let Some(display) = cap.display(candidates.len(), returned) else {
+                        return write_document(writer, answer, pretty);
+                    };
+                    let mut shown = selection.clone();
+                    if let SelectionFailure::Ambiguous { candidates } = &mut shown.outcome {
+                        candidates.truncate(returned);
+                    }
+                    write_displayed(writer, &shown, Some(display), pretty)
+                }
+                SelectionFailure::NotFound { .. } => write_document(writer, answer, pretty),
+            },
+            TypeAnswer::Selected(_) => write_document(writer, answer, pretty),
         }),
         text: Some(Box::new(move || match answer {
             TypeAnswer::Selected(result) => text(result),
@@ -35,12 +48,14 @@ pub(crate) fn answer(answer: &TypeAnswer) -> Delivery<'_> {
                     selection.project.display()
                 ),
                 SelectionFailure::Ambiguous { candidates } => {
+                    let returned = cap.shown(candidates.len());
                     let mut text = format!(
-                        "{}: selection matches {} type targets; select one with --at FILE:LINE:COLUMN",
+                        "{}: selection matches {} type targets; select one with {} FILE:LINE:COLUMN",
                         selection.project.display(),
-                        candidates.len()
+                        candidates.len(),
+                        FlagId::At
                     );
-                    for candidate in candidates {
+                    for candidate in &candidates[..returned] {
                         let anchor = &candidate.anchor;
                         write!(
                             text,
@@ -52,6 +67,7 @@ pub(crate) fn answer(answer: &TypeAnswer) -> Delivery<'_> {
                         )
                         .unwrap();
                     }
+                    cap.end(&mut text, candidates.len(), returned, None, None);
                     text
                 }
             },

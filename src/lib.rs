@@ -27,6 +27,7 @@ mod input;
 mod json;
 mod lexer;
 pub mod navigation;
+mod nonblocking;
 mod numbers;
 mod parser;
 mod pragmas;
@@ -65,6 +66,29 @@ impl ParseOptions {
 /// including unoptimized builds. It is reserved address space, committed only
 /// as used.
 pub const DEEP_PARSE_STACK_BYTES: usize = 256 << 20;
+
+/// The nearest of `candidates` to `name` by TypeScript's spelling rule
+/// (`core.GetSpellingSuggestion`, owned by `spelling`), or `None` when none
+/// is close; of equally near candidates, the earliest. TypeScript asks this
+/// of an unknown command-line option against its option names
+/// (`createUnknownOptionError`), so the `tsparse` binary asks it here
+/// rather than keeping a second copy of the rule.
+#[doc(hidden)]
+pub fn spelling_suggestion<'a>(
+    name: &str,
+    candidates: impl IntoIterator<Item = &'a str>,
+) -> Option<&'a str> {
+    spelling::suggestion(
+        name,
+        candidates
+            .into_iter()
+            .enumerate()
+            .map(|(index, candidate)| ((index, candidate), candidate.to_owned())),
+        |(left, _), (right, _)| left.cmp(&right),
+    )
+    .map(|(_, candidate)| candidate)
+}
+
 impl Default for ParseOptions {
     fn default() -> Self {
         Self {

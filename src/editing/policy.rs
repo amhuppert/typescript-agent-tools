@@ -146,8 +146,30 @@ fn callable(ast: &Ast<'_>, site: Site) -> Result<NodeId, Unsupported> {
         return Ok(site.node);
     }
     if !matches!(site.kind, Kind::Variable | Kind::Property) {
+        // A declaration whose content is a member list says so and names
+        // the remedy, a declaration with a body. It never names inserting
+        // after, which inserts after the whole declaration (design, step 5,
+        // "Refusal wording").
+        let remedy = match site.kind {
+            Kind::Class | Kind::Interface | Kind::Enum => {
+                "; member-list editing is not supported; select a declaration with a body"
+            }
+            Kind::Function
+            | Kind::Variable
+            | Kind::Type
+            | Kind::Namespace
+            | Kind::Module
+            | Kind::Method
+            | Kind::Accessor
+            | Kind::Constructor
+            | Kind::Signature
+            | Kind::Property
+            | Kind::EnumMember
+            | Kind::Import
+            | Kind::Export => "",
+        };
         return Err(Unsupported(format!(
-            "this {} has no body to replace",
+            "this {} has no body to replace{remedy}",
             describe(site)
         )));
     }

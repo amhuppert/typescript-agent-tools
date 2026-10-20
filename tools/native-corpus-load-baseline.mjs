@@ -73,7 +73,7 @@ for (const service of [false, true]) {
       assert.deepEqual([run.status, run.stdout, run.stderr],
         [report.journeys[0].exitCode, report.journeys[0].stdout, report.journeys[0].stderr]);
       if (service) {
-        const status = spawnSync(binary, ['--project', prior.profile, '--references-status'],
+        const status = spawnSync(binary, ['--project', prior.profile, '--references-status', '--json'],
           {cwd: corpus, env, encoding: 'utf8', timeout: 30_000});
         assert.ifError(status.error);
         assert.equal(status.status, 0, status.stderr);

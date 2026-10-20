@@ -42,23 +42,22 @@ fn syntax_and_usage_errors_have_distinct_exit_codes() {
     assert_eq!(cli(&[], &[255]).status.code(), Some(2));
 }
 
+/// Help is the registry's, which `tests/cli_registry.rs` checks. The
+/// version names the complete build stamp, which `tests/doctor.rs` checks
+/// against a running service's.
 #[test]
-fn help_and_version_emit_documentation() {
-    for arg in ["-h", "--help"] {
-        let output = cli(&[arg], b"");
-        assert!(output.status.success());
-        assert!(output.stderr.is_empty());
-        let text = String::from_utf8(output.stdout).unwrap();
-        assert!(text.starts_with("tsparse [--pretty] [--tsx] [--check]"));
-        assert!(text.ends_with("Exit codes: 0 success, 1 syntax error, 2 usage or I/O error.\n"));
-    }
+fn version_prints_the_package_version_and_build() {
     for arg in ["-V", "--version"] {
         let output = cli(&[arg], b"");
         assert!(output.status.success());
         assert!(output.stderr.is_empty());
         assert_eq!(
             String::from_utf8(output.stdout).unwrap(),
-            format!("tsparse {}\n", env!("CARGO_PKG_VERSION"))
+            format!(
+                "tsparse {} (build {})\n",
+                env!("CARGO_PKG_VERSION"),
+                env!("TSPARSE_SERVICE_BUILD")
+            )
         );
     }
 }
@@ -94,7 +93,10 @@ fn jsx_and_check_modes_work() {
     assert!(cli(&["--tsx"], b"const view = <div />;").status.success());
     let output = cli(&["--check"], b"type X = {a: string};");
     assert!(output.status.success());
-    assert!(output.stdout.is_empty());
+    assert_eq!(
+        String::from_utf8(output.stdout).unwrap(),
+        "ok: - parses as TypeScript 7 (jsx: off)\n"
+    );
 }
 
 #[test]

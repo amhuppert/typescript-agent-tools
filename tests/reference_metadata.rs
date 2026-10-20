@@ -15,6 +15,7 @@ fn lexical_results_name_their_coverage_even_when_no_occurrences_survive() {
         ReferenceFilters {
             calls: true,
             exclude_tests: true,
+            file: None,
         },
     ] {
         let result = project
@@ -23,7 +24,7 @@ fn lexical_results_name_their_coverage_even_when_no_occurrences_survive() {
                     name: "run".into(),
                     file: None,
                 },
-                filters,
+                filters: filters.clone(),
             })
             .unwrap();
         let document = serde_json::to_value(result).unwrap();
@@ -107,6 +108,7 @@ fn member_advisory_uses_exact_catalog_selectors_and_deduplicates_display_entries
                 filters: ReferenceFilters {
                     calls: true,
                     exclude_tests: true,
+                    file: None,
                 },
             })
             .unwrap()
@@ -158,6 +160,37 @@ fn member_advisory_uses_exact_catalog_selectors_and_deduplicates_display_entries
             found.declaration.selector.as_deref(),
             entry["selector"].as_str()
         );
+        // `search` is the position whose reference query searches the
+        // member: its anchor, except a parameter property's modifier, since
+        // the property's name is its lexical parameter.
+        let search = &entry["search"];
+        if entry["selector"] == "Parameter.run" {
+            assert_eq!(search, &json!({"file": "a.ts", "line": 12, "column": 38}));
+            assert_eq!(anchor, &json!({"file": "a.ts", "line": 12, "column": 45}));
+        } else {
+            assert_eq!(search, anchor, "{entry}");
+        }
+        let searched = serde_json::to_value(
+            project
+                .references(ReferenceRequest {
+                    query: ReferenceQuery::At {
+                        file: fixture.path(search["file"].as_str().unwrap()),
+                        position: SourcePosition {
+                            line: search["line"].as_u64().unwrap() as usize,
+                            column: search["column"].as_u64().unwrap() as usize,
+                        },
+                    },
+                    filters: ReferenceFilters::default(),
+                })
+                .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(searched["coverage"]["baseline"], "member", "{entry}");
+        assert_eq!(
+            searched["groups"][0]["declarations"][0]["location"]["start"],
+            json!({"line": anchor["line"], "column": anchor["column"]}),
+            "{entry}"
+        );
     }
     let scoped = serde_json::to_value(query(Some(fixture.path("z.test.ts")))).unwrap();
     assert_eq!(scoped["groups"], json!([]));
@@ -208,4 +241,9 @@ fn an_unmatched_lexical_name_can_report_members_without_semantic_checking() {
     assert_eq!(result["groups"], json!([]));
     assert_eq!(result["outcome"], "complete");
     assert_eq!(result["unsearchedMembers"]["count"], 2);
+    // `find_references` makes no semantic request, so it names no position
+    // that searches each member; `Project::references` does.
+    for entry in result["unsearchedMembers"]["selectors"].as_array().unwrap() {
+        assert!(entry.get("search").is_none(), "{entry}");
+    }
 }

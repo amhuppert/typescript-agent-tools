@@ -4,11 +4,19 @@ set -euo pipefail
 export FORCE_COLOR=0
 export NO_COLOR=1
 
+# Run a command, hiding its output unless it fails, when its output goes to
+# stderr and its exit status is returned: run_quiet [--label LABEL] COMMAND...
+# Given LABEL, a success prints the one-line verdict `LABEL: ok`.
 run_quiet() {
-  local output_file status
+  local output_file status label=""
+  if [[ "${1:-}" == --label ]]; then
+    label="$2"
+    shift 2
+  fi
   output_file="$(mktemp)"
   if "$@" >"$output_file" 2>&1; then
     rm -f "$output_file"
+    if [[ -n "$label" ]]; then printf '%s: ok\n' "$label"; fi
     return 0
   else
     status=$?

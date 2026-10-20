@@ -12,7 +12,7 @@ unsafe extern "C" {
     fn getuid() -> std::ffi::c_uint;
 }
 
-pub(super) fn user_id() -> u32 {
+pub(crate) fn user_id() -> u32 {
     // SAFETY: getuid has no arguments or pointer preconditions on Unix.
     unsafe { getuid() }
 }
@@ -30,17 +30,23 @@ impl Lease {
             .truncate(false)
             .mode(0o600)
             .open(path)?;
-        // LOCK_EX | LOCK_NB, shared by macOS, Linux, and the BSD flock API.
-        // SAFETY: file owns a live descriptor; flock retains no Rust pointers.
-        if unsafe { flock(file.as_raw_fd(), 2 | 4) } == 0 {
-            Ok(Some(Self { _file: file }))
+        Ok(try_lock(&file)?.then_some(Self { _file: file }))
+    }
+}
+
+/// Take the exclusive lock of `file` without waiting: `false` when another
+/// open file holds it. Closing `file` releases it, also when its process dies.
+pub(super) fn try_lock(file: &File) -> io::Result<bool> {
+    // LOCK_EX | LOCK_NB, shared by macOS, Linux, and the BSD flock API.
+    // SAFETY: file owns a live descriptor; flock retains no Rust pointers.
+    if unsafe { flock(file.as_raw_fd(), 2 | 4) } == 0 {
+        Ok(true)
+    } else {
+        let error = io::Error::last_os_error();
+        if error.kind() == io::ErrorKind::WouldBlock {
+            Ok(false)
         } else {
-            let error = io::Error::last_os_error();
-            if error.kind() == io::ErrorKind::WouldBlock {
-                Ok(None)
-            } else {
-                Err(error)
-            }
+            Err(error)
         }
     }
 }

@@ -66,6 +66,7 @@ fn filtered_contextual_seed_retains_its_declaration_metadata() {
                 filters: ReferenceFilters {
                     calls: true,
                     exclude_tests,
+                    file: None,
                 },
             })
             .unwrap();

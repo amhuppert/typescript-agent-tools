@@ -63,8 +63,13 @@ if (service) {
 // before removing its state, including after a failed query or verification.
 const runtime = service ? fs.mkdtempSync('/tmp/tsparse-corpus-') : undefined;
 const env = service ? {...process.env, TSPARSE_SERVICE_DIR: runtime, TSPARSE_SERVICE_IDLE_SECS: '120'} : process.env;
+// The status fields that stay the same while one service runs: all but the
+// idle seconds it has left, which count down between calls.
+function stableStatus({idle_remaining_secs: _remaining, ...stable}) {
+  return stable;
+}
 function readServiceStatus() {
-  const status = spawnSync(binary, ['--project', report.profile, '--references-status'], {cwd: corpus, env, encoding: 'utf8', timeout: 30_000});
+  const status = spawnSync(binary, ['--project', report.profile, '--references-status', '--json'], {cwd: corpus, env, encoding: 'utf8', timeout: 30_000});
   assert.ifError(status.error);
   assert.equal(status.status, 0, status.stderr);
   const value = JSON.parse(status.stdout);
@@ -72,7 +77,7 @@ function readServiceStatus() {
   assert.equal(value.running, true);
   assert.ok(Number.isInteger(value.pid) && value.pid > 0);
   assert.equal(value.generation, 1);
-  if (report.serviceStatus) assert.deepEqual(value, report.serviceStatus, 'service restarted or refreshed');
+  if (report.serviceStatus) assert.deepEqual(stableStatus(value), stableStatus(report.serviceStatus), 'service restarted or refreshed');
   else report.serviceStatus = value;
   return value;
 }
@@ -92,7 +97,8 @@ try {
         if (process.argv.includes('--failed-only') && !((name === 'member-observations.json') || row.id === 'predicate-callback')) continue;
         const member = row.request.operation === 'member';
         const {file, line, column} = row.request.at;
-        const args = [...(service ? [] : ['--direct']), '--project', report.profile, member ? '--references' : '--type', '--json', '--at', `${line}:${column}`, file];
+        // Every occurrence, which a reference answer's display cap would otherwise bound.
+        const args = [...(service ? [] : ['--direct']), '--project', report.profile, member ? '--references' : '--type', '--json', '--limit', 'all', '--at', `${line}:${column}`, file];
         const loadBefore = resources ? os.loadavg() : undefined;
         const started = performance.now();
         const run = (resources ? measuredRun : spawnSync)(binary, args, {cwd: corpus, env, encoding: 'utf8', timeout: 180_000, maxBuffer: 16 * 1024 * 1024});

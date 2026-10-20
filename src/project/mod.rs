@@ -32,9 +32,7 @@ pub use session::ProjectSession;
 
 use crate::analysis::{AnalysisError, InputError, InputErrorKind, QueryError, QueryErrorKind};
 use crate::navigation::{Outline, Show, ShowQuery};
-use crate::references::{
-    ReferenceAnswer, ReferenceFilters, ReferenceQuery, ReferenceRequest, ReferenceResult,
-};
+use crate::references::{ReferenceAnswer, ReferenceQuery, ReferenceRequest, ReferenceResult};
 use crate::types::{TypeAnswer, TypeQuery, TypeRequest};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
@@ -211,7 +209,8 @@ impl Project {
     /// and are matched lexically, without reading the filesystem; a path
     /// that is not Unicode names no file (`FileLookup::find`).
     pub fn find_references(&self, query: ReferenceQuery) -> Result<ReferenceResult, AnalysisError> {
-        references::lexical(self, query, ReferenceFilters::default())
+        let selection = references::selection(self, &query)?;
+        references::lexical(self, query, references::Filters::default(), selection)
     }
 
     /// Find reference groups with explicit call and test-path filters.
@@ -333,9 +332,12 @@ impl ProjectRequest {
                 ReferenceQuery::At { file, .. }
                 | ReferenceQuery::Name {
                     file: Some(file), ..
-                } => vec![file],
-                ReferenceQuery::Name { file: None, .. } => vec![],
-            },
+                } => Some(file),
+                ReferenceQuery::Name { file: None, .. } => None,
+            }
+            .into_iter()
+            .chain(request.filters.file.as_mut())
+            .collect(),
             Self::Type(request) => match &mut request.query {
                 TypeQuery::At { file, .. }
                 | TypeQuery::Name {

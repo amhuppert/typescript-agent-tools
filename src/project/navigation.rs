@@ -95,6 +95,8 @@ impl Project {
                             file: candidate.file,
                             position: candidate.anchor,
                         },
+                        // A semantic request names it (`reference_search`).
+                        search: None,
                     }),
             );
         }

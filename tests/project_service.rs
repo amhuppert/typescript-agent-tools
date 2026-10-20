@@ -462,7 +462,7 @@ fn library_replacement_changes_serve_a_new_generation_to_every_operation() {
     // The outline is the first request to see the installed replacement.
     assert_eq!(labels(&outline(&service, "a.ts")), ["use"]);
     assert_eq!(service.generation(), 2);
-    let groups = json(service.run(&["--references", "--at", "1:25", "a.ts"]));
+    let groups = json(service.run(&["--references", "--at", "1:25", "a.ts", "--json"]));
     assert_eq!(
         groups["groups"][0]["declarations"][0]["location"]["file"],
         "node_modules/@typescript/lib-dom/index.d.ts"
@@ -477,7 +477,7 @@ fn library_replacement_changes_serve_a_new_generation_to_every_operation() {
         "function use() { return replaced; }"
     );
     assert_eq!(service.generation(), 3);
-    let groups = json(service.run(&["--references", "--at", "1:25", "a.ts"]));
+    let groups = json(service.run(&["--references", "--at", "1:25", "a.ts", "--json"]));
     assert_eq!(
         groups["groups"][0]["declarations"][0]["location"]["start"]["line"],
         2

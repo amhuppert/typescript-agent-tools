@@ -15,6 +15,9 @@ tsparse --references --project ./tsconfig.json --at src/app.ts:12:8
 tsparse --references --project ./tsconfig.json --name run
 tsparse --references --project ./tsconfig.json --name run src/app.ts --pretty
 tsparse --references --project ./tsconfig.json --name run --calls --no-tests
+tsparse --references --project ./tsconfig.json --name run src/app.ts --file src/api.ts
+tsparse --references --project ./tsconfig.json --name run --json
+tsparse --references --project ./tsconfig.json --name run --limit all
 ```
 
 `--project` names a configuration file; no ancestor directory is searched.
@@ -26,14 +29,23 @@ so FILE may contain `:`, and giving both is a usage error. A bare NAME selects
 lexical declarations and aliases. A dotted NAME such as `RunHost.observe`
 selects by declaration containment, with explicit not-found/ambiguous results;
 `--at` also selects supported semantic member tokens. Argument paths are relative to
-the working directory. `--pretty` and `-o OUTPUT` keep their parse-mode meanings; stdin,
-`--check`, `--tsx`, and `--depth` are rejected. `--direct` (or
-`--references-direct`) answers in the CLI process instead of the service.
-A result goes to stdout or `-o`; by default a failure is a diagnostic on stderr
-and never creates or replaces the `-o` file. With `--json`, an analysis failure
-is delivered as a document to stdout or `-o`. Usage, transport and delivery
-failures remain stderr diagnostics, under the delivery policy navigation shares
-([exit codes and channels](navigation.md#exit-codes-and-channels)).
+the working directory. Without `--json` an answer is [text](#result); `--json`
+writes its document instead, and `--pretty` indents that document, alone
+writing it in place of the text, as references always have. `-o OUTPUT`
+writes the result to a file. An answer shows at most 200 occurrences unless
+`--limit N|all` or `-o` says otherwise ([display limit](#display-limit)). Stdin, `--check`, `--tsx`, and `--depth` are
+rejected. `--direct` (or `--references-direct`) answers in the CLI process
+instead of the service. A result goes to stdout or `-o`; by default a
+selection that selects nothing or several, and a failure, are diagnostics on
+stderr and never create or replace the `-o` file. With `--json`, such a
+selection and an analysis failure are delivered as documents to stdout or
+`-o`; with `--pretty` alone the selection is its indented document there, and
+a failure stays a diagnostic. A usage or transport failure is
+`CODE: message` on stderr, and with `--json` a document (a usage failure's on
+stdout, never `-o`); a result that cannot be written is one stderr
+diagnostic. Navigation shares this delivery policy
+([exit codes and channels](navigation.md#exit-codes-and-channels)), and the
+[CLI reference](cli-reference.md#failure-codes) lists the codes.
 
 `--calls` keeps only direct call, optional call, constructor and tagged-template
 targets. Parentheses, non-null assertions, type assertions, `as`, `satisfies`
@@ -47,8 +59,21 @@ that function. Implicit decorator calls and JSX tags are excluded; explicit
 `test`, `tests`, `__tests__`, or basenames ending `.test` or `.spec` followed by
 `.ts`, `.tsx`, `.mts` or `.cts`, on normalized project-relative `/` paths.
 Selection, loading, dependencies and declaration metadata still include those
-files. `fixtures`, `spec`, `Tests`, and `.TEST.ts` are retained. Both filters
-are echoed in the result and rejected on service-administration commands.
+files. `fixtures`, `spec`, `Tests`, and `.TEST.ts` are retained.
+
+`--file FILE` keeps only occurrences in FILE. FILE is named as the FILE
+operand is, relative to the working directory and never `-`, and compared as
+every query path is ([Library](#library)): lexically, with `\` read as `/`, and with the
+file system's case policy, so on a case-insensitive file system `APP.TS`
+names `app.ts`. A FILE that is not one of the searched files fails the query
+as `OutsideProject` (exit 2), never giving an empty answer; its message names
+the configuration whose `files`, `include`, and `exclude` decide membership. The FILE operand
+narrows the candidate declarations; `--file` instead filters the occurrences
+of whatever was selected, and the two combine. Like the other filters it
+keeps declaration metadata and the selected group, and a member search does
+not establish candidates outside FILE. The filters are echoed in the result
+(`filters.file` names FILE as locations name files, and is present only when
+given) and rejected on service-administration commands.
 Results identify their coverage as `lexical` or `member`. Bare-name lexical
 results list matching catalog members in `unsearchedMembers`. Member searches
 report `complete` or `partial` coverage and located gaps; they do not merge
@@ -56,11 +81,8 @@ unrelated properties by spelling. See [types.md](types.md) for semantic selectio
 partial results, and process limits. Final delivery validation is tracked in
 [the completion checkpoint](types-completion-correctness-2026-10-13.md).
 
-| Exit | Meaning |
-| --- | --- |
-| 0 | A result, including `groups: []` for a token-free position or an unmatched name. |
-| 1 | Invalid configuration content or inheritance, a syntax error, unsupported required input, invalid binding, a name that resolution looks up and does not find (an import, a `types` entry, or a `/// <reference>` target), or an unsupported or unresolved selected target. |
-| 2 | Invalid flags or position; a file the invocation or configuration names to be read, the `--project` file, an `extends` target, or a `files` entry, that does not exist; any file or directory that exists but cannot be read; or a query file that is not one of the project's searched files (including a missing file). |
+The [CLI reference](cli-reference.md#references) lists what each exit code
+reports, as `tsparse --references --help` does.
 
 Diagnostics on stderr have the form `path:line:column: message` when a location
 is known. Sources, configurations, and package manifests are read as TypeScript
@@ -81,9 +103,23 @@ on several threads, so it dominates a warm request on a large project: on
 Command Center (4,154 searched files) the check takes about 0.1 s of a
 0.12–0.16 s warm query, and a rebuild after an edit about 9.5 s
 ([measurements](performance-command-center.md#current-state-2026-10-17-after-the-performance-work)).
-`--references-status --project CONFIG` reports `running`, `pid`, and `generation`
-(the number of successfully published snapshots); status does not check freshness.
-`--references-stop --project CONFIG` stops it, and `--direct` (or
+`--references-status --project CONFIG` reports a running service in two
+lines, `running: pid 59643, generation 1, build STAMP, idle 10m, 7m12s remaining`
+and `limits: 6144 MiB, 60000 ms`, or `no service: CONFIG`; `--json` (or
+`--pretty`, alone or with it) prints the document instead: `running`, `pid`,
+`generation` (the number of successfully published snapshots), `build`,
+`limits` (`max_memory_mb`, `query_timeout_ms`), `idle_secs`,
+`idle_remaining_secs`, and `started_unix`. Without a service `running` is
+`false`, `generation` is `0`, and every other field is `null`.
+Status does not check freshness and does not extend the service's idle time;
+between two calls to one running service only `idle_remaining_secs` changes.
+A runtime directory that does not exist, or whose path runs through a file,
+holds no service: status reports none there and stop has none to stop.
+`--references-stop --project CONFIG` stops it and prints `stopped: pid N`, or
+`no service: CONFIG` when none was running. These three flags administer the
+project service, which answers every project query (`--references`, `--type`,
+and `--outline`, `--show`, and edits with `--project`), whatever their names
+say. `--direct` (or
 `--references-direct`) performs a fresh load in the CLI process through the
 same request boundary, giving the same output and exit code.
 `--references-serve --project CONFIG` runs the service in the foreground for a
@@ -91,23 +127,123 @@ supervisor. Background services use null standard streams and a separate process
 group, close every other descriptor they inherit, and expire after ten idle
 minutes.
 
+A service reads `TSPARSE_MAX_MEMORY_MB`, `TSPARSE_QUERY_TIMEOUT_MS`, and
+`TSPARSE_SERVICE_IDLE_SECS` once, from the environment of the client that
+starts it, and keeps them until it exits: changing them in a later client's
+environment does not change a running service. A query that exceeds a limit
+ends the process that ran it, and its failure says which: for example
+`query exceeded TSPARSE_QUERY_TIMEOUT_MS (60000 ms) in the project service;
+that service and its cache exited, and the next request starts a replacement`,
+or in a direct query `…; this query process exited`, and for memory the
+footprint observed beside the threshold. Its remedy, `set a higher
+TSPARSE_QUERY_TIMEOUT_MS before retrying`, is the text's `  next:` line and
+the document's `error.remedy`; it never says to stop a service, which has
+already exited, and the replacement the next request starts reads that
+request's environment.
+
+`tsparse --doctor` checks what project queries depend on, one line per check,
+and loads nothing, starts nothing, and creates nothing: `build` (the version,
+build stamp, platform, and whether the service, `--apply`, and memory
+monitoring work there), `environment` (each `TSPARSE_*` variable with its value
+or default, and every invalid value), and `runtime directory` (its path, that
+it is a private directory of this user's with mode 0700 or does not exist yet,
+and its socket paths' length beside the longest a socket address holds, 103
+bytes on macOS and 107 on Linux). `tsparse --doctor --project CONFIG` adds
+`configuration` (the spelling, its absolute form, and that it can be read),
+`service` (none, with the failure an earlier start recorded and a partial
+diagnostic it left, which the next start removes and the doctor only reads;
+or its pid, generation, build, idle time, and start), and
+`service limits`, the limits the service inherited beside this environment's.
+A difference is a finding:
+
+```text
+service limits: TSPARSE_QUERY_TIMEOUT_MS 60000 inherited at start, 120000 in this environment
+  why: a service keeps the environment it started with
+  next: tsparse --references-stop --project tsconfig.json
+```
+
+Each finding prints its `why` and `next` lines, as a failure does, and the
+last line is `ok: N checks pass` or `findings:` and the checks that found
+something; a check the doctor cannot perform is a finding. It exits 0 when
+every check passes and 1 when any finding is present. `--json` prints one
+document with an entry per check: `name`, `status` (`pass` or `finding`),
+`detail`, and a finding's `why`, `next.argv`, or `remedy`.
+
 The private runtime directory defaults to `/tmp/tsparse-UID`. Override it with
 `TSPARSE_SERVICE_DIR`, naming a directory owned by the current user with mode 0700;
 its parent must exist. Keep paths short enough for Unix sockets: a socket
 address holds about 100 bytes (104 on macOS, 108 on Linux), and the socket's
 name adds 22 to the directory. A longer path fails every service request with
-an exit-2 diagnostic that names the socket and asks for a shorter
-`TSPARSE_SERVICE_DIR`. Set
+`transport.socket`, exit 2, naming the socket, with the remedy
+`next: set a shorter TSPARSE_SERVICE_DIR` (`remedy` in a document). Set
 `TSPARSE_SERVICE_IDLE_SECS` to a positive integer to change the idle timeout.
 Configuration spellings and compiled build identities have separate services.
 Old-build services expire normally. Lock files remain after shutdown so concurrent
 launchers always lock the same inode; do not remove them while services run.
 
+A client reports every startup cause it can see before it starts a service,
+with exit 2 and `CODE: message`, then any remedy, on stderr, or with `--json` one
+document: an invalid `TSPARSE_SERVICE_IDLE_SECS`,
+`TSPARSE_MAX_MEMORY_MB`, or `TSPARSE_QUERY_TIMEOUT_MS`, named with its accepted
+form, default, and value (`usage.environment: TSPARSE_SERVICE_IDLE_SECS must be
+a positive integer number of seconds (default 600), got 0`), which direct
+queries, direct edits, and `--references-serve` report alike; as
+`transport.directory`, a runtime directory that cannot be created, named with
+the cause, and one that is not a directory owned by the current user with mode
+0700, since a service could not report why it failed in a directory it cannot
+write, which `--references-status` and `--references-stop` also report; and,
+as `transport.socket`, a socket path that is too long. A directory of this
+user's with any group or other permission prints
+`  why: any process that can open the socket can run queries as you` and
+`  next: chmod 700 DIR` (`why` and `next.argv` in a document), or, where DIR is
+not Unicode and so cannot be named in a command,
+`  next: give the runtime directory mode 0700` (`remedy`); one whose owner
+lacks read, write, or search says a service could not create its socket or
+record why it failed, with the same command; and a directory of another user,
+or a link or another kind of file at its path, prints
+`  next: set TSPARSE_SERVICE_DIR to a new path or to a private directory this user owns`
+(`remedy` in a document). Status and stop read only
+`TSPARSE_SERVICE_DIR`. Clients that find no service start one at a time, holding
+`KEY.start.lock`, which, like the lock file, is never removed; a client that
+waits 10 seconds for another's start without a service answering says so, as
+`transport.timeout`. A
+service that fails before it listens, for example on a lock file it cannot
+open, writes the failure's code and message to `KEY.start-error` beside its
+lock file: it writes
+`KEY.start-error.staged`, a new file with mode 0600 that it locks while
+writing, and renames it into place once complete. The client that started it
+reports that failure with its code, as `--references-serve` prints it (for
+example `transport.lock: Project service lock …`), and removes the file. A staged copy whose writer died, for
+example when it was killed while writing, is removed by the next start or the
+next failing service and never read; one whose writer holds its lock is left
+to it. A staged path naming anything but a regular file, such as a pipe or a
+symbolic link, is reported without opening or removing it, and so is a
+published diagnostic of another kind when the client reads it after a failed
+start. A client removes an earlier published diagnostic, of any kind but a
+directory, before starting a service; a foreground service's failure stays
+recorded until then. When a service exits without recording a cause, including
+when the diagnostic cannot be written, the client prints, as its `next`
+command, `tsparse --references-serve --project` with the configuration's
+absolute path: the service it started, run in the foreground, whose stderr
+shows the cause and why it was not recorded. A service that was killed while
+starting, rather than failing, records nothing either, and its cause may not
+recur: then that command starts a healthy service, which serves until it is
+idle (`TSPARSE_SERVICE_IDLE_SECS`) or `--references-stop` stops it.
+
 Requests are limited to 1 MiB including their terminating newline. Socket reads
 and writes at the server allow five seconds without progress; clients wait up to
-five minutes for a result. A transport or runtime-directory failure is exit 2,
-a stderr diagnostic even for navigation's `--json`, and never a silent direct
-load. Before either a direct or a service answer, the client makes a query's
+five minutes for a result. A transport failure is exit 2, `CODE: message` and
+its `why` and `next` lines on stderr or, with `--json`, a document with the same
+parts, and never a silent direct load. Its message ends with the command that
+diagnoses it, `run: tsparse --doctor --project CONFIG`. Its code names the cause:
+`transport.directory`, `transport.socket` (also a connection that fails or
+closes before an answer), `transport.lock`, `transport.startup` (a service that
+could not be started, exited without recording why, or whose diagnostic cannot
+be read or removed), `transport.timeout` (a service that does not become ready,
+take a request, answer, or stop in time), `transport.protocol` (a request over
+1 MiB, one the service could not read, or an answer that does not decode), and
+`transport.identity` (a service at the endpoint for another configuration or
+build); the [CLI reference](cli-reference.md#failure-codes) lists them. Before either a direct or a service answer, the client makes a query's
 file absolute against its own working directory
 (`ProjectRequest::make_absolute`, for every operation), so both answer alike
 from any directory; diagnostics about that file (`OutsideProject`,
@@ -189,11 +325,62 @@ can outlive the project.
 
 ## Result
 
+Without `--json`, an answer is text:
+
+```text
+/abs/path/tsconfig.json: `run` 1 group, 4 occurrences in 2 files; coverage lexical, complete
+group 1: run, declared at /abs/path/src/api.ts:1:17
+  /abs/path/src/api.ts:1:17 declaration, export
+  /abs/path/src/app.ts:1:10 import
+  /abs/path/src/app.ts:1:17 import (start)
+  /abs/path/src/app.ts:2:1 use (start)
+```
+
+The header is `CONFIG: SELECTION N groups, M occurrences in K files; coverage
+BASELINE, STATUS`, the selection being `` `NAME` `` or `at FILE:LINE:COLUMN:`.
+When a FILE operand narrowed a name's candidates it adds `; candidates
+narrowed to FILE`, so no groups there does not read as no references, and the
+filters given add `; filtered by --calls, --no-tests, --file FILE`, so a count
+they bounded does not read as every occurrence. Each
+group follows as `group N: NAME, declared at FILE:LINE:COLUMN, …`, named by
+its first declaration, then its occurrences as `  FILE:LINE:COLUMN ROLES`,
+those of one file together, files in the order the result first names them
+and each file's in the result's order. An occurrence spelled other than its
+group, such as a renamed import or export alias, adds its spelling in
+parentheses. A partial result then prints each gap as `gap FILE:LINE:COLUMN:
+REASON: MESSAGE`, each located cause under it as `  cause FILE:LINE:COLUMN:
+REASON: MESSAGE`, and `  … N more causes` for causes it omits. When a bare
+name left catalog members unsearched, the last line counts them, `N catalog
+members named NAME were not searched`, and names the search of one of them,
+`; search SELECTOR with --at FILE:LINE:COLUMN`, followed by the request's
+`--calls`, `--no-tests`, and `--file FILE`. The member is the first
+suggestion with a selector (`search one with`, or `search it with`, when none
+has one), and the position is its `search` (below), which selects that member
+alone: a selector may name a static and an instance member alike, and a
+parameter property's anchor is its lexical parameter. Followed as printed
+after the same `--references --project CONFIG`, it searches that member with
+the same filters. A suggestion without a `search` is not offered, and when
+none has one the line names no search. Text names files absolutely, the
+configuration's directory joined with the relative file, so every
+`FILE:LINE:COLUMN` in a searched file is an `--at` operand from any working
+directory; a declaration in an installed package or a standard library is
+printed where it is, though no query selects a position there.
+
+A dotted name that selects no declaration, or several, exits 1 with a
+diagnostic on stderr: ``CONFIG: no declaration matches `NAME` ``, or ``CONFIG:
+`NAME` matches N symbols; select one with --at FILE:LINE:COLUMN`` followed by
+each candidate's anchor and selector, each anchor selecting its symbol. Each
+adds `; candidates narrowed to FILE` after the name when a FILE operand
+narrowed the candidates.
+
+With `--json`, or indented with `--pretty` alone, the answer is its document:
+
 ```json
 {
   "operation": "references",
   "outcome": "complete",
   "project": "/abs/path/tsconfig.json",
+  "selection": { "name": { "name": "run", "file": null } },
   "groups": [{
     "declarations": [{ "name": "run", "location": { "file": "src/api.ts", "start": { "line": 1, "column": 17 }, "end": { "line": 1, "column": 20 } } }],
     "occurrences": [{ "name": "run", "location": { "...": "..." }, "roles": ["declaration", "export"] }]
@@ -203,6 +390,16 @@ can outlive the project.
   "unsearchedMembers": { "count": 0, "selectors": [] }
 }
 ```
+
+`selection` echoes the request's selection, tagged `name` (`name`, and the
+FILE operand or `null`) or `at` (`{"at": {"file": "src/app.ts", "position":
+{"line": 12, "column": 8}}}`). Its file is named as every location's `file`
+is, relative to the configuration's directory, so the echo is the same from
+any working directory and through the service. A dotted name that selects
+nothing or several answers `{"operation", "project", "selection", "outcome":
+"not_found" | "ambiguous", "candidates"}`, whose `selection` is the same
+echo; before the text form, it was tagged `Name` or `At` and named the file
+as the request spelled it, made absolute.
 
 Each group is one underlying symbol. `declarations` lists all of its
 declarations, including merged declarations and declarations in installed
@@ -228,8 +425,19 @@ member types. The shared request boundary still performs checker initialization.
 For a bare name, `unsearchedMembers.selectors` lists matching method, accessor,
 property and enum-member declarations from the captured Q2 catalog. FILE narrows
 these declarations; `--calls` and `--no-tests` do not hide them. A position query
-has an empty advisory. Each suggestion has `file`, `selector`, and
-`anchor: {file,line,column}`. The key match is exact decoded text, including
+has an empty advisory. Each suggestion has `file`, `selector`,
+`anchor: {file,line,column}`, and `search: {file,line,column}`, the position
+whose position query searches that member, as a dotted selector naming it
+alone would: the anchor, or for a parameter property its first
+property-producing modifier, since its name selects the lexical parameter.
+`search` comes from the selection owner (`reference_selector_anchor`), the
+position ambiguity candidates' `anchor`s also name. Answers of
+`Project::references`, and so of the CLI and its service, carry it;
+`Project::find_references`, which makes no semantic request, leaves it out, as
+it does for a member whose name has no reference token. It is the one field
+these documents gained beside `selection`, by the run owner's decision
+(question 37f47364) as an exception to keeping step 4's documents unchanged.
+The key match is exact decoded text, including
 empty and normalized numeric keys; it is distinct from selector containment.
 Computed/unkeyed sites and inferred members absent from Q2 are not enumerated.
 
@@ -242,6 +450,45 @@ suggestions. These are catalog suggestions, not a semantic identity merge.
 Their anchors replay `--show --at`. In particular, a parameter property's Q2
 name anchor still selects its lexical parameter for reference queries;
 its first property-producing modifier is a semantic member anchor.
+
+### Display limit
+
+An answer shows at most 200 occurrences, the default that
+`tsparse --references --help --json` publishes under `limits`, counted across
+groups in the result's order: the first ones are shown, and the rest are
+withheld. `--limit N` (a positive number) sets the bound in every channel,
+and `--limit all` removes it; with `-o` and no `--limit` nothing is withheld,
+so the file holds the complete result. The result itself is complete, and a
+cut changes no outcome, coverage, gap, filter, member suggestion, or exit
+code: the header still counts every group, occurrence, and file, every group
+and its declarations are printed (a group whose occurrences the cut withholds
+prints its header alone), each gap and the member hint follow, and a partial
+result still exits 1. A cut text ends with one line, after the gaps and the
+member hint:
+
+```text
+… 212 more occurrences; see all with: tsparse --references --project tsconfig.json --name run --limit all, or write them to a file with -o FILE
+```
+
+The command is the request as given, with `--limit all` in place of any
+`--limit` value, rendered so a shell reads it back exactly; followed from the
+same working directory it prints every occurrence, and it keeps a request's
+`-o`, so it then writes the complete result to that file. With `--json`, or
+with `--pretty` alone, a cut document is the result with each group's
+`occurrences` cut, and after its fields a `display` that names the cut and the
+same command:
+
+```json
+"display": {"next": {"argv": ["tsparse", "--references", "--project", "tsconfig.json", "--name", "run", "--json", "--limit", "all"]},
+            "occurrences": {"returned": 200, "total": 412}, "truncated": true}
+```
+
+`display` is present only when something was withheld, so every answer that
+shows all its occurrences is the document it always was. The command names
+no transport: it leaves out `--direct` and spells `--references-direct` as
+`--references`, since the service and a direct load answer alike, so a cut
+answer is the same bytes from both. Ambiguous and missing dotted names list
+their candidates in full.
 
 Declarations that have no identifier use an anchor: an anonymous default export
 (`export default function () {}`, `export default 42`) is named `default` at the

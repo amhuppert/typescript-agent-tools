@@ -14,10 +14,10 @@ use crate::project::binding::ReferenceToken;
 use crate::project::sources::FileId;
 use crate::project::{Project, references};
 use crate::references::{
-    Location, NamedLocation, Occurrence, ReferenceAnswer, ReferenceBaseline, ReferenceCause,
-    ReferenceCoverage, ReferenceFilters, ReferenceGap, ReferenceGroup, ReferenceOperation,
-    ReferenceOutcome, ReferenceRequest, ReferenceResult, ReferenceSelection as SelectionDocument,
-    ReferenceSelectionFailure, UnsearchedMembers,
+    Location, NamedLocation, Occurrence, ReferenceAnchor, ReferenceAnswer, ReferenceBaseline,
+    ReferenceCause, ReferenceCoverage, ReferenceGap, ReferenceGroup, ReferenceOperation,
+    ReferenceOutcome, ReferenceQuery, ReferenceRequest, ReferenceResult,
+    ReferenceSelection as SelectionDocument, ReferenceSelectionFailure, UnsearchedMembers,
 };
 use crate::resources::FixedMap;
 use crate::syntax_kind::SyntaxKind;
@@ -31,13 +31,17 @@ pub(super) fn search(
     evaluator: &mut Evaluator<'_, '_>,
 ) -> Result<ReferenceAnswer, AnalysisError> {
     let selected = super::selection::references::select(project, evaluator, &request.query)?;
+    // The selection's file fails before the filter's, as selecting it does.
+    let selection = references::selection(project, &request.query)?;
+    let filters = references::Filters::resolve(project, &request.filters)?;
     let outcome = match selected {
         ReferenceSelection::One(ReferenceSelected::Lexical(query)) => {
-            return references::lexical(project, query, request.filters)
-                .map(ReferenceAnswer::Selected);
+            let mut result = references::lexical(project, query, filters, selection)?;
+            name_member_searches(project, evaluator, &mut result.unsearched_members)?;
+            return Ok(ReferenceAnswer::Selected(result));
         }
         ReferenceSelection::One(ReferenceSelected::Member { site, symbol }) => {
-            return member_search(project, evaluator, site, symbol, request.filters)
+            return member_search(project, evaluator, site, symbol, filters, selection)
                 .map(ReferenceAnswer::Selected);
         }
         ReferenceSelection::Absent => ReferenceSelectionFailure::NotFound {
@@ -50,9 +54,43 @@ pub(super) fn search(
     Ok(ReferenceAnswer::Unselected(SelectionDocument {
         operation: ReferenceOperation::References,
         project: project.config.clone(),
-        selection: request.query.clone(),
+        selection,
         outcome,
     }))
+}
+
+/// Name, for each member a bare name left unsearched, the position whose
+/// reference query searches it (`replay_offset`), so that a caller can follow
+/// the suggestion to its member search.
+fn name_member_searches(
+    project: &Project,
+    evaluator: &mut Evaluator<'_, '_>,
+    members: &mut UnsearchedMembers,
+) -> Result<(), AnalysisError> {
+    if members.selectors.is_empty() {
+        return Ok(());
+    }
+    let files: std::collections::HashMap<&str, FileId> = project
+        .sources
+        .ids()
+        .map(|file| (project.sources.get(file).display.as_str(), file))
+        .collect();
+    for member in &mut members.selectors {
+        let file = *files
+            .get(member.anchor.file.as_str())
+            .ok_or_else(|| super::internal("an unsearched member lacks a captured file"))?;
+        member.search = super::selection::references::replay_offset(
+            project,
+            evaluator,
+            file,
+            member.anchor.position,
+        )?
+        .map(|offset| ReferenceAnchor {
+            file: member.anchor.file.clone(),
+            position: project.sources.get(file).text.position(offset),
+        });
+    }
+    Ok(())
 }
 
 fn member_search(
@@ -60,7 +98,8 @@ fn member_search(
     evaluator: &mut Evaluator<'_, '_>,
     selected: ReferenceSite,
     original: ReferenceSymbol,
-    filters: ReferenceFilters,
+    filters: references::Filters,
+    selection: ReferenceQuery,
 ) -> Result<ReferenceResult, AnalysisError> {
     let symbol = evaluator
         .reference_inline_union_symbol(original, &selected.selection)?
@@ -169,7 +208,7 @@ fn member_search(
     // Native groups are created by established occurrences. Product filters
     // additionally retain the selected declarations even when its own group
     // has no surviving occurrence.
-    if filters.calls || filters.exclude_tests {
+    if filters.any() {
         state
             .ledger
             .ensure_group(seed_group_identity, seed_declarations);
@@ -184,8 +223,9 @@ fn member_search(
         operation: ReferenceOperation::References,
         outcome,
         project: project.config.clone(),
+        selection,
         groups,
-        filters,
+        filters: filters.echo(project),
         coverage: ReferenceCoverage {
             baseline: ReferenceBaseline::Member,
             status: outcome,
@@ -233,7 +273,7 @@ impl SearchSymbols {
 
 struct SearchState<'a> {
     project: &'a Project,
-    filters: ReferenceFilters,
+    filters: references::Filters,
     meaning: ReferenceMeaning,
     control: Option<crate::resources::Control>,
     ledger: Ledger,
@@ -746,9 +786,7 @@ impl SearchState<'_> {
     }
 
     fn occurrence_allowed(&self, file: FileId, call: bool) -> bool {
-        (!self.filters.calls || call)
-            && (!self.filters.exclude_tests
-                || !references::is_test_path(&self.project.sources.get(file).display))
+        self.filters.allows(self.project, file, call)
     }
 
     fn site_allowed(&self, site: &ReferenceSite) -> bool {

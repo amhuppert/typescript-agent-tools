@@ -173,7 +173,8 @@ test('compareSource parses a named file or stdin, and checks without a tree unde
   assert.equal(compareSource(ts, parser.binary, { name: 'unit.d.ts', source, file, normalize }).difference, undefined);
   assert.deepEqual(parser.calls(), [{ args: [file], stdin: '' }]);
 
-  parser.behave();
+  // --check prints its verdict line, which is not a tree.
+  parser.behave({ stdout: `ok: ${file} parses as TypeScript 7 (jsx: off)\n` });
   const checked = compareSource(ts, parser.binary, { name: 'unit.d.ts', source, file, checkOnly: true });
   assert.deepEqual([checked.outcome, checked.difference], ['accepted', undefined]);
   assert.deepEqual(parser.calls(), [{ args: ['--check', file], stdin: '' }]);
@@ -292,14 +293,19 @@ test('synthetic source/upstream checks count eligible syntax rejections and skip
 test('synthetic runners apply their own policy to the same comparison facts', t => {
   const directory = temporary(t);
   const environment = { TYPE_SCRIPT_API: syntheticApi(directory), TSPARSE: path.join(directory, 'parser') };
-  // Rejects sources containing "invalid"; otherwise prints a tree with one
-  // extra child for sources containing "extra".
+  // Rejects sources containing "invalid"; otherwise prints, as tsparse does,
+  // the verdict line with --check, or a tree with one extra child for
+  // sources containing "extra".
   fs.writeFileSync(environment.TSPARSE, `#!${process.execPath}
 const fs = require('node:fs');
 const file = process.argv.slice(2).find(arg => !arg.startsWith('--'));
 const source = fs.readFileSync(file ?? 0, 'utf8');
 if (source.includes('invalid')) { process.stderr.write('syntax error'); process.exitCode = 1; }
-else if (!process.argv.includes('--check')) process.stdout.write(JSON.stringify({ kind: 308, children: source.includes('extra') ? [{ kind: 80 }] : [] }));
+else if (process.argv.includes('--check')) {
+  const jsx = process.argv.includes('--tsx') || /\\.[jt]sx$/i.test(file ?? '');
+  process.stdout.write('ok: ' + (file ?? '-') + ' parses as TypeScript 7 (jsx: ' + (jsx ? 'on' : 'off') + ')\\n');
+}
+else process.stdout.write(JSON.stringify({ kind: 308, children: source.includes('extra') ? [{ kind: 80 }] : [] }));
 `, { mode: 0o755 });
   const cases = [['same', 'const x = 1;'], ['extra', 'const extra = 1;'], ['invalid', '/*invalid*/']];
   fs.mkdirSync(path.join(directory, 'fixtures'));

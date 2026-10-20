@@ -421,7 +421,7 @@ impl Source<'_, '_> {
             | R::JsxNamespacedAttribute
             | R::PrivateName => return Ok(true),
             R::Shorthand | R::ParameterName | R::ComputedValue => return Ok(false),
-            R::MemberName | R::Name => {}
+            R::MemberName | R::NamespaceName | R::Name => {}
         }
         let captured = self.syntax(root.file)?;
         let node = captured.node_at(root.site)?;

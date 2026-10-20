@@ -170,12 +170,13 @@ fn shared_type_and_value_targets_return_exact_ordered_groups_from_both_entry_poi
             occurrences,
         });
     }
-    let expected = ReferenceResult {
+    let expected = |selection| ReferenceResult {
         operation: ReferenceOperation::References,
         outcome: ReferenceOutcome::Complete,
         filters: Default::default(),
         project: fixture.path("tsconfig.json"),
-        groups,
+        selection,
+        groups: groups.clone(),
         coverage: ReferenceCoverage {
             baseline: ReferenceBaseline::Lexical,
             status: ReferenceOutcome::Complete,
@@ -191,16 +192,29 @@ fn shared_type_and_value_targets_return_exact_ordered_groups_from_both_entry_poi
                 && labels.iter().any(|label| label == "valueBox"))
         })
         .unwrap();
-    for query in [
-        ReferenceQuery::Name {
-            name: "Box".into(),
-            file: None,
-        },
-        ReferenceQuery::At {
-            file: fixture.path(&shared.location.file),
-            position: shared.location.start,
-        },
+    // The result echoes each selection, its file as locations name files.
+    for (query, selection) in [
+        (
+            ReferenceQuery::Name {
+                name: "Box".into(),
+                file: None,
+            },
+            ReferenceQuery::Name {
+                name: "Box".into(),
+                file: None,
+            },
+        ),
+        (
+            ReferenceQuery::At {
+                file: fixture.path(&shared.location.file),
+                position: shared.location.start,
+            },
+            ReferenceQuery::At {
+                file: shared.location.file.clone().into(),
+                position: shared.location.start,
+            },
+        ),
     ] {
-        assert_eq!(project.find_references(query).unwrap(), expected);
+        assert_eq!(project.find_references(query).unwrap(), expected(selection));
     }
 }

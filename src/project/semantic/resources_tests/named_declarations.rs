@@ -74,7 +74,7 @@ fn check(owner: Option<&'static str>, filters: Option<crate::references::Referen
                 file: fixture.directory.join(file),
                 position: text.position(source.find(marker).unwrap() + marker.len()),
             },
-            filters: filters.unwrap_or_default(),
+            filters: filters.clone().unwrap_or_default(),
         };
         let query = |limits| {
             worker_with_limits(&fixture.project, limits, |parser, control| {

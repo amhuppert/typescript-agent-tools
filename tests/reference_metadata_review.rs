@@ -214,6 +214,7 @@ fn lexical_target_failures_and_trivia_positions_do_not_become_member_metadata_su
         filters: ReferenceFilters {
             calls: true,
             exclude_tests: true,
+            file: None,
         },
     };
     let member = loaded
@@ -251,6 +252,7 @@ fn lexical_target_failures_and_trivia_positions_do_not_become_member_metadata_su
             filters: ReferenceFilters {
                 calls: true,
                 exclude_tests: true,
+                file: None,
             },
         })
         .query_error();

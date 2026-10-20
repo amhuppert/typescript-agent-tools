@@ -387,12 +387,13 @@ tsparse --type --project tsconfig.json --at src/runs/host.ts:42:10 --expand --de
 
 | Result | Default output | With `--json` | Exit |
 | --- | --- | --- | --- |
-| References complete/partial | JSON document to stdout or `-o` | Same; `--pretty` indents JSON | 0 / 1 |
-| References dotted selector not found/ambiguous | JSON selection document to stdout or `-o` | Same | 1 |
+| References complete/partial | Text result to stdout or `-o`; with `--pretty`, the indented JSON document | JSON document to stdout or `-o`; `--pretty` indents JSON | 0 / 1 |
+| References dotted selector not found/ambiguous | Stderr diagnostic naming the selection; with `--pretty`, the indented selection document to stdout or `-o` | JSON selection document to stdout or `-o` | 1 |
 | References analysis/target failure | Stderr diagnostic, leaving `-o` untouched (existing behavior) | Error document to stdout or `-o` | Existing kind's code |
 | Type found or partial expansion | Text result to stdout or `-o`, headed `TYPE` or `PARTIAL TYPE` | Type document to stdout or `-o` | 0 / 1 |
 | Type unselected/analysis failure | Stderr diagnostic; no replacement of `-o` | Selection/error document to stdout or `-o` | 1 except exit-2 kinds |
-| Usage, transport or delivery failure | Stderr only; never a second result document | Same | 2 |
+| Usage or transport failure | `CODE: message` on stderr | `"error"` document: a usage failure's on stdout, never `-o`; a transport failure's on stdout or `-o` ([channels](navigation.md#exit-codes-and-channels)) | 2 |
+| Delivery failure | Stderr only; never a second result document | Same | 2 |
 
 A delivered partial text result is a result with exit 1, requiring an explicit
 result-versus-diagnostic distinction at the existing delivery owner; do not route
@@ -825,14 +826,16 @@ state and the complete semantic/resource matrix remain required gates.
 
 ### Response examples and closed failures
 
-Locations use existing one-based UTF-16/exclusive-end positions. This Q3 result
-is delivered as JSON and exits 1, even with no established call occurrences:
+Locations use existing one-based UTF-16/exclusive-end positions. With
+`--json`, this Q3 result of `--name RunHost.observe --calls` is delivered as
+this document and exits 1, even with no established call occurrences:
 
 ```json
 {
   "operation": "references",
   "outcome": "partial",
   "project": "/work/tsconfig.json",
+  "selection": {"name": {"name": "RunHost.observe", "file": null}},
   "groups": [{
     "declarations": [{"name": "observe", "location": {"file": "host.ts", "start": {"line": 1, "column": 18}, "end": {"line": 1, "column": 25}}}],
     "occurrences": []

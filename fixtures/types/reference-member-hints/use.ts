@@ -1,0 +1,12 @@
+import Anon from "./anon";
+import { Both } from "./both";
+import { Parameter } from "./parameter";
+new Anon().run();
+Both.run();
+new Both().run();
+new Parameter(1).run;
+import { Shared } from "./shared";
+import AnonParam from "./anonparam";
+new Shared(1).run;
+Shared.run();
+new AnonParam(1).run;

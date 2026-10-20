@@ -14,7 +14,8 @@
 // given without `--project`, to answer after applying. For each flow, in
 // order:
 //   - the batch's JSON preview through the service, saving a plan, must
-//     succeed, and `--direct` must give the same document but its `plan`;
+//     succeed, and `--direct` must give the same document but its `plan`
+//     and `next`, the command that applies the plan;
 //     the text preview must succeed too;
 //   - applying the plan must replace exactly the previewed files, and each
 //     file must then hold its bytes before the flow with the preview's
@@ -96,7 +97,8 @@ export function runFlows({ tsparse, config, scenario, native = null }) {
       const batch = path.join(runtime, `edits-${index}.json`);
       const plan = path.join(runtime, `plan-${index}.json`);
       fs.writeFileSync(batch, JSON.stringify({ edits: flow.edits }));
-      const preview = exec(['--edit-batch', batch, ...project, '--json', '--plan', plan]);
+      // Every diff line, which the preview's display cap would otherwise bound.
+      const preview = exec(['--edit-batch', batch, ...project, '--json', '--limit', 'all', '--plan', plan]);
       record.previewMs = preview.ms;
       let document;
       try {
@@ -109,10 +111,12 @@ export function runFlows({ tsparse, config, scenario, native = null }) {
         fail('preview failed', document.error ?? document.outcome);
         return;
       }
-      const direct = exec(['--edit-batch', batch, ...project, '--json'], { direct: true });
+      const direct = exec(['--edit-batch', batch, ...project, '--json', '--limit', 'all'], { direct: true });
       record.directPreviewMs = direct.ms;
       const directDocument = direct.status === 0 ? JSON.parse(direct.stdout) : null;
-      if (!directDocument || JSON.stringify({ ...directDocument, plan: null }) !== JSON.stringify({ ...document, plan: null }))
+      // Only the service preview saved a plan, so only it names the plan and its command.
+      const unplanned = ({ plan: _plan, next: _next, ...rest }) => JSON.stringify(rest);
+      if (!directDocument || unplanned(directDocument) !== unplanned(document))
         fail('--direct preview differs from the service preview', direct.stderr.slice(0, 300));
       const text = exec(['--edit-batch', batch, ...project]);
       if (text.status !== 0 || !text.stdout.includes('validated: syntax and edit boundaries'))

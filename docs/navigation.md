@@ -16,6 +16,7 @@ implemented behavior and where it deliberately differs from TypeScript 7.0.2.
 ```sh
 tsparse --outline src/runs/host.ts
 tsparse --outline --depth all --json --pretty src/runs/host.ts
+tsparse --outline --depth all --limit all src/runs/host.ts
 tsparse --show --name createRunHost.startEligible src/runs/host.ts
 tsparse --show --at 42:10 src/runs/host.ts --json -o shown.json
 tsparse --outline --project tsconfig.json src/runs/host.ts
@@ -27,10 +28,10 @@ tsparse --show --project tsconfig.json --direct --name startEligible src/runs/ho
 
 | Operation | Project | File | Selector | Options |
 | --- | --- | --- | --- | --- |
-| `--outline` | optional | exactly one named file | none | `--depth N` or `--depth all` (default 2), `--json`, `--pretty` with `--json`, `-o` |
-| `--show` by name | optional | required without `--project`; optional with it, to narrow the search | `--name NAME` | `--json`, `--pretty` with `--json`, `-o` |
-| `--show` by position | optional | exactly one named file, as the operand or in `--at` | `--at LINE:COLUMN FILE` or `--at FILE:LINE:COLUMN` | `--json`, `--pretty` with `--json`, `-o` |
-| `--references` | required | required for `--at`, as for show; optional for `--name` | exactly one of `--name` (one identifier), `--at` | `--pretty`, `-o` ([find references](references.md)) |
+| `--outline` | optional | exactly one named file | none | `--depth N` or `--depth all` (default 2), `--limit N` or `--limit all`, `--json`, `--pretty` with `--json`, `-o` |
+| `--show` by name | optional | required without `--project`; optional with it, to narrow the search | `--name NAME` | `--limit N` or `--limit all`, `--json`, `--pretty` with `--json`, `-o` |
+| `--show` by position | optional | exactly one named file, as the operand or in `--at` | `--at LINE:COLUMN FILE` or `--at FILE:LINE:COLUMN` | `--limit N` or `--limit all`, `--json`, `--pretty` with `--json`, `-o` |
+| `--references` | required | required for `--at`, as for show; optional for `--name`, to narrow the candidates | exactly one of `--name` (one identifier), `--at` | `--calls`, `--no-tests`, `--file FILE`, `--limit N` or `--limit all`, `--json`, `--pretty` (alone, the indented document), `-o` ([find references](references.md)) |
 
 `--direct` answers a project query (outline, show, or references with
 `--project`) in the CLI process instead of the [service](#project-mode);
@@ -40,11 +41,13 @@ invalid request. Navigation rejects, as usage errors: stdin (`-`), `--direct`
 without `--project`, `--check`, `--tsx`, `--pretty` without `--json`, `--depth`
 with `--show`, `--at` or `--name` with `--outline`, both or neither of `--at`
 and `--name` with `--show`, a missing file, a FILE operand beside
-`--at FILE:LINE:COLUMN`, more than one file, a value
-option (`--project`, `--name`, `--at`, `--depth`, `-o`) given twice, a second
-operation such as `--references` or a service action, and `--json` or
-`--depth` outside navigation. Parse and reference requests keep their
-established rules, including the last value of a repeated option. Project
+`--at FILE:LINE:COLUMN`, more than one file, a `--limit` that is neither a
+positive number nor `all`, a value
+option (`--project`, `--name`, `--at`, `--depth`, `--limit`, `--output` or
+`-o`) given twice, a second operation such as `--references` or a service action, and a
+flag the operation does not accept, whose error lists every operation that
+does. Parse and reference requests keep their established rules, including
+the last value of a repeated option. Project
 selection is explicit: no ancestor directory is searched for a configuration.
 `--at` takes a one-based line and one-based UTF-16 column, `LINE:COLUMN` with
 the FILE operand or `FILE:LINE:COLUMN` without one, the form text results
@@ -76,14 +79,16 @@ With `--project`, a file must be one of the project's searched files, the files
 reference queries search, named as they name them: relative to the working
 directory, matched lexically under the project's case policy. Dependency and
 standard-library files and files outside the configuration's inputs are
-`OutsideProject`; a searched JSON module is `Unsupported`. `--show --name`
+`OutsideProject`, whose message names the configuration whose `files`,
+`include`, and `exclude`, or those of a configuration it extends, decide which
+files are searched; a searched JSON module is `Unsupported`. `--show --name`
 without a file searches every searched file, and candidates across files are
 ordered by file and then position. The whole project loads as for references:
 a project that fails to load answers no operation, and its failure is never
 replaced by an answer from the file alone.
 
-On macOS and Linux, project queries go to the project's service, the one that
-answers reference queries for the same configuration (its `--project` path
+On macOS and Linux, project queries go to the project service, the one that
+answers every project query for the same configuration (its `--project` path
 made absolute against the working directory, without resolving `..` or
 symbolic links), started on demand and stopped with `--references-stop`;
 other platforms answer directly. The
@@ -105,26 +110,46 @@ See [the service](references.md#persistent-cli-service) for its lifecycle.
 ### Exit codes and channels
 
 One delivery policy applies to file navigation, direct project queries, and
-service answers alike:
+service answers alike. The [CLI reference](cli-reference.md#outline) lists
+the exit code of each outcome (also for [show](cli-reference.md#show)), as
+`tsparse --outline --help` and `tsparse --show --help` do; this table gives
+the channel that receives it:
 
-| Outcome | Exit | Text | JSON (`--json`) |
-| --- | --- | --- | --- |
-| Outline, or one declaration found | 0 | Result on stdout or `-o` | `"outcome": "ok"` / `"found"` document on stdout or `-o` |
-| Ambiguous or missing selection | 1 | Diagnostic and candidate anchors on stderr | `"ambiguous"` / `"not_found"` document on stdout or `-o` |
-| Syntax error, unsupported input, project analysis failure (`Config`, `Binding`, `UnresolvedImport`) | 1 | `path:line:column: message` on stderr | `"error"` document on stdout or `-o` |
-| Unreadable file, invalid position, file outside the project | 2 | Diagnostic on stderr | `"error"` document on stdout or `-o` |
-| Usage error, service transport failure, failure to write the result | 2 | Diagnostic on stderr | Diagnostic on stderr |
+| Outcome | Text | JSON (`--json`) |
+| --- | --- | --- |
+| Outline, or one declaration found | Result on stdout or `-o` | `"outcome": "ok"` / `"found"` document on stdout or `-o` |
+| Ambiguous or missing selection | Diagnostic and candidate anchors on stderr | `"ambiguous"` / `"not_found"` document on stdout or `-o` |
+| Syntax error, unsupported input, project analysis failure (`Config`, `Binding`, `UnresolvedImport`) | `path:line:column: message` on stderr | `"error"` document on stdout or `-o` |
+| Unreadable file, invalid position, file outside the project | Diagnostic on stderr | `"error"` document on stdout or `-o` |
+| Usage error | `CODE: message` on stderr | `"error"` document on stdout, never `-o` |
+| Service transport failure (`transport.*`) | `CODE: message`, then `why` and `next` where it has them, on stderr | `"error"` document on stdout or `-o` |
+| Failure to write the result | `CODE: message` on stderr | `CODE: message` on stderr |
 
 A JSON outcome never writes stderr, so its document and exit status identify
-it. A document is built only in the format requested. Its `file` and
+it. A display cut ([Display limits](#display-limits)) changes neither an exit
+code nor a channel. A document is built only in the format requested. Its `file` and
 `error.path` hold exact paths only: a path that is not Unicode (possible on
 Linux, for example under a working directory whose name is not Unicode) is
 `null` there, and the error message names it in a lossy form. A text failure
-never creates or replaces the `-o` file. A transport failure (the service
-could not start or be reached, or its runtime directory is not private)
-leaves no outcome, so it is a diagnostic in every format, like a usage error;
-it never becomes a direct load. A result that cannot be written is one
-diagnostic, never followed by a second document. An empty file has an empty,
+never creates or replaces the `-o` file. A usage error, a transport failure
+(the service could not start or be reached, or its runtime directory is not
+private), and a failed write leave no outcome: each is a failure with a
+category and a code from the [CLI reference](cli-reference.md#failure-codes),
+whose text is `CODE: message` and whose document is
+`{"operation", "outcome": "error", "error": {"category", "code", "message"}}`.
+A failure with a remedy adds it: a runtime directory of this user's that is
+not private prints `  why: …` and `  next: chmod 700 DIR`, which the document
+gives as `why` and `next: {"argv": [...]}`, and a remedy that is not one
+command, such as setting `TSPARSE_SERVICE_DIR`, prints as `  next: …` and is
+`remedy` in the document. Each transport cause keeps its own code
+(`transport.directory`, `transport.socket`, `transport.lock`,
+`transport.startup`, `transport.timeout`, `transport.protocol`,
+`transport.identity`), with `--json` as with text.
+A usage failure's document goes to stdout, never `-o`, since the request
+that named `-o` was not valid; a usage error about `--json` itself, or an
+argument that is not Unicode, stays text. A transport failure never becomes
+a direct load. A result that cannot be written is one diagnostic, never
+followed by a second document. An empty file has an empty,
 successful outline. Unlike reference name queries, which succeed with no
 groups, a show selector that matches nothing exits 1. A position outside the
 file, past the end of its line, or inside a surrogate pair is invalid (exit 2);
@@ -353,7 +378,8 @@ configuration as the scope of its text diagnostics.
 {"operation":"show","outcome":"found","project":"/abs/app/tsconfig.json","file":"src/other.ts",
  "declaration":{…},"source":"export function run() {}"}
 {"operation":"outline","outcome":"error","project":"tsconfig.json","error":{"kind":"OutsideProject",
- "message":"not one of the project's searched files","path":"outside/x.ts","position":null}}
+ "message":"not one of the project's searched files; the files, include, and exclude of tsconfig.json, or of a configuration it extends, decide which files are searched",
+ "path":"outside/x.ts","position":null}}
 ```
 
 ```sh
@@ -374,6 +400,65 @@ since a project that failed to load has no canonical path, and no `file`;
 A diagnostic about the request's own file (`OutsideProject`,
 `InvalidPosition`) names it as the request spelled it; every other failure
 names the captured file by its canonical path.
+
+### Display limits
+
+Outline and show bound what they display; the library's results are always
+complete, and a cut is a rendering decision. Each list has a default, which
+`tsparse --outline --help --json` and `tsparse --show --help --json` publish
+under `limits`:
+
+| List | Default | Counted |
+| --- | --- | --- |
+| Outline `entries` | 200 | after `--depth` chooses the levels, in source order |
+| Show `lines` | 400 | from the declaration's first line |
+| Show `candidates` | 50 | of an ambiguous selection, in the order they are listed |
+
+`--limit N` (a positive number) shows at most N items of the list, in every
+channel; `--limit all` shows every item. `-o` is the spillover channel: with
+`-o` and no `--limit`, nothing is cut, so an excerpt or outline that reaches
+`-o` is complete. Without `-o`, `--json` is cut like text and says so. A cut
+keeps the first items and changes no outcome, field, or exit code: the
+outline's `omitted_children` and `… N more children` lines still count what
+`--depth` hides, a cut show is still `found`, and a cut ambiguity still exits
+1 with every candidate counted in its first line.
+
+A cut text ends with one line naming what it withheld and the command that
+shows it: the request as given, with `--limit all` in place of any `--limit`
+value, rendered so a shell reads it back exactly.
+
+```text
+… 812 more entries; see all with: tsparse --outline src/app.ts --limit all, or write them to a file with -o FILE
+… 600 more lines; see all with: tsparse --show --name run src/host.ts --limit all, or write them to a file with -o FILE
+… 12 more candidates; narrow with --name a.b or --at FILE:LINE:COLUMN, or see all with: tsparse --show --project tsconfig.json --name run --limit all
+```
+
+The command keeps the request's form and channel: a text outline's command
+prints text, whose import lines list eight names and count the others, as
+every text outline does, and the document lists one entry per name. Where
+the cut falls inside an import declaration, its line lists the names before
+the cut and counts the declaration's others, as it counts those past the
+eighth, so the line never reads as the whole import. A cut show
+prints the declaration's first N lines, numbered as the whole declaration is.
+Candidates are a diagnostic on stderr, which never reaches `-o`, so their line
+suggests narrowing instead of a file. A cut document adds `display`, present
+only when something was withheld, so every document that shows all its items
+is unchanged; a cut show's `source` is the first N lines of the excerpt,
+ending before the line break after the last:
+
+```json
+"display": {"entries": {"returned": 200, "total": 1012},
+            "next": {"argv": ["tsparse", "--outline", "src/app.ts", "--json", "--limit", "all"]},
+            "truncated": true}
+```
+
+`next.argv` is the same command as an argument list, `tsparse` first. It
+keeps the request's `-o`, so following it writes every item to the file the
+request named, and it names no transport: the service and a direct load
+answer alike, so it leaves out `--direct`, and the service's answer and a
+direct one stay byte-identical. Followed from the same working directory, it
+answers through the project's service, as every project request without
+`--direct` does.
 
 ## Parsing
 

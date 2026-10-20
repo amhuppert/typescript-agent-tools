@@ -40,6 +40,12 @@ fn search(project: &Project, query: ReferenceQuery) -> Value {
     )
     .unwrap()
 }
+/// `answer` without the selection it echoes, to compare the answers of two
+/// selections.
+fn selected(mut answer: Value) -> Value {
+    answer.as_object_mut().unwrap().remove("selection").unwrap();
+    answer
+}
 fn named(project: &Project, name: &str) -> Value {
     search(
         project,
@@ -100,7 +106,7 @@ fn parameter_member_and_dotted_namespace_use_their_own_replay_roles() {
             position: position(SOURCE, modifier),
         },
     );
-    assert_eq!(parameter, replay);
+    assert_eq!(selected(parameter), selected(replay));
     let local = search(
         &project,
         ReferenceQuery::At {
@@ -118,7 +124,7 @@ fn parameter_member_and_dotted_namespace_use_their_own_replay_roles() {
             position: position(SOURCE, inner),
         },
     );
-    assert_eq!(namespace, replay);
+    assert_eq!(selected(namespace.clone()), selected(replay));
     assert_eq!(namespace["coverage"]["baseline"], "lexical");
     assert_eq!(named(&project, "Absent.run")["candidates"], json!([]));
     assert_eq!(named(&project, "Absent.run")["outcome"], "not_found");
@@ -145,6 +151,7 @@ fn filtered_search_retains_seed_origins_when_only_a_related_group_has_calls() {
                 filters: ReferenceFilters {
                     calls: true,
                     exclude_tests: false,
+                    file: None,
                 },
             })
             .unwrap(),

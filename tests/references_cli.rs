@@ -74,6 +74,7 @@ fn position_query_emits_the_aliased_symbol_group() {
             "--at",
             "2:1",
             "src/app.ts",
+            "--json",
         ],
     ));
     let project = std::fs::canonicalize(fixture.path("tsconfig.json")).unwrap();
@@ -83,6 +84,7 @@ fn position_query_emits_the_aliased_symbol_group() {
             "operation": "references",
             "outcome": "complete",
             "project": project,
+            "selection": { "at": { "file": "src/app.ts", "position": { "line": 2, "column": 1 } } },
             "filters": { "calls": false, "excludeTests": false },
             "coverage": { "baseline": "lexical", "status": "complete", "gaps": [] },
             "unsearchedMembers": { "count": 0, "selectors": [] },
@@ -105,7 +107,7 @@ fn position_query_emits_the_aliased_symbol_group() {
 fn name_queries_return_every_group_and_narrow_by_file() {
     let fixture = aliases();
     let groups = |args: &[&str]| -> Vec<Value> {
-        let mut all = vec!["--references", "--project", "tsconfig.json"];
+        let mut all = vec!["--references", "--project", "tsconfig.json", "--json"];
         all.extend_from_slice(args);
         let result = success(tsparse(&fixture, &all));
         result["groups"].as_array().unwrap().clone()
@@ -157,6 +159,7 @@ fn pretty_and_output_file_keep_their_meanings() {
             "tsconfig.json",
             "--name",
             "run",
+            "--json",
         ],
     ));
     assert_eq!(serde_json::from_str::<Value>(&text).unwrap(), compact);
@@ -321,6 +324,7 @@ fn a_leading_byte_order_mark_is_not_part_of_the_first_line() {
                     "--at",
                     at,
                     "a.ts",
+                    "--json",
                 ],
             ));
             assert_eq!(result["groups"], expected, "{prefix:?} {at}");
@@ -334,6 +338,7 @@ fn a_leading_byte_order_mark_is_not_part_of_the_first_line() {
                 "--at",
                 "1:15",
                 "a.ts",
+                "--json",
             ],
         ));
         assert_eq!(result["groups"], json!([]), "{prefix:?}");
@@ -379,6 +384,7 @@ fn a_member_chain_of_any_length_loads_and_labels_its_callback() {
             "tsconfig.json",
             "--name",
             "value",
+            "--json",
         ],
     ));
     assert_eq!(
@@ -400,24 +406,4 @@ fn a_member_chain_of_any_length_loads_and_labels_its_callback() {
     assert_eq!(labels, ["value", "x", &format!("{chain}() callback")]);
     let column = chain.len() + 2;
     assert_eq!(entries[2]["anchor"], json!({ "line": 3, "column": column }));
-}
-
-#[test]
-fn help_documents_reference_mode_and_its_limits() {
-    let fixture = aliases();
-    let output = tsparse(&fixture, &["--help"]);
-    let text = String::from_utf8(output.stdout).unwrap();
-    for needle in [
-        "--references --project TSCONFIG",
-        "--at LINE:COLUMN",
-        "--name NAME",
-        "Project references are not followed",
-        "Standard libraries follow target, lib, noLib, and lib references",
-        "their files are never searched",
-        "JSON modules are program\ninputs where resolveJsonModule allows them",
-        "Positions\ninside JSON are not selectable",
-        "In reference mode, exit 1",
-    ] {
-        assert!(text.contains(needle), "help lacks {needle:?}:\n{text}");
-    }
 }

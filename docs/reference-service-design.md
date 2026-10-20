@@ -47,8 +47,12 @@ operand each operation has (`ProjectRequest::make_absolute`), and restores
 the caller's spelling in diagnostics that name that path.
 
 `--references-status --project CONFIG` reports whether a service is running and,
-when it is, its PID and successful index generation. It does not start or load a
-project. `--references-stop --project CONFIG` stops that project's service and
+when it is, its PID, successful index generation, build, the limits it read when
+it started, its idle timeout and the idle time it has left, and when it started.
+It does not start or load a project, and it does not extend the idle time.
+`--doctor --project CONFIG` composes that status with the environment, runtime
+directory, and configuration checks, and reports a service whose inherited
+limits differ from the client's. `--references-stop --project CONFIG` stops that project's service and
 succeeds when none is running. `--references-direct` selects fresh in-process
 loading for diagnostics and comparisons. `--references-serve --project CONFIG`
 runs the service in the foreground for a process supervisor.
@@ -122,7 +126,13 @@ share one build, and no reader observes a partially replaced index. This is
 proportionate to measured query costs and avoids concurrent rebuild memory peaks.
 A slow or disconnected client must not terminate the service or monopolize it
 indefinitely; bound protocol input and socket waits. Analysis failures and
-transport failures remain distinct until CLI exit handling.
+transport failures remain distinct until CLI exit handling, and so does each
+transport cause: `service` makes each failure where its cause is known, with
+its own `transport.*` code (the runtime directory, its socket, a lock file, a
+service's startup, a wait that ran out, an exchange the other side cannot use,
+or a service of another identity), and a service that answers no request says
+why in a typed refusal, so a malformed request, an identity mismatch, and a
+watchdog that could not run keep their codes across the socket.
 
 ## Lifecycle
 
@@ -144,7 +154,28 @@ parent's output collection open until the service exits. Foreground
 mode supports external supervisors. Administrative stop and test teardown must
 wait for process ownership to be released. Runtime permission failures and
 unexpected startup failures are reported, not silently converted to direct
-loading. Windows uses direct loading until a native transport is implemented.
+loading. The client asks the service's environment question itself before
+starting one (`process_limits::Environment`), and checks the runtime directory
+and socket path, so it reports those causes without starting anything.
+Clients that find no service start one at a time under a second lock file,
+`KEY.start.lock`, held until the service listens or exits, so each reads its
+own service's diagnostic. A service that fails before binding its socket
+records the failure's code and message in `KEY.start-error` beside its lock
+file, since its standard streams are null: it writes the one staged copy,
+`KEY.start-error.staged`, created new and locked until it is renamed into place,
+so a client reads a complete diagnostic or none. A staged copy whose lock no
+process holds was abandoned by a writer that died, and the next start or
+failing service removes it, so at most one of each file exists per endpoint.
+Reclaiming the staged copy and reading the published diagnostic open them
+without waiting (`nonblocking::open_without_waiting`) and only as regular
+files, so a pipe at either path is reported rather than waited on; removing an
+earlier published diagnostic before a start opens nothing.
+The client that started a service reports that failure, with the code the
+service recorded, exactly as the foreground service prints it, and removes the
+file; a diagnostic that names no failure code is reported as unreadable. It
+removes an earlier diagnostic before starting a service. No pipe is passed to
+the service.
+Windows uses direct loading until a native transport is implemented.
 
 ## Delivery and adversarial checkpoints
 

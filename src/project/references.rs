@@ -45,13 +45,102 @@ pub(super) fn has_lexical_target(
         .is_some_and(|occurrence| matches!(occurrence.target, OccurrenceTarget::Symbols(_)))
 }
 
+/// The selection a result echoes: `query` with its file named as
+/// `Location::file` names the searched file it selects, relative to the
+/// configuration's directory with `/` separators, so the echo is the same
+/// from any working directory and from the service. The one owner of that
+/// form; a file that names no searched file fails as selecting would.
+pub(super) fn selection(
+    project: &Project,
+    query: &ReferenceQuery,
+) -> Result<ReferenceQuery, AnalysisError> {
+    let echo = |file: &std::path::Path| -> Result<PathBuf, AnalysisError> {
+        let id = project.searched_file(file)?;
+        Ok(PathBuf::from(&project.sources.get(id).display))
+    };
+    Ok(match query {
+        ReferenceQuery::At { file, position } => ReferenceQuery::At {
+            file: echo(file)?,
+            position: *position,
+        },
+        ReferenceQuery::Name { name, file } => ReferenceQuery::Name {
+            name: name.clone(),
+            file: file.as_deref().map(echo).transpose()?,
+        },
+    })
+}
+
+/// A request's reporting filters, with `--file`'s path resolved to the
+/// searched file it names through the file-identity owner
+/// (`FileLookup::find`, which applies the project's case policy and
+/// separators). The one owner of which occurrences a result reports, for
+/// lexical and member searches alike.
+#[derive(Debug, Default, Clone, Copy)]
+pub(super) struct Filters {
+    calls: bool,
+    exclude_tests: bool,
+    file: Option<super::sources::FileId>,
+}
+
+impl Filters {
+    /// `filters` resolved against `project`: a `file` that is no searched
+    /// file fails as a FILE operand does (`OutsideProject`).
+    pub(super) fn resolve(
+        project: &Project,
+        filters: &ReferenceFilters,
+    ) -> Result<Self, AnalysisError> {
+        Ok(Self {
+            calls: filters.calls,
+            exclude_tests: filters.exclude_tests,
+            file: filters
+                .file
+                .as_deref()
+                .map(|file| project.searched_file(file))
+                .transpose()?,
+        })
+    }
+
+    /// Whether an occurrence in `file`, a call target when `call`, is
+    /// reported.
+    pub(super) fn allows(
+        &self,
+        project: &Project,
+        file: super::sources::FileId,
+        call: bool,
+    ) -> bool {
+        (!self.calls || call)
+            && (!self.exclude_tests || !is_test_path(&project.sources.get(file).display))
+            && self.file.is_none_or(|only| only == file)
+    }
+
+    /// Whether any filter may remove an occurrence.
+    pub(super) fn any(&self) -> bool {
+        self.calls || self.exclude_tests || self.file.is_some()
+    }
+
+    /// The filters as a result echoes them, `file` named as
+    /// `Location::file` names it.
+    pub(super) fn echo(&self, project: &Project) -> ReferenceFilters {
+        ReferenceFilters {
+            calls: self.calls,
+            exclude_tests: self.exclude_tests,
+            file: self
+                .file
+                .map(|file| PathBuf::from(&project.sources.get(file).display)),
+        }
+    }
+}
+
 /// The existing lexical question, also used by filtered lexical requests.
 /// Keeping it explicit preserves legacy Name semantics when semantic member
-/// selection is added at the new request boundary.
+/// selection is added at the new request boundary. `selection` is what the
+/// result echoes (`selection`), which differs from `query` where a member
+/// selector resolved to a lexical seed.
 pub(super) fn lexical(
     project: &Project,
     query: ReferenceQuery,
-    filters: ReferenceFilters,
+    filters: Filters,
+    selection: ReferenceQuery,
 ) -> Result<ReferenceResult, AnalysisError> {
     let index = &project.bindings.index;
     let mut symbols = Vec::new();
@@ -105,8 +194,9 @@ pub(super) fn lexical(
         operation: ReferenceOperation::References,
         outcome: ReferenceOutcome::Complete,
         project: project.config.clone(),
+        selection,
         groups,
-        filters,
+        filters: filters.echo(project),
         coverage: ReferenceCoverage {
             baseline: ReferenceBaseline::Lexical,
             status: ReferenceOutcome::Complete,
@@ -158,12 +248,7 @@ fn selected<'a>(
     })
 }
 
-fn group(
-    project: &Project,
-    index: &Index,
-    symbol: SymbolId,
-    filters: ReferenceFilters,
-) -> ReferenceGroup {
+fn group(project: &Project, index: &Index, symbol: SymbolId, filters: Filters) -> ReferenceGroup {
     let declarations: Vec<NamedLocation> = index
         .sites(symbol)
         .iter()
@@ -175,11 +260,7 @@ fn group(
     let occurrences = index
         .occurrences_of(symbol)
         .iter()
-        .filter(|indexed| {
-            (!filters.calls || indexed.call)
-                && (!filters.exclude_tests
-                    || !is_test_path(&project.sources.get(indexed.occurrence.file).display))
-        })
+        .filter(|indexed| filters.allows(project, indexed.occurrence.file, indexed.call))
         .map(|indexed| {
             let occurrence = index.occurrence(indexed.occurrence);
             Occurrence {
@@ -197,7 +278,7 @@ fn group(
 
 /// Product policy for `--no-tests`, applied to exact normalized project-relative
 /// paths, independently of TypeScript configuration glob matching.
-pub(super) fn is_test_path(path: &str) -> bool {
+fn is_test_path(path: &str) -> bool {
     let mut segments = path.split('/').peekable();
     while let Some(segment) = segments.next() {
         if segments.peek().is_some() {

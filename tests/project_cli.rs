@@ -132,6 +132,56 @@ fn document(output: &Output, code: i32) -> Value {
     serde_json::from_slice(&output.stdout).unwrap()
 }
 
+/// A transport failure with `code`, exit 2, as its message and the lines
+/// text gives after it: with `--json` one document, here on stdout, naming
+/// `operation`, whose `why`, `next`, and `remedy` are those lines; in text
+/// `code: message` and those lines on stderr.
+fn transport(output: &Output, json: Option<&str>, code: &str) -> (String, Vec<String>) {
+    assert_eq!(output.status.code(), Some(2), "{output:?}");
+    match json {
+        Some(operation) => {
+            let document = document(output, 2);
+            assert_eq!(document["operation"], operation, "{document}");
+            assert_eq!(document["outcome"], "error", "{document}");
+            assert_eq!(document["error"]["category"], "transport", "{document}");
+            assert_eq!(document["error"]["code"], code, "{document}");
+            let error = &document["error"];
+            // Nothing else: the document's lines are all text gives.
+            assert!(
+                document.as_object().unwrap().len() == 3
+                    && error.as_object().unwrap().keys().all(|key| {
+                        ["category", "code", "message", "why", "next", "remedy"]
+                            .contains(&key.as_str())
+                    }),
+                "{document}"
+            );
+            let mut lines = Vec::new();
+            if let Some(why) = error["why"].as_str() {
+                lines.push(format!("  why: {why}"));
+            }
+            if let Some(argv) = error["next"]["argv"].as_array() {
+                let argv: Vec<&str> = argv.iter().map(|a| a.as_str().unwrap()).collect();
+                lines.push(format!("  next: {}", argv.join(" ")));
+            }
+            if let Some(remedy) = error["remedy"].as_str() {
+                lines.push(format!("  next: {remedy}"));
+            }
+            (error["message"].as_str().unwrap().to_string(), lines)
+        }
+        None => {
+            assert!(output.stdout.is_empty(), "{output:?}");
+            let stderr = text(&output.stderr);
+            let mut lines = stderr.lines();
+            let message = lines
+                .next()
+                .and_then(|first| first.strip_prefix(&format!("{code}: ")))
+                .unwrap_or_else(|| panic!("{stderr}"))
+                .to_string();
+            (message, lines.map(String::from).collect())
+        }
+    }
+}
+
 /// A text outcome: the result on stdout for 0, or a diagnostic on stderr.
 fn text_outcome(output: &Output, code: i32) -> String {
     assert_eq!(output.status.code(), Some(code), "{output:?}");
@@ -429,8 +479,12 @@ fn ambiguity_lists_candidates_whose_project_relative_anchors_round_trip_from_any
                 ],
             );
             if references.status.code() == Some(0) {
-                let groups = &document(&references, 0)["groups"];
-                assert_eq!(groups.as_array().unwrap().len(), 1, "{entry:?} {place}");
+                assert!(references.stderr.is_empty(), "{entry:?} {place}");
+                let answer = text(&references.stdout);
+                assert!(
+                    answer.lines().next().unwrap().contains(": 1 group, "),
+                    "{entry:?} {place} {answer}"
+                );
             } else {
                 let diagnostic = text_outcome(&references, 1);
                 assert!(diagnostic.contains("(member)"), "{entry:?} {diagnostic}");
@@ -494,14 +548,14 @@ fn analysis_failures_are_typed_outcomes_with_their_exit_codes() {
                 &["--outline", "outside/x.ts"],
                 2,
                 "OutsideProject",
-                "outside/x.ts: not one of the project's searched files\n".into(),
+                "outside/x.ts: not one of the project's searched files; the files, include, and exclude of tsconfig.json, or of a configuration it extends, decide which files are searched\n".into(),
                 json!("outside/x.ts"),
             ),
             (
                 &["--show", "--name", "run", "outside/x.ts"],
                 2,
                 "OutsideProject",
-                "outside/x.ts: not one of the project's searched files\n".into(),
+                "outside/x.ts: not one of the project's searched files; the files, include, and exclude of tsconfig.json, or of a configuration it extends, decide which files are searched\n".into(),
                 json!("outside/x.ts"),
             ),
             (
@@ -720,7 +774,7 @@ fn output_files_receive_results_and_json_outcomes_but_never_text_failures() {
             assert!(output.stdout.is_empty(), "{entry:?} {args:?}");
             let message = text(&output.stderr);
             assert!(
-                message.starts_with("missing-dir/out.json: "),
+                message.starts_with("write.output: missing-dir/out.json: "),
                 "{entry:?} {args:?}: {message}"
             );
             assert_eq!(message.lines().count(), 1, "no second document: {message}");
@@ -733,14 +787,16 @@ fn output_files_receive_results_and_json_outcomes_but_never_text_failures() {
 fn unmatched_reference_names_remain_successful_empty_results() {
     for &entry in ENTRIES {
         let project = Project::new(entry);
-        let output = project.run(&["--references", "--name", "absent"]);
+        let output = project.run(&["--references", "--name", "absent", "--json"]);
         assert_eq!(output.status.code(), Some(0), "{entry:?} {output:?}");
         assert!(output.stderr.is_empty());
         assert_eq!(
             document(&output, 0),
             json!({
                 "operation": "references", "outcome": "complete",
-                "project": project.config(), "groups": [],
+                "project": project.config(),
+                "selection": { "name": { "name": "absent", "file": null } },
+                "groups": [],
                 "filters": { "calls": false, "excludeTests": false },
                 "coverage": { "baseline": "lexical", "status": "complete", "gaps": [] },
                 "unsearchedMembers": { "count": 0, "selectors": [] },
@@ -752,7 +808,7 @@ fn unmatched_reference_names_remain_successful_empty_results() {
 
 #[cfg(unix)]
 #[test]
-fn transport_failures_are_stderr_diagnostics_in_every_format() {
+fn transport_failures_are_typed_and_delivered_as_the_request_asks() {
     use std::os::unix::fs::PermissionsExt;
     let project = Project::new(Entry::Service);
     std::fs::create_dir(&project.service.runtime).unwrap();
@@ -761,22 +817,62 @@ fn transport_failures_are_stderr_diagnostics_in_every_format() {
         std::fs::Permissions::from_mode(0o755),
     )
     .unwrap();
-    for args in [
-        &["--outline", "src/host.ts"][..],
-        &["--outline", "--json", "src/host.ts"],
-        &["--show", "--json", "--name", "run"],
-        &["--show", "--at", "1:17", "src/other.ts", "-o", "out.txt"],
-        &["--show", "--json", "--name", "run", "-o", "out.txt"],
-        &["--references", "--name", "run"],
+    let runtime = project.service.runtime.to_str().unwrap().to_owned();
+    // Every transport failure ends by naming the doctor for its project.
+    let not_private = format!(
+        "Project service directory must be a private directory owned by this user with mode 0700: {runtime}; run: tsparse --doctor --project tsconfig.json"
+    );
+    let remedy = vec![
+        "  why: any process that can open the socket can run queries as you".to_string(),
+        format!("  next: chmod 700 {runtime}"),
+    ];
+    // Text on stderr, which never creates -o; with --json, a document.
+    for (args, json) in [
+        (&["--outline", "src/host.ts"][..], None),
+        (&["--outline", "--json", "src/host.ts"], Some("outline")),
+        (&["--show", "--json", "--name", "run"], Some("show")),
+        (&["--type", "--json", "--name", "run"], Some("type")),
+        (
+            &["--show", "--at", "1:17", "src/other.ts", "-o", "out.txt"],
+            None,
+        ),
+        (&["--references", "--name", "run"], None),
+        (
+            &["--references", "--json", "--name", "run"],
+            Some("references"),
+        ),
     ] {
         let output = project.run(args);
-        assert_eq!(output.status.code(), Some(2), "{args:?}");
-        assert!(output.stdout.is_empty(), "{args:?}");
-        let message = text(&output.stderr);
-        assert!(message.contains("private directory"), "{args:?}: {message}");
-        assert_eq!(message.lines().count(), 1, "{message}");
+        assert_eq!(
+            transport(&output, json, "transport.directory"),
+            (not_private.clone(), remedy.clone()),
+            "{args:?}"
+        );
         assert!(!project.path("out.txt").exists(), "{args:?}");
     }
+    // A valid request's failure document goes where its result would.
+    let output = project.run(&["--show", "--json", "--name", "run", "-o", "out.txt"]);
+    assert_eq!(output.status.code(), Some(2), "{output:?}");
+    assert!(
+        output.stdout.is_empty() && output.stderr.is_empty(),
+        "{output:?}"
+    );
+    let written: Value =
+        serde_json::from_str(&std::fs::read_to_string(project.path("out.txt")).unwrap()).unwrap();
+    assert_eq!(
+        written,
+        json!({
+            "operation": "show",
+            "outcome": "error",
+            "error": {
+                "category": "transport",
+                "code": "transport.directory",
+                "message": not_private,
+                "why": "any process that can open the socket can run queries as you",
+                "next": {"argv": ["chmod", "700", runtime]},
+            },
+        })
+    );
     // Direct execution does not use the service.
     let output = project
         .service
@@ -794,18 +890,21 @@ fn transport_failures_are_stderr_diagnostics_in_every_format() {
 }
 
 /// A runtime directory whose socket path is longer than a Unix socket
-/// address holds fails every service request, and the diagnostic names the
-/// socket and the remedy.
+/// address holds fails every service request before a service is started,
+/// and the diagnostic names the socket and the remedy.
 #[cfg(unix)]
 #[test]
 fn an_overlong_service_socket_path_names_the_socket_and_the_remedy() {
     let project = Project::new(Entry::Service);
     let runtime = project.root().join("r".repeat(120));
-    for args in [
-        &["--outline", "src/host.ts"][..],
-        &["--show", "--json", "--name", "run"],
-        &["--references", "--name", "run"],
-        &["--references-status"],
+    // The platform's refusal of a socket path this long.
+    let cause =
+        std::os::unix::net::UnixStream::connect(runtime.join("0123456789abcdef.sock")).unwrap_err();
+    for (args, json) in [
+        (&["--outline", "src/host.ts"][..], None),
+        (&["--show", "--json", "--name", "run"], Some("show")),
+        (&["--references", "--name", "run"], None),
+        (&["--references-status"], None),
     ] {
         let output = project
             .service
@@ -815,16 +914,28 @@ fn an_overlong_service_socket_path_names_the_socket_and_the_remedy() {
             .args(["--project", "tsconfig.json"])
             .output()
             .unwrap();
-        assert_eq!(output.status.code(), Some(2), "{args:?}: {output:?}");
-        assert!(output.stdout.is_empty(), "{args:?}");
-        let message = text(&output.stderr);
+        let (message, lines) = transport(&output, json, "transport.socket");
+        // The socket is named by the endpoint's 16-digit key.
+        let key = message
+            .strip_prefix(&format!("Project service socket {}/", runtime.display()))
+            .map(|rest| rest.split_at(16));
         assert!(
-            message.contains(&format!("{}/", runtime.display()))
-                && message.contains(".sock")
-                && message.contains("shorter TSPARSE_SERVICE_DIR"),
+            key.is_some_and(|(key, rest)| key.bytes().all(|b| b.is_ascii_hexdigit())
+                && rest
+                    == format!(".sock: {cause}; run: tsparse --doctor --project tsconfig.json")),
             "{args:?}: {message}"
         );
+        assert_eq!(
+            lines,
+            ["  next: set a shorter TSPARSE_SERVICE_DIR"],
+            "{args:?}"
+        );
     }
+    // No service was started: it would have left its lock file.
+    assert_eq!(std::fs::read_dir(&runtime).unwrap().count(), 0);
+    // Following the remedy: a shorter directory serves the same request.
+    let output = project.run(&["--outline", "src/host.ts"]);
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
 }
 
 #[test]
@@ -834,7 +945,7 @@ fn dotted_reference_names_select_catalog_declarations() {
         &["--references", "--name", "createRunHost.run"][..],
         &["--references", "--name", "Tools.run", "src/other.ts"],
     ] {
-        let output = project.run(args);
+        let output = project.run(&[args, &["--json"]].concat());
         assert_eq!(output.status.code(), Some(0), "{args:?}: {output:?}");
         assert!(output.stderr.is_empty(), "{args:?}");
         let answer: Value = serde_json::from_slice(&output.stdout).unwrap();
@@ -1076,21 +1187,6 @@ fn valid_project_requests_and_usage_errors() {
 }
 
 #[test]
-fn help_documents_project_navigation() {
-    let project = Project::new(Entry::Direct);
-    let output = project.service.command().arg("--help").output().unwrap();
-    let help = text(&output.stdout);
-    for needle in [
-        "tsparse --outline --project TSCONFIG FILE [--direct] [--depth N|all] [--json [--pretty]] [-o OUTPUT]",
-        "tsparse --show --project TSCONFIG (--name NAME [FILE] | --at LINE:COLUMN FILE | --at FILE:LINE:COLUMN) [--direct] [--json [--pretty]] [-o OUTPUT]",
-        "--direct",
-    ] {
-        assert!(help.contains(needle), "help lacks {needle:?}:\n{help}");
-    }
-    assert!(!help.contains("not yet available"), "{help}");
-}
-
-#[test]
 fn files_outside_the_configuration_directory_are_named_through_it() {
     // A searched file outside the configuration's directory is `../`
     // relative to it in JSON, and absolute without `..` in text; both
@@ -1142,5 +1238,103 @@ fn files_outside_the_configuration_directory_are_named_through_it() {
             );
         }
         project.check_no_service();
+        // The service this spelling started is not the one the fixture
+        // stops, which `tsconfig.json` names.
+        if entry == Entry::Service {
+            let stopped =
+                project.run_in(project.root(), &["--references-stop", "--project", config]);
+            assert!(stopped.status.success(), "{stopped:?}");
+        }
     }
+}
+
+/// A project is the configuration `--project` names, relative to the
+/// working directory: no ancestor directory is searched, even one holding a
+/// `tsconfig.json`, through the service or loaded directly, and without
+/// `--project` nothing is searched for (design, "Preserved behavior":
+/// explicit project identity).
+#[test]
+fn no_ancestor_directory_is_searched_for_a_configuration() {
+    let service = Service::new(&[("child/app.ts", "export const value = 1;\n")]);
+    let child = service.fixture.path("child");
+    let named = format!(
+        "{}: No such file or directory (os error 2)\n",
+        child.join("tsconfig.json").display()
+    );
+    for args in [
+        &["--references", "--name", "value"][..],
+        &["--references", "--name", "value", "--direct"],
+        &["--type", "--name", "value"],
+        &["--outline", "app.ts"],
+        &["--show", "--name", "value", "app.ts", "--direct"],
+    ] {
+        let output = service
+            .command()
+            .current_dir(&child)
+            .args(args)
+            .args(["--project", "tsconfig.json"])
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(2), "{args:?}: {output:?}");
+        assert!(output.stdout.is_empty(), "{args:?}: {output:?}");
+        assert_eq!(String::from_utf8_lossy(&output.stderr), named, "{args:?}");
+    }
+    let output = service
+        .command()
+        .current_dir(&child)
+        .args(["--references", "--name", "value"])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(2), "{output:?}");
+    assert_eq!(
+        String::from_utf8_lossy(&output.stderr),
+        "usage.missing_flag: --references requires --project TSCONFIG\n"
+    );
+    // From the directory that holds it, the same configuration is found.
+    let found = service.run(&["--references", "--name", "value", "--json"]);
+    assert_eq!(found.status.code(), Some(0), "{found:?}");
+}
+
+/// A service is keyed by the configuration as spelled: two spellings of one
+/// file, here a symbolic link beside it, each own a service, which only
+/// that spelling's queries, status, and stop reach. A spelling through a
+/// link can be retargeted, so this is deliberate (design, "Preserved
+/// behavior": explicit project identity).
+#[cfg(unix)]
+#[test]
+fn each_spelling_of_a_configuration_owns_its_own_service() {
+    let service = Service::new(&[("app.ts", "export const value = 1;\n")]);
+    std::os::unix::fs::symlink("tsconfig.json", service.fixture.path("link.json")).unwrap();
+    let request = |args: &[&str], config: &str| {
+        service
+            .command()
+            .args(args)
+            .args(["--project", config])
+            .output()
+            .unwrap()
+    };
+    let status =
+        |config: &str| support::service::json(request(&["--references-status", "--json"], config));
+    let query = |config: &str| {
+        support::service::json(request(
+            &["--references", "--name", "value", "--json"],
+            config,
+        ))
+    };
+    let answer = query("tsconfig.json");
+    assert_eq!(status("link.json")["running"], false);
+    assert_eq!(query("link.json")["groups"], answer["groups"]);
+    let (spelled, linked) = (status("tsconfig.json"), status("link.json"));
+    assert_eq!(
+        (&spelled["running"], &linked["running"]),
+        (&json!(true), &json!(true))
+    );
+    assert_ne!(spelled["pid"], linked["pid"]);
+    let stopped = request(&["--references-stop"], "link.json");
+    assert_eq!(
+        String::from_utf8_lossy(&stopped.stdout),
+        format!("stopped: pid {}\n", linked["pid"])
+    );
+    assert_eq!(status("link.json")["running"], false);
+    assert_eq!(status("tsconfig.json")["pid"], spelled["pid"]);
 }

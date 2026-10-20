@@ -492,9 +492,6 @@ fn invalid_requests_are_usage_errors() {
         &["--show", "--at", "1:1", "--at", "1:17", "host.ts"],
         &["--outline", "--depth", "1", "--depth", "all", "host.ts"],
         &["--outline", "-o", "a.txt", "--output", "out.txt", "host.ts"],
-        &[
-            "--show", "--json", "--pretty", "--name", "run", "-", "-o", "out.txt",
-        ],
         &["--name", "run", "host.ts"],
         &["--json", "host.ts"],
         &["--depth", "2", "host.ts"],
@@ -512,9 +509,31 @@ fn invalid_requests_are_usage_errors() {
         let output = tsparse(&fixture, args);
         assert_eq!(output.status.code(), Some(2), "{args:?}");
         assert!(output.stdout.is_empty(), "{args:?}");
-        assert!(!output.stderr.is_empty(), "{args:?}");
+        assert!(text(&output.stderr).starts_with("usage."), "{args:?}");
         assert!(!fixture.path("out.txt").exists(), "{args:?}");
     }
+    // With `--json`, which show takes, a usage failure is one document on
+    // stdout, and the `-o` the invalid request named is never written.
+    let output = tsparse(
+        &fixture,
+        &[
+            "--show", "--json", "--pretty", "--name", "run", "-", "-o", "out.txt",
+        ],
+    );
+    assert!(text(&output.stdout).lines().count() > 1, "{output:?}");
+    assert_eq!(
+        json_output(&output, 2),
+        json!({
+            "operation": "show",
+            "outcome": "error",
+            "error": {
+                "category": "usage",
+                "code": "usage.operands",
+                "message": "--show reads a named FILE, not stdin",
+            },
+        })
+    );
+    assert!(!fixture.path("out.txt").exists());
 }
 
 /// `--at FILE:LINE:COLUMN` stands for `--at LINE:COLUMN FILE`, read from
@@ -547,19 +566,19 @@ fn a_location_names_its_file_in_at_or_as_the_operand() {
     for (args, message) in [
         (
             &["--show", "--at", "host.ts:2:12", "host.ts"][..],
-            "--at FILE:LINE:COLUMN names the file; omit the FILE operand",
+            "usage.operands: --at FILE:LINE:COLUMN names the file; omit the FILE operand",
         ),
         (
             &["--show", "--at", ":2:12"],
-            "--at expects LINE:COLUMN or FILE:LINE:COLUMN, got :2:12",
+            "usage.invalid_value: --at expects LINE:COLUMN or FILE:LINE:COLUMN, got :2:12",
         ),
         (
             &["--show", "--at", "host.ts:0:12"],
-            "--at expects LINE:COLUMN or FILE:LINE:COLUMN, got host.ts:0:12",
+            "usage.invalid_value: --at expects LINE:COLUMN or FILE:LINE:COLUMN, got host.ts:0:12",
         ),
         (
             &["--show", "--at", "2:12"],
-            "--show --at needs a FILE operand or FILE:LINE:COLUMN",
+            "usage.operands: --show --at needs a FILE operand or FILE:LINE:COLUMN",
         ),
     ] {
         let output = tsparse(&fixture, args);
@@ -604,6 +623,7 @@ fn direct_is_the_project_query_spelling_of_references_direct() {
         "tsconfig.json",
         "--name",
         "run",
+        "--json",
     ];
     let direct = tsparse(&fixture, &[&query[..], &["--direct"]].concat());
     let spelled = tsparse(&fixture, &[&query[..], &["--references-direct"]].concat());
@@ -628,23 +648,6 @@ fn direct_is_the_project_query_spelling_of_references_direct() {
 }
 
 #[test]
-fn help_documents_navigation() {
-    let fixture = fixture();
-    let output = tsparse(&fixture, &["--help"]);
-    let help = text(&output.stdout);
-    for needle in [
-        "tsparse --outline FILE [--depth N|all] [--json [--pretty]] [-o OUTPUT]",
-        "tsparse --show (--name NAME FILE | --at LINE:COLUMN FILE | --at FILE:LINE:COLUMN) [--json [--pretty]] [-o OUTPUT]",
-        "--depth",
-        "ambiguous",
-    ] {
-        assert!(help.contains(needle), "help lacks {needle:?}:\n{help}");
-    }
-    assert!(help.starts_with("tsparse [--pretty] [--tsx] [--check]"));
-    assert!(help.ends_with("Exit codes: 0 success, 1 syntax error, 2 usage or I/O error.\n"));
-}
-
-#[test]
 fn json_outcomes_whose_result_cannot_be_written_exit_2_on_stderr_without_a_document() {
     let fixture = fixture();
     for args in [
@@ -661,7 +664,7 @@ fn json_outcomes_whose_result_cannot_be_written_exit_2_on_stderr_without_a_docum
         assert!(output.stdout.is_empty(), "{args:?}");
         let message = text(&output.stderr);
         assert!(
-            message.starts_with("missing-dir/out.json: "),
+            message.starts_with("write.output: missing-dir/out.json: "),
             "{args:?}: {message}"
         );
         assert_eq!(message.lines().count(), 1, "no second document: {message}");
@@ -807,7 +810,7 @@ fn arguments_that_are_not_unicode_are_usage_errors() {
         assert!(output.stdout.is_empty());
         assert_eq!(
             text(&output.stderr),
-            "Arguments must be Unicode: \u{FFFD}.ts\n"
+            "usage.not_unicode: Arguments must be Unicode: \u{FFFD}.ts\n"
         );
     }
 }
@@ -864,7 +867,7 @@ fn a_working_directory_that_is_not_unicode_is_unsupported_input() {
 fn pinned_outlines_are_the_catalog_s_own_output() {
     // tools/navigation-conformance.test.mjs mutates these entries to prove
     // that the conformance comparison fails on regressions, so they must be
-    // what the tool outputs.
+    // what the tool outputs: every entry, which it asks for with --limit all.
     let fixtures = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/navigation");
     let mut pinned = 0;
     for entry in std::fs::read_dir(&fixtures).unwrap() {
@@ -876,7 +879,15 @@ fn pinned_outlines_are_the_catalog_s_own_output() {
             continue;
         };
         let output = Command::new(env!("CARGO_BIN_EXE_tsparse"))
-            .args(["--outline", "--json", "--depth", "all", source])
+            .args([
+                "--outline",
+                "--json",
+                "--depth",
+                "all",
+                "--limit",
+                "all",
+                source,
+            ])
             .output()
             .unwrap();
         let expected: Value =

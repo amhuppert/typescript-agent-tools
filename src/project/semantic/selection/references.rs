@@ -4,7 +4,9 @@
 use super::super::evaluation::{Evaluator, ReferenceSymbol};
 use super::super::source::ReferenceSite;
 use crate::analysis::{AnalysisError, QueryError, QueryErrorKind};
-use crate::project::binding::{NativeSymbolIdentity, SymbolId};
+use crate::project::binding::{
+    NativeSymbolIdentity, ReferenceTokenFacts, ReferenceTokenRole, ReferenceTokenSource, SymbolId,
+};
 use crate::project::sources::FileId;
 use crate::project::{Project, references};
 use crate::references::{ReferenceBaseline, ReferenceCandidate, ReferenceQuery};
@@ -58,24 +60,13 @@ pub(in crate::project::semantic) fn select(
             let mut identities = HashSet::new();
             for declaration in project.declaration_name_sites(name, only)? {
                 let candidate = declaration.candidate();
-                let input = project.sources.get(declaration.file);
-                let offset = input.text.offset(candidate.anchor).map_err(|_| {
-                    super::super::internal(
-                        "captured reference selector anchor no longer addresses its source",
-                    )
-                })?;
-                let token = project
-                    .bindings
-                    .reference_token_at(declaration.file, offset)
+                let anchor = replay_offset(project, evaluator, declaration.file, candidate.anchor)?
                     .ok_or_else(|| QueryError {
                         kind: QueryErrorKind::UnsupportedTarget,
                         message: "the selected declaration has no reference token role".into(),
-                        path: Some(input.path.clone()),
+                        path: Some(project.sources.get(declaration.file).path.clone()),
                         position: Some(candidate.anchor),
                     })?;
-                let anchor = evaluator
-                    .source()
-                    .reference_selector_anchor(project.bindings.reference_token_facts(token))?;
                 let seed = at(project, evaluator, declaration.file, anchor)?;
                 let identity = identity(project, evaluator, &seed)?;
                 if identities.insert(identity) {
@@ -95,6 +86,73 @@ pub(in crate::project::semantic) fn select(
             }
         }
     }
+}
+
+/// The offset whose position selection (`at`) searches the catalog
+/// declaration anchored at `anchor` in `file`, as a selector naming it does,
+/// or `None` when its name has no reference token. The one owner of that
+/// mapping, for dotted selectors and for the members a bare name leaves
+/// unsearched, which it answers for every suggested member. The token
+/// inventory recorded the answer for those when it captured them: a
+/// member's name selects itself, and a parameter property's name selects
+/// the modifier token captured for it (`parameter_property_reference_anchor`),
+/// so they need no syntax capture per request. Any other declaration, such
+/// as a namespace, whose record denotes its innermost name, is answered from
+/// its syntax (`reference_selector_anchor`).
+pub(in crate::project::semantic) fn replay_offset(
+    project: &Project,
+    evaluator: &mut Evaluator<'_, '_>,
+    file: FileId,
+    anchor: crate::source::SourcePosition,
+) -> Result<Option<usize>, AnalysisError> {
+    let offset = project.sources.get(file).text.offset(anchor).map_err(|_| {
+        super::super::internal("captured reference selector anchor no longer addresses its source")
+    })?;
+    let Some(token) = project.bindings.reference_token_at(file, offset) else {
+        return Ok(None);
+    };
+    let facts = project.bindings.reference_token_facts(token);
+    if let ReferenceTokenSource::Syntax(syntax) = facts.source {
+        match syntax.role {
+            ReferenceTokenRole::MemberName => return Ok(Some(facts.selection_span.start)),
+            ReferenceTokenRole::ParameterName => {
+                let control = evaluator.checker_inputs().control;
+                if let Some(modifier) = captured_modifier(project, control, &facts) {
+                    return Ok(Some(modifier));
+                }
+            }
+            _ => {}
+        }
+    }
+    Ok(Some(evaluator.source().reference_selector_anchor(facts)?))
+}
+
+/// The modifier token the inventory captured for the parameter property
+/// whose name is `name`: keyed by that name, in its file, with that name as
+/// its occurrence. `None` leaves the question to the property's syntax.
+fn captured_modifier(
+    project: &Project,
+    control: Option<&crate::resources::Control>,
+    name: &ReferenceTokenFacts<'_>,
+) -> Option<usize> {
+    let Ok(key) = name.key else {
+        return None;
+    };
+    project
+        .bindings
+        .reference_tokens(key, control)
+        .iter()
+        .map(|token| project.bindings.reference_token_facts(token))
+        .find(|modifier| {
+            modifier.file == name.file
+                && matches!(
+                    modifier.source,
+                    ReferenceTokenSource::Syntax(syntax)
+                        if syntax.role == ReferenceTokenRole::ParameterPropertyModifier
+                            && syntax.occurrence_span == name.selection_span
+                )
+        })
+        .map(|modifier| modifier.selection_span.start)
 }
 
 fn at(
@@ -178,7 +236,9 @@ fn candidate(
     let (file, position, question, declarations) = match selected {
         ReferenceSelected::Lexical(query @ ReferenceQuery::At { file, position }) => {
             let id = project.searched_file(file)?;
-            let result = references::lexical(project, query.clone(), Default::default())?;
+            let selection = references::selection(project, query)?;
+            let result =
+                references::lexical(project, query.clone(), Default::default(), selection)?;
             (
                 id,
                 *position,

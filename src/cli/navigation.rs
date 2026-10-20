@@ -9,8 +9,13 @@
 //! directory joined with the relative file, as file navigation names its
 //! file, so a printed `FILE:LINE:COLUMN` is an operand for `--at` from any
 //! working directory.
+//!
+//! An outline shows at most its cap of the entries `--depth` shows, show
+//! at most its cap of a declaration's lines, from its first, and of an
+//! ambiguous selection's candidates (`super::delivery::Cap`).
 
-use super::delivery::{Delivery, write_document};
+use super::delivery::{Cap, Delivery, Display, write_document};
+use super::registry::{CANDIDATES, ENTRIES, FlagId, LINES};
 use serde_json::{Value, json};
 use std::fmt::Write as _;
 use std::path::{Component, Path, PathBuf};
@@ -30,42 +35,105 @@ impl Default for Depth {
     }
 }
 
-/// An outline result, shown to `depth`.
-pub(crate) fn outline(outline: &Outline, depth: Depth) -> Delivery<'_> {
+/// An outline result, shown to `depth` and to its cap of entries.
+pub(crate) fn outline<'a>(
+    outline: &'a Outline,
+    depth: Depth,
+    display: &'a Display,
+) -> Delivery<'a> {
+    let cap = display.cap(&ENTRIES);
     Delivery {
         code: 0,
         text_is_result: true,
         document: Box::new(move |writer, pretty| {
+            let kept = Kept::new(&outline.entries, depth, cap);
             let mut document = json!({
                 "operation": "outline",
                 "outcome": "ok",
                 "file": outline.file,
-                "entries": nested(&outline.entries, depth),
+                "entries": nested(&outline.entries, depth, &kept.entries),
             });
             project(&mut document, outline.project.as_deref());
+            if let Some(display) = cap.display(kept.total, kept.returned) {
+                document["display"] = display;
+            }
             write_document(writer, &document, pretty)
         }),
         text: Some(Box::new(move || {
-            outline_text(
+            let kept = Kept::new(&outline.entries, depth, cap);
+            let mut text = outline_text(
                 &place(outline.project.as_deref(), &outline.file),
                 &outline.entries,
                 depth,
-            )
+                &kept.entries,
+            );
+            cap.end(&mut text, kept.total, kept.returned, None, None);
+            text
         })),
+    }
+}
+
+/// The entries an outline displays: those `--depth` shows, in source order,
+/// up to its cap.
+struct Kept {
+    /// Whether each entry is displayed.
+    entries: Vec<bool>,
+    /// How many `--depth` shows.
+    total: usize,
+    returned: usize,
+}
+
+impl Kept {
+    fn new(entries: &[Declaration], depth: Depth, cap: Cap) -> Self {
+        let total = entries
+            .iter()
+            .filter(|entry| shown(depth, entry.depth))
+            .count();
+        let returned = cap.shown(total);
+        let mut rank = 0;
+        let entries = entries
+            .iter()
+            .map(|entry| {
+                let kept = shown(depth, entry.depth) && rank < returned;
+                rank += usize::from(shown(depth, entry.depth));
+                kept
+            })
+            .collect();
+        Self {
+            entries,
+            total,
+            returned,
+        }
     }
 }
 
 /// A show result: a found declaration exits 0, and an ambiguous or missing
 /// selection exits 1.
-pub(crate) fn show(show: &navigation::Show) -> Delivery<'_> {
+pub(crate) fn show<'a>(show: &'a navigation::Show, display: &'a Display) -> Delivery<'a> {
     Delivery {
         text_is_result: matches!(show.outcome, ShowOutcome::Found(_)),
         code: match show.outcome {
             ShowOutcome::Found(_) => 0,
             ShowOutcome::Ambiguous(_) | ShowOutcome::NotFound => super::delivery::UNSELECTED,
         },
-        document: Box::new(move |writer, pretty| write_document(writer, &show_json(show), pretty)),
-        text: Some(Box::new(move || show_text(show))),
+        document: Box::new(move |writer, pretty| {
+            write_document(writer, &show_json(show, display), pretty)
+        }),
+        text: Some(Box::new(move || show_text(show, display))),
+    }
+}
+
+/// The first `lines` lines of `found`'s source, as the library splits them
+/// (`Found::lines`), without the line break after the last.
+fn excerpt(found: &navigation::Found, lines: usize) -> &str {
+    let source = found.source.as_str();
+    match found.lines().nth(lines.saturating_sub(1)) {
+        // Each line is a slice of the source, so its end is an offset in it.
+        Some((_, line)) => {
+            let end = line.as_ptr() as usize - source.as_ptr() as usize + line.len();
+            &source[..end]
+        }
+        None => source,
     }
 }
 
@@ -98,7 +166,9 @@ pub(crate) fn place(project: Option<&Path>, file: &str) -> String {
     path.display().to_string()
 }
 
-pub(crate) fn show_json(show: &navigation::Show) -> Value {
+/// A show result's document, with at most its cap of the declaration's
+/// lines or of the candidates.
+pub(crate) fn show_json(show: &navigation::Show, display: &Display) -> Value {
     let mut document = json!({ "operation": "show" });
     project(&mut document, show.project.as_deref());
     // The searched file; absent when a name searched every file.
@@ -109,16 +179,24 @@ pub(crate) fn show_json(show: &navigation::Show) -> Value {
     };
     match &show.outcome {
         ShowOutcome::Found(found) => {
+            let cap = display.cap(&LINES);
+            let total = found.lines().count();
+            let returned = cap.shown(total);
             document["outcome"] = json!("found");
             document["file"] = json!(found.file);
             document["declaration"] = declaration(&found.declaration);
-            document["source"] = json!(found.source);
+            document["source"] = json!(excerpt(found, returned));
+            if let Some(display) = cap.display(total, returned) {
+                document["display"] = display;
+            }
         }
         ShowOutcome::Ambiguous(candidates) => {
+            let cap = display.cap(&CANDIDATES);
+            let returned = cap.shown(candidates.len());
             document["outcome"] = json!("ambiguous");
             scope(&mut document);
             document["query"] = json!(show.query);
-            let list: Vec<Value> = candidates
+            let list: Vec<Value> = candidates[..returned]
                 .iter()
                 .map(|candidate| {
                     let mut value = json!({
@@ -133,6 +211,9 @@ pub(crate) fn show_json(show: &navigation::Show) -> Value {
                 })
                 .collect();
             document["candidates"] = list.into();
+            if let Some(display) = cap.display(candidates.len(), returned) {
+                document["display"] = display;
+            }
         }
         ShowOutcome::NotFound => {
             document["outcome"] = json!("not_found");
@@ -143,10 +224,15 @@ pub(crate) fn show_json(show: &navigation::Show) -> Value {
     document
 }
 
-pub(crate) fn show_text(show: &navigation::Show) -> String {
+/// A show result's text, with at most its cap of the declaration's lines,
+/// numbered as the whole declaration is, or of the candidates.
+pub(crate) fn show_text(show: &navigation::Show, display: &Display) -> String {
     let place = |file: &str| place(show.project.as_deref(), file);
     match &show.outcome {
         ShowOutcome::Found(found) => {
+            let cap = display.cap(&LINES);
+            let total = found.lines().count();
+            let returned = cap.shown(total);
             let width = found.lines().last().map_or(1, |(line, _)| digits(line));
             let anchor = found.declaration.anchor;
             let mut text = format!(
@@ -157,20 +243,24 @@ pub(crate) fn show_text(show: &navigation::Show) -> String {
                 found.declaration.kind,
                 found.declaration.label
             );
-            for (line, source) in found.lines() {
+            for (line, source) in found.lines().take(returned) {
                 let _ = write!(text, "\n{line:>width$} |");
                 if !source.is_empty() {
                     let _ = write!(text, " {source}");
                 }
             }
+            cap.end(&mut text, total, returned, None, None);
             text
         }
         ShowOutcome::Ambiguous(candidates) => {
+            let cap = display.cap(&CANDIDATES);
+            let returned = cap.shown(candidates.len());
             let mut text = match &show.query {
                 Selector::Name(name) => format!(
-                    "{}: `{name}` matches {} declarations; select one with --at FILE:LINE:COLUMN",
+                    "{}: `{name}` matches {} declarations; select one with {} FILE:LINE:COLUMN",
                     scope(show),
-                    candidates.len()
+                    candidates.len(),
+                    FlagId::At
                 ),
                 Selector::At(at) => format!(
                     "{}:{}:{}: {} declarations are named or anchored at this position",
@@ -182,7 +272,7 @@ pub(crate) fn show_text(show: &navigation::Show) -> String {
             };
             // Each candidate's location is an `--at` operand; its selector,
             // when it has one, shows its containment.
-            for candidate in candidates {
+            for candidate in &candidates[..returned] {
                 let _ = write!(
                     text,
                     "\n{}:{}:{} {} {}",
@@ -196,6 +286,7 @@ pub(crate) fn show_text(show: &navigation::Show) -> String {
                     let _ = write!(text, " ({selector})");
                 }
             }
+            cap.end(&mut text, candidates.len(), returned, None, None);
             text
         }
         ShowOutcome::NotFound => match &show.query {
@@ -270,15 +361,17 @@ fn shown(depth: Depth, level: usize) -> bool {
     }
 }
 
-/// Entries nested under `children`, built bottom-up without recursion. An
-/// entry at the display limit reports its `omitted_children`.
-fn nested(entries: &[Declaration], depth: Depth) -> Value {
+/// The `kept` entries nested under `children`, built bottom-up without
+/// recursion. An entry at the display limit reports its `omitted_children`;
+/// those its cap withholds are counted in `display`. Every kept entry's
+/// parent is kept, as the cap keeps a prefix of the entries in source order.
+fn nested(entries: &[Declaration], depth: Depth, kept: &[bool]) -> Value {
     let (parents, counts) = structure(entries);
     let mut lists: Vec<Vec<Value>> = vec![Vec::new(); entries.len()];
     let mut roots = Vec::new();
     for index in (0..entries.len()).rev() {
         let entry = &entries[index];
-        if !shown(depth, entry.depth) {
+        if !kept[index] {
             continue;
         }
         let mut value = declaration(entry);
@@ -312,8 +405,12 @@ const IMPORT_NAMES: usize = 8;
 /// and take one line, at the first name's anchor, which `--at` selects,
 /// listing their labels: `1:8 import def, alias, Only`. A declaration with
 /// more than `IMPORT_NAMES` names lists that many and counts the rest. This
-/// is presentation only; the entries and JSON keep one per name.
-fn outline_text(file: &str, entries: &[Declaration], depth: Depth) -> String {
+/// is presentation only; the entries and JSON keep one per name. Only the
+/// `kept` entries are shown: where the cap ends inside an import
+/// declaration, its line lists the names before the cut and counts the
+/// declaration's others, as it counts those past the eighth, so it never
+/// reads as the whole declaration.
+fn outline_text(file: &str, entries: &[Declaration], depth: Depth, kept: &[bool]) -> String {
     let (_, counts) = structure(entries);
     let mut text = file.to_owned();
     let mut index = 0;
@@ -327,10 +424,15 @@ fn outline_text(file: &str, entries: &[Declaration], depth: Depth) -> String {
         } else {
             1
         };
-        let group = &entries[index..index + declaration];
         let at = index;
+        let group = &entries[index..index + declaration];
+        // The cap keeps a prefix of the entries, so a prefix of the group.
+        let displayed = kept[index..index + declaration]
+            .iter()
+            .take_while(|&&kept| kept)
+            .count();
         index += declaration;
-        if !shown(depth, entry.depth) {
+        if displayed == 0 {
             continue;
         }
         let indent = "  ".repeat(entry.depth - 1);
@@ -342,14 +444,15 @@ fn outline_text(file: &str, entries: &[Declaration], depth: Depth) -> String {
         if let [entry] = group {
             text.push_str(entry.signature.as_deref().unwrap_or(&entry.label));
         } else {
-            for (position, name) in group.iter().take(IMPORT_NAMES).enumerate() {
+            let listed = displayed.min(IMPORT_NAMES);
+            for (position, name) in group[..listed].iter().enumerate() {
                 if position > 0 {
                     text.push_str(", ");
                 }
                 text.push_str(&name.label);
             }
-            if group.len() > IMPORT_NAMES {
-                let _ = write!(text, ", … {} more", group.len() - IMPORT_NAMES);
+            if group.len() > listed {
+                let _ = write!(text, ", … {} more", group.len() - listed);
             }
         }
         let omitted = counts[at];

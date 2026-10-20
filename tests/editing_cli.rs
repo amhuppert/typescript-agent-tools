@@ -4,7 +4,7 @@
 //! entry agreeing. Which edits are valid is covered by `editing.rs`.
 mod support;
 
-use serde_json::Value;
+use serde_json::{Value, json};
 use std::io::Write as _;
 use std::process::{Command, Output, Stdio};
 use support::Fixture;
@@ -44,6 +44,27 @@ fn json(output: &Output, code: i32) -> Value {
     assert_eq!(output.status.code(), Some(code), "{output:?}");
     assert!(output.stderr.is_empty(), "{}", text(&output.stderr));
     serde_json::from_slice(&output.stdout).unwrap()
+}
+
+/// The message of a refused output path (`usage.output`), exit 2: with
+/// `--json` one document on stdout and nothing on stderr, and in text
+/// `usage.output: message` on stderr and nothing on stdout.
+fn refusal(output: &Output, json: bool) -> String {
+    assert_eq!(output.status.code(), Some(2), "{output:?}");
+    if json {
+        let document = self::json(output, 2);
+        assert_eq!(document["outcome"], "error", "{document}");
+        assert_eq!(document["error"]["code"], "usage.output", "{document}");
+        document["error"]["message"].as_str().unwrap().to_string()
+    } else {
+        assert!(output.stdout.is_empty(), "{output:?}");
+        let stderr = text(&output.stderr);
+        stderr
+            .strip_prefix("usage.output: ")
+            .and_then(|message| message.strip_suffix('\n'))
+            .unwrap_or_else(|| panic!("{stderr}"))
+            .to_string()
+    }
 }
 
 fn host(fixture: &Fixture) -> String {
@@ -296,7 +317,7 @@ fn invalid_requests_are_usage_errors() {
                 "body.ts",
                 "host.ts",
             ],
-            "Choose one of",
+            "Choose one operation: --replace-body, --insert-after",
         ),
         (
             &["--apply", "p.json", "--project", "tsconfig.json"],
@@ -304,7 +325,7 @@ fn invalid_requests_are_usage_errors() {
         ),
         (
             &["--show", "--name", "x", "host.ts", "--plan", "p.json"],
-            "--from and --plan apply",
+            "--plan applies to: --replace-body, --insert-after, --edit-batch",
         ),
         (
             &[
@@ -370,7 +391,7 @@ fn a_result_that_cannot_be_written_after_applying_still_reports_the_effect() {
     // The write failure, then the effect, on stderr.
     let stderr = text(&output.stderr);
     assert!(
-        stderr.starts_with("the result could not be written: out/result.json: "),
+        stderr.starts_with("write.output: the result could not be written: out/result.json: "),
         "{stderr}"
     );
     assert!(
@@ -414,6 +435,70 @@ fn plans_that_cannot_be_used_name_why() {
     assert_eq!(host(&fixture), HOST);
 }
 
+/// A plan that does not decode as a plan names the help that says what a
+/// plan is, in text and as a document, and with `-o`; a plan that cannot
+/// be read, or that another build saved, names no help, which could not
+/// fix it.
+#[test]
+fn a_plan_that_is_not_a_plan_names_the_help_that_says_what_one_is() {
+    let fixture = fixture();
+    std::fs::write(fixture.path("edits.json"), r#"{"edits": []}"#).unwrap();
+    // The cause the library reports for a document that is not a plan.
+    let output = tsparse(&fixture, &["--apply", "edits.json", "--json"]);
+    let document = json(&output, 2);
+    let message = document["error"]["message"].as_str().unwrap().to_string();
+    assert!(message.starts_with("not an edit plan: "), "{message}");
+    assert_eq!(
+        document,
+        json!({
+            "operation": "apply",
+            "outcome": "error",
+            "effect": "unchanged",
+            "error": {
+                "kind": "Malformed",
+                "message": message,
+                "path": "edits.json",
+                "next": {"argv": ["tsparse", "--apply", "PLAN", "--help"]},
+            },
+        })
+    );
+    let output = tsparse(&fixture, &["--apply", "edits.json"]);
+    assert_eq!(output.status.code(), Some(2), "{output:?}");
+    assert!(output.stdout.is_empty(), "{output:?}");
+    assert_eq!(
+        text(&output.stderr),
+        format!("edits.json: {message}\n  next: tsparse --apply PLAN --help\n")
+    );
+    for format in [&[][..], &["--json"]] {
+        let args = [&["--apply", "edits.json", "-o", "out.json"][..], format].concat();
+        let output = tsparse(&fixture, &args);
+        assert_eq!(output.status.code(), Some(2), "{args:?}: {output:?}");
+        assert!(output.stdout.is_empty(), "{args:?}: {output:?}");
+        assert_eq!(
+            text(&output.stderr),
+            format!(
+                "edits.json: {message}\nthe result is not written to out.json: the plan's file names cannot be read, so it could be one of them\n  next: tsparse --apply PLAN --help\n"
+            ),
+            "{args:?}"
+        );
+        assert!(!fixture.path("out.json").exists(), "{args:?}");
+    }
+    // Following it: the help says a plan is what --plan saved.
+    let output = tsparse(&fixture, &["--apply", "PLAN", "--help"]);
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    assert!(
+        text(&output.stdout).contains("Writes exactly the bytes --plan saved"),
+        "{output:?}"
+    );
+    // Help could not fix a plan that cannot be read.
+    let output = tsparse(&fixture, &["--apply", "missing.json"]);
+    assert_eq!(output.status.code(), Some(2), "{output:?}");
+    assert_eq!(
+        text(&output.stderr),
+        format!("missing.json: {}\n", std::io::Error::from_raw_os_error(2))
+    );
+}
+
 #[test]
 fn a_batch_file_prepares_every_edit_against_the_originals() {
     let fixture = fixture();
@@ -444,7 +529,10 @@ fn a_batch_file_prepares_every_edit_against_the_originals() {
     .unwrap();
     let output = tsparse(&fixture, &["--edit-batch", "bad-batch.json"]);
     assert_eq!(output.status.code(), Some(2), "{output:?}");
-    assert!(text(&output.stderr).contains("edit 1: give exactly one of name and at"));
+    assert_eq!(
+        text(&output.stderr),
+        "input.batch: bad-batch.json: 1 edit is invalid\n  edits[0]: give exactly one of name and at\n  edits[0].at: LINE:COLUMN needs file, or give FILE:LINE:COLUMN\n  next: tsparse --edit-batch EDITS --help\n"
+    );
 }
 
 #[test]
@@ -508,9 +596,16 @@ fn project_edits_agree_through_the_service_and_directly() {
         Some(true)
     );
     assert_eq!(direct["files"][0]["file"], "src/host.ts");
+    // Both name the saved plan and the command that applies it alike.
+    let direct = json(&run(&["--direct", "--plan", "p.json"]), 0);
+    std::fs::remove_file(service.fixture.path("p.json")).unwrap();
+    let through_service = json(&run(&["--plan", "p.json"]), 0);
+    assert_eq!(direct, through_service);
+    assert_eq!(
+        through_service["next"],
+        json!({"argv": ["tsparse", "--apply", "p.json"]})
+    );
     // Through the service, a plan applies locally.
-    let output = run(&["--plan", "p.json"]);
-    assert_eq!(output.status.code(), Some(0), "{output:?}");
     let output = service
         .command()
         .args(["--apply", "p.json"])
@@ -615,11 +710,10 @@ fn results_and_plans_are_new_files_so_no_outcome_replaces_a_file() {
         outputs.push(preview(&["-o", "to-new.json"]));
     }
     for output in outputs {
-        assert_eq!(output.status.code(), Some(2), "{output:?}");
-        let stderr = text(&output.stderr);
+        let message = refusal(&output, true);
         assert!(
-            stderr.contains("already exists") || stderr.contains("name one file"),
-            "{stderr}"
+            message.contains("already exists") || message.contains("name one file"),
+            "{message}"
         );
     }
     assert_eq!(host(&fixture), HOST);
@@ -919,10 +1013,10 @@ fn an_output_never_creates_a_file_the_request_or_plan_names() {
     ];
     for (args, absent) in refused {
         let output = run(&fixture, &args);
-        assert_eq!(output.status.code(), Some(2), "{args:?}: {output:?}");
+        let message = refusal(&output, args.iter().any(|arg| arg == "--json"));
         assert!(
-            text(&output.stderr).contains("names a file the command reads or edits"),
-            "{args:?}: {output:?}"
+            message.contains("names a file the command reads or edits"),
+            "{args:?}: {message}"
         );
         assert!(!fixture.path(absent).exists(), "{args:?}");
     }
@@ -1028,8 +1122,223 @@ fn a_preview_whose_result_cannot_be_written_says_its_plan_was_saved() {
     assert_eq!(output.status.code(), Some(2), "{output:?}");
     assert!(fixture.path("p.json").exists());
     let stderr = text(&output.stderr);
-    assert!(stderr.starts_with("missing/out.json: "), "{stderr}");
-    assert!(stderr.contains("the plan was saved to p.json"), "{stderr}");
+    assert_eq!(
+        stderr,
+        "write.output: missing/out.json: No such file or directory (os error 2); the plan was saved to p.json\n  next: tsparse --apply p.json\n"
+    );
+}
+
+/// Plan names a shell reads specially, each with the word that names it
+/// exactly: a space, a quote, an expansion, a command separator, a
+/// character outside ASCII, and a leading `-`, which reads as an option.
+const SHELL_NAMES: [(&str, &str); 6] = [
+    ("my plan.json", "'my plan.json'"),
+    ("it's.json", r"'it'\''s.json'"),
+    ("$plan.json", "'$plan.json'"),
+    ("a;b.json", "'a;b.json'"),
+    ("é.json", "'é.json'"),
+    ("-plan.json", "'-plan.json'"),
+];
+
+/// `PATH` with this build's `tsparse` first, so a printed command runs it.
+fn path_with_build() -> std::ffi::OsString {
+    let build = std::path::Path::new(env!("CARGO_BIN_EXE_tsparse"))
+        .parent()
+        .unwrap()
+        .to_path_buf();
+    let path = std::env::var_os("PATH").unwrap();
+    std::env::join_paths(std::iter::once(build).chain(std::env::split_paths(&path))).unwrap()
+}
+
+/// `command` as a POSIX shell runs it in the fixture.
+fn shell(fixture: &Fixture, command: &str) -> Output {
+    Command::new("sh")
+        .args(["-c", command])
+        .current_dir(&fixture.root)
+        .env("PATH", path_with_build())
+        .stdin(Stdio::null())
+        .output()
+        .unwrap()
+}
+
+/// Assert that `output` applied the plan replacing `start`'s body.
+fn applied(fixture: &Fixture, output: &Output) {
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    assert_eq!(
+        text(&output.stdout),
+        format!("applied: {} changed\n", fixture.path("host.ts").display())
+    );
+    assert_eq!(host(fixture), REPLACED);
+}
+
+/// The command on the last line of `text`, which must be `line`: after
+/// `apply it with: ` in a preview, or `  next: ` in a failure.
+fn printed_command<'a>(text: &'a str, line: &str) -> &'a str {
+    assert!(text.ends_with('\n'), "{text}");
+    let last = text.lines().last();
+    assert_eq!(last, Some(line), "{text}");
+    let last = last.unwrap();
+    match last.split_once("apply it with: ") {
+        Some((_, command)) => command,
+        None => last.strip_prefix("  next: ").unwrap(),
+    }
+}
+
+/// Run a document's `next.argv` exactly, with this build first on `PATH`.
+fn follow_next(fixture: &Fixture, document: &Value) -> Output {
+    let argv: Vec<&str> = document["next"]["argv"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|arg| arg.as_str().unwrap())
+        .collect();
+    Command::new(argv[0])
+        .args(&argv[1..])
+        .current_dir(&fixture.root)
+        .env("PATH", path_with_build())
+        .stdin(Stdio::null())
+        .output()
+        .unwrap()
+}
+
+#[cfg(unix)]
+#[test]
+fn every_printed_apply_command_applies_its_plan_as_printed() {
+    for (plan, word) in SHELL_NAMES {
+        let command = format!("tsparse --apply {word}");
+        let prepare = |fixture: &Fixture, extra: &[&str]| {
+            let mut args = vec![
+                "--replace-body",
+                "--name",
+                "start",
+                "--from",
+                "body.ts",
+                "host.ts",
+                "--plan",
+                plan,
+            ];
+            args.extend_from_slice(extra);
+            tsparse(fixture, &args)
+        };
+
+        // The text preview's last line, on stdout and in `-o`, run by a
+        // shell.
+        for extra in [&[][..], &["-o", "preview.txt"]] {
+            let preview = fixture();
+            let output = prepare(&preview, extra);
+            assert_eq!(output.status.code(), Some(0), "{output:?}");
+            assert!(output.stderr.is_empty(), "{output:?}");
+            let result = match extra {
+                [] => text(&output.stdout),
+                _ => {
+                    assert!(output.stdout.is_empty(), "{output:?}");
+                    std::fs::read_to_string(preview.path("preview.txt")).unwrap()
+                }
+            };
+            let printed =
+                printed_command(&result, &format!("plan: {plan}; apply it with: {command}"));
+            applied(&preview, &shell(&preview, printed));
+        }
+
+        // The JSON preview's `next`, on stdout and in `-o`, run as its
+        // argument list.
+        for extra in [&["--json"][..], &["--json", "-o", "preview.json"]] {
+            let document = fixture();
+            let output = prepare(&document, extra);
+            let value: Value = match extra {
+                [_] => json(&output, 0),
+                _ => {
+                    assert_eq!(output.status.code(), Some(0), "{output:?}");
+                    assert!(output.stdout.is_empty() && output.stderr.is_empty());
+                    let result = std::fs::read(document.path("preview.json")).unwrap();
+                    serde_json::from_slice(&result).unwrap()
+                }
+            };
+            assert_eq!(value["plan"], plan);
+            assert_eq!(
+                value["next"],
+                json!({"argv": ["tsparse", "--apply", plan]}),
+                "{value}"
+            );
+            applied(&document, &follow_next(&document, &value));
+        }
+
+        // A preview that cannot be written, as text or JSON, names the
+        // saved plan's command.
+        for extra in [
+            &["-o", "missing/out.txt"][..],
+            &["--json", "-o", "missing/out.json"],
+        ] {
+            let unwritten = fixture();
+            let output = prepare(&unwritten, extra);
+            assert_eq!(output.status.code(), Some(2), "{output:?}");
+            assert!(output.stdout.is_empty());
+            let stderr = text(&output.stderr);
+            assert!(
+                stderr.starts_with("write.output: missing/out.")
+                    && stderr.contains(&format!("; the plan was saved to {plan}\n")),
+                "{stderr}"
+            );
+            let printed = printed_command(&stderr, &format!("  next: {command}"));
+            applied(&unwritten, &shell(&unwritten, printed));
+        }
+    }
+
+    // A preview without a plan names no command.
+    let fixture = fixture();
+    let value = json(
+        &tsparse(
+            &fixture,
+            &[
+                "--replace-body",
+                "--name",
+                "start",
+                "--from",
+                "body.ts",
+                "host.ts",
+                "--json",
+            ],
+        ),
+        0,
+    );
+    assert_eq!(value["plan"], Value::Null);
+    assert_eq!(value.get("next"), None, "{value}");
+}
+
+/// A plan path that is not Unicode cannot be named exactly, so it is
+/// refused before anything is prepared or saved, and never printed in a
+/// command; the message alone shows its lossy form.
+#[cfg(unix)]
+#[test]
+fn a_plan_path_that_is_not_unicode_is_a_usage_error_and_saves_nothing() {
+    use std::os::unix::ffi::OsStrExt;
+    let fixture = fixture();
+    for format in [&[][..], &["--json"]] {
+        let output = Command::new(env!("CARGO_BIN_EXE_tsparse"))
+            .args([
+                "--replace-body",
+                "--name",
+                "start",
+                "--from",
+                "body.ts",
+                "host.ts",
+                "--plan",
+            ])
+            .arg(std::ffi::OsStr::from_bytes(b"\xff.json"))
+            .args(format)
+            .current_dir(&fixture.root)
+            .stdin(Stdio::null())
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(2), "{output:?}");
+        assert!(output.stdout.is_empty());
+        assert_eq!(
+            text(&output.stderr),
+            "usage.not_unicode: Arguments must be Unicode: \u{FFFD}.json\n"
+        );
+    }
+    assert_eq!(std::fs::read_dir(&fixture.root).unwrap().count(), 4);
+    assert_eq!(host(&fixture), HOST);
 }
 
 /// In a directory whose new files cannot be removed, checking an output
@@ -1104,8 +1413,7 @@ fn outputs_are_checked_in_a_directory_whose_new_files_cannot_be_removed() {
         }
     }
     let [reserved, broken, preview, stale] = runs;
-    assert_eq!(reserved.status.code(), Some(2), "{reserved:?}");
-    assert!(text(&reserved.stderr).contains("names a file the command reads or edits"));
+    assert!(refusal(&reserved, true).contains("names a file the command reads or edits"));
     assert_eq!(broken.status.code(), Some(2), "{broken:?}");
     assert!(text(&broken.stderr).contains("the plan's file names cannot be read"));
     assert!(!fixture.path("host.ts").exists());
@@ -1167,19 +1475,17 @@ fn an_output_that_cannot_be_removed_after_checking_is_reported_as_left() {
         &["--apply", "change.json", "--json", "-o", "host.ts"],
     );
     flags("nouappnd");
-    assert_eq!(reserved.status.code(), Some(2), "{reserved:?}");
-    let stderr = text(&reserved.stderr);
+    let message = refusal(&reserved, true);
     assert!(
-        stderr.contains("is left there, empty")
-            && stderr.contains(&format!("(it names {})", fixture.path("host.ts").display())),
-        "{stderr}"
+        message.contains("is left there, empty")
+            && message.contains(&format!("(it names {})", fixture.path("host.ts").display())),
+        "{message}"
     );
     assert_eq!(std::fs::read(fixture.path("host.ts")).unwrap(), b"");
-    assert_eq!(distinct.status.code(), Some(2), "{distinct:?}");
-    let stderr = text(&distinct.stderr);
+    let message = refusal(&distinct, true);
     assert!(
-        stderr.contains("is left there, empty") && !stderr.contains("it names"),
-        "{stderr}"
+        message.contains("is left there, empty") && !message.contains("it names"),
+        "{message}"
     );
     assert_eq!(std::fs::read(fixture.path("out.json")).unwrap(), b"");
 }
@@ -1214,14 +1520,13 @@ fn a_reserved_name_that_cannot_be_looked_up_is_named() {
         &["--apply", "locked.json", "--json", "-o", "result.json"],
     );
     mode(0o755);
-    assert_eq!(locked.status.code(), Some(2), "{locked:?}");
-    let stderr = text(&locked.stderr);
+    let message = refusal(&locked, true);
     assert!(
-        stderr.contains(&format!(
+        message.contains(&format!(
             "cannot look up {}",
             fixture.path("locked/a.ts").display()
         )),
-        "{stderr}"
+        "{message}"
     );
     assert!(!fixture.path("result.json").exists());
 }

@@ -225,7 +225,7 @@ fn read_regular(path: &Path) -> Regular {
     }
     // Opening without waiting, and checking what was opened, also declines
     // a file replaced by a pipe in between.
-    let mut file = match open_without_waiting(path) {
+    let mut file = match crate::nonblocking::open_without_waiting(path) {
         Ok(file) => file,
         Err(error) => return declined(error),
     };
@@ -239,55 +239,6 @@ fn read_regular(path: &Path) -> Regular {
         Ok(_) => Regular::Read(bytes),
         Err(error) => declined(error),
     }
-}
-
-/// `O_NONBLOCK` where this build knows its value; reading a regular file
-/// ignores it.
-#[cfg(any(target_os = "macos", target_os = "ios", target_os = "freebsd"))]
-pub(super) const NONBLOCK: Option<i32> = Some(0x0004);
-#[cfg(all(
-    any(target_os = "linux", target_os = "android"),
-    any(
-        target_arch = "x86",
-        target_arch = "x86_64",
-        target_arch = "arm",
-        target_arch = "aarch64",
-        target_arch = "riscv64"
-    )
-))]
-pub(super) const NONBLOCK: Option<i32> = Some(0o4000);
-/// Elsewhere only the check before opening declines a pipe.
-#[cfg(not(any(
-    target_os = "macos",
-    target_os = "ios",
-    target_os = "freebsd",
-    all(
-        any(target_os = "linux", target_os = "android"),
-        any(
-            target_arch = "x86",
-            target_arch = "x86_64",
-            target_arch = "arm",
-            target_arch = "aarch64",
-            target_arch = "riscv64"
-        )
-    )
-)))]
-pub(super) const NONBLOCK: Option<i32> = None;
-
-#[cfg(unix)]
-fn open_without_waiting(path: &Path) -> io::Result<std::fs::File> {
-    use std::os::unix::fs::OpenOptionsExt;
-    let mut options = std::fs::OpenOptions::new();
-    options.read(true);
-    if let Some(flag) = NONBLOCK {
-        options.custom_flags(flag);
-    }
-    options.open(path)
-}
-
-#[cfg(not(unix))]
-fn open_without_waiting(path: &Path) -> io::Result<std::fs::File> {
-    std::fs::File::open(path)
 }
 
 /// What `first_decisive`'s `decide` made of one item.
@@ -869,7 +820,7 @@ mod tests {
         use std::os::unix::fs::OpenOptionsExt;
         let _ = std::fs::OpenOptions::new()
             .write(true)
-            .custom_flags(super::NONBLOCK.expect("a test platform's O_NONBLOCK"))
+            .custom_flags(crate::nonblocking::NONBLOCK.expect("a test platform's O_NONBLOCK"))
             .open(path);
     }
 

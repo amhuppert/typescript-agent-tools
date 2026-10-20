@@ -11,7 +11,8 @@
 // than JSON modules, of a `list_configured_program` listing (see
 // tools/program-inputs.mjs), or LIST, one path per line, relative to the
 // configuration's directory. Each file's file-mode outline (`--outline
-// --json --depth all`) gives its entries. A name matches every entry whose
+// --json --depth all --limit all`, every entry where the default shows 200)
+// gives its entries. A name matches every entry whose
 // key's last segment it is (a namespace's key is its dotted chain). The
 // measured declarations are the top-level entries with a key, other than
 // imports and exports, whose signature begins with `export`, and whose name
@@ -67,7 +68,7 @@ export function runSelection({ tsparse, config, files, sample = 0 }) {
   const outlines = [];
   const failures = [];
   for (const file of files) {
-    const result = spawnSync(tsparse, ['--outline', '--json', '--depth', 'all', file], { cwd: root, encoding: 'utf8', maxBuffer: 1 << 30 });
+    const result = spawnSync(tsparse, ['--outline', '--json', '--depth', 'all', '--limit', 'all', file], { cwd: root, encoding: 'utf8', maxBuffer: 1 << 30 });
     if (result.error) throw result.error;
     const document = JSON.parse(result.stdout);
     if (document.outcome !== 'ok') { failures.push({ file, what: 'outline failed', detail: document.error }); continue; }

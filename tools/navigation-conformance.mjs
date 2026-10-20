@@ -1,5 +1,6 @@
-// Compare `tsparse --outline --json --depth all` with TypeScript 7.0.2's
-// document symbols (tools/navigation-oracle.mjs) for TypeScript files.
+// Compare `tsparse --outline --json --depth all --limit all` with TypeScript
+// 7.0.2's document symbols (tools/navigation-oracle.mjs) for TypeScript
+// files; `--limit all` asks for every entry, where the default shows 200.
 //
 //   TYPE_SCRIPT_NATIVE=/path/to/typescript-<platform>-7.0.2/package/lib/tsc \
 //   TYPE_SCRIPT_API=/path/to/typescript-6.0.3/package/lib/typescript.js \
@@ -355,7 +356,7 @@ function collect(target, files) {
 }
 
 export function toolOutline(tsparse, file) {
-  const result = spawnSync(tsparse, ['--outline', '--json', '--depth', 'all', file], {
+  const result = spawnSync(tsparse, ['--outline', '--json', '--depth', 'all', '--limit', 'all', file], {
     encoding: 'utf8', maxBuffer: 1 << 30, timeout: 120_000,
   });
   if (result.error) throw result.error;

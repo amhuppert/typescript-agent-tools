@@ -22,7 +22,10 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
 /// Selects reference groups by token position or by exact declared name.
+/// A result echoes it as its `selection`, tagged `at` or `name`, with its
+/// file named as [`Location::file`] names files.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum ReferenceQuery {
     /// The identifier token containing `position` in `file`.
     At {
@@ -35,11 +38,17 @@ pub enum ReferenceQuery {
 }
 
 /// Reporting filters; selection, loading and declaration origins are unaffected.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ReferenceFilters {
     pub calls: bool,
     pub exclude_tests: bool,
+    /// Keep only occurrences in this searched file. A request names it as a
+    /// query path names a file (`FileLookup::find`), and an absent or
+    /// unsearched file fails the query as `OutsideProject`; a result echoes
+    /// it as [`Location::file`] names it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub file: Option<PathBuf>,
 }
 
 /// A reference query with explicit reporting filters.
@@ -62,6 +71,7 @@ pub enum ReferenceAnswer {
 pub struct ReferenceSelection {
     pub operation: ReferenceOperation,
     pub project: PathBuf,
+    /// As [`ReferenceResult::selection`] echoes it.
     pub selection: ReferenceQuery,
     #[serde(flatten)]
     pub outcome: ReferenceSelectionFailure,
@@ -93,6 +103,9 @@ pub struct ReferenceResult {
     /// The selected configuration file, in the canonical form of its
     /// directory, which every `Location::file` is relative to.
     pub project: PathBuf,
+    /// The request's selection, its file named as `Location::file` names
+    /// files, so the echo is the same from any working directory.
+    pub selection: ReferenceQuery,
     /// Separate symbols, ordered by their earliest declaration.
     pub groups: Vec<ReferenceGroup>,
     pub filters: ReferenceFilters,
@@ -173,6 +186,14 @@ pub struct MemberSuggestion {
     /// Q2's declaration anchor. A parameter-property name addresses its
     /// lexical parameter; a semantic member modifier anchor is a separate role.
     pub anchor: ReferenceAnchor,
+    /// The position whose reference query (`ReferenceQuery::At`) searches
+    /// this member, as a dotted selector naming it alone would: the anchor,
+    /// or a parameter property's first property-producing modifier. Present
+    /// in `Project::references` answers, which select semantically;
+    /// `Project::find_references` makes no semantic request and leaves it
+    /// out, as it does for a member whose name has no reference token.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub search: Option<ReferenceAnchor>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

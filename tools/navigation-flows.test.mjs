@@ -55,13 +55,16 @@ test('built tsparse: navigation flows and name selection hold on a small project
   const { root, config } = project(t);
   const report = runFlows({
     tsparse, config, files: ['src/a.ts', 'src/b.ts', 'src/d.ts'], directSample: 3,
-    requests: ['--references --name run', '--show --name run', '--outline src/b.ts'],
+    requests: ['--references --name run --json', '--show --name run', '--outline src/b.ts'],
   });
   assert.deepEqual(report.failures, []);
   assert.equal(report.summary.files, 3);
   assert.ok(report.summary.ambiguous > 0 && report.summary.found > 0, JSON.stringify(report.summary));
   assert.equal(report.summary.directCompared, 6);
   assert.deepEqual(report.requests.map(request => request.status), [0, 1, 0]);
+  // The reference document's groups: `run` and its overload, imported and
+  // called in b.ts, and `Tools.run`.
+  assert.deepEqual(report.requests[0].groups, [[2, 4], [1, 1]]);
 
   // `unique` and `helper` are imported elsewhere without renaming, and
   // `Tools` is declared once; `run` and `shared` are declared twice.
@@ -77,7 +80,7 @@ test('built tsparse: a direct answer that differs from the service\'s fails the 
   fs.writeFileSync(wrapper, `#!/bin/sh\ncase " $* " in *" --direct "*) "${tsparse}" "$@"; status=$?; echo extra; exit $status;; esac\nexec "${tsparse}" "$@"\n`, { mode: 0o755 });
   const report = runFlows({ tsparse: wrapper, config, files: ['src/a.ts'], directSample: 1, requests: ['--references --name run'] });
   assert.deepEqual(report.failures.map(failure => failure.what), [
-    `--direct differs: --show --project ${config} --at 1:17 src/a.ts --json`,
+    `--direct differs: --show --project ${config} --at 1:17 src/a.ts --json --limit all`,
     `--direct differs: --references --name run --project ${config}`,
   ]);
   const result = spawnSync(process.execPath, [fileURLToPath(new URL('./navigation-flows.mjs', import.meta.url)), config,
@@ -85,6 +88,20 @@ test('built tsparse: a direct answer that differs from the service\'s fails the 
   { cwd: root, env: { ...process.env, TSPARSE: wrapper }, encoding: 'utf8' });
   assert.equal(result.status, 1, result.stdout + result.stderr);
   assert.equal(JSON.parse(fs.readFileSync(path.join(root, 'report.json'), 'utf8')).summary.failures, 1);
+});
+
+test('built tsparse: a cut request gives the same bytes in both entries and records its display', { skip: unbuilt || unixOnly }, t => {
+  const { config } = project(t);
+  const report = runFlows({
+    tsparse, config, files: [], directSample: 0,
+    requests: ['--references --name run --json --limit 1', '--references --name run --limit 1', '--show --name run --limit 1'],
+  });
+  assert.deepEqual(report.failures, []);
+  assert.deepEqual(report.requests.map(request => request.status), [0, 0, 1]);
+  // Of `run`'s five occurrences, the first group's first.
+  assert.deepEqual(report.requests[0].groups, [[2, 1], [1, 0]]);
+  assert.deepEqual(report.requests[0].display.occurrences, { total: 5, returned: 1 });
+  assert.match(report.requests[1].stdout, /\n… 4 more occurrences; see all with: tsparse --references --name run --limit all --project /);
 });
 
 test('built tsparse: text candidates round-trip through paths with spaces and colons', { skip: unbuilt || unixOnly }, t => {

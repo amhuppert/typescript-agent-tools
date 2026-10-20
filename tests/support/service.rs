@@ -56,13 +56,53 @@ impl Service {
             .unwrap()
     }
 
-    /// The groups of a reference name query, through the service.
-    pub fn query(&self, name: &str) -> Value {
-        json(self.run(&["--references", "--name", name]))
+    /// `args` answered through the service and loaded in the process with
+    /// `--direct`, which must agree byte for byte: the direct output.
+    pub fn both(&self, args: &[&str]) -> Output {
+        let served = self.run(args);
+        let direct = self
+            .command()
+            .args(args)
+            .args(["--project", "tsconfig.json", "--direct"])
+            .output()
+            .unwrap();
+        assert_eq!(served.status.code(), direct.status.code(), "{args:?}");
+        // Bytes, which a lossy reading could make look alike.
+        for (served, direct) in [
+            (&served.stdout, &direct.stdout),
+            (&served.stderr, &direct.stderr),
+        ] {
+            assert!(
+                served == direct,
+                "{args:?}: {} != {}",
+                String::from_utf8_lossy(served),
+                String::from_utf8_lossy(direct)
+            );
+        }
+        direct
     }
 
+    /// The groups of a reference name query, through the service, with
+    /// every occurrence, which a display cap would otherwise bound.
+    pub fn query(&self, name: &str) -> Value {
+        json(self.run(&["--references", "--name", name, "--json", "--limit", "all"]))
+    }
+
+    /// The status document. Between two calls only `idle_remaining_secs`
+    /// changes while one service runs; compare the others (`stable_status`).
     pub fn status(&self) -> Value {
-        json(self.run(&["--references-status"]))
+        json(self.run(&["--references-status", "--json"]))
+    }
+
+    /// The status fields that stay the same while one service runs: all
+    /// but the idle seconds it has left.
+    pub fn stable_status(&self) -> Value {
+        let mut status = self.status();
+        status
+            .as_object_mut()
+            .unwrap()
+            .remove("idle_remaining_secs");
+        status
     }
 
     /// The number of generations the running service has published, or 0.

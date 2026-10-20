@@ -93,7 +93,7 @@ fn type_display_options_and_operation_flags_are_validated_before_loading() {
             "--name",
             "value",
         ],
-        "--calls and --no-tests apply only to --references",
+        "--calls applies to: --references",
     );
     usage(
         &[
@@ -104,7 +104,7 @@ fn type_display_options_and_operation_flags_are_validated_before_loading() {
             "--name",
             "value",
         ],
-        "--check and --tsx do not apply to --type",
+        "--check applies to: parse mode (no operation flag)",
     );
     usage(
         &[
@@ -159,7 +159,7 @@ fn type_display_options_and_operation_flags_are_validated_before_loading() {
     );
     usage(
         &["--expand", "--outline", "value.ts"],
-        "--expand applies only to --type",
+        "--expand applies to: --type",
     );
     usage(
         &[
@@ -307,12 +307,12 @@ fn completed_conditional_members_are_found_in_direct_and_service_delivery() {
     assert_eq!(remote.stderr, direct.stderr);
 }
 
-#[test]
-fn partial_type_delivery_keeps_results_on_stdout_and_in_requested_output_files() {
-    // Native proves healthy Model/Element; demanding JSX expression typing
-    // is explicitly deferred by the product profile. Keep partial delivery
-    // coverage independent of newly implemented type operators.
-    let service = Service::of(support::Fixture::new(&[
+/// A project whose `View`, expanded, is a partial type. Native proves
+/// healthy Model/Element; demanding JSX expression typing is explicitly
+/// deferred by the product profile. Keep partial delivery coverage
+/// independent of newly implemented type operators.
+fn partial_type_project() -> Service {
+    Service::of(support::Fixture::new(&[
         (
             "tsconfig.json",
             include_str!("../fixtures/types/native-jsx-partial/tsconfig.json"),
@@ -329,7 +329,12 @@ fn partial_type_delivery_keeps_results_on_stdout_and_in_requested_output_files()
             "consumer.ts",
             "import type { Model as View } from './model';\n",
         ),
-    ]));
+    ]))
+}
+
+#[test]
+fn partial_type_delivery_keeps_results_on_stdout_and_in_requested_output_files() {
+    let service = partial_type_project();
     let arguments = [
         "--type",
         "--name",
@@ -397,4 +402,55 @@ fn partial_type_delivery_keeps_results_on_stdout_and_in_requested_output_files()
         std::fs::read_to_string(service.fixture.path("partial.txt")).unwrap(),
         rendered
     );
+}
+
+/// A partial type document reaches `-o` as it reaches stdout: exit 1,
+/// nothing on stdout or stderr, its partial outcome and its issue kept, and
+/// the same bytes through the service and loaded directly, plain and
+/// indented (design, "Preserved behavior": with `--json`, partial results
+/// reach `-o`).
+#[test]
+fn a_partial_type_document_reaches_the_output_file_through_both_entries() {
+    let service = partial_type_project();
+    for format in [&["--json"][..], &["--json", "--pretty"]] {
+        let request = [
+            &["--type", "--name", "View", "consumer.ts", "--expand"][..],
+            format,
+            &["--project", "tsconfig.json"],
+        ]
+        .concat();
+        let printed = service
+            .command()
+            .args(&request)
+            .arg("--direct")
+            .output()
+            .unwrap();
+        assert_eq!(printed.status.code(), Some(1), "{printed:?}");
+        let mut written = Vec::new();
+        for transport in [&[][..], &["--direct"]] {
+            let path = service.fixture.path("partial.json");
+            let _ = std::fs::remove_file(&path);
+            let output = service
+                .command()
+                .args(&request)
+                .args(transport)
+                .args(["-o", "partial.json"])
+                .output()
+                .unwrap();
+            assert_eq!(output.status.code(), Some(1), "{transport:?}: {output:?}");
+            assert!(
+                output.stdout.is_empty() && output.stderr.is_empty(),
+                "{transport:?}: {output:?}"
+            );
+            written.push(std::fs::read(&path).unwrap());
+        }
+        assert_eq!(written[0], written[1], "{format:?}");
+        assert_eq!(written[0], printed.stdout, "{format:?}");
+        let document: Value = serde_json::from_slice(&written[0]).unwrap();
+        assert_eq!(document["operation"], "type");
+        assert_eq!(document["outcome"], "partial");
+        assert_eq!(document["type"]["summary"], "Model");
+        assert_eq!(document["issues"].as_array().unwrap().len(), 1);
+        assert_eq!(document["issues"][0]["location"]["file"], "model.tsx");
+    }
 }

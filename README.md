@@ -18,7 +18,7 @@ printf 'const answer: number = 42;' | ./target/release/tsparse
 
 Run Cargo from this repository so its dependency overrides apply. If your usual Cargo home is read-only, set `CARGO_HOME="$PWD/.cache/cargo"` before building. Nothing is published or installed globally.
 
-The CLI reads UTF-8 from one input file or stdin (`-`, or no file). `.tsx` and `.jsx` filenames enable JSX automatically; `--tsx` enables it for stdin. `--pretty` indents JSON, `-o` writes a file, and `--check` validates without emitting JSON. Exit codes are **0** for success, **1** for a syntax error, and **2** for usage or I/O errors. Diagnostics use one-based lines and UTF-16 columns.
+The CLI reads UTF-8 from one input file or stdin (`-`, or no file); a `.tsx` or `.jsx` filename enables JSX. Diagnostics use one-based lines and UTF-16 columns. The [CLI reference](docs/cli-reference.md) gives every operation's flags, examples, and exit codes ([parse mode](docs/cli-reference.md#parse), [exit codes](docs/cli-reference.md#exit-codes)); it is generated from the registry that `tsparse --help` and `tsparse --OP --help` print. The [agent guide](docs/agent-guide.md) says which operation answers a task, the command to start with, and what each costs.
 
 ## Find references
 
@@ -29,24 +29,32 @@ The CLI reads UTF-8 from one input file or stdin (`-`, or no file). `.tsx` and `
 ./target/release/tsparse --references --project ./tsconfig.json --name run --pretty
 ```
 
+The answer is text: a header with the selection, its counts and coverage, then
+each group with its declarations and its occurrences by file, and any coverage
+gaps; `--json` writes the result document instead. The
+[CLI reference](docs/cli-reference.md#references) lists its flags and filters.
+
 On macOS and Linux, project queries (references, types, and outline and show with
 `--project`) automatically start a local service and reuse its snapshot across
 CLI invocations. Every query checks the captured inputs; changed sources,
 configuration, or resolution inputs trigger a full rebuild. A failed refresh
 reports its error. Services stop after ten idle minutes. `--direct` answers in
-the CLI process instead, with the same output. On Command Center, a Next.js
-application with 4,154 searched files, a load takes about 9 seconds and 2.7 GiB,
-a warm query about 0.12–0.16 seconds, most of it that check, a semantic member
-search about 10 seconds, and a rebuild after an edit about 9.5 seconds; the
-service holds about 1.7 GB ([measurements](docs/performance-command-center.md#current-state-2026-10-17-after-the-performance-work)).
+the CLI process instead, with the same output. The agent guide's
+[cost model](docs/agent-guide.md#cost-model) gives what a load, a warm query
+(most of it that check), a member search, and the first query after an edit
+cost on Command Center, from the latest measurements.
 
 ```sh
 ./target/release/tsparse --references-status --project ./tsconfig.json
+./target/release/tsparse --doctor --project ./tsconfig.json
 ./target/release/tsparse --references-stop --project ./tsconfig.json
 ./target/release/tsparse --references-direct --project ./tsconfig.json --name run
 ```
 
-Use `--references-serve --project CONFIG` for a foreground service managed by a
+`--references-status`, `--references-stop` (which prints `stopped: pid N`, or
+`no service: CONFIG`), and `--references-serve` administer the project service,
+which answers every project query, not only references. Use
+`--references-serve --project CONFIG` for a foreground service managed by a
 supervisor. `TSPARSE_SERVICE_DIR` selects a private runtime directory, and
 `TSPARSE_SERVICE_IDLE_SECS` sets its positive idle timeout in seconds. Read-only query memory monitoring currently supports macOS and Linux. The [service design](docs/reference-service-design.md)
 describes freshness, process ownership, and the current full-rebuild limitation.
@@ -63,8 +71,8 @@ under `resolveJsonModule`, read with the grammar `tsconfig.json` shares. Member 
 use resolved semantic identities; positions inside JSON are not selectable. Module
 augmentations merge as TypeScript's checker merges them, so TipTap's augmented `Commands` is one
 group with its 78 declarations. Project references are not followed. See
-[find references](docs/references.md) for the result format, binding model, exit codes, and
-compatibility limits.
+[find references](docs/references.md) for the result format, binding model, and
+compatibility limits, and the [CLI reference](docs/cli-reference.md#references) for exit codes.
 
 ## Inspect types and member references
 
@@ -82,7 +90,8 @@ Partial results report their gaps or issues and exit 1. See the
 
 Read-only CLI queries default to a 6144 MiB process-memory threshold and a
 60-second deadline. Set positive `TSPARSE_MAX_MEMORY_MB` and
-`TSPARSE_QUERY_TIMEOUT_MS` values to change them; restart an existing service
+`TSPARSE_QUERY_TIMEOUT_MS` values to change them; a running service keeps the
+values it started with, which `--doctor --project CONFIG` reports, so stop it
 first. A limit failure discards that process and its cache, and the next service
 request restarts it. Memory is sampled and may overshoot. Edit application is
 outside the watchdog, and the Rust library does not terminate its caller.
@@ -109,7 +118,10 @@ selector and exits 1, and `--show --at FILE:LINE:COLUMN` with that location sele
 workspace symbols, an import or export specifier has a name only where it renames, and a
 default import never does, so a name selects
 the declaration, not the files that import it. The outline shows two levels unless `--depth`
-says otherwise, with one line per import declaration;
+says otherwise, with one line per import declaration. Long answers are cut for display (200
+outline entries or reference occurrences, 400 lines of a declaration or of a preview's diff
+per file, 50 candidates) unless `--limit N|all` or `-o` says otherwise, and a cut's last line
+names the command that shows the rest ([display limits](docs/navigation.md#display-limits));
 `--json` returns one document for every outcome, including errors. Without `--project`,
 navigation reads only the named file and parses with the deep budget that project loading
 uses. With `--project`, it answers over the files reference queries search, from the same
@@ -118,7 +130,7 @@ then needs no file, and JSON names files relative to the configuration's directo
 reference results do. The library exposes the same operations as
 `typescript_parser::navigation`, and over a project's searched files as `Project::outline`
 and `Project::show` (also through `ProjectSession::execute`, which refreshes first). See
-[navigation](docs/navigation.md) for the catalog rules, output formats, exit codes, and
+[navigation](docs/navigation.md) for the catalog rules, output formats and channels, and
 differences from TypeScript's document symbols; every searched file of Command Center matches
 TypeScript's document symbols apart from those documented differences.
 
@@ -147,7 +159,8 @@ added where a line break would not separate statements. A prepared edit parses, 
 preserved syntax node, and leaves every `@ts-ignore`/`@ts-expect-error` directive and JSDoc
 comment governing what it governed; it is not type-checked. The library exposes the same
 operations as `typescript_parser::editing`. See [editing](docs/editing.md) for the sites each
-operation supports, layout, plans, the filesystem effects of applying, and exit codes.
+operation supports, layout, plans, and the filesystem effects of applying, and the
+[CLI reference](docs/cli-reference.md#apply) for exit codes.
 
 ## Library
 

@@ -319,6 +319,7 @@ fn initialized_json_member_references_preserve_origins_across_fresh_queries() {
                                 filters: ReferenceFilters {
                                     calls: true,
                                     exclude_tests: false,
+                                    file: None,
                                 },
                             })
                             .unwrap();

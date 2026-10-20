@@ -44,8 +44,19 @@ tsparse --apply .cc/temp/change.plan.json
 A batch file is `{"edits": [...]}`, each edit
 `{"operation": "replace_body" | "insert_after", "name": NAME | "at": AT, "file": FILE, "fragment": TEXT | "from": PATH}`
 with exactly one of `name` and `at` and exactly one of `fragment` and `from`;
-`at` is `LINE:COLUMN` with `file`, or `FILE:LINE:COLUMN`. Unknown fields are
-errors. Paths in arguments and batch files are relative to the working
+`at` is `LINE:COLUMN` with `file`, or `FILE:LINE:COLUMN`. A member that is
+`null` is absent; an unknown member, one given twice, and a value of another
+type are errors, as are an edit that is neither an object nor the
+compatibility array below, and a batch that has no edits. Write the object
+form above. Only for compatibility, the forms the
+batch's former derived decoding took by accident are still taken, so no batch
+that prepared before is refused: the document written as `[EDITS]`, an edit as
+`[operation, name, at, file, fragment, from]`, and an operation as
+`{"replace_body": null}`. Help does not teach them, and dropping them would be
+a separate, announced change; an issue in one is named by its position, such
+as `[0][1][2]`. A batch is checked whole before any fragment is read or anything is
+prepared, and every problem is reported at once (see [Output](#output)).
+Paths in arguments and batch files are relative to the working
 directory; plans record absolute paths, so a plan applies from anywhere.
 
 The request parser rejects, as usage errors (exit 2): two operations;
@@ -57,7 +68,13 @@ neither of `--at` and `--name`; `--name` without FILE or `--project`; FILE `-`;
 An editing command writes `-o` and `--plan` only as new files: a path that
 exists, even as a symbolic link to nothing, is a usage error before anything
 is prepared or applied, so no outcome's document or plan can replace a file it
-read, selected, or edits. Nor may either create a file the command names that
+read, selected, or edits. Each output refusal below names the flag as
+registered, whichever spelling was given, and its remedy and reason, for
+example `usage.output: --plan start.plan.json already exists; an edit command
+writes its result and plan only as new files; choose another path`, then
+`  why: no outcome may replace a file the command read or edits` (`error.why`
+in a document); one path given as both outputs says why one file cannot hold
+both. Nor may either create a file the command names that
 does not exist, such as a deleted target: a FILE or batch `file`, the
 project's configuration, the plan being applied, or a name the plan records
 (each file's names, the file they resolved to, and the project's
@@ -68,9 +85,21 @@ file, through links, case, and Unicode forms alike: `tsparse` creates the
 output for the question, looks for it under each such name, and removes it
 again, first freeing it of what its directory gave it if that denies the
 removal; an output it still cannot remove is reported as left there, empty.
-A plan whose text cannot be read, or does not decode as a plan, names files
-no one can know, so with `-o` its load failure goes to stderr, exit 2, and
-nothing is written.
+A fragment file and the batch file are files the command reads, so neither
+may be an output either. A plan whose text cannot be read, or does not decode
+as a plan, names files no one can know, so with `-o` its load failure goes to
+stderr, exit 2, and nothing is written; so does the failure of a batch file
+that cannot be read or is not a valid batch, which says the result is not
+written to `-o` and why. A plan that does not decode as one ends with
+`  next: tsparse --apply PLAN --help` (`error.next` in a document), whose help
+says a plan is what `--plan` saved. Every other input is read only after these checks: a fragment that
+cannot be read is an
+`input.read` failure delivered as the command's other outcomes are, with
+`--json` a document in `-o` when one is given. A usage failure, the paths
+above included, is `CODE: message` on stderr, and with `--json` a document on
+stdout, never `-o`, with `operation` and `effect` as the command's other
+documents have them; the [CLI reference](cli-reference.md#failure-codes) lists
+the codes.
 
 ## Body replacement (E1)
 
@@ -83,7 +112,10 @@ condition, `as`, or `satisfies` around a function leaves the variable without
 a body to replace, and the function inside is selected by its own position. A
 callable without a body (an overload, abstract member, or signature), an
 ambient one, and every other kind of site, such as a class, are
-`UnsupportedSite`.
+`UnsupportedSite`. A class, interface, or enum, whose content is a member
+list, adds the remedy: `Shape cannot have its body replaced: this interface
+has no body to replace; member-list editing is not supported; select a
+declaration with a body`, such as one of a class's methods.
 
 The fragment is the complete new body: a block `{ ... }`, or, for an arrow
 function only, an expression. It replaces the body's tokens exactly: the
@@ -219,22 +251,29 @@ Keep other writers away from the files while applying. Readers may see some
 files replaced before others; a crash may leave temporary or backup files
 (`.NAME.tsparse-PID-N.new` and `.orig`) and some files replaced.
 
-| Situation | `effect` | Exit |
-| --- | --- | --- |
-| The plan changes nothing | `no_change` | 0 |
-| Every file replaced | `applied`, with any file that could not be removed in `leftovers` | 0 |
-| A file changed since preparing | `unchanged` | 1 |
-| A file could not be read, staging failed, or the first replacement failed | `unchanged` | 2 |
-| A later replacement failed and every replaced file was restored | `rolled_back` | 2 |
-| A replaced file could not be restored | `recovery_required`, with each file's state and where its original is kept | 2 |
+| Situation | `effect` |
+| --- | --- |
+| The plan changes nothing | `no_change` |
+| Every file replaced | `applied`, with any file that could not be removed in `leftovers` |
+| A file changed since preparing | `unchanged` |
+| A file could not be read, staging failed, or the first replacement failed | `unchanged` |
+| A later replacement failed and every replaced file was restored | `rolled_back` |
+| A replaced file could not be restored | `recovery_required`, with each file's state and where its original is kept |
 
-When an apply's result cannot be written, stderr gives the write failure and,
-for every effect but `no_change`, then the outcome's text (`applied: …`, the
-restored files, each file needing recovery and where its original is kept,
-why nothing changed, or why the plan could not be loaded), with any
-leftovers; the command exits 2. When a preview's result cannot be written
-after its plan was saved, stderr gives the write failure and then that the
-plan was saved, and where.
+The [CLI reference](cli-reference.md#apply) gives the exit code of each, as
+`tsparse --apply PLAN --help` does.
+
+When an apply's result cannot be written, stderr gives the write failure,
+`write.output: the result could not be written: …`, and, for every effect but
+`no_change`, then the outcome's text (`applied: …`, the restored files, each
+file needing recovery and where its original is kept, why nothing changed, or
+why the plan could not be loaded), with any leftovers; the command exits 2.
+When a preview's result cannot be written after its plan was saved, stderr
+gives the write failure, that the plan was saved and where, and the command
+that applies it as `  next: tsparse --apply PLAN`. A plan that cannot be saved
+is a `write.plan` failure, delivered as the command's other outcomes are: in
+text on stderr, and with `--json` a document with `effect` `none`, in `-o`
+when one is given.
 
 ## Project mode
 
@@ -254,30 +293,92 @@ Text: per edit, its selected site as `FILE:LINE:COLUMN: operation kind label
 (selector)`, where it changes the file (`body L:C-L:C`, or `after the statement
 at L:C-L:C`), then `validated: syntax and edit boundaries; not type-checked`
 and a unified diff of each changed file (a `# line breaks:` line names breaks
-other than LF), and the plan's path or `preview only`. An apply prints
-`applied: FILES changed`. Failures are one diagnostic on stderr.
+other than LF), and the plan's path with the command that applies it, as
+`plan: PLAN; apply it with: tsparse --apply PLAN`, or `preview only`. A printed
+command runs as printed in a POSIX shell from the same directory: an argument
+that is not a plain word is single-quoted, so `my plan.json` prints as
+`'my plan.json'`. A plan path that is not Unicode cannot be an argument, so
+no command names one. An apply prints `applied: FILES changed`. Failures are
+one diagnostic on stderr. An invalid batch is one `input.batch` failure that
+lists every issue, each on its own line, named by its JSON path with
+zero-based indexes, then the command that prints the batch format:
+
+```text
+input.batch: edits.json: 2 edits are invalid
+  edits[0]: give exactly one of name and at
+  edits[1].extra: unknown field
+  next: tsparse --edit-batch EDITS --help
+```
+
+The summary counts the invalid edits, or says `not an edit batch` when the
+document itself is wrong, such as an empty `edits` or a member beside it. A
+file that is not JSON has the one issue `$` with the message serde reports,
+which gives the line and column where it stopped.
 
 JSON (`--json`): one document with `operation` (`edit` or `apply`), `outcome`,
 and `effect`. A preview has `outcome` `preview` or `no_change`, `effect`
-`none`, `validation`, `plan`, `project` in project mode, and `files`, each with
+`none`, `validation`, `plan`, `next` when a plan was saved (the command that
+applies it as an argument list, `{"argv": ["tsparse", "--apply", PLAN]}`),
+`project` in project mode, and `files`, each with
 `file`, `path`, `changed`, `edits` (index, operation, site, fragment, and
 changes with byte spans, positions, and text), and `diff`. Ambiguous and
 missing selections are `show`'s documents with `operation` `edit` and the
 `edit` index; an analysis failure is the navigation error document with
-`operation` `edit` and `effect` `none`; a rejection has `outcome` `rejected` and `error` with `kind`,
+`operation` `edit` and `effect` `none`; a failure that left no outcome, such
+as a fragment that cannot be read, has `outcome` `error` and `error` with
+`category`, `code`, and `message`, and an invalid batch's also `issues`, each
+`{"path", "message"}`, and `next`; a rejection has `outcome` `rejected` and `error` with `kind`,
 `message`, `edit`, `file`, `position`, and `proposed`. An apply has `files`
 with each file's `state` (`unchanged`, `replaced`, `restored`, or
 `recovery_required` with what it holds and where its original is), `leftovers`,
 and, on failure, `error` with `kind` `Stale` or `Io`.
 
-| Outcome | Exit |
-| --- | --- |
-| Preview, `no_change`, applied | 0 |
-| Ambiguous or missing selection, rejected edit, plan from another build or that no longer prepares to its text, stale files | 1 |
-| Usage error, unreadable input or plan, failed write, rollback, recovery, unreachable service | 2 |
+The [CLI reference](cli-reference.md#replace-body) lists what each exit code
+reports for every editing operation, as `tsparse --replace-body --help` does;
+analysis failures reach the same
+[channels](navigation.md#exit-codes-and-channels) as navigation's.
 
-Analysis failures keep their [navigation](navigation.md#exit-codes-and-channels)
-codes.
+### Display limits
+
+A preview shows at most 400 lines of each changed file's diff, counting its
+`---`, `+++`, `# line breaks:`, and `@@` header lines, and an ambiguous
+selection at most 50 candidates, the defaults that
+`tsparse --replace-body --help --json` publishes under `limits`
+(`diff_lines` and `candidates`), as navigation's
+[display limits](navigation.md#display-limits) do. `--limit N|all` sets both,
+in every channel; with `-o` and no `--limit` nothing is cut. A cut withholds
+display only: every changed file is still listed, in text and in `files`,
+with its edits and site; the plan, when `--plan` saved one, holds the complete
+proposed bytes; and the outcome, `effect`, and exit code are unchanged. A cut
+text ends with one line, after the plan line, naming each file whose diff it
+cut, and, when a plan was saved, that the plan holds the complete proposed
+text:
+
+```text
+… 520 more diff lines in /abs/src/host.ts, /abs/src/app.ts; the plan start.plan.json holds the complete proposed text; see all with: tsparse --replace-body --name start src/host.ts --from body.ts --limit all, or write them to a file with -o FILE
+```
+
+The command is the request as given with `--limit all` in place of any
+`--limit` value, but without `--plan` and `-o`, which name files that now
+exist, and without `--direct`, since a project's service and a direct load
+prepare alike: followed from the same directory, it prints the complete
+preview and writes no file. A command repeating an edit could not read its
+stdin again, so an edit whose fragment is read from stdin (`--from -`, or a
+batch edit's `"from": "-"`) is never cut, and `--limit N` with one is a usage
+error (`usage.flag_scope`) before stdin is read; `--limit all` is accepted. A
+cut document's `files[].diff` holds the lines shown, and `display` counts
+every file's diff lines together:
+
+```json
+"display": {"diff_lines": {"returned": 800, "total": 1320},
+            "next": {"argv": ["tsparse", "--replace-body", "--name", "start", "src/host.ts", "--from", "body.ts", "--json", "--limit", "all"]},
+            "truncated": true}
+```
+
+A cut ambiguity is `show`'s, with the edit's command:
+`… 12 more candidates; narrow with --name a.b or --at FILE:LINE:COLUMN, or see all with: …`.
+A batch names its selections in its file, so its line says
+`narrow the edit's name to a.b or give its at as FILE:LINE:COLUMN` instead.
 
 ## Library
 

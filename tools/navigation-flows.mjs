@@ -8,7 +8,9 @@
 //       [--direct-sample=N] [--request=ARGS ...] [FILE ...]
 //
 // Each FILE is a searched file, relative to the configuration's directory.
-// For each one:
+// Every check below that reads a whole list asks for it with `--limit all`,
+// which display caps otherwise bound (docs/navigation.md, "Output"). For
+// each file:
 //   - its project outline (`--json --depth all`, through the service) has
 //     the entries of its file-mode outline;
 //   - for sampled entries (the first, the last, the deepest, those without
@@ -28,8 +30,10 @@
 // `--request=ARGS` adds one request, its arguments split at spaces and
 // given without `--project`, answered through the service and with
 // `--direct`; both must give the same exit status and bytes, and the report
-// records each one's exit status, output size, times, and answer: a
-// reference result as its groups' declaration and occurrence counts.
+// records each one's exit status, output size, times, and answer: a reference result document, which `--json` asks for,
+// as its groups' declaration and occurrence counts, and other output as
+// abbreviated text, each with the `display` of a cut. A request is answered
+// as given, so add `--limit all` to count every occurrence.
 //
 // The service runs in a private directory under /tmp, created for the run,
 // and is stopped at the end. The report (default
@@ -43,6 +47,7 @@ import { pathToFileURL } from 'node:url';
 import { lineStarts, sourceText } from './navigation-oracle.mjs';
 
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
 
 // Outline entries in pre-order, with depth.
 function flatten(entries, depth = 1, out = []) {
@@ -110,10 +115,10 @@ export function runFlows({ tsparse, config, files = [], requests = [], directSam
   let directBudget = directSample;
   try {
     for (const file of files) {
-      const outlined = service(['--outline', ...project, '--json', '--depth', 'all', file]);
+      const outlined = service(['--outline', ...project, '--json', '--depth', 'all', '--limit', 'all', file]);
       if (outlined.status !== 0) { fail(file, 'outline failed', outlined.stdout.slice(0, 300) || outlined.stderr); continue; }
       const outline = JSON.parse(outlined.stdout);
-      const fileMode = exec(['--outline', '--json', '--depth', 'all', file]);
+      const fileMode = exec(['--outline', '--json', '--depth', 'all', '--limit', 'all', file]);
       if (fileMode.status !== 0 || !same(outline.entries, JSON.parse(fileMode.stdout).entries))
         fail(file, 'project outline differs from the file outline');
       const entries = flatten(outline.entries);
@@ -126,7 +131,7 @@ export function runFlows({ tsparse, config, files = [], requests = [], directSam
         const entry = entries[index];
         if (!entry.selector) record.positionOnly++;
         const at = `${entry.anchor.line}:${entry.anchor.column}`;
-        const argv = ['--show', ...project, '--at', at, file, '--json'];
+        const argv = ['--show', ...project, '--at', at, file, '--json', '--limit', 'all'];
         const shown = service(argv);
         record.shows++;
         if (directBudget > 0) {
@@ -142,7 +147,7 @@ export function runFlows({ tsparse, config, files = [], requests = [], directSam
         const slice = source.text.slice(source.offset(declaration.range.start), source.offset(declaration.range.end));
         if (slice !== document.source) fail(file, `excerpt at ${at}`, { expected: slice.slice(0, 80), got: document.source.slice(0, 80) });
         // The text form: the same lines, numbered as in the file.
-        const text = service(['--show', ...project, '--at', at, file]);
+        const text = service(['--show', ...project, '--at', at, file, '--limit', 'all']);
         const lines = text.stdout.split('\n');
         const header = `${path.join(root, file)}:${at} ${declaration.kind} ${declaration.label}`;
         if (text.status !== 0 || lines[0] !== header) fail(file, `text show header at ${at}`, lines[0]);
@@ -152,7 +157,7 @@ export function runFlows({ tsparse, config, files = [], requests = [], directSam
         if (!same(body, expected)) fail(file, `text show body at ${at}`, { got: body.slice(0, 3), expected: expected.slice(0, 3) });
         if (!entry.selector) continue;
         // The entry's qualified name across the project, and its candidates.
-        const named = service(['--show', ...project, '--name', entry.selector, '--json']);
+        const named = service(['--show', ...project, '--name', entry.selector, '--json', '--limit', 'all']);
         record.names++;
         const result = JSON.parse(named.stdout);
         if (result.outcome === 'found') {
@@ -235,10 +240,11 @@ function answer(stdout) {
   } catch {
     return { stdout: text };
   }
+  const display = document.display ? { display: document.display } : {};
   if (Array.isArray(document.groups)) {
-    return { groups: document.groups.map(group => [group.declarations.length, group.occurrences.length]) };
+    return { groups: document.groups.map(group => [group.declarations.length, group.occurrences.length]), ...display };
   }
-  return { outcome: document.outcome, stdout: text };
+  return { outcome: document.outcome, stdout: text, ...display };
 }
 
 function parseArguments(args) {

@@ -128,6 +128,16 @@ impl Fixture {
 
     /// A temporary copy of a checked-in fixture, for tests that change files.
     pub fn copy_of(name: &str) -> Self {
+        Self::copy_from(&fixtures_root().join(name))
+    }
+
+    /// A temporary copy of the checked-in fixture `directory`, relative to
+    /// the repository, such as `fixtures/types/member-search-core`.
+    pub fn copy_from_repository(directory: &str) -> Self {
+        Self::copy_from(&Path::new(env!("CARGO_MANIFEST_DIR")).join(directory))
+    }
+
+    fn copy_from(directory: &Path) -> Self {
         fn copy(from: &Path, to: &Path) {
             std::fs::create_dir_all(to).unwrap();
             for entry in std::fs::read_dir(from).unwrap() {
@@ -141,7 +151,7 @@ impl Fixture {
             }
         }
         let root = temporary_directory();
-        copy(&fixtures_root().join(name), &root);
+        copy(directory, &root);
         Self::temporary(root)
     }
 

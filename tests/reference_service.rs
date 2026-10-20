@@ -16,14 +16,14 @@ fn independent_invocations_reuse_the_service_and_stop_releases_it() {
         first["groups"][0]["occurrences"].as_array().unwrap().len(),
         2
     );
-    let warm = service.status();
+    let warm = service.stable_status();
     assert_eq!(
         warm["running"], true,
         "a CLI query must leave a reusable service"
     );
     assert_eq!(warm["generation"], 1);
     assert_eq!(service.query("value"), first);
-    assert_eq!(service.status(), warm);
+    assert_eq!(service.stable_status(), warm);
     assert!(service.run(&["--references-stop"]).status.success());
     assert_eq!(service.status()["running"], false);
     assert_eq!(service.query("value"), first);
@@ -42,6 +42,7 @@ fn concurrent_cold_clients_share_one_build() {
                 "tsconfig.json",
                 "--name",
                 "value",
+                "--json",
             ]);
             std::thread::spawn(move || json(command.output().unwrap()))
         })
@@ -92,7 +93,7 @@ fn edits_and_failed_refreshes_cross_the_process_boundary() {
 #[test]
 fn client_working_directory_and_utf16_queries_match_direct_loading() {
     let service = Service::new(&[("src/a.ts", "// 😀\r\nexport const café = 1;\u{2028}café;\n")]);
-    let cold = json(service.run(&["--references-direct", "--at", "3:1", "src/a.ts"]));
+    let cold = json(service.run(&["--references-direct", "--at", "3:1", "src/a.ts", "--json"]));
     assert_eq!(
         cold["groups"][0]["occurrences"].as_array().unwrap().len(),
         2
@@ -102,9 +103,16 @@ fn client_working_directory_and_utf16_queries_match_direct_loading() {
         .current_dir(service.fixture.path("src"))
         .args(["--references", "--project"])
         .arg(service.fixture.path("tsconfig.json"))
-        .args(["--at", "3:1", "a.ts"]);
+        .args(["--at", "3:1", "a.ts", "--json"]);
     assert_eq!(json(client.output().unwrap()), cold);
-    assert_eq!(service.query("café"), cold);
+    // The name selects the same symbol; only the echoed selection differs.
+    let mut named = service.query("café");
+    assert_eq!(
+        named["selection"],
+        serde_json::json!({"name": {"name": "café", "file": null}})
+    );
+    named["selection"] = cold["selection"].clone();
+    assert_eq!(named, cold);
     assert_eq!(service.status()["generation"], 1);
 }
 
@@ -135,7 +143,7 @@ fn crashed_service_releases_its_lease_and_a_new_client_recovers_the_stale_socket
     );
     let start = std::time::Instant::now();
     loop {
-        let output = service.run(&["--references-status"]);
+        let output = service.run(&["--references-status", "--json"]);
         if output.status.success() && json(output)["running"] == false {
             break;
         }
@@ -156,7 +164,7 @@ fn service_rejects_malformed_and_disconnected_clients_without_losing_the_index()
     use std::os::unix::net::UnixStream;
     let service = Service::new(&[("a.ts", "export const value = 1;")]);
     let expected = service.query("value");
-    let status = service.status();
+    let status = service.stable_status();
     let socket = std::fs::read_dir(&service.runtime)
         .unwrap()
         .map(|e| e.unwrap().path())
@@ -164,9 +172,17 @@ fn service_rejects_malformed_and_disconnected_clients_without_losing_the_index()
         .unwrap();
     let mut stream = UnixStream::connect(&socket).unwrap();
     stream.write_all(b"invalid JSON\n").unwrap();
+    // The service refuses it as unreadable, which the client reports as
+    // `transport.protocol`, and keeps serving.
+    let refused = serde_json::json!({
+        "Refused": {"Unreadable": "expected value at line 1 column 1"}
+    });
     let mut response = String::new();
     stream.read_to_string(&mut response).unwrap();
-    assert!(response.contains("Failure"));
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&response).unwrap(),
+        refused
+    );
     let mut delayed = UnixStream::connect(&socket).unwrap();
     std::thread::sleep(std::time::Duration::from_millis(100));
     let write = delayed.write_all(b"invalid JSON\n");
@@ -176,10 +192,13 @@ fn service_rejects_malformed_and_disconnected_clients_without_losing_the_index()
     );
     let mut response = String::new();
     delayed.read_to_string(&mut response).unwrap();
-    assert!(response.contains("Failure"));
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&response).unwrap(),
+        refused
+    );
     drop(UnixStream::connect(&socket).unwrap());
     assert_eq!(service.query("value"), expected);
-    assert_eq!(service.status(), status);
+    assert_eq!(service.stable_status(), status);
 }
 
 #[test]
@@ -192,6 +211,7 @@ fn idle_shutdown_releases_the_service() {
         "tsconfig.json",
         "--name",
         "value",
+        "--json",
     ]);
     let expected = json(command.output().unwrap());
     let first = service.status();
@@ -233,7 +253,14 @@ fn service_results_and_diagnostics_match_direct_cli_output() {
         assert_eq!(actual.stdout, expected.stdout, "{query:?}");
         assert_eq!(actual.stderr, expected.stderr, "{query:?}");
     }
-    let output = service.run(&["--references", "--name", "value", "-o", "answer.json"]);
+    let output = service.run(&[
+        "--references",
+        "--name",
+        "value",
+        "--json",
+        "-o",
+        "answer.json",
+    ]);
     assert!(output.status.success());
     assert!(output.stdout.is_empty());
     let saved: Value =
@@ -256,7 +283,7 @@ fn protocol_request_limit_accepts_under_and_at_limit_and_rejects_over_it() {
     for size in [(1 << 20) - 1, 1 << 20, (1 << 20) + 1] {
         let mut request = serde_json::to_vec(&serde_json::json!({
             "identity": {"config": service.fixture.path("tsconfig.json"), "build": env!("TSPARSE_SERVICE_BUILD")},
-            "action": {"Query": {"References": {"Name": {"name": "value", "file": null}}}}
+            "action": {"Query": {"References": {"name": {"name": "value", "file": null}}}}
         })).unwrap();
         request.resize(size - 1, b' ');
         request.push(b'\n');
@@ -321,6 +348,7 @@ fn a_service_never_holds_a_descriptor_its_launcher_inherited() {
             "tsconfig.json",
             "--name",
             "value",
+            "--json",
         ])
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())

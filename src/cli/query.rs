@@ -2,64 +2,77 @@
 //! through the project's service or a project loaded here. Both project
 //! entries answer through `ProjectSession::execute`, the one boundary that
 //! refreshes a generation before any operation; the service keeps that
-//! session between requests. Every answer, and a transport failure that
-//! leaves none, goes to the one delivery policy.
+//! session between requests. Every answer, and a failure that leaves none,
+//! goes to the one delivery policy.
 
-use super::Exit;
-use super::delivery::{self, Base, Delivery};
+use super::Failure;
+use super::delivery::{self, Base, Delivered, Delivery, Route};
+use super::failure::Code;
 use super::navigation;
 use super::request::{FileOperation, Query, Target};
-use std::io;
+use crate::process_limits::{Context, Environment};
 use std::path::Path;
 use typescript_parser::analysis::AnalysisError;
 use typescript_parser::navigation::{outline_file, show_file};
 use typescript_parser::project::{ProjectRequest, ProjectResponse, ProjectSession};
 
-/// An answer, or the transport failure that left none.
-pub(crate) type Answer = Result<Result<ProjectResponse, AnalysisError>, io::Error>;
+/// An answer, or the failure that left none.
+pub(crate) type Answer = Result<Result<ProjectResponse, AnalysisError>, Failure>;
 
-pub(crate) fn run(query: Query) -> Result<(), Exit> {
+pub(crate) fn run(query: Query) -> Result<(), Delivered> {
+    // Every query reads the environment before anything else, whichever
+    // entry answers it, so an invalid value fails alike in both.
+    let environment = match Environment::read() {
+        Ok(environment) => environment,
+        Err(failure) => return Err(delivery::fail(query.route(), failure)),
+    };
     // The service protects its own process. Direct/file reads protect this one;
     // edit application has a separate entry and must never be killed mid-write.
     if cfg!(unix) && matches!(&query.target, Target::Project { direct: false, .. }) {
-        return run_here(&query);
+        return deliver_answer(&query, answer(&query.target));
     }
     let answer = crate::process_limits::run(
+        &environment,
         |failure| {
-            let answer = Err(failure.into_error());
-            let outcome = delivery::deliver(
-                query.format,
-                query.pretty,
-                query.output.as_deref(),
-                Ok(delivery(&query, &answer)),
-            );
-            match outcome {
-                Ok(()) => 1,
-                Err((code, message)) => {
-                    if !message.is_empty() {
-                        eprintln!("{message}");
-                    }
-                    code.into()
-                }
+            let error = failure.into_error(&environment.limits(), Context::Direct);
+            // The process exits as its query's failure does.
+            let code = delivery::failure_code(&error);
+            let answer = Err(error);
+            match delivery::deliver(query.route(), Ok(delivery(&query, &answer))) {
+                Ok(()) => code.into(),
+                Err(delivered) => delivered.code().into(),
             }
         },
         || answer(&query.target),
-    )
-    .map_err(|error| (2, error.to_string()))?;
-    deliver_answer(&query, &answer)
+    );
+    match answer {
+        Ok(answer) => deliver_answer(&query, answer),
+        Err(error) => Err(delivery::fail(
+            query.route(),
+            Failure::new(Code::Watchdog, error.to_string()),
+        )),
+    }
 }
 
-fn run_here(query: &Query) -> Result<(), Exit> {
-    let answer = answer(&query.target);
-    deliver_answer(query, &answer)
+fn deliver_answer(query: &Query, answer: Answer) -> Result<(), Delivered> {
+    match answer {
+        Ok(answer) => delivery::deliver(query.route(), Ok(delivery(query, &answer))),
+        Err(failure) => delivery::deliver(query.route(), Err(failure)),
+    }
 }
 
-fn deliver_answer(query: &Query, answer: &Answer) -> Result<(), Exit> {
-    let outcome = match answer {
-        Ok(answer) => Ok(delivery(query, answer)),
-        Err(transport) => Err(transport),
-    };
-    delivery::deliver(query.format, query.pretty, query.output.as_deref(), outcome)
+impl Query {
+    /// Where this query's outcomes go: its documents name its operation.
+    fn route(&self) -> Route<'_> {
+        Route {
+            format: self.format,
+            pretty: self.pretty,
+            output: self.output.as_deref(),
+            new_file: false,
+            operation: Some(self.target.operation()),
+            fields: &[],
+        }
+    }
 }
 
 fn answer(target: &Target) -> Answer {
@@ -74,7 +87,7 @@ fn answer(target: &Target) -> Answer {
             config,
             request,
             direct,
-        } => project(Path::new(config), request.clone(), *direct),
+        } => project(config, request.clone(), *direct),
     }
 }
 
@@ -83,15 +96,13 @@ fn answer(target: &Target) -> Answer {
 /// file operand is made absolute here, and diagnostics that name it get
 /// the caller's spelling back (`ProjectRequest::make_absolute`), so the
 /// two entries answer alike from any working directory.
-pub(crate) fn project(config: &Path, mut request: ProjectRequest, direct: bool) -> Answer {
+pub(crate) fn project(config: &str, mut request: ProjectRequest, direct: bool) -> Answer {
     let spelled = match request.make_absolute() {
         Ok(spelled) => spelled,
         Err(error) => return Ok(Err(error)),
     };
     let answer = if direct {
-        // A fresh session's first request loads the project, as the
-        // service's does, through the same refresh and validation.
-        Ok(one_shot(config, request))
+        here(config, request)
     } else {
         service(config, request)
     };
@@ -101,6 +112,15 @@ pub(crate) fn project(config: &Path, mut request: ProjectRequest, direct: bool) 
             error
         })
     })
+}
+
+/// A project request answered in this process. It reads the environment the
+/// service would have read (`Endpoint::start`), so a value the service path
+/// refuses fails here too. A fresh session's first request loads the
+/// project, as the service's does, through the same refresh and validation.
+fn here(config: &str, request: ProjectRequest) -> Answer {
+    Environment::read()?;
+    Ok(one_shot(Path::new(config), request))
 }
 
 /// Answer this process's only request. The process exits after delivering
@@ -113,18 +133,18 @@ fn one_shot(config: &Path, request: ProjectRequest) -> Result<ProjectResponse, A
 }
 
 #[cfg(unix)]
-fn service(config: &Path, request: ProjectRequest) -> Answer {
+fn service(config: &str, request: ProjectRequest) -> Answer {
     match crate::service::execute(config, request) {
         Ok(response) => Ok(Ok(response)),
         Err(crate::service::Error::Analysis(error)) => Ok(Err(error)),
-        Err(crate::service::Error::Transport(error)) => Err(error),
+        Err(crate::service::Error::Unanswered(failure)) => Err(failure),
     }
 }
 
 /// Platforms without the service answer directly.
 #[cfg(not(unix))]
-fn service(config: &Path, request: ProjectRequest) -> Answer {
-    Ok(one_shot(config, request))
+fn service(config: &str, request: ProjectRequest) -> Answer {
+    here(config, request)
 }
 
 /// The forms of one answer.
@@ -133,43 +153,17 @@ fn delivery<'a>(
     answer: &'a Result<ProjectResponse, AnalysisError>,
 ) -> Delivery<'a> {
     match answer {
-        Ok(ProjectResponse::References(result)) => Delivery {
-            code: 0,
-            text_is_result: true,
-            document: Box::new(move |writer, pretty| {
-                if pretty {
-                    serde_json::to_writer_pretty(writer, result)
-                } else {
-                    serde_json::to_writer(writer, result)
-                }
-                .map_err(io::Error::other)
-            }),
-            text: None,
-        },
-        Ok(ProjectResponse::ReferenceSearch(answer)) => Delivery {
-            code: match answer.as_ref() {
-                typescript_parser::references::ReferenceAnswer::Selected(result)
-                    if result.outcome
-                        == typescript_parser::references::ReferenceOutcome::Complete =>
-                {
-                    0
-                }
-                _ => 1,
-            },
-            text_is_result: true,
-            document: Box::new(move |writer, pretty| {
-                if pretty {
-                    serde_json::to_writer_pretty(writer, answer)
-                } else {
-                    serde_json::to_writer(writer, answer)
-                }
-                .map_err(io::Error::other)
-            }),
-            text: None,
-        },
-        Ok(ProjectResponse::Outline(outline)) => navigation::outline(outline, query.depth),
-        Ok(ProjectResponse::Show(show)) => navigation::show(show),
-        Ok(ProjectResponse::Type(answer)) => super::types::answer(answer),
+        Ok(ProjectResponse::References(result)) => {
+            super::references::result(result, query.pretty, &query.display)
+        }
+        Ok(ProjectResponse::ReferenceSearch(answer)) => {
+            super::references::answer(answer, query.pretty, &query.display)
+        }
+        Ok(ProjectResponse::Outline(outline)) => {
+            navigation::outline(outline, query.depth, &query.display)
+        }
+        Ok(ProjectResponse::Show(show)) => navigation::show(show, &query.display),
+        Ok(ProjectResponse::Type(answer)) => super::types::answer(answer, &query.display),
         Ok(ProjectResponse::Edit(_)) => unreachable!("edit requests are delivered by cli::editing"),
         Err(error) => {
             let base = match &query.target {
@@ -184,8 +178,9 @@ fn delivery<'a>(
 #[cfg(all(test, unix))]
 mod tests {
     use super::*;
-    use crate::cli::delivery::Format;
+    use crate::cli::delivery::{Display, Format, Limit};
     use crate::cli::navigation::Depth;
+    use crate::cli::registry::OperationId;
     use serde_json::{Value, json};
     use std::os::unix::ffi::OsStringExt;
     use std::path::PathBuf;
@@ -208,21 +203,33 @@ mod tests {
             format,
             pretty: false,
             depth: Depth::default(),
+            display: Display::new(
+                OperationId::Show.operation(),
+                Limit::Default,
+                output.is_some(),
+                vec!["tsparse".into()],
+            ),
             output,
         }
     }
 
     #[test]
     fn a_path_that_is_not_unicode_is_a_typed_failure_in_both_formats() {
-        let result = run(query(FileOperation::Outline, Format::Text, None));
-        assert_eq!(
-            result,
-            Err((
-                1,
+        let outline = query(FileOperation::Outline, Format::Text, None);
+        {
+            // The diagnostic text mode writes to stderr.
+            let Ok(answer) = answer(&outline.target) else {
+                panic!("file navigation always answers");
+            };
+            let failure = delivery(&outline, &answer);
+            assert!(!failure.text_is_result);
+            assert_eq!(
+                failure.text.unwrap()(),
                 "/navigation-\u{FFFD}/x.ts: the file name is not Unicode, so it cannot be named exactly"
-                    .into()
-            ))
-        );
+            );
+        }
+        let result = run(outline);
+        assert_eq!(result.map_err(|delivered| delivered.code()), Err(1));
 
         let directory = std::env::temp_dir().join(format!(
             "tsparse-navigation-delivery-{}",
@@ -235,7 +242,7 @@ mod tests {
             Format::Json,
             Some(output.to_str().unwrap().into()),
         ));
-        assert_eq!(result, Err((1, String::new())));
+        assert_eq!(result.map_err(|delivered| delivered.code()), Err(1));
         let document: Value =
             serde_json::from_str(&std::fs::read_to_string(&output).unwrap()).unwrap();
         std::fs::remove_dir_all(&directory).unwrap();
