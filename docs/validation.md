@@ -165,7 +165,10 @@ On the tree of 7d3abaf (285 test executables), the full suite took 316 s with on
 thread per executable, against 734 s for `cargo test` running one executable at a
 time with two threads; a change to `src/cli/` alone took 35 s. On 2026-10-19,
 with 292 executables, two threads per executable took the full suite from 384 s
-to 273 s.
+to 273 s. Tests build with `opt-level = 1` (`[profile.test]` in `Cargo.toml`):
+that day the executables' time fell from 1,069 s to between 274 and 347 s, a
+rebuild after a library change cost about the same as before, and a build from
+scratch took 475 s instead of 183 s with 12 jobs.
 
 s; merge validation still runs the full suite.
 

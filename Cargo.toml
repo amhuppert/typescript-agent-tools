@@ -36,6 +36,13 @@ harness = false
 lto = "thin"
 codegen-units = 1
 
+# Tests spend most of their time in the parser and checker, which opt-level 1
+# runs about three times faster; debug assertions and overflow checks stay on.
+# A build from scratch takes longer, and a rebuild after a change costs about
+# the same (docs/validation.md#selecting-rust-tests).
+[profile.test]
+opt-level = 1
+
 [[bench]]
 name = "references"
 harness = false
