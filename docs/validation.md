@@ -182,11 +182,12 @@ Without paths, the changed command runs the test files that the changes since th
 | --- | --- |
 | `tools/<name>.test.mjs` | that file |
 | another module under `tools/` | the test files whose closure holds it, and those that name `scripts/` when a validation script names it |
-| `src/`, `tests/`, `examples/`, `benches/`, `vendor/`, `build.rs`, `Cargo.toml`, `Cargo.lock`, `.cargo/` | the test files whose closure names the Rust tool, Cargo, a build directory, or a Rust path: 27 of 352 on 2026-10-19 |
+| `src/`, `tests/`, `examples/`, `benches/`, `vendor/`, `build.rs`, `Cargo.toml`, `Cargo.lock`, `.cargo/` | the test files whose closure runs the Rust tool or Cargo (it names `tsparse`, `cargo`, `reference_batch`, or a `target/` directory: 27 of 352 on 2026-10-19), those that name the changed file, and for `vendor/` those that name `vendor/` |
+| `fixtures/` | the test files whose closure names the fixture; a directory below `fixtures/<area>/` that holds it, such as a fixture project whose other files a test names; `fixtures/`, `fixtures/<area>`, or another holding directory as a whole (followed by a quote or `${`); or a `'fixtures'` path segment |
 | `scripts/`, `docs/`, `memory-bank/`, `README.md`, `AGENTS.md`, `CommandCenter.json`, `LICENSE`, `.gitignore`, and other files under `tools/` | the test files whose closure names that directory or file |
-| anything else, such as `fixtures/` and package files | every test file |
+| anything else, such as package files | every test file |
 
-The base works as for Rust tests, recorded in `target/validation/harness-tests-passed.tree` with the Node version and each compiler variable's value, size, and time; a change to any of them runs every test file. Most harness tests check the pinned compilers, so their time is the compilers': in a 58-file sample, two workers took 607 s, four 564 s, and eight 384 s at a load near 13.
+The base works as for Rust tests, recorded in `target/validation/harness-tests-passed.tree` with the Node version and each compiler variable's value, size, and time; a change to any of them runs every test file. `test` and `harness-test` allow 60 minutes (`timeoutMs` in `CommandCenter.json`); other commands get Command Center's global default. Most harness tests check the pinned compilers, so their time is the compilers': in a 58-file sample, two workers took 607 s, four 564 s, and eight 384 s at a load near 13.
 
 Compiler variables that are set are used as they are. Unset ones are filled from the canonical checkout's `.cache/compiler-oracles`: `TYPE_SCRIPT_API` from `typescript-6.0.3/package/lib/typescript.js`, and the TypeScript 7.0.2 semantic API and native compiler as for the [`semantic` command](#reference-semantics). A test whose compiler is still missing skips with a stated reason. On success the wrapper prints one line, for example:
 

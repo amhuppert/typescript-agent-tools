@@ -15,15 +15,20 @@
 //   and, when a validation script names it, the tests that name scripts/;
 // - Rust sources and build inputs (src/, tests/, examples/, benches/,
 //   vendor/, build.rs, Cargo.toml, Cargo.lock, .cargo/): the tests whose
-//   closure names the Rust tool, Cargo, a build directory, or a Rust path;
+//   closure runs the Rust tool or Cargo (it names tsparse, cargo,
+//   reference_batch, or a target/ directory), and those that name the
+//   changed file; for vendor/, also those that name vendor/, which read the
+//   vendored TypeScript libraries;
 // - files no module imports (scripts/, docs/, memory-bank/, and top-level
 //   documents and settings), and other files under tools/: the tests whose
 //   closure names the directory or file;
-// - anything else, such as fixtures/ and package files: every test.
+// - a fixture: the tests whose closure names a path that reaches it (see
+//   readsFixture);
+// - anything else, such as package files: every test.
 import fs from 'node:fs';
 import path from 'node:path';
 
-const RUST = /tsparse|cargo|reference_batch|target\/|\bsrc\/|\btests\/|vendor\/|build\.rs|\.rs\b/i;
+const RUST_TOOL = /tsparse|cargo|reference_batch|target\//i;
 const MODULE = /\.(?:mjs|cjs|js)$/;
 const REFERENCE = /['"`]((?:\.{1,2}\/|tools\/)[^'"`\s]+\.(?:mjs|cjs|js))['"`]/g;
 
@@ -58,6 +63,23 @@ const scriptsName = name => fs.existsSync('scripts') && fs.readdirSync('scripts'
   .map(entry => path.join('scripts', String(entry)))
   .some(entry => fs.statSync(entry).isFile() && fs.readFileSync(entry, 'utf8').includes(name));
 
+// Whether a closure's text names a path through which a test can read the
+// fixture FILE: the file itself; a directory below fixtures/A/ that holds it,
+// such as a fixture project whose other files the test names; fixtures/,
+// fixtures/A, or another directory that holds it as a whole directory, which
+// a test may enumerate or join a name onto; or a `fixtures` path segment,
+// which composes fixture paths.
+function readsFixture(text, file) {
+  if (text.includes(file) || /['"`]fixtures['"`]/.test(text)) return true;
+  const parts = file.split('/');
+  for (let depth = 1; depth < parts.length; depth++) {
+    const directory = parts.slice(0, depth).join('/').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const whole = depth >= 3 ? `${directory}(?:/|['"\`]|$)` : `${directory}/?(?:['"\`]|\\$\\{|$)`;
+    if (new RegExp(whole, 'm').test(text)) return true;
+  }
+  return false;
+}
+
 const selected = new Set();
 const mentioning = needle => {
   const found = tests.filter(test => closure(test).text.includes(needle));
@@ -73,11 +95,15 @@ for (const file of changed) {
     if (scriptsName(path.basename(file))) mentioning('scripts/');
   } else if (/^(?:src|tests|examples|benches|vendor|\.cargo)\//.test(file)
     || ['build.rs', 'Cargo.toml', 'Cargo.lock'].includes(file)) {
-    for (const test of tests) if (RUST.test(closure(test).text)) selected.add(test);
+    for (const test of tests) if (RUST_TOOL.test(closure(test).text)) selected.add(test);
+    mentioning(file);
+    if (file.startsWith('vendor/')) mentioning('vendor/');
   } else if (/^(?:scripts|docs|memory-bank)\//.test(file)) {
     mentioning(file.slice(0, file.indexOf('/') + 1));
   } else if (['README.md', 'AGENTS.md', 'CommandCenter.json', 'LICENSE', '.gitignore'].includes(file)) {
     mentioning(file);
+  } else if (file.startsWith('fixtures/')) {
+    for (const test of tests) if (readsFixture(closure(test).text, file)) selected.add(test);
   } else if (file.startsWith('tools/')) {
     // A data file a module reads by name; one no test names may be read by a
     // computed path, so it may affect any test.

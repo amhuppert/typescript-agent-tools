@@ -261,8 +261,8 @@ test('without paths each changed file selects the harness tests that can observe
   }
 });
 
-test('without paths a fixture or unknown change runs every harness test', t => {
-  for (const file of ['fixtures/case.ts', 'package.json', 'unknown.txt']) {
+test('without paths a package or unknown change runs every harness test', t => {
+  for (const file of ['package.json', 'unknown.txt']) {
     const { write, changed, files } = selection(t);
     write(file, '// changed\n');
     const result = changed();
@@ -325,4 +325,62 @@ test('a passing full harness run is recorded for the changed wrapper', t => {
   const result = changed();
   assert.deepEqual(files(result.testRuns[0]), ['tools/rust.test.mjs']);
   assert.match(result.stdout, /\(changes since the last passing run\)/);
+});
+
+// A committed worktree whose tests reach fixtures, Rust sources, and vendor/
+// through each path form a test can name.
+function readers(t) {
+  const project = fixture(t);
+  const files = {
+    'fixtures/cases/one/a.ts': '', 'fixtures/cases/one/tsconfig.json': '{}',
+    'fixtures/cases/two/b.ts': '', 'fixtures/cases/two/tsconfig.json': '{}',
+    'fixtures/other/c.ts': '', 'fixtures/top.json': '{}',
+    'src/lib.rs': '', 'src/other.rs': '', 'vendor/lib.d.ts': '',
+    'tools/one.test.mjs': `import { test } from 'node:test';\nconst root = new URL('../fixtures/cases/one/', import.meta.url);\ntest('one', () => root);\n`,
+    'tools/each.test.mjs': `import { test } from 'node:test';\nconst each = name => new URL(\`../fixtures/cases/\${name}/\`, import.meta.url);\ntest('each', () => each);\n`,
+    'tools/project.test.mjs': `import { test } from 'node:test';\nconst config = '../fixtures/cases/two/tsconfig.json';\ntest('project', () => config);\n`,
+    'tools/joined.test.mjs': `import path from 'node:path';\nimport { test } from 'node:test';\nconst root = path.join('..', 'fixtures');\ntest('joined', () => root);\n`,
+    'tools/top.test.mjs': `import { test } from 'node:test';\nconst top = '../fixtures/top.json';\ntest('top', () => top);\n`,
+    'tools/source.test.mjs': `import { test } from 'node:test';\nconst source = '../src/lib.rs';\ntest('source', () => source);\n`,
+    'tools/vendor.test.mjs': `import { test } from 'node:test';\nconst libraries = '../vendor/';\ntest('vendor', () => libraries);\n`,
+  };
+  for (const [file, text] of Object.entries(files)) project.write(file, text);
+  project.commit();
+  const changed = () => project.run('changed', [], { TARGET_BRANCH: project.branch });
+  return { ...project, changed };
+}
+
+test('without paths a fixture change runs the harness tests that name a path reaching it', t => {
+  for (const [file, selected] of [
+    ['fixtures/cases/one/a.ts', ['tools/each.test.mjs', 'tools/joined.test.mjs', 'tools/one.test.mjs']],
+    ['fixtures/cases/two/b.ts', ['tools/each.test.mjs', 'tools/joined.test.mjs', 'tools/project.test.mjs']],
+    ['fixtures/other/c.ts', ['tools/joined.test.mjs']],
+    ['fixtures/top.json', ['tools/joined.test.mjs', 'tools/top.test.mjs']],
+  ]) {
+    const { write, changed, files } = readers(t);
+    write(file, '// changed\n');
+    const result = changed();
+    assert.equal(result.status, 0, `${file}: ${result.stderr}`);
+    assert.equal(result.testRuns.length, 1, `${file}: ${result.stdout}${result.stderr}`);
+    assert.deepEqual(files(result.testRuns[0]), selected, file);
+  }
+});
+
+test('without paths a Rust change runs the tests that run the tool or name the changed file', t => {
+  for (const [file, selected] of [
+    ['src/lib.rs', ['tools/source.test.mjs']],
+    ['src/other.rs', []],
+    ['vendor/lib.d.ts', ['tools/vendor.test.mjs']],
+  ]) {
+    const { write, changed, files } = readers(t);
+    write(file, '// changed\n');
+    const result = changed();
+    assert.equal(result.status, 0, `${file}: ${result.stderr}`);
+    if (selected.length === 0) {
+      assert.deepEqual(result.testRuns, [], file);
+      assert.match(result.stdout, /no harness test inputs changed/, file);
+    } else {
+      assert.deepEqual(files(result.testRuns[0]), selected, file);
+    }
+  }
 });

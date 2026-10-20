@@ -52,7 +52,8 @@
         },
         "cost": 2,
         "description": "Run the Node harness tests that changes since the last passing run can affect, or explicit existing tools/*.test.mjs files, with two workers, and report skipped tests; HARNESS_REQUIRE_COMPILERS=1 fails on skips",
-        "pathArgs": "paths"
+        "pathArgs": "paths",
+        "timeoutMs": 3600000
       },
       "semantic": {
         "command": {
