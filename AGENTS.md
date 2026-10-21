@@ -12,3 +12,9 @@ TypeScript 7.0.2 defines expected behavior. `docs/references.md` and `docs/navig
 - Before changing an exit code or output channel, read `docs/navigation.md#exit-codes-and-channels`.
 - Before running an editing flow, know that `--apply` and `tools/editing-flows.mjs` write files; point them at a disposable copy of the project.
 - Before measuring the service, know that it is one background process per user, configuration spelling, and build; `tsparse --doctor --project CONFIG` reports the one a measurement would reach.
+
+# Keep agent distribution surfaces current
+When a change adds, removes, or alters a CLI operation, flag, selector rule, output cap, exit/failure code, service behavior, or editing contract, update the external agent surfaces in the same change before finishing:
+- `plugins/tsparse/skills/tsparse/SKILL.md` (and `plugins/tsparse/plugin.json` when the version or scope changes): workflow guidance, selection/editing rules, and cost or troubleshooting notes.
+- `SHARED_AGENTS_BLOCK.md`: the portable `AGENTS.md` block for downstream TypeScript repositories, including the one-line-per-operation summary list.
+- `COMMANDS.md` and `docs/cli-reference.md` (regenerated from `src/cli/registry.rs` via `cargo test --test cli_registry -- --ignored write_reference`).
