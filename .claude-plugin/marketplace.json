@@ -1,0 +1,17 @@
+{
+  "name": "typescript-agent-tools",
+  "owner": {
+    "name": "Alex Huppert"
+  },
+  "metadata": {
+    "description": "Agent plugins for working on TypeScript projects with tsparse"
+  },
+  "plugins": [
+    {
+      "name": "tsparse",
+      "source": "./plugins/tsparse",
+      "description": "TypeScript 7 declaration navigation, semantic references, type inspection, and source-preserving code editing with tsparse",
+      "category": "development"
+    }
+  ]
+}

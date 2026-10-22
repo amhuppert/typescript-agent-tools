@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Regenerates the Codex plugin package from the Claude Code plugin and stages it,
+# so the committed package always matches the committed source.
+set -euo pipefail
+
+source_dir=plugins/tsparse
+package_dir=plugins/codex/tsparse
+
+# Only staged changes under the Claude plugin, or to the package itself, need a rebuild.
+if git diff --cached --quiet -- "$source_dir" "$package_dir"; then
+  exit 0
+fi
+
+if ! command -v skill-sync >/dev/null 2>&1; then
+  echo "pre-commit: skill-sync is not on PATH; install it to regenerate $package_dir" >&2
+  exit 1
+fi
+
+skill-sync plugin --from "$source_dir" --to "$package_dir" --override
+git add -A -- "$package_dir"

@@ -15,6 +15,6 @@ TypeScript 7.0.2 defines expected behavior. `docs/references.md` and `docs/navig
 
 # Keep agent distribution surfaces current
 When a change adds, removes, or alters a CLI operation, flag, selector rule, output cap, exit/failure code, service behavior, or editing contract, update the external agent surfaces in the same change before finishing:
-- `plugins/tsparse/skills/tsparse/SKILL.md` (and `plugins/tsparse/plugin.json` when the version or scope changes): workflow guidance, selection/editing rules, and cost or troubleshooting notes.
+- `plugins/tsparse/skills/tsparse/SKILL.md` (and `plugins/tsparse/.claude-plugin/plugin.json` when the version or scope changes; the pre-commit hook regenerates the Codex package in `plugins/codex/tsparse`, so never edit it by hand): workflow guidance, selection/editing rules, and cost or troubleshooting notes.
 - `SHARED_AGENTS_BLOCK.md`: the portable `AGENTS.md` block for downstream TypeScript repositories, including the one-line-per-operation summary list.
 - `COMMANDS.md` and `docs/cli-reference.md` (regenerated from `src/cli/registry.rs` via `cargo test --test cli_registry -- --ignored write_reference`).

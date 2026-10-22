@@ -1,0 +1,10 @@
+{
+  "name": "tsparse",
+  "description": "TypeScript 7 declaration navigation, semantic references, type inspection, and source-preserving code editing with tsparse",
+  "version": "0.1.1",
+  "author": {
+    "name": "Alex Huppert"
+  },
+  "repository": "https://github.com/amhuppert/typescript-agent-tools",
+  "license": "MIT"
+}

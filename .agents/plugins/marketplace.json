@@ -1,0 +1,20 @@
+{
+  "name": "typescript-agent-tools",
+  "interface": {
+    "displayName": "TypeScript Agent Tools"
+  },
+  "plugins": [
+    {
+      "name": "tsparse",
+      "source": {
+        "source": "local",
+        "path": "./plugins/codex/tsparse"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

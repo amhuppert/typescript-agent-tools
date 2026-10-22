@@ -20,6 +20,23 @@ Run Cargo from this repository so its dependency overrides apply. If your usual 
 
 The CLI reads UTF-8 from one input file or stdin (`-`, or no file); a `.tsx` or `.jsx` filename enables JSX. Diagnostics use one-based lines and UTF-16 columns. The [CLI reference](docs/cli-reference.md) gives every operation's flags, examples, and exit codes ([parse mode](docs/cli-reference.md#parse), [exit codes](docs/cli-reference.md#exit-codes)); it is generated from the registry that `tsparse --help` and `tsparse --OP --help` print. The [agent guide](docs/agent-guide.md) says which operation answers a task, the command to start with, and what each costs.
 
+## Agent plugin
+
+The `tsparse` skill ships as a Claude Code plugin from this repository's marketplace; it teaches agents to use the CLI above, which must be on their `PATH`:
+
+```sh
+/plugin install tsparse --marketplace amhuppert/typescript-agent-tools
+```
+
+For Codex, add the repository's marketplace and install the same plugin from it:
+
+```sh
+codex plugin marketplace add amhuppert/typescript-agent-tools
+codex plugin add tsparse@typescript-agent-tools
+```
+
+The Codex package in `plugins/codex/tsparse` is generated from `plugins/tsparse` by [`skill-sync`](scripts/hooks/pre-commit) in a pre-commit hook; run `scripts/hooks/install.sh` once per clone to enable it.
+
 ## Find references
 
 `tsparse --references` loads one `tsconfig.json` project and groups the declarations and occurrences of a symbol, following import and export aliases and keeping shadowed bindings separate:
