@@ -31,6 +31,10 @@ Historical manifests and observations one directory above remain unchanged.
 
 
 Completed current captures are under [single-threaded-native](single-threaded-native/README.md).
-The root manifest and unfinished member artifact preserve the earlier parallel
-profile. They were superseded after default-library external provenance varied
-on unchanged inputs. No historical record was finalized using the new config.
+The root manifest preserves the earlier parallel profile. It was superseded
+after default-library external provenance varied on unchanged inputs. No
+historical record was finalized using the new config. The unfinished parallel
+member artifact (30.7 MB, sha256 recorded in
+`superseded-api-baseline/artifact-and-tooling-hashes.json`) was removed from the
+tree; retrieve it with
+`git show af8e7f2:fixtures/types/command-center/aa484f4-2026-10-12/member-observations.json`.

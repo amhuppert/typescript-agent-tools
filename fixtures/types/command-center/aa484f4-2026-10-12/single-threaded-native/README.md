@@ -15,3 +15,5 @@ All five Q4 roots are established non-error native types. The inferred factory r
 Exact member/type toolkits and hashes are archived under `captured-tooling/members` and `captured-tooling/types`. `artifact-hashes.json` binds the baseline and completed raw artifacts; `observation-summary.json` supplies concise raw counts/answers. The temporary external-corpus harness prerequisites were removed after terminal collection.
 
 Native research capture timings include transport, filesystem observation and replay work and do not establish product semantic latency. Product normalized Q3 groups, call/test filter schedules, first/repeated/reversed orders, Q4 graphs, exact JSX/predicate failures, Rust/service/load-refresh comparison, memory and queued-lexical acceptance remain required.
+
+The three `*-observations.json` captures are stored with Git LFS. Run `git lfs install && git lfs pull` before the `native-corpus-journeys` or `native-corpus-load-baseline` validators; without it they read LFS pointer files and fail to parse.
