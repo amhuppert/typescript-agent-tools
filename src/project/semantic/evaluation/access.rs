@@ -312,7 +312,7 @@ impl Evaluator<'_, '_> {
                 let skip_augmentation = self.is_const_enum_object_type(apparent, name_location)?;
                 sequence.read(self.property_of_type_by_key_flags_completion(
                     apparent,
-                    &NativePropertyKey::fixed(name.as_bytes(), self.control.as_ref()),
+                    &NativePropertyKey::fixed(name.as_bytes()),
                     skip_augmentation,
                     recipe.root.site.kind == SyntaxKind::QualifiedName,
                     name_location,
@@ -405,7 +405,7 @@ impl Evaluator<'_, '_> {
                 let index = if index_allowed {
                     sequence.read(self.applicable_index_info_for_key_completion(
                         apparent,
-                        &NativePropertyKey::fixed(name.as_bytes(), self.control.as_ref()),
+                        &NativePropertyKey::fixed(name.as_bytes()),
                         name_location,
                     ))?
                 } else {
@@ -422,10 +422,7 @@ impl Evaluator<'_, '_> {
                             let property = match self.reference_raw_symbol_table(global, true)? {
                                 Some(table) => self.reference_raw_table_lookup(
                                     table,
-                                    &NativePropertyKey::fixed(
-                                        name.as_bytes(),
-                                        self.control.as_ref(),
-                                    ),
+                                    &NativePropertyKey::fixed(name.as_bytes()),
                                     name_location,
                                 )?,
                                 None => None,
@@ -789,18 +786,13 @@ impl Evaluator<'_, '_> {
                 .declaration_from_expression_root(ExpressionRoot { file, site })?;
             return Ok(self
                 .destructuring_property_name_completion(declaration)?
-                .map(|name| {
-                    name.map(|name| {
-                        NativePropertyKey::fixed(name.as_bytes(), self.control.as_ref())
-                    })
-                }));
+                .map(|name| name.map(|name| NativePropertyKey::fixed(name.as_bytes()))));
         }
         if site.kind == SyntaxKind::Parameter {
             return Ok(NativeCompletion::clean(Some(NativePropertyKey::fixed(
                 self.source
                     .parameter_access_index(ExpressionRoot { file, site })?
                     .as_bytes(),
-                self.control.as_ref(),
             ))));
         }
         if !matches!(
@@ -812,19 +804,16 @@ impl Evaluator<'_, '_> {
         let recipe = self.source.access_recipe(ExpressionRoot { file, site })?;
         match recipe.key {
             AccessKey::Name { name, .. } => Ok(NativeCompletion::clean(Some(
-                NativePropertyKey::fixed(name.as_bytes(), self.control.as_ref()),
+                NativePropertyKey::fixed(name.as_bytes()),
             ))),
             AccessKey::Element(expression) => {
                 let root = expression.root.ok_or_else(|| {
                     super::super::internal("element key has no exact source role")
                 })?;
                 match self.source.element_access_name_syntax(root)? {
-                    super::super::source::ElementAccessName::Text(text) => {
-                        Ok(NativeCompletion::clean(Some(NativePropertyKey::fixed(
-                            text.as_bytes(),
-                            self.control.as_ref(),
-                        ))))
-                    }
+                    super::super::source::ElementAccessName::Text(text) => Ok(
+                        NativeCompletion::clean(Some(NativePropertyKey::fixed(text.as_bytes()))),
+                    ),
                     super::super::source::ElementAccessName::Entity => {
                         self.name_from_entity_expression_completion(root, consumer)
                     }
@@ -888,9 +877,10 @@ impl Evaluator<'_, '_> {
                     return self.property_key_from_type(ty);
                 }
                 if let Some(name) = key.enum_name {
-                    return Ok(self.source.try_property_name_text(name)?.map(|name| {
-                        NativePropertyKey::fixed(name.as_bytes(), self.control.as_ref())
-                    }));
+                    return Ok(self
+                        .source
+                        .try_property_name_text(name)?
+                        .map(|name| NativePropertyKey::fixed(name.as_bytes())));
                 }
             }
             Ok(None)

@@ -21,12 +21,9 @@ impl Evaluator<'_, '_> {
         name: super::super::source::ExpressionRoot,
     ) -> NativeResult<Option<NativePropertyKey>> {
         match self.source.effective_property_name_syntax(name)? {
-            super::super::source::EffectivePropertyName::Text(text) => {
-                Ok(NativeCompletion::clean(Some(NativePropertyKey::fixed(
-                    text.as_bytes(),
-                    self.control.as_ref(),
-                ))))
-            }
+            super::super::source::EffectivePropertyName::Text(text) => Ok(NativeCompletion::clean(
+                Some(NativePropertyKey::fixed(text.as_bytes())),
+            )),
             super::super::source::EffectivePropertyName::Dynamic(root) => {
                 let expression = self.source.expression_at(root.file, root.site)?;
                 self.type_of_source_expression_completion(&expression)?
@@ -56,10 +53,10 @@ impl Evaluator<'_, '_> {
                 }
             }
             Ok(NativePropertyKey::from_string_value(
-                crate::project::binding::NativeStringValue::from_byte_parts(
-                    [b"\xfe@".as_slice(), name.as_bytes()],
-                    self.control.as_ref(),
-                ),
+                crate::project::binding::NativeStringValue::from_byte_parts([
+                    b"\xfe@".as_slice(),
+                    name.as_bytes(),
+                ]),
             ))
         })();
         sequence.finish(result)
@@ -566,7 +563,7 @@ impl Evaluator<'_, '_> {
     ) -> NativeResult<Option<Property>> {
         self.property_of_type_by_key_ex_completion(
             ty,
-            &NativePropertyKey::fixed(name, self.control.as_ref()),
+            &NativePropertyKey::fixed(name),
             skip_augmentation,
             consumer,
         )

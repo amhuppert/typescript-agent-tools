@@ -173,7 +173,7 @@ const ISSUES: &[Refusal] = &[
         "not an edit batch",
         &[("$", r#"expected {"edits": [...]}"#)],
     ),
-    // The document as an array of its one field, edits.
+    // The document as an array, of its one field or not.
     (
         r#"[[{"operation": "replace_body", "name": "start", "fragment": "{}"}], 1]"#,
         "not an edit batch",
@@ -182,12 +182,12 @@ const ISSUES: &[Refusal] = &[
     (
         r#"[{"operation": "replace_body", "name": "start", "fragment": "{}"}]"#,
         "not an edit batch",
-        &[("[0]", "expected an array of edits")],
+        &[("$", r#"expected {"edits": [...]}"#)],
     ),
     (
         "[[]]",
         "not an edit batch",
-        &[("[0]", "the batch has no edits")],
+        &[("$", r#"expected {"edits": [...]}"#)],
     ),
     ("{}", "not an edit batch", &[("edits", "missing field")]),
     (
@@ -218,50 +218,34 @@ const ISSUES: &[Refusal] = &[
         ],
     ),
     // An edit's shape and members, in the order they are written; an edit
-    // written as an array has its six fields in order.
+    // written as an array, of its six fields in order or not, is not an
+    // object.
     (
-        r#"{"edits": [1, ["replace_body", "start", null, "host.ts", "{}"], ["replace_body", "start", null, "host.ts", "{}", null, null]]}"#,
-        "3 edits are invalid",
+        r#"{"edits": [1, ["replace_body", "start", null, "host.ts", "{}", null], ["replace_body", "start", null, "host.ts", "{}"], ["replace_body", "start", null, "host.ts", "{}", null, null]]}"#,
+        "4 edits are invalid",
         &[
             ("edits[0]", "expected an object"),
             ("edits[1]", "expected an object"),
             ("edits[2]", "expected an object"),
+            ("edits[3]", "expected an object"),
         ],
     ),
     (
         r#"[[["replace_body", "start", "1:1", "host.ts", "{}", null], ["rename", 1, null, null, null, null]]]"#,
-        "2 edits are invalid",
-        &[
-            ("[0][0]", "give exactly one of name and at"),
-            (
-                "[0][1][0]",
-                "unknown variant `rename`, expected `replace_body` or `insert_after`",
-            ),
-            ("[0][1][1]", "expected a string"),
-            ("[0][1]", "give exactly one of fragment and from"),
-        ],
+        "not an edit batch",
+        &[("$", r#"expected {"edits": [...]}"#)],
     ),
-    // An operation written as an object names it, with null.
+    // An operation is a string: an object, even one naming it with null,
+    // is not.
     (
-        r#"{"edits": [{"operation": {"replace_body": 1}, "name": "start", "fragment": "{}"}, {"operation": {"rename": null}, "name": "start", "fragment": "{}"}, {"operation": {}, "name": "start", "fragment": "{}"}, {"operation": {"replace_body": null, "replace_body": null}, "name": "start", "fragment": "{}"}]}"#,
-        "4 edits are invalid",
+        r#"{"edits": [{"operation": {"replace_body": null}, "name": "start", "fragment": "{}"}, {"operation": {"replace_body": 1}, "name": "start", "fragment": "{}"}, {"operation": {"rename": null}, "name": "start", "fragment": "{}"}, {"operation": {}, "name": "start", "fragment": "{}"}, {"operation": {"replace_body": null, "replace_body": null}, "name": "start", "fragment": "{}"}]}"#,
+        "5 edits are invalid",
         &[
-            (
-                "edits[0].operation",
-                "invalid type: integer `1`, expected unit",
-            ),
-            (
-                "edits[1].operation",
-                "unknown variant `rename`, expected `replace_body` or `insert_after`",
-            ),
-            (
-                "edits[2].operation",
-                "expected a string, or one member naming the operation with null",
-            ),
-            (
-                "edits[3].operation",
-                "expected a string, or one member naming the operation with null",
-            ),
+            ("edits[0].operation", "expected a string"),
+            ("edits[1].operation", "expected a string"),
+            ("edits[2].operation", "expected a string"),
+            ("edits[3].operation", "expected a string"),
+            ("edits[4].operation", "expected a string"),
         ],
     ),
     (
@@ -381,12 +365,45 @@ fn the_named_help_describes_the_batch_format() {
     );
 }
 
-/// A valid batch prepares as it did before, in every form its decoding
-/// took: a member that is `null` is absent, members may come in any order,
-/// the document and an edit may be written as an array of their fields in
-/// order (`[edits]`, `[operation, name, at, file, fragment, from]`), and an
-/// operation as an object naming it, `{"replace_body": null}`. Each form's
-/// preview, through every entry, is its plain form's, and it applies.
+/// The forms the batch's former derived decoding took, which help never
+/// taught: the document as an array of its one field (`[edits]`), an edit
+/// as an array of its six fields in order (`[operation, name, at, file,
+/// fragment, from]`), and an operation as an object naming it
+/// (`{"replace_body": null}`). Each is refused with the issue any other
+/// array or object in its place has, at its JSON path, through every entry.
+#[test]
+fn the_former_array_and_operation_object_forms_are_refused() {
+    let document = [("$", r#"expected {"edits": [...]}"#)];
+    refused(
+        r#"[[{"operation": "replace_body", "at": "host.ts:1:17", "from": "body.ts"}]]"#,
+        "not an edit batch",
+        &document,
+    );
+    refused(
+        r#"[[[{"replace_body": null}, null, "1:17", "host.ts", null, "body.ts"]]]"#,
+        "not an edit batch",
+        &document,
+    );
+    for edit in [
+        r#"["replace_body", null, "host.ts:1:17", null, null, "body.ts"]"#,
+        r#"["replace_body", "start", null, "host.ts", "{ return 2; }", null]"#,
+    ] {
+        refused(
+            &format!(r#"{{"edits": [{edit}]}}"#),
+            "1 edit is invalid",
+            &[("edits[0]", "expected an object")],
+        );
+    }
+    refused(
+        r#"{"edits": [{"operation": {"replace_body": null}, "at": "host.ts:1:17", "from": "body.ts"}]}"#,
+        "1 edit is invalid",
+        &[("edits[0].operation", "expected a string")],
+    );
+}
+
+/// A valid batch prepares as it did before: a member that is `null` is
+/// absent, and members may come in any order. Each such form's preview,
+/// through every entry, is its plain form's, and it applies.
 #[test]
 fn a_valid_batch_prepares_as_before() {
     let service = Service::of(fixture());
@@ -395,15 +412,14 @@ fn a_valid_batch_prepares_as_before() {
             r#"{"edits": [{"operation": "replace_body", "at": "host.ts:1:17", "from": "body.ts"}]}"#,
             &[
                 r#"{"edits": [{"from": "body.ts", "fragment": null, "file": null, "at": "host.ts:1:17", "name": null, "operation": "replace_body"}]}"#,
-                r#"[[{"operation": "replace_body", "at": "host.ts:1:17", "from": "body.ts"}]]"#,
-                r#"{"edits": [["replace_body", null, "host.ts:1:17", null, null, "body.ts"]]}"#,
-                r#"{"edits": [{"operation": {"replace_body": null}, "at": "host.ts:1:17", "from": "body.ts"}]}"#,
-                r#"[[[{"replace_body": null}, null, "1:17", "host.ts", null, "body.ts"]]]"#,
+                r#"{"edits": [{"operation": "replace_body", "name": null, "at": "1:17", "file": "host.ts", "fragment": null, "from": "body.ts"}]}"#,
             ],
         ),
         (
             r#"{"edits": [{"operation": "replace_body", "name": "start", "file": "host.ts", "fragment": "{ return 2; }"}]}"#,
-            &[r#"{"edits": [["replace_body", "start", null, "host.ts", "{ return 2; }", null]]}"#],
+            &[
+                r#"{"edits": [{"fragment": "{ return 2; }", "from": null, "file": "host.ts", "at": null, "name": "start", "operation": "replace_body"}]}"#,
+            ],
         ),
     ];
     for (plain, written) in forms {
@@ -436,7 +452,7 @@ fn a_valid_batch_prepares_as_before() {
     let run = |args: &[&str]| service.command().args(args).output().unwrap();
     std::fs::write(
         service.fixture.path("form.json"),
-        r#"[[[{"replace_body": null}, null, "1:17", "host.ts", null, "body.ts"]]]"#,
+        r#"{"edits": [{"from": "body.ts", "fragment": null, "file": "host.ts", "at": "1:17", "name": null, "operation": "replace_body"}]}"#,
     )
     .unwrap();
     let output = run(&["--edit-batch", "form.json", "--plan", "form.plan.json"]);

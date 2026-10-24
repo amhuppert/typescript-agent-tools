@@ -69,7 +69,7 @@ impl Evaluator<'_, '_> {
             Some(Ok(links)) => links
                 .value()
                 .type_only
-                .get(&NativePropertyKey::fixed(name, self.control.as_ref()))
+                .get(&NativePropertyKey::fixed(name))
                 .copied(),
             Some(Err(_)) | None => None,
         })
@@ -88,7 +88,7 @@ impl Evaluator<'_, '_> {
                 Ok(links) => Ok(links
                     .value()
                     .type_only
-                    .contains_key(&NativePropertyKey::fixed(name, self.control.as_ref()))),
+                    .contains_key(&NativePropertyKey::fixed(name))),
                 Err(_) => Ok(false),
             };
         }
@@ -107,10 +107,6 @@ impl worker::Symbols for Symbols<'_, '_, '_> {
     type Identity = NativeSymbolIdentity;
     type Declaration = ReferenceDeclaration;
     type Error = DemandError;
-    fn control(&self) -> Option<&crate::resources::Control> {
-        self.checker.control.as_ref()
-    }
-
     fn module(
         &mut self,
         symbol: ReferenceSymbol,

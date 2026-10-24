@@ -204,7 +204,7 @@ impl Evaluator<'_, '_> {
     ) -> NativeResult<Option<TypeId>> {
         self.contextual_property_type_by_key_completion(
             ty,
-            &NativePropertyKey::fixed(name.as_bytes(), self.control.as_ref()),
+            &NativePropertyKey::fixed(name.as_bytes()),
             name_type,
             consumer,
         )

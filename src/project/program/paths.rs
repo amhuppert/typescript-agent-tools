@@ -97,19 +97,17 @@ pub(super) fn inexact_name(directory: &str, lossy: &str) -> InputError {
 }
 
 /// A native path as loader text: its exact text (`input::exact_path`), so a
-/// path that is not Unicode names no input, with `\\` written as `/` on
-/// Windows.
+/// path that is not Unicode names no input (`native_text`).
 pub(in crate::project) fn from_path(path: &Path) -> Result<String, InputError> {
     crate::input::exact_path(path).map(native_text)
 }
 
-/// Native path text with `/` separators: `\\` written as `/` on Windows.
+/// Native path text as loader text: the port of the `normalizeSlashes`
+/// TypeScript applies to a native path (`osFSRealpath`), as the identity. On
+/// macOS and Linux `/` is the only separator, and a `\\` is part of a file
+/// name, which keeps its exact value.
 pub(super) fn native_text(text: &str) -> String {
-    if cfg!(windows) {
-        separators(text)
-    } else {
-        text.to_owned()
-    }
+    text.to_owned()
 }
 
 /// `GetEncodedRootLength`: disk and URL roots retain separate identities.

@@ -168,7 +168,6 @@ impl ReadInvocations {
         if let Some(flow) = invocation.last_shared
             && !self.shared.contains_key(&flow)
         {
-            self.shared.reserve(1);
             self.shared.insert(flow, suffix.clone());
         }
         invocation.result = Some(prefix.and_then(|()| Ok(suffix))?);

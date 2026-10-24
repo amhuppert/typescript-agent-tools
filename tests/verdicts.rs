@@ -131,19 +131,10 @@ fn stop_names_the_service_it_stopped() {
         outcome(&service.run(&["--references-stop"])),
         (Some(0), "no service: tsconfig.json\n".into(), String::new())
     );
-    // The configuration is named as given; --references, --pretty, and
-    // --output change nothing.
+    // The configuration is named as given.
     let output = service
         .command()
-        .args([
-            "--references-stop",
-            "--project",
-            "./tsconfig.json",
-            "--references",
-            "--pretty",
-            "-o",
-            "out.txt",
-        ])
+        .args(["--references-stop", "--project", "./tsconfig.json"])
         .output()
         .unwrap();
     assert_eq!(
@@ -154,5 +145,4 @@ fn stop_names_the_service_it_stopped() {
             String::new()
         )
     );
-    assert!(!service.fixture.path("out.txt").exists());
 }

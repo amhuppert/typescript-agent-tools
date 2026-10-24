@@ -8,7 +8,6 @@ use serde::{Deserialize, Serialize};
 use std::ffi::OsString;
 use std::fmt;
 use std::io;
-#[cfg(unix)]
 use std::path::PathBuf;
 use std::sync::{Condvar, Mutex};
 use std::time::{Duration, Instant};
@@ -56,7 +55,6 @@ pub(crate) use {
 /// reports an invalid value as the service would have, and starts nothing.
 pub(crate) struct Environment {
     limits: Limits,
-    #[cfg(unix)]
     idle: Duration,
 }
 
@@ -71,7 +69,6 @@ impl Environment {
                     max_memory_mb: MEMORY_MB.read()?,
                     query_timeout_ms: TIMEOUT_MS.read()?,
                 },
-                #[cfg(unix)]
                 idle: Duration::from_secs(IDLE_SECS.read()?),
             })
         };
@@ -86,20 +83,17 @@ impl Environment {
     }
 
     /// How long a service waits for a request before it exits.
-    #[cfg(unix)]
     pub(crate) fn idle(&self) -> Duration {
         self.idle
     }
 
     /// The service's runtime directory: `TSPARSE_SERVICE_DIR`, any path, or
     /// `/tmp/tsparse-UID` when it is not set.
-    #[cfg(unix)]
     pub(crate) fn service_dir() -> PathBuf {
         Self::directory().0
     }
 
     /// The runtime directory, and whether it is the default.
-    #[cfg(unix)]
     fn directory() -> (PathBuf, bool) {
         match std::env::var_os(SERVICE_DIR) {
             Some(directory) => (PathBuf::from(directory), false),
@@ -118,10 +112,7 @@ impl Environment {
     /// and `service_dir` take it, so the doctor reports every invalid
     /// value, not only the first.
     pub(crate) fn settings() -> Vec<Setting> {
-        let mut variables = vec![&MEMORY_MB, &TIMEOUT_MS];
-        #[cfg(unix)]
-        variables.push(&IDLE_SECS);
-        let mut settings: Vec<Setting> = variables
+        let mut settings: Vec<Setting> = [&MEMORY_MB, &TIMEOUT_MS, &IDLE_SECS]
             .into_iter()
             .map(|variable| match variable.given() {
                 Ok(Some(number)) => Setting::Valid {
@@ -137,15 +128,12 @@ impl Environment {
                 Err(invalid) => Setting::Invalid(invalid.to_string()),
             })
             .collect();
-        #[cfg(unix)]
-        {
-            let (directory, default) = Self::directory();
-            settings.push(Setting::Valid {
-                name: SERVICE_DIR,
-                value: directory.display().to_string(),
-                default,
-            });
-        }
+        let (directory, default) = Self::directory();
+        settings.push(Setting::Valid {
+            name: SERVICE_DIR,
+            value: directory.display().to_string(),
+            default,
+        });
         settings
     }
 }
@@ -164,7 +152,6 @@ pub(crate) enum Setting {
 
 /// The variable that names the service's runtime directory, which a client
 /// also sets for the service it starts, so that both use one directory.
-#[cfg(unix)]
 pub(crate) const SERVICE_DIR: &str = "TSPARSE_SERVICE_DIR";
 
 /// A positive integer variable: a value that is not set takes `default`;
@@ -189,7 +176,6 @@ static TIMEOUT_MS: Variable = Variable {
     default: default_timeout_ms!(),
     maximum: u64::MAX,
 };
-#[cfg(unix)]
 static IDLE_SECS: Variable = Variable {
     name: "TSPARSE_SERVICE_IDLE_SECS",
     unit: "seconds",
@@ -491,12 +477,4 @@ fn memory_bytes() -> io::Result<u64> {
     read("VmRSS:")?
         .checked_add(read("VmSwap:")?)
         .ok_or_else(|| io::Error::other("process memory size overflow"))
-}
-
-#[cfg(not(any(target_os = "macos", target_os = "linux")))]
-fn memory_bytes() -> io::Result<u64> {
-    Err(io::Error::new(
-        io::ErrorKind::Unsupported,
-        "query memory monitoring supports macOS and Linux",
-    ))
 }

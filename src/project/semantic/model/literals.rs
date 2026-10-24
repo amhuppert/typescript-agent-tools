@@ -49,50 +49,50 @@ mod ordering_tests {
 
     #[test]
     fn literal_order_observes_only_a_decisive_native_byte() {
-        let identity = LiteralValue::from_parts([atom(0)], None);
+        let identity = LiteralValue::from_parts([atom(0)]);
         for byte in [0, b'/', b'0', b':', b'x', 0xfe, 0xff] {
-            let fixed = LiteralValue::from_bytes(vec![byte], None);
+            let fixed = LiteralValue::from_bytes(vec![byte]);
             let expected = if byte < b'1' {
                 Ordering::Greater
             } else {
                 Ordering::Less
             };
-            assert_eq!(identity.compare_value(&fixed, None), Ok(expected));
-            assert_eq!(fixed.compare_value(&identity, None), Ok(expected.reverse()));
+            assert_eq!(identity.compare_value(&fixed), Ok(expected));
+            assert_eq!(fixed.compare_value(&identity), Ok(expected.reverse()));
         }
         for byte in b'1'..=b'9' {
             assert_eq!(
-                identity.compare_value(&LiteralValue::from_bytes(vec![byte], None), None),
+                identity.compare_value(&LiteralValue::from_bytes(vec![byte])),
                 Err(LiteralError::IdentitySpelling)
             );
         }
-        let other = LiteralValue::from_parts([atom(1)], None);
+        let other = LiteralValue::from_parts([atom(1)]);
         assert_eq!(
-            identity.compare_value(&other, None),
+            identity.compare_value(&other),
             Err(LiteralError::IdentitySpelling)
         );
-        assert_eq!(identity.compare_value(&identity, None), Ok(Ordering::Equal));
-        let empty = LiteralValue::from_text("", None);
-        assert_eq!(empty.compare_value(&identity, None), Ok(Ordering::Less));
-        assert_eq!(identity.compare_value(&empty, None), Ok(Ordering::Greater));
-        let left = LiteralValue::from_parts([bytes(b"pre"), atom(0), bytes(b":a")], None);
-        let right = LiteralValue::from_parts([bytes(b"pre"), atom(0), bytes(b":b")], None);
-        assert_eq!(left.compare_value(&right, None), Ok(Ordering::Less));
-        let prefix = LiteralValue::from_parts([bytes(b"pre"), atom(0)], None);
-        assert_eq!(prefix.compare_value(&left, None), Ok(Ordering::Less));
-        let undecidable = LiteralValue::from_parts([bytes(b"pre"), atom(1), bytes(b":z")], None);
+        assert_eq!(identity.compare_value(&identity), Ok(Ordering::Equal));
+        let empty = LiteralValue::from_text("");
+        assert_eq!(empty.compare_value(&identity), Ok(Ordering::Less));
+        assert_eq!(identity.compare_value(&empty), Ok(Ordering::Greater));
+        let left = LiteralValue::from_parts([bytes(b"pre"), atom(0), bytes(b":a")]);
+        let right = LiteralValue::from_parts([bytes(b"pre"), atom(0), bytes(b":b")]);
+        assert_eq!(left.compare_value(&right), Ok(Ordering::Less));
+        let prefix = LiteralValue::from_parts([bytes(b"pre"), atom(0)]);
+        assert_eq!(prefix.compare_value(&left), Ok(Ordering::Less));
+        let undecidable = LiteralValue::from_parts([bytes(b"pre"), atom(1), bytes(b":z")]);
         assert_eq!(
-            left.compare_value(&undecidable, None),
+            left.compare_value(&undecidable),
             Err(LiteralError::IdentitySpelling)
         );
-        let partitioned = LiteralValue::from_parts([atom(0), atom(1)], None);
+        let partitioned = LiteralValue::from_parts([atom(0), atom(1)]);
         assert_eq!(
-            partitioned.compare_value(&LiteralValue::from_parts([atom(1), atom(0)], None), None),
+            partitioned.compare_value(&LiteralValue::from_parts([atom(1), atom(0)])),
             Err(LiteralError::IdentitySpelling)
         );
         assert_eq!(
-            LiteralValue::from_bytes(b"\xfe".as_slice(), None)
-                .compare_value(&LiteralValue::from_text("�", None), None),
+            LiteralValue::from_bytes(b"\xfe".as_slice())
+                .compare_value(&LiteralValue::from_text("�")),
             Ok(Ordering::Greater)
         );
     }
@@ -101,15 +101,13 @@ mod ordering_tests {
     fn generated_key_policy_cannot_leak_into_literal_order() {
         let a = NativePropertyKey::unique(
             NativeSymbolIdentity::Transient(0),
-            NativePropertyKey::fixed(b"a".as_slice(), None),
-            None,
+            NativePropertyKey::fixed(b"a".as_slice()),
         );
         let b = NativePropertyKey::unique(
             NativeSymbolIdentity::Transient(1),
-            NativePropertyKey::fixed(b"a0".as_slice(), None),
-            None,
+            NativePropertyKey::fixed(b"a0".as_slice()),
         );
-        let c = LiteralValue::from_parts([bytes(b"\xfe@a9"), atom(2)], None);
+        let c = LiteralValue::from_parts([bytes(b"\xfe@a9"), atom(2)]);
         // B's underlying-name rule gives a < b. Using that result for literal
         // values while comparing composed c by bytes would create a cycle.
         assert_eq!(
@@ -120,10 +118,10 @@ mod ordering_tests {
         );
         let a = LiteralValue::from_property_key(&a);
         let b = LiteralValue::from_property_key(&b);
-        assert_eq!(b.compare_value(&c, None), Ok(Ordering::Less));
-        assert_eq!(c.compare_value(&a, None), Ok(Ordering::Less));
-        assert_eq!(b.compare_value(&a, None), Ok(Ordering::Less));
-        assert_eq!(a.compare_value(&b, None), Ok(Ordering::Greater));
+        assert_eq!(b.compare_value(&c), Ok(Ordering::Less));
+        assert_eq!(c.compare_value(&a), Ok(Ordering::Less));
+        assert_eq!(b.compare_value(&a), Ok(Ordering::Less));
+        assert_eq!(a.compare_value(&b), Ok(Ordering::Greater));
     }
 }
 
@@ -131,18 +129,14 @@ mod ordering_tests {
 pub(in crate::project::semantic) struct LiteralValue(NativeStringValue);
 
 impl LiteralValue {
-    pub(in crate::project::semantic) fn from_text(
-        text: impl AsRef<str>,
-        control: Option<&crate::resources::Control>,
-    ) -> Self {
-        Self::from_bytes(text.as_ref().as_bytes(), control)
+    pub(in crate::project::semantic) fn from_text(text: impl AsRef<str>) -> Self {
+        Self::from_bytes(text.as_ref().as_bytes())
     }
 
     pub(in crate::project::semantic) fn from_bytes(
         bytes: impl crate::project::binding::NativeByteInput,
-        control: Option<&crate::resources::Control>,
     ) -> Self {
-        Self(NativeStringValue::from_bytes(bytes, control))
+        Self(NativeStringValue::from_bytes(bytes))
     }
 
     /// Canonical interner identity; semantic string comparison may ask the
@@ -157,9 +151,8 @@ impl LiteralValue {
 
     pub(in crate::project::semantic) fn from_parts(
         parts: impl IntoIterator<Item = LiteralPart>,
-        control: Option<&crate::resources::Control>,
     ) -> Self {
-        Self(NativeStringValue::from_parts(parts, control))
+        Self(NativeStringValue::from_parts(parts))
     }
 
     pub(in crate::project::semantic) fn from_property_key(key: &NativePropertyKey) -> Self {
@@ -182,11 +175,8 @@ impl LiteralValue {
     pub(in crate::project::semantic) fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
-    pub(in crate::project::semantic) fn display_length(
-        &self,
-        control: Option<&crate::resources::Control>,
-    ) -> usize {
-        self.0.display_length(control)
+    pub(in crate::project::semantic) fn display_length(&self) -> usize {
+        self.0.display_length()
     }
     pub(in crate::project::semantic) fn entire_identity(&self) -> Option<NativeSymbolIdentity> {
         self.0.entire_identity()
@@ -196,80 +186,64 @@ impl LiteralValue {
     }
     pub(in crate::project::semantic) fn concat<'a>(
         parts: impl IntoIterator<Item = &'a Self>,
-        control: Option<&crate::resources::Control>,
     ) -> Self {
-        Self::from_parts(parts.into_iter().flat_map(Self::parts), control)
+        Self::from_parts(parts.into_iter().flat_map(Self::parts))
     }
 
     /// Native `CombineSurrogatePairs` cannot combine across an identity atom:
     /// every possible spelling of that atom contains at least one digit.
-    pub(in crate::project::semantic) fn combine_surrogate_pairs(
-        &self,
-        control: Option<&crate::resources::Control>,
-    ) -> Self {
-        Self::from_parts(
-            self.parts().map(|part| match part {
-                LiteralPart::Bytes(bytes) => LiteralPart::Bytes(std::sync::Arc::from(
-                    crate::strings::combine_surrogate_pairs(&bytes, control),
-                )),
-                LiteralPart::Identity(identity) => LiteralPart::Identity(identity),
-            }),
-            control,
-        )
+    pub(in crate::project::semantic) fn combine_surrogate_pairs(&self) -> Self {
+        Self::from_parts(self.parts().map(|part| match part {
+            LiteralPart::Bytes(bytes) => LiteralPart::Bytes(std::sync::Arc::from(
+                crate::strings::combine_surrogate_pairs(&bytes),
+            )),
+            LiteralPart::Identity(identity) => LiteralPart::Identity(identity),
+        }))
     }
     pub(in crate::project::semantic) fn start(&self) -> LiteralPosition {
         self.0.start()
     }
-    pub(in crate::project::semantic) fn end(
-        &self,
-        control: Option<&crate::resources::Control>,
-    ) -> LiteralPosition {
-        self.0.end(control)
+    pub(in crate::project::semantic) fn end(&self) -> LiteralPosition {
+        self.0.end()
     }
     pub(in crate::project::semantic) fn segment_at(
         &self,
         position: LiteralPosition,
-        control: Option<&crate::resources::Control>,
     ) -> Result<LiteralSegment<'_>, LiteralError> {
-        self.0.segment_at(position, control)
+        self.0.segment_at(position)
     }
     pub(in crate::project::semantic) fn previous_segment(
         &self,
         position: LiteralPosition,
-        control: Option<&crate::resources::Control>,
     ) -> Result<(LiteralPosition, LiteralSegment<'_>), LiteralError> {
-        self.0.previous_segment(position, control)
+        self.0.previous_segment(position)
     }
     pub(in crate::project::semantic) fn advance_bytes(
         &self,
         position: LiteralPosition,
         count: usize,
-        control: Option<&crate::resources::Control>,
     ) -> Result<LiteralPosition, LiteralError> {
-        self.0.advance_bytes(position, count, control)
+        self.0.advance_bytes(position, count)
     }
     pub(in crate::project::semantic) fn retreat_bytes(
         &self,
         position: LiteralPosition,
         count: usize,
-        control: Option<&crate::resources::Control>,
     ) -> Result<LiteralPosition, LiteralError> {
-        self.0.retreat_bytes(position, count, control)
+        self.0.retreat_bytes(position, count)
     }
     pub(in crate::project::semantic) fn after_segment(
         &self,
         position: LiteralPosition,
-        control: Option<&crate::resources::Control>,
     ) -> Result<LiteralPosition, LiteralError> {
-        self.0.after_segment(position, control)
+        self.0.after_segment(position)
     }
     pub(in crate::project::semantic) fn slice(
         &self,
         start: LiteralPosition,
         end: LiteralPosition,
-        control: Option<&crate::resources::Control>,
     ) -> Result<Self, LiteralError> {
-        self.0.slice(start, end, control).map(Self)
+        self.0.slice(start, end).map(Self)
     }
 
     /// `CompareTypes` compares string values and template spans with native
@@ -280,14 +254,10 @@ impl LiteralValue {
     pub(in crate::project::semantic) fn compare_value(
         &self,
         other: &Self,
-        control: Option<&crate::resources::Control>,
     ) -> Result<Ordering, LiteralError> {
         let (mut left, mut right) = (self.start(), other.start());
         loop {
-            match (
-                self.segment_at(left, control)?,
-                other.segment_at(right, control)?,
-            ) {
+            match (self.segment_at(left)?, other.segment_at(right)?) {
                 (LiteralSegment::End, LiteralSegment::End) => return Ok(Ordering::Equal),
                 (LiteralSegment::End, _) => return Ok(Ordering::Less),
                 (_, LiteralSegment::End) => return Ok(Ordering::Greater),
@@ -297,12 +267,12 @@ impl LiteralValue {
                     if order != Ordering::Equal {
                         return Ok(order);
                     }
-                    left = self.advance_bytes(left, count, control)?;
-                    right = other.advance_bytes(right, count, control)?;
+                    left = self.advance_bytes(left, count)?;
+                    right = other.advance_bytes(right, count)?;
                 }
                 (LiteralSegment::Identity(a), LiteralSegment::Identity(b)) if a == b => {
-                    left = self.after_segment(left, control)?;
-                    right = other.after_segment(right, control)?;
+                    left = self.after_segment(left)?;
+                    right = other.after_segment(right)?;
                 }
                 (LiteralSegment::Identity(_), LiteralSegment::Bytes(bytes)) if bytes[0] < b'1' => {
                     return Ok(Ordering::Greater);
@@ -328,7 +298,6 @@ impl LiteralValue {
     pub(in crate::project::semantic) fn semantic_equal(
         &self,
         other: &Self,
-        control: Option<&crate::resources::Control>,
     ) -> Result<bool, LiteralError> {
         if self.0.canonical_equal(&other.0) {
             return Ok(true);
@@ -369,12 +338,12 @@ impl LiteralValue {
             }
             _ => {}
         }
-        match self.match_prefix_at(self.start(), other, control) {
-            Ok(Some(end)) => Ok(end == self.end(control)),
+        match self.match_prefix_at(self.start(), other) {
+            Ok(Some(end)) => Ok(end == self.end()),
             Ok(None) => Ok(false),
             // A fixed suffix can independently prove inequality without
             // observing the digits that made the prefix inconclusive.
-            Err(LiteralError::IdentitySpelling) => match self.match_suffix(other, control) {
+            Err(LiteralError::IdentitySpelling) => match self.match_suffix(other) {
                 Ok(None) => Ok(false),
                 Ok(Some(_)) | Err(LiteralError::IdentitySpelling) => {
                     Err(LiteralError::IdentitySpelling)
@@ -391,18 +360,16 @@ impl LiteralValue {
         &self,
         position: LiteralPosition,
         prefix: &Self,
-        control: Option<&crate::resources::Control>,
     ) -> Result<Option<LiteralPosition>, LiteralError> {
-        self.prefix_match(position, prefix, false, control)
+        self.prefix_match(position, prefix, false)
     }
 
     /// `templateLiteralTypesDefinitelyUnrelated` compares the shorter prefix.
     pub(in crate::project::semantic) fn compatible_prefix(
         &self,
         other: &Self,
-        control: Option<&crate::resources::Control>,
     ) -> Result<bool, LiteralError> {
-        self.prefix_match(self.start(), other, true, control)
+        self.prefix_match(self.start(), other, true)
             .map(|end| end.is_some())
     }
 
@@ -411,14 +378,10 @@ impl LiteralValue {
         mut position: LiteralPosition,
         prefix: &Self,
         allow_shorter: bool,
-        control: Option<&crate::resources::Control>,
     ) -> Result<Option<LiteralPosition>, LiteralError> {
         let mut pattern = prefix.start();
         loop {
-            match (
-                self.segment_at(position, control)?,
-                prefix.segment_at(pattern, control)?,
-            ) {
+            match (self.segment_at(position)?, prefix.segment_at(pattern)?) {
                 (_, LiteralSegment::End) => return Ok(Some(position)),
                 (LiteralSegment::End, _) => return Ok(allow_shorter.then_some(position)),
                 (LiteralSegment::Bytes(bytes), LiteralSegment::Bytes(wanted)) => {
@@ -426,12 +389,12 @@ impl LiteralValue {
                     if bytes[..count] != wanted[..count] {
                         return Ok(None);
                     }
-                    position = self.advance_bytes(position, count, control)?;
-                    pattern = prefix.advance_bytes(pattern, count, control)?;
+                    position = self.advance_bytes(position, count)?;
+                    pattern = prefix.advance_bytes(pattern, count)?;
                 }
                 (LiteralSegment::Identity(a), LiteralSegment::Identity(b)) if a == b => {
-                    position = self.after_segment(position, control)?;
-                    pattern = prefix.after_segment(pattern, control)?;
+                    position = self.after_segment(position)?;
+                    pattern = prefix.after_segment(pattern)?;
                 }
                 (LiteralSegment::Identity(_), LiteralSegment::Bytes(bytes))
                 | (LiteralSegment::Bytes(bytes), LiteralSegment::Identity(_))
@@ -449,32 +412,28 @@ impl LiteralValue {
     pub(in crate::project::semantic) fn match_suffix(
         &self,
         suffix: &Self,
-        control: Option<&crate::resources::Control>,
     ) -> Result<Option<LiteralPosition>, LiteralError> {
-        self.suffix_match(suffix, false, control)
+        self.suffix_match(suffix, false)
     }
 
     /// `templateLiteralTypesDefinitelyUnrelated` compares the shorter suffix.
     pub(in crate::project::semantic) fn compatible_suffix(
         &self,
         other: &Self,
-        control: Option<&crate::resources::Control>,
     ) -> Result<bool, LiteralError> {
-        self.suffix_match(other, true, control)
-            .map(|start| start.is_some())
+        self.suffix_match(other, true).map(|start| start.is_some())
     }
 
     fn suffix_match(
         &self,
         suffix: &Self,
         allow_shorter: bool,
-        control: Option<&crate::resources::Control>,
     ) -> Result<Option<LiteralPosition>, LiteralError> {
-        let mut position = self.end(control);
-        let mut pattern = suffix.end(control);
+        let mut position = self.end();
+        let mut pattern = suffix.end();
         loop {
-            let (before, segment) = self.previous_segment(position, control)?;
-            let (pattern_before, wanted) = suffix.previous_segment(pattern, control)?;
+            let (before, segment) = self.previous_segment(position)?;
+            let (pattern_before, wanted) = suffix.previous_segment(pattern)?;
             match (segment, wanted) {
                 (_, LiteralSegment::End) => return Ok(Some(position)),
                 (LiteralSegment::End, _) => return Ok(allow_shorter.then_some(position)),
@@ -483,8 +442,8 @@ impl LiteralValue {
                     if bytes[bytes.len() - count..] != wanted[wanted.len() - count..] {
                         return Ok(None);
                     }
-                    position = self.retreat_bytes(position, count, control)?;
-                    pattern = suffix.retreat_bytes(pattern, count, control)?;
+                    position = self.retreat_bytes(position, count)?;
+                    pattern = suffix.retreat_bytes(pattern, count)?;
                 }
                 (LiteralSegment::Identity(a), LiteralSegment::Identity(b)) if a == b => {
                     position = before;
@@ -507,16 +466,15 @@ impl LiteralValue {
         &self,
         mut position: LiteralPosition,
         delimiter: &Self,
-        control: Option<&crate::resources::Control>,
     ) -> Result<Option<(LiteralPosition, LiteralPosition)>, LiteralError> {
-        self.segment_at(position, control)?;
+        self.segment_at(position)?;
         if delimiter.is_empty() {
             return Ok(Some((position, position)));
         }
         loop {
-            match self.segment_at(position, control)? {
+            match self.segment_at(position)? {
                 LiteralSegment::Bytes(bytes) => {
-                    let offset = match delimiter.segment_at(delimiter.start(), control)? {
+                    let offset = match delimiter.segment_at(delimiter.start())? {
                         LiteralSegment::Bytes(wanted) => {
                             bytes.iter().position(|&byte| byte == wanted[0])
                         }
@@ -530,20 +488,20 @@ impl LiteralValue {
                         }
                     };
                     let Some(offset) = offset else {
-                        position = self.after_segment(position, control)?;
+                        position = self.after_segment(position)?;
                         continue;
                     };
-                    position = self.advance_bytes(position, offset, control)?;
-                    if let Some(after) = self.match_prefix_at(position, delimiter, control)? {
+                    position = self.advance_bytes(position, offset)?;
+                    if let Some(after) = self.match_prefix_at(position, delimiter)? {
                         return Ok(Some((position, after)));
                     }
-                    position = self.advance_bytes(position, 1, control)?;
+                    position = self.advance_bytes(position, 1)?;
                 }
                 LiteralSegment::Identity(_) => {
-                    if let Some(after) = self.match_prefix_at(position, delimiter, control)? {
+                    if let Some(after) = self.match_prefix_at(position, delimiter)? {
                         return Ok(Some((position, after)));
                     }
-                    position = self.after_segment(position, control)?;
+                    position = self.after_segment(position)?;
                 }
                 LiteralSegment::End => return Ok(None),
             }
@@ -555,12 +513,11 @@ impl LiteralValue {
     pub(in crate::project::semantic) fn next_rune(
         &self,
         position: LiteralPosition,
-        control: Option<&crate::resources::Control>,
     ) -> Result<Option<LiteralPosition>, LiteralError> {
-        match self.segment_at(position, control)? {
+        match self.segment_at(position)? {
             LiteralSegment::Bytes(bytes) => {
                 let (_, count) = crate::strings::decode_js_string_rune(bytes);
-                self.advance_bytes(position, count, control).map(Some)
+                self.advance_bytes(position, count).map(Some)
             }
             LiteralSegment::Identity(_) => Err(LiteralError::IdentitySpelling),
             LiteralSegment::End => Ok(None),

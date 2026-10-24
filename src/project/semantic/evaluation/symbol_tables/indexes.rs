@@ -16,8 +16,7 @@ impl Evaluator<'_, '_> {
             .map(|table| {
                 lookup(
                     table.as_deref(),
-                    &NativePropertyKey::fixed(b"\xfeindex".as_slice(), self.control.as_ref()),
-                    self.control.as_ref(),
+                    &NativePropertyKey::fixed(b"\xfeindex".as_slice()),
                 )
             }))
     }

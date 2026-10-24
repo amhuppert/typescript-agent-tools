@@ -19,8 +19,8 @@ use crate::references::{
     ReferenceOutcome, ReferenceQuery, ReferenceRequest, ReferenceResult,
     ReferenceSelection as SelectionDocument, ReferenceSelectionFailure, UnsearchedMembers,
 };
-use crate::resources::FixedMap;
 use crate::syntax_kind::SyntaxKind;
+use std::collections::HashMap;
 mod ledger;
 use crate::references::metadata::copy_location;
 use ledger::Ledger;
@@ -175,8 +175,8 @@ fn member_search(
         meaning,
         control: evaluator.checker_inputs().control.cloned(),
         ledger: Ledger::new(evaluator.checker_inputs().control.cloned()),
-        searched: FixedMap::new(),
-        reexports: FixedMap::new(),
+        searched: HashMap::new(),
+        reexports: HashMap::new(),
         imports: super::reference_import_tracker::ImportTracker::new(project),
     };
     let work = if let Some(scope) = scope {
@@ -248,13 +248,13 @@ struct Search {
 /// visitation list. Iteration marks searched identities without semantic child
 /// acquisition; insertion order has no effect on that commutative union.
 struct SearchSymbols {
-    identities: FixedMap<NativeSymbolIdentity, ()>,
+    identities: HashMap<NativeSymbolIdentity, ()>,
     ordered: Vec<NativeSymbolIdentity>,
 }
 impl SearchSymbols {
     fn new() -> Self {
         Self {
-            identities: FixedMap::new(),
+            identities: HashMap::new(),
             ordered: Vec::new(),
         }
     }
@@ -277,8 +277,8 @@ struct SearchState<'a> {
     meaning: ReferenceMeaning,
     control: Option<crate::resources::Control>,
     ledger: Ledger,
-    searched: FixedMap<(FileId, NativeSymbolIdentity), ()>,
-    reexports: FixedMap<ExpressionRoot, ()>,
+    searched: HashMap<(FileId, NativeSymbolIdentity), ()>,
+    reexports: HashMap<ExpressionRoot, ()>,
     imports: super::reference_import_tracker::ImportTracker<'a>,
 }
 

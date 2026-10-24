@@ -6,6 +6,7 @@ mod syntax;
 mod try_flow;
 
 use super::site_map::{PackedValue, SiteMap};
+use crate::analysis::{InputError, InputErrorKind};
 use crate::syntax as fields;
 use crate::syntax_kind::SyntaxKind;
 use crate::{Ast, NodeId, Span};
@@ -68,6 +69,26 @@ fn encode_index(index: usize) -> NonZeroUsize {
         .expect("native flow arena index fits a nonzero identity")
 }
 
+/// Refuse a file whose flow graph has more than `u32::MAX` nodes or
+/// containers, as `Unsupported`: a limit of tsparse, not a TypeScript rule.
+/// It is the one owner of that limit; a frozen read packs both identities as
+/// `u32` on the strength of it (`Read::pack`). The source-length limit does
+/// not imply it: `a&&a;` allocates six flow nodes in five bytes.
+fn check_arenas(nodes: usize, containers: usize) -> Result<(), InputError> {
+    if nodes <= u32::MAX as usize && containers <= u32::MAX as usize {
+        return Ok(());
+    }
+    Err(InputError {
+        kind: InputErrorKind::Unsupported,
+        message: format!(
+            "control flow has more than {} nodes or containers; tsparse supports up to u32::MAX of each per file",
+            u32::MAX
+        ),
+        path: None,
+        position: None,
+    })
+}
+
 #[derive(Debug, Clone, Copy)]
 pub(in crate::project) struct Read {
     pub(in crate::project) flow: Option<FlowId>,
@@ -76,22 +97,22 @@ pub(in crate::project) struct Read {
 
 // A zero encoded flow means an explicitly absent native attachment. Flow 0
 // itself is reachable as an identity (the Unreachable node), so present ids
-// are shifted by one. The shared table retains full-width values on overflow.
+// are shifted by one. Both fit, since capture refuses a graph with more than
+// `u32::MAX` nodes or containers (`check_arenas`, the owner of that limit).
 impl PackedValue for Read {
     type Packed = [u32; 2];
 
-    fn pack(self) -> Option<Self::Packed> {
-        if self.container.index() > u32::MAX as usize
-            || self
-                .flow
-                .is_some_and(|flow| flow.index() >= u32::MAX as usize)
-        {
-            return None;
-        }
-        Some([
+    fn pack(self) -> Self::Packed {
+        debug_assert!(
+            self.flow
+                .is_none_or(|flow| flow.index() < u32::MAX as usize)
+                && self.container.index() <= u32::MAX as usize,
+            "a file's flow identities fit u32: {self:?}"
+        );
+        [
             self.flow.map_or(0, |flow| flow.index() as u32 + 1),
             self.container.index() as u32,
-        ])
+        ]
     }
 
     fn unpack([flow, container]: Self::Packed) -> Self {
@@ -253,7 +274,7 @@ impl Graph {
     /// arena is released. The retained site inventory is the flow-attachment
     /// owner: every visited node records its optional native field, so an
     /// explicit nil attachment differs from a node that was not retained.
-    pub(super) fn capture(ast: &Ast<'_>) -> Capture {
+    pub(super) fn capture(ast: &Ast<'_>) -> Result<Capture, InputError> {
         Builder::new(ast).run()
     }
 }
@@ -393,7 +414,7 @@ impl<'a, 's> Builder<'a, 's> {
         }
     }
 
-    fn run(mut self) -> Capture {
+    fn run(mut self) -> Result<Capture, InputError> {
         while let Some(work) = self.work.pop() {
             match work {
                 Work::Bind(id) => self.bind(id),
@@ -540,14 +561,15 @@ impl<'a, 's> Builder<'a, 's> {
             }
         }
         self.graph.containers[0].end = Some(self.context.current);
+        check_arenas(self.graph.nodes.len(), self.graph.containers.len())?;
         self.graph.reads = SiteMap::from_entries(self.reads);
         // The captured graph never grows: release what its growth left.
         self.graph.nodes.shrink_to_fit();
         self.graph.containers.shrink_to_fit();
-        Capture {
+        Ok(Capture {
             graph: self.graph,
             contains_this: self.contains_this,
-        }
+        })
     }
 
     fn bind(&mut self, id: NodeId) {
@@ -1666,7 +1688,7 @@ mod tests {
     }
 
     #[test]
-    fn frozen_reads_preserve_nil_unreachable_and_full_width_identities() {
+    fn frozen_reads_preserve_nil_unreachable_and_u32_identities() {
         let site = Site {
             span: Span { start: 2, end: 4 },
             kind: SyntaxKind::Identifier,
@@ -1675,13 +1697,10 @@ mod tests {
             None,
             Some(FlowId::new(0)),
             Some(FlowId::new(u32::MAX as usize - 1)),
-            Some(FlowId::new((u32::MAX as usize).min(usize::MAX - 1))),
-            Some(FlowId::new(usize::MAX - 1)),
         ] {
             for container in [
                 ContainerId::new(0),
                 ContainerId::new((u32::MAX as usize).min(usize::MAX - 1)),
-                ContainerId::new(usize::MAX - 1),
             ] {
                 let graph = Graph {
                     reads: SiteMap::from_entries(vec![(
@@ -1703,6 +1722,28 @@ mod tests {
                         .is_none()
                 );
             }
+        }
+    }
+
+    /// The arena limit at and just over `u32::MAX` entries, for each arena.
+    /// No end-to-end variant runs: a file with four billion flow nodes needs
+    /// hundreds of gigabytes to parse and bind, so the rule takes the counts
+    /// as values, and `Builder::run` applies it to every file's graph.
+    #[test]
+    fn a_flow_graph_over_u32_max_nodes_or_containers_is_unsupported() {
+        let max = u32::MAX as usize;
+        assert!(check_arenas(max, max).is_ok());
+        for (nodes, containers) in [(max + 1, 1), (2, max + 1)] {
+            let error = check_arenas(nodes, containers)
+                .expect_err("a flow arena one entry over the limit is refused");
+            assert_eq!(error.kind, InputErrorKind::Unsupported);
+            assert_eq!(error.path, None);
+            assert_eq!(error.position, None);
+            assert_eq!(
+                error.message,
+                "control flow has more than 4294967295 nodes or containers; \
+                 tsparse supports up to u32::MAX of each per file"
+            );
         }
     }
 }

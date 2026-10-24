@@ -63,7 +63,6 @@ impl<K: CheckedKey, V> CheckedMap<K, V> {
             }
             bucket.push((key, value));
         } else {
-            self.buckets.reserve(1);
             let mut bucket = Bucket::new();
             bucket.push((key, value));
             self.buckets.insert(fingerprint, bucket);

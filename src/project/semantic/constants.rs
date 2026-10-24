@@ -10,15 +10,11 @@ pub(super) enum ConstantValue {
 }
 impl ConstantValue {
     /// `AnyToString` delegates numeric formatting to the shared jsnum owner.
-    pub(super) fn into_text(
-        self,
-        control: Option<&crate::resources::Control>,
-    ) -> super::model::LiteralValue {
+    pub(super) fn into_text(self) -> super::model::LiteralValue {
         match self {
-            Self::Number(number) => super::model::LiteralValue::from_text(
-                crate::numbers::number_to_string(number),
-                control,
-            ),
+            Self::Number(number) => {
+                super::model::LiteralValue::from_text(crate::numbers::number_to_string(number))
+            }
             Self::String(text) => text,
         }
     }

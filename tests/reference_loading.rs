@@ -1163,7 +1163,21 @@ fn the_first_failing_input_in_load_order_is_reported_among_many() {
     }
 }
 
-#[cfg(unix)]
+/// What loading `config` gives, from another thread: nothing when it does
+/// not answer within ten seconds, as a read waiting on a pipe never would.
+fn load_promptly(
+    config: std::path::PathBuf,
+) -> Option<Result<(), typescript_parser::analysis::AnalysisError>> {
+    let (sender, receiver) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        let _ = sender.send(Project::load(&config).map(|_| ()));
+    });
+    receiver
+        .recv_timeout(std::time::Duration::from_secs(10))
+        .ok()
+}
+
+/// A pipe with no writer at `path`.
 fn pipe(path: &std::path::Path) {
     let made = std::process::Command::new("mkfifo")
         .arg(path)
@@ -1172,168 +1186,207 @@ fn pipe(path: &std::path::Path) {
     assert!(made.success());
 }
 
-/// An input whose read would wait, a pipe without a writer, does not delay
-/// the failure of an input loading reaches before it: loading reads inputs
-/// in order and never reaches this one. The earlier failure itself arrives
-/// through a pipe a second late, long after the later input was reserved.
-#[cfg(unix)]
-#[test]
-fn an_unreached_pipe_does_not_delay_an_earlier_failure() {
-    let fixture = Fixture::new(&[
-        (
-            "tsconfig.json",
-            r#"{ "compilerOptions": { "noLib": true }, "files": ["first.ts"] }"#,
-        ),
-        ("first.ts", "import './second';\nimport './pipe';\n"),
-    ]);
-    pipe(&fixture.path("pipe.ts"));
-    pipe(&fixture.path("second.ts"));
-    let writer = {
-        let path = fixture.path("second.ts");
-        std::thread::spawn(move || {
-            use std::io::Write;
-            let mut pipe = std::fs::OpenOptions::new().write(true).open(path).unwrap();
-            std::thread::sleep(std::time::Duration::from_secs(1));
-            let _ = pipe.write_all(b"export const = ;\n");
-        })
-    };
-    let config = fixture.path("tsconfig.json");
-    let (sender, receiver) = std::sync::mpsc::channel();
-    std::thread::spawn(move || {
-        let _ = sender.send(Project::load(&config).map(|_| ()));
-    });
-    let result = receiver.recv_timeout(std::time::Duration::from_secs(20));
-    if result.is_err() {
-        // A read waits on the pipe: let it see the pipe's end. Opening for
-        // writing waits for a reader, so this thread is not joined.
-        let path = fixture.path("pipe.ts");
-        std::thread::spawn(move || drop(std::fs::OpenOptions::new().write(true).open(path)));
-    }
-    writer.join().unwrap();
-    let error = support::input_error(
-        result
-            .expect("loading answers without reading the pipe")
-            .expect_err("second.ts does not parse"),
-    );
-    assert_eq!(error.kind, InputErrorKind::Syntax);
-    assert!(error.path.unwrap().ends_with("second.ts"));
+/// What a path where loading reads a file names instead.
+#[derive(Debug, Clone, Copy)]
+enum NotRegular {
+    /// A pipe with no writer, which opening would wait on.
+    Pipe,
+    /// A symbolic link to such a pipe: loading follows links.
+    LinkToPipe,
+    /// A symbolic link to a device, which reading would read.
+    Device,
+    /// A directory, where loading reads the configuration.
+    Directory,
 }
 
-/// An input loading reaches is read however it must be read, also from a
-/// pipe whose writer supplies its text.
-#[cfg(unix)]
-#[test]
-fn a_pipe_loading_reaches_is_read_like_any_input() {
-    let fixture = Fixture::new(&[
-        (
-            "tsconfig.json",
-            r#"{ "compilerOptions": { "noLib": true }, "files": ["first.ts"] }"#,
-        ),
-        ("first.ts", "import { piped } from './pipe';\npiped;\n"),
-    ]);
-    pipe(&fixture.path("pipe.ts"));
-    let writer = {
-        let path = fixture.path("pipe.ts");
-        std::thread::spawn(move || {
-            use std::io::Write;
-            let mut pipe = std::fs::OpenOptions::new().write(true).open(path).unwrap();
-            pipe.write_all(b"export const piped = 1;\n").unwrap();
-        })
-    };
-    let project = Project::load(&fixture.path("tsconfig.json")).unwrap();
-    writer.join().unwrap();
-    let result = project
-        .find_references(ReferenceQuery::Name {
-            name: "piped".into(),
-            file: None,
-        })
-        .unwrap();
-    assert_eq!(result.groups.len(), 1);
-    assert_eq!(result.groups[0].occurrences.len(), 3);
-}
+/// A project's files, the path made something else, what it is made, and
+/// the path the failure names.
+type Refusal<'a> = (&'a [(&'a str, &'a str)], &'a str, NotRegular, &'a str);
 
-/// An input that changes while an earlier input is read from a pipe loads
-/// with its new text, as loading in order reads it after the pipe: here the
-/// pipe's writer, once loading opens it, changes `z.ts`, which loading
-/// reaches next and a worker had already read.
-#[cfg(unix)]
+/// A source, a configuration, or a package manifest that is not a regular
+/// file is refused before it is opened (ENVELOPE.md, "Accepted inputs"):
+/// loading fails promptly with an `Io` failure naming the path and saying
+/// it is not a regular file, where opening a pipe would wait for a writer
+/// and reading a device would read it. An imported input is named by its
+/// real path, as loading names every resolved input; the configuration by
+/// the path it is given.
 #[test]
-fn an_input_changed_while_an_earlier_pipe_is_read_loads_its_new_text() {
-    let fixture = Fixture::new(&[
-        (
-            "tsconfig.json",
-            r#"{ "compilerOptions": { "noLib": true }, "files": ["first.ts"] }"#,
-        ),
-        ("first.ts", "import './pipe';\nimport './z';\n"),
-        ("z.ts", "export const before = 1;\n"),
-    ]);
-    pipe(&fixture.path("pipe.ts"));
-    let writer = {
-        let (path, source) = (fixture.path("pipe.ts"), fixture.path("z.ts"));
-        std::thread::spawn(move || {
-            use std::io::Write;
-            // By now a worker has read `z.ts`; loading reaches the pipe.
-            std::thread::sleep(std::time::Duration::from_millis(500));
-            let mut pipe = std::fs::OpenOptions::new().write(true).open(path).unwrap();
-            std::fs::write(source, "export const after_ = 1;\n").unwrap();
-            pipe.write_all(b"export {};\n").unwrap();
-        })
-    };
-    let project = Project::load(&fixture.path("tsconfig.json")).unwrap();
-    writer.join().unwrap();
-    let groups = |name: &str| {
-        project
-            .find_references(ReferenceQuery::Name {
-                name: name.into(),
-                file: None,
-            })
-            .unwrap()
-            .groups
-            .len()
-    };
-    assert_eq!(groups("after_"), 1);
-    assert_eq!(groups("before"), 0);
-}
-
-/// A source changed while loading reads a package manifest from a pipe loads
-/// with its new text, as loading in order reads the source after the
-/// manifest: the manifest's writer, once loading opens it, changes `z.ts`,
-/// which a worker had already read.
-#[cfg(unix)]
-#[test]
-fn a_source_changed_while_a_manifest_pipe_is_read_loads_its_new_text() {
-    let fixture = Fixture::new(&[
-        (
-            "tsconfig.json",
-            r#"{ "compilerOptions": { "module": "nodenext", "noLib": true, "types": [] }, "files": ["sub/a.ts", "z.ts"] }"#,
-        ),
+fn a_path_that_is_not_a_regular_file_is_refused_without_waiting() {
+    let imports = r#"{ "compilerOptions": { "noLib": true }, "files": ["first.ts"] }"#;
+    let importer = ("first.ts", "import './input';\n");
+    let packaged = r#"{ "compilerOptions": { "module": "nodenext", "noLib": true, "types": [] }, "files": ["sub/a.ts"] }"#;
+    let manifest = [
+        ("tsconfig.json", packaged),
         ("sub/a.ts", "export const a = 1;\n"),
-        ("z.ts", "export const before = 1;\n"),
-    ]);
-    pipe(&fixture.path("sub/package.json"));
-    let writer = {
-        let (path, source) = (fixture.path("sub/package.json"), fixture.path("z.ts"));
-        std::thread::spawn(move || {
-            use std::io::Write;
-            let mut pipe = std::fs::OpenOptions::new().write(true).open(path).unwrap();
-            // Meanwhile a worker reads `z.ts`.
-            std::thread::sleep(std::time::Duration::from_millis(500));
-            std::fs::write(source, "export const after_ = 1;\n").unwrap();
-            pipe.write_all(b"{}").unwrap();
-        })
-    };
-    let project = Project::load(&fixture.path("tsconfig.json")).unwrap();
-    writer.join().unwrap();
-    let groups = |name: &str| {
-        project
-            .find_references(ReferenceQuery::Name {
-                name: name.into(),
-                file: None,
-            })
-            .unwrap()
-            .groups
-            .len()
-    };
-    assert_eq!(groups("after_"), 1);
-    assert_eq!(groups("before"), 0);
+    ];
+    let cases: [Refusal; 7] = [
+        (
+            &[("tsconfig.json", imports), importer],
+            "input.ts",
+            NotRegular::Pipe,
+            "input.ts",
+        ),
+        (
+            &[("tsconfig.json", imports), importer],
+            "input.ts",
+            NotRegular::LinkToPipe,
+            "pipe",
+        ),
+        (
+            &[("tsconfig.json", imports), importer],
+            "input.ts",
+            NotRegular::Device,
+            "/dev/null",
+        ),
+        (
+            &[("a.ts", "export {};\n")],
+            "tsconfig.json",
+            NotRegular::Pipe,
+            "tsconfig.json",
+        ),
+        (
+            &[("a.ts", "export {};\n")],
+            "tsconfig.json",
+            NotRegular::LinkToPipe,
+            "tsconfig.json",
+        ),
+        (
+            &[("a.ts", "export {};\n")],
+            "tsconfig.json",
+            NotRegular::Directory,
+            "tsconfig.json",
+        ),
+        (
+            &manifest,
+            "sub/package.json",
+            NotRegular::Pipe,
+            "sub/package.json",
+        ),
+    ];
+    for (files, refused, kind, named) in cases {
+        let fixture = Fixture::new(files);
+        let path = fixture.path(refused);
+        match kind {
+            NotRegular::Pipe => pipe(&path),
+            NotRegular::LinkToPipe => {
+                let target = fixture.path("pipe");
+                pipe(&target);
+                std::os::unix::fs::symlink(&target, &path).unwrap();
+            }
+            NotRegular::Device => std::os::unix::fs::symlink("/dev/null", &path).unwrap(),
+            NotRegular::Directory => std::fs::create_dir(&path).unwrap(),
+        }
+        let result = load_promptly(fixture.path("tsconfig.json"))
+            .unwrap_or_else(|| panic!("loading waits on {refused} ({kind:?})"));
+        let error =
+            support::input_error(result.expect_err(&format!("{refused} ({kind:?}) is refused")));
+        assert_eq!(
+            error.kind,
+            InputErrorKind::Io,
+            "{refused} ({kind:?}): {error}"
+        );
+        assert_eq!(error.message, "not a regular file", "{refused} ({kind:?})");
+        let path = error.path.expect("the failure names the path");
+        assert!(
+            path.ends_with(named),
+            "{refused} ({kind:?}): {}",
+            path.display()
+        );
+    }
+}
+
+/// A name written literally, as a `files` entry, a reference directive, or
+/// a relative `extends`, selects what TypeScript's `FileExists` finds there,
+/// any entry but a directory (`getSourceFileFromReference`,
+/// `getExtendsConfigPath`): a pipe or a device there is selected, then
+/// refused where loading reads it, rather than reported missing or passed
+/// over for another candidate, such as `input.tsx` for `input` or
+/// `base.json` for `./base`. A selected input is named by its real path; an
+/// extended configuration, as every failure to read one, by the extending
+/// configuration, whose message names it (`Cannot read file`).
+#[test]
+fn a_literal_name_that_is_not_a_regular_file_is_refused_not_passed_over() {
+    let listed = r#"{ "compilerOptions": { "noLib": true }, "files": ["input.ts"] }"#;
+    let extensionless = r#"{ "compilerOptions": { "noLib": true }, "files": ["input"] }"#;
+    let referenced = r#"{ "compilerOptions": { "noLib": true }, "files": ["first.ts"] }"#;
+    let reference = ("first.ts", "/// <reference path=\"./input.ts\" />\n");
+    let extends = r#"{ "extends": "./base", "files": ["a.ts"] }"#;
+    let extends_json = r#"{ "extends": "./base.json", "files": ["a.ts"] }"#;
+    let base = r#"{ "compilerOptions": { "noLib": true } }"#;
+    let source = ("a.ts", "export {};\n");
+    let cases: [Refusal; 6] = [
+        (
+            &[("tsconfig.json", listed)],
+            "input.ts",
+            NotRegular::Pipe,
+            "input.ts",
+        ),
+        (
+            &[("tsconfig.json", listed)],
+            "input.ts",
+            NotRegular::Device,
+            "/dev/null",
+        ),
+        (
+            &[
+                ("tsconfig.json", extensionless),
+                ("input.tsx", "export {};\n"),
+            ],
+            "input.ts",
+            NotRegular::Pipe,
+            "input.ts",
+        ),
+        (
+            &[("tsconfig.json", referenced), reference],
+            "input.ts",
+            NotRegular::Pipe,
+            "input.ts",
+        ),
+        (
+            &[("tsconfig.json", extends), ("base.json", base), source],
+            "base",
+            NotRegular::Pipe,
+            "tsconfig.json",
+        ),
+        (
+            &[("tsconfig.json", extends_json), source],
+            "base.json",
+            NotRegular::Pipe,
+            "tsconfig.json",
+        ),
+    ];
+    for (files, refused, kind, named) in cases {
+        let fixture = Fixture::new(files);
+        let path = fixture.path(refused);
+        match kind {
+            NotRegular::Pipe => pipe(&path),
+            NotRegular::Device => std::os::unix::fs::symlink("/dev/null", &path).unwrap(),
+            NotRegular::LinkToPipe | NotRegular::Directory => unreachable!("not a case here"),
+        }
+        let result = load_promptly(fixture.path("tsconfig.json"))
+            .unwrap_or_else(|| panic!("loading waits on {refused} ({kind:?})"));
+        let error =
+            support::input_error(result.expect_err(&format!("{refused} ({kind:?}) is refused")));
+        assert_eq!(
+            error.kind,
+            InputErrorKind::Io,
+            "{refused} ({kind:?}): {error}"
+        );
+        let message = if refused.starts_with("base") {
+            let target = std::fs::canonicalize(&fixture.root).unwrap().join(refused);
+            format!(
+                "Cannot read file '{}': not a regular file",
+                target.display()
+            )
+        } else {
+            "not a regular file".to_owned()
+        };
+        assert_eq!(error.message, message, "{refused} ({kind:?}): {error}");
+        let path = error.path.expect("the failure names the path");
+        assert!(
+            path.ends_with(named),
+            "{refused} ({kind:?}): {}",
+            path.display()
+        );
+    }
 }

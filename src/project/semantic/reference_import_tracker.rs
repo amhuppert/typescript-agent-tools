@@ -13,9 +13,9 @@ use crate::project::Project;
 use crate::project::binding::{NativeSymbolIdentity, ReadOrigin};
 use crate::project::sources::FileId;
 use crate::references::Location;
-use crate::resources::FixedMap;
+use std::collections::HashMap;
 
-type DirectImports = FixedMap<NativeSymbolIdentity, Vec<ImportNode>>;
+type DirectImports = HashMap<NativeSymbolIdentity, Vec<ImportNode>>;
 
 pub(super) struct ImportSearch {
     pub(super) location: ExpressionRoot,
@@ -73,8 +73,8 @@ impl<'p> ImportTracker<'p> {
             direct,
             global,
             kind,
-            direct_seen: FixedMap::new(),
-            indirect_seen: FixedMap::new(),
+            direct_seen: HashMap::new(),
+            indirect_seen: HashMap::new(),
             direct_imports: Vec::new(),
             indirect: Vec::new(),
         };
@@ -137,7 +137,7 @@ impl<'p> ImportTracker<'p> {
         evaluator: &mut Evaluator<'_, '_>,
         consumer: &Location,
     ) -> Result<DirectImports, DemandError> {
-        let mut result: DirectImports = FixedMap::new();
+        let mut result: DirectImports = HashMap::new();
         for file in self.project.sources.ids() {
             if !self.project.bindings.reference_file_is_searched(file) {
                 continue;
@@ -161,8 +161,8 @@ struct Importers<'a> {
     direct: &'a DirectImports,
     global: bool,
     kind: ReferenceExportKind,
-    direct_seen: FixedMap<ImportNode, ()>,
-    indirect_seen: FixedMap<SourceFileLike, ()>,
+    direct_seen: HashMap<ImportNode, ()>,
+    indirect_seen: HashMap<SourceFileLike, ()>,
     direct_imports: Vec<ImportNode>,
     indirect: Vec<SourceFileLike>,
 }

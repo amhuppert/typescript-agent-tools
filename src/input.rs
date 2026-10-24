@@ -45,12 +45,11 @@ pub(crate) enum Case {
 }
 
 impl Case {
-    /// TypeScript's test: the file system is case-insensitive when the
-    /// running executable is also reachable with its letters' case swapped.
+    /// TypeScript's `isFileSystemCaseSensitive` (`vfs/osvfs`): the file
+    /// system is case-insensitive when the running executable is also
+    /// reachable with its letters' case swapped. Its Windows answer has no
+    /// counterpart, as the crate builds only on macOS and Linux.
     pub(crate) fn detect() -> Self {
-        if cfg!(windows) {
-            return Self::Insensitive;
-        }
         let Ok(executable) = std::env::current_exe() else {
             return Self::Sensitive;
         };

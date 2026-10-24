@@ -7,6 +7,7 @@ use super::super::model::{
 use super::super::source::{ExpressionRoot, mapped::MappedRecipe};
 use super::{Evaluator, relations::RelationKind};
 use crate::references::Location;
+use std::collections::HashMap;
 use std::sync::Arc;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -28,11 +29,11 @@ enum Slot {
 // Six fixed native mapped-link questions; no mapped recipe participates.
 
 pub(super) struct MappedState {
-    nodes: crate::resources::FixedMap<ExpressionRoot, NativeCompletion<TypeId>>,
-    declarations: crate::resources::FixedMap<TypeId, (ExpressionRoot, Arc<MappedRecipe>)>,
-    slots: crate::resources::FixedMap<(TypeId, Slot), NativeCompletion<TypeId>>,
+    nodes: HashMap<ExpressionRoot, NativeCompletion<TypeId>>,
+    declarations: HashMap<TypeId, (ExpressionRoot, Arc<MappedRecipe>)>,
+    slots: HashMap<(TypeId, Slot), NativeCompletion<TypeId>>,
     contains_error: std::collections::HashSet<TypeId>,
-    demands: crate::resources::FixedMap<(TypeId, MappedOperand), super::super::model::TypeDemand>,
+    demands: HashMap<(TypeId, MappedOperand), super::super::model::TypeDemand>,
 }
 
 impl Evaluator<'_, '_> {
@@ -1708,11 +1709,11 @@ impl MappedState {
     /// identities, child values and provisional publication stay operation-owned.
     pub(super) fn new() -> Self {
         Self {
-            nodes: crate::resources::FixedMap::new(),
-            declarations: crate::resources::FixedMap::new(),
-            slots: crate::resources::FixedMap::new(),
+            nodes: HashMap::new(),
+            declarations: HashMap::new(),
+            slots: HashMap::new(),
             contains_error: Default::default(),
-            demands: crate::resources::FixedMap::new(),
+            demands: HashMap::new(),
         }
     }
 }

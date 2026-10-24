@@ -437,7 +437,7 @@ struct RelationEntry {
 
 pub(super) struct RelationsState {
     // `isEnumTypeRelatedTo`: ordered source/target identity, never an unordered pair.
-    enum_relations: crate::resources::FixedMap<
+    enum_relations: HashMap<
         (
             crate::project::binding::NativeSymbolIdentity,
             crate::project::binding::NativeSymbolIdentity,
@@ -469,7 +469,7 @@ pub(super) struct RelationComparer {
 impl RelationsState {
     pub(super) fn new() -> Self {
         Self {
-            enum_relations: crate::resources::FixedMap::new(),
+            enum_relations: HashMap::new(),
             caches: HashMap::new(),
             active: HashMap::default(),
             next_session: 0,
@@ -482,15 +482,12 @@ impl RelationsState {
 
     /// `Relation.set`: all native commits share this storage owner, including
     /// failed comparisons, Maybe commits and root overflow entries. Replacement
-    /// retains the existing table capacity; reserve before publishing a new key.
+    /// retains the existing table capacity.
     fn store(&mut self, kind: RelationKind, key: RelationKey, entry: RelationEntry) {
         self.cache_mut(kind).insert(key, entry);
     }
 
     fn cache_mut(&mut self, kind: RelationKind) -> &mut RelationTable<RelationEntry> {
-        if !self.caches.contains_key(&kind) {
-            self.caches.reserve(1);
-        }
         self.caches.entry(kind).or_default()
     }
 
@@ -513,7 +510,6 @@ impl RelationsState {
             .checked_add(1)
             .expect("request-local relation identity fits usize");
         let cache_size = self.cache_mut(kind).len();
-        self.active.reserve(1);
         self.active.insert(id, Relater::new(kind, cache_size));
         RelationInvocation::silent(id)
     }
@@ -4102,7 +4098,6 @@ impl Evaluator<'_, '_> {
                                 if super::templates::matching::definitely_unrelated(
                                     &source_template,
                                     &template,
-                                    self.control.as_ref(),
                                 )
                                 .map_err(|error| self.literal_value_failure(error, consumer))?
                                 {
@@ -4457,7 +4452,7 @@ impl Evaluator<'_, '_> {
                 }
                 (TypeView::TemplateLiteral(source), TypeView::TemplateLiteral(target)) => {
                     if !source
-                        .semantic_texts_equal(&target, self.control.as_ref())
+                        .semantic_texts_equal(&target)
                         .map_err(|error| self.literal_value_failure(error, consumer))?
                     {
                         return Ok(Ternary::False);
@@ -5344,7 +5339,6 @@ impl Evaluator<'_, '_> {
                     if can_exclude
                         && excluded.contains(&NativePropertyKey::fixed(
                             source_position.to_string().into_bytes(),
-                            self.control.as_ref(),
                         ))
                     {
                         continue;
@@ -5666,7 +5660,7 @@ impl Evaluator<'_, '_> {
         sequence.finish(result)
     }
 
-    /// `getUnmatchedPropertiesWorker` charges each visited target, including
+    /// `getUnmatchedPropertiesWorker` visits each target property, including
     /// private and optional skips; only an actual unmatched result is retained.
     fn unmatched_properties_worker_completion(
         &mut self,

@@ -17,7 +17,6 @@ impl Evaluator<'_, '_> {
             self.model.new_symbol_identity(),
             b"\xfetype".as_slice(),
             None,
-            self.control.as_ref(),
         );
         self.install_created_property(CreatedProperty {
             native_flags: None,
@@ -60,7 +59,6 @@ impl Evaluator<'_, '_> {
                 self.model.new_symbol_identity(),
                 b"default".as_slice(),
                 None,
-                self.control.as_ref(),
             );
             let name_type = self
                 .model
@@ -114,10 +112,7 @@ impl Evaluator<'_, '_> {
             sequence.read(self.new_resolved_anonymous_type_completion(
                 type_symbol,
                 Some(MemberTable::Symbols(Arc::from([(
-                    crate::project::binding::NativePropertyKey::fixed(
-                        b"default".as_slice(),
-                        self.control.as_ref(),
-                    ),
+                    crate::project::binding::NativePropertyKey::fixed(b"default".as_slice()),
                     property,
                 )]))),
                 MembersView {

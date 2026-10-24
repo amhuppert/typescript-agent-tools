@@ -105,7 +105,7 @@ impl Evaluator<'_, '_> {
                         native.file,
                         kind,
                         native.span,
-                        &NativePropertyKey::fixed(name.as_bytes(), self.control.as_ref()),
+                        &NativePropertyKey::fixed(name.as_bytes()),
                     )
                     .map_err(|failure| self.generic_binding_failure(failure, consumer))?
                     .map(ReferenceSymbol::from_origin)
@@ -182,7 +182,7 @@ impl Evaluator<'_, '_> {
             } else if let Some(raw) = raw {
                 let star = self.reference_raw_table_lookup(
                     raw,
-                    &NativePropertyKey::fixed(b"\xfeexport".as_slice(), self.control.as_ref()),
+                    &NativePropertyKey::fixed(b"\xfeexport".as_slice()),
                     consumer,
                 )?;
                 if let Some(star) = star {

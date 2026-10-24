@@ -247,7 +247,6 @@ impl Project {
     /// Effective inputs captured with this generation, resolved only by the
     /// configuration owner (`GetStrictOptionValue`). Semantic evaluation reads
     /// this snapshot rather than reopening or converting configuration.
-    #[allow(dead_code)] // Retained before checker implementation's baseline gate.
     pub(crate) fn semantic_options(&self) -> &program::SemanticOptions {
         &self.semantic
     }

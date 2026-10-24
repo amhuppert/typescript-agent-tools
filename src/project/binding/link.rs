@@ -485,13 +485,9 @@ pub(in crate::project) struct LinkState {
     global_exports: Vec<Vec<(String, AliasRef)>>,
     alias_states: Vec<Vec<State>>,
     ref_states: Vec<Vec<State>>,
-    /// Parallel to reference states during linking, then moved into their
-    /// retained attachments. Only the existing lexical lookup supplies this
-    /// raw identity; qualified/module references require other native owners.
-    ref_origins: Vec<Vec<Option<ValueOrigin>>>,
-    ref_type_alias_origins: Vec<Vec<Option<AliasRef>>>,
-    /// The same lookup's raw identity for local export aliases, required by
-    /// native assignment marking without replaying lookup or following aliases.
+    /// The lexical lookup's raw value identity for local export aliases,
+    /// required by native assignment marking without replaying lookup or
+    /// following aliases.
     alias_origins: Vec<Vec<Option<ValueOrigin>>>,
     resolution: super::resolution::Runtime,
     /// The value each value symbol stands for (`value_symbol`), and the
@@ -613,14 +609,6 @@ impl LinkState {
                 .iter()
                 .map(|f| vec![State::Unvisited; f.facts.facts.refs.len()])
                 .collect(),
-            ref_origins: files
-                .iter()
-                .map(|f| vec![None; f.facts.facts.refs.len()])
-                .collect(),
-            ref_type_alias_origins: files
-                .iter()
-                .map(|f| vec![None; f.facts.facts.refs.len()])
-                .collect(),
             alias_origins: files
                 .iter()
                 .map(|f| vec![None; f.facts.facts.aliases.len()])
@@ -632,7 +620,7 @@ impl LinkState {
         }
     }
 
-    fn complete(mut self, raw: super::raw::RawBindingSnapshot, output: NativeLinkOutput) -> Linked {
+    fn complete(self, raw: super::raw::RawBindingSnapshot, output: NativeLinkOutput) -> Linked {
         assert!(
             self.resolution.running.is_none(),
             "completed linking has no active demand"
@@ -650,8 +638,6 @@ impl LinkState {
         Linked {
             index: output.index,
             reference_sources: output.reference_sources,
-            reference_origins: std::mem::take(&mut self.ref_origins),
-            reference_type_alias_origins: std::mem::take(&mut self.ref_type_alias_origins),
             raw,
             link_state: self,
         }
@@ -723,8 +709,6 @@ impl<'p> Linker<'p, '_> {
                 aliases: &mut self.state.alias_states,
                 refs: &mut self.state.ref_states,
                 alias_origins: &mut self.state.alias_origins,
-                ref_origins: &mut self.state.ref_origins,
-                ref_type_alias_origins: &mut self.state.ref_type_alias_origins,
             },
             runtime: &mut self.state.resolution,
         }
@@ -2800,8 +2784,6 @@ impl<'p> Linker<'p, '_> {
                 }
                 Task::Ref(r) => {
                     self.state.ref_states[r.file.index()][r.id.index()] = State::Unvisited;
-                    self.state.ref_origins[r.file.index()][r.id.index()] = None;
-                    self.state.ref_type_alias_origins[r.file.index()][r.id.index()] = None;
                 }
             }
         }

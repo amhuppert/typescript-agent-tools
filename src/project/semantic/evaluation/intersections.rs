@@ -146,7 +146,6 @@ impl Evaluator<'_, '_> {
             ))
         })();
         let result = sequence.finish(result);
-        self.intersections.nodes.reserve(1);
         self.intersections.nodes.insert(key, result.clone());
         result
     }
@@ -173,7 +172,6 @@ impl Evaluator<'_, '_> {
             sequence.read(self.union_type_ex_completion(types, alias, None, &expression.location))
         })();
         let result = sequence.finish(result);
-        self.intersections.nodes.reserve(1);
         self.intersections.nodes.insert(key, result.clone());
         result
     }

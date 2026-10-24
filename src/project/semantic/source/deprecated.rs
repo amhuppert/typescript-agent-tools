@@ -58,7 +58,6 @@ impl Source<'_, '_> {
                     .into(),
                 })
         };
-        self.jsdoc_tags.reserve(1);
         self.jsdoc_tags.insert(declaration, result.clone());
         result.map(|tags| tags.deprecated)
     }

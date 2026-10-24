@@ -2,7 +2,7 @@
 //! decoder. The public AST's UTF-16-compatible value is a projection of those
 //! bytes, never the source of identity or checker literal values.
 
-use crate::resources::{Control, Stop};
+use crate::resources::Stop;
 use crate::{
     Value,
     compiler::token as flags,
@@ -86,10 +86,7 @@ fn utf16(bytes: &[u8]) -> Result<Vec<u16>, Stop> {
     Ok(units)
 }
 
-pub(super) fn decode<'s>(
-    raw: &'s str,
-    _control: Option<&Control>,
-) -> Result<DecodedLiteral<'s>, Stop> {
+pub(super) fn decode<'s>(raw: &'s str) -> Result<DecodedLiteral<'s>, Stop> {
     if raw.find(['\\', '\r']).is_none() {
         return Ok(DecodedLiteral {
             bytes: Cow::Borrowed(raw.as_bytes()),
@@ -176,7 +173,7 @@ pub(super) fn decode<'s>(
 }
 
 /// `scanEscapeSequence`'s fixed/braced hexadecimal arm. A speculative low
-/// surrogate read owns its offset and flags, while resource charges persist.
+/// surrogate read owns its offset and flags.
 fn hex_escape(
     raw: &str,
     offset: &mut usize,

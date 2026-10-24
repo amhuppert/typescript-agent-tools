@@ -612,7 +612,7 @@ fn display_depth_never_changes_what_parses() {
 }
 
 #[test]
-fn direct_is_the_project_query_spelling_of_references_direct() {
+fn direct_answers_a_reference_query_in_this_process() {
     let fixture = Fixture::new(&[
         ("tsconfig.json", support::CONFIG),
         ("app.ts", "export function run() {}\nrun();\n"),
@@ -626,9 +626,7 @@ fn direct_is_the_project_query_spelling_of_references_direct() {
         "--json",
     ];
     let direct = tsparse(&fixture, &[&query[..], &["--direct"]].concat());
-    let spelled = tsparse(&fixture, &[&query[..], &["--references-direct"]].concat());
     assert_eq!(direct.status.code(), Some(0), "{direct:?}");
-    assert_eq!(direct.stdout, spelled.stdout);
     let json: Value = serde_json::from_slice(&direct.stdout).unwrap();
     assert_eq!(
         json["groups"][0]["occurrences"].as_array().unwrap().len(),

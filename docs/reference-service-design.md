@@ -9,8 +9,8 @@ request boundary. Its administration keeps the `--references-*` flags.
 Repeated `tsparse --references` invocations, and project outline and show,
 should reuse a completed project snapshot across agent processes. Callers are local processes of the same user,
 including concurrent agents, over editable files on disk. Each worktree and
-selected configuration must remain isolated. The initial service targets Unix
-(macOS and Linux); other platforms retain direct reference loading. There is no
+selected configuration must remain isolated. The service runs on macOS and
+Linux, the only systems the crate builds on. There is no
 network listener, editor buffer protocol, or cross-user service.
 
 The existing Command Center benchmark measures 22–25 seconds to construct an
@@ -53,8 +53,8 @@ It does not start or load a project, and it does not extend the idle time.
 `--doctor --project CONFIG` composes that status with the environment, runtime
 directory, and configuration checks, and reports a service whose inherited
 limits differ from the client's. `--references-stop --project CONFIG` stops that project's service and
-succeeds when none is running. `--references-direct` selects fresh in-process
-loading for diagnostics and comparisons. `--references-serve --project CONFIG`
+succeeds when none is running. `--references --direct` selects fresh
+in-process loading for diagnostics and comparisons. `--references-serve --project CONFIG`
 runs the service in the foreground for a process supervisor.
 
 Service identity includes the selected absolute configuration spelling and the
@@ -71,7 +71,7 @@ they must never accidentally reuse each other's captured lookup aliases.
   `SourceText` rather than retaining another copy. A load asks each path's real
   path once. Validation repeats these operations and compares their results;
   source identity does not depend on size or modification time. I/O failures
-  remain failures.
+  remain failures. It owns the rule that every file read is of a regular file.
 * `project::ProjectSession`: one project's current generation. Its one
   request operation (`execute(ProjectRequest)`) validates, loads when
   necessary, and answers any operation from a complete immutable `Project`.
@@ -97,11 +97,15 @@ An unchanged metadata timestamp does not establish unchanged contents.
 
 Validation repeats the observations on several threads; the first observation in
 key order that differs or fails decides, exactly as one pass in key order would.
-A read that could wait for another process, such as a pipe without a writer, is
-never made speculatively: a path that is not a regular file, and a read that
-fails other than by absence, are read only where that pass would read them, and
-the observations after such a read are repeated after it ends. Loading follows
-the same rule for its captures (`Reading::InOrder`). A warm request is answered
+Every file that loading or validation reads must be a regular file: `disk`
+takes the path's metadata, following symbolic links, and refuses a pipe, device,
+socket, or directory without opening it, as an `Io` failure naming the path,
+`not a regular file` (ENVELOPE.md refuses such inputs). No read therefore waits
+for another process, and the loader's capture workers read exactly as the
+loader does. A path replaced by a pipe between that check and its open can
+still block; ENVELOPE.md accepts this, since a hostile filesystem layout is
+outside the envelope. An input that becomes a pipe after loading fails
+validation; the session reloads, and the reload reports the refusal. A warm request is answered
 from the current generation while it is validated, and the answer is delivered
 only once validation confirms the generation; otherwise a semantic answer stops
 at its next check, any other answer finishes, the answer is discarded, and the
@@ -166,16 +170,16 @@ file, since its standard streams are null: it writes the one staged copy,
 so a client reads a complete diagnostic or none. A staged copy whose lock no
 process holds was abandoned by a writer that died, and the next start or
 failing service removes it, so at most one of each file exists per endpoint.
-Reclaiming the staged copy and reading the published diagnostic open them
-without waiting (`nonblocking::open_without_waiting`) and only as regular
-files, so a pipe at either path is reported rather than waited on; removing an
-earlier published diagnostic before a start opens nothing.
+Reclaiming the staged copy and reading the published diagnostic open them only
+as regular files, checked before opening, so a pipe or link at either path is
+reported rather than opened; removing an earlier published diagnostic before a
+start opens nothing.
 The client that started a service reports that failure, with the code the
 service recorded, exactly as the foreground service prints it, and removes the
 file; a diagnostic that names no failure code is reported as unreadable. It
 removes an earlier diagnostic before starting a service. No pipe is passed to
 the service.
-Windows uses direct loading until a native transport is implemented.
+The crate builds only on macOS and Linux, per ENVELOPE.md.
 
 ## Delivery and adversarial checkpoints
 

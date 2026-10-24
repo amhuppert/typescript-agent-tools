@@ -33,12 +33,8 @@ impl Evaluator<'_, '_> {
                 Some(&symbol) => symbol,
                 None => {
                     let name_bytes = { std::sync::Arc::from(name.as_bytes()) };
-                    let header = NativeSymbol::created(
-                        self.model.new_symbol_identity(),
-                        name_bytes,
-                        None,
-                        self.control.as_ref(),
-                    );
+                    let header =
+                        NativeSymbol::created(self.model.new_symbol_identity(), name_bytes, None);
                     let symbol = self.install_created_property(CreatedProperty {
                         native_flags: None,
                         flags: PropertySymbolFlags {
@@ -69,7 +65,6 @@ impl Evaluator<'_, '_> {
                         .symbols
                         .unresolved_names
                         .insert(path.clone(), symbol);
-                    let control = self.control.clone();
                     let Association::Created(data) =
                         &mut self.native_members.symbols.entries[symbol.index()].association
                     else {
@@ -78,8 +73,7 @@ impl Evaluator<'_, '_> {
                         )
                         .into());
                     };
-                    CreatedProperty::make_mut(data, control.as_ref()).parent =
-                        parent.map(SymbolParent::Created);
+                    CreatedProperty::make_mut(data).parent = parent.map(SymbolParent::Created);
                     self.native_members
                         .symbols
                         .unresolved_declared
@@ -134,7 +128,7 @@ impl Evaluator<'_, '_> {
     ) -> Result<Alias, DemandError> {
         let header = self.property_native_symbol(symbol, consumer)?;
         let name = header
-            .name(self.control.as_ref())
+            .name()
             .map_err(|error| self.generic_binding_failure(error, consumer))?;
         let name = String::from_utf8(name).map_err(|_| {
             self.access_pending(consumer, "unresolved symbol spelling is not scalar text")

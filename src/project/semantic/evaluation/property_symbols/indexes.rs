@@ -31,7 +31,6 @@ impl Evaluator<'_, '_> {
             }
             let mut declarations = Vec::new();
             if let Some(declaration) = info.declaration {
-                declarations.reserve(1);
                 declarations.push(ReferenceDeclaration::Captured(declaration));
             } else {
                 let indices = sequence.read(self.index_infos_of_type_completion(ty, consumer))?;
@@ -41,7 +40,6 @@ impl Evaluator<'_, '_> {
                         if sequence.read(
                             self.is_applicable_index_type_completion(key, index_key, consumer),
                         )? {
-                            declarations.reserve(1);
                             declarations.push(ReferenceDeclaration::Captured(declaration));
                         }
                     }
@@ -52,7 +50,7 @@ impl Evaluator<'_, '_> {
             };
             let header = NativeSymbol::created_with_key(
                 self.model.new_symbol_identity(),
-                NativePropertyKey::fixed(b"\xfeindex".as_slice(), self.control.as_ref()),
+                NativePropertyKey::fixed(b"\xfeindex".as_slice()),
                 Some(self.reference_declaration_ordering(first)?),
             );
             let parent = self
@@ -84,7 +82,6 @@ impl Evaluator<'_, '_> {
             });
             self.native_members.symbols.entries[symbol.index()].read =
                 Some(TypeState::Installed(NativeCompletion::clean(value)));
-            self.native_members.symbols.index_symbols.reserve(1);
             self.native_members
                 .symbols
                 .index_symbols

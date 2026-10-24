@@ -2,12 +2,7 @@
 //! batch may hold: `{"edits": [...]}`, each edit an object with an
 //! `operation`, exactly one of `name` and `at`, an optional `file`, and
 //! exactly one of `fragment` and `from`, where a member that is `null` is
-//! absent and any other member is an error. Only for compatibility, it also
-//! takes every other form the derived deserializers it replaced took, no
-//! more: the document and an edit written as an array of their fields in
-//! order (`[edits]`, `[operation, name, at, file, fragment, from]`), and an
-//! operation as an object naming it, `{"replace_body": null}`. Help teaches
-//! only the object form; dropping these would be an announced change.
+//! absent and any other member is an error.
 //!
 //! A batch is decoded in two stages so that one run reports every problem.
 //! First its text is read as JSON, the only stage that fails with a single
@@ -74,29 +69,10 @@ fn invalid(path: &Path, summary: &str, issues: Vec<Issue>) -> Failure {
 enum Node {
     Null,
     /// A boolean or a number, which no member of a batch takes.
-    Scalar(Value),
+    Scalar,
     String(String),
     Array(Vec<Node>),
     Object(Vec<(String, Node)>),
-}
-
-impl Node {
-    /// The value as `serde_json::Value` holds it, for a deserializer that
-    /// decides what it may be. An object member given twice is kept once.
-    fn value(&self) -> Value {
-        match self {
-            Node::Null => Value::Null,
-            Node::Scalar(value) => value.clone(),
-            Node::String(text) => Value::String(text.clone()),
-            Node::Array(items) => Value::Array(items.iter().map(Node::value).collect()),
-            Node::Object(members) => Value::Object(
-                members
-                    .iter()
-                    .map(|(key, value)| (key.clone(), value.value()))
-                    .collect(),
-            ),
-        }
-    }
 }
 
 impl<'de> Deserialize<'de> for Node {
@@ -118,20 +94,20 @@ impl<'de> Visitor<'de> for NodeVisitor {
         Ok(Node::Null)
     }
 
-    fn visit_bool<E: de::Error>(self, value: bool) -> Result<Node, E> {
-        Ok(Node::Scalar(Value::Bool(value)))
+    fn visit_bool<E: de::Error>(self, _: bool) -> Result<Node, E> {
+        Ok(Node::Scalar)
     }
 
-    fn visit_i64<E: de::Error>(self, value: i64) -> Result<Node, E> {
-        Ok(Node::Scalar(Value::from(value)))
+    fn visit_i64<E: de::Error>(self, _: i64) -> Result<Node, E> {
+        Ok(Node::Scalar)
     }
 
-    fn visit_u64<E: de::Error>(self, value: u64) -> Result<Node, E> {
-        Ok(Node::Scalar(Value::from(value)))
+    fn visit_u64<E: de::Error>(self, _: u64) -> Result<Node, E> {
+        Ok(Node::Scalar)
     }
 
-    fn visit_f64<E: de::Error>(self, value: f64) -> Result<Node, E> {
-        Ok(Node::Scalar(Value::from(value)))
+    fn visit_f64<E: de::Error>(self, _: f64) -> Result<Node, E> {
+        Ok(Node::Scalar)
     }
 
     fn visit_str<E: de::Error>(self, text: &str) -> Result<Node, E> {
@@ -220,9 +196,7 @@ fn member(parent: &str, key: &str) -> String {
 fn batch(document: &Node, found: &mut Found) -> Vec<Pending> {
     let members = match document {
         Node::Object(members) => members,
-        // The document as an array of its one field.
-        Node::Array(fields) if fields.len() == 1 => return edits("[0]", &fields[0], found),
-        Node::Null | Node::Scalar(_) | Node::String(_) | Node::Array(_) => {
+        Node::Null | Node::Scalar | Node::String(_) | Node::Array(_) => {
             found.document("$", r#"expected {"edits": [...]}"#);
             return Vec::new();
         }
@@ -258,14 +232,14 @@ fn edits(path: &str, value: &Node, found: &mut Found) -> Vec<Pending> {
             .enumerate()
             .filter_map(|(index, item)| edit(index, &format!("{path}[{index}]"), item, found))
             .collect(),
-        Node::Null | Node::Scalar(_) | Node::String(_) | Node::Object(_) => {
+        Node::Null | Node::Scalar | Node::String(_) | Node::Object(_) => {
             found.document(path, "expected an array of edits");
             Vec::new()
         }
     }
 }
 
-/// An edit's fields, in the order an edit written as an array gives them.
+/// An edit's fields: its operation, then the strings it may give.
 const FIELDS: [&str; 6] = ["operation", "name", "at", "file", "fragment", "from"];
 
 /// A string member of an edit as given.
@@ -285,7 +259,7 @@ impl<'a> Given<'a> {
         match value {
             Node::Null => Given::Absent,
             Node::String(text) => Given::Text(text),
-            Node::Scalar(_) | Node::Array(_) | Node::Object(_) => {
+            Node::Scalar | Node::Array(_) | Node::Object(_) => {
                 found.edit(index, path, "expected a string");
                 Given::Invalid
             }
@@ -304,43 +278,25 @@ fn edit(index: usize, path: &str, node: &Node, found: &mut Found) -> Option<Pend
     let issues = found.issues.len();
     let mut operation = None;
     let mut strings: [Option<Given>; 5] = [None; 5];
-    // Where each field is written: a member, or a position in an array.
-    let field = |name: &str| match node {
-        Node::Array(_) => {
-            let position = FIELDS.iter().position(|field| *field == name);
-            format!("{path}[{}]", position.expect("a field of an edit"))
-        }
-        Node::Null | Node::Scalar(_) | Node::String(_) | Node::Object(_) => member(path, name),
-    };
-    match node {
-        Node::Object(members) => {
-            for (key, value) in members {
-                match FIELDS.iter().position(|field| field == key) {
-                    None => found.edit(index, member(path, key), "unknown field"),
-                    Some(0) if operation.is_some() => {
-                        found.edit(index, member(path, key), "given more than once")
-                    }
-                    Some(0) => operation = Some(self::operation(found, index, field(key), value)),
-                    Some(position) if strings[position - 1].is_some() => {
-                        found.edit(index, member(path, key), "given more than once")
-                    }
-                    Some(position) => {
-                        strings[position - 1] = Some(Given::of(found, index, field(key), value))
-                    }
-                }
-            }
-        }
-        // The edit as an array of its fields in order.
-        Node::Array(values) if values.len() == FIELDS.len() => {
-            operation = Some(self::operation(found, index, field(FIELDS[0]), &values[0]));
-            for (position, value) in values.iter().enumerate().skip(1) {
-                strings[position - 1] =
-                    Some(Given::of(found, index, field(FIELDS[position]), value));
-            }
-        }
-        Node::Null | Node::Scalar(_) | Node::String(_) | Node::Array(_) => {
+    let field = |name: &str| member(path, name);
+    let members = match node {
+        Node::Object(members) => members,
+        Node::Null | Node::Scalar | Node::String(_) | Node::Array(_) => {
             found.edit(index, path, "expected an object");
             return None;
+        }
+    };
+    for (key, value) in members {
+        match FIELDS.iter().position(|field| field == key) {
+            None => found.edit(index, field(key), "unknown field"),
+            Some(0) if operation.is_some() => found.edit(index, field(key), "given more than once"),
+            Some(0) => operation = Some(self::operation(found, index, field(key), value)),
+            Some(position) if strings[position - 1].is_some() => {
+                found.edit(index, field(key), "given more than once")
+            }
+            Some(position) => {
+                strings[position - 1] = Some(Given::of(found, index, field(key), value))
+            }
         }
     }
     let operation = match operation {
@@ -434,202 +390,21 @@ fn edit(index: usize, path: &str, node: &Node, found: &mut Found) -> Option<Pend
 }
 
 /// The operation `value`, at `path`, names, or `None` when it names none,
-/// which is an issue added to `found`: a string, or an object whose one
-/// member is the name, with null. The library's deserializer for its
-/// operations decides which names, and which forms, are valid.
+/// which is an issue added to `found`. It is a string, whose names the
+/// library's deserializer for its operations decides.
 fn operation(found: &mut Found, index: usize, path: String, value: &Node) -> Option<Operation> {
-    match value {
-        Node::String(_) => {}
-        // An object given one member twice is not one member.
-        Node::Object(members) if members.len() == 1 => {}
-        Node::Object(_) => {
-            found.edit(
-                index,
-                path,
-                "expected a string, or one member naming the operation with null",
-            );
-            return None;
-        }
-        Node::Null | Node::Scalar(_) | Node::Array(_) => {
+    let name = match value {
+        Node::String(name) => name,
+        Node::Null | Node::Scalar | Node::Array(_) | Node::Object(_) => {
             found.edit(index, path, "expected a string");
             return None;
         }
-    }
-    match serde_json::from_value(value.value()) {
+    };
+    match serde_json::from_value(Value::String(name.clone())) {
         Ok(operation) => Some(operation),
         Err(error) => {
             found.edit(index, path, error.to_string());
             None
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    /// One edit as the batch file's former decoding read it: derived
-    /// deserializers, which also take a struct written as an array of its
-    /// fields in order and a unit variant written as `{"name": null}`.
-    #[derive(Deserialize)]
-    #[serde(deny_unknown_fields)]
-    struct FormerEdit {
-        operation: Operation,
-        name: Option<String>,
-        at: Option<String>,
-        file: Option<PathBuf>,
-        fragment: Option<String>,
-        from: Option<PathBuf>,
-    }
-
-    #[derive(Deserialize)]
-    #[serde(deny_unknown_fields)]
-    struct FormerFile {
-        edits: Vec<FormerEdit>,
-    }
-
-    fn describe(edit: &Pending) -> String {
-        let fragment = match &edit.fragment {
-            Fragment::Inline(text) => format!("inline {text:?}"),
-            Fragment::From(path) => format!("from {path:?}"),
-        };
-        format!("{:?} {:?} {fragment}", edit.operation, edit.target)
-    }
-
-    /// The edits the former decoding and its checks gave `text`, or `None`
-    /// when they refused it.
-    fn former(text: &str) -> Option<Vec<String>> {
-        let Ok(batch) = serde_json::from_str::<FormerFile>(text) else {
-            return None;
-        };
-        if batch.edits.is_empty() {
-            return None;
-        }
-        let mut edits = Vec::new();
-        for edit in batch.edits {
-            let target = match (edit.name, edit.at) {
-                (Some(name), None) => ShowQuery::Name {
-                    name,
-                    file: edit.file,
-                },
-                (None, Some(at)) => match request::locate(&at, edit.file) {
-                    Ok((file, position)) => ShowQuery::At { file, position },
-                    Err(_) => return None,
-                },
-                (Some(_), Some(_)) | (None, None) => return None,
-            };
-            let fragment = match (edit.fragment, edit.from) {
-                (Some(fragment), None) => Fragment::Inline(fragment),
-                (None, Some(from)) => Fragment::From(from),
-                (Some(_), Some(_)) | (None, None) => return None,
-            };
-            edits.push(describe(&Pending {
-                operation: edit.operation,
-                target,
-                fragment,
-            }));
-        }
-        Some(edits)
-    }
-
-    /// Edits in each form the former decoding took or refused.
-    const EDITS: &[&str] = &[
-        r#"{"operation": "replace_body", "name": "start", "fragment": "{}"}"#,
-        r#"{"operation": "insert_after", "at": "host.ts:1:17", "from": "body.ts"}"#,
-        r#"{"operation": "replace_body", "at": "1:17", "file": "host.ts", "fragment": "{}"}"#,
-        r#"{"operation": "replace_body", "at": "1:17", "fragment": "{}"}"#,
-        r#"{"operation": "replace_body", "at": "host.ts:1:17", "file": "host.ts", "fragment": "{}"}"#,
-        r#"{"operation": "replace_body", "name": null, "at": "host.ts:1:17", "file": null, "fragment": "{}", "from": null}"#,
-        r#"{"operation": "replace_body", "name": "start", "at": "1:1", "fragment": "{}"}"#,
-        r#"{"operation": "replace_body", "fragment": "{}"}"#,
-        r#"{"operation": "replace_body", "name": "start", "fragment": "{}", "from": "b"}"#,
-        r#"{"operation": "replace_body", "name": "start"}"#,
-        r#"{"operation": "replace_body", "name": "start", "fragment": "{}", "extra": null}"#,
-        r#"{"operation": "replace_body", "name": "start", "fragment": "{}", "name": "start"}"#,
-        r#"{"operation": "replace_body", "operation": "replace_body", "name": "start", "fragment": "{}"}"#,
-        r#"{"name": "start", "fragment": "{}"}"#,
-        r#"{"operation": null, "name": "start", "fragment": "{}"}"#,
-        r#"{"operation": "rename", "name": "start", "fragment": "{}"}"#,
-        r#"{"operation": "replace\u005fbody", "name": "start", "fragment": "{}"}"#,
-        r#"{"operation": {"replace_body": null}, "name": "start", "fragment": "{}"}"#,
-        r#"{"operation": {"insert_after": null}, "at": "host.ts:1:17", "fragment": "{}"}"#,
-        r#"{"operation": {"replace_body": 1}, "name": "start", "fragment": "{}"}"#,
-        r#"{"operation": {"replace_body": {}}, "name": "start", "fragment": "{}"}"#,
-        r#"{"operation": {"rename": null}, "name": "start", "fragment": "{}"}"#,
-        r#"{"operation": {}, "name": "start", "fragment": "{}"}"#,
-        r#"{"operation": {"replace_body": null, "insert_after": null}, "name": "start", "fragment": "{}"}"#,
-        r#"{"operation": {"replace_body": null, "replace_body": null}, "name": "start", "fragment": "{}"}"#,
-        r#"{"operation": ["replace_body"], "name": "start", "fragment": "{}"}"#,
-        r#"{"operation": 1, "name": "start", "fragment": "{}"}"#,
-        r#"{"operation": "replace_body", "name": 1, "fragment": "{}"}"#,
-        r#"{"operation": "replace_body", "name": "start", "file": true, "fragment": "{}"}"#,
-        r#"{"operation": "replace_body", "at": ":1:17", "fragment": "{}"}"#,
-        r#"{"operation": "replace_body", "at": "host.ts:0:1", "fragment": "{}"}"#,
-        r#"{"operation": "replace_body", "name": "", "fragment": ""}"#,
-        r#"["replace_body", "start", null, null, "{}", null]"#,
-        r#"["replace_body", "start", null, "host.ts", "{ return 2; }", null]"#,
-        r#"[{"replace_body": null}, null, "1:17", "host.ts", null, "body.ts"]"#,
-        r#"["insert_after", null, "host.ts:1:17", "host.ts", "{}", null]"#,
-        r#"["replace_body", "start", null, null, "{}"]"#,
-        r#"["replace_body", "start", null, null, "{}", null, null]"#,
-        r#"["replace_body", "start", "1:1", null, "{}", null]"#,
-        r#"[null, "start", null, null, "{}", null]"#,
-        r#"["replace_body", 1, null, null, "{}", null]"#,
-        "[]",
-        "1",
-        r#""replace_body""#,
-        "null",
-        "true",
-    ];
-
-    /// Each edit in each form of the document the former decoding took or
-    /// refused.
-    fn batches(edit: &str) -> Vec<String> {
-        [
-            format!(r#"{{"edits": [{edit}]}}"#),
-            format!("[[{edit}]]"),
-            format!(r#"{{"edits": [{edit}, {edit}]}}"#),
-            format!(r#"[[{edit}], 1]"#),
-            format!(r#"{{"edits": [{edit}], "x": 1}}"#),
-            format!(r#"{{"edits": [], "edits": [{edit}]}}"#),
-            format!(r#"[{{"edits": [{edit}]}}]"#),
-            format!("[{edit}]"),
-        ]
-        .into()
-    }
-
-    /// A batch is valid exactly when the former decoding and its checks took
-    /// it, and then names the same edits: strictness is unchanged in both
-    /// directions.
-    #[test]
-    fn a_batch_is_valid_exactly_when_the_former_decoding_took_it() {
-        let mut texts: Vec<String> = EDITS.iter().flat_map(|edit| batches(edit)).collect();
-        texts.extend(
-            [
-                "{}",
-                "[]",
-                "[[]]",
-                "[null]",
-                r#"{"edits": null}"#,
-                r#"{"edits": []}"#,
-            ]
-            .map(String::from),
-        );
-        let mut taken = 0;
-        for text in &texts {
-            let decoded = decode(Path::new("edits.json"), text)
-                .map(|edits| edits.iter().map(describe).collect::<Vec<_>>());
-            match (former(text), decoded) {
-                (Some(expected), Ok(edits)) => {
-                    assert_eq!(edits, expected, "{text}");
-                    taken += 1;
-                }
-                (None, Err(_)) => {}
-                (expected, decoded) => panic!("{text}: formerly {expected:?}, now {decoded:?}"),
-            }
-        }
-        // Eleven edits, in both forms of an edit and of its operation, are
-        // valid, in three documents of both forms each.
-        assert_eq!(taken, 33, "{} batches", texts.len());
     }
 }

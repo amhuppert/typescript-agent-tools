@@ -80,17 +80,16 @@ impl CheckedKey for ActiveKey {
 /// structured inventory and mapper substitutions are different questions;
 /// none is keyed by a printed name or a display origin.
 pub(super) struct GenericsState {
-    reference_nodes: crate::resources::FixedMap<(FileId, Site), NativeResult<TypeId>>,
-    reference_symbols:
-        crate::resources::FixedMap<(FileId, Site), NativeResult<super::ReferenceSymbol>>,
-    targets: crate::resources::FixedMap<TypeId, TargetAssociation>,
-    declared_members: crate::resources::FixedMap<TypeId, MembersState>,
+    reference_nodes: HashMap<(FileId, Site), NativeResult<TypeId>>,
+    reference_symbols: HashMap<(FileId, Site), NativeResult<super::ReferenceSymbol>>,
+    targets: HashMap<TypeId, TargetAssociation>,
+    declared_members: HashMap<TypeId, MembersState>,
     bases: HashMap<TypeId, BaseTypesState>,
-    base_constructors: crate::resources::FixedMap<TypeId, TypeState>,
-    equivalent_bases: crate::resources::FixedMap<TypeId, NativeResult<Option<TypeId>>>,
+    base_constructors: HashMap<TypeId, TypeState>,
+    equivalent_bases: HashMap<TypeId, NativeResult<Option<TypeId>>>,
     /// Native TypeParameter.mapper belongs to the fresh parameter identity.
-    parameter_mappers: crate::resources::FixedMap<TypeId, MapperId>,
-    instantiated_demands: crate::resources::FixedMap<(DemandId, MapperId), TypeDemand>,
+    parameter_mappers: HashMap<TypeId, MapperId>,
+    instantiated_demands: HashMap<(DemandId, MapperId), TypeDemand>,
     active_mappers: Vec<ActiveMapper>,
     instantiation_depth: usize,
     instantiation_count: usize,
@@ -101,15 +100,15 @@ impl GenericsState {
     /// and provisional publication remain with their individual operations.
     pub(super) fn new() -> Self {
         Self {
-            reference_nodes: crate::resources::FixedMap::new(),
-            reference_symbols: crate::resources::FixedMap::new(),
-            targets: crate::resources::FixedMap::new(),
-            declared_members: crate::resources::FixedMap::new(),
+            reference_nodes: HashMap::new(),
+            reference_symbols: HashMap::new(),
+            targets: HashMap::new(),
+            declared_members: HashMap::new(),
             bases: Default::default(),
-            base_constructors: crate::resources::FixedMap::new(),
-            equivalent_bases: crate::resources::FixedMap::new(),
-            parameter_mappers: crate::resources::FixedMap::new(),
-            instantiated_demands: crate::resources::FixedMap::new(),
+            base_constructors: HashMap::new(),
+            equivalent_bases: HashMap::new(),
+            parameter_mappers: HashMap::new(),
+            instantiated_demands: HashMap::new(),
             active_mappers: Default::default(),
             instantiation_depth: Default::default(),
             instantiation_count: Default::default(),
@@ -2811,8 +2810,7 @@ impl Evaluator<'_, '_> {
         })
     }
 
-    /// `popActiveMapper` clears the retiring frame before releasing it. These
-    /// checks belong to normal execution; request-abort unwinding never charges.
+    /// `popActiveMapper` clears the retiring frame before releasing it.
     fn pop_active_mapper(&mut self) {
         self.generics
             .active_mappers
@@ -3039,8 +3037,8 @@ impl Evaluator<'_, '_> {
     }
 
     /// Native `TypeMapper.Map` and its Simple/Array/Deferred/ArrayToSingle,
-    /// Merged and Composite implementations. Charge only visited comparisons;
-    /// a short-circuit never scans or charges an unvisited parameter tail.
+    /// Merged and Composite implementations. Only visited comparisons run;
+    /// a short-circuit never scans an unvisited parameter tail.
     pub(super) fn map_parameter_completion(
         &mut self,
         ty: TypeId,

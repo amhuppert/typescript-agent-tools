@@ -8,7 +8,6 @@
 use super::collect::{RefBase, SharedFacts};
 use super::ids::OccurrenceId;
 use super::index::Index;
-use super::link::ValueOrigin;
 use super::{JsonFacts, ModuleRequest, ModuleResolution};
 use crate::project::program::{Diagnostics, ProgramFile};
 use std::sync::Arc;
@@ -29,8 +28,6 @@ pub(in crate::project) struct Bindings {
 pub(in crate::project) struct Linked {
     pub(super) index: Index,
     pub(super) reference_sources: Vec<Vec<OccurrenceId>>,
-    pub(super) reference_origins: Vec<Vec<Option<ValueOrigin>>>,
-    pub(super) reference_type_alias_origins: Vec<Vec<Option<super::store::AliasRef>>>,
     pub(super) raw: super::raw::RawBindingSnapshot,
     /// The linker's working state, which publication leaves behind.
     pub(super) link_state: super::link::LinkState,
@@ -60,16 +57,12 @@ impl Bindings {
 impl Linked {
     pub(in crate::project) fn retain_files(self, files: Vec<ProgramFile>) -> (Bindings, LoadOnly) {
         assert_eq!(files.len(), self.reference_sources.len());
-        assert_eq!(files.len(), self.reference_origins.len());
-        assert_eq!(files.len(), self.reference_type_alias_origins.len());
         let mut recipes = Vec::with_capacity(files.len());
         let files = files
             .into_iter()
             .zip(self.reference_sources)
-            .zip(self.reference_origins)
-            .zip(self.reference_type_alias_origins)
-            .map(|(((file, sources), origins), type_alias_origins)| {
-                let (file, facts) = File::retain(file, sources, origins, type_alias_origins);
+            .map(|(file, sources)| {
+                let (file, facts) = File::retain(file, sources);
                 recipes.push(facts);
                 file
             })
@@ -90,14 +83,12 @@ impl Linked {
 /// Published file facts never grow. Boxed slices discard capture capacity
 /// without changing the file-local indices used by native identities.
 #[derive(Debug)]
-#[allow(dead_code)] // Existing lexical facts; complete semantic recipes pending.
 pub(super) struct File {
     pub(super) module_semantics: crate::project::program::FileModuleSemantics,
     shared: Arc<SharedFacts>,
     pub(super) search: bool,
     pub(super) module: bool,
     pub(super) declaration: bool,
-    pub(super) jsx: Option<usize>,
     pub(super) requests: Box<[ModuleRequest]>,
     pub(super) modules: Box<[ModuleResolution]>,
     pub(super) diagnostics: Diagnostics,
@@ -114,7 +105,6 @@ impl std::ops::Deref for File {
 }
 
 #[derive(Debug)]
-#[allow(dead_code)] // Attachment is retained without adding a new query operation.
 pub(super) struct Reference {
     pub(super) source: OccurrenceId,
     pub(super) base: RefBase,
@@ -122,17 +112,10 @@ pub(super) struct Reference {
     pub(super) property: bool,
     pub(super) type_context: bool,
     pub(super) flow: Option<super::flow::Read>,
-    pub(super) value_origin: Option<ValueOrigin>,
-    pub(super) type_alias_origin: Option<super::store::AliasRef>,
 }
 
 impl File {
-    fn retain(
-        file: ProgramFile,
-        sources: Vec<OccurrenceId>,
-        origins: Vec<Option<ValueOrigin>>,
-        type_alias_origins: Vec<Option<super::store::AliasRef>>,
-    ) -> (Self, Arc<super::collect::Facts>) {
+    fn retain(file: ProgramFile, sources: Vec<OccurrenceId>) -> (Self, Arc<super::collect::Facts>) {
         let ProgramFile {
             module_semantics,
             search,
@@ -151,34 +134,27 @@ impl File {
         let super::FileFacts {
             module,
             declaration,
-            jsx,
             requests,
             facts,
             json,
+            // Loading already consumed the JSX indicator for the runtime import.
+            jsx: _,
             // The Diagnostics product already owns directive coverage.
             directives: _,
         } = facts;
         assert_eq!(facts.refs.len(), sources.len());
-        assert_eq!(facts.refs.len(), origins.len());
-        assert_eq!(facts.refs.len(), type_alias_origins.len());
         let refs = facts
             .refs
             .iter()
             .zip(sources)
-            .zip(origins)
-            .zip(type_alias_origins)
-            .map(
-                |(((reference, source), value_origin), type_alias_origin)| Reference {
-                    source,
-                    base: reference.base,
-                    meaning: reference.meaning,
-                    property: reference.property,
-                    type_context: reference.type_context,
-                    flow: facts.names[reference.token.index()].flow,
-                    value_origin,
-                    type_alias_origin,
-                },
-            )
+            .map(|(reference, source)| Reference {
+                source,
+                base: reference.base,
+                meaning: reference.meaning,
+                property: reference.property,
+                type_context: reference.type_context,
+                flow: facts.names[reference.token.index()].flow,
+            })
             .collect();
         let file = Self {
             module_semantics,
@@ -186,7 +162,6 @@ impl File {
             shared: Arc::clone(&facts.shared),
             module,
             declaration,
-            jsx,
             requests: requests.into_boxed_slice(),
             modules: modules.into_boxed_slice(),
             diagnostics,
@@ -424,7 +399,7 @@ mod tests {
                             .native_inputs()
                             .native_symbol(member.symbol)
                             .unwrap()
-                            .name(None)
+                            .name()
                             .unwrap(),
                         member.symbol,
                     )

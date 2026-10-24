@@ -65,7 +65,6 @@ impl Source<'_, '_> {
                 indices.last = Some(index);
             }
         }
-        self.array_spreads.reserve(1);
         self.array_spreads.insert(root, indices);
         Ok(indices)
     }

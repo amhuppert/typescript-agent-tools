@@ -1,6 +1,6 @@
 //! Native identity-list and alias-key operations used by type factory caches.
 use super::{Alias, AliasKey, IntersectionFlags, IntersectionKey, TypeId, UnionIdentity, UnionKey};
-use crate::resources::{CheckedKey, CheckedMap, Control};
+use crate::resources::{CheckedKey, CheckedMap};
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::sync::Arc;
 
@@ -214,7 +214,6 @@ impl CheckedKey for ErrorAliasKey {
 /// payload construction stays with the native operation that produces it.
 pub(in crate::project::semantic) struct TypeListCache<V> {
     entries: CheckedMap<TypeListKey, V>,
-    control: Option<Control>,
 }
 
 struct TypeListKey {
@@ -223,7 +222,7 @@ struct TypeListKey {
 }
 
 impl TypeListKey {
-    fn hash(types: &[TypeId], _control: Option<&Control>) -> u64 {
+    fn hash(types: &[TypeId]) -> u64 {
         let mut hash = KeyBuilder::new();
         hash.types(types);
         hash.finish()
@@ -243,20 +242,17 @@ impl CheckedKey for TypeListKey {
 }
 
 impl<V> TypeListCache<V> {
-    pub(in crate::project::semantic) fn new(control: Option<Control>) -> Self {
+    pub(in crate::project::semantic) fn new() -> Self {
         Self {
             entries: CheckedMap::new(),
-            control,
         }
     }
     pub(in crate::project::semantic) fn get(&self, types: &[TypeId]) -> Option<&V> {
         self.entries
-            .get_by(TypeListKey::hash(types, self.control.as_ref()), |key| {
-                key.matches(types)
-            })
+            .get_by(TypeListKey::hash(types), |key| key.matches(types))
     }
     pub(in crate::project::semantic) fn insert(&mut self, types: &[TypeId], value: V) {
-        let fingerprint = TypeListKey::hash(types, self.control.as_ref());
+        let fingerprint = TypeListKey::hash(types);
         let types = { types.to_vec() };
         self.entries
             .insert(TypeListKey { types, fingerprint }, value);
@@ -264,6 +260,6 @@ impl<V> TypeListCache<V> {
 }
 impl<V> Default for TypeListCache<V> {
     fn default() -> Self {
-        Self::new(None)
+        Self::new()
     }
 }

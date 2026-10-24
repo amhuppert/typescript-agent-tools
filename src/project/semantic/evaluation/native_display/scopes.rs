@@ -173,7 +173,7 @@ impl Evaluator<'_, '_> {
                             let name = sequence.read(checker.diagnostic_type_parameter_name_completion(parameter, context, consumer))?;
                             let symbol = checker.reference_symbol_of_type(parameter, consumer)?.ok_or_else(||
                                 checker.diagnostic_dependency(consumer, "native synthetic type parameter requires its actual symbol"))?;
-                            checker.diagnostic_scope_add(edit, NativePropertyKey::fixed(name.into_bytes(), checker.control.as_ref()), symbol);
+                            checker.diagnostic_scope_add(edit, NativePropertyKey::fixed(name.into_bytes()), symbol);
                         }
                         Ok(())
                     })?;

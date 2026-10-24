@@ -27,7 +27,7 @@ fn tsparse(fixture: &Fixture, args: &[&str]) -> Output {
     // These tests own CLI formatting/diagnostics; service lifecycle and
     // concurrent clients have dedicated teardown in reference_service.rs.
     if args.contains(&"--references") {
-        command.arg("--references-direct");
+        command.arg("--direct");
     }
     command
         .current_dir(&fixture.root)

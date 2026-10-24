@@ -18,10 +18,6 @@ impl binding::ScopeSymbols for Names<'_, '_, '_> {
     type Table = ReferenceRawSymbolTable;
     type Declaration = DeclarationAssociation;
     type Error = DemandError;
-    fn control(&self) -> Option<&crate::resources::Control> {
-        self.checker.control.as_ref()
-    }
-
     fn lookup(
         &mut self,
         table: Self::Table,
@@ -249,9 +245,6 @@ impl binding::ScopeSymbols for HeaderFacts<'_, '_, '_> {
     type Table = ReferenceRawSymbolTable;
     type Declaration = DeclarationAssociation;
     type Error = binding::LookupFailure;
-    fn control(&self) -> Option<&crate::resources::Control> {
-        self.checker.control.as_ref()
-    }
     fn lookup(
         &mut self,
         table: Self::Table,

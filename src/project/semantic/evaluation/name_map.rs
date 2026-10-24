@@ -2,18 +2,17 @@
 //! checked buckets own collision traversal and growth, and clones share bytes.
 use crate::project::binding::NativePropertyKey;
 use crate::project::semantic::model::KeyBuilder;
-use crate::resources::{CheckedKey, CheckedMap, Control};
+use crate::resources::{CheckedKey, CheckedMap};
 
 pub(super) struct NameMap<V> {
     entries: CheckedMap<NameKey, V>,
-    control: Option<Control>,
 }
 struct NameKey {
     name: NativePropertyKey,
     fingerprint: u64,
 }
 impl NameKey {
-    fn hash(name: &NativePropertyKey, _control: Option<&Control>) -> u64 {
+    fn hash(name: &NativePropertyKey) -> u64 {
         let mut hash = KeyBuilder::new();
         hash.native_string(name.string_value());
         hash.finish()
@@ -35,20 +34,17 @@ impl CheckedKey for NameKey {
 impl<V> NameMap<V> {
     /// Native SymbolTable / map[string] operations use the complete canonical
     /// name, including opaque identity, with no extra escaping or case policy.
-    pub(super) fn new(control: Option<Control>) -> Self {
+    pub(super) fn new() -> Self {
         Self {
             entries: CheckedMap::new(),
-            control,
         }
     }
     pub(super) fn get(&self, name: &NativePropertyKey) -> Option<&V> {
         self.entries
-            .get_by(NameKey::hash(name, self.control.as_ref()), |key| {
-                key.matches(name)
-            })
+            .get_by(NameKey::hash(name), |key| key.matches(name))
     }
     pub(super) fn insert(&mut self, name: NativePropertyKey, value: V) {
-        let fingerprint = NameKey::hash(&name, self.control.as_ref());
+        let fingerprint = NameKey::hash(&name);
 
         self.entries.insert(NameKey { name, fingerprint }, value);
     }

@@ -165,7 +165,6 @@ impl Evaluator<'_, '_> {
             sequence.read(self.template_literal_type_completion(recipe.texts, types, consumer))
         })();
         let result = sequence.finish(result);
-        self.templates.nodes.reserve(1);
         self.templates.nodes.insert(root, result.clone());
         result
     }
@@ -236,10 +235,10 @@ impl Evaluator<'_, '_> {
                         // hold their canonical spelling.
                         TypeView::Literal { value, .. } => text.push(value),
                         TypeView::Special(SpecialName::Null) => {
-                            text.push(LiteralValue::from_text("null", self.control.as_ref()))
+                            text.push(LiteralValue::from_text("null"))
                         }
                         TypeView::Special(SpecialName::Undefined) => {
-                            text.push(LiteralValue::from_text("undefined", self.control.as_ref()))
+                            text.push(LiteralValue::from_text("undefined"))
                         }
                         TypeView::TemplateLiteral(template) => {
                             text.push(template.texts[0].clone());
@@ -253,10 +252,8 @@ impl Evaluator<'_, '_> {
                             || self.is_pattern_literal_placeholder_type(ty)? =>
                         {
                             new_types.push(ty);
-                            new_texts.push(
-                                LiteralValue::concat(text.iter(), control.as_ref())
-                                    .combine_surrogate_pairs(control.as_ref()),
-                            );
+                            new_texts
+                                .push(LiteralValue::concat(text.iter()).combine_surrogate_pairs());
                             // A wide run of literal spans has one retained Arc
                             // per span even when its normalized text is empty.
                             while !text.is_empty() {
@@ -269,14 +266,10 @@ impl Evaluator<'_, '_> {
             }
             if new_types.is_empty() {
                 return Ok(self.model.regular_string_literal_value(
-                    LiteralValue::concat(text.iter(), control.as_ref())
-                        .combine_surrogate_pairs(control.as_ref()),
+                    LiteralValue::concat(text.iter()).combine_surrogate_pairs(),
                 ));
             }
-            new_texts.push(
-                LiteralValue::concat(text.iter(), control.as_ref())
-                    .combine_surrogate_pairs(control.as_ref()),
-            );
+            new_texts.push(LiteralValue::concat(text.iter()).combine_surrogate_pairs());
             if new_texts.iter().all(|text| text.is_empty()) {
                 if new_types
                     .iter()
@@ -416,7 +409,7 @@ impl Evaluator<'_, '_> {
                     base: PrimitiveName::String,
                     value,
                 } => {
-                    let mapped = kind.apply(&value, self.control.as_ref());
+                    let mapped = kind.apply(&value);
                     return Ok(self.model.regular_string_literal_value(mapped));
                 }
                 TypeView::TemplateLiteral(template) => {
@@ -428,7 +421,7 @@ impl Evaluator<'_, '_> {
                     match kind {
                         K::Uppercase | K::Lowercase => {
                             for text in &mut texts {
-                                *text = kind.apply(text, self.control.as_ref());
+                                *text = kind.apply(text);
                             }
                             for ty in &mut types {
                                 *ty =
@@ -439,7 +432,7 @@ impl Evaluator<'_, '_> {
                         }
                         K::Capitalize | K::Uncapitalize => {
                             if !texts[0].is_empty() {
-                                texts[0] = kind.apply(&texts[0], self.control.as_ref());
+                                texts[0] = kind.apply(&texts[0]);
                             } else {
                                 types[0] = sequence.read(self.string_mapping_type_completion(
                                     symbol, kind, types[0], consumer,
@@ -466,8 +459,8 @@ impl Evaluator<'_, '_> {
             } else if self.is_pattern_literal_placeholder_type(ty)? {
                 sequence.read(self.template_literal_type_completion(
                     std::sync::Arc::from(vec![
-                        LiteralValue::from_text("", self.control.as_ref()),
-                        LiteralValue::from_text("", self.control.as_ref()),
+                        LiteralValue::from_text(""),
+                        LiteralValue::from_text(""),
                     ]),
                     vec![ty],
                     consumer,

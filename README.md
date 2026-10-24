@@ -6,7 +6,7 @@ The parser targets TypeScript 7, including TSX, deferred imports, import attribu
 
 ## Build and run
 
-Rust 1.85 or newer is required. Dependencies are included in `vendor/` and selected by `.cargo/config.toml`, so this checkout builds without accessing crates.io:
+Rust 1.85 or newer is required. The crate builds and runs on macOS and Linux only; any other target fails to compile. Dependencies are included in `vendor/` and selected by `.cargo/config.toml`, so this checkout builds without accessing crates.io:
 
 ```sh
 cargo build --offline --release
@@ -51,11 +51,13 @@ each group with its declarations and its occurrences by file, and any coverage
 gaps; `--json` writes the result document instead. The
 [CLI reference](docs/cli-reference.md#references) lists its flags and filters.
 
-On macOS and Linux, project queries (references, types, and outline and show with
-`--project`) automatically start a local service and reuse its snapshot across
-CLI invocations. Every query checks the captured inputs; changed sources,
+Project queries (references, types, and outline and show with `--project`)
+automatically start a local service and reuse its snapshot across CLI
+invocations. Every query checks the captured inputs; changed sources,
 configuration, or resolution inputs trigger a full rebuild. A failed refresh
-reports its error. Services stop after ten idle minutes. `--direct` answers in
+reports its error. A source, configuration, or package manifest that is not a
+regular file, such as a pipe, is refused with `PATH: not a regular file`
+rather than read. Services stop after ten idle minutes. `--direct` answers in
 the CLI process instead, with the same output. The agent guide's
 [cost model](docs/agent-guide.md#cost-model) gives what a load, a warm query
 (most of it that check), a member search, and the first query after an edit
@@ -65,7 +67,7 @@ cost on Command Center, from the latest measurements.
 ./target/release/tsparse --references-status --project ./tsconfig.json
 ./target/release/tsparse --doctor --project ./tsconfig.json
 ./target/release/tsparse --references-stop --project ./tsconfig.json
-./target/release/tsparse --references-direct --project ./tsconfig.json --name run
+./target/release/tsparse --references --direct --project ./tsconfig.json --name run
 ```
 
 `--references-status`, `--references-stop` (which prints `stopped: pid N`, or
@@ -73,7 +75,7 @@ cost on Command Center, from the latest measurements.
 which answers every project query, not only references. Use
 `--references-serve --project CONFIG` for a foreground service managed by a
 supervisor. `TSPARSE_SERVICE_DIR` selects a private runtime directory, and
-`TSPARSE_SERVICE_IDLE_SECS` sets its positive idle timeout in seconds. Read-only query memory monitoring currently supports macOS and Linux. The [service design](docs/reference-service-design.md)
+`TSPARSE_SERVICE_IDLE_SECS` sets its positive idle timeout in seconds. The [service design](docs/reference-service-design.md)
 describes freshness, process ownership, and the current full-rebuild limitation.
 
 The library exposes immutable snapshots through `typescript_parser::project::Project`

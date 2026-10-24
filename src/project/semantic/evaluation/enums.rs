@@ -265,7 +265,6 @@ impl Evaluator<'_, '_> {
                             PrimitiveName::Number,
                             super::super::model::LiteralValue::from_text(
                                 crate::numbers::number_to_string(*value),
-                                self.control.as_ref(),
                             ),
                         ),
                         Some(ConstantValue::String(value)) => self.model.enum_literal_type(

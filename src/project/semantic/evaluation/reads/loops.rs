@@ -151,7 +151,6 @@ impl Evaluator<'_, '_> {
                                         )
                                     })?
                                     .as_bytes(),
-                                self.control.as_ref(),
                             ),
                         ));
                         site = super::required(syntax.left, "qualified flow key has no left")?;

@@ -137,8 +137,8 @@ impl Evaluator<'_, '_> {
             if let TypeView::StringMapping(mapping) = self.model.get(right)? {
                 if mapping
                     .kind
-                    .apply(text, self.control.as_ref())
-                    .semantic_equal(text, self.control.as_ref())
+                    .apply(text)
+                    .semantic_equal(text)
                     .map_err(|error| self.literal_value_failure(error, consumer))?
                 {
                     return Ok(source);
@@ -271,7 +271,7 @@ impl Evaluator<'_, '_> {
         right: &LiteralValue,
         consumer: &Location,
     ) -> Result<bool, DemandError> {
-        left.semantic_equal(right, self.control.as_ref())
+        left.semantic_equal(right)
             .map_err(|error| self.literal_value_failure(error, consumer))
     }
 }

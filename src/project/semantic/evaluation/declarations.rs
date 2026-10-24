@@ -470,7 +470,7 @@ impl Evaluator<'_, '_> {
                         "JSON property identity contains an unpaired UTF-16 surrogate",
                     )
                 })?;
-                let key = binding::NativePropertyKey::fixed(text.as_bytes(), self.control.as_ref());
+                let key = binding::NativePropertyKey::fixed(text.as_bytes());
                 Ok(super::super::model::NativeCompletion::clean(Some(
                     self.model.string_literal_for_key(&key),
                 )))

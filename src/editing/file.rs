@@ -1,9 +1,9 @@
 //! Captured file identity and the replacement lifecycle of one file: the
 //! paths a request names, the regular file they resolve to, that file's
-//! identity and supported metadata, and its exact bytes. Preparation binds
-//! edits to these captures, and plans record them; application checks them
-//! again before it replaces anything. No other code decides what makes a
-//! file the same file.
+//! identity, and its exact bytes. Preparation binds edits to these
+//! captures, and plans record them; application checks them again before
+//! it replaces anything. No other code decides what makes a file the same
+//! file.
 
 use crate::analysis::{InputError, InputErrorKind};
 use crate::input::{Case, InputKind};
@@ -26,18 +26,15 @@ pub(super) struct Captured {
 }
 
 /// What identifies a file's contents as the same file, besides its bytes:
-/// its device and inode, and the metadata replacement must preserve.
+/// its device and inode, the permission mode replacement gives the new
+/// file, and its link count, which is one: a file with other hard links is
+/// not edited. Nothing else about a file is kept or compared.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub(super) struct Identity {
     pub(super) device: u64,
     pub(super) inode: u64,
     pub(super) mode: u32,
-    pub(super) owner: u32,
-    pub(super) group: u32,
-    /// macOS file flags (`st_flags`), which must be none: a new file would
-    /// not keep them. Always 0 elsewhere.
-    #[serde(default)]
-    pub(super) flags: u32,
+    pub(super) links: u64,
 }
 
 fn failure(kind: InputErrorKind, message: impl Into<String>, path: &Path) -> InputError {
@@ -123,40 +120,26 @@ fn identity(metadata: &std::fs::Metadata, path: &Path) -> Result<Identity, Input
             path,
         ));
     }
-    let identity = Identity {
-        device: metadata.dev(),
-        inode: metadata.ino(),
-        mode: metadata.mode(),
-        owner: metadata.uid(),
-        group: metadata.gid(),
-        flags: flags(metadata),
-    };
-    if identity.flags != 0 {
+    let flags = flags(metadata);
+    if flags != 0 {
         return Err(failure(
             InputErrorKind::Unsupported,
             format!(
-                "the file has flags ({:#x}, such as hidden or uchg) that replacing it would drop",
-                identity.flags
+                "the file has flags ({flags:#x}, such as hidden or uchg) that replacing it would drop"
             ),
             path,
         ));
     }
-    Ok(identity)
-}
-
-#[cfg(not(unix))]
-fn identity(_: &std::fs::Metadata, _: &Path) -> Result<Identity, InputError> {
     Ok(Identity {
-        device: 0,
-        inode: 0,
-        mode: 0,
-        owner: 0,
-        group: 0,
-        flags: 0,
+        device: metadata.dev(),
+        inode: metadata.ino(),
+        mode: metadata.mode(),
+        links: metadata.nlink(),
     })
 }
 
-/// A file's macOS flags (`chflags`); elsewhere not inspected.
+/// A file's macOS flags (`chflags`), which a new file would not keep, so a
+/// file with any is not edited; elsewhere not inspected.
 #[cfg(target_os = "macos")]
 fn flags(metadata: &std::fs::Metadata) -> u32 {
     std::os::macos::fs::MetadataExt::st_flags(metadata)
@@ -269,8 +252,7 @@ impl Captured {
 /// others, rather than repeat the file system's rules for which spellings
 /// name one file (links, case, Unicode forms), this asks it: `output` is
 /// created empty, a name that now resolves to a file names it, since
-/// nothing else writes meanwhile, and `output` is removed again, freed
-/// first of what its directory gave it if that denies the removal. An
+/// nothing else writes meanwhile, and `output` is removed again. An
 /// `output` that cannot be created creates no file, so no name is it;
 /// writing the result reports why. Only absence (`input::is_absence`) means
 /// a name names nothing; a failure to look one up, naming it, or to remove
@@ -293,13 +275,14 @@ pub(super) fn would_create<'a>(output: &Path, names: &[&'a Path]) -> io::Result<
     if absent.is_empty() {
         return Ok(None);
     }
-    let Ok(probe) = std::fs::OpenOptions::new()
+    if std::fs::OpenOptions::new()
         .write(true)
         .create_new(true)
         .open(output)
-    else {
+        .is_err()
+    {
         return Ok(None);
-    };
+    }
     let mut found = Ok(None);
     for name in absent {
         match resolves(name) {
@@ -314,15 +297,7 @@ pub(super) fn would_create<'a>(output: &Path, names: &[&'a Path]) -> io::Result<
             }
         }
     }
-    let removed = std::fs::remove_file(output).or_else(|denied| {
-        #[cfg(unix)]
-        if attributes::unrestrict(&probe).is_ok() {
-            return std::fs::remove_file(output);
-        }
-        Err(denied)
-    });
-    drop(probe);
-    match (removed, found) {
+    match (std::fs::remove_file(output), found) {
         (Ok(()), found) => found,
         (Err(error), found) => {
             let named = match found {
@@ -343,17 +318,21 @@ pub(super) fn would_create<'a>(output: &Path, names: &[&'a Path]) -> io::Result<
 /// inspected.
 #[derive(Debug)]
 pub(super) enum Mismatch {
-    /// It is absent, another file, or has other bytes or metadata.
+    /// It is absent, another file, or has another identity or other bytes.
     Stale(String),
     /// It could not be read or inspected.
     Io(io::Error),
 }
 
+/// Why a file with another identity than the captured file's, or with flags
+/// it was captured without, is stale.
+const CHANGED: &str = "it was replaced, or its permissions or flags changed";
+
 impl Captured {
     /// Check that `path` still resolves to the captured file with the
-    /// captured bytes and metadata, linked `links` times (one, or two while a
-    /// backup link exists). Timestamps are not identity; bytes are compared
-    /// in full.
+    /// captured bytes and identity, linked `links` times (one, or two while a
+    /// backup link exists), and still without flags. Timestamps are not
+    /// identity; bytes are compared in full.
     fn check(&self, links: u64) -> Result<(), Mismatch> {
         let stale = |reason: &str| Err(Mismatch::Stale(reason.into()));
         for name in std::iter::once(&self.path).chain(&self.aliases) {
@@ -381,7 +360,7 @@ impl Captured {
         }
         match current_identity(&metadata, links) {
             Ok(identity) if identity == self.identity => {}
-            Ok(_) => return stale("it was replaced, or its permissions, owner, or flags changed"),
+            Ok(_) => return stale(CHANGED),
             Err(mismatch) => return Err(mismatch),
         }
         match std::fs::read(&self.referent) {
@@ -407,31 +386,26 @@ fn current_identity(metadata: &std::fs::Metadata, links: u64) -> Result<Identity
             metadata.nlink() + 1 - links
         )));
     }
+    // A file is captured without flags (`identity`).
+    if flags(metadata) != 0 {
+        return Err(Mismatch::Stale(CHANGED.into()));
+    }
     Ok(Identity {
         device: metadata.dev(),
         inode: metadata.ino(),
         mode: metadata.mode(),
-        owner: metadata.uid(),
-        group: metadata.gid(),
-        flags: flags(metadata),
+        // Its own link; a backup link is this process's.
+        links: 1,
     })
-}
-
-#[cfg(not(unix))]
-fn current_identity(_: &std::fs::Metadata, _: u64) -> Result<Identity, Mismatch> {
-    Err(Mismatch::Io(io::Error::new(
-        io::ErrorKind::Unsupported,
-        "applying edits is supported on macOS and Linux",
-    )))
 }
 
 /// The replacement of one captured file by its proposed bytes, from
 /// staging through installation and restoration. Staging creates a
 /// temporary file beside the original, writes the proposed bytes with the
-/// original's permissions, owner, group, extended attributes, and access
-/// control lists, and links the original under a backup name; installing
-/// renames the temporary file over the original; restoring renames the
-/// backup back; releasing removes what remains. The state says which of
+/// original's permission mode, and links the original under a backup name;
+/// installing renames the temporary file over the original; restoring
+/// renames the backup back; releasing removes what remains. The state says
+/// which of
 /// those resources exist from the moment each is made, so every path
 /// through it, including a staging failure, releases or reports exactly
 /// them, and nothing it did not make.
@@ -444,7 +418,7 @@ pub(super) struct Replacement<'c> {
 
 #[derive(Debug)]
 enum State {
-    /// The temporary file exists, its bytes or metadata perhaps incomplete.
+    /// The temporary file exists, its bytes or mode perhaps incomplete.
     Writing { temporary: PathBuf },
     /// The proposed bytes wait in `temporary`; the original is linked at
     /// `backup` too.
@@ -666,14 +640,9 @@ fn file_id(metadata: &std::fs::Metadata) -> (u64, u64) {
     (metadata.dev(), metadata.ino())
 }
 
-#[cfg(not(unix))]
-fn file_id(_: &std::fs::Metadata) -> (u64, u64) {
-    (0, 0)
-}
-
-/// Write `proposed` to `file`, a new temporary file, with the captured
-/// file's metadata, verify that metadata as it stands at the end, and return
-/// the file's device and inode.
+/// Write `proposed` to `file`, a new temporary file, give it the captured
+/// file's permission mode, verify that mode, and return the file's device
+/// and inode once its bytes are on disk.
 #[cfg(unix)]
 fn write_staged(
     captured: &Captured,
@@ -683,397 +652,15 @@ fn write_staged(
     use std::io::Write;
     use std::os::unix::fs::{MetadataExt, PermissionsExt};
     file.write_all(proposed)?;
-    let identity = captured.identity;
-    if file.metadata()?.uid() != identity.owner {
-        return Err(io::Error::new(
-            io::ErrorKind::PermissionDenied,
-            "the file belongs to another user, whose ownership a new file cannot keep",
-        ));
-    }
-    if file.metadata()?.gid() != identity.group {
-        std::os::unix::fs::fchown(&file, None, Some(identity.group)).map_err(|error| {
-            io::Error::new(
-                error.kind(),
-                format!("cannot keep the file's group: {error}"),
-            )
-        })?;
-    }
-    let original = std::fs::File::open(&captured.referent)?;
-    attributes::copy(&original, &file)?;
-    file.set_permissions(std::fs::Permissions::from_mode(identity.mode & 0o7777))?;
-    // Changing the mode can change an access control list; verify last.
-    attributes::verify(&original, &file)?;
+    let mode = captured.identity.mode;
+    file.set_permissions(std::fs::Permissions::from_mode(mode & 0o7777))?;
     let metadata = file.metadata()?;
-    if metadata.mode() != identity.mode || metadata.gid() != identity.group || flags(&metadata) != 0
-    {
+    if metadata.mode() != mode {
         return Err(io::Error::new(
             io::ErrorKind::Unsupported,
-            "cannot give the new file the original's permissions, group, and flags",
+            "cannot give the new file the original's permissions",
         ));
     }
     file.sync_all()?;
     Ok(file_id(&metadata))
-}
-
-#[cfg(not(unix))]
-fn write_staged(_: &Captured, _: &[u8], _: std::fs::File) -> io::Result<(u64, u64)> {
-    Err(io::Error::new(
-        io::ErrorKind::Unsupported,
-        "applying edits is supported on macOS and Linux",
-    ))
-}
-
-/// Extended attributes, and on macOS access control lists, which a new file
-/// must carry over from the original it replaces and must not have beyond
-/// it, by one explicit rule on both systems: each attribute's value is set,
-/// each attribute the original lacks is removed, and on macOS the list is set
-/// to the original's (or none); then everything is compared both ways, so
-/// an attribute or list the system will not set or remove fails staging
-/// instead of being silently dropped or added. On Linux, access control
-/// lists are attributes too, so one inherited from a directory's default
-/// list is removed. No copying routine with policies of its own, such as
-/// macOS `fcopyfile` rewriting quarantine values, decides what is kept.
-#[cfg(any(target_os = "macos", target_os = "linux"))]
-mod attributes {
-    use std::ffi::{CStr, CString, c_char, c_int, c_void};
-    use std::fs::File;
-    use std::io;
-    use std::os::fd::AsRawFd;
-
-    /// The one attribute whose presence and value may differ: macOS gives
-    /// every file a process writes its `com.apple.provenance`, and removing
-    /// or setting it has no effect. It records where a file came from and
-    /// changes no access or behavior.
-    const SYSTEM_MANAGED: &[u8] = b"com.apple.provenance";
-
-    #[cfg(target_os = "macos")]
-    unsafe extern "C" {
-        fn flistxattr(fd: c_int, names: *mut c_char, size: usize, options: c_int) -> isize;
-        fn fgetxattr(
-            fd: c_int,
-            name: *const c_char,
-            value: *mut c_void,
-            size: usize,
-            position: u32,
-            options: c_int,
-        ) -> isize;
-        fn fsetxattr(
-            fd: c_int,
-            name: *const c_char,
-            value: *const c_void,
-            size: usize,
-            position: u32,
-            options: c_int,
-        ) -> c_int;
-        fn fremovexattr(fd: c_int, name: *const c_char, options: c_int) -> c_int;
-        fn acl_get_fd_np(fd: c_int, kind: u32) -> *mut c_void;
-        fn acl_set_fd_np(fd: c_int, acl: *mut c_void, kind: u32) -> c_int;
-        fn acl_init(count: c_int) -> *mut c_void;
-        fn acl_to_text(acl: *mut c_void, length: *mut isize) -> *mut c_char;
-        fn acl_free(object: *mut c_void) -> c_int;
-    }
-
-    #[cfg(target_os = "linux")]
-    unsafe extern "C" {
-        fn flistxattr(fd: c_int, names: *mut c_char, size: usize) -> isize;
-        fn fgetxattr(fd: c_int, name: *const c_char, value: *mut c_void, size: usize) -> isize;
-        fn fsetxattr(
-            fd: c_int,
-            name: *const c_char,
-            value: *const c_void,
-            size: usize,
-            flags: c_int,
-        ) -> c_int;
-        fn fremovexattr(fd: c_int, name: *const c_char) -> c_int;
-    }
-
-    /// Read into a buffer sized by a first call with none, retrying if the
-    /// value grew in between.
-    fn sized(mut call: impl FnMut(*mut c_void, usize) -> isize) -> io::Result<Vec<u8>> {
-        loop {
-            let size = call(std::ptr::null_mut(), 0);
-            if size < 0 {
-                return Err(io::Error::last_os_error());
-            }
-            let mut buffer = vec![0u8; size as usize];
-            let read = call(buffer.as_mut_ptr().cast(), buffer.len());
-            if read >= 0 {
-                buffer.truncate(read as usize);
-                return Ok(buffer);
-            }
-            let error = io::Error::last_os_error();
-            // ERANGE, 34 on both systems: the list or value grew between
-            // the two calls.
-            if error.raw_os_error() != Some(34) {
-                return Err(error);
-            }
-        }
-    }
-
-    /// The attribute names of `file`, sorted, without the system-managed one.
-    fn names(file: &File) -> io::Result<Vec<CString>> {
-        let fd = file.as_raw_fd();
-        #[cfg(target_os = "macos")]
-        let list = sized(|buffer, size| unsafe { flistxattr(fd, buffer.cast(), size, 0) })?;
-        #[cfg(target_os = "linux")]
-        let list = sized(|buffer, size| unsafe { flistxattr(fd, buffer.cast(), size) })?;
-        let mut names: Vec<CString> = list
-            .split(|&byte| byte == 0)
-            .filter(|name| !name.is_empty() && *name != SYSTEM_MANAGED)
-            .map(|name| CString::new(name).expect("names end at NUL"))
-            .collect();
-        names.sort();
-        Ok(names)
-    }
-
-    fn value(file: &File, name: &CStr) -> io::Result<Vec<u8>> {
-        let fd = file.as_raw_fd();
-        #[cfg(target_os = "macos")]
-        let value =
-            sized(|buffer, size| unsafe { fgetxattr(fd, name.as_ptr(), buffer, size, 0, 0) });
-        #[cfg(target_os = "linux")]
-        let value = sized(|buffer, size| unsafe { fgetxattr(fd, name.as_ptr(), buffer, size) });
-        value
-    }
-
-    fn remove(file: &File, name: &CStr) -> io::Result<()> {
-        #[cfg(target_os = "macos")]
-        let result = unsafe { fremovexattr(file.as_raw_fd(), name.as_ptr(), 0) };
-        #[cfg(target_os = "linux")]
-        let result = unsafe { fremovexattr(file.as_raw_fd(), name.as_ptr()) };
-        if result == 0 {
-            Ok(())
-        } else {
-            Err(io::Error::last_os_error())
-        }
-    }
-
-    fn set(file: &File, name: &CStr, value: &[u8]) -> io::Result<()> {
-        #[cfg(target_os = "macos")]
-        let result = unsafe {
-            fsetxattr(
-                file.as_raw_fd(),
-                name.as_ptr(),
-                value.as_ptr().cast(),
-                value.len(),
-                0,
-                0,
-            )
-        };
-        #[cfg(target_os = "linux")]
-        let result = unsafe {
-            fsetxattr(
-                file.as_raw_fd(),
-                name.as_ptr(),
-                value.as_ptr().cast(),
-                value.len(),
-                0,
-            )
-        };
-        if result == 0 {
-            Ok(())
-        } else {
-            Err(io::Error::last_os_error())
-        }
-    }
-
-    /// `ACL_TYPE_EXTENDED`, the only kind of list macOS files have.
-    #[cfg(target_os = "macos")]
-    const EXTENDED: u32 = 0x100;
-
-    /// A file's access control list as text, or `None` without one.
-    #[cfg(target_os = "macos")]
-    fn acl(file: &File) -> io::Result<Option<String>> {
-        let acl = unsafe { acl_get_fd_np(file.as_raw_fd(), EXTENDED) };
-        if acl.is_null() {
-            let error = io::Error::last_os_error();
-            // ENOENT: the file has no list.
-            return if error.raw_os_error() == Some(2) {
-                Ok(None)
-            } else {
-                Err(error)
-            };
-        }
-        let text = unsafe { acl_to_text(acl, std::ptr::null_mut()) };
-        let result = if text.is_null() {
-            Err(io::Error::last_os_error())
-        } else {
-            let owned = unsafe { CStr::from_ptr(text) }
-                .to_string_lossy()
-                .into_owned();
-            unsafe { acl_free(text.cast()) };
-            Ok(Some(owned))
-        };
-        unsafe { acl_free(acl) };
-        result
-    }
-
-    /// Give `to` the access control list of `from`, or none without `from`
-    /// or when `from` has none.
-    #[cfg(target_os = "macos")]
-    fn copy_acl(from: Option<&File>, to: &File) -> io::Result<()> {
-        let mut acl = std::ptr::null_mut();
-        if let Some(from) = from {
-            acl = unsafe { acl_get_fd_np(from.as_raw_fd(), EXTENDED) };
-            if acl.is_null() {
-                let error = io::Error::last_os_error();
-                // ENOENT: the file has no list.
-                if error.raw_os_error() != Some(2) {
-                    return Err(error);
-                }
-            }
-        }
-        if acl.is_null() {
-            acl = unsafe { acl_init(0) };
-            if acl.is_null() {
-                return Err(io::Error::last_os_error());
-            }
-        }
-        let set = unsafe { acl_set_fd_np(to.as_raw_fd(), acl, EXTENDED) };
-        let error = io::Error::last_os_error();
-        unsafe { acl_free(acl) };
-        if set == 0 { Ok(()) } else { Err(error) }
-    }
-
-    /// Free `to`, a new file this process made, of what its directory gave
-    /// it that could deny its owner the writes `copy` makes or its removal:
-    /// on macOS an inherited list, on Linux an owner entry without write,
-    /// which a default list gives. The final mode is set after `copy`.
-    pub(super) fn unrestrict(to: &File) -> io::Result<()> {
-        #[cfg(target_os = "macos")]
-        let result = copy_acl(None, to);
-        #[cfg(target_os = "linux")]
-        let result = {
-            use std::os::unix::fs::PermissionsExt;
-            to.set_permissions(std::fs::Permissions::from_mode(0o600))
-        };
-        result.map_err(|error| {
-            io::Error::new(
-                error.kind(),
-                format!("cannot clear what the directory gave the new file: {error}"),
-            )
-        })
-    }
-
-    /// Whether attribute `name` holds an access control list: Linux keeps
-    /// a file's lists as attributes.
-    fn is_list(name: &CStr) -> bool {
-        name.to_bytes().starts_with(b"system.posix_acl_")
-    }
-
-    /// Give `to`, a new file, every attribute of `from`, and on macOS its
-    /// access control list, and remove the attributes and list `to` has
-    /// beyond them. A list can deny the owner the writes before it, so `to`
-    /// starts without its directory's restrictions and gets `from`'s list
-    /// last.
-    pub(super) fn copy(from: &File, to: &File) -> io::Result<()> {
-        unrestrict(to)?;
-        let wanted = names(from)?;
-        let (lists, others): (Vec<&CString>, Vec<&CString>) =
-            wanted.iter().partition(|name| is_list(name));
-        copy_values(from, to, &others)?;
-        for name in names(to)? {
-            if !wanted.contains(&name) {
-                remove(to, &name).map_err(|error| {
-                    io::Error::new(
-                        error.kind(),
-                        format!(
-                            "cannot remove the extended attribute {} the original lacks: {error}",
-                            name.to_string_lossy()
-                        ),
-                    )
-                })?;
-            }
-        }
-        copy_values(from, to, &lists)?;
-        #[cfg(target_os = "macos")]
-        copy_acl(Some(from), to).map_err(|error| {
-            io::Error::new(
-                error.kind(),
-                format!("cannot keep the access control list: {error}"),
-            )
-        })?;
-        Ok(())
-    }
-
-    fn copy_values(from: &File, to: &File, names: &[&CString]) -> io::Result<()> {
-        for name in names {
-            let original = value(from, name)?;
-            // A new file may already carry an attribute, such as a security
-            // label; set only what differs.
-            if value(to, name).ok().as_ref() != Some(&original) {
-                set(to, name, &original).map_err(|error| {
-                    io::Error::new(
-                        error.kind(),
-                        format!(
-                            "cannot keep the extended attribute {}: {error}",
-                            name.to_string_lossy()
-                        ),
-                    )
-                })?;
-            }
-        }
-        Ok(())
-    }
-
-    /// Require `to` to have exactly `from`'s attributes, with the same
-    /// values, and on macOS the same access control list.
-    pub(super) fn verify(from: &File, to: &File) -> io::Result<()> {
-        let unkept = |what: String| {
-            io::Error::new(io::ErrorKind::Unsupported, format!("cannot keep {what}"))
-        };
-        let (wanted, have) = (names(from)?, names(to)?);
-        if wanted != have {
-            return Err(unkept(format!(
-                "the extended attributes ({}); the new file has ({})",
-                list(&wanted),
-                list(&have)
-            )));
-        }
-        for name in &wanted {
-            if value(from, name)? != value(to, name)? {
-                return Err(unkept(format!(
-                    "the extended attribute {}",
-                    name.to_string_lossy()
-                )));
-            }
-        }
-        #[cfg(target_os = "macos")]
-        if acl(from)? != acl(to)? {
-            return Err(unkept("the access control list".into()));
-        }
-        Ok(())
-    }
-
-    fn list(names: &[CString]) -> String {
-        names
-            .iter()
-            .map(|name| name.to_string_lossy().into_owned())
-            .collect::<Vec<_>>()
-            .join(", ")
-    }
-}
-
-/// Elsewhere, whether a file's attributes survive replacement is unverified,
-/// so applying refuses rather than risk dropping them.
-#[cfg(all(unix, not(any(target_os = "macos", target_os = "linux"))))]
-mod attributes {
-    fn unsupported() -> std::io::Error {
-        std::io::Error::new(
-            std::io::ErrorKind::Unsupported,
-            "applying edits is supported on macOS and Linux",
-        )
-    }
-
-    pub(super) fn copy(_: &std::fs::File, _: &std::fs::File) -> std::io::Result<()> {
-        Err(unsupported())
-    }
-
-    pub(super) fn unrestrict(_: &std::fs::File) -> std::io::Result<()> {
-        Err(unsupported())
-    }
-
-    pub(super) fn verify(_: &std::fs::File, _: &std::fs::File) -> std::io::Result<()> {
-        Err(unsupported())
-    }
 }

@@ -96,7 +96,6 @@ impl Evaluator<'_, '_> {
         key: TypeId,
         consumer: &Location,
     ) -> NativeResult<()> {
-        let control = self.control.clone();
         let mut sequence = NativeSequence::new();
         let result = (|| -> Result<(), DemandError> {
             let data = self.created_property(symbol)?;
@@ -126,7 +125,7 @@ impl Evaluator<'_, '_> {
             else {
                 unreachable!("created mapped association");
             };
-            CreatedProperty::make_mut(data, control.as_ref()).name_type = Some(name);
+            CreatedProperty::make_mut(data).name_type = Some(name);
             let key = sequence.read(self.union_type_ex_completion(
                 vec![previous_key, key],
                 None,
@@ -139,7 +138,7 @@ impl Evaluator<'_, '_> {
                 unreachable!("created mapped association");
             };
             let CreatedPropertyValue::Mapped { key_type, .. } =
-                &mut CreatedProperty::make_mut(data, control.as_ref()).value
+                &mut CreatedProperty::make_mut(data).value
             else {
                 unreachable!("mapped value recipe");
             };

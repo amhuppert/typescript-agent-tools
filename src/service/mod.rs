@@ -902,11 +902,12 @@ fn absent(error: &io::Error) -> bool {
 }
 
 /// `path` opened for reading when it names a regular file, or `None` when
-/// nothing is there (`absent`). It never waits: another kind of file, such as a pipe a
-/// blocking open would wait on, is refused before it is opened, and so is one
-/// put in its place in between (`nonblocking::open_without_waiting`).
+/// nothing is there (`absent`). Another kind of file, such as a pipe an open
+/// would wait on, is refused before it is opened (ENVELOPE.md, "Accepted
+/// inputs"). A path replaced by a pipe between the check and the open can
+/// block the open; ENVELOPE.md accepts this, since a hostile filesystem
+/// layout is outside the envelope.
 fn open_regular(path: &Path) -> io::Result<Option<std::fs::File>> {
-    let not_regular = || io::Error::new(io::ErrorKind::InvalidInput, "not a regular file");
     match std::fs::symlink_metadata(path) {
         Ok(metadata) if metadata.is_file() => {}
         // Refused whatever it names, so a link to a regular file says why.
@@ -916,19 +917,20 @@ fn open_regular(path: &Path) -> io::Result<Option<std::fs::File>> {
                 "a symbolic link, not a regular file",
             ));
         }
-        Ok(_) => return Err(not_regular()),
+        Ok(_) => {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "not a regular file",
+            ));
+        }
         Err(error) if absent(&error) => return Ok(None),
         Err(error) => return Err(error),
     }
-    let file = match crate::nonblocking::open_without_waiting(path) {
-        Ok(file) => file,
-        Err(error) if absent(&error) => return Ok(None),
-        Err(error) => return Err(error),
-    };
-    if !file.metadata()?.is_file() {
-        return Err(not_regular());
+    match std::fs::File::open(path) {
+        Ok(file) => Ok(Some(file)),
+        Err(error) if absent(&error) => Ok(None),
+        Err(error) => Err(error),
     }
-    Ok(Some(file))
 }
 
 /// The failure a complete startup diagnostic records: its code, a line

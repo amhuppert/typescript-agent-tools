@@ -381,10 +381,7 @@ impl Evaluator<'_, '_> {
         let raw = self
             .reference_raw_table_lookup(
                 super::reference_symbols::ReferenceRawSymbolTable::Retained(table),
-                &crate::project::binding::NativePropertyKey::fixed(
-                    name.as_bytes(),
-                    self.control.as_ref(),
-                ),
+                &crate::project::binding::NativePropertyKey::fixed(name.as_bytes()),
                 consumer,
             )?
             .ok_or_else(|| {
@@ -411,10 +408,7 @@ impl Evaluator<'_, '_> {
         let class = self
             .reference_raw_symbol_of_declaration(class)?
             .ok_or_else(|| super::super::internal("parameter property class lacks its symbol"))?;
-        let key = crate::project::binding::NativePropertyKey::fixed(
-            name.as_bytes(),
-            self.control.as_ref(),
-        );
+        let key = crate::project::binding::NativePropertyKey::fixed(name.as_bytes());
         let member = self
             .reference_members_of_symbol(class, consumer)?
             .and_then(|table| {

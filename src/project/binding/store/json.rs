@@ -10,9 +10,9 @@ use crate::project::sources::FileId;
 use std::collections::HashMap;
 
 impl Store {
-    /// Preserve raw JSON node.Symbol and export-assignment identities for
-    /// native `initializeChecker`; the normal projection readers below may
-    /// follow find after merging and cannot supply this snapshot later.
+    /// Preserve raw JSON node.Symbol identities for native `initializeChecker`;
+    /// the normal projection readers below may follow find after merging and
+    /// cannot supply this snapshot later.
     pub(in crate::project::binding) fn snapshot_json_symbols(
         &self,
     ) -> crate::project::binding::raw::RawJsonSymbols {
@@ -21,11 +21,6 @@ impl Store {
                 .json_symbols
                 .iter()
                 .map(|(&node, &symbol)| (node, self.header_for_symbol(symbol)))
-                .collect(),
-            exports: self
-                .json_exports
-                .iter()
-                .map(|(&file, &symbol)| (file, self.header_for_symbol(symbol)))
                 .collect(),
         }
     }
@@ -51,7 +46,6 @@ impl Store {
         );
         self.set_symbol_parent(export, module_symbol);
         self.add_source_file_declaration(export, file, span);
-        self.json_exports.insert(file, export);
         let bound_table = self.binding_symbol_table(self.declaration_result(module_symbol), true);
         let table = bound_table.projection;
         self.hold(

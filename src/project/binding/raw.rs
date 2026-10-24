@@ -13,7 +13,6 @@ use crate::project::sources::FileId;
 use std::collections::HashMap;
 
 #[derive(Debug)]
-#[allow(dead_code)] // Captured before the coordinated semantic reader migration.
 pub(in crate::project) struct RawBindingSnapshot {
     pub(super) native: NativeSymbols,
     pub(super) scope_tables: Vec<Vec<Option<NativeTableId>>>,
@@ -24,7 +23,6 @@ pub(in crate::project) struct RawBindingSnapshot {
     pub(super) global_augmentations: Vec<Option<NativeHeaderId>>,
     pub(super) json: RawJsonSymbols,
     pub(super) requests: Vec<Vec<RawModuleRequest>>,
-    pub(super) ambient: HashMap<String, NativeHeaderId>,
     pub(super) patterns: Vec<(String, NativeHeaderId)>,
     pub(super) initialization: InitializationRecipe,
 }
@@ -34,7 +32,6 @@ pub(in crate::project) struct RawBindingSnapshot {
 /// Missing/unchecked/unsupported distinctions remain in the file's existing
 /// ModuleResolution facts; Script and Ignored are not interchangeable.
 #[derive(Debug, Clone, Copy)]
-#[allow(dead_code)]
 pub(super) enum RawModuleRequest {
     Module {
         header: NativeHeaderId,
@@ -45,24 +42,20 @@ pub(super) enum RawModuleRequest {
 }
 
 #[derive(Debug)]
-#[allow(dead_code)]
 pub(super) struct RawJsonSymbols {
     pub(super) nodes: HashMap<(FileId, JsonDeclaration), NativeHeaderId>,
-    pub(super) exports: HashMap<FileId, NativeHeaderId>,
 }
 
 /// Native `initializeChecker` consumes these groups in separate phases:
 /// script globals/UMD, global augmentations, intrinsic/fixed globals, deferred
 /// ambient modules, then nonglobal augmentations. No alias is resolved here.
 #[derive(Debug)]
-#[allow(dead_code)]
 pub(super) struct InitializationRecipe {
     pub(super) files: Vec<InitializationFile>,
     pub(super) modules: Vec<ModuleAugmentation>,
 }
 
 #[derive(Debug)]
-#[allow(dead_code)]
 pub(super) struct InitializationFile {
     pub(super) file: FileId,
     /// The initializer classifies every raw entry, queuing all ambient module
@@ -74,7 +67,6 @@ pub(super) struct InitializationFile {
 }
 
 #[derive(Debug)]
-#[allow(dead_code)]
 pub(super) struct ModuleAugmentation {
     pub(super) file: FileId,
     pub(super) request: RequestId,

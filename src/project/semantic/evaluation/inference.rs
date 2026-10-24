@@ -859,8 +859,8 @@ impl Evaluator<'_, '_> {
 
     /// `InferenceTypeMapper.Map` fixes only the actual matching slot. A
     /// non-fixing access can observe a provisional installed inferred type.
-    /// The parameter scan charges each visited slot before comparing it, just
-    /// as the other Map implementations charge their source-table scans.
+    /// The parameter scan stops at the first slot whose parameter is `ty`, just
+    /// as the other Map implementations stop their source-table scans.
     pub(super) fn map_inference_parameter_completion(
         &mut self,
         ty: TypeId,

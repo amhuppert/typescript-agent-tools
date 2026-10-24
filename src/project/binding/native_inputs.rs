@@ -180,7 +180,7 @@ impl<'p> NativeInputs<'p> {
         Ok(self
             .raw
             .native
-            .lookup(table, &super::NativePropertyKey::fixed(key, None))?
+            .lookup(table, &super::NativePropertyKey::fixed(key))?
             .map(BoundSymbol))
     }
 
@@ -964,10 +964,8 @@ impl<'p> NativeInputs<'p> {
     pub(in crate::project) fn read_origin_name(
         &self,
         origin: ReadOrigin,
-        control: Option<&crate::resources::Control>,
     ) -> Result<Vec<u8>, TypeBindingFailure> {
-        self.native_symbol(BoundSymbol(origin.header()))?
-            .name(control)
+        self.native_symbol(BoundSymbol(origin.header()))?.name()
     }
 
     pub(in crate::project) fn read_origin_key(

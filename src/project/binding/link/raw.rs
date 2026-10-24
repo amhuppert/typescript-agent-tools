@@ -104,12 +104,6 @@ impl Linker<'_, '_> {
             .map(|symbol| symbol.map(header))
             .collect();
         let json = self.state.store.snapshot_json_symbols();
-        let ambient = self
-            .state
-            .ambient
-            .iter()
-            .map(|(name, &module)| (name.clone(), module_header(module)))
-            .collect();
         let patterns = self
             .state
             .patterns
@@ -126,7 +120,6 @@ impl Linker<'_, '_> {
             global_augmentations,
             json,
             requests,
-            ambient,
             patterns,
             initialization: InitializationRecipe { files, modules },
         }

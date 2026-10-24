@@ -83,8 +83,7 @@ impl Source<'_, '_> {
                     "unresolved symbol name has no exact scalar spelling",
                 ));
             };
-            let name = { captured.shared_text(text) };
-            names.push(name);
+            names.push(std::sync::Arc::from(text.as_ref()));
             if text.is_empty() {
                 break;
             }

@@ -34,8 +34,7 @@ writes its document instead, and `--pretty` indents that document, alone
 writing it in place of the text, as references always have. `-o OUTPUT`
 writes the result to a file. An answer shows at most 200 occurrences unless
 `--limit N|all` or `-o` says otherwise ([display limit](#display-limit)). Stdin, `--check`, `--tsx`, and `--depth` are
-rejected. `--direct` (or `--references-direct`) answers in the CLI process
-instead of the service. A result goes to stdout or `-o`; by default a
+rejected. `--direct` answers in the CLI process instead of the service. A result goes to stdout or `-o`; by default a
 selection that selects nothing or several, and a failure, are diagnostics on
 stderr and never create or replace the `-o` file. With `--json`, such a
 selection and an analysis failure are delivered as documents to stdout or
@@ -88,11 +87,14 @@ Diagnostics on stderr have the form `path:line:column: message` when a location
 is known. Sources, configurations, and package manifests are read as TypeScript
 reads them (`decodeBytes`): a leading UTF-8 byte order mark is not part of the
 text, so first-line columns in queries, results, and diagnostics are the ones
-`tsc` reports.
+`tsc` reports. Loading reads only regular files: a pipe, device, or socket it
+selects there, which TypeScript would read, is refused before it is opened, as
+an `Io` failure `PATH: not a regular file` (exit 2), so no query waits on a
+pipe's writer.
 
 ## Persistent CLI service
 
-On macOS and Linux, ordinary CLI project queries use a local service: reference and type
+Ordinary CLI project queries use a local service: reference and type
 queries, and [outline and show](navigation.md#project-mode) with `--project`.
 One service per absolute configuration spelling answers these through one
 session request boundary, which checks the captured filesystem inputs before
@@ -119,8 +121,7 @@ holds no service: status reports none there and stop has none to stop.
 `no service: CONFIG` when none was running. These three flags administer the
 project service, which answers every project query (`--references`, `--type`,
 and `--outline`, `--show`, and edits with `--project`), whatever their names
-say. `--direct` (or
-`--references-direct`) performs a fresh load in the CLI process through the
+say. `--direct` performs a fresh load in the CLI process through the
 same request boundary, giving the same output and exit code.
 `--references-serve --project CONFIG` runs the service in the foreground for a
 supervisor. Background services use null standard streams and a separate process
@@ -249,7 +250,7 @@ file absolute against its own working directory
 from any directory; diagnostics about that file (`OutsideProject`,
 `InvalidPosition`) keep the caller's spelling, and a working directory that
 cannot be read is an `Io` failure naming the file as spelled.
-Other platforms use direct loading and reject service administration flags.
+`tsparse` builds and runs only on macOS and Linux (ENVELOPE.md).
 See [the design](reference-service-design.md) for ownership and consistency limits.
 
 ## Library
@@ -299,7 +300,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 `load` reads each program input once and returns either a complete immutable
 index or an `analysis::InputError` (`Io`, `Config`, `Syntax`, `ResourceLimit`
 for a source nesting deeper than the parser's grammar budget, `Unsupported`,
-`Binding`, or `UnresolvedImport`) with a path and position where available. Only a path
+`Binding`, or `UnresolvedImport`) with a path and position where available. A
+program input longer than 4,294,967,295 bytes (`u32::MAX`), or whose control
+flow has more nodes or containers than that, is `Unsupported`: that is this
+tool's limit, not a TypeScript rule. Only a path
 that does not exist, or that runs through a file, is absent. Any other failure
 to inspect or read a file or directory, such as a package manifest, a type
 root, or a directory entry, is an `Io` error. Queries read
@@ -485,9 +489,8 @@ same command:
 
 `display` is present only when something was withheld, so every answer that
 shows all its occurrences is the document it always was. The command names
-no transport: it leaves out `--direct` and spells `--references-direct` as
-`--references`, since the service and a direct load answer alike, so a cut
-answer is the same bytes from both. Ambiguous and missing dotted names list
+no transport: it leaves out `--direct`, since the service and a direct
+load answer alike, so a cut answer is the same bytes from both. Ambiguous and missing dotted names list
 their candidates in full.
 
 Declarations that have no identifier use an anchor: an anonymous default export

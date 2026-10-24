@@ -277,7 +277,7 @@ fn a_flag_out_of_scope_names_exactly_the_operations_that_accept_it() {
 }
 
 #[test]
-fn operations_are_chosen_once_and_references_direct_is_references_with_direct() {
+fn operations_are_chosen_once() {
     let fixture = Fixture::new(&[]);
     for (args, message) in [
         (
@@ -321,24 +321,8 @@ fn operations_are_chosen_once_and_references_direct_is_references_with_direct() 
             "Choose one operation: --references-status, --references-stop",
         ),
         (
-            &[
-                "--references-direct",
-                "--references-serve",
-                "--project",
-                "c.json",
-            ],
-            "Choose one operation: --references-direct, --references-serve",
-        ),
-        (
-            &[
-                "--type",
-                "--references-direct",
-                "--project",
-                "c.json",
-                "--name",
-                "x",
-            ],
-            "Choose one operation: --type, --references-direct",
+            &["--doctor", "--references-serve", "--project", "c.json"],
+            "Choose one operation: --doctor, --references-serve",
         ),
     ] {
         usage(&run(&fixture, args), "usage.operation", message, args);
@@ -350,23 +334,23 @@ fn operations_are_chosen_once_and_references_direct_is_references_with_direct() 
             "{help:?}"
         );
     }
-    // Each spelling of the one references operation, together or alone,
-    // reaches the query, which this environment's idle time then refuses.
+    // References in this process, its flag given once or again, reaches
+    // the query, which this environment's idle time then refuses.
     for args in [
-        &["--references-direct", "--project", "c.json", "--name", "x"][..],
         &[
             "--references",
-            "--references-direct",
+            "--direct",
             "--project",
             "c.json",
             "--name",
             "x",
-        ],
+        ][..],
         &[
-            "--references-direct",
-            "--references-direct",
+            "--references",
             "--project",
             "c.json",
+            "--direct",
+            "--references",
             "--name",
             "x",
         ],
@@ -375,42 +359,147 @@ fn operations_are_chosen_once_and_references_direct_is_references_with_direct() 
     }
 }
 
-/// A service action implies `--references`, so the parser has always taken
-/// `--references` beside one: before or after the action, it changes nothing.
+/// The removed flag that stood for `--references --direct`, built from
+/// parts so that a search for its spelling finds no use of it.
+const REMOVED_DIRECT: &str = concat!("--references", "-direct");
+
+/// The removed flag is no flag: it is an unknown option wherever it stands,
+/// alone or beside the `--references --direct` it stood for, with the
+/// nearest registered name TypeScript's spelling rule gives, and nothing is
+/// loaded or started.
 #[test]
-fn references_beside_a_service_action_changes_nothing() {
+fn references_direct_is_an_unknown_option() {
     let fixture = Fixture::new(&[]);
-    let idle = format!("usage.environment: {IDLE}\n");
-    for (action, code, stdout, stderr) in [
-        ("--references-status", 0, "no service: missing.json\n", ""),
-        ("--references-stop", 0, "no service: missing.json\n", ""),
-        // Serve reaches its environment, which this one refuses.
-        ("--references-serve", 2, "", idle.as_str()),
+    let message = format!(
+        "Unknown option: {REMOVED_DIRECT}; did you mean --references-serve? See tsparse --help"
+    );
+    for args in [
+        &[REMOVED_DIRECT, "--project", "c.json", "--name", "x"][..],
+        &["--project", "c.json", "--at", "1:1", "a.ts", REMOVED_DIRECT],
+        &[
+            "--references",
+            REMOVED_DIRECT,
+            "--project",
+            "c.json",
+            "--name",
+            "x",
+        ],
+        &[
+            REMOVED_DIRECT,
+            "--direct",
+            "--project",
+            "c.json",
+            "--name",
+            "x",
+        ],
     ] {
-        for args in [
-            &[action, "--project", "missing.json"][..],
-            &["--references", action, "--project", "missing.json"],
-            &[action, "--project", "missing.json", "--references"],
-        ] {
-            let output = run(&fixture, args);
-            assert_eq!(output.status.code(), Some(code), "{args:?}: {output:?}");
-            assert_eq!(text(&output.stdout), stdout, "{args:?}");
-            assert_eq!(text(&output.stderr), stderr, "{args:?}");
-        }
+        usage(&run(&fixture, args), "usage.unknown_option", &message, args);
     }
-    // `--references-direct` is a query's flag, which no service action takes.
+    // With --json, the same failure is the usage document.
     let args = [
-        "--references-status",
-        "--references-direct",
+        REMOVED_DIRECT,
         "--project",
         "c.json",
+        "--name",
+        "x",
+        "--json",
     ];
-    usage(
-        &run(&fixture, &args),
-        "usage.operation",
-        "Choose one operation: --references-status, --references-direct",
-        &args,
+    let output = run(&fixture, &args);
+    assert_eq!(output.status.code(), Some(2), "{output:?}");
+    assert!(output.stderr.is_empty(), "{output:?}");
+    let document: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(
+        document,
+        serde_json::json!({
+            "outcome": "error",
+            "error": {
+                "category": "usage",
+                "code": "usage.unknown_option",
+                "message": message,
+            },
+        })
     );
+    assert!(!fixture.path("services").exists());
+}
+
+/// A service action takes only `--project`, and status, which prints a
+/// document, `--json`, `--pretty`, and `--output` beside it. `--pretty` and
+/// `--output` beside stop or serve, which print no document, are out of
+/// their scope; `--references` beside any of the three names a second
+/// operation. Nothing is stopped, served, or written.
+#[test]
+fn a_service_action_refuses_the_flags_it_does_not_take() {
+    let fixture = Fixture::new(&[]);
+    let pretty = "--pretty applies to: parse mode (no operation flag), --outline, --show, --type, --references, --replace-body, --insert-after, --edit-batch, --apply, --references-status, --doctor";
+    let output = "--output applies to: parse mode (no operation flag), --outline, --show, --type, --references, --replace-body, --insert-after, --edit-batch, --apply, --references-status";
+    for action in ["--references-stop", "--references-serve"] {
+        for (flags, message) in [
+            (&["--pretty"][..], pretty),
+            (&["-o", "out.txt"], output),
+            (&["--output", "out.txt"], output),
+        ] {
+            let args = [&[action, "--project", "missing.json"][..], flags].concat();
+            usage(&run(&fixture, &args), "usage.flag_scope", message, &args);
+            assert!(!fixture.path("out.txt").exists(), "{args:?}");
+        }
+    }
+    for action in [
+        "--references-status",
+        "--references-stop",
+        "--references-serve",
+    ] {
+        for (args, message) in [
+            (
+                [
+                    &["--references", action][..],
+                    &["--project", "missing.json"],
+                ]
+                .concat(),
+                format!("Choose one operation: --references, {action}"),
+            ),
+            (
+                [
+                    &[action][..],
+                    &["--project", "missing.json", "--references"],
+                ]
+                .concat(),
+                format!("Choose one operation: {action}, --references"),
+            ),
+        ] {
+            usage(&run(&fixture, &args), "usage.operation", &message, &args);
+        }
+    }
+    assert!(!fixture.path("services").exists());
+    // Status still prints its text, its document, and either indented, to
+    // stdout or the file -o names.
+    let document = r#"{"running":false,"pid":null,"generation":0,"build":null,"limits":null,"idle_secs":null,"idle_remaining_secs":null,"started_unix":null}"#;
+    let indented = "{\n  \"running\": false,\n  \"pid\": null,\n  \"generation\": 0,\n  \"build\": null,\n  \"limits\": null,\n  \"idle_secs\": null,\n  \"idle_remaining_secs\": null,\n  \"started_unix\": null\n}\n";
+    let status = ["--references-status", "--project", "missing.json"];
+    for (flags, expected) in [
+        (&[][..], "no service: missing.json\n".to_string()),
+        (&["--json"], format!("{document}\n")),
+        (&["--pretty"], indented.to_string()),
+        (&["--json", "--pretty"], indented.to_string()),
+    ] {
+        let args = [&status[..], flags].concat();
+        let printed = run(&fixture, &args);
+        assert_eq!(printed.status.code(), Some(0), "{args:?}: {printed:?}");
+        assert!(printed.stderr.is_empty(), "{args:?}: {printed:?}");
+        assert_eq!(text(&printed.stdout), expected, "{args:?}");
+        let to_file = [&args[..], &["-o", "status.out"]].concat();
+        let written = run(&fixture, &to_file);
+        assert_eq!(written.status.code(), Some(0), "{to_file:?}: {written:?}");
+        assert!(
+            written.stdout.is_empty() && written.stderr.is_empty(),
+            "{to_file:?}: {written:?}"
+        );
+        assert_eq!(
+            std::fs::read_to_string(fixture.path("status.out")).unwrap(),
+            expected,
+            "{to_file:?}"
+        );
+        std::fs::remove_file(fixture.path("status.out")).unwrap();
+    }
 }
 
 #[test]

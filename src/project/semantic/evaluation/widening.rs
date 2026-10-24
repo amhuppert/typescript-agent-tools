@@ -9,7 +9,6 @@ use super::super::model::{
 use super::{Evaluator, name_map::NameMap};
 use crate::project::binding::NativePropertyKey;
 use crate::references::Location;
-use crate::resources::Control;
 use crate::types::TypePropertyKind;
 use std::collections::HashMap;
 
@@ -19,10 +18,10 @@ pub(super) struct WideningState {
 }
 
 impl WideningState {
-    pub(super) fn new(control: Option<Control>) -> Self {
+    pub(super) fn new() -> Self {
         Self {
             roots: HashMap::new(),
-            undefined_properties: NameMap::new(control),
+            undefined_properties: NameMap::new(),
         }
     }
 }
@@ -37,13 +36,13 @@ struct Context {
 }
 
 impl Context {
-    fn new(control: Option<Control>) -> Self {
+    fn new() -> Self {
         Self {
             parent: None,
             property: None,
             siblings: None,
             properties: None,
-            children: NameMap::new(control),
+            children: NameMap::new(),
             widened: HashMap::new(),
         }
     }
@@ -330,7 +329,7 @@ impl Evaluator<'_, '_> {
                         let id = contexts.len();
                         contexts.push(Context {
                             siblings: Some(NativeCompletion::clean(types.to_vec())),
-                            ..Context::new(self.control.clone())
+                            ..Context::new()
                         });
                         id
                     }
@@ -422,7 +421,7 @@ impl Evaluator<'_, '_> {
         let mut sequence = NativeSequence::new();
         let result = (|| -> Result<TypeId, DemandError> {
             let mut properties = Vec::new();
-            let mut names = NameMap::new(self.control.clone());
+            let mut names = NameMap::new();
             for property in
                 sequence.read(self.properties_of_object_type_completion(ty, consumer))?
             {
@@ -524,7 +523,7 @@ impl Evaluator<'_, '_> {
                         contexts.push(Context {
                             parent: Some(parent),
                             property: Some(name.clone()),
-                            ..Context::new(self.control.clone())
+                            ..Context::new()
                         });
                         contexts[parent].children.insert(name, child);
                         child
@@ -609,7 +608,7 @@ impl Evaluator<'_, '_> {
         let mut sequence = NativeSequence::new();
         let result = (|| -> Result<Vec<Property>, DemandError> {
             let mut properties = Vec::<Property>::new();
-            let mut positions = NameMap::new(self.control.clone());
+            let mut positions = NameMap::new();
             for ty in
                 sequence.read(self.siblings_of_widening_context(context, contexts, consumer))?
             {

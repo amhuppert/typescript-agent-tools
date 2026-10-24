@@ -4,7 +4,9 @@ This checkpoint reduces the retained cost of the existing native T/Q3/Q4
 implementation. The implementation and measurements cover immutable Project
 storage and allocation removal in the existing path owner. Native type/reference
 delivery, resource-accounting calibration and compiler-conformance work remain
-in progress.
+in progress. Since this checkpoint, the per-request fee ledger that calibration
+was for has been dropped in favor of the CLI process watchdog
+(`src/process_limits.rs`), so the accounting calibration below is no longer planned.
 
 ## Measured storage and load results
 

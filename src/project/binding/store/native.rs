@@ -95,7 +95,7 @@ impl NativeSymbols {
         let Some(exports) = self.header(module).exports else {
             return Ok(());
         };
-        let export_equals_key = NativePropertyKey::fixed(b"export=".as_slice(), None);
+        let export_equals_key = NativePropertyKey::fixed(b"export=".as_slice());
         let Some(export_equals) = self.lookup(exports, &export_equals_key)? else {
             return Ok(());
         };

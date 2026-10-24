@@ -6,11 +6,12 @@ use super::*;
 use crate::references::metadata::{
     copy_location, copy_text, location_hash, location_order, option_location_order, text_order,
 };
-use crate::resources::{CheckedKey, CheckedMap, Control, FixedMap, complete_or_abort};
+use crate::resources::{CheckedKey, CheckedMap, Control, complete_or_abort};
 use std::cmp::Ordering;
+use std::collections::HashMap;
 
 pub(super) struct Ledger {
-    identities: FixedMap<NativeSymbolIdentity, usize>,
+    identities: HashMap<NativeSymbolIdentity, usize>,
     groups: Vec<Group>,
     gaps: Vec<ReferenceGap>,
     control: Option<Control>,
@@ -35,7 +36,7 @@ impl CheckedKey for OccurrenceKey {
 impl Ledger {
     pub(super) fn new(control: Option<Control>) -> Self {
         Self {
-            identities: FixedMap::new(),
+            identities: HashMap::new(),
             groups: Vec::new(),
             gaps: Vec::new(),
             control,

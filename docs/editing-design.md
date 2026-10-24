@@ -62,6 +62,16 @@ envelope. macOS's `com.apple.provenance`, which the system sets on every file a
 process writes and which cannot be changed, is the one exemption. Resolve symlinks to their referents, keep the
 links themselves intact, and recheck that resolution before writing.
 
+*Removed 2026-10-23:* the preservation of owner, group, extended attributes,
+and access control lists was removed, with the output check's freeing of an
+inherited list. The tool edits its author's own source files in git checkouts
+on a single-user Mac, and the operating envelope (ENVELOPE.md) puts files
+whose ACLs, extended attributes, flags, group, or ownership must survive an
+edit outside it, so about 330 lines of system calls served no supported case.
+Identity is now device, inode, mode, and link count; the new file gets the
+proposed bytes and the original's mode; hard-linked files and files with
+macOS flags are still refused. `docs/editing.md` states the current contract.
+
 ## Agent workflow and public contract
 
 Extend `tsparse` and its existing request and delivery owners. These illustrative
@@ -140,7 +150,8 @@ name does not exist, since a name that does cannot be the new output, so
 commands whose reserved names all exist create nothing to check, except to
 compare a new `-o` with a new `--plan`; the output created for the
 question is freed of what its directory gave it if that denies its removal,
-and one that still cannot be removed is reported as left. A plan's names
+and one that still cannot be removed is reported as left (*the freeing was
+removed 2026-10-23; see Scope and operating conditions*). A plan's names
 are known exactly when its text decodes as a plan, and are otherwise
 unknown, rather than read leniently from damaged text. A result-delivery failure after commit reports that the
 edits were applied; it is not grounds to replay or roll back the edit.

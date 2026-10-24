@@ -9,25 +9,20 @@ use super::{Evaluator, ReferenceDeclaration, ReferenceSymbol};
 use crate::project::binding::{NativePropertyKey, NativeSymbolIdentity};
 use crate::references::Location;
 use crate::syntax_kind::SyntaxKind as K;
+use std::collections::HashMap;
 mod entity;
 mod indexes;
 
 pub(super) struct SymbolTables {
     pub(super) raw: Vec<crate::project::binding::NativeSymbolTable<ReferenceSymbol>>,
-    pub(super) raw_overlays:
-        crate::resources::FixedMap<crate::project::binding::NativeRawSymbolTable, usize>,
-    pub(super) merged: crate::resources::FixedMap<NativeSymbolIdentity, ReferenceSymbol>,
-    pub(super) projections:
-        crate::resources::FixedMap<NativeSymbolIdentity, crate::project::binding::SymbolId>,
-    pub(super) headers: crate::resources::FixedMap<NativeSymbolIdentity, PropertySymbolId>,
-    resolved: crate::resources::FixedMap<
-        (NativeSymbolIdentity, bool),
-        NativeCompletion<ReferenceSymbolTable>,
-    >,
-    declaration_symbols:
-        crate::resources::FixedMap<DeclarationIdentity, NativeCompletion<ReferenceSymbol>>,
+    pub(super) raw_overlays: HashMap<crate::project::binding::NativeRawSymbolTable, usize>,
+    pub(super) merged: HashMap<NativeSymbolIdentity, ReferenceSymbol>,
+    pub(super) projections: HashMap<NativeSymbolIdentity, crate::project::binding::SymbolId>,
+    pub(super) headers: HashMap<NativeSymbolIdentity, PropertySymbolId>,
+    resolved: HashMap<(NativeSymbolIdentity, bool), NativeCompletion<ReferenceSymbolTable>>,
+    declaration_symbols: HashMap<DeclarationIdentity, NativeCompletion<ReferenceSymbol>>,
     /// `lateBindMember` / `getLateBoundSymbol`: raw header identity to its resolved late symbol.
-    late_symbols: crate::resources::FixedMap<NativeSymbolIdentity, ReferenceSymbol>,
+    late_symbols: HashMap<NativeSymbolIdentity, ReferenceSymbol>,
 }
 
 /// `lateBindMember` / `lateBindIndexSignature` build one ordered late table.
@@ -35,19 +30,17 @@ pub(super) struct SymbolTables {
 /// when publishing the final table. Nil-versus-empty selection stays at the caller.
 struct LateSymbolTable {
     entries: Vec<(NativePropertyKey, ReferenceSymbol)>,
-    control: Option<crate::resources::Control>,
 }
 
 impl LateSymbolTable {
-    fn new(control: Option<crate::resources::Control>) -> Self {
+    fn new() -> Self {
         Self {
             entries: Vec::new(),
-            control,
         }
     }
 
     fn lookup(&self, key: &NativePropertyKey) -> Option<ReferenceSymbol> {
-        lookup(Some(&self.entries), key, self.control.as_ref())
+        lookup(Some(&self.entries), key)
     }
 
     fn insert(&mut self, key: NativePropertyKey, symbol: ReferenceSymbol) {
@@ -65,7 +58,6 @@ impl LateSymbolTable {
 fn lookup(
     table: Option<&[(NativePropertyKey, ReferenceSymbol)]>,
     key: &NativePropertyKey,
-    _control: Option<&crate::resources::Control>,
 ) -> Option<ReferenceSymbol> {
     table?.iter().find_map(|(name, symbol)| {
         name.string_value()
@@ -218,7 +210,7 @@ impl Evaluator<'_, '_> {
                         sequence.read(self.late_bind_member_completion(
                             symbol,
                             early.as_ref(),
-                            late.get_or_insert_with(|| LateSymbolTable::new(self.control.clone())),
+                            late.get_or_insert_with(LateSymbolTable::new),
                             member,
                             consumer,
                         ))?;
@@ -227,7 +219,7 @@ impl Evaluator<'_, '_> {
                     {
                         self.late_bind_index_signature(
                             early.as_ref(),
-                            late.get_or_insert_with(|| LateSymbolTable::new(self.control.clone())),
+                            late.get_or_insert_with(LateSymbolTable::new),
                             member,
                             consumer,
                         )?;
@@ -239,10 +231,7 @@ impl Evaluator<'_, '_> {
                 && self
                     .reference_raw_table_lookup(
                         raw,
-                        &NativePropertyKey::fixed(
-                            b"\xfeassignment".as_slice(),
-                            self.control.as_ref(),
-                        ),
+                        &NativePropertyKey::fixed(b"\xfeassignment".as_slice()),
                         consumer,
                     )?
                     .is_some()
@@ -306,7 +295,7 @@ impl Evaluator<'_, '_> {
             if existing.conflicts_with(flags) {
                 // Native reports duplicate identifiers using declaration-name
                 // syntax; that diagnostic consumes no symbol value type.
-                let _early_symbol = lookup(early.map(|table| &**table), &key, self.control.as_ref());
+                let _early_symbol = lookup(early.map(|table| &**table), &key);
                 self.set_merge_symbol_flags(symbol, existing.repair_conflicting_accessor(flags))?;
                 symbol = self.new_late_symbol(key);
             }
@@ -367,12 +356,11 @@ impl Evaluator<'_, '_> {
         declaration: DeclarationIdentity,
         consumer: &Location,
     ) -> Result<(), DemandError> {
-        let key = NativePropertyKey::fixed(b"\xfeindex".as_slice(), self.control.as_ref());
+        let key = NativePropertyKey::fixed(b"\xfeindex".as_slice());
         let symbol = match late.lookup(&key) {
             Some(symbol) => self.register_reference_symbol(symbol, consumer)?,
             None => {
-                let symbol = match lookup(early.map(|table| &**table), &key, self.control.as_ref())
-                {
+                let symbol = match lookup(early.map(|table| &**table), &key) {
                     Some(early) => self.clone_reference_symbol(early, consumer)?,
                     None => self.new_late_symbol(key.clone()),
                 };
@@ -639,13 +627,13 @@ impl SymbolTables {
     pub(super) fn new() -> Self {
         Self {
             raw: Default::default(),
-            raw_overlays: crate::resources::FixedMap::new(),
-            merged: crate::resources::FixedMap::new(),
-            projections: crate::resources::FixedMap::new(),
-            headers: crate::resources::FixedMap::new(),
-            resolved: crate::resources::FixedMap::new(),
-            declaration_symbols: crate::resources::FixedMap::new(),
-            late_symbols: crate::resources::FixedMap::new(),
+            raw_overlays: HashMap::new(),
+            merged: HashMap::new(),
+            projections: HashMap::new(),
+            headers: HashMap::new(),
+            resolved: HashMap::new(),
+            declaration_symbols: HashMap::new(),
+            late_symbols: HashMap::new(),
         }
     }
 }

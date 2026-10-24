@@ -68,16 +68,15 @@ pub(super) fn array_or_tuple_recipe(
     let ast = &captured.ast;
     let node = ast.node(id);
     let element_nodes = if node.syntax_kind == SyntaxKind::ArrayType {
-        captured.collect([syntax::id(node, "elementType").expect("parsed ArrayType element")])
+        vec![syntax::id(node, "elementType").expect("parsed ArrayType element")]
     } else {
-        captured.collect(syntax::ids(node, "elements").iter().copied())
+        syntax::ids(node, "elements").to_vec()
     };
     let tuple = array_element_type_node(captured, id).is_none().then(|| {
-        captured.collect(
-            element_nodes
-                .iter()
-                .map(|&element| element_info(inputs, file, captured, element)),
-        )
+        element_nodes
+            .iter()
+            .map(|&element| element_info(inputs, file, captured, element))
+            .collect()
     });
     let variadic = node.syntax_kind == SyntaxKind::TupleType
         && element_nodes.iter().any(|&element| {
@@ -87,11 +86,10 @@ pub(super) fn array_or_tuple_recipe(
         site: Site::new(ast, id),
         readonly: parents[id.index()].is_some_and(|parent| readonly_operator(ast, parent)),
         tuple,
-        elements: captured.collect(
-            element_nodes
-                .iter()
-                .map(|&element| type_expression(inputs, file, captured, parents, element)),
-        ),
+        elements: element_nodes
+            .iter()
+            .map(|&element| type_expression(inputs, file, captured, parents, element))
+            .collect(),
         variadic,
         deferred: deferred_reference_recipe(inputs, file, captured, parents, id, &element_nodes),
     }
@@ -122,7 +120,7 @@ pub(super) fn element_recipe(
         optional: !rest
             && (node.syntax_kind == SyntaxKind::OptionalType
                 || syntax::id(node, "questionToken").is_some()),
-        value: captured.boxed(type_expression(inputs, file, captured, parents, value)),
+        value: Box::new(type_expression(inputs, file, captured, parents, value)),
     }
 }
 
@@ -217,7 +215,7 @@ pub(super) fn tuple_element_label(
         declaration: super::DeclarationIdentity::new(file, id),
         name: ast
             .identifier_name(name)
-            .map(|name| captured.shared_text(name))
+            .map(std::sync::Arc::from)
             .ok_or_else(|| {
                 crate::project::semantic::unsupported_demand_at_location(
                     inputs,
@@ -253,11 +251,10 @@ pub(super) fn deferred_reference_recipe(
         declaration: super::DeclarationIdentity::new(file, id),
         alias: alias_for_type_node(file, captured, parents, id),
         resolved_by_alias: resolved_by_type_alias(captured, parents, id),
-        arguments: captured.collect(
-            arguments
-                .iter()
-                .map(|&argument| alias_resolution_recipe(inputs, file, captured, argument)),
-        ),
+        arguments: arguments
+            .iter()
+            .map(|&argument| alias_resolution_recipe(inputs, file, captured, argument))
+            .collect(),
     }
 }
 
@@ -336,21 +333,22 @@ fn alias_resolution_recipe(
             }
         }
         SyntaxKind::UnionType | SyntaxKind::IntersectionType => AliasResolutionRecipe::Some(
-            captured.collect(syntax::ids(node, "types").iter().map(|&id| child(id))),
+            syntax::ids(node, "types")
+                .iter()
+                .map(|&id| child(id))
+                .collect(),
         ),
-        SyntaxKind::IndexedAccessType => AliasResolutionRecipe::Some(captured.collect(
-            ["objectType", "indexType"].into_iter().map(|field| {
-                child(syntax::id(node, field).expect("parsed indexed-access operand"))
-            }),
-        )),
+        SyntaxKind::IndexedAccessType => AliasResolutionRecipe::Some(
+            ["objectType", "indexType"]
+                .into_iter()
+                .map(|field| child(syntax::id(node, field).expect("parsed indexed-access operand")))
+                .collect(),
+        ),
         SyntaxKind::ConditionalType => AliasResolutionRecipe::Some(
-            captured.collect(
-                ["checkType", "extendsType", "trueType", "falseType"]
-                    .into_iter()
-                    .map(|field| {
-                        child(syntax::id(node, field).expect("parsed conditional operand"))
-                    }),
-            ),
+            ["checkType", "extendsType", "trueType", "falseType"]
+                .into_iter()
+                .map(|field| child(syntax::id(node, field).expect("parsed conditional operand")))
+                .collect(),
         ),
         _ => AliasResolutionRecipe::No,
     }

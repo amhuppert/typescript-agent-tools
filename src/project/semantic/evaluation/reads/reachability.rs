@@ -161,9 +161,6 @@ impl Evaluator<'_, '_> {
                         flow,
                     } => {
                         let reachable = invocations.result(antecedent)?;
-                        if !self.reads.reachable.contains_key(&(file, flow)) {
-                            self.reads.reachable.reserve(1);
-                        }
                         self.reads.reachable.insert((file, flow), reachable.clone());
                         invocations.finish_with(frame, Ok(reachable))?;
                     }

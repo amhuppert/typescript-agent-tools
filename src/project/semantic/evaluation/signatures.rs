@@ -17,8 +17,8 @@ use super::{DemandRecipe, Evaluator, TypeDemandState, TypeState, resolution};
 use crate::analysis::SemanticFailureReason;
 use crate::project::binding::{BoundDeclaration, BoundSymbol};
 use crate::references::Location;
-use crate::resources::{CheckedKey, CheckedMap, FixedMap};
-use std::collections::HashSet;
+use crate::resources::{CheckedKey, CheckedMap};
+use std::collections::{HashMap, HashSet};
 
 mod composite;
 mod deprecated;
@@ -29,22 +29,22 @@ mod predicates;
 /// result. Constraint/default types are distinct lazy questions; output
 /// origins and the signature's eventual return type never identify this cache.
 pub(super) struct SignaturesState {
-    declared: FixedMap<SignatureRoot, NativeResult<Signature>>,
-    declarations: FixedMap<SignatureId, SignatureDeclaration>,
-    returns: FixedMap<SignatureId, (TypeDemand, Option<Location>)>,
-    return_signatures: FixedMap<DemandId, SignatureId>,
-    minimum_arguments: FixedMap<SignatureId, NativeResult<usize>>,
+    declared: HashMap<SignatureRoot, NativeResult<Signature>>,
+    declarations: HashMap<SignatureId, SignatureDeclaration>,
+    returns: HashMap<SignatureId, (TypeDemand, Option<Location>)>,
+    return_signatures: HashMap<DemandId, SignatureId>,
+    minimum_arguments: HashMap<SignatureId, NativeResult<usize>>,
     instantiations: CheckedMap<InstantiationKey, NativeCompletion<Signature>>,
-    instantiated: crate::resources::FixedMap<SignatureId, (Signature, MapperId)>,
-    erased: crate::resources::FixedMap<SignatureId, NativeCompletion<Signature>>,
-    base: crate::resources::FixedMap<SignatureId, NativeCompletion<Signature>>,
-    canonical: crate::resources::FixedMap<SignatureId, NativeCompletion<Signature>>,
-    predicates: crate::resources::FixedMap<SignatureId, NativeCompletion<Option<Predicate>>>,
-    isolated_types: crate::resources::FixedMap<SignatureId, TypeId>,
-    composites: crate::resources::FixedMap<SignatureId, composite::CompositeSignature>,
+    instantiated: HashMap<SignatureId, (Signature, MapperId)>,
+    erased: HashMap<SignatureId, NativeCompletion<Signature>>,
+    base: HashMap<SignatureId, NativeCompletion<Signature>>,
+    canonical: HashMap<SignatureId, NativeCompletion<Signature>>,
+    predicates: HashMap<SignatureId, NativeCompletion<Option<Predicate>>>,
+    isolated_types: HashMap<SignatureId, TypeId>,
+    composites: HashMap<SignatureId, composite::CompositeSignature>,
     unknown: Option<Signature>,
-    optional: crate::resources::FixedMap<(SignatureId, super::super::model::CallChain), Signature>,
-    optional_returns: crate::resources::FixedMap<SignatureId, super::super::model::CallChain>,
+    optional: HashMap<(SignatureId, super::super::model::CallChain), Signature>,
+    optional_returns: HashMap<SignatureId, super::super::model::CallChain>,
 }
 
 /// `CachedSignatureKey` / `getTypeListKey`: the actual signature plus ordered
@@ -99,22 +99,22 @@ pub(super) fn predicate_kinds_match(source: &Predicate, target: &Predicate) -> b
 impl SignaturesState {
     pub(super) fn new() -> Self {
         Self {
-            declared: FixedMap::new(),
-            declarations: FixedMap::new(),
-            returns: FixedMap::new(),
-            return_signatures: FixedMap::new(),
-            minimum_arguments: FixedMap::new(),
+            declared: HashMap::new(),
+            declarations: HashMap::new(),
+            returns: HashMap::new(),
+            return_signatures: HashMap::new(),
+            minimum_arguments: HashMap::new(),
             instantiations: CheckedMap::new(),
-            instantiated: crate::resources::FixedMap::new(),
-            erased: crate::resources::FixedMap::new(),
-            base: crate::resources::FixedMap::new(),
-            canonical: crate::resources::FixedMap::new(),
-            predicates: crate::resources::FixedMap::new(),
-            isolated_types: crate::resources::FixedMap::new(),
-            composites: crate::resources::FixedMap::new(),
+            instantiated: HashMap::new(),
+            erased: HashMap::new(),
+            base: HashMap::new(),
+            canonical: HashMap::new(),
+            predicates: HashMap::new(),
+            isolated_types: HashMap::new(),
+            composites: HashMap::new(),
             unknown: None,
-            optional: crate::resources::FixedMap::new(),
-            optional_returns: crate::resources::FixedMap::new(),
+            optional: HashMap::new(),
+            optional_returns: HashMap::new(),
         }
     }
 

@@ -1,7 +1,7 @@
 //! Actual target and ordered argument identities for native reference interning.
 use super::keys::{KeyBuilder, same_types};
 use super::{DemandError, Model, NativeCompletion, ObjectFlags, Type, TypeArgumentsState, TypeId};
-use crate::resources::{CheckedKey, Control};
+use crate::resources::CheckedKey;
 use std::sync::Arc;
 
 /// `createTypeReferenceEx` / `getTypeListKey`: native storage is per target;
@@ -14,8 +14,8 @@ pub(super) struct ReferenceKey {
 }
 
 impl ReferenceKey {
-    pub(super) fn new(target: TypeId, arguments: Arc<[TypeId]>, control: Option<&Control>) -> Self {
-        let fingerprint = Self::hash(target, &arguments, control);
+    pub(super) fn new(target: TypeId, arguments: Arc<[TypeId]>) -> Self {
+        let fingerprint = Self::hash(target, &arguments);
         Self {
             target,
             arguments,
@@ -23,7 +23,7 @@ impl ReferenceKey {
         }
     }
 
-    fn hash(target: TypeId, arguments: &[TypeId], _control: Option<&Control>) -> u64 {
+    fn hash(target: TypeId, arguments: &[TypeId]) -> u64 {
         let mut hash = KeyBuilder::new();
         hash.fixed(&target);
         hash.types(arguments);
@@ -77,7 +77,7 @@ impl Model {
             )
             .into());
         }
-        let fingerprint = ReferenceKey::hash(target, &arguments, self.control.as_ref());
+        let fingerprint = ReferenceKey::hash(target, &arguments);
         if let Some(&id) = self
             .references
             .get_by(fingerprint, |key| key.matches(target, &arguments))

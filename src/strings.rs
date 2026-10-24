@@ -58,10 +58,7 @@ pub(crate) fn encode_js_string_rune(rune: u32, output: &mut impl Extend<u8>) {
 /// `stringutil.CombineSurrogatePairs` normalizes values after concatenation.
 /// Unrelated bytes, including invalid UTF-8, remain exact; decoding only finds
 /// adjacent high/low sentinels and their widths.
-pub(crate) fn combine_surrogate_pairs(
-    bytes: &[u8],
-    _control: Option<&crate::resources::Control>,
-) -> Vec<u8> {
+pub(crate) fn combine_surrogate_pairs(bytes: &[u8]) -> Vec<u8> {
     let mut output = Vec::with_capacity(bytes.len());
     let mut offset = 0;
     while offset < bytes.len() {

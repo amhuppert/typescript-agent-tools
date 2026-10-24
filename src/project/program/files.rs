@@ -252,7 +252,9 @@ pub(super) enum Literal {
 /// with a program-input extension must exist as written, and a name without
 /// an extension may omit `.ts`, `.tsx`, or `.d.ts`, never `.json`. `.json`
 /// is a program-input extension only with `resolveJsonModule` (`json`).
-/// Each caller decides how to report the outcome.
+/// Existing is `FileExists`, any entry but a directory: one that is not a
+/// regular file, such as a pipe, is found, and refused where it is read
+/// (`disk`). Each caller decides how to report the outcome.
 pub(super) fn literal_input(
     path: &str,
     json: bool,
@@ -276,7 +278,7 @@ pub(super) fn literal_input(
         };
     for candidate in candidates {
         if disk
-            .is_file(&candidate)
+            .file_exists(&candidate)
             .map_err(|error| io_error(Path::new(&candidate), &error))?
         {
             return Ok(Literal::Found(candidate));

@@ -38,11 +38,7 @@ impl Evaluator<'_, '_> {
     ) -> Result<NativePropertyKey, DemandError> {
         let identity = self.reference_symbol_identity(class, consumer)?;
         self.model.observe_symbol_identity(identity);
-        Ok(NativePropertyKey::private(
-            identity,
-            description,
-            self.control.as_ref(),
-        ))
+        Ok(NativePropertyKey::private(identity, description))
     }
 
     /// `lookupSymbolForPrivateIdentifierDeclaration` walks lexical classes

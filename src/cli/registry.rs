@@ -32,7 +32,6 @@ pub(crate) enum FlagId {
     Doctor,
     Project,
     Direct,
-    ReferencesDirect,
     At,
     Name,
     Depth,
@@ -214,11 +213,6 @@ pub(crate) static FLAGS: [Flag; FlagId::COUNT] = [
         "--direct",
         "Load a fresh project in this process instead of asking the project's service.",
     ),
-    switch(
-        FlagId::ReferencesDirect,
-        "--references-direct",
-        "--references --direct in one flag.",
-    ),
     value(
         FlagId::At,
         "--at",
@@ -394,8 +388,9 @@ pub(crate) enum RepeatedValue {
     Reject,
 }
 
-/// Where `--pretty` is valid. It indents JSON output, so it stands alone
-/// only where the output is JSON and needs `--json` elsewhere.
+/// Where `--pretty` is valid, for an operation that takes it. It indents
+/// JSON output, so it stands alone only where the output is JSON and needs
+/// `--json` elsewhere.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub(crate) enum Pretty {
     /// The output, if any, is JSON: the AST, or a reference answer or a
@@ -499,7 +494,9 @@ pub(crate) struct Operation {
     /// Its document, relative to the repository.
     pub(crate) doc: &'static str,
     pub(crate) repeat: RepeatedValue,
-    pub(crate) pretty: Pretty,
+    /// Where `--pretty` is valid; `None` where the operation does not take
+    /// it.
+    pub(crate) pretty: Option<Pretty>,
     /// The lists it bounds, which `--limit` sets: an operation accepts
     /// `--limit` exactly when it has one.
     pub(crate) limits: &'static [Bounded],
@@ -532,14 +529,8 @@ impl fmt::Display for Operation {
     }
 }
 
-/// The operation `flag` selects: the one whose flag it is, and references
-/// for `--references-direct`, which stands for `--references --direct`
-/// (decisions.md, step 2).
+/// The operation `flag` selects: the one whose flag it is.
 pub(crate) fn selected_by(flag: FlagId) -> Option<&'static Operation> {
-    let flag = match flag {
-        FlagId::ReferencesDirect => FlagId::References,
-        flag => flag,
-    };
     OPERATIONS
         .iter()
         .find(|operation| operation.flag == Some(flag))
@@ -565,16 +556,13 @@ const EDIT_FLAGS: &[FlagId] = &[
     F::Output,
 ];
 
-/// A service action implies `--references`, so beside one `--references`
-/// is accepted and changes nothing, as the parser has always taken it.
 /// Stop prints only its verdict line on stdout and serve only a failure,
-/// neither a document, so `--pretty` and `--output` change nothing there
-/// either; the parser has always taken them too.
-const SERVICE_FLAGS: &[FlagId] = &[F::References, F::Project, F::Pretty, F::Output];
+/// neither a document, so neither takes an output flag.
+const SERVICE_FLAGS: &[FlagId] = &[F::Project];
 
 /// Status prints text, or with `--json` its document (decisions.md,
 /// step 5).
-const STATUS_FLAGS: &[FlagId] = &[F::References, F::Project, F::Json, F::Pretty, F::Output];
+const STATUS_FLAGS: &[FlagId] = &[F::Project, F::Json, F::Pretty, F::Output];
 
 /// An edit's selection, as show's, and each changed file's diff.
 const EDIT_LIMITS: &[Bounded] = &[CANDIDATES, DIFF_LINES];
@@ -663,7 +651,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         related: &[OperationId::Outline, OperationId::Show],
         doc: "docs/ast-json.md",
         repeat: RepeatedValue::LastValue,
-        pretty: Pretty::Alone,
+        pretty: Some(Pretty::Alone),
         limits: &[],
     },
     Operation {
@@ -723,7 +711,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         related: &[OperationId::Show, OperationId::References],
         doc: "docs/navigation.md",
         repeat: RepeatedValue::Reject,
-        pretty: Pretty::WithJson,
+        pretty: Some(Pretty::WithJson),
         limits: &[ENTRIES],
     },
     Operation {
@@ -794,7 +782,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         ],
         doc: "docs/navigation.md",
         repeat: RepeatedValue::Reject,
-        pretty: Pretty::WithJson,
+        pretty: Some(Pretty::WithJson),
         limits: &[LINES, CANDIDATES],
     },
     Operation {
@@ -868,7 +856,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         related: &[OperationId::Show, OperationId::References],
         doc: "docs/types.md",
         repeat: RepeatedValue::Reject,
-        pretty: Pretty::WithJson,
+        pretty: Some(Pretty::WithJson),
         limits: &[CANDIDATES],
     },
     Operation {
@@ -881,7 +869,6 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
             "tsparse --references --project TSCONFIG (--at LINE:COLUMN FILE | --at FILE:LINE:COLUMN | --name NAME [FILE]) [--direct] [--calls] [--no-tests] [--file FILE] [--limit N|all] [--json] [--pretty] [--output OUTPUT]",
         ],
         flags: &[
-            F::ReferencesDirect,
             F::Project,
             F::Direct,
             F::At,
@@ -944,13 +931,14 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
             },
             Example {
                 args: &[
-                    "--references-direct",
+                    "--references",
+                    "--direct",
                     "--project",
                     "tsconfig.json",
                     "--at",
                     "src/app.ts:12:8",
                 ],
-                summary: "--references --direct: answered in this process.",
+                summary: "Answered in this process instead of by the project's service.",
             },
         ],
         exits: &[
@@ -974,7 +962,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         ],
         doc: "docs/references.md",
         repeat: RepeatedValue::LastValue,
-        pretty: Pretty::Alone,
+        pretty: Some(Pretty::Alone),
         limits: &[OCCURRENCES],
     },
     Operation {
@@ -1025,7 +1013,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         ],
         doc: "docs/editing.md",
         repeat: RepeatedValue::Reject,
-        pretty: Pretty::WithJson,
+        pretty: Some(Pretty::WithJson),
         limits: EDIT_LIMITS,
     },
     Operation {
@@ -1060,7 +1048,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         ],
         doc: "docs/editing.md",
         repeat: RepeatedValue::Reject,
-        pretty: Pretty::WithJson,
+        pretty: Some(Pretty::WithJson),
         limits: EDIT_LIMITS,
     },
     Operation {
@@ -1110,7 +1098,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         ],
         doc: "docs/editing.md",
         repeat: RepeatedValue::Reject,
-        pretty: Pretty::WithJson,
+        pretty: Some(Pretty::WithJson),
         limits: EDIT_LIMITS,
     },
     Operation {
@@ -1152,7 +1140,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         ],
         doc: "docs/editing.md",
         repeat: RepeatedValue::Reject,
-        pretty: Pretty::WithJson,
+        pretty: Some(Pretty::WithJson),
         limits: &[],
     },
     Operation {
@@ -1164,7 +1152,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
             service_administration!(),
             " On macOS and Linux, project queries reuse one service per configuration spelling and build, started automatically, which reloads the project when its inputs change. Status prints running: with the service's pid, generation (the number of snapshots it has published), build, idle timeout, and the idle time it has left, then limits: with the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with; or no service: TSCONFIG. --json prints the document instead: running, pid, generation, build, limits (max_memory_mb, query_timeout_ms), idle_secs, idle_remaining_secs, and started_unix; without a service running is false, generation 0, and every other field null; --pretty, with or without --json, prints it indented. It reads only TSPARSE_SERVICE_DIR, the private runtime directory (default ",
             default_service_dir_prefix!(),
-            "UID, owned by this user with mode 0700). A service action implies --references, so --references beside it changes nothing."
+            "UID, owned by this user with mode 0700)."
         ),
         usage: &[
             "tsparse --references-status --project TSCONFIG [--json] [--pretty] [--output OUTPUT]",
@@ -1198,7 +1186,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         related: &[OperationId::ReferencesStop, OperationId::ReferencesServe],
         doc: "docs/references.md",
         repeat: RepeatedValue::LastValue,
-        pretty: Pretty::Alone,
+        pretty: Some(Pretty::Alone),
         limits: &[],
     },
     Operation {
@@ -1208,7 +1196,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         summary: "Stop the project's service and release its cache.",
         details: concat!(
             service_administration!(),
-            " It prints stopped: pid N when it stopped a service, or no service: TSCONFIG when none was running, on stdout. The next project query starts a new service. A service keeps the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with, so stop it after changing them; --doctor --project TSCONFIG reports a service whose limits differ from this environment's. It reads only TSPARSE_SERVICE_DIR. --pretty and --output change nothing, and like every service action it implies --references, which beside it changes nothing."
+            " It prints stopped: pid N when it stopped a service, or no service: TSCONFIG when none was running, on stdout. The next project query starts a new service. A service keeps the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with, so stop it after changing them; --doctor --project TSCONFIG reports a service whose limits differ from this environment's. It reads only TSPARSE_SERVICE_DIR."
         ),
         usage: &["tsparse --references-stop --project TSCONFIG"],
         flags: SERVICE_FLAGS,
@@ -1229,7 +1217,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         related: &[OperationId::ReferencesStatus, OperationId::ReferencesServe],
         doc: "docs/references.md",
         repeat: RepeatedValue::LastValue,
-        pretty: Pretty::Alone,
+        pretty: None,
         limits: &[],
     },
     Operation {
@@ -1247,7 +1235,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
             default_memory_mb!(),
             " MiB) and TSPARSE_QUERY_TIMEOUT_MS (default ",
             default_timeout_ms!(),
-            "); a limit failure exits the service and the next request starts a replacement, and memory sampling can overshoot. TSPARSE_SERVICE_IDLE_SECS, TSPARSE_MAX_MEMORY_MB, and TSPARSE_QUERY_TIMEOUT_MS must each be a positive integer. It prints nothing but a failure, so --pretty and --output change nothing, and like every service action it implies --references, which beside it changes nothing."
+            "); a limit failure exits the service and the next request starts a replacement, and memory sampling can overshoot. TSPARSE_SERVICE_IDLE_SECS, TSPARSE_MAX_MEMORY_MB, and TSPARSE_QUERY_TIMEOUT_MS must each be a positive integer. It prints nothing but a failure."
         ),
         usage: &["tsparse --references-serve --project TSCONFIG"],
         flags: SERVICE_FLAGS,
@@ -1272,7 +1260,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         related: &[OperationId::ReferencesStatus, OperationId::ReferencesStop],
         doc: "docs/references.md",
         repeat: RepeatedValue::LastValue,
-        pretty: Pretty::Alone,
+        pretty: None,
         limits: &[],
     },
     Operation {
@@ -1310,7 +1298,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         related: &[OperationId::ReferencesStatus, OperationId::ReferencesStop],
         doc: "docs/references.md",
         repeat: RepeatedValue::Reject,
-        pretty: Pretty::WithJson,
+        pretty: Some(Pretty::WithJson),
         limits: &[],
     },
 ];
@@ -1398,17 +1386,10 @@ mod tests {
             }
             for &accepted in operation.flags {
                 assert!(!GLOBAL_FLAGS.contains(&accepted), "{}", operation.name);
-                // An accepted flag selects no other operation, except the
-                // `--references` a service action implies, which it takes.
-                let service = matches!(
-                    operation.id,
-                    OperationId::ReferencesStatus
-                        | OperationId::ReferencesStop
-                        | OperationId::ReferencesServe
-                );
+                // An accepted flag selects no other operation, so the
+                // operations the flags name are the ones a request runs.
                 assert!(
-                    selected_by(accepted).is_none_or(|selected| selected.id == operation.id)
-                        || service && accepted == FlagId::References,
+                    selected_by(accepted).is_none_or(|selected| selected.id == operation.id),
                     "{}: {accepted}",
                     operation.name
                 );
@@ -1426,10 +1407,6 @@ mod tests {
                 }
             }
         }
-        assert_eq!(
-            selected_by(FlagId::ReferencesDirect).map(|o| o.id),
-            Some(OperationId::References)
-        );
         for &global in GLOBAL_FLAGS {
             assert!(OPERATIONS.iter().all(|operation| operation.accepts(global)));
         }
@@ -1570,16 +1547,20 @@ mod tests {
                 .any(|example| value(example.args, FlagId::From).is_some()
                     && example.summary.contains("{ ... }"))
         );
-        // Stop and serve print no document for --pretty to indent: stop's
-        // verdict is one text line on stdout, and serve prints only a
-        // failure.
-        for operation in OPERATIONS.iter().filter(|operation| {
-            operation.pretty == Pretty::Alone
-                && !matches!(
-                    operation.id,
-                    OperationId::ReferencesStop | OperationId::ReferencesServe
-                )
-        }) {
+        // An operation states where --pretty is valid exactly when it takes
+        // it; stop and serve print no document for it to indent.
+        for operation in &OPERATIONS {
+            assert_eq!(
+                operation.pretty.is_some(),
+                operation.accepts(FlagId::Pretty),
+                "{}",
+                operation.name
+            );
+        }
+        for operation in OPERATIONS
+            .iter()
+            .filter(|operation| operation.pretty == Some(Pretty::Alone))
+        {
             assert!(
                 operation.examples.iter().any(|example| {
                     example.args.contains(&FlagId::Pretty.flag().name)
