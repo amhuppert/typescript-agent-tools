@@ -63,6 +63,10 @@ pub(in crate::project::semantic) enum ContextRecipe {
     Absent,
     VariableInitializer(super::DeclarationIdentity),
     Forward(Site),
+    /// `case SpreadAssignment`: the containing object literal's context, as
+    /// `Forward`; kept distinct because Q5 asks whether a literal's context
+    /// came from an enclosing literal's spread operand.
+    Spread(Site),
     AwaitOperand(Site),
     Annotation(Box<TypeExpression>),
     Return(Option<super::SignatureRoot>),
@@ -310,7 +314,7 @@ impl Source<'_, '_> {
                 let object = parents[parent_id.index()].ok_or_else(|| {
                     super::super::internal("spread assignment has no object parent")
                 })?;
-                ContextRecipe::Forward(Site::new(ast, object))
+                ContextRecipe::Spread(Site::new(ast, object))
             }
             SyntaxKind::ArrayLiteralExpression => {
                 let elements = syntax::ids(parent, "elements");

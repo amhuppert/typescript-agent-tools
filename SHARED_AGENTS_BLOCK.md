@@ -12,6 +12,7 @@ Use `tsparse` (and load the `tsparse` skill) as your primary workflow for readin
 - `tsparse --show (--name NAME | --at [FILE:]LINE:COLUMN) [FILE] [--project TSCONFIG]`: Print one declaration's exact source with original line numbers.
 - `tsparse --type --project TSCONFIG (--name NAME | --at [FILE:]LINE:COLUMN) [--expand]`: Inspect the resolved type (and optional structural graph) of a declaration or token.
 - `tsparse --references --project TSCONFIG (--name NAME | --at [FILE:]LINE:COLUMN) [--calls] [--no-tests] [--file FILE]`: Group all declarations and uses of a symbol or `Receiver.member` across a project.
+- `tsparse --constructs --project TSCONFIG (--name NAME | --at [FILE:]LINE:COLUMN) [--missing KEY] [--all-literals] [--no-tests] [--file FILE]`: List the object literals that construct an interface, class, or type alias, and the properties (optional ones too) each does not certainly provide; by default it examines literals naming one of its keys or none, and `--all-literals` (much slower) examines every literal.
 - `tsparse --replace-body (--name NAME | --at [FILE:]LINE:COLUMN) --from FRAGMENT [--plan PLAN]`: Preview replacing the body of a function, method, constructor, accessor, or arrow function.
 - `tsparse --insert-after (--name NAME | --at [FILE:]LINE:COLUMN) --from FRAGMENT [--plan PLAN]`: Preview inserting complete statements after a selected declaration's statement.
 - `tsparse --edit-batch EDITS [--project TSCONFIG] [--plan PLAN]`: Preview and validate multiple `replace_body` and `insert_after` edits together from a JSON file.

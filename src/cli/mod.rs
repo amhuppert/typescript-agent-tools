@@ -9,6 +9,7 @@
 //! follow-up commands (`command_line`).
 
 pub(crate) mod command_line;
+pub(crate) mod constructs;
 pub(crate) mod delivery;
 pub(crate) mod doctor;
 pub(crate) mod editing;

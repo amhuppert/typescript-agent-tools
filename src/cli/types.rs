@@ -281,14 +281,20 @@ fn reference(value: &TypeRef, summaries: &HashMap<&str, &str>) -> String {
     }
 }
 
+/// A property key in text: quoted, so every exact name reads as itself, with
+/// the kind of a key that is not a string.
+pub(super) fn key_text(key: &TypeKey) -> String {
+    match key {
+        TypeKey::String { name } => quoted(name),
+        TypeKey::Private { name, .. } => format!("private {}", quoted(name)),
+        TypeKey::Symbol { name, .. } => format!("symbol {}", quoted(name)),
+    }
+}
+
 fn members_text(text: &mut String, members: &TypeMembers, summaries: &HashMap<&str, &str>) {
     if let Some(properties) = &members.properties {
         for property in properties {
-            let key = match &property.key {
-                TypeKey::String { name } => quoted(name),
-                TypeKey::Private { name, .. } => format!("private {}", quoted(name)),
-                TypeKey::Symbol { name, .. } => format!("symbol {}", quoted(name)),
-            };
+            let key = key_text(&property.key);
             write!(
                 text,
                 "\n  {}{}{}: {}",

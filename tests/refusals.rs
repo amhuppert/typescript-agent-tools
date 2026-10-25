@@ -430,7 +430,7 @@ fn a_file_outside_the_project_names_the_configuration_that_decides() {
 /// reference service.
 #[test]
 fn help_names_the_project_service_and_what_administers_it() {
-    const ADMINISTERS: &str = "--references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, and --outline, --show, and edits with --project.";
+    const ADMINISTERS: &str = "--references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, --constructs, and --outline, --show, and edits with --project.";
     let help = |args: &[&str]| {
         let output = Command::new(env!("CARGO_BIN_EXE_tsparse"))
             .args(args)

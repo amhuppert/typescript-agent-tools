@@ -338,10 +338,7 @@ impl Evaluator<'_, '_> {
                 let raw = raw
                     .ok_or_else(|| super::super::internal("object member has no native symbol"))?;
                 let raw = self.register_reference_symbol(raw, consumer)?;
-                let checked = if matches!(
-                    member.kind,
-                    K::PropertyAssignment | K::ShorthandPropertyAssignment | K::MethodDeclaration
-                ) {
+                let checked = if renamed_member(member.kind) {
                     let ty = self.check_object_member_value(
                         member,
                         recipe.destructuring,
@@ -468,6 +465,29 @@ impl Evaluator<'_, '_> {
     fn check_object_computed_name(&mut self, root: ExpressionRoot) -> Result<TypeId, DemandError> {
         let expression = self.source.expression_at(root.file, root.site)?;
         self.computed_property_name_type(&expression, false, &expression.location)
+    }
+
+    /// The key `checkObjectLiteral` gives a member's property: a member it
+    /// renames (`renamed_member`) whose computed name's type is usable as a
+    /// property name is named by that type, as `create_object_literal_property`
+    /// does (`[+100]` is `100`, `[-0]` is `0`, though the binder spells them
+    /// `+100` and `-0`); an accessor, and any other member, keeps its binder
+    /// name (`get [+100]` is `+100`). Only the name is typed.
+    pub(super) fn object_member_key(
+        &mut self,
+        member: &ObjectMember,
+        consumer: &Location,
+    ) -> Result<NativePropertyKey, DemandError> {
+        if renamed_member(member.kind)
+            && let Some(name) = member.computed
+        {
+            let ty = self.check_object_computed_name(name)?;
+            if let Some(key) = self.property_key_from_type(ty)? {
+                return Ok(key);
+            }
+        }
+        let symbol = self.reference_symbol_of_declaration(member.declaration)?;
+        self.reference_symbol_key(symbol, consumer)
     }
 
     /// `checkPropertyAssignment`, `checkShorthandPropertyAssignment`, and
@@ -775,4 +795,14 @@ fn empty_members() -> MembersView {
         construct_signatures: Arc::from([]),
         index_signatures: Arc::from([]),
     }
+}
+
+/// The members `checkObjectLiteral` checks as values and turns into fresh
+/// property symbols, named by a usable computed name's type; an accessor is
+/// checked later and keeps its binder symbol.
+fn renamed_member(kind: K) -> bool {
+    matches!(
+        kind,
+        K::PropertyAssignment | K::ShorthandPropertyAssignment | K::MethodDeclaration
+    )
 }

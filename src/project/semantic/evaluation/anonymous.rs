@@ -1145,6 +1145,15 @@ impl Evaluator<'_, '_> {
         })
     }
 
+    /// An anonymous instantiation's `target`, the declared anonymous type
+    /// `instantiateAnonymousType` instantiated; None for any other type.
+    pub(super) fn anonymous_instantiation_target(&self, ty: TypeId) -> Option<TypeId> {
+        match self.anonymous.associations.get(&ty) {
+            Some(Association::Instantiated { target, .. }) => Some(*target),
+            _ => None,
+        }
+    }
+
     /// `instantiateAnonymousType` creates a fresh native object, with mapped
     /// parameter cloning before alias substitution and final target publication.
     pub(super) fn instantiate_anonymous_type_completion(

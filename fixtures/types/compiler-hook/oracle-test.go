@@ -414,6 +414,8 @@ func TestAgentTypeOracle(t *testing.T) {
 			searchRoots = append(searchRoots, declarations(root))
 		}
 		output["searchRoots"] = searchRoots
+	} else if input.Operation == "constructs" {
+		output["constructs"] = constructionSites(t, p, c, node, input)
 	} else {
 		if input.Normalize {
 			ls.AgentOraclePrelude(c, node)
@@ -515,4 +517,281 @@ func TestAgentTypeOracle(t *testing.T) {
 	if err := os.WriteFile(os.Getenv("AGENT_TYPE_ORACLE_OUTPUT"), bytes, 0600); err != nil {
 		t.Fatal(err)
 	}
+}
+
+// constructionSites observes Q5's per-literal facts on the pinned checker,
+// independently of the product's enumeration: every object literal in a
+// searched file, whether the default universe examines it, the
+// assignment-pattern and spread-contribution exclusions,
+// getApparentTypeOfContextualType before and after object-literal
+// discrimination, the per-form declared-type instance question, and presence
+// read from the full checked literal type.
+func constructionSites(t *testing.T, p *compiler.Program, c *checker.Checker, node *ast.Node, input oracleInput) map[string]any {
+	symbol := c.GetSymbolAtLocation(node)
+	if input.SymbolMode == "alias" && symbol != nil && symbol.Flags&ast.SymbolFlagsAlias != 0 {
+		symbol = c.GetAliasedSymbol(symbol)
+	}
+	if symbol == nil || input.Question != "declared" {
+		t.Fatal("constructs requires a declared type selection")
+	}
+	declared := c.GetDeclaredTypeOfSymbol(symbol)
+	constituents := []*checker.Type{declared}
+	if declared.Flags()&checker.TypeFlagsUnion != 0 {
+		constituents = declared.Types()
+	}
+	alternatives := []*checker.Type{}
+	for _, constituent := range constituents {
+		if objectLike(constituent) && !c.AgentOracleCallable(constituent) {
+			alternatives = append(alternatives, constituent)
+		}
+	}
+	result := map[string]any{"target": c.TypeToString(declared)}
+	if len(alternatives) == 0 {
+		result["unsupported"] = "no object alternative"
+		return result
+	}
+	generic := len(c.GetLocalTypeParametersOfClassOrInterfaceOrTypeAlias(symbol)) != 0
+	alternativeSummaries := []string{}
+	for _, alternative := range alternatives {
+		if c.AgentOracleIsGenericObjectType(alternative) {
+			result["unsupported"] = "generic object type"
+			return result
+		}
+		if generic && !c.AgentOracleHasInstanceProvenance(alternative, symbol) {
+			result["unsupported"] = "alternative without instantiation provenance"
+			return result
+		}
+		alternativeSummaries = append(alternativeSummaries, c.TypeToString(alternative))
+	}
+	result["alternatives"], result["generic"] = alternativeSummaries, generic
+	// Q5's default universe, decided from each literal's syntax and the
+	// binder's member names: an alternative that admits every key makes every
+	// literal examined; otherwise a literal is examined unless
+	// inDefaultUniverse rules it out.
+	keys := map[string]bool{}
+	universe := "target_keys"
+	for _, alternative := range alternatives {
+		if c.AgentOracleAdmitsEveryKey(alternative) {
+			universe = "all"
+		}
+		for _, property := range c.GetPropertiesOfType(alternative) {
+			keys[property.Name] = true
+		}
+	}
+	result["universe"] = universe
+	literals := []*ast.Node{}
+	for _, file := range p.GetSourceFiles() {
+		// A JSON module's literals have no contextual type: never constructions.
+		if p.IsSourceFileDefaultLibrary(file.Path()) || p.IsSourceFileFromExternalLibrary(file) || ast.IsJsonSourceFile(file) {
+			continue
+		}
+		var visit func(*ast.Node) bool
+		visit = func(current *ast.Node) bool {
+			if current.Kind == ast.KindObjectLiteralExpression {
+				literals = append(literals, current)
+			}
+			current.ForEachChild(visit)
+			return false
+		}
+		file.ForEachChild(visit)
+	}
+	slices.SortStableFunc(literals, func(a, b *ast.Node) int {
+		left, right := ast.GetSourceFileOfNode(a), ast.GetSourceFileOfNode(b)
+		if order := strings.Compare(left.FileName(), right.FileName()); order != 0 {
+			return order
+		}
+		return scanner.GetTokenPosOfNode(a, left, false) - scanner.GetTokenPosOfNode(b, right, false)
+	})
+	rows := []map[string]any{}
+	for _, literal := range literals {
+		row := map[string]any{"span": span(literal)}
+		rows = append(rows, row)
+		row["examinedByDefault"] = universe == "all" || inDefaultUniverse(c, literal, keys)
+		if ast.IsAssignmentTarget(literal) {
+			row["excluded"] = "pattern"
+			continue
+		}
+		if c.AgentOracleSpreadContribution(literal) {
+			row["excluded"] = "spread"
+			continue
+		}
+		// getContextualType on demand: an argument context resolves its own
+		// call, and an annotation needs none, so no checking prelude runs.
+		instantiated, undiscriminated, discriminated := c.AgentOracleConstructionContext(literal)
+		if undiscriminated == nil {
+			row["excluded"] = "context"
+			continue
+		}
+		// The context as discrimination leaves it: the instantiated contextual
+		// type, or the discriminated apparent type when it removed a member.
+		context := instantiated
+		if discriminated != undiscriminated {
+			context = discriminated
+		}
+		row["context"], row["contextError"] = c.TypeToString(context), c.AgentOracleIsErrorType(undiscriminated)
+		constituents := func(t *checker.Type) []*checker.Type {
+			if t.Flags()&checker.TypeFlagsUnion != 0 {
+				return t.Types()
+			}
+			return []*checker.Type{t}
+		}
+		// Independent of the identity rule below: a constituent of the
+		// instantiated context, or of its base constraint, is the declared
+		// type or one of its alternatives, or carries the declaration's alias
+		// symbol.
+		isTarget := func(t *checker.Type) bool {
+			return t == declared || slices.Contains(alternatives, t) || t.Alias() != nil && t.Alias().Symbol() == symbol
+		}
+		contextIsTarget := false
+		for _, constituent := range constituents(instantiated) {
+			if isTarget(constituent) {
+				contextIsTarget = true
+			}
+			if constraint := c.AgentOracleBaseConstraint(constituent); constraint != nil && slices.ContainsFunc(constituents(constraint), isTarget) {
+				contextIsTarget = true
+			}
+		}
+		row["contextIsTarget"] = contextIsTarget
+		remaining := constituents(discriminated)
+		match := func(t *checker.Type) int {
+			for candidate, alternative := range alternatives {
+				if c.AgentOracleInstanceOf(t, alternative, symbol, generic) {
+					return candidate
+				}
+			}
+			return -1
+		}
+		// Identity is decided on each constituent of the instantiated context,
+		// whose apparent form may be rebuilt without its alias (an
+		// intersection's getTypeWithThisArgument). A constituent that is not
+		// an instance is tried through its base constraint when it is
+		// instantiable (rebuilt likewise by its apparent form), and through
+		// its apparent forms otherwise. Discrimination keeps or removes the
+		// apparent forms; an alternative reached twice is one construction.
+		type candidate struct {
+			instance *checker.Type
+			index    int
+			forms    []*checker.Type
+		}
+		candidates := []candidate{}
+		add := func(instance *checker.Type, index int, forms []*checker.Type) {
+			if !slices.ContainsFunc(candidates, func(found candidate) bool { return found.instance == instance && found.index == index }) {
+				candidates = append(candidates, candidate{instance, index, forms})
+			}
+		}
+		for _, constituent := range constituents(instantiated) {
+			apparent := c.AgentOracleContextualApparent(constituent)
+			apparentForms := constituents(apparent)
+			if index := match(constituent); index >= 0 {
+				add(constituent, index, apparentForms)
+				continue
+			}
+			if apparent == constituent {
+				continue
+			}
+			identities := apparentForms
+			if constituent.Flags()&checker.TypeFlagsInstantiable != 0 {
+				identities = nil
+				if constraint := c.AgentOracleBaseConstraint(constituent); constraint != nil {
+					identities = constituents(constraint)
+				}
+			}
+			for _, form := range identities {
+				if index := match(form); index >= 0 {
+					if slices.Contains(apparentForms, form) {
+						add(form, index, []*checker.Type{form})
+					} else {
+						add(form, index, apparentForms)
+					}
+				}
+			}
+		}
+		constructed := []map[string]any{}
+		discriminatedAway := 0
+		var literalType *checker.Type
+		for _, found := range candidates {
+			if !slices.ContainsFunc(found.forms, func(form *checker.Type) bool { return slices.Contains(remaining, form) }) {
+				discriminatedAway++
+				continue
+			}
+			if literalType == nil {
+				literalType = c.GetTypeAtLocation(literal)
+				row["literalError"] = c.AgentOracleIsErrorType(literalType)
+			}
+			properties, optional := c.AgentOracleTargetProperties(found.instance)
+			lacks := []map[string]any{}
+			for position, property := range properties {
+				if presence := c.AgentOraclePresence(literalType, property.Name); presence != "present" {
+					lack := map[string]any{"optional": optional[position], "presence": presence}
+					for name, value := range publicKey(property.Name) {
+						lack[name] = value
+					}
+					lacks = append(lacks, lack)
+				}
+			}
+			constructed = append(constructed, map[string]any{"alternative": found.index, "summary": c.TypeToString(found.instance), "lacks": lacks})
+		}
+		if len(constructed) != 0 || discriminatedAway != 0 {
+			row["constructed"], row["discriminatedAway"] = constructed, discriminatedAway
+		}
+	}
+	result["literals"] = rows
+	return result
+}
+
+// publicKey spells a property's name as the product's TypeKey does: an
+// ECMAScript private name and a unique symbol's name are internal encodings
+// (prefix, then `#id@#name` or `@name@id`), which give the public name and a
+// kind; any other name is a string key.
+func publicKey(name string) map[string]any {
+	if internal, ok := strings.CutPrefix(name, ast.InternalSymbolNamePrefix); ok {
+		if rest, ok := strings.CutPrefix(internal, "#"); ok {
+			if _, private, ok := strings.Cut(rest, "@"); ok {
+				return map[string]any{"key": private, "kind": "private"}
+			}
+		}
+		if rest, ok := strings.CutPrefix(internal, "@"); ok {
+			if at := strings.LastIndex(rest, "@"); at >= 0 {
+				return map[string]any{"key": rest[:at], "kind": "symbol"}
+			}
+		}
+	}
+	return map[string]any{"key": name}
+}
+
+// inDefaultUniverse: a literal is examined when one of its named members
+// (not a spread, and with no dynamic name, ast.IsDynamicName) has a key
+// (AgentOracleMemberKey) some alternative declares, or when it has no named
+// member at all.
+func inDefaultUniverse(c *checker.Checker, literal *ast.Node, keys map[string]bool) bool {
+	named := false
+	for _, member := range literal.AsObjectLiteralExpression().Properties.Nodes {
+		if member.Kind == ast.KindSpreadAssignment {
+			continue
+		}
+		if ast.IsDynamicName(member.Name()) {
+			continue
+		}
+		named = true
+		if member.Symbol() == nil || keys[c.AgentOracleMemberKey(member)] {
+			return true
+		}
+	}
+	return !named
+}
+
+// objectLike: an object type, or an intersection made only of object types.
+func objectLike(t *checker.Type) bool {
+	if t.Flags()&checker.TypeFlagsObject != 0 {
+		return true
+	}
+	if t.Flags()&checker.TypeFlagsIntersection == 0 {
+		return false
+	}
+	for _, constituent := range t.Types() {
+		if !objectLike(constituent) {
+			return false
+		}
+	}
+	return true
 }

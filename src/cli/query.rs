@@ -156,6 +156,9 @@ fn delivery<'a>(
         }
         Ok(ProjectResponse::Show(show)) => navigation::show(show, &query.display),
         Ok(ProjectResponse::Type(answer)) => super::types::answer(answer, &query.display),
+        Ok(ProjectResponse::Constructs(answer)) => {
+            super::constructs::answer(answer, &query.display)
+        }
         Ok(ProjectResponse::Edit(_)) => unreachable!("edit requests are delivered by cli::editing"),
         Err(error) => {
             let base = match &query.target {

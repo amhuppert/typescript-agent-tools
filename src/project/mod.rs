@@ -31,6 +31,7 @@ mod sources;
 pub use session::ProjectSession;
 
 use crate::analysis::{AnalysisError, InputError, InputErrorKind, QueryError, QueryErrorKind};
+use crate::constructs::{ConstructsAnswer, ConstructsRequest};
 use crate::navigation::{Outline, Show, ShowQuery};
 use crate::references::{ReferenceAnswer, ReferenceQuery, ReferenceRequest, ReferenceResult};
 use crate::types::{TypeAnswer, TypeQuery, TypeRequest};
@@ -201,6 +202,9 @@ impl Project {
             ProjectRequest::Type(request) => {
                 ProjectResponse::Type(Box::new(self.type_of_unless(request, superseded)?))
             }
+            ProjectRequest::Constructs(request) => {
+                ProjectResponse::Constructs(Box::new(self.constructs_unless(request, superseded)?))
+            }
         })
     }
 
@@ -244,6 +248,24 @@ impl Project {
         semantic::type_of(self, request, superseded)
     }
 
+    /// Find the object literals that construct the selected interface, class
+    /// or type alias, and the properties each does not certainly provide.
+    pub fn constructs(
+        &self,
+        request: ConstructsRequest,
+    ) -> Result<ConstructsAnswer, AnalysisError> {
+        self.constructs_unless(request, None)
+    }
+
+    /// `constructs`, stopping as `execute_unless` describes.
+    fn constructs_unless(
+        &self,
+        request: ConstructsRequest,
+        superseded: Option<&semantic::Superseded>,
+    ) -> Result<ConstructsAnswer, AnalysisError> {
+        semantic::constructs(self, request, superseded)
+    }
+
     /// Effective inputs captured with this generation, resolved only by the
     /// configuration owner (`GetStrictOptionValue`). Semantic evaluation reads
     /// this snapshot rather than reopening or converting configuration.
@@ -281,6 +303,7 @@ pub enum ProjectRequest {
     References(ReferenceQuery),
     ReferenceSearch(ReferenceRequest),
     Type(TypeRequest),
+    Constructs(ConstructsRequest),
     /// The outline of one searched file (`Project::outline`).
     Outline {
         file: PathBuf,
@@ -344,6 +367,16 @@ impl ProjectRequest {
                 } => vec![file],
                 TypeQuery::Name { file: None, .. } => vec![],
             },
+            Self::Constructs(request) => match &mut request.query {
+                TypeQuery::At { file, .. }
+                | TypeQuery::Name {
+                    file: Some(file), ..
+                } => Some(file),
+                TypeQuery::Name { file: None, .. } => None,
+            }
+            .into_iter()
+            .chain(request.filters.file.as_mut())
+            .collect(),
             Self::Show(query) => show(query).into_iter().collect(),
             Self::Edit(request) => request
                 .edits
@@ -385,6 +418,7 @@ pub enum ProjectResponse {
     References(ReferenceResult),
     ReferenceSearch(Box<ReferenceAnswer>),
     Type(Box<TypeAnswer>),
+    Constructs(Box<ConstructsAnswer>),
     Outline(Outline),
     /// Boxed: a found declaration is far larger than the other responses.
     Show(Box<Show>),

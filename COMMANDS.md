@@ -16,6 +16,7 @@
 | | `--show` | Print one declaration's exact source with original line numbers. |
 | **Project Queries** | `--type` | Inspect the type (and optional structural graph) of a declaration or token. |
 | | `--references` | Group declarations and occurrences of a symbol or member across a project. |
+| | `--constructs` | List the object literals that construct a type, and the properties each lacks. |
 | **Edit Code** | `--replace-body` | Preview replacing the body of a function, method, constructor, accessor, or arrow. |
 | | `--insert-after` | Preview inserting statements after a selected declaration's statement. |
 | | `--edit-batch EDITS` | Preview multiple edits from a JSON batch file against the original files. |
@@ -136,6 +137,28 @@ tsparse --references --project tsconfig.json --name RunHost.observe --calls --no
 tsparse --references --project tsconfig.json --at src/app.ts:12:8 --pretty
 ```
 
+### `--constructs`
+Lists the object literals whose contextual type constructs the selected interface, class, or type alias (per union alternative, generic instantiations included), and the properties each does not certainly provide, optional ones included. Presence is the compiler's model of the literal: `absent`, or `unknown` through optional or conditional spreads, index signatures, or `any`. By default it examines the literals with a member naming one of the target's keys, or with no named member (`{}`, only spreads, only computed names); the header reads `N of M literals examined`, and a line counts the rest.
+
+```sh
+tsparse --constructs --project TSCONFIG (--name NAME [FILE] | --at [FILE:]LINE:COLUMN [FILE]) [--direct] [--missing KEY] [--all-literals] [--no-tests] [--file FILE] [--limit N|all] [--json [--pretty]] [-o OUTPUT]
+```
+
+- **`--name NAME`**: The declaration to construct, by `--show`'s selectors; optional `FILE` narrows the candidates.
+- **`--missing KEY`**: Keep only the sites whose constructed type declares the string key `KEY` (compared exactly; `''` is a key) and that do not certainly provide it. A key the target does not declare as a string key fails with `UnknownProperty` (exit `1`).
+- **`--all-literals`**: Examine every literal, also those whose named members name only keys the target does not declare (for example a type assertion such as `{other: 1} as Options`, a union member those keys choose, a union context with a member accepting any key such as `View | {}`, or an excess-property error). Several times slower on a large project; narrow it with `--file` or `--no-tests`. A target with an index signature, an empty alternative, or the global `Object` as an alternative always examines every literal.
+- **`--no-tests`**: Skip the literals in test paths.
+- **`--file FILE`**: Keep only the sites in `FILE`.
+- **`--limit N|all`**: Cap displayed sites (default `200`), lacking properties per construction (default `20`), and gaps (default `50`).
+
+**Examples:**
+```sh
+tsparse --constructs --project tsconfig.json --name RunView
+tsparse --constructs --project tsconfig.json --name RunView --missing lane --no-tests
+tsparse --constructs --project tsconfig.json --at src/views.ts:12:18 --file src/fixtures.ts --json
+tsparse --constructs --project tsconfig.json --name Options --all-literals --json -o sites.json
+```
+
 ---
 
 ## 4. Edit Declarations
@@ -205,7 +228,7 @@ tsparse --apply batch.plan.json
 
 ## 5. Service Administration & Diagnostics
 
-`--references-status`, `--references-stop`, and `--references-serve` manage the background project service that answers all `--project` queries (`--references`, `--type`, `--outline`, `--show`, and project edits).
+`--references-status`, `--references-stop`, and `--references-serve` manage the background project service that answers all `--project` queries (`--references`, `--type`, `--constructs`, `--outline`, `--show`, and project edits).
 
 ### `--references-status`
 Reports whether the project's service is running, its PID, snapshot generation, build stamp, remaining idle time, and active memory/timeout limits. Does not load the project, check freshness, or reset the idle timer.

@@ -1,0 +1,1 @@
+{"compilerOptions": {"strict": true, "target": "ESNext", "module": "ESNext", "noLib": true, "types": []}, "files": ["globals.d.ts", "definitions.ts", "cases.ts", "unions.ts", "spreads.ts", "calls.ts", "universe.ts", "intersections.ts", "keys.ts", "constraints.ts", "tests/fixture.ts"]}

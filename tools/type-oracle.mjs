@@ -436,7 +436,7 @@ function replaceExactly(source, before, after) {
  */
 export async function compilerHookOracle(config, request) {
   const operation = request.operation ?? 'type';
-  if (!['type', 'member'].includes(operation)) throw new Error(`Unknown oracle operation: ${operation}`);
+  if (!['type', 'member', 'constructs'].includes(operation)) throw new Error(`Unknown oracle operation: ${operation}`);
   const history = request.history ?? 'baseline';
   if (!['baseline', 'cold', 'diagnostics'].includes(history)) throw new Error(`Unknown checking history: ${history}`);
   if (history === 'diagnostics') throw new Error('Unsupported compiler hook history: diagnostics-first checker equivalence remains unproved');
@@ -453,6 +453,8 @@ export async function compilerHookOracle(config, request) {
         }
         return syntax.token;
       })() } : selectType(context, syntax, request.question);
+    if (operation === 'constructs' && selected.kind !== 'declared')
+      throw new Error('UnsupportedTarget: construction sites need a class, interface or type alias declaration');
     const sourceFiles = context.project.program.getSourceFileNames();
     const programFiles = sourceFiles.map(file => {
       const metadata = context.project.program.getSourceFileMetadata(file);
@@ -1359,11 +1361,19 @@ ${kinds.map(kind => `    case *${kind}: AgentOracleCounters["mapper:${kind}"]++`
           relatedKind: row.relatedKind, ...(row.blocker ? { blocker: row.blocker } : {}) })),
         schedule: { checker: 'one', relationshipBeforeCandidates: history === 'baseline' && raw.searchSetCount > 0,
           searchSetCount: raw.searchSetCount, candidates: raw.candidateDemands.length } } : {}),
+      ...(raw.constructs ? { constructs: constructionRows(raw.constructs, nodeLocation) } : {}),
       counters: raw.counters, demandFailures: raw.demandFailures, observations: raw.observations, diagnosticCodes: raw.diagnosticCodes,
       compilerOptions: input.compilerOptions };
   } finally {
     fs.rmSync(temporary, { recursive: true, force: true });
   }
+}
+
+// The hook's per-literal construction facts with public locations; row order
+// is the hook's exact path/position schedule.
+function constructionRows(raw, nodeLocation) {
+  const { literals, ...target } = raw;
+  return { ...target, literals: (literals ?? []).map(({ span, ...row }) => ({ location: nodeLocation(span), ...row })) };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {

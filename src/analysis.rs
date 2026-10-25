@@ -207,6 +207,8 @@ pub enum QueryErrorKind {
     UnsupportedTarget,
     /// The selected identifier, or a name candidate, has no resolvable target.
     UnresolvedTarget,
+    /// A request names a property the selected target does not declare.
+    UnknownProperty,
 }
 
 impl QueryError {

@@ -224,7 +224,7 @@ fn occurrences_text(text: &mut String, project: &Path, name: &str, occurrences: 
 
 /// `gap FILE:LINE:COLUMN: REASON: MESSAGE`, then each located cause and a
 /// count of the causes the library omitted.
-fn gap_text(text: &mut String, project: &Path, gap: &ReferenceGap) {
+pub(super) fn gap_text(text: &mut String, project: &Path, gap: &ReferenceGap) {
     let _ = write!(
         text,
         "\ngap {}: {}: {}",
@@ -404,11 +404,11 @@ fn filter_flags(project: &Path, filters: &ReferenceFilters) -> Vec<(FlagId, Opti
 
 /// A selection's or filter's file, which the library echoes as `Location::file` names
 /// files: text, so this conversion is exact.
-fn file_text(project: &Path, file: &Path) -> String {
+pub(super) fn file_text(project: &Path, file: &Path) -> String {
     place(Some(project), &file.to_string_lossy())
 }
 
-fn location_text(project: &Path, location: &Location) -> String {
+pub(super) fn location_text(project: &Path, location: &Location) -> String {
     format!(
         "{}:{}:{}",
         place(Some(project), &location.file),
@@ -418,13 +418,13 @@ fn location_text(project: &Path, location: &Location) -> String {
 }
 
 /// `N noun`, singular for one.
-fn count(number: usize, one: &str, many: &str) -> String {
+pub(super) fn count(number: usize, one: &str, many: &str) -> String {
     format!("{number} {}", if number == 1 { one } else { many })
 }
 
 /// The name the document gives `value`, a unit variant, so that text and
 /// JSON spell it alike.
-fn spelled(value: impl Serialize) -> String {
+pub(super) fn spelled(value: impl Serialize) -> String {
     match serde_json::to_value(value) {
         Ok(serde_json::Value::String(name)) => name,
         other => unreachable!("a unit variant serializes as its name: {other:?}"),

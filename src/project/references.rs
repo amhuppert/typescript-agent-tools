@@ -54,10 +54,7 @@ pub(super) fn selection(
     project: &Project,
     query: &ReferenceQuery,
 ) -> Result<ReferenceQuery, AnalysisError> {
-    let echo = |file: &std::path::Path| -> Result<PathBuf, AnalysisError> {
-        let id = project.searched_file(file)?;
-        Ok(PathBuf::from(&project.sources.get(id).display))
-    };
+    let echo = |file: &std::path::Path| echoed_file(project, file);
     Ok(match query {
         ReferenceQuery::At { file, position } => ReferenceQuery::At {
             file: echo(file)?,
@@ -68,6 +65,16 @@ pub(super) fn selection(
             file: file.as_deref().map(echo).transpose()?,
         },
     })
+}
+
+/// A request's file as its result echoes it: the searched file it names,
+/// relative to the configuration's directory with `/` separators.
+pub(super) fn echoed_file(
+    project: &Project,
+    file: &std::path::Path,
+) -> Result<PathBuf, AnalysisError> {
+    let id = project.searched_file(file)?;
+    Ok(PathBuf::from(&project.sources.get(id).display))
 }
 
 /// A request's reporting filters, with `--file`'s path resolved to the

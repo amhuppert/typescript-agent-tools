@@ -8,16 +8,16 @@ use super::selection::references::{ReferenceSelected, ReferenceSelection};
 use super::source::{
     DeclarationIdentity, ExpressionRoot, ReferenceExportKind, ReferenceMeaning, ReferenceSite,
 };
-use crate::analysis::{AnalysisError, SemanticErrorKind, SemanticFailureReason, SemanticReason};
+use crate::analysis::AnalysisError;
 use crate::project::binding::NativeSymbolIdentity;
 use crate::project::binding::ReferenceToken;
 use crate::project::sources::FileId;
 use crate::project::{Project, references};
 use crate::references::{
     Location, NamedLocation, Occurrence, ReferenceAnchor, ReferenceAnswer, ReferenceBaseline,
-    ReferenceCause, ReferenceCoverage, ReferenceGap, ReferenceGroup, ReferenceOperation,
-    ReferenceOutcome, ReferenceQuery, ReferenceRequest, ReferenceResult,
-    ReferenceSelection as SelectionDocument, ReferenceSelectionFailure, UnsearchedMembers,
+    ReferenceCoverage, ReferenceGap, ReferenceGroup, ReferenceOperation, ReferenceOutcome,
+    ReferenceQuery, ReferenceRequest, ReferenceResult, ReferenceSelection as SelectionDocument,
+    ReferenceSelectionFailure, UnsearchedMembers,
 };
 use crate::syntax_kind::SyntaxKind;
 use std::collections::HashMap;

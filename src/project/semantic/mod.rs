@@ -2,7 +2,9 @@
 //! source access, inference and finite presentation have separate owners.
 
 mod constants;
+mod constructs;
 mod evaluation;
+mod gaps;
 mod inputs;
 mod model;
 mod presentation;
@@ -75,6 +77,22 @@ pub(super) fn type_of(
 ) -> Result<TypeAnswer, AnalysisError> {
     worker(project, superseded, |parser, control| {
         type_of_here(project, &request, parser, control)
+    })
+}
+
+/// Q5: the construction sites of a declared type, in the same worker.
+pub(super) fn constructs(
+    project: &Project,
+    request: crate::constructs::ConstructsRequest,
+    superseded: Option<&Superseded>,
+) -> Result<crate::constructs::ConstructsAnswer, AnalysisError> {
+    worker(project, superseded, |parser, control| {
+        let mut evaluator = evaluation::Evaluator::new(
+            CheckerInputs::from_project(project, Some(&control)),
+            parser,
+        );
+        evaluator.ensure_initialized()?;
+        constructs::search(project, &request, &mut evaluator)
     })
 }
 

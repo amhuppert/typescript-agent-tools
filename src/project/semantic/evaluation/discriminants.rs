@@ -348,6 +348,39 @@ impl Evaluator<'_, '_> {
         sequence.finish(result)
     }
 
+    /// `findMatchingTypeReferenceOrTypeAliasReference`'s reference question:
+    /// both are references to one generic target.
+    pub(super) fn same_reference_target(
+        &self,
+        source: TypeId,
+        target: TypeId,
+    ) -> Result<bool, DemandError> {
+        Ok(match (self.model.get(source)?, self.model.get(target)?) {
+            (TypeView::Reference(source), TypeView::Reference(target)) => {
+                source.target == target.target
+            }
+            _ => false,
+        })
+    }
+
+    /// `findMatchingTypeReferenceOrTypeAliasReference`'s alias question: both
+    /// carry an alias, of one alias symbol.
+    pub(super) fn same_alias_symbol(
+        &self,
+        source: TypeId,
+        target: TypeId,
+    ) -> Result<bool, DemandError> {
+        Ok(
+            match (
+                self.model.metadata(source)?.alias,
+                self.model.metadata(target)?.alias,
+            ) {
+                (Some(source), Some(target)) => source.symbol == target.symbol,
+                _ => false,
+            },
+        )
+    }
+
     /// `getBestMatchingType` selects one reporting elaboration target in its
     /// native priority order. The callback uses the caller's live silent
     /// comparison, retaining its recursion assumptions and acquired caches.
@@ -371,18 +404,12 @@ impl Evaluator<'_, '_> {
                 if self.model.has_type_flags(target, TypeFlags::OBJECT) {
                     let overlap = source_flags & self.model.object_flags(target)?;
                     if overlap.intersects(ObjectFlags::REFERENCE)
-                        && let (TypeView::Reference(source), TypeView::Reference(target_view)) =
-                            (self.model.get(source)?, self.model.get(target)?)
-                        && source.target == target_view.target
+                        && self.same_reference_target(source, target)?
                     {
                         return Ok(Some(target));
                     }
                     if overlap.intersects(ObjectFlags::ANONYMOUS)
-                        && let (Some(source_alias), Some(target_alias)) = (
-                            self.model.metadata(source)?.alias,
-                            self.model.metadata(target)?.alias,
-                        )
-                        && source_alias.symbol == target_alias.symbol
+                        && self.same_alias_symbol(source, target)?
                     {
                         return Ok(Some(target));
                     }

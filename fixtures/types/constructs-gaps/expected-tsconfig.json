@@ -1,0 +1,180 @@
+[
+  {
+    "name": "View",
+    "alternatives": [
+      "View"
+    ],
+    "generic": false,
+    "target": "View",
+    "universe": "target_keys",
+    "literals": [
+      {
+        "at": "flow.ts:6:26-6:53",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [
+              {
+                "key": "lane",
+                "optional": true,
+                "presence": "absent"
+              }
+            ],
+            "summary": "View"
+          }
+        ],
+        "context": "View",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "flow.ts:10:10-10:32",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [
+              {
+                "key": "lane",
+                "optional": true,
+                "presence": "absent"
+              }
+            ],
+            "summary": "View"
+          }
+        ],
+        "context": "View",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "flow.ts:14:10-14:32",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [],
+            "summary": "View"
+          }
+        ],
+        "context": "View",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "flow.ts:18:25-18:54",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [
+              {
+                "key": "lane",
+                "optional": true,
+                "presence": "absent"
+              }
+            ],
+            "summary": "View"
+          }
+        ],
+        "context": "View",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "flow.ts:22:22-22:51",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [
+              {
+                "key": "lane",
+                "optional": true,
+                "presence": "absent"
+              }
+            ],
+            "summary": "View"
+          }
+        ],
+        "context": "View",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "flow.ts:22:68-22:83",
+        "context": "{ status: number; }",
+        "contextError": false,
+        "contextIsTarget": false,
+        "examinedByDefault": true
+      },
+      {
+        "at": "flow.ts:26:8-26:40",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [
+              {
+                "key": "status",
+                "optional": false,
+                "presence": "absent"
+              },
+              {
+                "key": "lane",
+                "optional": true,
+                "presence": "absent"
+              }
+            ],
+            "summary": "View"
+          }
+        ],
+        "context": "number | View",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "flow.ts:32:46-32:63",
+        "context": "Circle | Square",
+        "contextError": false,
+        "contextIsTarget": false,
+        "examinedByDefault": true
+      },
+      {
+        "at": "view.tsx:5:33-5:60",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [
+              {
+                "key": "lane",
+                "optional": true,
+                "presence": "absent"
+              }
+            ],
+            "summary": "View"
+          }
+        ],
+        "context": "View",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      }
+    ]
+  }
+]

@@ -30,6 +30,16 @@ const INVOCATIONS: &[(&str, &[&str])] = &[
         ],
     ),
     (
+        "constructs",
+        &[
+            "--constructs",
+            "--project",
+            "tsconfig.json",
+            "--name",
+            "run",
+        ],
+    ),
+    (
         "replace-body",
         &[
             "--replace-body",
@@ -271,7 +281,7 @@ fn a_flag_out_of_scope_names_exactly_the_operations_that_accept_it() {
     usage(
         &output,
         "usage.flag_scope",
-        "--json applies to: --outline, --show, --type, --references, --replace-body, --insert-after, --edit-batch, --apply, --references-status, --doctor",
+        "--json applies to: --outline, --show, --type, --references, --constructs, --replace-body, --insert-after, --edit-batch, --apply, --references-status, --doctor",
         &["--json"],
     );
 }
@@ -430,8 +440,8 @@ fn references_direct_is_an_unknown_option() {
 #[test]
 fn a_service_action_refuses_the_flags_it_does_not_take() {
     let fixture = Fixture::new(&[]);
-    let pretty = "--pretty applies to: parse mode (no operation flag), --outline, --show, --type, --references, --replace-body, --insert-after, --edit-batch, --apply, --references-status, --doctor";
-    let output = "--output applies to: parse mode (no operation flag), --outline, --show, --type, --references, --replace-body, --insert-after, --edit-batch, --apply, --references-status";
+    let pretty = "--pretty applies to: parse mode (no operation flag), --outline, --show, --type, --references, --constructs, --replace-body, --insert-after, --edit-batch, --apply, --references-status, --doctor";
+    let output = "--output applies to: parse mode (no operation flag), --outline, --show, --type, --references, --constructs, --replace-body, --insert-after, --edit-batch, --apply, --references-status";
     for action in ["--references-stop", "--references-serve"] {
         for (flags, message) in [
             (&["--pretty"][..], pretty),

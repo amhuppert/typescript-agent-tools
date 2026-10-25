@@ -74,6 +74,36 @@ pub(super) fn present(
     })
 }
 
+/// Q5's bounded spelling of one established type: a Q4 summary's text and
+/// byte bound. An unsupported detail it meets is that type's failure, located
+/// at its own site; a display cannot stand in for it.
+pub(super) fn bounded_summary(
+    evaluator: &mut Evaluator<'_, '_>,
+    id: TypeId,
+    consumer: &Location,
+) -> Result<crate::constructs::Summary, DemandError> {
+    evaluator.describe(id)?;
+    let mut issues = Issues::default();
+    let summary = summary(
+        evaluator,
+        id,
+        &mut SummaryContext::new(consumer.clone(), LiteralPresentation::default()),
+        &mut issues,
+    )?;
+    if let Some(issue) = issues.ordered.into_iter().next() {
+        return Err(super::unsupported_demand_at_location(
+            evaluator.checker_inputs(),
+            &issue.location,
+            issue.reason,
+            issue.message,
+        ));
+    }
+    Ok(crate::constructs::Summary {
+        summary: summary.text,
+        summary_truncated: summary.truncated,
+    })
+}
+
 /// Node-builder recursion and infer declarations have independent dynamic
 /// scopes. Nested conditionals replace the infer list only for their extends
 /// clause; all exit paths restore the enclosing context.

@@ -4,10 +4,11 @@ description: Navigate, query, and edit TypeScript and TSX code with the
   `tsparse` CLI. Use when working in a TypeScript project (.ts, .tsx, .mts,
   .cts, tsconfig.json) to list declarations in a file (`--outline`), read a
   declaration's exact source (`--show`), find symbol or member references and
-  call sites across a project (`--references`), inspect types (`--type`),
-  replace callable bodies or insert statements (`--replace-body`,
-  `--insert-after`, `--edit-batch`, `--apply`), or check TypeScript 7 syntax
-  (`--check`).
+  call sites across a project (`--references`), inspect types (`--type`), list
+  the object literals that construct a type and the properties each lacks
+  (`--constructs`), replace callable bodies or insert statements
+  (`--replace-body`, `--insert-after`, `--edit-batch`, `--apply`), or check
+  TypeScript 7 syntax (`--check`).
 ---
 
 # Working on TypeScript Projects with `tsparse`
@@ -25,6 +26,7 @@ Assume `tsparse` is on `PATH`; it builds and runs on macOS and Linux only. For a
 | Find all uses of a symbol | `tsparse --references --project tsconfig.json --name start` | Follows import/export renames and barrel re-exports while keeping shadowed bindings in separate groups. |
 | Find uses or callers of a member | `tsparse --references --project tsconfig.json --name RunHost.observe --calls --no-tests` | Matches members by resolved receiver type rather than property spelling, optionally restricted to call sites outside tests. |
 | Inspect a declaration or token type | `tsparse --type --project tsconfig.json --at src/host.ts:42:10` | Reports the resolved type summary (and a bounded structural graph with `--expand [--depth 0..32]`). |
+| Find every literal that builds a type, e.g. after adding a property | `tsparse --constructs --project tsconfig.json --name RunView --missing lane` | Lists each object literal TypeScript contextually types as the target (annotations, `satisfies`, returns, arguments, array elements, nested values; per union alternative; generic instantiations), with the properties it lacks, optional ones included, which the compiler never reports. By default it examines the literals naming one of the target's keys or none; `--all-literals` examines the rest, slowly. |
 | Replace a callable body | `tsparse --replace-body --name RunHost.run src/host.ts --from body.ts --plan run.plan.json` | Replaces only the body, preserves all surrounding bytes, and validates syntax, AST boundaries, `@ts-ignore`/`@ts-expect-error` reach, and JSDoc attachment before writing. |
 | Insert statements after a declaration | `tsparse --insert-after --name start src/host.ts --from stmts.ts --plan add.plan.json` | Inserts at the statement seam with matching indentation, line breaks, and automatic semicolon safety. |
 | Apply a prepared edit plan | `tsparse --apply run.plan.json` | Verifies every target file's original bytes and inode identity before replacing, rolling back all files if any replacement fails. Replaced files keep only their permission mode. |
@@ -40,7 +42,7 @@ Assume `tsparse` is on `PATH`; it builds and runs on macOS and Linux only. For a
 Every selector is exact so a typo or overloaded name never silently targets the wrong code:
 
 - **Exact names (`--name NAME`):** Case-sensitive, decoded identifier match with no fuzzy matching.
-  - **Containment (`--name Parent.child`):** In `--show`, `--type`, `--replace-body`, `--insert-after`, and `--references`, dotted names walk declaration containment (e.g., `createRunHost.startEligible` selects `startEligible` inside `createRunHost`).
+  - **Containment (`--name Parent.child`):** In `--show`, `--type`, `--constructs`, `--replace-body`, `--insert-after`, and `--references`, dotted names walk declaration containment (e.g., `createRunHost.startEligible` selects `startEligible` inside `createRunHost`).
   - **Imports and exports:** An import or export specifier has a `--name` key only when it renames (`import { a as b }` has key `b`; `import { a }` has no key). Thus `--show --project tsconfig.json --name createThing` selects the original declaration of `createThing`, not every file that imports it.
 - **Lexical vs. semantic member references (`--references`):**
   - A **bare name** (`--references --project tsconfig.json --name run`) performs a fast lexical search across declarations, imports, and export aliases, and ends with a hint listing any matching class/interface/object members it did not search (`N catalog members named run were not searched; search SELECTOR with --at FILE:LINE:COLUMN`).
@@ -48,6 +50,9 @@ Every selector is exact so a typo or overloaded name never silently targets the 
 - **Positions (`--at`):** Uses 1-based line and 1-based UTF-16 column.
   - Pass either `--at FILE:LINE:COLUMN` (the exact handle printed by `--show`, `--references`, and candidate lists—paste it directly with no `FILE` operand) or `--at LINE:COLUMN FILE` (the `LINE:COLUMN` printed under a file header in `--outline`). Giving a `FILE` operand alongside `--at FILE:LINE:COLUMN` is a usage error.
   - For constructor parameter properties (`constructor(public readonly id: string)`), the identifier `id` selects the lexical parameter; the first modifier (`public`) anchors the semantic class property.
+- **Construction sites (`--constructs`):** Select the interface, class, or type alias by `--name` or by `--at` on its declaration name (a type reference in an annotation is `UnsupportedTarget`). Each site line reads `FILE:LINE:COLUMN lacks "lane"?, "status" (unknown)`: keys are quoted, `?` marks an optional property, `(unknown)` a property a spread, index signature, or `any` may provide. Aliases of intersections (`type Props = Base<string> & Extra`) match the literals annotated with them, a type parameter's constraint (and a class's `this`) stands for it, and a literal passed through an inferred type parameter (`const p: Plain = id({...})`) has the inferred type, not the target. Presence is the compiler's type of the literal, not the runtime object. Bases, intersection parts, and `Partial<T>`-style mapped forms are separate types; query them by name. A literal spread into another literal (`{id, ...(c ? {lane} : {})}`) belongs to the outer site. `--missing KEY` keeps the sites lacking the string key `KEY` (exact; `''` is a key); a key the target does not declare as a string key fails with `UnknownProperty` and the nearest key.
+  - **Examined literals:** By default only literals with a member naming one of the target's keys, or with no named member (`{}`, only spreads, only computed names), are examined; the header reads `N of M literals examined` and a line counts the rest. Literals whose named members name only other keys can still construct the target (for example a type assertion such as `{other: 1} as Options`, a union context beside the member those keys choose or with a member accepting any key such as `View | {}`, or an excess-property error such as `{...base, other: 1}`): `--all-literals` examines them too, at several times the cost (about 75 s on a ~4,000-file project, past the default 60 s deadline), so narrow it with `--file` or `--no-tests` or raise `TSPARSE_QUERY_TIMEOUT_MS`. A target with an index signature, an empty alternative (`interface Empty {}`), or the global `Object` as an alternative always examines every literal.
+  - **Partial answers are normal on real projects:** literals whose context needs flow narrowing, JSX attribute typing, or another unsupported form are located gaps (exit `1`, `coverage partial (N gaps: …)`); every site listed is still exact, and each gap names the literal to inspect by hand.
 - **Candidate narrowing (`FILE`) vs. occurrence filtering (`--file FILE`):**
   - The positional `FILE` operand narrows which file's candidate declarations `--name` selects.
   - In `--references`, `--file FILE` filters the reported occurrences to `FILE` without narrowing where the symbol is declared. Combine both when needed:
@@ -58,7 +63,7 @@ Every selector is exact so a typo or overloaded name never silently targets the 
 
 ## Work with the Project Service and Cost Model
 
-Project queries (`--references`, `--type`, and `--outline`/`--show`/edits with `--project`) require an explicit `--project TSCONFIG`. `tsparse` never searches ancestor directories for `tsconfig.json`, and it rejects configs with project `references` rather than searching partially (pass the specific subproject's `tsconfig.json` instead).
+Project queries (`--references`, `--type`, `--constructs`, and `--outline`/`--show`/edits with `--project`) require an explicit `--project TSCONFIG`. `tsparse` never searches ancestor directories for `tsconfig.json`, and it rejects configs with project `references` rather than searching partially (pass the specific subproject's `tsconfig.json` instead).
 
 `--project` queries automatically start and reuse a per-project background service (keyed by the exact `--project` path spelling and build, expiring after 10 idle minutes). Before each request, the service verifies that no captured source, config, or package manifest changed, rebuilding the snapshot when any input changed.
 
@@ -68,6 +73,7 @@ Typical costs on a ~4,000-file TypeScript project:
 - **Cold start (first project query):** ~6 s (~1.6 GB service RSS).
 - **First project query after any file edit:** ~4.5 s (snapshot rebuild).
 - **Warm semantic member search (`--references --name Receiver.member`):** ~9–10 s.
+- **Warm construction-site search (`--constructs`):** ~14–23 s; with `--all-literals` ~75 s.
 
 Follow these sequencing rules to keep queries fast:
 1. **Omit `--project` when one file suffices:** Use `tsparse --outline FILE` and `tsparse --show ... FILE` without `--project` when you already know the file path.
@@ -136,6 +142,7 @@ Follow these sequencing rules to keep queries fast:
 ### Display Caps (`--limit` and `-o`)
 To protect context windows, stdout responses are capped by default (both in text and `--json`):
 - `--references`: `200` occurrences across groups
+- `--constructs`: `200` sites, `20` lacking properties per construction, and `50` gaps (one `--limit N` sets all three)
 - `--outline`: `200` entries (after `--depth` filtering)
 - `--show`: `400` declaration lines
 - Edit previews: `400` diff lines per changed file

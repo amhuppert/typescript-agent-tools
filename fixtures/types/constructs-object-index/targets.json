@@ -1,0 +1,18 @@
+[
+ {
+  "name": "Callish",
+  "at": {
+   "file": "objects.ts",
+   "line": 4,
+   "column": 18
+  }
+ },
+ {
+  "name": "Indexed",
+  "at": {
+   "file": "objects.ts",
+   "line": 5,
+   "column": 18
+  }
+ }
+]

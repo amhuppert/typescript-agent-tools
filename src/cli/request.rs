@@ -13,6 +13,7 @@ use super::navigation::Depth;
 use super::registry::{self, FlagId, Kind, Operation, OperationId, Pretty, Repeat, RepeatedValue};
 use std::ffi::OsString;
 use std::path::PathBuf;
+use typescript_parser::constructs::{ConstructsFilters, ConstructsRequest};
 use typescript_parser::editing::Operation as EditOperation;
 use typescript_parser::navigation::{Selector, ShowQuery};
 use typescript_parser::project::ProjectRequest;
@@ -190,6 +191,10 @@ impl Target {
                 request: ProjectRequest::Type(_),
                 ..
             } => "type",
+            Self::Project {
+                request: ProjectRequest::Constructs(_),
+                ..
+            } => "constructs",
         }
     }
 }
@@ -574,6 +579,7 @@ fn validate(flags: Flags) -> Result<Request, Refusal> {
         OperationId::Show => navigation(operation, false, flags),
         OperationId::Type => type_query(operation, flags),
         OperationId::References => references(operation, flags),
+        OperationId::Constructs => constructs(operation, flags),
         OperationId::ReplaceBody => edit(operation, EditOperation::ReplaceBody, flags),
         OperationId::InsertAfter => edit(operation, EditOperation::InsertAfter, flags),
         OperationId::EditBatch => batch(operation, flags),
@@ -794,6 +800,51 @@ fn references(operation: &'static Operation, flags: Flags) -> Result<Request, Fa
         // Answers are text unless `--json`, which also delivers analysis
         // failures as documents, or `--pretty`, which keeps the indented
         // document with failures as diagnostics (`super::references`).
+        format: flags.format(),
+        pretty: flags.has(FlagId::Pretty),
+        depth: Depth::default(),
+        output: flags.value(FlagId::Output),
+        display: flags.display(operation, false)?,
+    }))
+}
+
+fn constructs(operation: &'static Operation, flags: Flags) -> Result<Request, Failure> {
+    let project = required_project(operation, &flags)?;
+    let file = flags.files.first().cloned();
+    // `--file` names a file as the FILE operand does, so neither is stdin.
+    let filter = flags.value(FlagId::File);
+    if file.as_deref() == Some("-") || filter.as_deref() == Some("-") {
+        return Err(Failure::new(
+            Code::Operands,
+            format!("{operation} reads files from the project, not stdin"),
+        ));
+    }
+    let query = match (flags.value(FlagId::At), flags.value(FlagId::Name)) {
+        (Some(at), None) => {
+            let (file, position) = location(&at, file, &format!("{operation} {}", FlagId::At))?;
+            TypeQuery::At { file, position }
+        }
+        (None, Some(name)) => TypeQuery::Name {
+            name,
+            file: file.map(PathBuf::from),
+        },
+        _ => return Err(one_selection(operation)),
+    };
+    let request = ConstructsRequest {
+        query,
+        filters: ConstructsFilters {
+            exclude_tests: flags.has(FlagId::NoTests),
+            file: filter.map(PathBuf::from),
+            missing: flags.value(FlagId::Missing),
+            all_literals: flags.has(FlagId::AllLiterals),
+        },
+    };
+    Ok(Request::Query(Query {
+        target: Target::Project {
+            config: project,
+            request: ProjectRequest::Constructs(request),
+            direct: flags.has(FlagId::Direct),
+        },
         format: flags.format(),
         pretty: flags.has(FlagId::Pretty),
         depth: Depth::default(),
@@ -1114,6 +1165,7 @@ mod tests {
                 "show" => OperationId::Show,
                 "type" => OperationId::Type,
                 "references" => OperationId::References,
+                "constructs" => OperationId::Constructs,
                 other => panic!("a query for {other}"),
             },
             Request::Edit(command) => match &command.action {

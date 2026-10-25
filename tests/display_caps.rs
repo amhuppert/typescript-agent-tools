@@ -274,6 +274,15 @@ fn each_operation_publishes_the_lists_it_bounds_and_their_defaults() {
         (&["--type"], json!([list("candidates", 50)])),
         (&["--references"], json!([list("occurrences", 200)])),
         (
+            &["--constructs"],
+            json!([
+                list("sites", 200),
+                list("lacks", 20),
+                list("gaps", 50),
+                list("candidates", 50)
+            ]),
+        ),
+        (
             &["--replace-body"],
             json!([list("candidates", 50), list("diff_lines", 400)]),
         ),
@@ -321,7 +330,7 @@ fn each_operation_publishes_the_lists_it_bounds_and_their_defaults() {
     let output = run(&service, &["--apply", "plan.json", "--limit", "all"]);
     assert_eq!(
         stderr(&output, 2),
-        "usage.flag_scope: --limit applies to: --outline, --show, --type, --references, --replace-body, --insert-after, --edit-batch\n"
+        "usage.flag_scope: --limit applies to: --outline, --show, --type, --references, --constructs, --replace-body, --insert-after, --edit-batch\n"
     );
     for value in ["0", "-1", "two", "", "ALL", "1.5"] {
         let output = run(&service, &["--outline", "app.ts", "--limit", value]);

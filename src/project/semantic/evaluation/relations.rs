@@ -5660,6 +5660,22 @@ impl Evaluator<'_, '_> {
         sequence.finish(result)
     }
 
+    /// `getUnmatchedPropertiesWorker`'s target-property test: a static private
+    /// identifier is skipped; otherwise the property's symbol and whether it is
+    /// optional (its Optional or Partial flag), in that acquisition order.
+    pub(super) fn unmatched_target_property(
+        &mut self,
+        property: &Property,
+        consumer: &Location,
+    ) -> Result<Option<(PropertySymbolId, bool)>, DemandError> {
+        let symbol = self.property_symbol(property, consumer)?;
+        if self.is_static_private_identifier_property(symbol, consumer)? {
+            return Ok(None);
+        }
+        let flags = self.property_symbol_flags(symbol)?;
+        Ok(Some((symbol, flags.optional || flags.partial)))
+    }
+
     /// `getUnmatchedPropertiesWorker` visits each target property, including
     /// private and optional skips; only an actual unmatched result is retained.
     fn unmatched_properties_worker_completion(
@@ -5678,12 +5694,12 @@ impl Evaluator<'_, '_> {
         let mut sequence = NativeSequence::new();
         let result = (|| -> Result<Option<Property>, DemandError> {
             for property in sequence.read(self.properties_of_type_completion(target, consumer))? {
-                let symbol = self.property_symbol(&property, consumer)?;
-                if self.is_static_private_identifier_property(symbol, consumer)? {
+                let Some((symbol, optional)) =
+                    self.unmatched_target_property(&property, consumer)?
+                else {
                     continue;
-                }
-                let flags = self.property_symbol_flags(symbol)?;
-                if require_optional || !flags.optional && !flags.partial {
+                };
+                if require_optional || !optional {
                     let name = self.property_lookup_key(symbol, consumer)?;
                     let unmatched = match sequence
                         .read(self.property_of_type_by_key_completion(source, &name, consumer))?

@@ -1,0 +1,283 @@
+[
+  {
+    "name": "Callish",
+    "alternatives": [
+      "Callish"
+    ],
+    "generic": false,
+    "target": "Callish",
+    "universe": "target_keys",
+    "literals": [
+      {
+        "at": "objects.ts:7:31-7:33",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [
+              {
+                "key": "call",
+                "optional": true,
+                "presence": "absent"
+              },
+              {
+                "key": "apply",
+                "optional": true,
+                "presence": "absent"
+              },
+              {
+                "key": "bind",
+                "optional": true,
+                "presence": "absent"
+              },
+              {
+                "key": "marker",
+                "optional": true,
+                "presence": "absent"
+              }
+            ],
+            "summary": "Callish"
+          }
+        ],
+        "context": "Callish",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "objects.ts:8:32-8:41",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [
+              {
+                "key": "call",
+                "optional": true,
+                "presence": "absent"
+              },
+              {
+                "key": "apply",
+                "optional": true,
+                "presence": "absent"
+              },
+              {
+                "key": "bind",
+                "optional": true,
+                "presence": "absent"
+              },
+              {
+                "key": "marker",
+                "optional": true,
+                "presence": "absent"
+              }
+            ],
+            "summary": "Callish"
+          }
+        ],
+        "context": "Callish",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "objects.ts:8:37-8:39",
+        "examinedByDefault": true,
+        "excluded": "spread"
+      },
+      {
+        "at": "objects.ts:9:32-9:47",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [
+              {
+                "key": "call",
+                "optional": true,
+                "presence": "absent"
+              },
+              {
+                "key": "apply",
+                "optional": true,
+                "presence": "absent"
+              },
+              {
+                "key": "bind",
+                "optional": true,
+                "presence": "absent"
+              }
+            ],
+            "summary": "Callish"
+          }
+        ],
+        "context": "Callish",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "objects.ts:10:31-10:33",
+        "context": "Indexed",
+        "contextError": false,
+        "contextIsTarget": false,
+        "examinedByDefault": true
+      },
+      {
+        "at": "objects.ts:11:31-11:44",
+        "context": "Indexed",
+        "contextError": false,
+        "contextIsTarget": false,
+        "examinedByDefault": false
+      },
+      {
+        "at": "objects.ts:12:39-12:48",
+        "context": "Indexed",
+        "contextError": false,
+        "contextIsTarget": false,
+        "examinedByDefault": true
+      },
+      {
+        "at": "objects.ts:12:44-12:46",
+        "examinedByDefault": true,
+        "excluded": "spread"
+      }
+    ]
+  },
+  {
+    "name": "Indexed",
+    "alternatives": [
+      "Indexed"
+    ],
+    "generic": false,
+    "target": "Indexed",
+    "universe": "target_keys",
+    "literals": [
+      {
+        "at": "objects.ts:7:31-7:33",
+        "context": "Callish",
+        "contextError": false,
+        "contextIsTarget": false,
+        "examinedByDefault": true
+      },
+      {
+        "at": "objects.ts:8:32-8:41",
+        "context": "Callish",
+        "contextError": false,
+        "contextIsTarget": false,
+        "examinedByDefault": true
+      },
+      {
+        "at": "objects.ts:8:37-8:39",
+        "examinedByDefault": true,
+        "excluded": "spread"
+      },
+      {
+        "at": "objects.ts:9:32-9:47",
+        "context": "Callish",
+        "contextError": false,
+        "contextIsTarget": false,
+        "examinedByDefault": true
+      },
+      {
+        "at": "objects.ts:10:31-10:33",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [
+              {
+                "key": "marker",
+                "optional": true,
+                "presence": "absent"
+              },
+              {
+                "key": "maybe",
+                "optional": true,
+                "presence": "unknown"
+              },
+              {
+                "key": "own",
+                "optional": true,
+                "presence": "absent"
+              }
+            ],
+            "summary": "Indexed"
+          }
+        ],
+        "context": "Indexed",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "objects.ts:11:31-11:44",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [
+              {
+                "key": "marker",
+                "optional": true,
+                "presence": "absent"
+              },
+              {
+                "key": "maybe",
+                "optional": true,
+                "presence": "unknown"
+              }
+            ],
+            "summary": "Indexed"
+          }
+        ],
+        "context": "Indexed",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "objects.ts:12:39-12:48",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [
+              {
+                "key": "marker",
+                "optional": true,
+                "presence": "absent"
+              },
+              {
+                "key": "maybe",
+                "optional": true,
+                "presence": "unknown"
+              },
+              {
+                "key": "own",
+                "optional": true,
+                "presence": "absent"
+              }
+            ],
+            "summary": "Indexed"
+          }
+        ],
+        "context": "Indexed",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "objects.ts:12:44-12:46",
+        "examinedByDefault": true,
+        "excluded": "spread"
+      }
+    ]
+  }
+]

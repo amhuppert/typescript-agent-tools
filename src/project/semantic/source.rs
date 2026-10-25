@@ -854,6 +854,36 @@ impl<'p, 'w> Source<'p, 'w> {
         Ok(calls)
     }
 
+    /// Whether `file`'s syntax is captured for this request.
+    pub(super) fn holds_syntax(&self, file: FileId) -> bool {
+        self.syntax.contains_key(&file)
+    }
+
+    /// Release `file`'s captured syntax. Its handles stay valid: capturing it
+    /// again parses the same text into the same nodes, spans and attachments.
+    pub(super) fn release_syntax(&mut self, file: FileId) {
+        self.syntax.remove(&file);
+    }
+
+    /// Every object literal of a file, in source order (Q5's examined
+    /// literals).
+    pub(super) fn object_literals(
+        &mut self,
+        file: FileId,
+    ) -> Result<Vec<ExpressionRoot>, AnalysisError> {
+        let CapturedSyntax { ast, .. } = self.syntax(file)?;
+        let mut literals: Vec<ExpressionRoot> = ast
+            .walk()
+            .filter(|&id| ast.node(id).syntax_kind == SyntaxKind::ObjectLiteralExpression)
+            .map(|id| ExpressionRoot {
+                file,
+                site: crate::project::binding::flow::Site::new(ast, id),
+            })
+            .collect();
+        literals.sort_by_key(|root| (root.site.span.start, root.site.span.end));
+        Ok(literals)
+    }
+
     /// `getSymbolAtLocation` / `getTypeOfAlias`: a named import or export's
     /// two name tokens address its local alias symbol. Other semantic token
     /// families remain explicit pending operations at this implementation

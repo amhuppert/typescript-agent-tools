@@ -1,0 +1,314 @@
+[
+ {
+  "name": "View",
+  "at": {
+   "file": "definitions.ts",
+   "line": 1,
+   "column": 18
+  }
+ },
+ {
+  "name": "Box",
+  "at": {
+   "file": "definitions.ts",
+   "line": 2,
+   "column": 18
+  }
+ },
+ {
+  "name": "Pair",
+  "at": {
+   "file": "definitions.ts",
+   "line": 3,
+   "column": 13
+  }
+ },
+ {
+  "name": "Tagged",
+  "at": {
+   "file": "definitions.ts",
+   "line": 4,
+   "column": 13
+  }
+ },
+ {
+  "name": "Merged",
+  "at": {
+   "file": "definitions.ts",
+   "line": 5,
+   "column": 13
+  }
+ },
+ {
+  "name": "Point",
+  "at": {
+   "file": "definitions.ts",
+   "line": 6,
+   "column": 14
+  }
+ },
+ {
+  "name": "WithMethod",
+  "at": {
+   "file": "definitions.ts",
+   "line": 7,
+   "column": 18
+  }
+ },
+ {
+  "name": "Base",
+  "at": {
+   "file": "definitions.ts",
+   "line": 8,
+   "column": 18
+  }
+ },
+ {
+  "name": "Derived",
+  "at": {
+   "file": "definitions.ts",
+   "line": 9,
+   "column": 18
+  }
+ },
+ {
+  "name": "Alias",
+  "at": {
+   "file": "definitions.ts",
+   "line": 10,
+   "column": 13
+  }
+ },
+ {
+  "name": "Shape",
+  "at": {
+   "file": "unions.ts",
+   "line": 3,
+   "column": 13
+  }
+ },
+ {
+  "name": "Result",
+  "at": {
+   "file": "unions.ts",
+   "line": 4,
+   "column": 13
+  }
+ },
+ {
+  "name": "Event",
+  "at": {
+   "file": "unions.ts",
+   "line": 7,
+   "column": 13
+  }
+ },
+ {
+  "name": "Fixed",
+  "at": {
+   "file": "definitions.ts",
+   "line": 11,
+   "column": 13
+  }
+ },
+ {
+  "name": "PartialView",
+  "at": {
+   "file": "definitions.ts",
+   "line": 12,
+   "column": 13
+  }
+ },
+ {
+  "name": "Cross",
+  "at": {
+   "file": "definitions.ts",
+   "line": 13,
+   "column": 13
+  }
+ },
+ {
+  "name": "Options",
+  "at": {
+   "file": "definitions.ts",
+   "line": 14,
+   "column": 18
+  }
+ },
+ {
+  "name": "Keyed",
+  "at": {
+   "file": "definitions.ts",
+   "line": 16,
+   "column": 13
+  }
+ },
+ {
+  "name": "Bag",
+  "at": {
+   "file": "definitions.ts",
+   "line": 17,
+   "column": 13
+  }
+ },
+ {
+  "name": "Numbered",
+  "at": {
+   "file": "definitions.ts",
+   "line": 18,
+   "column": 13
+  }
+ },
+ {
+  "name": "Empty",
+  "at": {
+   "file": "definitions.ts",
+   "line": 19,
+   "column": 18
+  }
+ },
+ {
+  "name": "PointExtra",
+  "at": {
+   "file": "intersections.ts",
+   "line": 10,
+   "column": 13
+  }
+ },
+ {
+  "name": "BoxExtra",
+  "at": {
+   "file": "intersections.ts",
+   "line": 11,
+   "column": 13
+  }
+ },
+ {
+  "name": "FluentExtra",
+  "at": {
+   "file": "intersections.ts",
+   "line": 12,
+   "column": 13
+  }
+ },
+ {
+  "name": "ClassExtra",
+  "at": {
+   "file": "intersections.ts",
+   "line": 13,
+   "column": 13
+  }
+ },
+ {
+  "name": "PE",
+  "at": {
+   "file": "intersections.ts",
+   "line": 14,
+   "column": 13
+  }
+ },
+ {
+  "name": "Props",
+  "at": {
+   "file": "intersections.ts",
+   "line": 15,
+   "column": 13
+  }
+ },
+ {
+  "name": "Variant",
+  "at": {
+   "file": "intersections.ts",
+   "line": 16,
+   "column": 13
+  }
+ },
+ {
+  "name": "Plain",
+  "at": {
+   "file": "intersections.ts",
+   "line": 9,
+   "column": 18
+  }
+ },
+ {
+  "name": "Secret",
+  "at": {
+   "file": "keys.ts",
+   "line": 4,
+   "column": 14
+  }
+ },
+ {
+  "name": "Symbolic",
+  "at": {
+   "file": "keys.ts",
+   "line": 5,
+   "column": 18
+  }
+ },
+ {
+  "name": "TextKeys",
+  "at": {
+   "file": "keys.ts",
+   "line": 6,
+   "column": 18
+  }
+ },
+ {
+  "name": "Fluent",
+  "at": {
+   "file": "intersections.ts",
+   "line": 7,
+   "column": 18
+  }
+ },
+ {
+  "name": "Chain",
+  "at": {
+   "file": "constraints.ts",
+   "line": 13,
+   "column": 14
+  }
+ },
+ {
+  "name": "Signed",
+  "at": {
+   "file": "constraints.ts",
+   "line": 20,
+   "column": 18
+  }
+ },
+ {
+  "name": "Fn",
+  "at": {
+   "file": "constraints.ts",
+   "line": 25,
+   "column": 13
+  }
+ },
+ {
+  "name": "Callable",
+  "at": {
+   "file": "constraints.ts",
+   "line": 26,
+   "column": 13
+  }
+ },
+ {
+  "name": "Accessed",
+  "at": {
+   "file": "constraints.ts",
+   "line": 30,
+   "column": 18
+  }
+ },
+ {
+  "name": "GetterOnly",
+  "at": {
+   "file": "constraints.ts",
+   "line": 31,
+   "column": 18
+  }
+ }
+]

@@ -71,6 +71,7 @@ pub(crate) fn documents(operation: OperationId) -> Option<Documents> {
         | OperationId::Show
         | OperationId::Type
         | OperationId::References
+        | OperationId::Constructs
         | OperationId::ReferencesStatus
         | OperationId::ReferencesStop
         | OperationId::ReferencesServe

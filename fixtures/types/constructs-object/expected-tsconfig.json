@@ -1,0 +1,245 @@
+[
+  {
+    "name": "V",
+    "alternatives": [
+      "V"
+    ],
+    "generic": false,
+    "target": "V",
+    "universe": "target_keys",
+    "literals": [
+      {
+        "at": "objects.ts:8:25-8:27",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [
+              {
+                "key": "marker",
+                "optional": true,
+                "presence": "absent"
+              }
+            ],
+            "summary": "V"
+          }
+        ],
+        "context": "V",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "objects.ts:9:25-9:40",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [],
+            "summary": "V"
+          }
+        ],
+        "context": "V",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "objects.ts:10:26-10:35",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [
+              {
+                "key": "marker",
+                "optional": true,
+                "presence": "absent"
+              }
+            ],
+            "summary": "V"
+          }
+        ],
+        "context": "V",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "objects.ts:10:31-10:33",
+        "examinedByDefault": true,
+        "excluded": "spread"
+      },
+      {
+        "at": "objects.ts:11:28-11:47",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [],
+            "summary": "V"
+          }
+        ],
+        "context": "V",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "objects.ts:12:33-12:35",
+        "context": "Augmented",
+        "contextError": false,
+        "contextIsTarget": false,
+        "examinedByDefault": true
+      },
+      {
+        "at": "objects.ts:13:35-13:48",
+        "context": "Augmented",
+        "contextError": false,
+        "contextIsTarget": false,
+        "examinedByDefault": false
+      },
+      {
+        "at": "objects.ts:14:43-14:52",
+        "context": "Augmented",
+        "contextError": false,
+        "contextIsTarget": false,
+        "examinedByDefault": true
+      },
+      {
+        "at": "objects.ts:14:48-14:50",
+        "examinedByDefault": true,
+        "excluded": "spread"
+      }
+    ]
+  },
+  {
+    "name": "Augmented",
+    "alternatives": [
+      "Augmented"
+    ],
+    "generic": false,
+    "target": "Augmented",
+    "universe": "target_keys",
+    "literals": [
+      {
+        "at": "objects.ts:8:25-8:27",
+        "context": "V",
+        "contextError": false,
+        "contextIsTarget": false,
+        "examinedByDefault": true
+      },
+      {
+        "at": "objects.ts:9:25-9:40",
+        "context": "V",
+        "contextError": false,
+        "contextIsTarget": false,
+        "examinedByDefault": false
+      },
+      {
+        "at": "objects.ts:10:26-10:35",
+        "context": "V",
+        "contextError": false,
+        "contextIsTarget": false,
+        "examinedByDefault": true
+      },
+      {
+        "at": "objects.ts:10:31-10:33",
+        "examinedByDefault": true,
+        "excluded": "spread"
+      },
+      {
+        "at": "objects.ts:11:28-11:47",
+        "context": "V",
+        "contextError": false,
+        "contextIsTarget": false,
+        "examinedByDefault": false
+      },
+      {
+        "at": "objects.ts:12:33-12:35",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [
+              {
+                "key": "maybe",
+                "optional": true,
+                "presence": "unknown"
+              },
+              {
+                "key": "own",
+                "optional": true,
+                "presence": "absent"
+              }
+            ],
+            "summary": "Augmented"
+          }
+        ],
+        "context": "Augmented",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "objects.ts:13:35-13:48",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [
+              {
+                "key": "maybe",
+                "optional": true,
+                "presence": "unknown"
+              }
+            ],
+            "summary": "Augmented"
+          }
+        ],
+        "context": "Augmented",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "objects.ts:14:43-14:52",
+        "constructed": [
+          {
+            "alternative": 0,
+            "lacks": [
+              {
+                "key": "maybe",
+                "optional": true,
+                "presence": "unknown"
+              },
+              {
+                "key": "own",
+                "optional": true,
+                "presence": "absent"
+              }
+            ],
+            "summary": "Augmented"
+          }
+        ],
+        "context": "Augmented",
+        "contextError": false,
+        "contextIsTarget": true,
+        "discriminatedAway": 0,
+        "examinedByDefault": true,
+        "literalError": false
+      },
+      {
+        "at": "objects.ts:14:48-14:50",
+        "examinedByDefault": true,
+        "excluded": "spread"
+      }
+    ]
+  }
+]

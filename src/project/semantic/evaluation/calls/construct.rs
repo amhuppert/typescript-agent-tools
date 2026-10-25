@@ -15,6 +15,17 @@ impl Evaluator<'_, '_> {
         recipe: &CallRecipe,
         mode: CheckMode,
     ) -> NativeResult<ResolvedSignature> {
+        let prepared = self.prepared_signature_completion(recipe, mode)?;
+        self.resolve_prepared_signature_completion(recipe, prepared)
+    }
+
+    /// `resolveNewExpression` up to `resolveCall`: accessibility and
+    /// abstractness, then construct signatures or the call-signature fallback.
+    pub(super) fn prepare_new_expression_completion(
+        &mut self,
+        recipe: &CallRecipe,
+        mode: CheckMode,
+    ) -> NativeResult<SignaturePreparation> {
         let mut sequence = NativeSequence::new();
         let result = (|| {
             let expression = sequence
@@ -89,8 +100,7 @@ impl Evaluator<'_, '_> {
                 ),
             ))
         })();
-        let prepared = sequence.finish(result)?;
-        self.resolve_prepared_signature_completion(recipe, prepared)
+        sequence.finish(result)
     }
 
     /// resolveNewExpression's call-signature fallback runs after resolveCall

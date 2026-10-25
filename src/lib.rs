@@ -14,6 +14,8 @@
 //!   project's searched files.
 //! - `editing`: source-preserving body replacement and statement insertion,
 //!   prepared as a batch, previewed, and applied.
+//! - `constructs`: object literals that construct a declared type, and the
+//!   properties each does not certainly provide.
 //! - `analysis`: the failures every operation reports (`AnalysisError`).
 //! - `source`: positions in analyzed text (`SourcePosition`).
 
@@ -23,6 +25,7 @@ compile_error!("tsparse builds on macOS and Linux only; see ENVELOPE.md");
 pub mod analysis;
 pub mod ast;
 mod compiler;
+pub mod constructs;
 pub mod editing;
 mod hash;
 mod identifier_exclusions;

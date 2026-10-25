@@ -235,6 +235,9 @@ impl Cap<'_> {
             List::Candidates => ("candidate", "candidates"),
             List::Lines => ("line", "lines"),
             List::DiffLines => ("diff line", "diff lines"),
+            List::Sites => ("site", "sites"),
+            List::Lacks => ("lacking property", "lacking properties"),
+            List::Gaps => ("gap", "gaps"),
         };
         let mut line = format!(
             "\n… {withheld} more {}",
@@ -261,7 +264,13 @@ impl Cap<'_> {
             List::Candidates => line.push_str(&format!(
                 "; narrow the edit's name to a.b or give its at as FILE:LINE:COLUMN, or see all with: {command}"
             )),
-            List::Occurrences | List::Entries | List::Lines | List::DiffLines => {
+            List::Occurrences
+            | List::Entries
+            | List::Lines
+            | List::DiffLines
+            | List::Sites
+            | List::Lacks
+            | List::Gaps => {
                 line.push_str(&format!("; see all with: {command}"));
                 if !self.display.spill {
                     line.push_str(&format!(
@@ -446,7 +455,9 @@ pub(crate) fn failure_code(error: &AnalysisError) -> u8 {
             QueryErrorKind::OutsideProject
             | QueryErrorKind::InvalidPosition
             | QueryErrorKind::InvalidRequest => 2,
-            QueryErrorKind::UnsupportedTarget | QueryErrorKind::UnresolvedTarget => 1,
+            QueryErrorKind::UnsupportedTarget
+            | QueryErrorKind::UnresolvedTarget
+            | QueryErrorKind::UnknownProperty => 1,
         },
         AnalysisError::Semantic(error) => match error.kind {
             SemanticErrorKind::Internal => 2,

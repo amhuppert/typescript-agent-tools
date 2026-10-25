@@ -150,3 +150,207 @@ func (c *Checker) AgentOracleCombinedMember(symbol *ast.Symbol) *ast.Symbol {
 	}
 	return symbol
 }
+
+// AgentOracleConstructionContext repeats getApparentTypeOfContextualType's
+// body for one object literal and returns its instantiated contextual type,
+// that type's apparent form (unreduced, the input to object-literal
+// discrimination) and the final answer. It acquires the contextual type
+// once, exactly as the native body does.
+func (c *Checker) AgentOracleConstructionContext(node *ast.Node) (instantiated *Type, undiscriminated *Type, discriminated *Type) {
+	contextualType := c.getContextualType(node, ContextFlagsNone)
+	instantiatedType := c.instantiateContextualType(contextualType, node, ContextFlagsNone)
+	if instantiatedType == nil {
+		return nil, nil, nil
+	}
+	apparentType := c.mapTypeEx(instantiatedType, c.AgentOracleContextualApparent, true)
+	if apparentType.flags&TypeFlagsUnion != 0 {
+		return instantiatedType, apparentType, c.discriminateContextualTypeByObjectMembers(node, apparentType)
+	}
+	return instantiatedType, apparentType, apparentType
+}
+
+// AgentOracleContextualApparent is getApparentTypeOfContextualType's mapper
+// for one constituent: a mapped type stays, any other takes getApparentType.
+func (c *Checker) AgentOracleContextualApparent(t *Type) *Type {
+	if t.objectFlags&ObjectFlagsMapped != 0 {
+		return t
+	}
+	return c.getApparentType(t)
+}
+
+// AgentOracleBaseConstraint is getBaseConstraintOfType for an instantiable
+// type (a type parameter, `this`, an indexed access), nil otherwise.
+func (c *Checker) AgentOracleBaseConstraint(t *Type) *Type {
+	if t.flags&TypeFlagsInstantiable == 0 {
+		return nil
+	}
+	return c.getBaseConstraintOfType(t)
+}
+
+// AgentOracleCallable: a type with call or construct signatures, which no
+// object literal's type has.
+func (c *Checker) AgentOracleCallable(t *Type) bool {
+	return len(c.getSignaturesOfType(t, SignatureKindCall)) != 0 || len(c.getSignaturesOfType(t, SignatureKindConstruct)) != 0
+}
+
+// AgentOracleMemberKey is the key checkObjectLiteral gives a named member: a
+// property assignment, shorthand or method whose computed name has a type
+// usable as a property name is named by that type (`[+100]` is `100`); an
+// accessor, and any other member, keeps its binder name (`get [+100]` is
+// `+100`).
+func (c *Checker) AgentOracleMemberKey(member *ast.Node) string {
+	renamed := ast.IsPropertyAssignment(member) || ast.IsShorthandPropertyAssignment(member) || ast.IsMethodDeclaration(member)
+	if name := member.Name(); renamed && name != nil && ast.IsComputedPropertyName(name) {
+		if t := c.checkComputedPropertyName(name); isTypeUsableAsPropertyName(t) {
+			return getPropertyNameFromType(t)
+		}
+	}
+	return member.Symbol().Name
+}
+
+// AgentOracleAdmitsEveryKey: an alternative against which writing any key is
+// no excess-property error (hasExcessProperties skips an empty object type
+// and the global Object type), or which an index signature lets any key
+// address.
+func (c *Checker) AgentOracleAdmitsEveryKey(t *Type) bool {
+	return len(c.getIndexInfosOfType(t)) != 0 || c.isEmptyObjectType(t) || t == c.globalObjectType
+}
+
+// AgentOracleInstanceOf is Q5's per-form construction identity. A
+// non-generic target's alternatives are interned identities. A generic
+// declaration's alternative is matched through the provenance TypeScript keeps
+// on its instantiations: identity when it contains no type variables, a
+// reference's target, its own alias symbol, or an anonymous instantiation's
+// target (findMatchingTypeReferenceOrTypeAliasReference's two questions plus
+// identity and instantiation).
+func (c *Checker) AgentOracleInstanceOf(source, alternative *Type, target *ast.Symbol, generic bool) bool {
+	if source == alternative {
+		return true
+	}
+	if !generic || !c.couldContainTypeVariables(alternative) {
+		return false
+	}
+	if alternative.objectFlags&ObjectFlagsReference != 0 {
+		return source.objectFlags&ObjectFlagsReference != 0 && source.Target() == alternative.Target()
+	}
+	if alternative.alias != nil {
+		return source.alias != nil && source.alias.symbol == alternative.alias.symbol
+	}
+	if alternative.flags&TypeFlagsObject != 0 && alternative.objectFlags&ObjectFlagsAnonymous != 0 {
+		return source.flags&TypeFlagsObject != 0 && source.objectFlags&ObjectFlagsInstantiated != 0 && source.Target() == alternative
+	}
+	return false
+}
+
+// AgentOracleHasInstanceProvenance: whether AgentOracleInstanceOf can
+// recognize every instantiation of this generic declaration's alternative.
+func (c *Checker) AgentOracleHasInstanceProvenance(alternative *Type, target *ast.Symbol) bool {
+	return !c.couldContainTypeVariables(alternative) ||
+		alternative.objectFlags&ObjectFlagsReference != 0 ||
+		alternative.alias != nil ||
+		alternative.flags&TypeFlagsObject != 0 && alternative.objectFlags&ObjectFlagsAnonymous != 0
+}
+
+// AgentOracleIsGenericObjectType exposes the native genericity question.
+func (c *Checker) AgentOracleIsGenericObjectType(t *Type) bool {
+	return c.isGenericObjectType(t)
+}
+
+// AgentOracleTargetProperties is getUnmatchedPropertiesWorker's target
+// inventory: every property except static private identifiers, with the
+// Optional-or-Partial test that decides whether it is required.
+func (c *Checker) AgentOracleTargetProperties(t *Type) ([]*ast.Symbol, []bool) {
+	properties := []*ast.Symbol{}
+	optional := []bool{}
+	for _, property := range c.getPropertiesOfType(t) {
+		if isStaticPrivateIdentifierProperty(property) {
+			continue
+		}
+		properties = append(properties, property)
+		optional = append(optional, property.Flags&ast.SymbolFlagsOptional != 0 || property.CheckFlags&ast.CheckFlagsPartial != 0)
+	}
+	return properties, optional
+}
+
+// AgentOracleSpreadContribution follows getContextualType's parent dispatch
+// from an object literal while each step derives the operand's context from
+// its parent's (parentheses, `!`, `as const`, conditional arms, `await`, and
+// the operands getContextualTypeForBinaryOperand forwards) and reports whether
+// that chain reaches an enclosing object literal's spread operand.
+func (c *Checker) AgentOracleSpreadContribution(node *ast.Node) bool {
+	for {
+		parent := node.Parent
+		if parent == nil {
+			return false
+		}
+		switch parent.Kind {
+		case ast.KindParenthesizedExpression, ast.KindNonNullExpression, ast.KindAwaitExpression:
+		case ast.KindTypeAssertionExpression, ast.KindAsExpression:
+			if !ast.IsConstAssertion(parent) {
+				return false
+			}
+		case ast.KindConditionalExpression:
+			if node == parent.AsConditionalExpression().Condition {
+				return false
+			}
+		case ast.KindBinaryExpression:
+			binary := parent.AsBinaryExpression()
+			if binary.Type != nil {
+				return false
+			}
+			switch binary.OperatorToken.Kind {
+			case ast.KindBarBarToken, ast.KindQuestionQuestionToken:
+				if node == binary.Right {
+					t := c.getContextualType(parent, ContextFlagsNone)
+					if t == nil || c.patternForType[t] != nil {
+						return false
+					}
+				}
+			case ast.KindAmpersandAmpersandToken, ast.KindCommaToken:
+				if node != binary.Right {
+					return false
+				}
+			default:
+				return false
+			}
+		case ast.KindSpreadAssignment:
+			return true
+		default:
+			return false
+		}
+		node = parent
+	}
+}
+
+// AgentOraclePresence reads a key from the checked literal type: any is
+// unknown; each constituent (one, or a union's) provides the key as a required
+// or optional named property, or not at all, and an absent key with an
+// applicable index signature (getApplicableIndexInfoForName) may be present.
+// Only agreement on required, or on absent without an index, is certain.
+func (c *Checker) AgentOraclePresence(literalType *Type, key string) string {
+	if literalType.flags&TypeFlagsAny != 0 {
+		return "unknown"
+	}
+	types := []*Type{literalType}
+	if literalType.flags&TypeFlagsUnion != 0 {
+		types = literalType.Types()
+	}
+	present, absent := 0, 0
+	for _, constituent := range types {
+		property := c.getPropertyOfType(constituent, key)
+		switch {
+		case property == nil && c.getApplicableIndexInfoForName(constituent, key) == nil:
+			absent++
+		case property != nil && property.Flags&ast.SymbolFlagsOptional == 0:
+			present++
+		}
+	}
+	switch {
+	case present == len(types):
+		return "present"
+	case absent == len(types):
+		return "absent"
+	default:
+		return "unknown"
+	}
+}

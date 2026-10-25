@@ -2,19 +2,19 @@
 //! exact public Location identity establishes occurrence identity. No display key
 //! replaces either. Checked maps own collisions; this owner owns retained payloads,
 //! scalar buffers and the existing public output order.
+use super::super::gaps::{Gaps, sequence_order};
 use super::*;
 use crate::references::metadata::{
-    copy_location, copy_text, location_hash, location_order, option_location_order, text_order,
+    copy_location, copy_text, location_hash, location_order, text_order,
 };
-use crate::resources::{CheckedKey, CheckedMap, Control, complete_or_abort};
+use crate::resources::{CheckedKey, CheckedMap, Control};
 use std::cmp::Ordering;
 use std::collections::HashMap;
 
 pub(super) struct Ledger {
     identities: HashMap<NativeSymbolIdentity, usize>,
     groups: Vec<Group>,
-    gaps: Vec<ReferenceGap>,
-    control: Option<Control>,
+    gaps: Gaps,
 }
 struct Group {
     declarations: Vec<NamedLocation>,
@@ -38,8 +38,7 @@ impl Ledger {
         Self {
             identities: HashMap::new(),
             groups: Vec::new(),
-            gaps: Vec::new(),
-            control,
+            gaps: Gaps::new(control),
         }
     }
     /// Seed-only groups use precisely the same cache and backing as occurrence groups.
@@ -128,57 +127,7 @@ impl Ledger {
         location: Location,
         failure: DemandError,
     ) -> Result<(), AnalysisError> {
-        let error = AnalysisError::from(failure);
-        let AnalysisError::Semantic(semantic) = &error else {
-            return Err(error);
-        };
-        if !matches!(
-            semantic.kind,
-            SemanticErrorKind::UnsupportedSemantic | SemanticErrorKind::InvalidSemantic
-        ) {
-            return Err(error);
-        }
-        let SemanticReason::Failure(reason) = semantic.reason else {
-            return Err(error);
-        };
-        let control = self.control.as_ref();
-
-        let mut bounded = semantic.clone();
-        // The gap belongs to the candidate; a consumed prerequisite can belong
-        // to a different declaration (or have no native source site). Preserve
-        // that primary dependency before its already ordered nested causes.
-        // A same-site primary is already represented by the gap itself.
-        if option_location_order(semantic.exact_location.as_ref(), Some(&location))
-            != Ordering::Equal
-        {
-            bounded.causes.clear();
-            if let Some(control) = control {
-                complete_or_abort(control.check());
-            }
-            bounded.omitted_causes = None;
-            bounded.append_dependency(semantic)?;
-        } else {
-            bounded.bound_causes()?;
-        }
-        let mut causes = Vec::new();
-        for cause in bounded.causes {
-            let SemanticReason::Failure(reason) = cause.reason else {
-                return Err(error);
-            };
-            (causes).push(ReferenceCause {
-                reason,
-                location: cause.location,
-                message: cause.message,
-            });
-        }
-        (self.gaps).push(ReferenceGap {
-            reason,
-            location,
-            message: bounded.message,
-            causes,
-            omitted_causes: bounded.omitted_causes,
-        });
-        Ok(())
+        self.gaps.record(location, failure)
     }
 
     pub(super) fn finish(self) -> (Vec<ReferenceGroup>, Vec<ReferenceGap>) {
@@ -200,58 +149,6 @@ impl Ledger {
                 })
             })
         });
-        let mut gaps = self.gaps;
-        (gaps).sort_by(|a, b| {
-            location_order(&a.location, &b.location)
-                .then_with(|| reason_name(a.reason).cmp(reason_name(b.reason)))
-                .then_with(|| {
-                    sequence_order(&a.causes, &b.causes, |a, b| {
-                        option_location_order(a.location.as_ref(), b.location.as_ref())
-                    })
-                })
-        });
-        gaps.dedup_by(|a, b| {
-            location_order(&a.location, &b.location) == Ordering::Equal
-                && a.reason == b.reason
-                && sequence_order(&a.causes, &b.causes, |a, b| {
-                    option_location_order(a.location.as_ref(), b.location.as_ref())
-                }) == Ordering::Equal
-        });
-        (groups, gaps)
-    }
-}
-
-fn sequence_order<T>(a: &[T], b: &[T], mut compare: impl FnMut(&T, &T) -> Ordering) -> Ordering {
-    for (a, b) in a.iter().zip(b) {
-        let order = compare(a, b);
-        if order != Ordering::Equal {
-            return order;
-        }
-    }
-    a.len().cmp(&b.len())
-}
-
-fn reason_name(reason: SemanticFailureReason) -> &'static str {
-    use SemanticFailureReason::*;
-    match reason {
-        FlowRequired => "flow_required",
-        JsxTypingRequired => "jsx_typing_required",
-        GeneratorInferenceRequired => "generator_inference_required",
-        DecoratorTypingRequired => "decorator_typing_required",
-        JavascriptSemanticsRequired => "javascript_semantics_required",
-        ExpandoSemanticsRequired => "expando_semantics_required",
-        UnsupportedSemanticForm => "unsupported_semantic_form",
-        UnrepresentableIdentity => "unrepresentable_identity",
-        UnresolvedSymbol => "unresolved_symbol",
-        ErrorType => "error_type",
-        OverloadRecovery => "overload_recovery",
-        CircularType => "circular_type",
-        InstantiationLimit => "instantiation_limit",
-        ConditionalTailLimit => "conditional_tail_limit",
-        UnionComplexityLimit => "union_complexity_limit",
-        TupleComplexityLimit => "tuple_complexity_limit",
-        SubtypeComplexityLimit => "subtype_complexity_limit",
-        RelationDepthLimit => "relation_depth_limit",
-        RelationComplexityLimit => "relation_complexity_limit",
+        (groups, self.gaps.finish())
     }
 }

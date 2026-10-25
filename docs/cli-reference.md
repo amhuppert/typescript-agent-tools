@@ -71,6 +71,7 @@ own documents, described in each operation's document.
 | [show](#show) | `--show` | Print one declaration's exact source with its original line numbers. |
 | [type](#type) | `--type` | Inspect the type of the selected declaration or token in one explicit project. |
 | [references](#references) | `--references` | Group the declarations and occurrences of the selected symbol in one explicit project. |
+| [constructs](#constructs) | `--constructs` | List the object literals that construct the selected interface, class, or type alias in one explicit project, and the properties each does not certainly provide. |
 | [replace-body](#replace-body) | `--replace-body` | Preview replacing the complete body of the selected function, method, constructor, accessor, or arrow function. |
 | [insert-after](#insert-after) | `--insert-after` | Preview inserting complete statements after the statement the selected declaration designates. |
 | [edit-batch](#edit-batch) | `--edit-batch` | Preview several edits from a JSON file, all selected in the original files. |
@@ -258,8 +259,8 @@ tsparse --references --project TSCONFIG (--at LINE:COLUMN FILE | --at FILE:LINE:
 | `--at [FILE:]LINE:COLUMN` | Select by position: a one-based line and UTF-16 column, in FILE or the FILE operand. |
 | `--name NAME` | Select by exact declared name; a dotted name such as RunHost.run selects by containment. |
 | `--calls` | Keep only direct call, new, and tagged-template targets. |
-| `--no-tests` | Omit occurrences in test paths, keeping the selected declarations. |
-| `--file FILE` | Keep only occurrences in FILE, one of the searched files; unlike the FILE operand, it does not narrow the candidates. |
+| `--no-tests` | Omit results in test paths: references keep the selected declarations, and constructs skips the literals there. |
+| `--file FILE` | Keep only results in FILE, one of the searched files: occurrences, or construction sites; unlike the FILE operand, it does not narrow the candidates. |
 | `--limit N|all` | Show at most N items of each list the operation bounds, or all of them; without it each list has a default, which -o removes. |
 | `--json` | Write one result document, also for a failure the analysis reports. |
 | `--pretty` | Indent JSON output: alone where the output is JSON, and with --json elsewhere. |
@@ -284,6 +285,51 @@ Examples:
 | 2 | A usage error or invalid position; a file the request or configuration names (the --project file, an extends target, a files entry) that does not exist, or a file or directory that cannot be read; a query file that is not one of the project's searched files; a service that cannot be started or reached; or a result that cannot be written. |
 
 Related: [show](#show), [type](#type), [references-status](#references-status). Document: [docs/references.md](references.md).
+
+## constructs
+
+List the object literals that construct the selected interface, class, or type alias in one explicit project, and the properties each does not certainly provide.
+
+```text
+tsparse --constructs --project TSCONFIG (--at LINE:COLUMN FILE | --at FILE:LINE:COLUMN | --name NAME [FILE]) [--direct] [--missing KEY] [--all-literals] [--no-tests] [--file FILE] [--limit N|all] [--json [--pretty]] [--output OUTPUT]
+```
+
+--name takes --show's declaration containment selectors and FILE narrows the seeds; --at selects the declaration's name. By default the object literals of the searched files examined are those with a member naming a key the target declares, or with no named member ({}, or only spreads and computed names that are not literals). --all-literals examines every literal, as a target always does when an alternative has an index signature or is an empty object type or the global Object type: also those whose named members name only other keys, which construct the target, for example, under a type assertion such as {other: 1} as Options, beside a union member those keys choose, in a union context with a member accepting any key such as View | {}, or with an excess-property error. A site is one whose contextual type, as declared and as TypeScript discriminates it, is the target or one of its union alternatives, generic instantiations and aliases of intersections included; bases, intersection parts, and mapped forms such as Partial&lt;T> are other types. Each site lists, per constructed alternative, its properties the literal lacks, quoted, marked ? when optional, absent or of unknown presence in the compiler's type of the literal (a spread of an optional property, an index signature, or any); this is not the runtime object. A literal spread into another literal belongs to that literal's site. --missing KEY keeps the sites that lack the string key KEY, compared exactly. Literals whose context cannot be established are located gaps, and the coverage is partial. A query runs under TSPARSE_MAX_MEMORY_MB (default 6144 MiB) and TSPARSE_QUERY_TIMEOUT_MS (default 60000), positive integers checked before any service starts; a service keeps the values it started with, and a limit failure exits the process that hit it.
+
+| Flag | Summary |
+| --- | --- |
+| `--constructs` | List the object literals that construct a type in one project, and the properties each lacks. |
+| `--project TSCONFIG` | The project's configuration file, as spelled; no ancestor directory is searched. |
+| `--direct` | Load a fresh project in this process instead of asking the project's service. |
+| `--at [FILE:]LINE:COLUMN` | Select by position: a one-based line and UTF-16 column, in FILE or the FILE operand. |
+| `--name NAME` | Select by exact declared name; a dotted name such as RunHost.run selects by containment. |
+| `--missing KEY` | Keep only the construction sites whose constructed type declares the string key KEY, compared exactly, and that do not certainly provide it. |
+| `--all-literals` | Examine every object literal, also those whose named members name only keys the target does not declare; several times slower on a large project. |
+| `--no-tests` | Omit results in test paths: references keep the selected declarations, and constructs skips the literals there. |
+| `--file FILE` | Keep only results in FILE, one of the searched files: occurrences, or construction sites; unlike the FILE operand, it does not narrow the candidates. |
+| `--limit N|all` | Show at most N items of each list the operation bounds, or all of them; without it each list has a default, which -o removes. |
+| `--json` | Write one result document, also for a failure the analysis reports. |
+| `--pretty` | Indent JSON output: alone where the output is JSON, and with --json elsewhere. |
+| `-o, --output OUTPUT` | Write the result to OUTPUT instead of stdout; editing writes it only as a new file. |
+| `-h, --help` | Print help and exit. |
+| `-V, --version` | Print the version and exit. |
+
+A value flag may be given once. --pretty is valid only with --json. Display limits: at most 200 construction sites, 20 properties each construction lacks, 50 gaps of a partial answer and 50 candidates of an ambiguous selection; --limit N|all sets them, -o without --limit removes them, and a cut's last line names the command that shows the rest.
+
+Examples:
+
+- `tsparse --constructs --project tsconfig.json --name RunView`: Every literal that builds a RunView, and the properties each lacks.
+- `tsparse --constructs --project tsconfig.json --name RunView --missing lane --no-tests`: Only the sites outside test paths that do not certainly provide lane.
+- `tsparse --constructs --project tsconfig.json --at src/views.ts:12:18 --file src/fixtures.ts --json`: The type declared at a position, its sites in one file, as a document.
+- `tsparse --constructs --project tsconfig.json --name Options --all-literals --json -o sites.json`: Every literal examined, also those naming only keys Options does not declare; the whole document goes to a file.
+
+| Exit | Reports |
+| --- | --- |
+| 0 | A complete answer, including one with no site. |
+| 1 | A partial answer, an ambiguous or missing selection, an unsupported target, a --missing KEY the target does not declare, an analysis failure, or a memory, time, depth, or output limit. |
+| 2 | A usage error, a file that cannot be read or another I/O failure, an invalid position, a file outside the project, an internal failure, a service that cannot be started or reached, or a result that cannot be written. |
+
+Related: [type](#type), [references](#references). Document: [docs/constructs.md](constructs.md).
 
 ## replace-body
 
@@ -445,7 +491,7 @@ Report the state of the project's service; it loads nothing, does not check fres
 tsparse --references-status --project TSCONFIG [--json] [--pretty] [--output OUTPUT]
 ```
 
---references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, and --outline, --show, and edits with --project. On macOS and Linux, project queries reuse one service per configuration spelling and build, started automatically, which reloads the project when its inputs change. Status prints running: with the service's pid, generation (the number of snapshots it has published), build, idle timeout, and the idle time it has left, then limits: with the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with; or no service: TSCONFIG. --json prints the document instead: running, pid, generation, build, limits (max_memory_mb, query_timeout_ms), idle_secs, idle_remaining_secs, and started_unix; without a service running is false, generation 0, and every other field null; --pretty, with or without --json, prints it indented. It reads only TSPARSE_SERVICE_DIR, the private runtime directory (default /tmp/tsparse-UID, owned by this user with mode 0700).
+--references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, --constructs, and --outline, --show, and edits with --project. On macOS and Linux, project queries reuse one service per configuration spelling and build, started automatically, which reloads the project when its inputs change. Status prints running: with the service's pid, generation (the number of snapshots it has published), build, idle timeout, and the idle time it has left, then limits: with the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with; or no service: TSCONFIG. --json prints the document instead: running, pid, generation, build, limits (max_memory_mb, query_timeout_ms), idle_secs, idle_remaining_secs, and started_unix; without a service running is false, generation 0, and every other field null; --pretty, with or without --json, prints it indented. It reads only TSPARSE_SERVICE_DIR, the private runtime directory (default /tmp/tsparse-UID, owned by this user with mode 0700).
 
 | Flag | Summary |
 | --- | --- |
@@ -479,7 +525,7 @@ Stop the project's service and release its cache.
 tsparse --references-stop --project TSCONFIG
 ```
 
---references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, and --outline, --show, and edits with --project. It prints stopped: pid N when it stopped a service, or no service: TSCONFIG when none was running, on stdout. The next project query starts a new service. A service keeps the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with, so stop it after changing them; --doctor --project TSCONFIG reports a service whose limits differ from this environment's. It reads only TSPARSE_SERVICE_DIR.
+--references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, --constructs, and --outline, --show, and edits with --project. It prints stopped: pid N when it stopped a service, or no service: TSCONFIG when none was running, on stdout. The next project query starts a new service. A service keeps the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with, so stop it after changing them; --doctor --project TSCONFIG reports a service whose limits differ from this environment's. It reads only TSPARSE_SERVICE_DIR.
 
 | Flag | Summary |
 | --- | --- |
@@ -509,7 +555,7 @@ Run the project's service in the foreground, for a supervisor, until it is idle.
 tsparse --references-serve --project TSCONFIG
 ```
 
---references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, and --outline, --show, and edits with --project. A service exits after TSPARSE_SERVICE_IDLE_SECS idle seconds (default 600). Its runtime directory is TSPARSE_SERVICE_DIR (default /tmp/tsparse-UID): owned by this user with mode 0700, and short enough for a socket path of about 100 bytes. Its queries run under TSPARSE_MAX_MEMORY_MB (default 6144 MiB) and TSPARSE_QUERY_TIMEOUT_MS (default 60000); a limit failure exits the service and the next request starts a replacement, and memory sampling can overshoot. TSPARSE_SERVICE_IDLE_SECS, TSPARSE_MAX_MEMORY_MB, and TSPARSE_QUERY_TIMEOUT_MS must each be a positive integer. It prints nothing but a failure.
+--references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, --constructs, and --outline, --show, and edits with --project. A service exits after TSPARSE_SERVICE_IDLE_SECS idle seconds (default 600). Its runtime directory is TSPARSE_SERVICE_DIR (default /tmp/tsparse-UID): owned by this user with mode 0700, and short enough for a socket path of about 100 bytes. Its queries run under TSPARSE_MAX_MEMORY_MB (default 6144 MiB) and TSPARSE_QUERY_TIMEOUT_MS (default 60000); a limit failure exits the service and the next request starts a replacement, and memory sampling can overshoot. TSPARSE_SERVICE_IDLE_SECS, TSPARSE_MAX_MEMORY_MB, and TSPARSE_QUERY_TIMEOUT_MS must each be a positive integer. It prints nothing but a failure.
 
 | Flag | Summary |
 | --- | --- |
@@ -576,6 +622,7 @@ Related: [references-status](#references-status), [references-stop](#references-
 | `--show` | stays on | Print one declaration's exact source with its line numbers. |
 | `--type` | stays on | Inspect the type of a declaration or token in one project. |
 | `--references` | stays on | Group a symbol's declarations and occurrences in one project. |
+| `--constructs` | stays on | List the object literals that construct a type in one project, and the properties each lacks. |
 | `--replace-body` | stays on | Preview replacing the complete body of the selected declaration. |
 | `--insert-after` | stays on | Preview inserting statements after the selected declaration's statement. |
 | `--edit-batch EDITS` | as the operation says | Preview the edits a JSON batch file names, selected together. |
@@ -592,8 +639,10 @@ Related: [references-status](#references-status), [references-stop](#references-
 | `--limit N|all` | as the operation says | Show at most N items of each list the operation bounds, or all of them; without it each list has a default, which -o removes. |
 | `--expand` | stays on | Add a bounded structural graph of the type. |
 | `--calls` | stays on | Keep only direct call, new, and tagged-template targets. |
-| `--no-tests` | stays on | Omit occurrences in test paths, keeping the selected declarations. |
-| `--file FILE` | as the operation says | Keep only occurrences in FILE, one of the searched files; unlike the FILE operand, it does not narrow the candidates. |
+| `--no-tests` | stays on | Omit results in test paths: references keep the selected declarations, and constructs skips the literals there. |
+| `--file FILE` | as the operation says | Keep only results in FILE, one of the searched files: occurrences, or construction sites; unlike the FILE operand, it does not narrow the candidates. |
+| `--missing KEY` | as the operation says | Keep only the construction sites whose constructed type declares the string key KEY, compared exactly, and that do not certainly provide it. |
+| `--all-literals` | stays on | Examine every object literal, also those whose named members name only keys the target does not declare; several times slower on a large project. |
 | `--from FRAGMENT` | as the operation says | The file holding the new body or statements; - reads stdin. |
 | `--plan PLAN` | as the operation says | Save the prepared edits to PLAN, a new file, for --apply. |
 | `--tsx` | stays on | Parse JSX, as a .tsx or .jsx file name already does. |

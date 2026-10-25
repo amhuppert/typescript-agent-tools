@@ -64,6 +64,10 @@ pub(in crate::project::semantic) struct CallRecipe {
     pub(in crate::project::semantic) callee_optional_root: bool,
     pub(in crate::project::semantic) callee_optional_chain: bool,
     pub(in crate::project::semantic) super_call: bool,
+    /// The callee, through parentheses, is the function expression this call
+    /// invokes immediately (`getImmediatelyInvokedFunctionExpression`): its
+    /// unannotated parameters take their types from this call's arguments.
+    pub(in crate::project::semantic) invokes_function_expression: bool,
     pub(in crate::project::semantic) import_call: bool,
     pub(in crate::project::semantic) require_call: bool,
     pub(in crate::project::semantic) symbol_candidate: Option<ExpressionRoot>,
@@ -362,6 +366,16 @@ impl Source<'_, '_> {
             ),
             callee_optional_chain: syntax::is_optional_chain(ast, callee),
             super_call: ast.node(callee).syntax_kind == SyntaxKind::SuperKeyword,
+            invokes_function_expression: {
+                let mut function = callee;
+                while ast.node(function).syntax_kind == SyntaxKind::ParenthesizedExpression {
+                    match syntax::id(ast.node(function), "expression") {
+                        Some(inner) => function = inner,
+                        None => break,
+                    }
+                }
+                syntax::immediately_invoked_function(ast, &captured.parents, function) == Some(id)
+            },
             import_call: syntax::is_import_call(ast, id),
             require_call: syntax::is_require_call(ast, id, true),
             symbol_candidate: (node.syntax_kind == SyntaxKind::CallExpression)

@@ -22,6 +22,7 @@ pub(crate) enum FlagId {
     Show,
     Type,
     References,
+    Constructs,
     ReplaceBody,
     InsertAfter,
     EditBatch,
@@ -40,6 +41,8 @@ pub(crate) enum FlagId {
     Calls,
     NoTests,
     File,
+    Missing,
+    AllLiterals,
     From,
     Plan,
     Tsx,
@@ -161,6 +164,11 @@ pub(crate) static FLAGS: [Flag; FlagId::COUNT] = [
         "Group a symbol's declarations and occurrences in one project.",
     ),
     switch(
+        FlagId::Constructs,
+        "--constructs",
+        "List the object literals that construct a type in one project, and the properties each lacks.",
+    ),
+    switch(
         FlagId::ReplaceBody,
         "--replace-body",
         "Preview replacing the complete body of the selected declaration.",
@@ -250,13 +258,24 @@ pub(crate) static FLAGS: [Flag; FlagId::COUNT] = [
     switch(
         FlagId::NoTests,
         "--no-tests",
-        "Omit occurrences in test paths, keeping the selected declarations.",
+        "Omit results in test paths: references keep the selected declarations, and constructs skips the literals there.",
     ),
     value(
         FlagId::File,
         "--file",
         "FILE",
-        "Keep only occurrences in FILE, one of the searched files; unlike the FILE operand, it does not narrow the candidates.",
+        "Keep only results in FILE, one of the searched files: occurrences, or construction sites; unlike the FILE operand, it does not narrow the candidates.",
+    ),
+    value(
+        FlagId::Missing,
+        "--missing",
+        "KEY",
+        "Keep only the construction sites whose constructed type declares the string key KEY, compared exactly, and that do not certainly provide it.",
+    ),
+    switch(
+        FlagId::AllLiterals,
+        "--all-literals",
+        "Examine every object literal, also those whose named members name only keys the target does not declare; several times slower on a large project.",
     ),
     value(
         FlagId::From,
@@ -360,6 +379,7 @@ pub(crate) enum OperationId {
     Show,
     Type,
     References,
+    Constructs,
     ReplaceBody,
     InsertAfter,
     EditBatch,
@@ -411,6 +431,9 @@ pub(crate) enum List {
     Candidates,
     Lines,
     DiffLines,
+    Sites,
+    Lacks,
+    Gaps,
 }
 
 impl List {
@@ -422,6 +445,9 @@ impl List {
             Self::Candidates => "candidates",
             Self::Lines => "lines",
             Self::DiffLines => "diff_lines",
+            Self::Sites => "sites",
+            Self::Lacks => "lacks",
+            Self::Gaps => "gaps",
         }
     }
 }
@@ -457,6 +483,21 @@ pub(crate) const LINES: Bounded = Bounded {
     list: List::Lines,
     default: 400,
     summary: "lines of the declaration from its first line",
+};
+pub(crate) const SITES: Bounded = Bounded {
+    list: List::Sites,
+    default: 200,
+    summary: "construction sites",
+};
+pub(crate) const LACKS: Bounded = Bounded {
+    list: List::Lacks,
+    default: 20,
+    summary: "properties each construction lacks",
+};
+pub(crate) const GAPS: Bounded = Bounded {
+    list: List::Gaps,
+    default: 50,
+    summary: "gaps of a partial answer",
 };
 pub(crate) const DIFF_LINES: Bounded = Bounded {
     list: List::DiffLines,
@@ -603,7 +644,7 @@ macro_rules! preview_details {
 /// wording"). The help index states it, and so does each action's entry.
 macro_rules! service_administration {
     () => {
-        "--references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, and --outline, --show, and edits with --project."
+        "--references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, --constructs, and --outline, --show, and edits with --project."
     };
 }
 
@@ -964,6 +1005,107 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         repeat: RepeatedValue::LastValue,
         pretty: Some(Pretty::Alone),
         limits: &[OCCURRENCES],
+    },
+    Operation {
+        id: OperationId::Constructs,
+        name: "constructs",
+        flag: Some(F::Constructs),
+        summary: "List the object literals that construct the selected interface, class, or type alias in one explicit project, and the properties each does not certainly provide.",
+        details: concat!(
+            "--name takes --show's declaration containment selectors and FILE narrows the seeds; --at selects the declaration's name. By default the object literals of the searched files examined are those with a member naming a key the target declares, or with no named member ({}, or only spreads and computed names that are not literals). --all-literals examines every literal, as a target always does when an alternative has an index signature or is an empty object type or the global Object type: also those whose named members name only other keys, which construct the target, for example, under a type assertion such as {other: 1} as Options, beside a union member those keys choose, in a union context with a member accepting any key such as View | {}, or with an excess-property error. A site is one whose contextual type, as declared and as TypeScript discriminates it, is the target or one of its union alternatives, generic instantiations and aliases of intersections included; bases, intersection parts, and mapped forms such as Partial<T> are other types. Each site lists, per constructed alternative, its properties the literal lacks, quoted, marked ? when optional, absent or of unknown presence in the compiler's type of the literal (a spread of an optional property, an index signature, or any); this is not the runtime object. A literal spread into another literal belongs to that literal's site. --missing KEY keeps the sites that lack the string key KEY, compared exactly. Literals whose context cannot be established are located gaps, and the coverage is partial. A query runs under TSPARSE_MAX_MEMORY_MB (default ",
+            default_memory_mb!(),
+            " MiB) and TSPARSE_QUERY_TIMEOUT_MS (default ",
+            default_timeout_ms!(),
+            "), positive integers checked before any service starts; a service keeps the values it started with, and a limit failure exits the process that hit it."
+        ),
+        usage: &[
+            "tsparse --constructs --project TSCONFIG (--at LINE:COLUMN FILE | --at FILE:LINE:COLUMN | --name NAME [FILE]) [--direct] [--missing KEY] [--all-literals] [--no-tests] [--file FILE] [--limit N|all] [--json [--pretty]] [--output OUTPUT]",
+        ],
+        flags: &[
+            F::Project,
+            F::Direct,
+            F::At,
+            F::Name,
+            F::Missing,
+            F::AllLiterals,
+            F::NoTests,
+            F::File,
+            F::Limit,
+            F::Json,
+            F::Pretty,
+            F::Output,
+        ],
+        examples: &[
+            Example {
+                args: &[
+                    "--constructs",
+                    "--project",
+                    "tsconfig.json",
+                    "--name",
+                    "RunView",
+                ],
+                summary: "Every literal that builds a RunView, and the properties each lacks.",
+            },
+            Example {
+                args: &[
+                    "--constructs",
+                    "--project",
+                    "tsconfig.json",
+                    "--name",
+                    "RunView",
+                    "--missing",
+                    "lane",
+                    "--no-tests",
+                ],
+                summary: "Only the sites outside test paths that do not certainly provide lane.",
+            },
+            Example {
+                args: &[
+                    "--constructs",
+                    "--project",
+                    "tsconfig.json",
+                    "--at",
+                    "src/views.ts:12:18",
+                    "--file",
+                    "src/fixtures.ts",
+                    "--json",
+                ],
+                summary: "The type declared at a position, its sites in one file, as a document.",
+            },
+            Example {
+                args: &[
+                    "--constructs",
+                    "--project",
+                    "tsconfig.json",
+                    "--name",
+                    "Options",
+                    "--all-literals",
+                    "--json",
+                    "-o",
+                    "sites.json",
+                ],
+                summary: "Every literal examined, also those naming only keys Options does not declare; the whole document goes to a file.",
+            },
+        ],
+        exits: &[
+            ExitMeaning {
+                code: 0,
+                meaning: "A complete answer, including one with no site.",
+            },
+            ExitMeaning {
+                code: 1,
+                meaning: "A partial answer, an ambiguous or missing selection, an unsupported target, a --missing KEY the target does not declare, an analysis failure, or a memory, time, depth, or output limit.",
+            },
+            ExitMeaning {
+                code: 2,
+                meaning: "A usage error, a file that cannot be read or another I/O failure, an invalid position, a file outside the project, an internal failure, a service that cannot be started or reached, or a result that cannot be written.",
+            },
+        ],
+        related: &[OperationId::Type, OperationId::References],
+        doc: "docs/constructs.md",
+        repeat: RepeatedValue::Reject,
+        pretty: Some(Pretty::WithJson),
+        limits: &[SITES, LACKS, GAPS, CANDIDATES],
     },
     Operation {
         id: OperationId::ReplaceBody,

@@ -43,6 +43,7 @@ pub(super) enum ResolvedSignature {
 /// Callee preparation transfers all its acquired evidence into resolveCall.
 /// That owner can publish a signature before reporting finishes, so its
 /// installation must already contain this prefix.
+#[derive(Clone)]
 struct PreparedCall {
     signatures: Vec<Signature>,
     chain: Option<CallChain>,
@@ -50,6 +51,7 @@ struct PreparedCall {
     construct_via_call: bool,
 }
 
+#[derive(Clone)]
 enum SignaturePreparation {
     Resolved(ResolvedSignature),
     Call(PreparedCall),
@@ -114,6 +116,11 @@ impl CallArgument {
 /// Candidate preparation and contextual save/restore keep this same table.
 pub(super) struct CallsState {
     resolved: HashMap<CallRoot, CallState>,
+    /// `independent_candidate_completion` per call.
+    independent: HashMap<CallRoot, NativeResult<Option<Signature>>>,
+    /// Each call's normal-mode preparation, which getResolvedSignature
+    /// performs once and the independent-candidate question shares.
+    prepared: HashMap<CallRoot, NativeResult<SignaturePreparation>>,
     any_signature: Option<Signature>,
     silent_never_signature: Option<Signature>,
 }
@@ -122,6 +129,8 @@ impl CallsState {
     pub(super) fn new() -> Self {
         Self {
             resolved: HashMap::new(),
+            independent: HashMap::new(),
+            prepared: HashMap::new(),
             any_signature: None,
             silent_never_signature: None,
         }
@@ -198,11 +207,16 @@ impl Evaluator<'_, '_> {
             ) {
                 return Ok(self.model.special(SpecialName::Any));
             }
-            let signature = match sequence
-                .read(self.resolved_signature_completion(recipe, CheckMode::NORMAL))?
-            {
-                ResolvedSignature::Signature(signature) => signature,
-                ResolvedSignature::Deferred => return Ok(self.model.special(SpecialName::Any)),
+            let signature = match sequence.read(self.independent_candidate_completion(recipe))? {
+                Some(signature) => signature,
+                None => match sequence
+                    .read(self.resolved_signature_completion(recipe, CheckMode::NORMAL))?
+                {
+                    ResolvedSignature::Signature(signature) => signature,
+                    ResolvedSignature::Deferred => {
+                        return Ok(self.model.special(SpecialName::Any));
+                    }
+                },
             };
             if signature.flags.has_rest()
                 && let Some(rest_index) = signature.parameters.len().checked_sub(1)
@@ -543,14 +557,48 @@ impl Evaluator<'_, '_> {
         }
     }
 
-    /// `resolveCallExpression`: callee checking precedes non-null/apparent
-    /// type and both signature inventories. Genuine any has an untyped path;
-    /// a missing/error target remains its original consumed failure.
     fn resolve_call_expression_completion(
         &mut self,
         recipe: &CallRecipe,
         mode: CheckMode,
     ) -> NativeResult<ResolvedSignature> {
+        let prepared = self.prepared_signature_completion(recipe, mode)?;
+        self.resolve_prepared_signature_completion(recipe, prepared)
+    }
+
+    /// A call or construction's preparation up to `resolveCall`, made once in
+    /// normal mode: resolution and the independent-candidate question share
+    /// it. Results computed while flow loops are active are provisional and
+    /// are not kept, as resolved signatures are not.
+    fn prepared_signature_completion(
+        &mut self,
+        recipe: &CallRecipe,
+        mode: CheckMode,
+    ) -> NativeResult<SignaturePreparation> {
+        let normal = mode == CheckMode::NORMAL;
+        if normal && let Some(cached) = self.calls.prepared.get(&recipe.root) {
+            return cached.clone();
+        }
+        let result = if recipe.kind == SyntaxKind::NewExpression {
+            self.prepare_new_expression_completion(recipe, mode)
+        } else {
+            self.prepare_call_expression_completion(recipe, mode)
+        };
+        if normal && self.reads.loops.active.is_empty() {
+            self.calls.prepared.insert(recipe.root, result.clone());
+        }
+        result
+    }
+
+    /// `resolveCallExpression` up to `resolveCall`: callee checking precedes
+    /// non-null/apparent type and both signature inventories. Genuine any has
+    /// an untyped path; a missing/error target remains its original consumed
+    /// failure.
+    fn prepare_call_expression_completion(
+        &mut self,
+        recipe: &CallRecipe,
+        mode: CheckMode,
+    ) -> NativeResult<SignaturePreparation> {
         let mut sequence = NativeSequence::new();
         let result = (|| {
             if recipe.super_call {
@@ -712,8 +760,89 @@ impl Evaluator<'_, '_> {
                 construct_via_call: false,
             }))
         })();
-        let prepared = sequence.finish(result)?;
-        self.resolve_prepared_signature_completion(recipe, prepared)
+        sequence.finish(result)
+    }
+
+    /// The signature `getResolvedSignature` gives a call or construction
+    /// whatever its arguments, when it has exactly one candidate and that
+    /// candidate is not generic: `chooseOverload` returns it when its
+    /// arguments apply, and `getCandidateForOverloadFailure` (through
+    /// `pickLongestCandidateSignature`) returns it unchanged when they do not.
+    /// Its parameter types therefore need no argument checking, except for a
+    /// function expression invoked immediately, whose unannotated parameters
+    /// take their types from the arguments. None for any other call, which
+    /// only resolution can answer.
+    fn independent_candidate_completion(
+        &mut self,
+        recipe: &CallRecipe,
+    ) -> NativeResult<Option<Signature>> {
+        if !matches!(
+            recipe.kind,
+            SyntaxKind::CallExpression | SyntaxKind::NewExpression
+        ) || recipe.super_call
+            || recipe.invokes_function_expression
+            || recipe.import_call
+            || !recipe.type_arguments.is_empty()
+        {
+            return Ok(NativeCompletion::clean(None));
+        }
+        if let Some(cached) = self.calls.independent.get(&recipe.root) {
+            return cached.clone();
+        }
+        // getResolvedSignature marks the call resolving while it prepares: a
+        // question about this call's arguments asked meanwhile (an IIFE's
+        // parameters take its arguments' types) sees resolvingSignature.
+        let previous = self.calls.resolved.get(&recipe.root).cloned();
+        if matches!(previous, Some(CallState::Resolving)) {
+            return Ok(NativeCompletion::clean(None));
+        }
+        // Its uncached resolution also starts a fresh type-resolution window,
+        // as `resolved_signature_completion` does.
+        let window = self.resolution.begin_call(previous.is_none());
+        self.calls
+            .resolved
+            .insert(recipe.root, CallState::Resolving);
+        let prepared = self.prepared_signature_completion(recipe, CheckMode::NORMAL);
+        self.resolution.end_call(window);
+        // Its final check keeps, and returns, a signature that nested
+        // checking installed meanwhile, as `resolved_signature_completion`
+        // does; otherwise this call's state is what it was.
+        let installed = match self.calls.resolved.get(&recipe.root) {
+            Some(CallState::Resolved(signature)) => Some(signature.value().clone()),
+            _ => None,
+        };
+        if installed.is_none() {
+            match previous {
+                Some(state) => self.calls.resolved.insert(recipe.root, state),
+                None => self.calls.resolved.remove(&recipe.root),
+            };
+        }
+        let result = (|| {
+            let prepared = prepared?;
+            if let Some(signature) = installed {
+                return Ok(prepared.map(|_| Some(signature)));
+            }
+            prepared.and_then(|prepared| match prepared {
+                SignaturePreparation::Call(call) if !call.construct_via_call => {
+                    let candidates = self.reorder_candidates_completion(
+                        &call.signatures,
+                        call.chain,
+                        &recipe.location,
+                    )?;
+                    Ok(candidates.map(|candidates| match candidates.as_slice() {
+                        [candidate] if candidate.type_parameter_types().is_empty() => {
+                            Some(candidate.clone())
+                        }
+                        _ => None,
+                    }))
+                }
+                _ => Ok(NativeCompletion::clean(None)),
+            })
+        })();
+        if self.reads.loops.active.is_empty() {
+            self.calls.independent.insert(recipe.root, result.clone());
+        }
+        result
     }
 
     /// Complete native resolveCallExpression/resolveNewExpression/tagged

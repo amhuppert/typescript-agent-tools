@@ -294,6 +294,11 @@ reference. Record the operation and causal site, not just a displayed `any`.
 Genuine `any` is valid. An ordinary compiler relation of false is valid data,
 including when it rejects an overload candidate at the compiler's prescribed
 stage. An unsupported operation is not a false relation.
+An argument's contextual type at a call with one non-generic candidate is that
+candidate's parameter type on both the success and the failure path, so it is
+read from the candidate without resolving the call and is not recovery data;
+only the call's own result is ([Q5 design](constructs-design.md#construction),
+independent argument candidate).
 
 Two reached async-from-sync iteration branches have no native type result:
 7.0.2 panics when an iteration triple has an absent yield/return field, and

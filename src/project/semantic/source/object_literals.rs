@@ -17,6 +17,9 @@ pub(in crate::project::semantic) struct ObjectMember {
     pub(in crate::project::semantic) kind: K,
     pub(in crate::project::semantic) name: Option<ExpressionRoot>,
     pub(in crate::project::semantic) computed: Option<ExpressionRoot>,
+    /// `isDynamicName`: a computed name the binder cannot name, whose key a
+    /// type decides.
+    pub(in crate::project::semantic) dynamic_name: bool,
     pub(in crate::project::semantic) initializer: Option<ExpressionRoot>,
     pub(in crate::project::semantic) annotation: Option<ExpressionRoot>,
     pub(in crate::project::semantic) default_value: bool,
@@ -148,6 +151,7 @@ fn object_member(
         kind: node.syntax_kind,
         name: name.map(at),
         computed: computed.map(at),
+        dynamic_name: name.is_some_and(|name| syntax::is_dynamic_name(ast, name)),
         initializer: initializer.map(at),
         annotation: syntax::id(node, "type").map(at),
         default_value: syntax::has_default_value(ast, id),

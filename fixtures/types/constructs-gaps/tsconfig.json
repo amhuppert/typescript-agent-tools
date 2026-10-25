@@ -1,0 +1,1 @@
+{"compilerOptions": {"strict": true, "target": "ESNext", "module": "ESNext", "noLib": true, "types": [], "jsx": "preserve", "resolveJsonModule": true, "moduleResolution": "bundler"}, "files": ["globals.d.ts", "definitions.ts", "flow.ts", "view.tsx"]}
