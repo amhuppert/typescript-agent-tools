@@ -95,9 +95,6 @@ pub(crate) struct Parse {
 
 pub(crate) struct Service {
     pub(crate) action: ServiceAction,
-    /// The operation's flag, for the message of platforms without a service.
-    #[cfg_attr(unix, allow(dead_code))]
-    pub(crate) flag: String,
     pub(crate) project: String,
     /// Status's form: text, or its document with `--json`.
     pub(crate) format: Format,
@@ -255,21 +252,15 @@ impl Flags {
         named
     }
 
-    /// The one operation the flags run: of the operations they name, the
-    /// one that accepts every such flag, so an operation's flag that another
-    /// named operation accepts (`--references` beside a service action)
-    /// changes nothing. No operation flag runs parse mode.
+    /// The one operation the flags run: the one they name, however
+    /// repeated. No operation takes another's flag (`super::registry`), so
+    /// flags that name several form no request. No operation flag runs
+    /// parse mode.
     fn operation(&self) -> Result<&'static Operation, Failure> {
-        let named = self.named();
-        if named.is_empty() {
-            return Ok(OperationId::Parse.operation());
-        }
-        let mut chosen = named
-            .iter()
-            .filter(|(_, operation)| named.iter().all(|&(flag, _)| operation.accepts(flag)));
-        match (chosen.next(), chosen.next()) {
-            (Some(&(_, operation)), None) => Ok(operation),
-            _ => Err(Failure::new(
+        match self.named()[..] {
+            [] => Ok(OperationId::Parse.operation()),
+            [(_, operation)] => Ok(operation),
+            ref named @ [_, _, ..] => Err(Failure::new(
                 Code::Operation,
                 format!(
                     "Choose one operation: {}",
@@ -280,10 +271,8 @@ impl Flags {
     }
 
     /// The operation whose help a request for help prints: the one its
-    /// flags name, however spelled or repeated. Help asks which operations
-    /// the flags name, not which one a request would run, so a service
-    /// action beside the `--references` it takes names two; with none or
-    /// several the index answers (decisions.md, step 2).
+    /// flags name, however repeated; with none or several the index
+    /// answers (decisions.md, step 2).
     fn help(&self) -> Option<&'static Operation> {
         match self.named()[..] {
             [(_, operation)] => Some(operation),
@@ -348,9 +337,8 @@ impl Flags {
     /// `-o`, both of which now exist; a query keeps `-o`, so following it
     /// writes every item where the request asked. The command names no
     /// transport: the service and a direct load give the same answer byte
-    /// for byte, so it leaves out `--direct` and spells
-    /// `--references-direct` as `--references`, and the answer that prints
-    /// it is the same whichever entry gave it (charter, `parity`). The
+    /// for byte, so it leaves out `--direct`, and the answer that prints it
+    /// is the same whichever entry gave it (charter, `parity`). The
     /// command keeps the request's form, so an outline's text stays text,
     /// whose import lines list eight names and count the rest, as every
     /// text outline does (the run owner's resolution of this step's
@@ -385,7 +373,6 @@ impl Flags {
         for (arg, read) in &self.args {
             match *read {
                 Read::Flag(flag) | Read::Value(flag) if dropped.contains(&flag) => {}
-                Read::Flag(FlagId::ReferencesDirect) => reveal.push(FlagId::References.to_string()),
                 Read::Value(FlagId::Limit) => reveal.push("all".into()),
                 Read::Flag(flag) => {
                     limited |= flag == FlagId::Limit;
@@ -567,7 +554,9 @@ fn validate(flags: Flags) -> Result<Request, Refusal> {
     refuse_selection(operation, &flags)?;
     flags.check_scope(operation)?;
     flags.check_repeats(operation)?;
-    if operation.pretty == Pretty::WithJson && flags.has(FlagId::Pretty) && !flags.has(FlagId::Json)
+    if operation.pretty == Some(Pretty::WithJson)
+        && flags.has(FlagId::Pretty)
+        && !flags.has(FlagId::Json)
     {
         return Err(Failure::new(
             Code::FlagScope,
@@ -746,7 +735,6 @@ fn service(operation: &Operation, action: ServiceAction, flags: Flags) -> Result
     }
     Ok(Request::Service(Service {
         action,
-        flag: operation.to_string(),
         project,
         format: flags.format(),
         pretty: flags.has(FlagId::Pretty),
@@ -801,7 +789,7 @@ fn references(operation: &'static Operation, flags: Flags) -> Result<Request, Fa
                     file: filter.map(PathBuf::from),
                 },
             }),
-            direct: flags.has(FlagId::ReferencesDirect) || flags.has(FlagId::Direct),
+            direct: flags.has(FlagId::Direct),
         },
         // Answers are text unless `--json`, which also delivers analysis
         // failures as documents, or `--pretty`, which keeps the indented

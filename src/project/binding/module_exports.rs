@@ -36,7 +36,6 @@ pub(in crate::project) trait Symbols {
     type Declaration: Clone;
     type Error;
 
-    fn control(&self) -> Option<&crate::resources::Control>;
     fn module(
         &mut self,
         symbol: Self::Symbol,
@@ -59,10 +58,7 @@ pub(in crate::project) fn exports<O: Symbols>(
 ) -> Result<Exports<O::Symbol, O::Declaration>, O::Error> {
     let own = original.exports.clone().unwrap_or_default();
     let export_equals = own
-        .get(&NativePropertyKey::fixed(
-            b"export=".as_slice(),
-            operations.control(),
-        ))
+        .get(&NativePropertyKey::fixed(b"export=".as_slice()))
         .copied();
     let has_original = match export_equals {
         Some(symbol) => !matches!(operations.resolve(symbol)?, Resolved::Absent),
@@ -135,10 +131,7 @@ pub(in crate::project) fn exports<O: Symbols>(
                     returned.clear();
                     continue;
                 }
-                let stars = match symbols.get(&NativePropertyKey::fixed(
-                    b"\xfeexport".as_slice(),
-                    operations.control(),
-                )) {
+                let stars = match symbols.get(&NativePropertyKey::fixed(b"\xfeexport".as_slice())) {
                     Some(&symbol) => operations.stars(symbol)?,
                     None => Vec::new(),
                 };

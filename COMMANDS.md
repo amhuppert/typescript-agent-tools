@@ -1,6 +1,6 @@
 # `tsparse` CLI Commands Reference
 
-`tsparse` parses TypeScript 7 and TSX into a compiler-style JSON AST, and navigates, queries, and edits declarations across files and `tsconfig.json` projects.
+`tsparse` parses TypeScript 7 and TSX into a compiler-style JSON AST, and navigates, queries, and edits declarations across files and `tsconfig.json` projects. It builds and runs on macOS and Linux only.
 
 > For full flag rules, failure codes, and exit tables per operation, run `tsparse --OP --help` or see [docs/cli-reference.md](docs/cli-reference.md).
 
@@ -95,7 +95,7 @@ tsparse --show --at src/host.ts:42:10
 
 ## 3. Semantic Project Queries
 
-Project queries require an explicit `--project TSCONFIG` (no ancestor directory search). On macOS and Linux, they automatically start and reuse a per-project background service that rebuilds when inputs change; pass `--direct` to run in the CLI process instead.
+Project queries require an explicit `--project TSCONFIG` (no ancestor directory search). They automatically start and reuse a per-project background service that rebuilds when inputs change; pass `--direct` to run in the CLI process instead. Project loading reads only regular files: a source, `tsconfig.json`, or `package.json` that is a pipe, device, or socket is refused with `PATH: not a regular file` (exit `2`), never read.
 
 ### `--type`
 Inspects the type of a selected declaration (`--name`) or token (`--at`) in a project.
@@ -114,7 +114,7 @@ tsparse --type --project tsconfig.json --at src/host.ts:42:10
 tsparse --type --project tsconfig.json --name createRunHost --expand --depth 2 --json
 ```
 
-### `--references` (alias: `--references-direct`)
+### `--references`
 Finds and groups all declarations and occurrences of a symbol across a project, following import/export aliases and keeping shadowed bindings in separate groups.
 
 ```sh
@@ -254,7 +254,7 @@ tsparse --doctor [--project TSCONFIG] [--json [--pretty]]
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `TSPARSE_MAX_MEMORY_MB` | `6144` | Positive integer MiB memory ceiling for read-only queries (macOS/Linux). |
+| `TSPARSE_MAX_MEMORY_MB` | `6144` | Positive integer MiB memory ceiling for read-only queries. |
 | `TSPARSE_QUERY_TIMEOUT_MS` | `60000` | Positive integer millisecond deadline for read-only queries. |
 | `TSPARSE_SERVICE_IDLE_SECS` | `600` | Positive integer idle timeout in seconds before a background service exits. |
 | `TSPARSE_SERVICE_DIR` | `/tmp/tsparse-<UID>` | Private runtime directory (must be owned by current user with mode `0700`). |

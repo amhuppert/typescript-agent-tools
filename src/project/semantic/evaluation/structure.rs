@@ -9,7 +9,7 @@ use super::{Evaluator, facts::TypeFacts};
 use crate::analysis::SemanticFailureReason;
 use crate::project::binding::NativePropertyKey;
 use crate::references::Location;
-use crate::resources::FixedMap;
+use std::collections::HashMap;
 use std::sync::Arc;
 
 mod composite;
@@ -64,27 +64,27 @@ pub(super) enum RawPropertyLookup {
 }
 
 pub(super) struct StructureState {
-    pub(super) members: FixedMap<TypeId, MembersState>,
+    pub(super) members: HashMap<TypeId, MembersState>,
     // Absence, installed nil and present-empty are distinct native table states.
-    pub(super) member_tables: FixedMap<TypeId, Option<MemberTable>>,
+    pub(super) member_tables: HashMap<TypeId, Option<MemberTable>>,
     // `getApparentTypeOfIntersectionType` uses the intersection's own slot
     // when original == intersection, otherwise a cache keyed by original.
     // Those key domains are disjoint; one map retains both native identities.
-    apparent_intersections: FixedMap<TypeId, NativeCompletion<TypeId>>,
-    generic_flags: FixedMap<TypeId, NativeCompletion<(bool, bool)>>,
-    reduced: FixedMap<TypeId, NativeCompletion<TypeId>>,
-    regular_objects: FixedMap<TypeId, Result<TypeId, DemandError>>,
+    apparent_intersections: HashMap<TypeId, NativeCompletion<TypeId>>,
+    generic_flags: HashMap<TypeId, NativeCompletion<(bool, bool)>>,
+    reduced: HashMap<TypeId, NativeCompletion<TypeId>>,
+    regular_objects: HashMap<TypeId, Result<TypeId, DemandError>>,
 }
 
 impl StructureState {
     pub(super) fn new() -> Self {
         Self {
-            members: FixedMap::new(),
-            member_tables: FixedMap::new(),
-            apparent_intersections: FixedMap::new(),
-            generic_flags: FixedMap::new(),
-            reduced: FixedMap::new(),
-            regular_objects: FixedMap::new(),
+            members: HashMap::new(),
+            member_tables: HashMap::new(),
+            apparent_intersections: HashMap::new(),
+            generic_flags: HashMap::new(),
+            reduced: HashMap::new(),
+            regular_objects: HashMap::new(),
         }
     }
 }
@@ -295,7 +295,7 @@ impl Evaluator<'_, '_> {
             .raw_member_entry(
                 ty,
                 members,
-                &NativePropertyKey::fixed(name.as_bytes(), self.control.as_ref()),
+                &NativePropertyKey::fixed(name.as_bytes()),
                 consumer,
             )?
             .is_some())

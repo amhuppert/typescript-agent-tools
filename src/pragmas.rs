@@ -86,7 +86,7 @@ pub(crate) fn references_controlled<'s>(
                     return Some(Err(stop));
                 }
             };
-            match Reference::parse(comment, control) {
+            match Reference::parse(comment) {
                 Ok(Some(reference)) => return Some(Ok(reference)),
                 Ok(None) => {}
                 Err(stop) => {
@@ -103,7 +103,7 @@ impl<'s> Reference<'s> {
     /// case. Attributes follow as `name = "value"` or `name = 'value'`, with
     /// optional spaces or tabs around each part, until the first text that is
     /// not one; the rest of the comment, including any `/>`, is ignored.
-    fn parse(comment: Comment<'s>, _control: Option<&Control>) -> Result<Option<Self>, Stop> {
+    fn parse(comment: Comment<'s>) -> Result<Option<Self>, Stop> {
         let Some(body) = comment.text.strip_prefix("///") else {
             return Ok(None);
         };

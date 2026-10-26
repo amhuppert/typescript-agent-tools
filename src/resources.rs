@@ -6,7 +6,6 @@ use std::rc::Rc;
 
 mod checked_map;
 pub(crate) use checked_map::{CheckedKey, CheckedMap};
-pub(crate) use std::collections::HashMap as FixedMap;
 
 struct RequestAbort(Stop);
 pub(crate) fn complete_or_abort<T>(result: Result<T, Stop>) -> T {
@@ -111,7 +110,5 @@ impl Drop for DepthGuard {
 /// Exact bytes with a length prefix separating adjacent identity fields.
 pub(crate) fn hash_bytes<H: std::hash::Hasher>(bytes: &[u8], state: &mut H) {
     bytes.len().hash(state);
-    for chunk in bytes.chunks(1024) {
-        state.write(chunk);
-    }
+    state.write(bytes);
 }

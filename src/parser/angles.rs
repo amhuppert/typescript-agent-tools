@@ -96,7 +96,6 @@ impl Angles {
                     for offset in token.start..token.start + token.raw.len() {
                         open.push((offset, brackets.len()));
                         (levels.last_mut().unwrap()).push(offset);
-                        self.angles.reserve(1);
                         self.angles.insert(
                             offset,
                             Angle {
@@ -174,8 +173,6 @@ impl Angles {
         match self.greater.last() {
             Some(&last) if last >= offset => {
                 if let Err(index) = self.greater.binary_search(&offset) {
-                    self.greater.reserve(1);
-
                     self.greater.insert(index, offset);
                 }
             }

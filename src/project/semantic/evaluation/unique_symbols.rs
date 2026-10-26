@@ -5,19 +5,19 @@ use super::super::source::{CallRecipe, DeclarationIdentity, ExpressionRoot};
 use super::Evaluator;
 use crate::project::binding::{NativePropertyKey, NativePropertyKeyKind, NativeSymbolIdentity};
 use crate::references::Location;
-use crate::resources::FixedMap;
 use crate::types::PrimitiveName;
+use std::collections::HashMap;
 
 pub(super) struct UniqueSymbolsState {
-    symbols: FixedMap<NativeSymbolIdentity, TypeId>,
-    nodes: FixedMap<ExpressionRoot, NativeCompletion<TypeId>>,
+    symbols: HashMap<NativeSymbolIdentity, TypeId>,
+    nodes: HashMap<ExpressionRoot, NativeCompletion<TypeId>>,
 }
 
 impl UniqueSymbolsState {
     pub(super) fn new() -> Self {
         Self {
-            symbols: FixedMap::new(),
-            nodes: FixedMap::new(),
+            symbols: HashMap::new(),
+            nodes: HashMap::new(),
         }
     }
 }
@@ -45,8 +45,8 @@ impl Evaluator<'_, '_> {
     }
 
     /// Owned scalar key projection preserves the existing exact UTF-8
-    /// admission rule. Copying and indivisible validation use this request's
-    /// controller; invalid native bytes remain Unsupported, never replacement.
+    /// admission rule. Validation runs on an owned copy before the request's
+    /// `Control::check`; invalid native bytes remain Unsupported, never replacement.
     fn property_key_text(
         &self,
         bytes: &[u8],
@@ -79,7 +79,7 @@ impl Evaluator<'_, '_> {
         consumer: &Location,
     ) -> Result<crate::types::TypeKey, DemandError> {
         use crate::types::TypeKey;
-        match key.kind(self.control.as_ref()) {
+        match key.kind() {
             NativePropertyKeyKind::Fixed(bytes) => Ok(TypeKey::String {
                 name: self.property_key_text(
                     bytes,
@@ -145,7 +145,7 @@ impl Evaluator<'_, '_> {
             // ast.GetSymbolId is acquired at generated-name construction. The
             // documented request-local ordering policy observes that same point.
             self.model.observe_symbol_identity(identity);
-            let key = NativePropertyKey::unique(identity, underlying, self.control.as_ref());
+            let key = NativePropertyKey::unique(identity, underlying);
             let symbol = self.type_symbol_of_reference(symbol, consumer)?;
             let ty = self.model.new_unique_es_symbol_type(symbol, key);
             self.unique_symbols.symbols.insert(identity, ty);

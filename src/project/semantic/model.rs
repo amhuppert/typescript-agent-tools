@@ -980,8 +980,8 @@ pub(super) struct SignatureData {
 
 /// Factory input distinguishes an already-shared native field snapshot from
 /// owned storage. Conversion to this carrier never allocates; `newSignature`
-/// publishes owned arrays through its existing controller. Acquisition owns
-/// the original Vec and its children. No controller enters immutable handles.
+/// shares owned arrays through `into_shared`. Acquisition owns the original
+/// Vec and its children.
 pub(super) enum SignatureSlice<T> {
     Owned(Vec<T>),
     Shared(Arc<[T]>),
@@ -997,7 +997,7 @@ impl<T> From<Arc<[T]>> for SignatureSlice<T> {
     }
 }
 impl<T> SignatureSlice<T> {
-    fn into_shared(self, _control: Option<&crate::resources::Control>) -> Arc<[T]> {
+    fn into_shared(self) -> Arc<[T]> {
         match self {
             Self::Owned(values) => std::sync::Arc::from(values),
             Self::Shared(values) => values,
@@ -1336,8 +1336,7 @@ pub(super) enum PropertyValueQuestion {
 }
 
 /// Keep failure-only payload out of every successful native completion/cache
-/// slot. The payload and semantic error have separate boxes; controlled recovery
-/// copies account for both. Ordinary Clone retains its caller's accounting duty.
+/// slot. The payload and semantic error have separate boxes.
 #[derive(Clone)]
 pub(super) struct DemandError {
     payload: Box<DemandErrorPayload>,
@@ -1714,8 +1713,6 @@ impl Model {
         if let Some(&ty) = self.error_alias_types.get(&key) {
             return ty;
         }
-        self.intrinsic_aliases.reserve(1);
-
         let ty = self.push(Type::Special(SpecialName::Any));
         self.intrinsic_aliases.insert(ty, Arc::new(alias));
         self.error_alias_types.insert(key, ty);
@@ -1751,7 +1748,7 @@ impl Model {
     /// A semantic key write observes identity without exposing numeric ranks
     /// or sharing mutable order with another Project request.
     pub(super) fn observe_symbol_identity(&self, identity: NativeSymbolIdentity) {
-        self.symbol_order.observe(identity, self.control.as_ref());
+        self.symbol_order.observe(identity);
     }
 
     pub(super) fn compare_native_symbols(
@@ -1942,10 +1939,7 @@ impl Model {
         self.union_sorted(vec![number, bigint]);
         // getTemplateLiteralType(["", ""], [number]) is already normalized.
         self.numeric_string = Some(self.template_literal(
-            vec![
-                LiteralValue::from_text("", self.control.as_ref()),
-                LiteralValue::from_text("", self.control.as_ref()),
-            ],
+            vec![LiteralValue::from_text(""), LiteralValue::from_text("")],
             vec![number],
         ));
         let undefined = self.special(SpecialName::Undefined);
@@ -1964,8 +1958,8 @@ impl Model {
                 None,
                 None,
                 &HashMap::new(),
-                &TypeListCache::new(self.control.clone()),
-                &TypeListCache::new(self.control.clone()),
+                &TypeListCache::new(),
+                &TypeListCache::new(),
             ) {
                 Ok(ty) => ty,
                 Err(_) => unreachable!("primitive startup union has no semantic dependencies"),
@@ -2293,10 +2287,8 @@ impl Model {
         }
         // The target is its own reference at its outer/local parameters. The
         // synthetic this argument belongs to mapper padding, not this key.
-        self.references.insert(
-            ReferenceKey::new(id, actual_arguments, self.control.as_ref()),
-            id,
-        );
+        self.references
+            .insert(ReferenceKey::new(id, actual_arguments), id);
         Ok(view)
     }
 
@@ -2801,8 +2793,8 @@ impl Model {
             )
             .into());
         }
-        let parameters = { data.parameters.into_shared(self.control.as_ref()) };
-        let origins = { data.origins.into_shared(self.control.as_ref()) };
+        let parameters = { data.parameters.into_shared() };
+        let origins = { data.origins.into_shared() };
 
         let id = SignatureId(self.signatures);
         self.signatures = self.signatures.checked_add(1).ok_or_else(|| {
@@ -3072,7 +3064,7 @@ impl Model {
         base: PrimitiveName,
         value: impl AsRef<str>,
     ) -> TypeId {
-        self.intern_regular_literal(base, LiteralValue::from_text(value, self.control.as_ref()))
+        self.intern_regular_literal(base, LiteralValue::from_text(value))
     }
 
     /// `getStringLiteralType` accepts an exact native value, including generated
@@ -3261,7 +3253,7 @@ impl Model {
                 if a != b || *a == PrimitiveName::Number && av.equals_text("NaN") {
                     Ok(false)
                 } else {
-                    av.semantic_equal(bv, self.control.as_ref())
+                    av.semantic_equal(bv)
                 }
             }
             _ => Ok(false),
@@ -3578,8 +3570,6 @@ impl Model {
         if low == types.len() || self.compare_types(types[low], ty)? != Ordering::Equal {
             // Binary search has already observed every semantic comparator.
             // The remaining move is plain TypeId storage.
-
-            types.reserve(1);
             types.insert(low, ty);
         }
         Ok(())
@@ -3723,7 +3713,7 @@ impl Model {
                     ..
                 },
                 Type::Literal { value: b, .. },
-            ) => a.compare_value(b, self.control.as_ref())?,
+            ) => a.compare_value(b)?,
             (
                 Type::Literal {
                     base: PrimitiveName::Number,
@@ -3771,7 +3761,7 @@ impl Model {
             (Type::TemplateLiteral(a), Type::TemplateLiteral(b)) => {
                 let mut texts = Ordering::Equal;
                 for (a, b) in a.texts.iter().zip(b.texts.iter()) {
-                    texts = a.compare_value(b, self.control.as_ref())?;
+                    texts = a.compare_value(b)?;
                     if texts != Ordering::Equal {
                         break;
                     }
@@ -4514,7 +4504,7 @@ impl Model {
         }
         let id = self.structured(
             TypeSymbol::Synthetic {
-                native: NativeSymbol::empty_type_literal(self.control.as_ref()),
+                native: NativeSymbol::empty_type_literal(),
                 flags: TypeSymbolFlags {
                     type_literal: true,
                     ..TypeSymbolFlags::default()
@@ -4823,9 +4813,8 @@ impl Model {
     }
 
     /// `newTypeMapper` and its specialized factories allocate a fresh identity.
-    /// All mapper variants share one arena publication and reservation owner.
+    /// All mapper variants share one arena publication owner.
     fn push_mapper(&mut self, mapper: Mapper) -> MapperId {
-        self.mappers.reserve(1);
         let id = MapperId(self.mappers.len());
         self.mappers.push(mapper);
         id
@@ -4839,14 +4828,6 @@ impl Model {
     /// on every fresh identity. Eager objects then install their own completed
     /// inventory, as `newAnonymousType` / `setStructuredTypeMembers` do.
     fn push_with_flags(&mut self, ty: Type, input_flags: ObjectFlags) -> TypeId {
-        // Reserve every aligned arena before publishing any length or TypeId.
-        // A denied later reservation can leave spare capacity, never a partial
-        // type. Cumulative replacement allocations are intentionally retained.
-
-        self.types.reserve(1);
-        self.symbols.reserve(1);
-        self.object_flags.reserve(1);
-        self.type_mappers.reserve(1);
         let id = TypeId(self.types.len());
         let flags = match &ty {
             Type::WideningNull | Type::WideningUndefined | Type::NonInferrableAny => {

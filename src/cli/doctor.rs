@@ -15,7 +15,6 @@ use super::delivery::{self, Delivered, Delivery, FINDINGS, Route};
 use super::registry::{FlagId, OperationId};
 use super::request::Doctor;
 use crate::process_limits::{self, Environment, Limits, Setting};
-#[cfg(unix)]
 use crate::service::{self, Status};
 use serde_json::{Value, json};
 use std::io;
@@ -108,44 +107,40 @@ pub(crate) fn run(request: &Doctor) -> Result<(), Delivered> {
 
 /// Every check, in order.
 fn checks(project: Option<&str>) -> Vec<Check> {
-    let mut checks = vec![build(), environment()];
-    #[cfg(unix)]
-    checks.push(Check {
-        name: "runtime directory",
-        outcome: service::inspect_directory(project).map_err(|failure| (&failure).into()),
-    });
+    let mut checks = vec![
+        build(),
+        environment(),
+        Check {
+            name: "runtime directory",
+            outcome: service::inspect_directory(project).map_err(|failure| (&failure).into()),
+        },
+    ];
     if let Some(config) = project {
         checks.push(configuration(config));
-        #[cfg(unix)]
-        {
-            let status = service::observe(config);
-            checks.push(service_check(config, &status));
-            checks.push(service_limits(config, &status));
-        }
+        let status = service::observe(config);
+        checks.push(service_check(config, &status));
+        checks.push(service_limits(config, &status));
     }
     checks
 }
 
 /// The build stamp and what this build can do on its platform: the
-/// project service, compiled on Unix (`main.rs`); applying a plan, which
-/// the library's `editing::file` supports on macOS and Linux and refuses
-/// elsewhere; and memory monitoring, which every query's watchdog needs,
-/// asked of `process_limits` by sampling this process.
+/// project service and applying a plan, which every build has, as the
+/// crate builds only on macOS and Linux (ENVELOPE.md); and memory
+/// monitoring, which every query's watchdog needs, asked of
+/// `process_limits` by sampling this process.
 fn build() -> Check {
     build_with(process_limits::memory_footprint())
 }
 
 /// The build check, given what sampling this process's memory gave.
 fn build_with(memory: io::Result<u64>) -> Check {
-    let answer = |supported: bool| if supported { "yes" } else { "no" };
     let detail = format!(
-        "{} on {} {}: project service {}, {} {}",
+        "{} on {} {}: project service yes, {} yes",
         super::version(),
         std::env::consts::OS,
         std::env::consts::ARCH,
-        answer(cfg!(unix)),
         FlagId::Apply,
-        answer(cfg!(any(target_os = "macos", target_os = "linux")))
     );
     Check {
         name: "build",
@@ -220,42 +215,29 @@ fn configuration(config: &str) -> Check {
 }
 
 /// The configuration's absolute spelling, as its service is keyed.
-#[cfg(unix)]
 fn absolute(config: &str) -> Result<PathBuf, Failure> {
     service::absolute(config)
 }
 
-#[cfg(not(unix))]
-fn absolute(config: &str) -> Result<PathBuf, Failure> {
-    std::path::absolute(config).map_err(|error| {
-        Failure::new(
-            super::failure::Code::Read,
-            format!("{config}: its absolute path cannot be established: {error}"),
-        )
-    })
-}
-
-/// Read `path` to its end, as a regular file, without waiting on another
-/// kind of file such as a pipe.
+/// Read `path` to its end when it names a regular file, following symbolic
+/// links as loading does. Another kind of file, such as a pipe an open would
+/// wait on, is refused before it is opened (ENVELOPE.md, "Accepted inputs");
+/// a path replaced by a pipe between the check and the open can block, which
+/// ENVELOPE.md accepts.
 fn readable(path: &Path) -> io::Result<()> {
-    #[cfg(unix)]
-    let mut file = crate::nonblocking::open_without_waiting(path)?;
-    #[cfg(not(unix))]
-    let mut file = std::fs::File::open(path)?;
-    if !file.metadata()?.is_file() {
+    if !std::fs::metadata(path)?.is_file() {
         return Err(io::Error::new(
             io::ErrorKind::InvalidInput,
             "not a regular file",
         ));
     }
-    io::copy(&mut file, &mut io::sink())?;
+    io::copy(&mut std::fs::File::open(path)?, &mut io::sink())?;
     Ok(())
 }
 
 /// Whether the project's service runs, and if so what it reports of
 /// itself, whose build must be this one; and if not, what an earlier start
 /// left that the next start removes (`service::leftovers`).
-#[cfg(unix)]
 fn service_check(config: &str, status: &Result<Status, Failure>) -> Check {
     let outcome = match status {
         Err(failure) => Err(failure.into()),
@@ -303,7 +285,6 @@ fn named(limits: &Limits) -> String {
 /// The limits the running service inherited beside this environment's: a
 /// service keeps the environment it started with, so a difference is a
 /// finding whose remedy is to stop it.
-#[cfg(unix)]
 fn service_limits(config: &str, status: &Result<Status, Failure>) -> Check {
     let finding = |detail: String| Check {
         name: "service limits",

@@ -13,11 +13,12 @@ use crate::project::semantic::model::{
 use crate::project::semantic::source::DeclarationReference;
 use crate::references::Location;
 use crate::syntax_kind::SyntaxKind;
+use std::collections::HashMap;
 
 pub(super) struct MemberValuesState {
     pub(super) symbols: super::property_symbols::PropertySymbols,
-    pub(super) writes: crate::resources::FixedMap<BoundSymbol, TypeState>,
-    serialization_ids: crate::resources::FixedMap<PropertySymbolId, PropertySerializationId>,
+    pub(super) writes: HashMap<BoundSymbol, TypeState>,
+    serialization_ids: HashMap<PropertySymbolId, PropertySerializationId>,
     serialization: Vec<Serialization>,
 }
 
@@ -27,8 +28,8 @@ impl MemberValuesState {
     pub(super) fn new() -> Self {
         Self {
             symbols: super::property_symbols::PropertySymbols::new(),
-            writes: crate::resources::FixedMap::new(),
-            serialization_ids: crate::resources::FixedMap::new(),
+            writes: HashMap::new(),
+            serialization_ids: HashMap::new(),
             serialization: Default::default(),
         }
     }

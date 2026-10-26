@@ -12,17 +12,18 @@ use crate::Span;
 use crate::analysis::SemanticFailureReason;
 use crate::project::binding::NativeSymbolIdentity;
 use crate::references::Location;
-use crate::resources::{CheckedKey, CheckedMap, FixedMap};
+use crate::resources::{CheckedKey, CheckedMap};
+use std::collections::HashMap;
 
 pub(super) struct AliasesState {
-    parameters: FixedMap<NativeSymbolIdentity, NativeResult<Vec<TypeId>>>,
+    parameters: HashMap<NativeSymbolIdentity, NativeResult<Vec<TypeId>>>,
     instantiations: CheckedMap<InstantiationKey, NativeResult<TypeId>>,
 }
 
 impl AliasesState {
     pub(super) fn new() -> Self {
         Self {
-            parameters: FixedMap::new(),
+            parameters: HashMap::new(),
             instantiations: CheckedMap::new(),
         }
     }

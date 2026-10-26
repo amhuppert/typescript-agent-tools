@@ -72,8 +72,8 @@ fn cases(_metric: Option<bool>) {
         });
         let query = |limits| {
             worker_with_limits(&fixture.project, limits, |parser, control| {
-                // Keep the public query's failure as the value so the test can inspect
-                // successful charges before its return. Private resource aborts still
+                // Keep the public query's failure as the value so the test can also
+                // inspect the request's depth usage. Private resource aborts still
                 // terminate the worker and become the outer error.
                 let answer = type_of_here(&fixture.project, &request, parser, control.clone());
                 Ok((answer, control.usage()))

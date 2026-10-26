@@ -49,7 +49,6 @@ own documents, described in each operation's document.
 | `usage.operands` | usage | The FILE operands do not fit the operation: more than one, stdin where it reads files by name, none where it needs one, or one beside --at FILE:LINE:COLUMN. |
 | `usage.output` | usage | An editing command cannot write its result or plan at the path given: it exists, names the other output or a file the command reads or edits, or cannot be inspected. |
 | `usage.environment` | usage | A TSPARSE_* variable holds a value it does not accept. |
-| `usage.platform` | usage | The operation is not available on this platform. |
 | `input.read` | input | An input the request names cannot be read: the file to parse, stdin, a fragment, or a batch file. |
 | `input.batch` | input | A batch file is not JSON, or not a valid edit batch: each issue is named by its JSON path, and next prints the batch format. |
 | `transport.directory` | transport | The service's runtime directory cannot be created or inspected, or is not a private directory owned by this user with mode 0700; next or remedy says how to fix it. |
@@ -254,7 +253,6 @@ tsparse --references --project TSCONFIG (--at LINE:COLUMN FILE | --at FILE:LINE:
 | Flag | Summary |
 | --- | --- |
 | `--references` | Group a symbol's declarations and occurrences in one project. |
-| `--references-direct` | --references --direct in one flag. |
 | `--project TSCONFIG` | The project's configuration file, as spelled; no ancestor directory is searched. |
 | `--direct` | Load a fresh project in this process instead of asking the project's service. |
 | `--at [FILE:]LINE:COLUMN` | Select by position: a one-based line and UTF-16 column, in FILE or the FILE operand. |
@@ -277,7 +275,7 @@ Examples:
 - `tsparse --references --project tsconfig.json --name run src/app.ts --file src/api.ts`: Only the candidates declared in src/app.ts (the FILE operand), and only their occurrences in src/api.ts (--file).
 - `tsparse --references --project tsconfig.json --name RunHost.observe --calls --no-tests`: A member, by containment: its calls outside test paths.
 - `tsparse --references --project tsconfig.json --at 12:8 src/app.ts --pretty`: The symbol at a position, as the indented document --pretty writes without --json.
-- `tsparse --references-direct --project tsconfig.json --at src/app.ts:12:8`: --references --direct: answered in this process.
+- `tsparse --references --direct --project tsconfig.json --at src/app.ts:12:8`: Answered in this process instead of by the project's service.
 
 | Exit | Reports |
 | --- | --- |
@@ -447,12 +445,11 @@ Report the state of the project's service; it loads nothing, does not check fres
 tsparse --references-status --project TSCONFIG [--json] [--pretty] [--output OUTPUT]
 ```
 
---references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, and --outline, --show, and edits with --project. On macOS and Linux, project queries reuse one service per configuration spelling and build, started automatically, which reloads the project when its inputs change. Status prints running: with the service's pid, generation (the number of snapshots it has published), build, idle timeout, and the idle time it has left, then limits: with the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with; or no service: TSCONFIG. --json prints the document instead: running, pid, generation, build, limits (max_memory_mb, query_timeout_ms), idle_secs, idle_remaining_secs, and started_unix; without a service running is false, generation 0, and every other field null; --pretty, with or without --json, prints it indented. It reads only TSPARSE_SERVICE_DIR, the private runtime directory (default /tmp/tsparse-UID, owned by this user with mode 0700). A service action implies --references, so --references beside it changes nothing.
+--references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, and --outline, --show, and edits with --project. On macOS and Linux, project queries reuse one service per configuration spelling and build, started automatically, which reloads the project when its inputs change. Status prints running: with the service's pid, generation (the number of snapshots it has published), build, idle timeout, and the idle time it has left, then limits: with the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with; or no service: TSCONFIG. --json prints the document instead: running, pid, generation, build, limits (max_memory_mb, query_timeout_ms), idle_secs, idle_remaining_secs, and started_unix; without a service running is false, generation 0, and every other field null; --pretty, with or without --json, prints it indented. It reads only TSPARSE_SERVICE_DIR, the private runtime directory (default /tmp/tsparse-UID, owned by this user with mode 0700).
 
 | Flag | Summary |
 | --- | --- |
 | `--references-status` | Report whether the project's service is running. |
-| `--references` | Group a symbol's declarations and occurrences in one project. |
 | `--project TSCONFIG` | The project's configuration file, as spelled; no ancestor directory is searched. |
 | `--json` | Write one result document, also for a failure the analysis reports. |
 | `--pretty` | Indent JSON output: alone where the output is JSON, and with --json elsewhere. |
@@ -482,19 +479,16 @@ Stop the project's service and release its cache.
 tsparse --references-stop --project TSCONFIG
 ```
 
---references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, and --outline, --show, and edits with --project. It prints stopped: pid N when it stopped a service, or no service: TSCONFIG when none was running, on stdout. The next project query starts a new service. A service keeps the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with, so stop it after changing them; --doctor --project TSCONFIG reports a service whose limits differ from this environment's. It reads only TSPARSE_SERVICE_DIR. --pretty and --output change nothing, and like every service action it implies --references, which beside it changes nothing.
+--references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, and --outline, --show, and edits with --project. It prints stopped: pid N when it stopped a service, or no service: TSCONFIG when none was running, on stdout. The next project query starts a new service. A service keeps the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with, so stop it after changing them; --doctor --project TSCONFIG reports a service whose limits differ from this environment's. It reads only TSPARSE_SERVICE_DIR.
 
 | Flag | Summary |
 | --- | --- |
 | `--references-stop` | Stop the project's service. |
-| `--references` | Group a symbol's declarations and occurrences in one project. |
 | `--project TSCONFIG` | The project's configuration file, as spelled; no ancestor directory is searched. |
-| `--pretty` | Indent JSON output: alone where the output is JSON, and with --json elsewhere. |
-| `-o, --output OUTPUT` | Write the result to OUTPUT instead of stdout; editing writes it only as a new file. |
 | `-h, --help` | Print help and exit. |
 | `-V, --version` | Print the version and exit. |
 
-A value flag given more than once takes its last value. --pretty is valid without --json.
+A value flag given more than once takes its last value.
 
 Examples:
 
@@ -515,19 +509,16 @@ Run the project's service in the foreground, for a supervisor, until it is idle.
 tsparse --references-serve --project TSCONFIG
 ```
 
---references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, and --outline, --show, and edits with --project. A service exits after TSPARSE_SERVICE_IDLE_SECS idle seconds (default 600). Its runtime directory is TSPARSE_SERVICE_DIR (default /tmp/tsparse-UID): owned by this user with mode 0700, and short enough for a socket path of about 100 bytes. Its queries run under TSPARSE_MAX_MEMORY_MB (default 6144 MiB) and TSPARSE_QUERY_TIMEOUT_MS (default 60000); a limit failure exits the service and the next request starts a replacement, and memory sampling can overshoot. TSPARSE_SERVICE_IDLE_SECS, TSPARSE_MAX_MEMORY_MB, and TSPARSE_QUERY_TIMEOUT_MS must each be a positive integer. It prints nothing but a failure, so --pretty and --output change nothing, and like every service action it implies --references, which beside it changes nothing.
+--references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, and --outline, --show, and edits with --project. A service exits after TSPARSE_SERVICE_IDLE_SECS idle seconds (default 600). Its runtime directory is TSPARSE_SERVICE_DIR (default /tmp/tsparse-UID): owned by this user with mode 0700, and short enough for a socket path of about 100 bytes. Its queries run under TSPARSE_MAX_MEMORY_MB (default 6144 MiB) and TSPARSE_QUERY_TIMEOUT_MS (default 60000); a limit failure exits the service and the next request starts a replacement, and memory sampling can overshoot. TSPARSE_SERVICE_IDLE_SECS, TSPARSE_MAX_MEMORY_MB, and TSPARSE_QUERY_TIMEOUT_MS must each be a positive integer. It prints nothing but a failure.
 
 | Flag | Summary |
 | --- | --- |
 | `--references-serve` | Run the project's service in the foreground. |
-| `--references` | Group a symbol's declarations and occurrences in one project. |
 | `--project TSCONFIG` | The project's configuration file, as spelled; no ancestor directory is searched. |
-| `--pretty` | Indent JSON output: alone where the output is JSON, and with --json elsewhere. |
-| `-o, --output OUTPUT` | Write the result to OUTPUT instead of stdout; editing writes it only as a new file. |
 | `-h, --help` | Print help and exit. |
 | `-V, --version` | Print the version and exit. |
 
-A value flag given more than once takes its last value. --pretty is valid without --json.
+A value flag given more than once takes its last value.
 
 Examples:
 
@@ -595,7 +586,6 @@ Related: [references-status](#references-status), [references-stop](#references-
 | `--doctor` | refused | Check what project queries depend on, one line per check. |
 | `--project TSCONFIG` | as the operation says | The project's configuration file, as spelled; no ancestor directory is searched. |
 | `--direct` | stays on | Load a fresh project in this process instead of asking the project's service. |
-| `--references-direct` | stays on | --references --direct in one flag. |
 | `--at [FILE:]LINE:COLUMN` | as the operation says | Select by position: a one-based line and UTF-16 column, in FILE or the FILE operand. |
 | `--name NAME` | as the operation says | Select by exact declared name; a dotted name such as RunHost.run selects by containment. |
 | `--depth DEPTH` | as the operation says | Outline levels to show (N or all, default 2), or type edges to expand (0 through 32, default 3). |

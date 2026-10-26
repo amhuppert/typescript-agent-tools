@@ -14,16 +14,13 @@ use crate::types::PrimitiveName;
 pub(in crate::project::semantic::evaluation) fn definitely_unrelated(
     source: &TemplateLiteralView,
     target: &TemplateLiteralView,
-    control: Option<&crate::resources::Control>,
 ) -> Result<bool, LiteralError> {
-    Ok(
-        !source.texts[0].compatible_prefix(&target.texts[0], control)?
-            || !source
-                .texts
-                .last()
-                .expect("template has a tail")
-                .compatible_suffix(target.texts.last().expect("template has a tail"), control)?,
-    )
+    Ok(!source.texts[0].compatible_prefix(&target.texts[0])?
+        || !source
+            .texts
+            .last()
+            .expect("template has a tail")
+            .compatible_suffix(target.texts.last().expect("template has a tail"))?)
 }
 
 impl Evaluator<'_, '_> {
@@ -52,7 +49,7 @@ impl Evaluator<'_, '_> {
                     // Native slices.Equal is a semantic string observation. An
                     // unequal structural cache key cannot reject opaque spellings.
                     let equal_texts = source
-                        .semantic_texts_equal(target, self.control.as_ref())
+                        .semantic_texts_equal(target)
                         .map_err(|error| self.literal_value_failure(error, consumer))?;
                     if !equal_texts {
                         return sequence.read(self.infer_literal_parts_completion(
@@ -105,11 +102,7 @@ impl Evaluator<'_, '_> {
             return Ok(NativeCompletion::clean(ty));
         }
         self.template_literal_type_completion(
-            vec![
-                LiteralValue::from_text("", self.control.as_ref()),
-                LiteralValue::from_text("", self.control.as_ref()),
-            ]
-            .into(),
+            vec![LiteralValue::from_text(""), LiteralValue::from_text("")].into(),
             vec![ty],
             consumer,
         )
@@ -130,13 +123,13 @@ impl Evaluator<'_, '_> {
             let last = texts.len() - 1;
             let target_last = target.texts.len() - 1;
             let Some(mut position) = texts[0]
-                .match_prefix_at(texts[0].start(), &target.texts[0], self.control.as_ref())
+                .match_prefix_at(texts[0].start(), &target.texts[0])
                 .map_err(|error| self.literal_value_failure(error, consumer))?
             else {
                 return Ok(None);
             };
             let Some(end) = texts[last]
-                .match_suffix(&target.texts[target_last], self.control.as_ref())
+                .match_suffix(&target.texts[target_last])
                 .map_err(|error| self.literal_value_failure(error, consumer))?
             else {
                 return Ok(None);
@@ -148,7 +141,7 @@ impl Evaluator<'_, '_> {
             }
             let mut texts = texts.to_vec();
             texts[last] = texts[last]
-                .slice(texts[last].start(), end, self.control.as_ref())
+                .slice(texts[last].start(), end)
                 .map_err(|error| self.literal_value_failure(error, consumer))?;
             let mut segment = 0;
             let mut result = Vec::with_capacity(target.types.len());
@@ -158,7 +151,7 @@ impl Evaluator<'_, '_> {
                     let mut start = position;
                     loop {
                         if let Some((at, after)) = texts[next]
-                            .index_from(start, delimiter, self.control.as_ref())
+                            .index_from(start, delimiter)
                             .map_err(|error| self.literal_value_failure(error, consumer))?
                         {
                             break (next, at, after);
@@ -170,7 +163,7 @@ impl Evaluator<'_, '_> {
                         start = texts[next].start();
                     }
                 } else if let Some(next) = texts[segment]
-                    .next_rune(position, self.control.as_ref())
+                    .next_rune(position)
                     .map_err(|error| self.literal_value_failure(error, consumer))?
                 {
                     (segment, next, next)
@@ -194,7 +187,7 @@ impl Evaluator<'_, '_> {
                 &texts,
                 types,
                 (segment, position),
-                (last, texts[last].end(self.control.as_ref())),
+                (last, texts[last].end()),
                 consumer,
             ))?);
             Ok(Some(result))
@@ -215,28 +208,23 @@ impl Evaluator<'_, '_> {
         let next_text = &texts[next_segment];
         if segment == next_segment {
             let value = next_text
-                .slice(position, next_position, self.control.as_ref())
+                .slice(position, next_position)
                 .map_err(|error| self.literal_value_failure(error, consumer))?;
             return Ok(NativeCompletion::clean(
-                self.model.regular_string_literal_value(
-                    value.combine_surrogate_pairs(self.control.as_ref()),
-                ),
+                self.model
+                    .regular_string_literal_value(value.combine_surrogate_pairs()),
             ));
         }
         let mut result = Vec::with_capacity(next_segment - segment + 1);
         result.push(
             texts[segment]
-                .slice(
-                    position,
-                    texts[segment].end(self.control.as_ref()),
-                    self.control.as_ref(),
-                )
+                .slice(position, texts[segment].end())
                 .map_err(|error| self.literal_value_failure(error, consumer))?,
         );
         result.extend(texts[segment + 1..next_segment].iter().cloned());
         result.push(
             next_text
-                .slice(next_text.start(), next_position, self.control.as_ref())
+                .slice(next_text.start(), next_position)
                 .map_err(|error| self.literal_value_failure(error, consumer))?,
         );
         self.template_literal_type_completion(

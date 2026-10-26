@@ -47,7 +47,6 @@ pub(crate) enum Code {
     Operands,
     Output,
     Environment,
-    Platform,
     Read,
     Batch,
     Directory,
@@ -73,7 +72,6 @@ impl Code {
     }
 
     /// The code `name` names, or `None` when none is registered.
-    #[cfg(unix)]
     pub(crate) fn named(name: &str) -> Option<Self> {
         CODES
             .iter()
@@ -177,12 +175,6 @@ pub(crate) static CODES: [CodeEntry; Code::COUNT] = [
         Category::Usage,
         "usage.environment",
         "A TSPARSE_* variable holds a value it does not accept.",
-    ),
-    code(
-        Code::Platform,
-        Category::Usage,
-        "usage.platform",
-        "The operation is not available on this platform.",
     ),
     code(
         Code::Read,

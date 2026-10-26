@@ -28,7 +28,7 @@ pub(crate) fn run(query: Query) -> Result<(), Delivered> {
     };
     // The service protects its own process. Direct/file reads protect this one;
     // edit application has a separate entry and must never be killed mid-write.
-    if cfg!(unix) && matches!(&query.target, Target::Project { direct: false, .. }) {
+    if matches!(&query.target, Target::Project { direct: false, .. }) {
         return deliver_answer(&query, answer(&query.target));
     }
     let answer = crate::process_limits::run(
@@ -91,11 +91,10 @@ fn answer(target: &Target) -> Answer {
     }
 }
 
-/// A project request through the service, unless `direct`; platforms
-/// without the service always answer directly. Either way, the request's
-/// file operand is made absolute here, and diagnostics that name it get
-/// the caller's spelling back (`ProjectRequest::make_absolute`), so the
-/// two entries answer alike from any working directory.
+/// A project request through the service, unless `direct`. Either way,
+/// the request's file operand is made absolute here, and diagnostics that
+/// name it get the caller's spelling back (`ProjectRequest::make_absolute`),
+/// so the two entries answer alike from any working directory.
 pub(crate) fn project(config: &str, mut request: ProjectRequest, direct: bool) -> Answer {
     let spelled = match request.make_absolute() {
         Ok(spelled) => spelled,
@@ -132,19 +131,12 @@ fn one_shot(config: &Path, request: ProjectRequest) -> Result<ProjectResponse, A
     std::mem::ManuallyDrop::new(session).execute(request)
 }
 
-#[cfg(unix)]
 fn service(config: &str, request: ProjectRequest) -> Answer {
     match crate::service::execute(config, request) {
         Ok(response) => Ok(Ok(response)),
         Err(crate::service::Error::Analysis(error)) => Ok(Err(error)),
         Err(crate::service::Error::Unanswered(failure)) => Err(failure),
     }
-}
-
-/// Platforms without the service answer directly.
-#[cfg(not(unix))]
-fn service(config: &str, request: ProjectRequest) -> Answer {
-    here(config, request)
 }
 
 /// The forms of one answer.

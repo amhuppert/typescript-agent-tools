@@ -51,10 +51,6 @@ fn has_tag(text: &str, name: &str) -> bool {
     })
 }
 
-fn work(_control: Option<&Control>) -> Result<(), Stop> {
-    Ok(())
-}
-
 /// The same Unicode escape grammar as ordinary identifier scanning. A failed
 /// grammar match leaves the backslash as an unknown JSDoc token.
 fn escaped_character(text: &str, control: Option<&Control>) -> Result<Option<(char, usize)>, Stop> {
@@ -81,7 +77,6 @@ impl<'s> Lexer<'s> {
     /// whitespace token; CR/LF alone produce NewLineTrivia. Unicode line
     /// characters remain unknown here, although the text scanner stops at them.
     pub(crate) fn next_jsdoc(&mut self, control: Option<&Control>) -> Result<Token<'s>, Stop> {
-        work(control)?;
         let start = self.pos;
         let Some(ch) = self.src[start..].chars().next() else {
             return Ok(self.token(Kind::Eof, start, start, false, None));
@@ -92,7 +87,6 @@ impl<'s> Lexer<'s> {
         match ch {
             '\t' | '\u{b}' | '\u{c}' | ' ' => {
                 while let Some(next) = self.src[self.pos..].chars().next() {
-                    work(control)?;
                     if !whitespace(next) || line_break(next) {
                         break;
                     }
@@ -121,7 +115,6 @@ impl<'s> Lexer<'s> {
             }
             _ if id_start(ch) => {
                 while let Some(next) = self.src[self.pos..].chars().next() {
-                    work(control)?;
                     if !id_continue(next) && next != '-' {
                         break;
                     }
@@ -139,7 +132,6 @@ impl<'s> Lexer<'s> {
 
     fn jsdoc_identifier_parts(&mut self, control: Option<&Control>) -> Result<(), Stop> {
         while let Some(ch) = self.src[self.pos..].chars().next() {
-            work(control)?;
             if id_continue(ch) {
                 self.pos += ch.len_utf8();
             } else if ch == '\\' {
@@ -164,10 +156,8 @@ impl<'s> Lexer<'s> {
         in_backticks: bool,
         control: Option<&Control>,
     ) -> Result<Token<'s>, Stop> {
-        work(control)?;
         let start = self.pos;
         while let Some(ch) = self.src[self.pos..].chars().next() {
-            work(control)?;
             if line_break(ch) || ch == '`' {
                 break;
             }

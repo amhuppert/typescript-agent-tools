@@ -642,6 +642,125 @@ fn an_analysis_failure_document_names_its_effect() {
     assert_eq!(document["error"]["kind"], "Syntax");
 }
 
+/// A target that is not a regular file, is not UTF-8, has another hard
+/// link, or has macOS flags is refused with its own message and exit code.
+#[cfg(unix)]
+#[test]
+fn a_target_that_cannot_be_replaced_is_refused() {
+    let fixture = fixture();
+    let status = Command::new("mkfifo")
+        .arg(fixture.path("pipe.ts"))
+        .status()
+        .unwrap();
+    assert!(status.success());
+    std::fs::write(fixture.path("latin.ts"), b"function start() {}\n\xff\n").unwrap();
+    std::fs::write(fixture.path("linked.ts"), "function start() {}\n").unwrap();
+    std::fs::hard_link(fixture.path("linked.ts"), fixture.path("other.ts")).unwrap();
+    let refused = vec![
+        ("pipe.ts", 1, "Unsupported", "not a regular file"),
+        ("latin.ts", 2, "Io", "stream did not contain valid UTF-8"),
+        (
+            "linked.ts",
+            1,
+            "Unsupported",
+            "the file has 2 hard links; replacing it would separate them",
+        ),
+    ];
+    #[cfg(target_os = "macos")]
+    let refused = {
+        let mut refused = refused;
+        std::fs::write(fixture.path("flagged.ts"), "function start() {}\n").unwrap();
+        let status = Command::new("chflags")
+            .arg("hidden")
+            .arg(fixture.path("flagged.ts"))
+            .status()
+            .unwrap();
+        assert!(status.success());
+        refused.push((
+            "flagged.ts",
+            1,
+            "Unsupported",
+            "the file has flags (0x8000, such as hidden or uchg) that replacing it would drop",
+        ));
+        refused
+    };
+    for (file, code, kind, message) in refused {
+        let output = tsparse(
+            &fixture,
+            &[
+                "--replace-body",
+                "--name",
+                "start",
+                "--from",
+                "body.ts",
+                file,
+                "--json",
+            ],
+        );
+        let document = json(&output, code);
+        assert_eq!(document["outcome"], "error", "{file}: {document}");
+        assert_eq!(document["error"]["kind"], kind, "{file}: {document}");
+        assert_eq!(document["error"]["message"], message, "{file}: {document}");
+    }
+}
+
+/// A target that gains another hard link, other permissions, or macOS flags
+/// after planning is stale when applying, exit 1, with its reason, and is
+/// left unchanged.
+#[cfg(unix)]
+#[test]
+fn a_target_changed_after_planning_is_refused_with_its_reason() {
+    use std::os::unix::fs::PermissionsExt;
+    let changed = "it was replaced, or its permissions or flags changed";
+    type Change = fn(&Fixture);
+    let changes: Vec<(&str, Change, &str)> = vec![
+        (
+            "hard link",
+            |f| std::fs::hard_link(f.path("host.ts"), f.path("other.ts")).unwrap(),
+            "it now has 2 hard links",
+        ),
+        (
+            "permissions",
+            |f| {
+                std::fs::set_permissions(f.path("host.ts"), std::fs::Permissions::from_mode(0o600))
+                    .unwrap()
+            },
+            changed,
+        ),
+    ];
+    #[cfg(target_os = "macos")]
+    let changes = {
+        let mut changes = changes;
+        changes.push((
+            "flags",
+            |f| {
+                let status = Command::new("chflags")
+                    .arg("hidden")
+                    .arg(f.path("host.ts"))
+                    .status()
+                    .unwrap();
+                assert!(status.success());
+            },
+            changed,
+        ));
+        changes
+    };
+    for (name, change, reason) in changes {
+        let fixture = fixture();
+        save_plan(&fixture, "host.ts", "p.json");
+        change(&fixture);
+        let document = json(&tsparse(&fixture, &["--apply", "p.json", "--json"]), 1);
+        assert_eq!(document["effect"], "unchanged", "{name}: {document}");
+        assert_eq!(document["error"]["kind"], "Stale", "{name}: {document}");
+        assert_eq!(
+            document["error"]["message"],
+            format!("the file changed since the batch was prepared: {reason}; prepare it again"),
+            "{name}: {document}"
+        );
+        assert_eq!(host(&fixture), HOST, "{name}");
+    }
+}
+
 #[test]
 fn results_and_plans_are_new_files_so_no_outcome_replaces_a_file() {
     let fixture = fixture();
@@ -1342,14 +1461,32 @@ fn a_plan_path_that_is_not_unicode_is_a_usage_error_and_saves_nothing() {
 }
 
 /// In a directory whose new files cannot be removed, checking an output
-/// leaves nothing behind: an output whose names all exist is not created to
-/// check it, one created to check is freed of what the directory gave it,
-/// and a plan that does not decode creates none.
+/// leaves nothing behind when no check needs one: an output whose names all
+/// exist is not created to check it, and a plan that does not decode
+/// creates none.
 #[cfg(target_os = "macos")]
 #[test]
 fn outputs_are_checked_in_a_directory_whose_new_files_cannot_be_removed() {
     let fixture = fixture();
-    let output = tsparse(
+    std::fs::write(fixture.path("broken.json"), "{broken").unwrap();
+    std::fs::copy(fixture.path("host.ts"), fixture.path("other.ts")).unwrap();
+    std::fs::remove_file(fixture.path("host.ts")).unwrap();
+    let flags = |flag: &str| {
+        assert!(
+            Command::new("chflags")
+                .arg(flag)
+                .arg(&fixture.root)
+                .status()
+                .unwrap()
+                .success()
+        )
+    };
+    flags("uappnd");
+    let broken = tsparse(
+        &fixture,
+        &["--apply", "broken.json", "--json", "-o", "host.ts"],
+    );
+    let preview = tsparse(
         &fixture,
         &[
             "--replace-body",
@@ -1357,63 +1494,13 @@ fn outputs_are_checked_in_a_directory_whose_new_files_cannot_be_removed() {
             "start",
             "--from",
             "body.ts",
-            "host.ts",
-            "--plan",
-            "change.json",
+            "other.ts",
+            "--json",
+            "-o",
+            "preview.json",
         ],
     );
-    assert_eq!(output.status.code(), Some(0), "{output:?}");
-    std::fs::write(fixture.path("broken.json"), "{broken").unwrap();
-    std::fs::copy(fixture.path("host.ts"), fixture.path("other.ts")).unwrap();
-    std::fs::remove_file(fixture.path("host.ts")).unwrap();
-    let chmod = |args: &[&str], path: &std::path::Path| {
-        assert!(
-            Command::new("chmod")
-                .args(args)
-                .arg(path)
-                .status()
-                .unwrap()
-                .success()
-        );
-    };
-    let entry = "everyone deny delete,file_inherit,only_inherit";
-    chmod(&["+a", entry], &fixture.root);
-    let runs = [
-        tsparse(
-            &fixture,
-            &["--apply", "change.json", "--json", "-o", "host.ts"],
-        ),
-        tsparse(
-            &fixture,
-            &["--apply", "broken.json", "--json", "-o", "host.ts"],
-        ),
-        tsparse(
-            &fixture,
-            &[
-                "--replace-body",
-                "--name",
-                "start",
-                "--from",
-                "body.ts",
-                "other.ts",
-                "--json",
-                "-o",
-                "preview.json",
-            ],
-        ),
-        tsparse(
-            &fixture,
-            &["--apply", "change.json", "--json", "-o", "stale.json"],
-        ),
-    ];
-    chmod(&["-a", entry], &fixture.root);
-    for name in ["host.ts", "preview.json", "stale.json"] {
-        if fixture.path(name).exists() {
-            chmod(&["-N"], &fixture.path(name));
-        }
-    }
-    let [reserved, broken, preview, stale] = runs;
-    assert!(refusal(&reserved, true).contains("names a file the command reads or edits"));
+    flags("nouappnd");
     assert_eq!(broken.status.code(), Some(2), "{broken:?}");
     assert!(text(&broken.stderr).contains("the plan's file names cannot be read"));
     assert!(!fixture.path("host.ts").exists());
@@ -1422,11 +1509,6 @@ fn outputs_are_checked_in_a_directory_whose_new_files_cannot_be_removed() {
         serde_json::from_str(&std::fs::read_to_string(fixture.path("preview.json")).unwrap())
             .unwrap();
     assert_eq!(preview["outcome"], "preview");
-    assert_eq!(stale.status.code(), Some(1), "{stale:?}");
-    let stale: Value =
-        serde_json::from_str(&std::fs::read_to_string(fixture.path("stale.json")).unwrap())
-            .unwrap();
-    assert_eq!(stale["effect"], "unchanged");
 }
 
 /// Save a plan replacing `start`'s body in `file`.

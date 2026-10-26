@@ -14,7 +14,7 @@ description: Navigate, query, and edit TypeScript and TSX code with the
 
 Use `tsparse` instead of text search or whole-file reads whenever the question or edit targets TypeScript declarations, symbols, members, or types. A text search cannot distinguish a symbol from its spelling, follow import/export aliases, separate shadowed bindings, or resolve receiver types on member accesses; reading an entire file wastes context when you only need its declaration catalog or one function's implementation.
 
-Assume `tsparse` is on `PATH`. For any flag scope or failure code not covered below, run `tsparse --OP --help` (for example, `tsparse --references --help` or `tsparse --edit-batch EDITS --help`), which prints the operation's exact contract in a few milliseconds without reading files or starting a service.
+Assume `tsparse` is on `PATH`; it builds and runs on macOS and Linux only. For any flag scope or failure code not covered below, run `tsparse --OP --help` (for example, `tsparse --references --help` or `tsparse --edit-batch EDITS --help`), which prints the operation's exact contract in a few milliseconds without reading files or starting a service.
 
 ## Choose the Operation
 
@@ -27,7 +27,7 @@ Assume `tsparse` is on `PATH`. For any flag scope or failure code not covered be
 | Inspect a declaration or token type | `tsparse --type --project tsconfig.json --at src/host.ts:42:10` | Reports the resolved type summary (and a bounded structural graph with `--expand [--depth 0..32]`). |
 | Replace a callable body | `tsparse --replace-body --name RunHost.run src/host.ts --from body.ts --plan run.plan.json` | Replaces only the body, preserves all surrounding bytes, and validates syntax, AST boundaries, `@ts-ignore`/`@ts-expect-error` reach, and JSDoc attachment before writing. |
 | Insert statements after a declaration | `tsparse --insert-after --name start src/host.ts --from stmts.ts --plan add.plan.json` | Inserts at the statement seam with matching indentation, line breaks, and automatic semicolon safety. |
-| Apply a prepared edit plan | `tsparse --apply run.plan.json` | Verifies every target file's original bytes and inode identity before replacing, rolling back all files if any replacement fails. |
+| Apply a prepared edit plan | `tsparse --apply run.plan.json` | Verifies every target file's original bytes and inode identity before replacing, rolling back all files if any replacement fails. Replaced files keep only their permission mode. |
 | Check if a file or snippet parses | `tsparse --check src/host.ts` | Validates TypeScript 7 syntax in milliseconds and prints a one-line verdict (`ok: ...`). Does not type-check. |
 | Diagnose a project query or service failure | `tsparse --doctor --project tsconfig.json` | Checks build capabilities, `TSPARSE_*` variables, runtime directory permissions, config readability, and service state without loading the project. |
 
@@ -60,7 +60,7 @@ Every selector is exact so a typo or overloaded name never silently targets the 
 
 Project queries (`--references`, `--type`, and `--outline`/`--show`/edits with `--project`) require an explicit `--project TSCONFIG`. `tsparse` never searches ancestor directories for `tsconfig.json`, and it rejects configs with project `references` rather than searching partially (pass the specific subproject's `tsconfig.json` instead).
 
-On macOS and Linux, `--project` queries automatically start and reuse a per-project background service (keyed by the exact `--project` path spelling and build, expiring after 10 idle minutes). Before each request, the service verifies that no captured source, config, or package manifest changed, rebuilding the snapshot when any input changed.
+`--project` queries automatically start and reuse a per-project background service (keyed by the exact `--project` path spelling and build, expiring after 10 idle minutes). Before each request, the service verifies that no captured source, config, or package manifest changed, rebuilding the snapshot when any input changed.
 
 Typical costs on a ~4,000-file TypeScript project:
 - **Single-file `--outline`, `--show`, `--check`, or edit without `--project`:** 5–20 ms (no project loaded).
@@ -73,7 +73,7 @@ Follow these sequencing rules to keep queries fast:
 1. **Omit `--project` when one file suffices:** Use `tsparse --outline FILE` and `tsparse --show ... FILE` without `--project` when you already know the file path.
 2. **Batch project reads before editing:** Complete your `--references`, `--type`, and project-wide `--show` queries before modifying files so every query reuses the warm snapshot instead of triggering a rebuild.
 3. **Parallelize independent warm queries:** Once the service is running, issue independent read queries concurrently; if the service is cold, let the first query start it so concurrent callers do not wait on the startup lock.
-4. **Keep `--direct` for debugging only:** `--direct` (or `--references-direct`) loads the entire project in the CLI process (~6 s and ~2 GiB RSS every run). Use it only to rule out the service when diagnosing an issue.
+4. **Keep `--direct` for debugging only:** `--direct` (as in `--references --direct`) loads the entire project in the CLI process (~6 s and ~2 GiB RSS every run). Use it only to rule out the service when diagnosing an issue.
 
 ## Edit Declarations (`--replace-body`, `--insert-after`, `--edit-batch`, `--apply`)
 
@@ -122,6 +122,7 @@ Follow these sequencing rules to keep queries fast:
    tsparse --apply /tmp/batch.plan.json
    ```
    - Do not modify target files between `--plan` and `--apply`; if any file changed, `--apply` exits `1` (`effect: unchanged`) and you must prepare the plan again.
+   - Each file is replaced by a new file that keeps only the original's permission mode: extended attributes, ACLs, owner, and group are not carried over. Files with another hard link or macOS flags (`chflags`) are refused.
    - `tsparse` does **not** type-check edited code. After applying edits, run the project's type checker (e.g., `tsc --noEmit`) or relevant tests to verify types and behavior.
 
 ## Read Outcomes, Display Caps, and Failures
@@ -145,5 +146,6 @@ When output is truncated, the last line of text (or the `display` object in `--j
 ### Troubleshooting and Designed Constraints
 - **File outside project (`OutsideProject`, exit `2`):** The queried file is in `node_modules`, a declaration library, or excluded by `tsconfig.json`'s `files`/`include`/`exclude`. Use single-file `--outline FILE` or `--show ... FILE` (without `--project`) to inspect files outside the project's searched set.
 - **Query memory or timeout limits (`exit 1`):** Read-only queries default to `TSPARSE_MAX_MEMORY_MB=6144` and `TSPARSE_QUERY_TIMEOUT_MS=60000`. A limit failure terminates that service process and its cache. If you change `TSPARSE_*` variables while a service is already running, run `tsparse --references-stop --project tsconfig.json` first so the next request starts a service with the new environment.
+- **Input that is not a regular file (`Io`, exit `2`):** Project loading (`--project`) refuses a source, `tsconfig.json`, or `package.json` that is a pipe, device, or socket with `PATH: not a regular file` and never reads it; the service reloads and reports the same once an input becomes one. Replace it with a regular file. Single-file parse and navigation without `--project` do not make this check.
 - **Service transport errors (`transport.*`, exit `2`):** `tsparse` never falls back silently from a broken service to `--direct`. Run the `tsparse --doctor --project CONFIG` command printed at the end of the error, and follow its `next:` remedy (such as `chmod 700` on the runtime directory or setting a shorter `TSPARSE_SERVICE_DIR` if the Unix socket path exceeds ~100 bytes).
 - **Surface friction and enhancements:** Do not work around `tsparse` defects or gaps silently. In your final response, report any bugs, misleading messages/remedies, stale results after edits, silent truncation, or missing operations/enhancements that forced you to fall back to text search or raw file reads, along with the command run, its output, and what you expected.

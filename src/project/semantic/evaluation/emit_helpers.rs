@@ -6,7 +6,7 @@ use super::super::source::DeclarationIdentity;
 use super::{Evaluator, ReferenceSymbol};
 use crate::project::sources::FileId;
 use crate::references::Location;
-use crate::resources::FixedMap;
+use std::collections::HashMap;
 
 /// Native helper bits admitted by current checked expression producers.
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -40,8 +40,8 @@ impl ExternalEmitHelpers {
 }
 
 pub(super) struct EmitHelpersState {
-    modules: FixedMap<FileId, Result<ReferenceSymbol, DemandError>>,
-    requested: FixedMap<FileId, u32>,
+    modules: HashMap<FileId, Result<ReferenceSymbol, DemandError>>,
+    requested: HashMap<FileId, u32>,
 }
 
 impl EmitHelpersState {
@@ -49,8 +49,8 @@ impl EmitHelpersState {
     /// Payload creation/copies and publication order stay with those operations.
     pub(super) fn new() -> Self {
         Self {
-            modules: FixedMap::new(),
-            requested: FixedMap::new(),
+            modules: HashMap::new(),
+            requested: HashMap::new(),
         }
     }
 }

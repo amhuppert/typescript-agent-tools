@@ -18,8 +18,8 @@ use super::iteration::IterationUse;
 use super::relations::{RelationKind, RelationReporting};
 use crate::analysis::SemanticFailureReason;
 use crate::references::Location;
-use crate::resources::FixedMap;
 use crate::syntax_kind::SyntaxKind;
+use std::collections::HashMap;
 
 mod construct;
 mod instanceof;
@@ -113,7 +113,7 @@ impl CallArgument {
 /// `getResolvedSignature` owns the actual call-like node's installed property.
 /// Candidate preparation and contextual save/restore keep this same table.
 pub(super) struct CallsState {
-    resolved: FixedMap<CallRoot, CallState>,
+    resolved: HashMap<CallRoot, CallState>,
     any_signature: Option<Signature>,
     silent_never_signature: Option<Signature>,
 }
@@ -121,7 +121,7 @@ pub(super) struct CallsState {
 impl CallsState {
     pub(super) fn new() -> Self {
         Self {
-            resolved: FixedMap::new(),
+            resolved: HashMap::new(),
             any_signature: None,
             silent_never_signature: None,
         }

@@ -12,11 +12,12 @@ use crate::project::binding::flow::Site;
 use crate::project::sources::FileId;
 use crate::references::Location;
 use crate::types::PrimitiveName;
+use std::collections::HashMap;
 
 pub(super) struct IndexedAccessState {
-    nodes: crate::resources::FixedMap<(FileId, Site), NativeResult<TypeId>>,
-    unique_filled: crate::resources::FixedMap<TypeId, NativeResult<TypeId>>,
-    simplified: crate::resources::FixedMap<(TypeId, bool), NativeResult<TypeId>>,
+    nodes: HashMap<(FileId, Site), NativeResult<TypeId>>,
+    unique_filled: HashMap<TypeId, NativeResult<TypeId>>,
+    simplified: HashMap<(TypeId, bool), NativeResult<TypeId>>,
 }
 
 /// Native nil, IndexedAccessType and ElementAccessExpression contexts. A nil
@@ -1141,9 +1142,9 @@ impl IndexedAccessState {
     /// identities, child values and provisional publication stay operation-owned.
     pub(super) fn new() -> Self {
         Self {
-            nodes: crate::resources::FixedMap::new(),
-            unique_filled: crate::resources::FixedMap::new(),
-            simplified: crate::resources::FixedMap::new(),
+            nodes: HashMap::new(),
+            unique_filled: HashMap::new(),
+            simplified: HashMap::new(),
         }
     }
 }

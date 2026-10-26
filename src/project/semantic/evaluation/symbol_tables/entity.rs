@@ -97,11 +97,7 @@ impl Evaluator<'_, '_> {
     ) -> NativeResult<Option<ReferenceSymbol>> {
         self.reference_exports_of_symbol_completion(parent, consumer)?
             .and_then(|table| {
-                let symbol = lookup(
-                    table.as_deref(),
-                    &NativePropertyKey::fixed(name.as_bytes(), self.control.as_ref()),
-                    self.control.as_ref(),
-                );
+                let symbol = lookup(table.as_deref(), &NativePropertyKey::fixed(name.as_bytes()));
                 match symbol {
                     Some(symbol) => {
                         self.select_reference_symbol_completion(symbol, meaning, false, consumer)

@@ -53,12 +53,8 @@ impl NativePropertyKey {
     /// Binder `GetSymbolNameForPrivateIdentifier`: the containing class's
     /// actual header identity and exact description form the native key.
     /// Construction does not observe the request's identity ordering.
-    pub(in crate::project) fn private(
-        class: NativeSymbolIdentity,
-        description: &str,
-        control: Option<&Control>,
-    ) -> Self {
-        let mut value = NativeStringBuilder::new(control);
+    pub(in crate::project) fn private(class: NativeSymbolIdentity, description: &str) -> Self {
+        let mut value = NativeStringBuilder::new();
         value.bytes(b"\xfe#");
         value.identity(class);
         value.bytes(b"@");
@@ -71,9 +67,8 @@ impl NativePropertyKey {
     pub(in crate::project) fn unique(
         symbol: NativeSymbolIdentity,
         underlying: NativePropertyKey,
-        control: Option<&Control>,
     ) -> Self {
-        let mut value = NativeStringBuilder::new(control);
+        let mut value = NativeStringBuilder::new();
         value.bytes(b"\xfe@");
         value.value(&underlying.0);
         value.bytes(b"@");
@@ -81,14 +76,14 @@ impl NativePropertyKey {
         Self(value.finish())
     }
 
-    pub(in crate::project) fn kind(&self, control: Option<&Control>) -> NativePropertyKeyKind<'_> {
+    pub(in crate::project) fn kind(&self) -> NativePropertyKeyKind<'_> {
         if let Some(bytes) = self.0.fixed_part() {
             return NativePropertyKeyKind::Fixed(bytes);
         }
         if let Some((class, description)) = self.0.private_parts() {
             return NativePropertyKeyKind::Private { class, description };
         }
-        if let Some((symbol, underlying)) = self.0.unique_parts(control) {
+        if let Some((symbol, underlying)) = self.0.unique_parts() {
             return NativePropertyKeyKind::Unique {
                 symbol,
                 underlying: Self(underlying),
@@ -107,15 +102,12 @@ impl NativePropertyKey {
     /// Approximate display length under design B's generated-name rule:
     /// exact byte components and punctuation, one unit per opaque identity.
     /// Reading length never allocates or observes an ordering rank.
-    pub(in crate::project) fn display_length(&self, control: Option<&Control>) -> usize {
-        self.0.display_length(control)
+    pub(in crate::project) fn display_length(&self) -> usize {
+        self.0.display_length()
     }
 
-    pub(in crate::project) fn fixed(
-        bytes: impl NativeByteInput,
-        control: Option<&Control>,
-    ) -> Self {
-        Self(NativeStringValue::from_bytes(bytes, control))
+    pub(in crate::project) fn fixed(bytes: impl NativeByteInput) -> Self {
+        Self(NativeStringValue::from_bytes(bytes))
     }
 
     /// Ordinary text and fixed internal names have exact bytes; generated
@@ -217,12 +209,12 @@ impl NativeSymbolName {
     /// the internal global-augmentation name. Quotes are identity bytes.
     pub(super) fn module_declaration(name: &str, global: bool) -> Self {
         if global {
-            Self::internal(b"global", None)
+            Self::internal(b"global")
         } else {
             Self::Bytes(format!("\"{name}\"").into_bytes().into())
         }
     }
-    fn internal(name: &'static [u8], _control: Option<&Control>) -> Self {
+    fn internal(name: &'static [u8]) -> Self {
         Self::Bytes(fixed_name(name, true))
     }
 
@@ -241,33 +233,29 @@ impl NativeSymbolName {
             return Self::Bytes(fixed_name(b"default", false));
         }
         match declaration.kind {
-            DeclKind::TypeLiteral => Self::internal(b"type", None),
-            DeclKind::ObjectLiteral => Self::internal(b"object", None),
-            DeclKind::Function if declaration.name.is_empty() => Self::internal(b"function", None),
-            DeclKind::Class if declaration.name.is_empty() => Self::internal(b"class", None),
+            DeclKind::TypeLiteral => Self::internal(b"type"),
+            DeclKind::ObjectLiteral => Self::internal(b"object"),
+            DeclKind::Function if declaration.name.is_empty() => Self::internal(b"function"),
+            DeclKind::Class if declaration.name.is_empty() => Self::internal(b"class"),
             _ => {
                 if let Some(member) = &declaration.member {
                     return match &member.key {
                         MemberKey::Text(name) => Self::Bytes(Arc::from(name.clone())),
-                        MemberKey::Reserved(kind) => Self::internal(
-                            match kind {
-                                ReservedMember::Call => b"call",
-                                ReservedMember::New => b"new",
-                                ReservedMember::Index => b"index",
-                                ReservedMember::Constructor => b"constructor",
-                            },
-                            None,
-                        ),
-                        MemberKey::Dynamic => Self::internal(b"computed", None),
+                        MemberKey::Reserved(kind) => Self::internal(match kind {
+                            ReservedMember::Call => b"call",
+                            ReservedMember::New => b"new",
+                            ReservedMember::Index => b"index",
+                            ReservedMember::Constructor => b"constructor",
+                        }),
+                        MemberKey::Dynamic => Self::internal(b"computed"),
                         MemberKey::Private(description) => match context.private_class {
                             Some(class) => Self::Generated(NativePropertyKey::private(
                                 class,
                                 description.as_str(),
-                                None,
                             )),
                             // `getDeclarationName` uses the missing-name
                             // sentinel for a private name outside any class.
-                            None => Self::internal(b"missing", None),
+                            None => Self::internal(b"missing"),
                         },
                         MemberKey::NonScalar(_) => Self::Unavailable(
                             "native symbol name contains an unrepresentable UTF-16 identity",
@@ -292,7 +280,7 @@ impl NativeSymbolName {
 
     pub(super) fn key(&self) -> Result<NativePropertyKey, TypeBindingFailure> {
         match self {
-            Self::Bytes(bytes) => Ok(NativePropertyKey::fixed(bytes.clone(), None)),
+            Self::Bytes(bytes) => Ok(NativePropertyKey::fixed(bytes.clone())),
             Self::Generated(key) => Ok(key.clone()),
             Self::Unavailable(message) => Err(TypeBindingFailure::Pending(message)),
         }
@@ -363,13 +351,8 @@ impl NativeSymbol {
         identity: NativeSymbolIdentity,
         name: impl NativeByteInput,
         declaration: Option<NativeDeclaration>,
-        control: Option<&Control>,
     ) -> Arc<Self> {
-        Self::created_with_key(
-            identity,
-            NativePropertyKey::fixed(name, control),
-            declaration,
-        )
+        Self::created_with_key(identity, NativePropertyKey::fixed(name), declaration)
     }
 
     /// `Symbol.Declarations` pointer publication updates only latent first-node
@@ -398,10 +381,10 @@ impl NativeSymbol {
     }
 
     /// initializeTypeCaches creates this real symbol with no declarations.
-    pub(in crate::project) fn empty_type_literal(control: Option<&Control>) -> Arc<Self> {
+    pub(in crate::project) fn empty_type_literal() -> Arc<Self> {
         Self::publish(Self {
             identity: NativeSymbolIdentity::EmptyTypeLiteral,
-            name: NativeSymbolName::internal(b"type", control),
+            name: NativeSymbolName::internal(b"type"),
             declaration: Ok(None),
         })
     }
@@ -440,10 +423,7 @@ impl NativeSymbol {
     /// `Symbol.Name` as an owned exact byte observation. The header keeps its
     /// shared payload; consumers needing ownership copy only through this owner.
     /// Observe an unavailable/generated name before copying its payload.
-    pub(in crate::project) fn name(
-        &self,
-        _control: Option<&Control>,
-    ) -> Result<Vec<u8>, TypeBindingFailure> {
+    pub(in crate::project) fn name(&self) -> Result<Vec<u8>, TypeBindingFailure> {
         let bytes = self.name.bytes()?;
 
         Ok(bytes.to_vec())
@@ -476,7 +456,7 @@ impl IdentityOrder {
     ) -> Result<Ordering, TypeBindingFailure> {
         let _depth = control.map(|control| complete_or_abort(control.enter()));
         use NativePropertyKeyKind::*;
-        Ok(match (left.kind(control), right.kind(control)) {
+        Ok(match (left.kind(), right.kind()) {
             (Fixed(a), Fixed(b)) => a.cmp(b),
             (
                 Private {
@@ -487,7 +467,7 @@ impl IdentityOrder {
                     class: b,
                     description: bn,
                 },
-            ) => self.compare(a, b, control).then_with(|| an.cmp(bn)),
+            ) => self.compare(a, b).then_with(|| an.cmp(bn)),
             (
                 Unique {
                     symbol: a,
@@ -499,7 +479,7 @@ impl IdentityOrder {
                 },
             ) => self
                 .compare_property_keys(&an, &bn, control)?
-                .then_with(|| self.compare(a, b, control)),
+                .then_with(|| self.compare(a, b)),
             (Private { .. }, Unique { .. }) => Ordering::Less,
             (Unique { .. }, Private { .. }) => Ordering::Greater,
             (generated @ (Private { .. } | Unique { .. }), Fixed(fixed)) => {
@@ -518,7 +498,7 @@ impl IdentityOrder {
                 }
                 match generated {
                     Unique { underlying, .. } => {
-                        let tail = NativePropertyKey::fixed(&fixed[prefix.len()..], control);
+                        let tail = NativePropertyKey::fixed(&fixed[prefix.len()..]);
                         self.compare_property_keys(&underlying, &tail, control)?
                             .then(Ordering::Greater)
                     }
@@ -549,11 +529,7 @@ impl IdentityOrder {
         self.compare_property_keys(&left.key()?, &right.key()?, control)
     }
 
-    pub(in crate::project) fn observe(
-        &self,
-        identity: NativeSymbolIdentity,
-        _control: Option<&Control>,
-    ) {
+    pub(in crate::project) fn observe(&self, identity: NativeSymbolIdentity) {
         self.rank(identity);
     }
 
@@ -564,18 +540,12 @@ impl IdentityOrder {
         if let Some(&rank) = symbols.get(&identity) {
             return rank;
         }
-        symbols.reserve(1);
         let rank = symbols.len();
         symbols.insert(identity, rank);
         rank
     }
 
-    fn compare(
-        &self,
-        left: NativeSymbolIdentity,
-        right: NativeSymbolIdentity,
-        _control: Option<&Control>,
-    ) -> Ordering {
+    fn compare(&self, left: NativeSymbolIdentity, right: NativeSymbolIdentity) -> Ordering {
         let left = self.rank(left);
         let right = self.rank(right);
         left.cmp(&right)
@@ -618,7 +588,7 @@ impl IdentityOrder {
         if names != Ordering::Equal {
             return Ok(names);
         }
-        Ok(self.compare(left.identity, right.identity, control))
+        Ok(self.compare(left.identity, right.identity))
     }
 }
 
@@ -769,7 +739,7 @@ mod identity_order_tests {
         let class = NativeSymbolIdentity::Transient(0);
         let symbol = NativeSymbolIdentity::Transient(1);
         for description in ["", "#field", "#\u{03c0}"] {
-            let private = NativePropertyKey::private(class, description, None);
+            let private = NativePropertyKey::private(class, description);
             let rebuilt = NativePropertyKey::from_string_value(NativeStringValue::from_parts(
                 private.string_value().parts().flat_map(|part| match part {
                     NativeStringPart::Bytes(bytes) => bytes
@@ -778,47 +748,37 @@ mod identity_order_tests {
                         .collect::<Vec<_>>(),
                     atom => vec![atom],
                 }),
-                None,
             ));
             assert_eq!(private, rebuilt);
             assert!(
-                matches!(rebuilt.kind(None), NativePropertyKeyKind::Private { class: actual, description: actual_text }
+                matches!(rebuilt.kind(), NativePropertyKeyKind::Private { class: actual, description: actual_text }
                 if actual == class && actual_text == description.as_bytes())
             );
-            let unique = NativePropertyKey::unique(symbol, rebuilt.clone(), None);
+            let unique = NativePropertyKey::unique(symbol, rebuilt.clone());
             assert!(
-                matches!(unique.kind(None), NativePropertyKeyKind::Unique { symbol: actual, underlying }
+                matches!(unique.kind(), NativePropertyKeyKind::Unique { symbol: actual, underlying }
                 if actual == symbol && underlying == rebuilt)
             );
-            assert_ne!(
-                private,
-                NativePropertyKey::private(symbol, description, None)
-            );
+            assert_ne!(private, NativePropertyKey::private(symbol, description));
         }
-        let exact = NativePropertyKey::fixed(b"\xfe#field".as_slice(), None);
-        let replacement = NativePropertyKey::fixed("\u{fffd}#field".as_bytes(), None);
+        let exact = NativePropertyKey::fixed(b"\xfe#field".as_slice());
+        let replacement = NativePropertyKey::fixed("\u{fffd}#field".as_bytes());
         assert_ne!(exact, replacement);
     }
 
     #[test]
     fn unique_key_prefix_and_separator_cannot_overlap() {
         let symbol = NativeSymbolIdentity::Transient(0);
-        let composed = NativePropertyKey::from_string_value(NativeStringValue::from_parts(
-            [
-                NativeStringPart::Bytes(b"\xfe@".as_slice().into()),
-                NativeStringPart::Identity(symbol),
-            ],
-            None,
-        ));
-        assert!(matches!(
-            composed.kind(None),
-            NativePropertyKeyKind::Composed
-        ));
+        let composed = NativePropertyKey::from_string_value(NativeStringValue::from_parts([
+            NativeStringPart::Bytes(b"\xfe@".as_slice().into()),
+            NativeStringPart::Identity(symbol),
+        ]));
+        assert!(matches!(composed.kind(), NativePropertyKeyKind::Composed));
         for name in ["", "a"] {
-            let underlying = NativePropertyKey::fixed(name.as_bytes(), None);
-            let unique = NativePropertyKey::unique(symbol, underlying.clone(), None);
+            let underlying = NativePropertyKey::fixed(name.as_bytes());
+            let unique = NativePropertyKey::unique(symbol, underlying.clone());
             assert!(
-                matches!(unique.kind(None), NativePropertyKeyKind::Unique { symbol: actual, underlying: actual_name }
+                matches!(unique.kind(), NativePropertyKeyKind::Unique { symbol: actual, underlying: actual_name }
                 if actual == symbol && actual_name == underlying)
             );
         }
@@ -828,10 +788,8 @@ mod identity_order_tests {
     fn unique_keys_compare_underlying_names_before_the_identity_separator() {
         let a = NativeSymbolIdentity::Transient(0);
         let b = NativeSymbolIdentity::Transient(1);
-        let left =
-            NativePropertyKey::unique(a, NativePropertyKey::fixed(b"a".as_slice(), None), None);
-        let right =
-            NativePropertyKey::unique(b, NativePropertyKey::fixed(b"a!".as_slice(), None), None);
+        let left = NativePropertyKey::unique(a, NativePropertyKey::fixed(b"a".as_slice()));
+        let right = NativePropertyKey::unique(b, NativePropertyKey::fixed(b"a!".as_slice()));
         let order = IdentityOrder::default();
         // Comparing flattened bytes would put the '@' separator after '!'.
         // The adopted name-family policy compares the underlying names first.
@@ -840,7 +798,7 @@ mod identity_order_tests {
             Ordering::Less
         );
         // The decisive name comparison must not have observed either symbol.
-        assert_eq!(order.compare(b, a, None), Ordering::Less);
+        assert_eq!(order.compare(b, a), Ordering::Less);
         assert_eq!(
             order.compare_property_keys(&right, &left, None).unwrap(),
             Ordering::Greater
@@ -851,18 +809,15 @@ mod identity_order_tests {
     fn composed_ordering_fails_without_observing_identity() {
         let a = NativeSymbolIdentity::Transient(0);
         let b = NativeSymbolIdentity::Transient(1);
-        let composed = NativePropertyKey::from_string_value(NativeStringValue::from_parts(
-            [
-                NativeStringPart::Bytes(b"prefix".as_slice().into()),
-                NativeStringPart::Identity(a),
-            ],
-            None,
-        ));
+        let composed = NativePropertyKey::from_string_value(NativeStringValue::from_parts([
+            NativeStringPart::Bytes(b"prefix".as_slice().into()),
+            NativeStringPart::Identity(a),
+        ]));
         let order = IdentityOrder::default();
         assert!(matches!(
             order.compare_property_keys(
                 &composed,
-                &NativePropertyKey::fixed(b"other".as_slice(), None),
+                &NativePropertyKey::fixed(b"other".as_slice()),
                 None
             ),
             Err(TypeBindingFailure::Pending(_))
@@ -873,11 +828,11 @@ mod identity_order_tests {
                 .unwrap(),
             Ordering::Equal
         );
-        assert_eq!(order.compare(b, a, None), Ordering::Less);
+        assert_eq!(order.compare(b, a), Ordering::Less);
     }
 
     fn header(id: usize, name: &[u8], declaration: Option<NativeDeclaration>) -> Arc<NativeSymbol> {
-        NativeSymbol::created(NativeSymbolIdentity::Transient(id), name, declaration, None)
+        NativeSymbol::created(NativeSymbolIdentity::Transient(id), name, declaration)
     }
 
     #[test]
@@ -887,7 +842,7 @@ mod identity_order_tests {
         for prior_right in [false, true] {
             let order = IdentityOrder::default();
             if prior_right {
-                order.observe(right.identity(), None);
+                order.observe(right.identity());
             }
             let expected = if prior_right {
                 Ordering::Greater

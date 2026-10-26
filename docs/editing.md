@@ -46,16 +46,10 @@ A batch file is `{"edits": [...]}`, each edit
 with exactly one of `name` and `at` and exactly one of `fragment` and `from`;
 `at` is `LINE:COLUMN` with `file`, or `FILE:LINE:COLUMN`. A member that is
 `null` is absent; an unknown member, one given twice, and a value of another
-type are errors, as are an edit that is neither an object nor the
-compatibility array below, and a batch that has no edits. Write the object
-form above. Only for compatibility, the forms the
-batch's former derived decoding took by accident are still taken, so no batch
-that prepared before is refused: the document written as `[EDITS]`, an edit as
-`[operation, name, at, file, fragment, from]`, and an operation as
-`{"replace_body": null}`. Help does not teach them, and dropping them would be
-a separate, announced change; an issue in one is named by its position, such
-as `[0][1][2]`. A batch is checked whole before any fragment is read or anything is
-prepared, and every problem is reported at once (see [Output](#output)).
+type are errors, as are a document or an edit that is not an object, an
+operation that is not a string, and a batch that has no edits. A batch is
+checked whole before any fragment is read or anything is prepared, and every
+problem is reported at once (see [Output](#output)).
 Paths in arguments and batch files are relative to the working
 directory; plans record absolute paths, so a plan applies from anywhere.
 
@@ -83,8 +77,7 @@ cannot be loaded. `-o` and `--plan` may not name one new file either. When
 such a name does not exist, the file system decides which spellings name one
 file, through links, case, and Unicode forms alike: `tsparse` creates the
 output for the question, looks for it under each such name, and removes it
-again, first freeing it of what its directory gave it if that denies the
-removal; an output it still cannot remove is reported as left there, empty.
+again; an output it cannot remove is reported as left there, empty.
 A fragment file and the batch file are files the command reads, so neither
 may be an output either. A plan whose text cannot be read, or does not decode
 as a plan, names files no one can know, so with `-o` its load failure goes to
@@ -213,7 +206,7 @@ rejected; no subset is ever offered. A batch that changes nothing is
 A plan is an inspectable JSON file recording, per file, the path analysis
 parsed it by (as named, or the canonical path a project selected), any other
 names the request used for it, the regular file they resolve to, its device,
-inode, mode, owner, group, and flags,
+inode, mode, and link count,
 whether it begins with a byte order mark, its original and proposed text, and
 each edit's operation, selected site with its anchor, fragment, and changes.
 Loading a plan reads no current file, fragment, or project: it prepares the
@@ -225,27 +218,19 @@ changes nothing until applied.
 
 Applying is supported on macOS and Linux. It checks every file: each name
 still resolves to the same regular file with one link, the same device, inode,
-mode, owner, group, and flags, and exactly the original bytes; timestamps are
-not identity. Then it stages every replacement beside its file, with the
-original's permissions, owner, group, extended attributes, and access control
-lists, by one explicit rule: the new file starts free of what its directory
-gave it that could deny its owner the writes that follow (on macOS an
-inherited list, on Linux an owner entry without write), each attribute's
-value is set, each attribute the new file has beyond the original's is
-removed (such as the access list a directory's default list gives it on
-Linux), the original's list, or none, is set last since it can deny the
-writes before it, and everything is compared both ways after the final mode
-change, so metadata that cannot be kept fails staging instead of being
-dropped, rewritten, or added.
-`com.apple.provenance`, which macOS gives every file a process writes and
-which cannot be removed or set, is the one attribute exempt. A file with macOS
-flags (`chflags`, such as `hidden` or `uchg`) is not edited; Linux file
-attributes (`chattr`) are not inspected. Staging links the original under a
-backup name; a name it did not create is never removed. It checks every file
-again, replaces them one rename each in path order, and removes the backups.
-If a replacement fails, it restores the files it replaced, unless a file is no
-longer the one it installed: another writer's bytes are never overwritten.
-Applying a plan again finds its files changed.
+and mode, and exactly the original bytes; timestamps are not identity. Then it
+stages every replacement beside its file: a new file with exactly the proposed
+bytes and the original's permission mode, synced to disk. The new file does
+not keep the original's extended attributes, access control lists, flags,
+owner, or group; a file whose other metadata must survive an edit is outside
+the operating envelope (ENVELOPE.md). A file with macOS flags (`chflags`, such
+as `hidden` or `uchg`) is not edited; Linux file attributes (`chattr`) are not
+inspected. Staging links the original under a backup name; a name it did not
+create is never removed. It checks every file again, replaces them one rename
+each in path order, and removes the backups. If a replacement fails, it
+restores the files it replaced, unless a file is no longer the one it
+installed: another writer's bytes are never overwritten. Applying a plan again
+finds its files changed.
 
 Keep other writers away from the files while applying. Readers may see some
 files replaced before others; a crash may leave temporary or backup files

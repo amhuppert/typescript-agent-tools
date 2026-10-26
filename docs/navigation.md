@@ -34,8 +34,8 @@ tsparse --show --project tsconfig.json --direct --name startEligible src/runs/ho
 | `--references` | required | required for `--at`, as for show; optional for `--name`, to narrow the candidates | exactly one of `--name` (one identifier), `--at` | `--calls`, `--no-tests`, `--file FILE`, `--limit N` or `--limit all`, `--json`, `--pretty` (alone, the indented document), `-o` ([find references](references.md)) |
 
 `--direct` answers a project query (outline, show, or references with
-`--project`) in the CLI process instead of the [service](#project-mode);
-`--references-direct` remains the reference spelling. One request parser
+`--project`) in the CLI process instead of the [service](#project-mode).
+One request parser
 decides validity before anything runs, and nothing starts or loads for an
 invalid request. Navigation rejects, as usage errors: stdin (`-`), `--direct`
 without `--project`, `--check`, `--tsx`, `--pretty` without `--json`, `--depth`
@@ -70,7 +70,9 @@ part of the text, so first-line columns, anchors, ranges, excerpts, and
 syntax-error positions count from the character after it, as `tsc` and
 editors report them (`\u{FEFF}const a = 1;` has `a` at 1:7). Project loading
 reads sources, configurations, and package manifests through the same rule.
-Contents that are not UTF-8, including UTF-16, are unreadable (`Io`). Parse
+Contents that are not UTF-8, including UTF-16, are unreadable (`Io`). A pipe,
+device, or socket that project loading selects is refused before it is opened,
+as `Io`, `PATH: not a regular file`, where TypeScript would read it. Parse
 mode is unchanged: it parses the bytes it is given, mark included.
 
 ### Project mode
@@ -87,11 +89,10 @@ ordered by file and then position. The whole project loads as for references:
 a project that fails to load answers no operation, and its failure is never
 replaced by an answer from the file alone.
 
-On macOS and Linux, project queries go to the project service, the one that
+Project queries go to the project service, the one that
 answers every project query for the same configuration (its `--project` path
 made absolute against the working directory, without resolving `..` or
-symbolic links), started on demand and stopped with `--references-stop`;
-other platforms answer directly. The
+symbolic links), started on demand and stopped with `--references-stop`. The
 service checks the captured inputs before every request, whichever operation
 it is, and loads a new generation when any changed: a source, the
 configuration or a file it extends, a dependency or package manifest, or a

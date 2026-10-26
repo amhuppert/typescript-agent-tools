@@ -81,8 +81,8 @@ reference CLI behavior while adding this matrix for navigation:
 
 `-o` selects the result destination for queries. `--direct` selects direct
 execution of a project query (outline, show, or references), and is invalid for
-file-only navigation, parse, and administration. Keep `--references-direct` as
-the existing reference-operation spelling. Reject conflicting operations,
+file-only navigation, parse, and administration; a direct reference query is
+`--references --direct`. Reject conflicting operations,
 selectors without an applicable operation, navigation stdin, and options outside
 their rows. Output mode never changes selection semantics.
 

@@ -14,13 +14,12 @@ impl TemplateLiteralView {
     pub(in crate::project::semantic) fn semantic_texts_equal(
         &self,
         other: &Self,
-        control: Option<&crate::resources::Control>,
     ) -> Result<bool, super::LiteralError> {
         if self.texts.len() != other.texts.len() {
             return Ok(false);
         }
         for (left, right) in self.texts.iter().zip(other.texts.iter()) {
-            if !left.semantic_equal(right, control)? {
+            if !left.semantic_equal(right)? {
                 return Ok(false);
             }
         }
@@ -137,14 +136,10 @@ impl StringMappingKind {
     /// rune and copies the remainder exactly. Full casing maps canonical byte
     /// runs independently: intervening positive-decimal atoms are uncased and
     /// non-Case_Ignorable, so they reset Final_Sigma context on both sides.
-    pub(in crate::project::semantic) fn apply(
-        self,
-        text: &LiteralValue,
-        control: Option<&crate::resources::Control>,
-    ) -> LiteralValue {
+    pub(in crate::project::semantic) fn apply(self, text: &LiteralValue) -> LiteralValue {
         match self {
-            Self::Uppercase | Self::Lowercase => LiteralValue::from_parts(
-                text.parts().map(|part| match part {
+            Self::Uppercase | Self::Lowercase => {
+                LiteralValue::from_parts(text.parts().map(|part| match part {
                     LiteralPart::Bytes(bytes) => {
                         let mapped = if self == Self::Uppercase {
                             crate::strings::to_upper_js(&bytes)
@@ -154,9 +149,8 @@ impl StringMappingKind {
                         LiteralPart::Bytes(std::sync::Arc::from(mapped))
                     }
                     LiteralPart::Identity(identity) => LiteralPart::Identity(identity),
-                }),
-                control,
-            ),
+                }))
+            }
             Self::Capitalize | Self::Uncapitalize => {
                 let mut parts = text.parts();
                 let Some(LiteralPart::Bytes(bytes)) = parts.next() else {
@@ -172,7 +166,6 @@ impl StringMappingKind {
                 result.extend_from_slice(&bytes[split..]);
                 LiteralValue::from_parts(
                     std::iter::once(LiteralPart::Bytes(std::sync::Arc::from(result))).chain(parts),
-                    control,
                 )
             }
         }

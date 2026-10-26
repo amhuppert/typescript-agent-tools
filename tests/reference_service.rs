@@ -93,7 +93,14 @@ fn edits_and_failed_refreshes_cross_the_process_boundary() {
 #[test]
 fn client_working_directory_and_utf16_queries_match_direct_loading() {
     let service = Service::new(&[("src/a.ts", "// 😀\r\nexport const café = 1;\u{2028}café;\n")]);
-    let cold = json(service.run(&["--references-direct", "--at", "3:1", "src/a.ts", "--json"]));
+    let cold = json(service.run(&[
+        "--references",
+        "--direct",
+        "--at",
+        "3:1",
+        "src/a.ts",
+        "--json",
+    ]));
     assert_eq!(
         cold["groups"][0]["occurrences"].as_array().unwrap().len(),
         2
@@ -243,7 +250,7 @@ fn service_results_and_diagnostics_match_direct_cli_output() {
         &["--at", "99:1", "a.ts"],
         &["--name", "value", "missing.ts"],
     ] {
-        let mut direct = vec!["--references-direct"];
+        let mut direct = vec!["--references", "--direct"];
         direct.extend_from_slice(query);
         let mut cached = vec!["--references"];
         cached.extend_from_slice(query);

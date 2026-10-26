@@ -29,8 +29,8 @@ pub(in crate::project::semantic) struct AccessorRecipe {
 
 impl Source<'_, '_> {
     /// An attached DeclarationIdentity already has a final AST in this Source.
-    /// Header-only lookup gates may inspect it without parsing, charging work,
-    /// or changing checker state through an otherwise read-only facts view.
+    /// Header-only lookup gates may inspect it without parsing or changing
+    /// checker state through an otherwise read-only facts view.
     pub(in crate::project::semantic) fn observed_declaration_site(
         &self,
         declaration: DeclarationIdentity,
@@ -444,7 +444,7 @@ impl Source<'_, '_> {
 
     /// `getObjectTypeInstantiation` consumes full Symbol.Declarations, including
     /// nonmember entries. Validate the complete native array before projecting
-    /// it; resource accounting never interleaves syntax with fact validation.
+    /// it, so syntax projection never interleaves with fact validation.
     pub(in crate::project::semantic) fn symbol_declaration_references(
         &self,
         symbol: BoundSymbol,

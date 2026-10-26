@@ -91,6 +91,7 @@ For an existing supported project, measure `--references-direct` and
 service before a cold sample, keep it running for warm samples, and compare
 complete outputs. After a source edit, compare the refreshed service output
 against a new direct invocation. Always stop the service after measurement.
+The `--references-direct` spelling has since been removed; measure the direct load with `--references --direct`.
 
 The generated-project probe and raw sample arrays from this run are session-local
 artifacts at `.cc/temp/reference-service-benchmark.py` and

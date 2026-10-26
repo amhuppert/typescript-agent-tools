@@ -35,7 +35,6 @@ impl Source<'_, '_> {
             .ok_or_else(|| super::super::internal("string literal has no native cooked text"))?;
         Ok(crate::project::binding::NativePropertyKey::fixed(
             captured.literal_bytes(bytes),
-            self.control.as_ref(),
         ))
     }
 

@@ -122,24 +122,26 @@ fn leaf(operation: &Operation) -> String {
     text
 }
 
-/// The operation's repeated-value, `--pretty`, and display-limit rules,
-/// as one sentence each, for its help and the reference alike.
+/// The operation's repeated-value, `--pretty` (where it takes `--pretty`),
+/// and display-limit rules, as one sentence each, for its help and the
+/// reference alike.
 fn rules(operation: &Operation) -> String {
     let values = match operation.repeat {
         RepeatedValue::LastValue => "A value flag given more than once takes its last value.",
         RepeatedValue::Reject => "A value flag may be given once.",
     };
     let mut rules = match operation.pretty {
-        Pretty::Alone => format!(
+        Some(Pretty::Alone) => format!(
             "{values} {} is valid without {}.",
             FlagId::Pretty,
             FlagId::Json
         ),
-        Pretty::WithJson => format!(
+        Some(Pretty::WithJson) => format!(
             "{values} {} is valid only with {}.",
             FlagId::Pretty,
             FlagId::Json
         ),
+        None => values.to_owned(),
     };
     let bounds: Vec<String> = operation
         .limits
@@ -301,7 +303,8 @@ struct OperationDocument {
     usage: &'static [&'static str],
     flags: Vec<FlagDocument>,
     repeated_values: &'static str,
-    pretty: &'static str,
+    /// Null where the operation does not take `--pretty`.
+    pretty: Option<&'static str>,
     /// The lists it bounds, which `--limit` sets, with their defaults.
     limits: Vec<LimitDocument>,
     /// `repeated_values`, `pretty`, and `limits` as help states them.
@@ -328,10 +331,10 @@ impl OperationDocument {
                 RepeatedValue::LastValue => "last_value",
                 RepeatedValue::Reject => "reject",
             },
-            pretty: match operation.pretty {
+            pretty: operation.pretty.map(|pretty| match pretty {
                 Pretty::Alone => "alone",
                 Pretty::WithJson => "with_json",
-            },
+            }),
             limits: operation
                 .limits
                 .iter()

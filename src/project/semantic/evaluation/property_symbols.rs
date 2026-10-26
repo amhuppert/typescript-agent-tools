@@ -68,22 +68,20 @@ pub(super) mod checks {
 pub(super) struct PropertySymbols {
     index_symbols: HashMap<super::super::model::Index, PropertySymbolId>,
     unresolved_names: std::collections::HashMap<String, PropertySymbolId>,
-    unresolved_declared: crate::resources::FixedMap<PropertySymbolId, TypeId>,
-    own: crate::resources::FixedMap<NativeSymbolIdentity, PropertySymbolId>,
+    unresolved_declared: HashMap<PropertySymbolId, TypeId>,
+    own: HashMap<NativeSymbolIdentity, PropertySymbolId>,
     entries: Vec<Symbol>,
-    demands: crate::resources::FixedMap<(PropertySymbolId, bool), DemandId>,
+    demands: HashMap<(PropertySymbolId, bool), DemandId>,
     composite_cache: crate::resources::CheckedMap<
         composite::CompositeKey,
         NativeCompletion<crate::project::semantic::model::Property>,
     >,
-    composite_inventories: crate::resources::FixedMap<
-        TypeId,
-        NativeCompletion<Vec<crate::project::semantic::model::Property>>,
-    >,
-    discriminants: crate::resources::FixedMap<PropertySymbolId, NativeCompletion<bool>>,
+    composite_inventories:
+        HashMap<TypeId, NativeCompletion<Vec<crate::project::semantic::model::Property>>>,
+    discriminants: HashMap<PropertySymbolId, NativeCompletion<bool>>,
     // Evidence for this owner's actual computed-bit publication; factory-set
     // bits have no associated acquisition and remain clean observations.
-    containment: crate::resources::FixedMap<TypeId, NativeCompletion<bool>>,
+    containment: HashMap<TypeId, NativeCompletion<bool>>,
 }
 
 impl PropertySymbols {
@@ -93,14 +91,14 @@ impl PropertySymbols {
         Self {
             index_symbols: Default::default(),
             unresolved_names: std::collections::HashMap::new(),
-            unresolved_declared: crate::resources::FixedMap::new(),
-            own: crate::resources::FixedMap::new(),
+            unresolved_declared: HashMap::new(),
+            own: HashMap::new(),
             entries: Default::default(),
-            demands: crate::resources::FixedMap::new(),
+            demands: HashMap::new(),
             composite_cache: crate::resources::CheckedMap::new(),
-            composite_inventories: crate::resources::FixedMap::new(),
-            discriminants: crate::resources::FixedMap::new(),
-            containment: crate::resources::FixedMap::new(),
+            composite_inventories: HashMap::new(),
+            discriminants: HashMap::new(),
+            containment: HashMap::new(),
         }
     }
 }
@@ -1399,7 +1397,6 @@ impl Evaluator<'_, '_> {
         match &property.key {
             TypeKey::String { name } => Ok(crate::project::binding::NativePropertyKey::fixed(
                 name.as_bytes(),
-                self.control.as_ref(),
             )),
             TypeKey::Private { .. } | TypeKey::Symbol { .. } => {
                 Err(crate::project::semantic::internal(
@@ -2249,7 +2246,6 @@ impl Evaluator<'_, '_> {
     /// Native symbol creation/instantiation decides the header and association;
     /// this owner only publishes storage for that already selected identity.
     fn register_property_entry(&mut self, symbol: Symbol) -> PropertySymbolId {
-        self.native_members.symbols.entries.reserve(1);
         let id = PropertySymbolId::new(self.native_members.symbols.entries.len());
         self.native_members.symbols.entries.push(symbol);
         id
@@ -2258,7 +2254,7 @@ impl Evaluator<'_, '_> {
     fn install_created_property(&mut self, property: CreatedProperty) -> PropertySymbolId {
         self.register_property_entry(Symbol {
             actual_identity: property.header.identity(),
-            association: Association::Created(property.shared(self.control.as_ref())),
+            association: Association::Created(Arc::new(property)),
             read: None,
             write: None,
         })
@@ -2419,7 +2415,6 @@ impl Evaluator<'_, '_> {
             self.model.new_symbol_identity(),
             b"\xfeinstantiationExpression".as_slice(),
             None,
-            self.control.as_ref(),
         );
         let symbol = self.install_created_property(CreatedProperty {
             native_flags: None,
@@ -2455,12 +2450,7 @@ impl Evaluator<'_, '_> {
         rest: bool,
         ty: Option<TypeId>,
     ) -> PropertySymbolId {
-        let header = NativeSymbol::created(
-            self.model.new_symbol_identity(),
-            name.as_bytes(),
-            None,
-            self.control.as_ref(),
-        );
+        let header = NativeSymbol::created(self.model.new_symbol_identity(), name.as_bytes(), None);
         let symbol = self.install_created_property(CreatedProperty {
             native_flags: None,
             flags: PropertySymbolFlags {
@@ -2511,7 +2501,7 @@ impl Evaluator<'_, '_> {
         ty: TypeId,
     ) -> PropertySymbolId {
         self.create_property_symbol(
-            NativePropertyKey::fixed(name.as_bytes(), self.control.as_ref()),
+            NativePropertyKey::fixed(name.as_bytes()),
             optional,
             readonly,
             Some(ty),
@@ -2562,7 +2552,6 @@ impl Evaluator<'_, '_> {
             self.model.new_symbol_identity(),
             b"unknown".as_slice(),
             None,
-            self.control.as_ref(),
         );
         self.install_created_property(CreatedProperty {
             native_flags: None,
@@ -2589,19 +2578,11 @@ impl Evaluator<'_, '_> {
 }
 
 impl CreatedProperty {
-    /// Retained storage for one actual factory/merge record. Every Arc allocation
-    /// routes here; shared headers inside the record retain their actual identity.
-    fn shared(self, _control: Option<&crate::resources::Control>) -> Arc<Self> {
-        std::sync::Arc::new(self)
-    }
     /// Copy-on-write belongs to the record owner, not to Clone. Arc clones stay
     /// constant work; a mutation copies only the explicitly retained scalar lists.
-    fn make_mut<'a>(
-        data: &'a mut Arc<Self>,
-        control: Option<&crate::resources::Control>,
-    ) -> &'a mut Self {
+    fn make_mut(data: &mut Arc<Self>) -> &mut Self {
         if Arc::get_mut(data).is_none() {
-            *data = data.copy_data().shared(control);
+            *data = Arc::new(data.copy_data());
         }
         Arc::get_mut(data).expect("replacement created record has unique ownership")
     }

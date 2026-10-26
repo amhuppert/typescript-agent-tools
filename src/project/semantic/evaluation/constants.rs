@@ -84,13 +84,8 @@ impl Evaluator<'_, '_> {
                             .map(ConstantValue::Number)
                         }
                         (Some(left), Some(right)) if operator == K::PlusToken => {
-                            let text = LiteralValue::concat(
-                                [
-                                    &left.into_text(self.control.as_ref()),
-                                    &right.into_text(self.control.as_ref()),
-                                ],
-                                self.control.as_ref(),
-                            );
+                            let text =
+                                LiteralValue::concat([&left.into_text(), &right.into_text()]);
                             Some(ConstantValue::String(text))
                         }
                         _ => None,
@@ -121,15 +116,12 @@ impl Evaluator<'_, '_> {
                                 ..Default::default()
                             });
                         };
-                        texts.push(value.into_text(self.control.as_ref()));
+                        texts.push(value.into_text());
                         texts.push(recipe.texts[index + 1].clone());
                         result.other_files |= span.other_files;
                         result.external_references |= span.external_references;
                     }
-                    result.value = Some(ConstantValue::String(LiteralValue::concat(
-                        &texts,
-                        self.control.as_ref(),
-                    )));
+                    result.value = Some(ConstantValue::String(LiteralValue::concat(&texts)));
                     Ok(result)
                 }
                 ConstantExpression::Entity { name } => {

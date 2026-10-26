@@ -176,37 +176,21 @@ struct Record {
     traversal_header: bool,
 }
 
-/// Spans packed to `u32` offsets where all of them fit
-/// (`site_map::pack_span`), as `SiteMap` packs sites: never a truncated
-/// offset or a new input restriction.
+/// Spans packed to `u32` offsets (`site_map::pack_span`), as `SiteMap`
+/// packs sites.
 #[derive(Debug)]
-enum Spans {
-    Narrow(Box<[[u32; 2]]>),
-    Wide(Box<[Span]>),
-}
+struct Spans(Box<[[u32; 2]]>);
 
 impl Spans {
     fn new(spans: Vec<Span>) -> Self {
-        let narrow: Option<Vec<[u32; 2]>> = spans
-            .iter()
-            .map(|&span| super::site_map::pack_span(span))
-            .collect();
-        match narrow {
-            Some(narrow) => Spans::Narrow(narrow.into_boxed_slice()),
-            None => Spans::Wide(spans.into_boxed_slice()),
-        }
+        Spans(spans.into_iter().map(super::site_map::pack_span).collect())
     }
 
     fn get(&self, index: usize) -> Span {
-        match self {
-            Spans::Narrow(spans) => {
-                let [start, end] = spans[index];
-                Span {
-                    start: start as usize,
-                    end: end as usize,
-                }
-            }
-            Spans::Wide(spans) => spans[index],
+        let [start, end] = self.0[index];
+        Span {
+            start: start as usize,
+            end: end as usize,
         }
     }
 }
@@ -359,10 +343,9 @@ impl Index {
         name: &str,
         control: Option<&crate::resources::Control>,
     ) -> ReferenceTokens<'_> {
-        // getPossibleSymbolReferencePositions' decoded-key accelerator. Debit
-        // the exact query bytes before the indivisible standard-table lookup;
-        // this neither copies the key nor changes its hash/equality policy.
-
+        // getPossibleSymbolReferencePositions' decoded-key accelerator: one
+        // standard-table lookup by the exact query bytes, which neither copies
+        // the key nor changes its hash/equality policy.
         let tokens: &[StoredToken] = self
             .by_reference_name
             .get(name)
@@ -690,36 +673,25 @@ mod tests {
         assert!(std::mem::size_of::<StoredToken>() <= 12);
     }
 
-    /// Offsets that do not fit `u32` keep their full width, for the file.
+    /// Offsets up to `u32::MAX`, the longest source loading accepts, are
+    /// not truncated.
     #[test]
-    fn spans_pack_only_what_fits() {
+    fn spans_up_to_u32_max_are_not_truncated() {
         let spans = |offsets: &[(usize, usize)]| {
             offsets
                 .iter()
                 .map(|&(start, end)| Span { start, end })
                 .collect::<Vec<_>>()
         };
-        let narrow = Spans::new(spans(&[(0, 1), (7, u32::MAX as usize)]));
-        assert!(matches!(narrow, Spans::Narrow(_)));
+        let packed = Spans::new(spans(&[(0, 1), (7, u32::MAX as usize)]));
+        assert_eq!(packed.get(0), Span { start: 0, end: 1 });
         assert_eq!(
-            narrow.get(1),
+            packed.get(1),
             Span {
                 start: 7,
                 end: u32::MAX as usize
             }
         );
-        if let Some(wide_end) = (u32::MAX as usize).checked_add(1) {
-            let wide = Spans::new(spans(&[(0, 1), (7, wide_end)]));
-            assert!(matches!(wide, Spans::Wide(_)));
-            assert_eq!(wide.get(0), Span { start: 0, end: 1 });
-            assert_eq!(
-                wide.get(1),
-                Span {
-                    start: 7,
-                    end: wide_end
-                }
-            );
-        }
     }
 
     fn token(name: StringId, span: Span, target: Target) -> Token<'static> {

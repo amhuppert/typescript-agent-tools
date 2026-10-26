@@ -12,6 +12,7 @@ use crate::project::binding::flow::Site;
 use crate::project::sources::FileId;
 use crate::references::Location;
 use crate::types::PrimitiveName;
+use std::collections::HashMap;
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 struct PropertiesTypesKey {
@@ -23,8 +24,8 @@ struct PropertiesTypesKey {
 // One type index, fixed-width flags and two tags, never the property's inventory.
 
 pub(super) struct KeyofState {
-    nodes: crate::resources::FixedMap<(FileId, Site), NativeResult<TypeId>>,
-    properties: crate::resources::FixedMap<PropertiesTypesKey, NativeResult<TypeId>>,
+    nodes: HashMap<(FileId, Site), NativeResult<TypeId>>,
+    properties: HashMap<PropertiesTypesKey, NativeResult<TypeId>>,
 }
 
 impl Evaluator<'_, '_> {
@@ -305,8 +306,8 @@ impl KeyofState {
     /// identities, child values and provisional publication stay operation-owned.
     pub(super) fn new() -> Self {
         Self {
-            nodes: crate::resources::FixedMap::new(),
-            properties: crate::resources::FixedMap::new(),
+            nodes: HashMap::new(),
+            properties: HashMap::new(),
         }
     }
 }

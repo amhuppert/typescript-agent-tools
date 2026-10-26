@@ -503,9 +503,9 @@ impl Evaluator<'_, '_> {
         let view = self.model.get(ty)?;
         if let TypeView::Literal { base, value } = &view {
             context.length += match base {
-                PrimitiveName::String => value.display_length(self.control.as_ref()) + 2,
-                PrimitiveName::Bigint => value.display_length(self.control.as_ref()) + 1,
-                _ => value.display_length(self.control.as_ref()),
+                PrimitiveName::String => value.display_length() + 2,
+                PrimitiveName::Bigint => value.display_length() + 1,
+                _ => value.display_length(),
             };
             return Ok(NativeCompletion::clean(Node::text(match base {
                 PrimitiveName::String => self.quoted_literal_value(
@@ -1461,7 +1461,7 @@ impl Evaluator<'_, '_> {
                         } else {
                             self.property_symbol_name_facts(symbol, consumer)?
                                 .key
-                                .display_length(self.control.as_ref())
+                                .display_length()
                                 + 1
                         }
                     } else {

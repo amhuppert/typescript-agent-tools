@@ -9,7 +9,6 @@ use crate::project::binding::inputs::BindingFiles;
 use crate::project::program::specifier_environment::SpecifierEnvironment;
 use crate::project::program::{Program, SemanticOptions};
 use crate::project::sources::Sources;
-use std::path::Path;
 
 /// Inputs to the shared initialization and semantic operation owners. The
 /// file-facts view keeps Loading and Retained storage distinct without
@@ -19,8 +18,6 @@ pub(super) struct CheckerInputs<'p> {
     pub(super) sources: &'p Sources,
     // A borrowed request recursion guard; absent during project loading.
     pub(super) control: Option<&'p crate::resources::Control>,
-    #[allow(dead_code)] // Shared initialization retains configuration provenance.
-    pub(super) config: &'p Path,
     pub(super) bindings: BindingFiles<'p>,
     pub(super) raw_bindings: &'p crate::project::binding::raw::RawBindingSnapshot,
     options: &'p SemanticOptions,
@@ -35,7 +32,6 @@ impl<'p> CheckerInputs<'p> {
         Self {
             sources: &project.sources,
             control,
-            config: &project.config,
             bindings: BindingFiles::Retained(&project.bindings),
             raw_bindings: project.bindings.raw_binding_snapshot(),
             options: project.semantic_options(),
@@ -52,7 +48,6 @@ impl<'p> CheckerInputs<'p> {
         Self {
             sources: &program.sources,
             control: None,
-            config: &program.config,
             bindings: BindingFiles::Loading(program),
             raw_bindings,
             options: &program.semantic,

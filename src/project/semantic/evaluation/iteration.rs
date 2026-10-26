@@ -864,10 +864,7 @@ impl Evaluator<'_, '_> {
                             if let Some(raw) = self.reference_raw_symbol_table(owner, false)? {
                                 let members = self.reference_raw_table_entries(raw, consumer)?;
                                 if let Some((_, candidate)) = members.iter().find(|(key, _)| {
-                                    key == &NativePropertyKey::fixed(
-                                        name.as_bytes(),
-                                        self.control.as_ref(),
-                                    )
+                                    key == &NativePropertyKey::fixed(name.as_bytes())
                                 }) {
                                     if self.reference_symbol_identity(*candidate, consumer)?
                                         == self.reference_symbol_identity(symbol, consumer)?

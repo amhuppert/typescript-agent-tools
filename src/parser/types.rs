@@ -853,7 +853,7 @@ impl<'src> Parser<'src> {
             && !generator
             && self.current.kind == Kind::String
             && self.peek_at("(")?
-            && matches!(decode_string(self.current, self.control.as_ref())?, Ok(Value::Text(text)) if text == "constructor");
+            && matches!(decode_string(self.current)?, Ok(Value::Text(text)) if text == "constructor");
         let constructor = constructor_keyword || quoted_constructor;
         if accessor.is_none() && !constructor {
             self.ambient_modifiers(&modifiers)?;

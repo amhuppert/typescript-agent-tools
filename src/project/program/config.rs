@@ -1155,9 +1155,10 @@ fn extends_of(file: &File, disk: &disk::Disk) -> Result<Vec<(String, JsonValue)>
     Ok(applied)
 }
 
-/// TypeScript's `extends` lookup: a relative or rooted path, adding `.json`
-/// when the file does not exist, or else a package resolved like a NodeNext
-/// `require` of a JSON configuration.
+/// TypeScript's `extends` lookup (`getExtendsConfigPath`): a relative or
+/// rooted path, adding `.json` when no file exists there (`FileExists`, so a
+/// pipe there is selected, and refused where it is read), or else a package
+/// resolved like a NodeNext `require` of a JSON configuration.
 fn extends_path(
     file: &File,
     value: &JsonValue,
@@ -1170,15 +1171,15 @@ fn extends_path(
     }
     if paths::is_rooted(&name) || name.starts_with("./") || name.starts_with("../") {
         let path = paths::resolve(&file.dir, &name);
-        let is_file = |path: &str| {
-            disk.is_file(path)
+        let exists = |path: &str| {
+            disk.file_exists(path)
                 .map_err(|error| io_error(Path::new(path), &error))
         };
-        if path.ends_with(".json") || is_file(&path)? {
+        if path.ends_with(".json") || exists(&path)? {
             return Ok(path);
         }
         let with_json = format!("{path}.json");
-        if is_file(&with_json)? {
+        if exists(&with_json)? {
             return Ok(with_json);
         }
     } else if let Some(path) = resolve::config_package(&name, &file.dir, disk)? {

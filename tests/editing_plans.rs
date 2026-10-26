@@ -87,6 +87,28 @@ fn a_plan_is_a_new_file_and_names_files_absolutely() {
     assert!(text.contains(fixture.path("a.ts").to_str().unwrap()));
 }
 
+/// A plan records a file's identity as its device, inode, permission mode,
+/// and link count, and nothing else about it: no owner, group, or flags.
+#[cfg(unix)]
+#[test]
+fn a_plan_records_a_files_device_inode_mode_and_links_only() {
+    use std::os::unix::fs::MetadataExt;
+    let fixture = Fixture::new(&[("a.ts", SOURCE)]);
+    let path = plan(&fixture);
+    let plan: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+    let metadata = std::fs::metadata(fixture.path("a.ts")).unwrap();
+    assert_eq!(
+        plan["files"][0]["identity"],
+        serde_json::json!({
+            "device": metadata.dev(),
+            "inode": metadata.ino(),
+            "mode": metadata.mode(),
+            "links": 1,
+        })
+    );
+}
+
 #[test]
 fn loading_ignores_current_files_and_fragments_until_apply_checks_them() {
     let fixture = Fixture::new(&[("a.ts", SOURCE)]);
@@ -183,14 +205,18 @@ fn a_plan_edits_only_files_preparation_would() {
         PreparedBatch::load(&path).unwrap_err().kind,
         LoadErrorKind::Malformed
     );
-    // A relative path names nothing exactly.
-    let fixture = Fixture::new(&[("a.ts", SOURCE)]);
-    let path = plan(&fixture);
-    edit_plan(&path, |plan| plan["files"][0]["path"] = "a.ts".into());
-    assert_eq!(
-        PreparedBatch::load(&path).unwrap_err().kind,
-        LoadErrorKind::Malformed
-    );
+    // A relative path names nothing exactly, nor does a relative referent.
+    for field in ["path", "referent"] {
+        let fixture = Fixture::new(&[("a.ts", SOURCE)]);
+        let path = plan(&fixture);
+        edit_plan(&path, |plan| plan["files"][0][field] = "a.ts".into());
+        let error = PreparedBatch::load(&path).unwrap_err();
+        assert_eq!(error.kind, LoadErrorKind::Malformed, "{field}: {error:?}");
+        assert!(
+            error.message.contains("absolute path"),
+            "{field}: {error:?}"
+        );
+    }
 }
 
 /// The names a plan records as its loaded batch gives them, and as a plan

@@ -479,10 +479,7 @@ impl Evaluator<'_, '_> {
                         .property_name
                         .as_ref()
                         .map(|name| {
-                            crate::project::binding::NativePropertyKey::fixed(
-                                name.as_bytes(),
-                                self.control.as_ref(),
-                            )
+                            crate::project::binding::NativePropertyKey::fixed(name.as_bytes())
                         }),
                 ))
             }
@@ -492,10 +489,7 @@ impl Evaluator<'_, '_> {
                     .access_name_text(name)
                     .map(|name| {
                         NativeCompletion::clean(Some(
-                            crate::project::binding::NativePropertyKey::fixed(
-                                name.as_bytes(),
-                                self.control.as_ref(),
-                            ),
+                            crate::project::binding::NativePropertyKey::fixed(name.as_bytes()),
                         ))
                     })
                     .map_err(Into::into),

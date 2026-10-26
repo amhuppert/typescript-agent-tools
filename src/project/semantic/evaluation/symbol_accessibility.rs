@@ -79,7 +79,7 @@ impl Evaluator<'_, '_> {
         let mut sequence = NativeSequence::new();
         let result = (|| {
             while let Some(ScopeLocation::Synthetic(id)) = scope {
-                let key = NativePropertyKey::fixed(name.as_bytes(), self.control.as_ref());
+                let key = NativePropertyKey::fixed(name.as_bytes());
                 let symbol = self
                     .diagnostic_scope_locals(id)?
                     .iter()
@@ -406,7 +406,6 @@ impl Evaluator<'_, '_> {
                                                         (
                                                             NativePropertyKey::fixed(
                                                                 name.into_bytes(),
-                                                                self.control.as_ref(),
                                                             ),
                                                             symbol,
                                                         )

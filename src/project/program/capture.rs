@@ -9,11 +9,11 @@
 //! The loader alone decides what a capture means
 //! for the program: it observes the read where it uses it, and a capture's
 //! failure surfaces only when the loader reaches its input, exactly where a
-//! capture of its own would have failed. Workers read speculatively
-//! (`Reading::Speculative`): an input that is not a regular file, such as a
-//! pipe, is read only by the loader, when it reaches the input.
+//! capture of its own would have failed. Workers and the loader read alike
+//! (`disk::TextRead`), which refuses an input that is not a regular file,
+//! such as a pipe, without opening it.
 
-use super::disk::{Reading, TextRead, Waits};
+use super::disk::TextRead;
 use crate::analysis::{InputError, InputErrorKind, Parser};
 use crate::parser::json::JsonErrorKind;
 use crate::project::binding::{self, FileFacts, FileOptions, ModuleIndicators};
@@ -21,7 +21,7 @@ use crate::project::navigation::Captured;
 use crate::project::sources::FileId;
 use crate::source::SourceText;
 use std::collections::{HashMap, VecDeque};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::{Arc, Condvar, Mutex};
 
 /// Worker threads beside the loader. Capturing is most of a load's work
@@ -108,45 +108,60 @@ pub(super) fn keep_navigation(cache: &mut Cache, path: &str, catalog: &Captured)
     }
 }
 
-/// Capture `job`'s input with `parser`, reading as `reading` reads; nothing
-/// when that reading declines to read the input.
+/// Capture `job`'s input with `parser`.
 #[cfg(test)]
-pub(super) fn capture(parser: &Parser, job: &Job, reading: Reading<'_>) -> Option<Capture> {
-    capture_reusing(parser, job, reading, &Cache::new())
+pub(super) fn capture(parser: &Parser, job: &Job) -> Capture {
+    capture_reusing(parser, job, &Cache::new())
 }
 
-fn capture_reusing(
-    parser: &Parser,
-    job: &Job,
-    reading: Reading<'_>,
-    previous: &Cache,
-) -> Option<Capture> {
-    let mut read = TextRead::with(job.path.as_ref(), reading)?;
+fn capture_reusing(parser: &Parser, job: &Job, previous: &Cache) -> Capture {
+    let mut read = TextRead::new(job.path.as_ref());
     if let Some(cached) = previous.get(&job.path)
         && cached.library == job.library
         && cached.json == job.json
         && read.reuse_text(&cached.text)
     {
-        return Some(Capture {
+        return Capture {
             read,
             json: job.json,
             parsed: Some(cached.parsed.clone()),
-        });
+        };
     }
     let parsed = read.text().ok().map(|text| {
         let source = Arc::new(SourceText::shared(Arc::clone(text)));
         let contents = contents(parser, job, &source);
         Parsed { source, contents }
     });
-    Some(Capture {
+    Capture {
         read,
         json: job.json,
         parsed,
+    }
+}
+
+/// Refuse a program input whose text is longer than `u32::MAX` UTF-8 bytes,
+/// as `Unsupported`: a limit of tsparse, not a TypeScript rule. It is the one
+/// owner of that limit; binding packs every offset into a source as a `u32`
+/// on the strength of it (`binding::site_map::pack_span`). Every program
+/// input's text passes here (`contents`) before it is parsed or bound.
+fn check_length(length: usize, path: &Path) -> Result<(), InputError> {
+    if length <= u32::MAX as usize {
+        return Ok(());
+    }
+    Err(InputError {
+        kind: InputErrorKind::Unsupported,
+        message: format!(
+            "source file is longer than {} bytes; tsparse supports source files up to u32::MAX bytes",
+            u32::MAX
+        ),
+        path: Some(path.to_path_buf()),
+        position: None,
     })
 }
 
 fn contents(parser: &Parser, job: &Job, source: &Arc<SourceText>) -> Result<Contents, InputError> {
     let file_path = PathBuf::from(&job.path);
+    check_length(source.as_str().len(), &file_path)?;
     if job.json {
         // TypeScript's `ParseSourceFile` with `ScriptKindJSON`, read by the
         // reader configuration files share.
@@ -194,15 +209,12 @@ pub(super) fn collect(
 }
 
 /// How a job is captured: `capture`, except where a test observes it.
-type CaptureWith<'c> = &'c (dyn Fn(&Parser, &Job, Reading<'_>) -> Option<Capture> + Sync);
+type CaptureWith<'c> = &'c (dyn Fn(&Parser, &Job) -> Capture + Sync);
 
 /// The captures of one load: jobs in reservation order, which is the order
 /// the loader takes them in, and workers that capture them ahead of it.
 pub(super) struct Captures<'c> {
     capture: CaptureWith<'c>,
-    /// The load's reads in order that may have waited: a capture begun
-    /// before one of them ended is out of date.
-    waits: &'c Waits,
     state: Mutex<State>,
     /// Workers wait for a job they may start.
     startable: Condvar,
@@ -214,10 +226,9 @@ pub(super) struct Captures<'c> {
 struct State {
     /// Reserved jobs no worker has started, by increasing id.
     waiting: VecDeque<Job>,
-    /// Finished captures the loader has not taken, each with its job and the
-    /// count of `Captures::waits` when it began: a worker's capture, nothing
-    /// when it declined to read, or its panic.
-    finished: HashMap<FileId, (Job, u64, std::thread::Result<Option<Capture>>)>,
+    /// Finished captures the loader has not taken: a worker's capture, or
+    /// its panic.
+    finished: HashMap<FileId, std::thread::Result<Capture>>,
     /// The id after the last one the loader took.
     next: usize,
     closed: bool,
@@ -229,27 +240,19 @@ impl Captures<'_> {
     /// the others and to the loader, which captures any job no worker has
     /// started when it needs it, so the result does not depend on how many
     /// workers there are.
-    pub(super) fn with_reuse<T>(
-        waits: &Waits,
-        previous: &Cache,
-        load: impl FnOnce(&Captures<'_>) -> T,
-    ) -> T {
-        let capture = |parser: &Parser, job: &Job, reading: Reading<'_>| {
-            capture_reusing(parser, job, reading, previous)
-        };
-        Captures::run(workers(), waits, &capture, load)
+    pub(super) fn with_reuse<T>(previous: &Cache, load: impl FnOnce(&Captures<'_>) -> T) -> T {
+        let capture = |parser: &Parser, job: &Job| capture_reusing(parser, job, previous);
+        Captures::run(workers(), &capture, load)
     }
 
     /// `with_reuse`, on `workers` workers that capture each job with `capture`.
     fn run<'c, T>(
         workers: usize,
-        waits: &'c Waits,
         capture: CaptureWith<'c>,
         load: impl FnOnce(&Captures<'c>) -> T,
     ) -> T {
         let captures = Captures {
             capture,
-            waits,
             state: Mutex::new(State::default()),
             startable: Condvar::new(),
             finished: Condvar::new(),
@@ -280,9 +283,7 @@ impl Captures<'_> {
     }
 
     /// The capture of the next input in reservation order, `id`: a worker's,
-    /// or the loader's own (`in_order`) when no worker has started it, a
-    /// worker declined to read it, or a worker read it before an earlier
-    /// input's read that may have waited.
+    /// or the loader's own when no worker has started it.
     pub(super) fn take(&self, id: FileId, parser: &Parser) -> Capture {
         let mut state = self.lock();
         assert_eq!(
@@ -292,23 +293,14 @@ impl Captures<'_> {
         );
         state.next += 1;
         loop {
-            if let Some((job, waits, capture)) = state.finished.remove(&id) {
-                let current = waits == self.waits.count();
+            if let Some(capture) = state.finished.remove(&id) {
                 drop(state);
-                // Reading in order reads this input after any such earlier
-                // read; a capture read before it, and its panic, are for
-                // nobody.
-                if !current {
-                    return self.in_order(parser, &job);
-                }
-                return capture
-                    .unwrap_or_else(|panic| std::panic::resume_unwind(panic))
-                    .unwrap_or_else(|| self.in_order(parser, &job));
+                return capture.unwrap_or_else(|panic| std::panic::resume_unwind(panic));
             }
             if state.waiting.front().is_some_and(|job| job.id == id) {
                 let job = state.waiting.pop_front().expect("the front job");
                 drop(state);
-                return self.in_order(parser, &job);
+                return (self.capture)(parser, &job);
             }
             // A worker is capturing it.
             state = self
@@ -316,15 +308,6 @@ impl Captures<'_> {
                 .wait(state)
                 .unwrap_or_else(std::sync::PoisonError::into_inner);
         }
-    }
-
-    /// The loader's capture of `job`, where loading in order reaches it
-    /// (`Reading::InOrder`). An input a speculative reading declines, such as
-    /// a pipe, is read as an ordinary read is, waiting as it must; captures
-    /// workers began before that read ended are then out of date, as after
-    /// every other read in order that may have waited, such as a manifest's.
-    fn in_order(&self, parser: &Parser, job: &Job) -> Capture {
-        (self.capture)(parser, job, Reading::InOrder(self.waits)).expect("a reading in order reads")
     }
 
     fn work(&self, parser: &Parser) {
@@ -344,15 +327,14 @@ impl Captures<'_> {
                 continue;
             }
             let job = state.waiting.pop_front().expect("the front job");
-            let waits = self.waits.count();
             drop(state);
             // A panic belongs to the loader, which resumes it when it takes
             // this input, as if it had captured the input itself.
             let capture = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                (self.capture)(parser, &job, Reading::Speculative)
+                (self.capture)(parser, &job)
             }));
             state = self.lock();
-            state.finished.insert(job.id, (job, waits, capture));
+            state.finished.insert(job.id, capture);
             self.finished.notify_all();
         }
     }
@@ -397,7 +379,7 @@ fn workers() -> usize {
 
 #[cfg(test)]
 pub(super) mod tests {
-    use super::{Capture, Captures, Job, Reading, Waits};
+    use super::{Capture, Captures, Job};
     use crate::analysis::Parser;
     use crate::project::binding::FileOptions;
     use crate::project::sources::Sources;
@@ -415,7 +397,9 @@ pub(super) mod tests {
     /// Load with `workers` workers, or the default, while this lives: tests
     /// that choose take turns, so each load sees its test's choice.
     pub(in crate::project::program) fn use_workers(workers: Option<usize>) -> impl Drop {
-        struct Chosen(#[allow(dead_code)] std::sync::MutexGuard<'static, ()>);
+        struct Chosen {
+            _turn: std::sync::MutexGuard<'static, ()>,
+        }
         impl Drop for Chosen {
             fn drop(&mut self) {
                 WORKERS.store(usize::MAX, Ordering::Relaxed);
@@ -425,7 +409,7 @@ pub(super) mod tests {
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
         WORKERS.store(workers.unwrap_or(usize::MAX), Ordering::Relaxed);
-        Chosen(turn)
+        Chosen { _turn: turn }
     }
 
     pub(super) fn workers() -> Option<usize> {
@@ -494,14 +478,14 @@ pub(super) mod tests {
         let directory = Directory::new("order");
         let count = 8;
         let later = (Mutex::new(0), Condvar::new());
-        let capture = |parser: &Parser, job: &Job, reading: Reading| {
+        let capture = |parser: &Parser, job: &Job| {
             if job.id.index() == 0 {
                 let mut finished = later.0.lock().unwrap();
                 while *finished < count - 1 {
                     finished = later.1.wait(finished).unwrap();
                 }
             }
-            let captured = super::capture(parser, job, reading);
+            let captured = super::capture(parser, job);
             if job.id.index() != 0 {
                 *later.0.lock().unwrap() += 1;
                 later.1.notify_all();
@@ -509,7 +493,7 @@ pub(super) mod tests {
             captured
         };
         crate::analysis::on_parsing_thread("tsparse-test", |parser| {
-            Captures::run(4, &Waits::default(), &capture, |captures| {
+            Captures::run(4, &capture, |captures| {
                 let ids = reserve(captures, &directory.0, count);
                 for (index, id) in ids.into_iter().enumerate() {
                     assert_eq!(read(&captures.take(id, parser)), text(index));
@@ -526,16 +510,16 @@ pub(super) mod tests {
         let directory = Directory::new("panic");
         for taken in [2, 3] {
             let panicked = AtomicBool::new(false);
-            let capture = |parser: &Parser, job: &Job, reading: Reading| {
+            let capture = |parser: &Parser, job: &Job| {
                 if job.id.index() == 2 {
                     panicked.store(true, Ordering::SeqCst);
                     panic!("capture 2");
                 }
-                super::capture(parser, job, reading)
+                super::capture(parser, job)
             };
             let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                 crate::analysis::on_parsing_thread("tsparse-test", |parser| {
-                    Captures::run(2, &Waits::default(), &capture, |captures| {
+                    Captures::run(2, &capture, |captures| {
                         let ids = reserve(captures, &directory.0, 4);
                         for (index, &id) in ids.iter().enumerate().take(taken) {
                             assert_eq!(read(&captures.take(id, parser)), text(index));
@@ -560,60 +544,23 @@ pub(super) mod tests {
         }
     }
 
-    /// A capture a worker made before a read in order that may have waited
-    /// ended, here a manifest's from a pipe whose writer changes the input
-    /// first, is made again: loading in order reads the input after it.
-    #[cfg(unix)]
+    /// The length limit at and just over `u32::MAX` bytes. No end-to-end
+    /// variant runs: a source over 4 GiB cannot be written, read, and loaded
+    /// within a test's time and memory, so the rule takes the length as a
+    /// value, and `contents` applies it to every input before parsing.
     #[test]
-    fn a_capture_made_before_a_wait_ended_is_made_again() {
-        let directory = Directory::new("wait");
-        let waits = Waits::default();
-        let captured = (Mutex::new(false), Condvar::new());
-        let capture = |parser: &Parser, job: &Job, reading: Reading<'_>| {
-            let result = super::capture(parser, job, reading);
-            if job.id.index() == 1 && matches!(reading, Reading::Speculative) {
-                *captured.0.lock().unwrap() = true;
-                captured.1.notify_all();
-            }
-            result
-        };
-        let manifest = directory.0.join("package.json");
-        let made = std::process::Command::new("mkfifo")
-            .arg(&manifest)
-            .status()
-            .unwrap();
-        assert!(made.success());
-        crate::analysis::on_parsing_thread("tsparse-test", |parser| {
-            Captures::run(2, &waits, &capture, |captures| {
-                let ids = reserve(captures, &directory.0, 2);
-                assert_eq!(read(&captures.take(ids[0], parser)), text(0));
-                let mut done = captured.0.lock().unwrap();
-                while !*done {
-                    done = captured.1.wait(done).unwrap();
-                }
-                drop(done);
-                let writer = {
-                    let (manifest, input) = (manifest.clone(), directory.0.join("f1.ts"));
-                    std::thread::spawn(move || {
-                        use std::io::Write;
-                        let mut pipe = std::fs::OpenOptions::new()
-                            .write(true)
-                            .open(manifest)
-                            .unwrap();
-                        std::fs::write(input, "export const changed = 1;").unwrap();
-                        pipe.write_all(b"{}").unwrap();
-                    })
-                };
-                let read_in_order =
-                    super::TextRead::with(&manifest, Reading::InOrder(&waits)).unwrap();
-                writer.join().unwrap();
-                assert_eq!(read_in_order.text().unwrap().as_ref(), "{}");
-                assert_eq!(
-                    read(&captures.take(ids[1], parser)),
-                    "export const changed = 1;"
-                );
-            })
-        })
-        .unwrap();
+    fn a_source_longer_than_u32_max_bytes_is_unsupported() {
+        let path = Path::new("/project/huge.ts");
+        assert!(super::check_length(u32::MAX as usize, path).is_ok());
+        let error = super::check_length(u32::MAX as usize + 1, path)
+            .expect_err("a source one byte over the limit is refused");
+        assert_eq!(error.kind, crate::analysis::InputErrorKind::Unsupported);
+        assert_eq!(error.path.as_deref(), Some(path));
+        assert_eq!(error.position, None);
+        assert_eq!(
+            error.to_string(),
+            "/project/huge.ts: source file is longer than 4294967295 bytes; \
+             tsparse supports source files up to u32::MAX bytes"
+        );
     }
 }

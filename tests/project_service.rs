@@ -97,12 +97,6 @@ fn service_answers_are_the_bytes_of_direct_answers_for_every_operation() {
     assert!(!service.runtime.exists(), "a direct query used the service");
     for (query, expected) in QUERIES.iter().zip(&expected) {
         same(&service.run(query), expected, &format!("{query:?}"));
-        // The `--references-direct` spelling is the same request.
-        if query[0] == "--references" {
-            let mut spelled = query.to_vec();
-            spelled[0] = "--references-direct";
-            same(&service.run(&spelled), expected, &format!("{query:?}"));
-        }
     }
     // Every outcome kind occurs above.
     let codes: Vec<Option<i32>> = expected.iter().map(|output| output.status.code()).collect();

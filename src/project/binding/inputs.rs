@@ -61,7 +61,6 @@ enum Owner<'a> {
     Retained(&'a super::retained::File),
 }
 
-#[allow(dead_code)] // Shared source facts precede remaining native-reader migration.
 impl<'a> File<'a> {
     pub(super) fn module(self) -> bool {
         match self.owner {

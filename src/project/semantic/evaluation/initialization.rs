@@ -161,10 +161,7 @@ impl Evaluator<'_, '_> {
             Some(ReferenceRawSymbolTable::Created(globals)),
         )?;
         self.symbol_tables.raw[globals].insert(
-            Ok(NativePropertyKey::fixed(
-                b"globalThis".as_slice(),
-                self.control.as_ref(),
-            )),
+            Ok(NativePropertyKey::fixed(b"globalThis".as_slice())),
             global_this,
         );
         self.observe_initialization(observer, Step::GlobalThis)?;
@@ -204,7 +201,7 @@ impl Evaluator<'_, '_> {
                     let (name, symbol) = entry.map_err(|failure| {
                         super::super::binding_failure(self.inputs, None, failure)
                     })?;
-                    let key = NativePropertyKey::fixed(name.as_bytes(), self.control.as_ref());
+                    let key = NativePropertyKey::fixed(name.as_bytes());
                     if self
                         .reference_raw_table_lookup_at(
                             ReferenceRawSymbolTable::Created(globals),
@@ -236,7 +233,7 @@ impl Evaluator<'_, '_> {
                 }
             }
             // `addUndefinedToGlobalsOrErrorOnRedeclaration` is first-in-wins.
-            let key = NativePropertyKey::fixed(b"undefined".as_slice(), self.control.as_ref());
+            let key = NativePropertyKey::fixed(b"undefined".as_slice());
             if self
                 .reference_raw_table_lookup_at(
                     ReferenceRawSymbolTable::Created(globals),
@@ -371,10 +368,7 @@ impl Evaluator<'_, '_> {
                     Some(raw) => self
                         .reference_raw_table_lookup(
                             raw,
-                            &NativePropertyKey::fixed(
-                                b"\xfeexport".as_slice(),
-                                self.control.as_ref(),
-                            ),
+                            &NativePropertyKey::fixed(b"\xfeexport".as_slice()),
                             &consumer,
                         )?
                         .is_some(),

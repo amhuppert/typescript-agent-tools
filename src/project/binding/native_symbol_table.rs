@@ -243,7 +243,7 @@ mod tests {
     use super::*;
 
     fn key(index: usize) -> NativePropertyKey {
-        NativePropertyKey::fixed(format!("k{index}").into_bytes().as_slice(), None)
+        NativePropertyKey::fixed(format!("k{index}").into_bytes().as_slice())
     }
 
     /// A table answers as a map does at every size, across the change from

@@ -603,12 +603,11 @@ fn help_wins_over_every_usage_error() {
         (&["--help", "--outline", "--depth"], &outline),
         (&["--help", "--apply"], &apply),
         (&["-h", "--edit-batch"], &batch),
-        // Several operations; and flags that name one, however spelled
-        // or repeated.
+        // Several operations; and flags that name one, however repeated.
         (&["--type", "--references", "--help"], &index),
         (&["--outline", "--show", "--help", "app.ts"], &index),
-        (&["--references-direct", "--help"], &references),
-        (&["--references", "--references-direct", "-h"], &references),
+        (&["--references", "--direct", "--help"], &references),
+        (&["--references", "--references", "-h"], &references),
         (
             &["--apply", "a.json", "--apply", "b.json", "--help"],
             &apply,
@@ -643,9 +642,8 @@ fn help_wins_over_every_usage_error() {
         document
     );
     assert_eq!(leaf(&["--help", "--pretty"]), index);
-    // Help asks which operations the flags name, not which one a request
-    // would run: a service action takes `--references` beside it, but the
-    // two flags name two operations, so help is the index.
+    // A service action and `--references` name two operations, so help is
+    // the index.
     for action in [
         "--references-status",
         "--references-stop",

@@ -600,7 +600,7 @@ impl Evaluator<'_, '_> {
         match self.reference_raw_symbol_table(module, true)? {
             Some(raw) => self.reference_raw_table_lookup(
                 raw,
-                &NativePropertyKey::fixed(name.as_bytes(), self.control.as_ref()),
+                &NativePropertyKey::fixed(name.as_bytes()),
                 consumer,
             ),
             None => Ok(None),
@@ -1854,7 +1854,7 @@ impl Evaluator<'_, '_> {
     ) -> NativeResult<Option<ReferenceSymbol>> {
         self.reference_property_symbol_by_key_completion(
             ty,
-            &NativePropertyKey::fixed(name.as_bytes(), self.control.as_ref()),
+            &NativePropertyKey::fixed(name.as_bytes()),
             consumer,
         )
     }
@@ -1914,11 +1914,11 @@ impl Evaluator<'_, '_> {
             Symbol::Bound(origin) => self
                 .source
                 .bindings()
-                .read_origin_name(origin, self.control.as_ref())
+                .read_origin_name(origin)
                 .map_err(|error| self.generic_binding_failure(error, consumer)),
             Symbol::Property(property) => self
                 .property_native_symbol(property, consumer)?
-                .name(self.control.as_ref())
+                .name()
                 .map_err(|failure| self.generic_binding_failure(failure, consumer)),
         }
     }

@@ -101,7 +101,7 @@ fn request_resource_completed_copy_preserves_exact_os_path() {
     use std::os::unix::ffi::OsStringExt;
     let fixture = Fixture::new("let chosen: number = 1;");
     let result: Result<(), AnalysisError> =
-        worker_with_limits(&fixture.project, Limits::default(), |_, _control| {
+        worker_with_limits(&fixture.project, Limits::default(), |_, _| {
             let expected: AnalysisError = SemanticError {
                 kind: SemanticErrorKind::InvalidSemantic,
                 reason: SemanticFailureReason::UnresolvedSymbol.into(),

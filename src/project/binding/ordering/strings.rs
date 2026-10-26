@@ -103,37 +103,35 @@ impl NativeStringPart {
 }
 
 pub(in crate::project) trait NativeByteInput {
-    fn into_native_bytes(self, control: Option<&crate::resources::Control>) -> Arc<[u8]>;
+    fn into_native_bytes(self) -> Arc<[u8]>;
 }
 impl NativeByteInput for &[u8] {
-    fn into_native_bytes(self, _control: Option<&crate::resources::Control>) -> Arc<[u8]> {
+    fn into_native_bytes(self) -> Arc<[u8]> {
         std::sync::Arc::from(self)
     }
 }
 impl NativeByteInput for Vec<u8> {
-    fn into_native_bytes(self, _control: Option<&crate::resources::Control>) -> Arc<[u8]> {
+    fn into_native_bytes(self) -> Arc<[u8]> {
         std::sync::Arc::from(self)
     }
 }
 impl NativeByteInput for Arc<[u8]> {
-    fn into_native_bytes(self, _control: Option<&crate::resources::Control>) -> Arc<[u8]> {
+    fn into_native_bytes(self) -> Arc<[u8]> {
         self
     }
 }
 
 /// The existing from_parts coalescing decision, reusable by native factories
 /// supplying borrowed byte runs. Formatting policy stays with those factories.
-pub(super) struct NativeStringBuilder<'a> {
+pub(super) struct NativeStringBuilder {
     parts: Vec<NativeStringPart>,
     bytes: Vec<u8>,
-    control: Option<&'a crate::resources::Control>,
 }
-impl<'a> NativeStringBuilder<'a> {
-    pub(super) fn new(control: Option<&'a crate::resources::Control>) -> Self {
+impl NativeStringBuilder {
+    pub(super) fn new() -> Self {
         Self {
             parts: Vec::new(),
             bytes: Vec::new(),
-            control,
         }
     }
     pub(super) fn bytes(&mut self, bytes: &[u8]) {
@@ -159,7 +157,7 @@ impl<'a> NativeStringBuilder<'a> {
     }
     pub(super) fn finish(mut self) -> NativeStringValue {
         if self.parts.is_empty() {
-            return NativeStringValue::from_bytes(std::sync::Arc::from(self.bytes), self.control);
+            return NativeStringValue::from_bytes(std::sync::Arc::from(self.bytes));
         }
         self.flush();
         NativeStringValue(Repr::Parts(std::sync::Arc::from(self.parts)))
@@ -169,11 +167,8 @@ impl<'a> NativeStringBuilder<'a> {
 impl NativeStringValue {
     /// Exact retained bytes: borrowed/owned inputs pay for a new payload;
     /// already shared input stays shared without an intermediate conversion.
-    pub(in crate::project) fn from_bytes(
-        bytes: impl NativeByteInput,
-        control: Option<&crate::resources::Control>,
-    ) -> Self {
-        Self(Repr::Bytes(bytes.into_native_bytes(control)))
+    pub(in crate::project) fn from_bytes(bytes: impl NativeByteInput) -> Self {
+        Self(Repr::Bytes(bytes.into_native_bytes()))
     }
 
     /// Concatenation retains exact native bytes and actual identity atoms.
@@ -181,9 +176,8 @@ impl NativeStringValue {
     /// are separate semantic string operations and must not run here.
     pub(in crate::project) fn from_parts(
         parts: impl IntoIterator<Item = NativeStringPart>,
-        control: Option<&crate::resources::Control>,
     ) -> Self {
-        let mut result = NativeStringBuilder::new(control);
+        let mut result = NativeStringBuilder::new();
         for part in parts {
             match part {
                 NativeStringPart::Bytes(bytes) => result.bytes(&bytes),
@@ -197,9 +191,8 @@ impl NativeStringValue {
     /// without requiring callers to allocate temporary Arc parts first.
     pub(in crate::project) fn from_byte_parts<'a>(
         parts: impl IntoIterator<Item = &'a [u8]>,
-        control: Option<&crate::resources::Control>,
     ) -> Self {
-        let mut result = NativeStringBuilder::new(control);
+        let mut result = NativeStringBuilder::new();
         for bytes in parts {
             result.bytes(bytes);
         }
@@ -283,10 +276,7 @@ impl NativeStringValue {
         matches!(&self.0, Repr::Bytes(bytes) if bytes.is_empty())
     }
 
-    pub(in crate::project) fn display_length(
-        &self,
-        _control: Option<&crate::resources::Control>,
-    ) -> usize {
+    pub(in crate::project) fn display_length(&self) -> usize {
         match &self.0 {
             Repr::Bytes(bytes) => bytes.len(),
             Repr::Parts(parts) => parts
@@ -314,17 +304,13 @@ impl NativeStringValue {
     pub(in crate::project) fn start(&self) -> NativeStringPosition {
         NativeStringPosition(0)
     }
-    pub(in crate::project) fn end(
-        &self,
-        control: Option<&crate::resources::Control>,
-    ) -> NativeStringPosition {
-        NativeStringPosition(self.display_length(control))
+    pub(in crate::project) fn end(&self) -> NativeStringPosition {
+        NativeStringPosition(self.display_length())
     }
 
     pub(in crate::project) fn segment_at(
         &self,
         position: NativeStringPosition,
-        _control: Option<&crate::resources::Control>,
     ) -> Result<NativeStringSegment<'_>, NativeStringError> {
         let mut offset = position.0;
         match &self.0 {
@@ -367,9 +353,8 @@ impl NativeStringValue {
         &self,
         position: NativeStringPosition,
         count: usize,
-        control: Option<&crate::resources::Control>,
     ) -> Result<NativeStringPosition, NativeStringError> {
-        match self.segment_at(position, control)? {
+        match self.segment_at(position)? {
             NativeStringSegment::Bytes(bytes) if count <= bytes.len() => {
                 Ok(NativeStringPosition(position.0 + count))
             }
@@ -386,9 +371,8 @@ impl NativeStringValue {
     pub(in crate::project) fn after_segment(
         &self,
         position: NativeStringPosition,
-        control: Option<&crate::resources::Control>,
     ) -> Result<NativeStringPosition, NativeStringError> {
-        Ok(match self.segment_at(position, control)? {
+        Ok(match self.segment_at(position)? {
             NativeStringSegment::Bytes(bytes) => NativeStringPosition(position.0 + bytes.len()),
             NativeStringSegment::Identity(_) => NativeStringPosition(position.0 + 1),
             NativeStringSegment::End => position,
@@ -400,12 +384,11 @@ impl NativeStringValue {
     pub(in crate::project) fn previous_segment(
         &self,
         position: NativeStringPosition,
-        control: Option<&crate::resources::Control>,
     ) -> Result<(NativeStringPosition, NativeStringSegment<'_>), NativeStringError> {
         if position == self.start() {
             return Ok((position, NativeStringSegment::End));
         }
-        if position > self.end(control) {
+        if position > self.end() {
             return Err(NativeStringError::InvalidBoundary(
                 "native string slice position is outside its value",
             ));
@@ -450,9 +433,8 @@ impl NativeStringValue {
         &self,
         position: NativeStringPosition,
         count: usize,
-        control: Option<&crate::resources::Control>,
     ) -> Result<NativeStringPosition, NativeStringError> {
-        match self.previous_segment(position, control)?.1 {
+        match self.previous_segment(position)?.1 {
             NativeStringSegment::Bytes(bytes) if count <= bytes.len() => {
                 Ok(NativeStringPosition(position.0 - count))
             }
@@ -468,9 +450,8 @@ impl NativeStringValue {
         &self,
         start: NativeStringPosition,
         end: NativeStringPosition,
-        control: Option<&crate::resources::Control>,
     ) -> Result<Self, NativeStringError> {
-        if start > end || end > self.end(control) {
+        if start > end || end > self.end() {
             return Err(NativeStringError::InvalidBoundary(
                 "native string slice has invalid boundaries",
             ));
@@ -500,7 +481,7 @@ impl NativeStringValue {
                 break;
             }
         }
-        Ok(Self::from_parts(parts, control))
+        Ok(Self::from_parts(parts))
     }
 
     pub(super) fn byte_prefix(&self, prefix: &[u8]) -> bool {
@@ -528,10 +509,7 @@ impl NativeStringValue {
         }
     }
 
-    pub(super) fn unique_parts(
-        &self,
-        control: Option<&crate::resources::Control>,
-    ) -> Option<(NativeSymbolIdentity, Self)> {
+    pub(super) fn unique_parts(&self) -> Option<(NativeSymbolIdentity, Self)> {
         let Repr::Parts(parts) = &self.0 else {
             return None;
         };
@@ -550,7 +528,7 @@ impl NativeStringValue {
         // Prefix, delimiter and final whole atom are established components;
         // these positions never depend on the atom's hidden decimal width.
         let start = NativeStringPosition(2);
-        let end = NativeStringPosition(self.display_length(control) - 2);
+        let end = NativeStringPosition(self.display_length() - 2);
         // getUniqueESSymbolType's leading FE@ and trailing @ are distinct,
         // including when the underlying name is empty.
         if end < start {
@@ -558,7 +536,7 @@ impl NativeStringValue {
         }
         Some((
             *symbol,
-            self.slice(start, end, control)
+            self.slice(start, end)
                 .expect("recognized unique-name boundaries"),
         ))
     }

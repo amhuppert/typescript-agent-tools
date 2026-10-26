@@ -408,58 +408,46 @@ fn every_kind_of_input_is_validated_wherever_it_sorts_in_a_large_project() {
     assert_eq!(session.generation(), 7);
 }
 
-/// An input that changes after loading read it, while loading still runs,
-/// fails the refresh rather than publishing what was read: the check after
-/// loading compares every observation again. Here a pipe whose writer
-/// answers a second late keeps loading running while an input already read
-/// changes; the pipe sorts after it, so the check never waits on the pipe.
-#[cfg(unix)]
+/// An input replaced by a pipe after loading fails validation, which
+/// refuses the pipe without opening it, and the reload that follows reports
+/// that refusal (ENVELOPE.md, "Accepted inputs"): neither waits for a writer,
+/// and nothing answers from the earlier generation. The input is imported,
+/// or listed in `files`, where its kind is observed as well as its text.
 #[test]
-fn an_input_changed_while_loading_fails_the_refresh() {
-    let fixture = project(&[
-        (
-            "tsconfig.json",
-            r#"{"compilerOptions":{"noLib":true},"files":["a.ts","first.ts"]}"#,
-        ),
-        ("a.ts", "export const before = 1;"),
-        ("first.ts", "import { late } from './z';\nlate;\n"),
-    ]);
-    let made = std::process::Command::new("mkfifo")
-        .arg(fixture.path("z.ts"))
-        .status()
-        .unwrap();
-    assert!(made.success());
-    let writer = {
-        let path = fixture.path("z.ts");
+fn an_input_replaced_by_a_pipe_is_refused_by_the_refresh() {
+    for files in [r#"["first.ts"]"#, r#"["first.ts","a.ts"]"#] {
+        let config = format!(r#"{{"compilerOptions":{{"noLib":true}},"files":{files}}}"#);
+        let fixture = support::Fixture::new(&[
+            ("tsconfig.json", &config),
+            ("first.ts", "import { value } from './a';\nvalue;\n"),
+            ("a.ts", "export const value = 1;\n"),
+        ]);
+        let mut session = ProjectSession::new(&fixture.path("tsconfig.json")).unwrap();
+        assert_eq!(count(&mut session, "value"), 1, "{files}");
+        std::fs::remove_file(fixture.path("a.ts")).unwrap();
+        let made = std::process::Command::new("mkfifo")
+            .arg(fixture.path("a.ts"))
+            .status()
+            .unwrap();
+        assert!(made.success());
+        let (sender, receiver) = std::sync::mpsc::channel();
         std::thread::spawn(move || {
-            use std::io::Write;
-            let mut pipe = std::fs::OpenOptions::new().write(true).open(path).unwrap();
-            std::thread::sleep(std::time::Duration::from_secs(1));
-            pipe.write_all(b"export const late = 1;").unwrap();
-        })
-    };
-    let editor = {
-        let path = fixture.path("a.ts");
-        std::thread::spawn(move || {
-            std::thread::sleep(std::time::Duration::from_millis(300));
-            std::fs::write(path, "export const after_ = 1;").unwrap();
-        })
-    };
-    let mut session = ProjectSession::new(&fixture.path("tsconfig.json")).unwrap();
-    let result = support::references(&mut session, name("before"));
-    writer.join().unwrap();
-    editor.join().unwrap();
-    match result {
-        Err(AnalysisError::Input(error)) => {
-            assert_eq!(error.kind, InputErrorKind::Io);
-            assert!(
-                error.message.contains("changed during indexing"),
-                "{error:?}"
-            );
+            let result = support::references(&mut session, name("value")).map(|_| ());
+            let _ = sender.send((result, session.generation()));
+        });
+        let (result, generation) = receiver
+            .recv_timeout(std::time::Duration::from_secs(10))
+            .unwrap_or_else(|_| panic!("the refresh waits on the pipe: {files}"));
+        match result {
+            Err(AnalysisError::Input(error)) => {
+                assert_eq!(error.kind, InputErrorKind::Io, "{files}: {error:?}");
+                assert_eq!(error.message, "not a regular file", "{files}: {error:?}");
+                assert!(error.path.unwrap().ends_with("a.ts"), "{files}");
+            }
+            other => panic!("a refresh across a pipe answered: {files}: {other:?}"),
         }
-        other => panic!("a refresh that read a changed input published: {other:?}"),
+        assert_eq!(generation, 1, "{files}");
     }
-    assert_eq!(session.generation(), 0);
 }
 
 /// A type query after an edit answers from the new generation, although a
@@ -491,166 +479,6 @@ fn a_type_query_after_an_edit_answers_from_the_new_generation() {
     std::fs::write(fixture.path("a.ts"), "export const value = 'two';\n").unwrap();
     assert_eq!(summary(&mut session), "\"two\"");
     assert_eq!(session.generation(), 2);
-}
-
-/// A pipe at `path` whose writer answers each reader with `contents`, after
-/// `before(read)` for the reader's one-based read number, until stopped.
-#[cfg(unix)]
-struct Pipe {
-    path: std::path::PathBuf,
-    stop: std::sync::Arc<std::sync::atomic::AtomicBool>,
-    writer: Option<std::thread::JoinHandle<()>>,
-}
-
-#[cfg(unix)]
-impl Pipe {
-    fn new(
-        path: std::path::PathBuf,
-        contents: &'static [u8],
-        before: impl Fn(usize) + Send + 'static,
-    ) -> Self {
-        let made = std::process::Command::new("mkfifo")
-            .arg(&path)
-            .status()
-            .unwrap();
-        assert!(made.success());
-        let stop = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
-        let writer = {
-            let (path, stop) = (path.clone(), stop.clone());
-            std::thread::spawn(move || {
-                use std::io::Write;
-                for read in 1.. {
-                    let mut pipe = std::fs::OpenOptions::new().write(true).open(&path).unwrap();
-                    if stop.load(std::sync::atomic::Ordering::SeqCst) {
-                        return;
-                    }
-                    before(read);
-                    let _ = pipe.write_all(contents);
-                    drop(pipe);
-                    // Let the reader see the end before the next writer opens.
-                    std::thread::sleep(std::time::Duration::from_millis(100));
-                }
-            })
-        };
-        Self {
-            path,
-            stop,
-            writer: Some(writer),
-        }
-    }
-}
-
-#[cfg(unix)]
-impl Drop for Pipe {
-    fn drop(&mut self) {
-        self.stop.store(true, std::sync::atomic::Ordering::SeqCst);
-        // The writer waits for a reader; this one releases it.
-        drop(std::fs::File::open(&self.path));
-        if let Some(writer) = self.writer.take() {
-            let _ = writer.join();
-        }
-    }
-}
-
-/// An input changed while an earlier input is read from a pipe is seen, as
-/// validating in key order sees it: the configuration, a pipe sorting before
-/// `z.ts`, changes `z.ts` only once its third reader has begun.
-#[cfg(unix)]
-#[test]
-fn a_change_made_while_an_earlier_pipe_is_read_is_seen() {
-    let fixture = project(&[("z.ts", "export const before = 1;\n")]);
-    let source = fixture.path("z.ts");
-    let config = Pipe::new(
-        fixture.path("aconfig.json"),
-        br#"{"compilerOptions":{"noLib":true},"files":["z.ts"]}"#,
-        move |read| {
-            if read == 3 {
-                std::fs::write(&source, "export const after_ = 1;\n").unwrap();
-            }
-        },
-    );
-    let mut session = ProjectSession::new(&config.path).unwrap();
-    // Reads 1 and 2: loading and the check after it.
-    assert_eq!(count(&mut session, "before"), 1);
-    // Read 3 validates the next request; the edit precedes its end.
-    assert_eq!(count(&mut session, "before"), 0);
-    assert_eq!(count(&mut session, "after_"), 1);
-    assert_eq!(session.generation(), 2);
-}
-
-/// A symbolic link retargeted while loading still runs fails the refresh, as
-/// its real path changed after loading asked it; the next request publishes
-/// the new target. A pipe whose writer answers a second late keeps the first
-/// load running.
-#[cfg(unix)]
-#[test]
-fn a_link_retargeted_while_loading_fails_the_refresh_then_publishes() {
-    let fixture = project(&[
-        (
-            "tsconfig.json",
-            r#"{"compilerOptions":{"noLib":true},"files":["link.ts","first.ts"]}"#,
-        ),
-        ("first.ts", "import { late } from './z';\nlate;\n"),
-        ("t1.ts", "export const firstTarget = 1;\n"),
-        ("t2.ts", "export const secondTarget = 1;\n"),
-    ]);
-    std::os::unix::fs::symlink(fixture.path("t1.ts"), fixture.path("link.ts")).unwrap();
-    let _pipe = Pipe::new(fixture.path("z.ts"), b"export const late = 1;\n", |read| {
-        if read == 1 {
-            std::thread::sleep(std::time::Duration::from_secs(1));
-        }
-    });
-    let retarget = {
-        let (link, target) = (fixture.path("link.ts"), fixture.path("t2.ts"));
-        std::thread::spawn(move || {
-            std::thread::sleep(std::time::Duration::from_millis(300));
-            std::fs::remove_file(&link).unwrap();
-            std::os::unix::fs::symlink(target, &link).unwrap();
-        })
-    };
-    let mut session = ProjectSession::new(&fixture.path("tsconfig.json")).unwrap();
-    let result = support::references(&mut session, name("firstTarget"));
-    retarget.join().unwrap();
-    match result {
-        Err(AnalysisError::Input(error)) => {
-            assert!(
-                error.message.contains("changed during indexing"),
-                "{error:?}"
-            )
-        }
-        other => panic!("a refresh across a retargeted link published: {other:?}"),
-    }
-    assert_eq!(session.generation(), 0);
-    assert_eq!(count(&mut session, "secondTarget"), 1);
-    assert_eq!(count(&mut session, "firstTarget"), 0);
-    assert_eq!(session.generation(), 1);
-}
-
-/// A session loads a source changed while a package manifest is read from a
-/// pipe with its new text and publishes it: the manifest's writer, once its
-/// first reader opens it, changes `z.ts`, which a worker had already read.
-#[cfg(unix)]
-#[test]
-fn a_source_changed_while_a_manifest_pipe_is_read_is_published_with_its_new_text() {
-    let fixture = project(&[
-        (
-            "tsconfig.json",
-            r#"{"compilerOptions":{"module":"nodenext","noLib":true,"types":[]},"files":["sub/a.ts","z.ts"]}"#,
-        ),
-        ("sub/a.ts", "export const a = 1;\n"),
-        ("z.ts", "export const before = 1;\n"),
-    ]);
-    let source = fixture.path("z.ts");
-    let _manifest = Pipe::new(fixture.path("sub/package.json"), b"{}", move |read| {
-        if read == 1 {
-            std::thread::sleep(std::time::Duration::from_millis(500));
-            std::fs::write(&source, "export const after_ = 1;\n").unwrap();
-        }
-    });
-    let mut session = ProjectSession::new(&fixture.path("tsconfig.json")).unwrap();
-    assert_eq!(count(&mut session, "after_"), 1);
-    assert_eq!(count(&mut session, "before"), 0);
-    assert_eq!(session.generation(), 1);
 }
 
 /// Package manifests the module-specifier environment found unreadable stay

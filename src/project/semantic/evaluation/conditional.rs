@@ -82,17 +82,17 @@ enum Branch {
 // Four fixed native questions, independent of either branch's type graph.
 
 pub(super) struct ConditionalState {
-    nodes: crate::resources::FixedMap<ExpressionRoot, NativeResult<TypeId>>,
+    nodes: HashMap<ExpressionRoot, NativeResult<TypeId>>,
     roots: Vec<Root>,
-    branches: crate::resources::FixedMap<(TypeId, Branch), NativeResult<TypeId>>,
-    branch_demands: crate::resources::FixedMap<(TypeId, bool), super::super::model::TypeDemand>,
-    distributive_constraints: crate::resources::FixedMap<TypeId, NativeResult<Option<TypeId>>>,
-    permissive: crate::resources::FixedMap<TypeId, NativeResult<TypeId>>,
-    restrictive: crate::resources::FixedMap<TypeId, NativeResult<TypeId>>,
-    restrictive_parameters: crate::resources::FixedMap<TypeId, TypeId>,
+    branches: HashMap<(TypeId, Branch), NativeResult<TypeId>>,
+    branch_demands: HashMap<(TypeId, bool), super::super::model::TypeDemand>,
+    distributive_constraints: HashMap<TypeId, NativeResult<Option<TypeId>>>,
+    permissive: HashMap<TypeId, NativeResult<TypeId>>,
+    restrictive: HashMap<TypeId, NativeResult<TypeId>>,
+    restrictive_parameters: HashMap<TypeId, TypeId>,
     deferred_arguments: Vec<(TypeExpression, Vec<TypeId>)>,
     no_infer_consumers: HashMap<TypeId, Location>,
-    checked_infer_parameters: crate::resources::FixedMap<
+    checked_infer_parameters: HashMap<
         crate::project::binding::NativeSymbolIdentity,
         super::super::model::NativeResult<()>,
     >,
@@ -1615,17 +1615,17 @@ impl ConditionalState {
     /// and provisional publication remain with their individual operations.
     pub(super) fn new() -> Self {
         Self {
-            nodes: crate::resources::FixedMap::new(),
+            nodes: HashMap::new(),
             roots: Default::default(),
-            branches: crate::resources::FixedMap::new(),
-            branch_demands: crate::resources::FixedMap::new(),
-            distributive_constraints: crate::resources::FixedMap::new(),
-            permissive: crate::resources::FixedMap::new(),
-            restrictive: crate::resources::FixedMap::new(),
-            restrictive_parameters: crate::resources::FixedMap::new(),
+            branches: HashMap::new(),
+            branch_demands: HashMap::new(),
+            distributive_constraints: HashMap::new(),
+            permissive: HashMap::new(),
+            restrictive: HashMap::new(),
+            restrictive_parameters: HashMap::new(),
             deferred_arguments: Default::default(),
             no_infer_consumers: Default::default(),
-            checked_infer_parameters: crate::resources::FixedMap::new(),
+            checked_infer_parameters: HashMap::new(),
         }
     }
 }

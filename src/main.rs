@@ -6,11 +6,7 @@ use std::{
 use typescript_parser::{ParseOptions, parse_with_options};
 
 mod cli;
-/// The library's owner of opening without waiting, compiled here too.
-#[cfg(unix)]
-mod nonblocking;
 mod process_limits;
-#[cfg(unix)]
 mod service;
 
 use cli::Failure;
@@ -77,11 +73,9 @@ fn parse(request: request::Parse) -> Result<(), Delivered> {
 /// its failures; `--pretty` alone keeps its indented document. Stop prints
 /// its verdict on stdout. Stop and serve have no document: their failures
 /// are stderr's, and `--pretty` and `--output` change nothing.
-#[cfg_attr(not(unix), allow(unused_variables))]
 fn service_action(request: request::Service) -> Result<(), Delivered> {
     let failed = |failure| delivery::fail(Route::TEXT, failure);
-    #[cfg(unix)]
-    return match request.action {
+    match request.action {
         request::ServiceAction::Status => {
             let route = Route {
                 format: request.format,
@@ -121,12 +115,7 @@ fn service_action(request: request::Service) -> Result<(), Delivered> {
             let environment = process_limits::Environment::read().map_err(failed)?;
             service::serve(&request.project, &environment).map_err(failed)
         }
-    };
-    #[cfg(not(unix))]
-    return Err(failed(Failure::new(
-        Code::Platform,
-        format!("{} is available only on Unix", request.flag),
-    )));
+    }
 }
 
 fn main() -> ExitCode {

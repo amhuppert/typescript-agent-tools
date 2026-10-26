@@ -204,7 +204,7 @@ fn load_program(
         Some((previous, next)) => (previous, Some(next)),
         None => (&empty, None),
     };
-    capture::Captures::with_reuse(disk.waits(), &previous.captures, |captures| {
+    capture::Captures::with_reuse(&previous.captures, |captures| {
         let (next_captures, next_resolutions) = match next {
             Some(next) => (Some(&mut next.captures), Some(&mut next.resolutions)),
             None => (None, None),

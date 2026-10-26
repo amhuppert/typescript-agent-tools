@@ -20,7 +20,6 @@ pub(in crate::project) trait ScopeSymbols {
     type Declaration: Copy;
     type Error;
 
-    fn control(&self) -> Option<&crate::resources::Control>;
     fn lookup(
         &mut self,
         table: Self::Table,
@@ -137,10 +136,9 @@ pub(in crate::project) fn scope_export_lookup<O: ScopeSymbols>(
     meaning: NativeLookupMeaning,
 ) -> Result<ScopeExportLookup<O::Symbol, O::Table>, O::Error> {
     if external && let Some(table) = table {
-        if let Some(exported) = operations.lookup(
-            table,
-            &NativePropertyKey::fixed(b"default".as_slice(), operations.control()),
-        )? {
+        if let Some(exported) =
+            operations.lookup(table, &NativePropertyKey::fixed(b"default".as_slice()))?
+        {
             if let Some(local) = local_symbol_for_export_default(operations, exported)? {
                 if meaning.matches(operations.flags(exported)?)
                     && operations.name_matches(local, name)?
@@ -149,10 +147,9 @@ pub(in crate::project) fn scope_export_lookup<O: ScopeSymbols>(
                 }
             }
         }
-        if let Some(exported) = operations.lookup(
-            table,
-            &NativePropertyKey::fixed(name.as_bytes(), operations.control()),
-        )? && pure_export_specifier(operations, exported)?
+        if let Some(exported) =
+            operations.lookup(table, &NativePropertyKey::fixed(name.as_bytes()))?
+            && pure_export_specifier(operations, exported)?
         {
             return Ok(ScopeExportLookup::Skip);
         }
@@ -209,10 +206,7 @@ impl NativeInputs<'_> {
         use NativeSelectionFailure::Selection;
         let table = operations.globals().map_err(Selection)?;
         let symbol = operations
-            .lookup(
-                table,
-                &NativePropertyKey::fixed(name.as_bytes(), operations.control()),
-            )
+            .lookup(table, &NativePropertyKey::fixed(name.as_bytes()))
             .map_err(Selection)?;
         match symbol {
             Some(symbol) => operations.select(symbol, meaning, false).map_err(Selection),
@@ -292,7 +286,7 @@ impl NativeInputs<'_> {
         meaning: NativeLookupMeaning,
     ) -> Result<Option<O::Symbol>, NativeSelectionFailure<O::Error>> {
         use NativeSelectionFailure::{Binding, Selection};
-        let key = NativePropertyKey::fixed(name.as_bytes(), operations.control());
+        let key = NativePropertyKey::fixed(name.as_bytes());
         for index in self.files.lookup_scope_chain(file, scope) {
             let plan = self.files.name_scope(file, index);
             if let Some(declaration) = plan.infer

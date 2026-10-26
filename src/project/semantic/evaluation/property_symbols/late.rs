@@ -37,7 +37,6 @@ impl Evaluator<'_, '_> {
         &mut self,
         symbol: PropertySymbolId,
     ) -> Result<&mut CreatedProperty, DemandError> {
-        let control = self.control.clone();
         let entry = self
             .native_members
             .symbols
@@ -45,7 +44,7 @@ impl Evaluator<'_, '_> {
             .get_mut(symbol.index())
             .ok_or_else(|| super::super::super::internal("merge symbol is absent"))?;
         match &mut entry.association {
-            Association::Created(data) => Ok(CreatedProperty::make_mut(data, control.as_ref())),
+            Association::Created(data) => Ok(CreatedProperty::make_mut(data)),
             _ => Err(super::super::super::internal(
                 "retained symbol cannot be mutated by checker merge",
             )
@@ -88,10 +87,7 @@ impl Evaluator<'_, '_> {
         flags: NativeSymbolFlags,
         readonly: bool,
     ) -> Result<ReferenceSymbol, DemandError> {
-        let symbol = self.new_late_symbol(NativePropertyKey::fixed(
-            name.as_bytes(),
-            self.control.as_ref(),
-        ));
+        let symbol = self.new_late_symbol(NativePropertyKey::fixed(name.as_bytes()));
         let property = flags.property_flags();
         let data = self.merge_property_mut(symbol)?;
         data.native_flags = Some(flags);
@@ -195,8 +191,8 @@ impl Evaluator<'_, '_> {
             entry.read = self.value_types.get(&bound).cloned();
             entry.write = self.native_members.writes.get(&bound).cloned();
         }
-        self.native_members.symbols.entries[registered.index()].association = Association::Created(
-            CreatedProperty {
+        self.native_members.symbols.entries[registered.index()].association =
+            Association::Created(Arc::new(CreatedProperty {
                 native_flags: Some(native_flags),
                 flags,
                 checks: 0,
@@ -213,9 +209,7 @@ impl Evaluator<'_, '_> {
                 spread: None,
                 export_type: None,
                 value: CreatedPropertyValue::Declaration,
-            }
-            .shared(self.control.as_ref()),
-        );
+            }));
         self.symbol_tables.headers.insert(identity, registered);
         Ok(registered)
     }

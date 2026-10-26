@@ -480,10 +480,7 @@ impl Evaluator<'_, '_> {
                 // `getPropertyNameFromIndex(name, nil)` returns this exact native
                 // internal name when the type is not usable as a property key.
                 let key = self.property_key_from_type(name)?.unwrap_or_else(|| {
-                    crate::project::binding::NativePropertyKey::fixed(
-                        b"\xfemissing".as_slice(),
-                        self.control.as_ref(),
-                    )
+                    crate::project::binding::NativePropertyKey::fixed(b"\xfemissing".as_slice())
                 });
                 let target_optional = sequence
                     .read(self.elaboration_property_optional_completion(target, &key, consumer))?;

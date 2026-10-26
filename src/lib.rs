@@ -17,6 +17,9 @@
 //! - `analysis`: the failures every operation reports (`AnalysisError`).
 //! - `source`: positions in analyzed text (`SourcePosition`).
 
+#[cfg(not(any(target_os = "macos", target_os = "linux")))]
+compile_error!("tsparse builds on macOS and Linux only; see ENVELOPE.md");
+
 pub mod analysis;
 pub mod ast;
 mod compiler;
@@ -27,7 +30,6 @@ mod input;
 mod json;
 mod lexer;
 pub mod navigation;
-mod nonblocking;
 mod numbers;
 mod parser;
 mod pragmas;

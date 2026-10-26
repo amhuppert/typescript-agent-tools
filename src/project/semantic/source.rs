@@ -544,18 +544,6 @@ impl<'s> CapturedSyntax<'s> {
             .map(|control| crate::resources::complete_or_abort(control.enter()))
     }
 
-    fn boxed<T>(&self, value: T) -> Box<T> {
-        Box::new(value)
-    }
-
-    fn collect<T>(&self, values: impl IntoIterator<Item = T>) -> Vec<T> {
-        values.into_iter().collect::<Vec<_>>()
-    }
-
-    fn shared_text(&self, text: &str) -> std::sync::Arc<str> {
-        std::sync::Arc::from(text)
-    }
-
     /// Retain exact `parseLiteralLikeNode` payloads. Scanner normalization is
     /// already complete; projection only copies bytes into request-owned values.
     fn literal_bytes(&self, bytes: &[u8]) -> std::sync::Arc<[u8]> {
@@ -564,7 +552,7 @@ impl<'s> CapturedSyntax<'s> {
     }
 
     fn literal_value(&self, bytes: &[u8]) -> LiteralValue {
-        LiteralValue::from_bytes(self.literal_bytes(bytes), self.control.as_ref())
+        LiteralValue::from_bytes(self.literal_bytes(bytes))
     }
 
     /// The existing declaration anchor (`getFirstToken`/token-span owner),
@@ -1207,7 +1195,7 @@ fn type_expression(
     {
         TypeExpressionForm::Keyof {
             site: super::super::binding::flow::Site::new(ast, id),
-            value: captured.boxed(type_expression(inputs, file, captured, parents, value)),
+            value: Box::new(type_expression(inputs, file, captured, parents, value)),
         }
     } else if node.syntax_kind == SyntaxKind::TypeOperator
         && syntax::number(node, "operator") == Some(SyntaxKind::UniqueKeyword.number())
@@ -1221,7 +1209,7 @@ fn type_expression(
     {
         TypeExpressionForm::Readonly {
             site: super::super::binding::flow::Site::new(ast, id),
-            value: captured.boxed(type_expression(inputs, file, captured, parents, value)),
+            value: Box::new(type_expression(inputs, file, captured, parents, value)),
         }
     } else if matches!(
         node.syntax_kind,
@@ -1249,8 +1237,8 @@ fn type_expression(
     {
         TypeExpressionForm::IndexedAccess {
             site: super::super::binding::flow::Site::new(ast, id),
-            object: captured.boxed(type_expression(inputs, file, captured, parents, object)),
-            index: captured.boxed(type_expression(inputs, file, captured, parents, index)),
+            object: Box::new(type_expression(inputs, file, captured, parents, object)),
+            index: Box::new(type_expression(inputs, file, captured, parents, index)),
             alias: alias_for_type_node(file, captured, parents, id),
         }
     } else if matches!(
@@ -1258,11 +1246,10 @@ fn type_expression(
         SyntaxKind::UnionType | SyntaxKind::IntersectionType
     ) {
         let site = super::super::binding::flow::Site::new(ast, id);
-        let types = captured.collect(
-            syntax::ids(node, "types")
-                .iter()
-                .map(|&id| type_expression(inputs, file, captured, parents, id)),
-        );
+        let types = syntax::ids(node, "types")
+            .iter()
+            .map(|&id| type_expression(inputs, file, captured, parents, id))
+            .collect();
         let alias = alias_for_type_node(file, captured, parents, id);
         if node.syntax_kind == SyntaxKind::UnionType {
             TypeExpressionForm::Union { site, types, alias }
@@ -1290,11 +1277,10 @@ fn type_expression(
             site: super::super::binding::flow::Site::new(ast, id),
             anchor: unresolved::type_reference_name_node(ast, id)
                 .and_then(|name| entity_name_anchor(ast, name)),
-            arguments: captured.collect(
-                syntax::ids(node, "typeArguments")
-                    .iter()
-                    .map(|&argument| type_expression(inputs, file, captured, parents, argument)),
-            ),
+            arguments: syntax::ids(node, "typeArguments")
+                .iter()
+                .map(|&argument| type_expression(inputs, file, captured, parents, argument))
+                .collect(),
             alias: alias_for_type_node(file, captured, parents, id),
             deferred: (node.syntax_kind == SyntaxKind::TypeReference).then(|| {
                 tuples::deferred_reference_recipe(
@@ -1499,9 +1485,9 @@ fn signature_return_recipe(
             class: DeclarationIdentity::new(file, class),
         }
     } else if let Some(annotation) = syntax::id(node, "type") {
-        SignatureReturnRecipe::Annotation(
-            captured.boxed(type_expression(inputs, file, captured, parents, annotation)),
-        )
+        SignatureReturnRecipe::Annotation(Box::new(type_expression(
+            inputs, file, captured, parents, annotation,
+        )))
     } else if role == SignatureRole::Getter {
         syntax::id(node, "name").ok_or("native getter signature has no declaration name")?;
         SignatureReturnRecipe::GetterAccessor {
@@ -1836,7 +1822,7 @@ fn expression_worker(
                     "await expression has no operand",
                 );
             };
-            ExpressionForm::Await(captured.boxed(expression(inputs, file, captured, operand)))
+            ExpressionForm::Await(Box::new(expression(inputs, file, captured, operand)))
         }
         SyntaxKind::TemplateExpression => ExpressionForm::Template(ExpressionRoot {
             file,
@@ -1996,7 +1982,7 @@ fn expression_worker(
             ExpressionForm::Unary {
                 operator,
                 direct_literal,
-                operand: captured.boxed(expression(inputs, file, captured, operand)),
+                operand: Box::new(expression(inputs, file, captured, operand)),
             }
         }
         // checkExpressionWorker dispatches all three JSX result forms to

@@ -10,7 +10,7 @@ use super::Evaluator;
 use super::relations::RelationKind;
 use crate::analysis::SemanticFailureReason;
 use crate::references::Location;
-use crate::resources::{CheckedKey, CheckedMap, Control};
+use crate::resources::{CheckedKey, CheckedMap};
 use std::collections::HashMap;
 use std::sync::Arc;
 
@@ -31,10 +31,10 @@ struct UnionPair {
 }
 
 impl UnionsState {
-    pub(super) fn new(control: Option<Control>) -> Self {
+    pub(super) fn new() -> Self {
         Self {
             pairs: CheckedMap::new(),
-            subtypes: TypeListCache::new(control),
+            subtypes: TypeListCache::new(),
             ..Self::default()
         }
     }
@@ -161,8 +161,8 @@ impl Evaluator<'_, '_> {
         let mut sequence = NativeSequence::new();
         let result = (|| -> Result<TypeId, DemandError> {
             let mut constraints = HashMap::new();
-            let mut subtypes = TypeListCache::new(self.control.clone());
-            let mut strings = TypeListCache::new(self.control.clone());
+            let mut subtypes = TypeListCache::new();
+            let mut strings = TypeListCache::new();
             loop {
                 match self.model.union_with_reductions(
                     &types,
@@ -185,7 +185,6 @@ impl Evaluator<'_, '_> {
                     }
                     Err(UnionFailure::Constraint(variable)) => {
                         let constraint = sequence.read(self.base_constraint_completion(variable, consumer))?.ok_or_else(|| super::super::internal("native constrained intersection lost its established base constraint"))?;
-                        constraints.reserve(1);
                         constraints.insert(variable, constraint);
                     }
                     Err(UnionFailure::SubtypeReduction {

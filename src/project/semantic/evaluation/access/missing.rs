@@ -77,10 +77,7 @@ impl Evaluator<'_, '_> {
                         && sequence
                             .read(self.applicable_index_info_for_key_completion(
                                 subtype,
-                                &NativePropertyKey::fixed(
-                                    syntax.name.as_bytes(),
-                                    self.control.as_ref(),
-                                ),
+                                &NativePropertyKey::fixed(syntax.name.as_bytes()),
                                 consumer,
                             ))?
                             .is_none()

@@ -281,7 +281,6 @@ pub(super) struct Store {
     binding_headers: bool,
     global_this: Option<SymbolId>,
     json_symbols: HashMap<(FileId, super::JsonDeclaration), SymbolId>,
-    json_exports: HashMap<FileId, SymbolId>,
     /// Lookup tables: their order is the hasher's, so nothing that reaches
     /// output may follow it (`member_entries` and `drain` merge whatever
     /// order they meet).
@@ -685,7 +684,6 @@ impl Store {
             binding_headers: true,
             global_this: None,
             json_symbols: HashMap::new(),
-            json_exports: HashMap::new(),
             tables: vec![FastMap::default()],
             special_members: FastMap::default(),
             symbols: Vec::with_capacity(symbols),

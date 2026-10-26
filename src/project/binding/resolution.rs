@@ -116,28 +116,19 @@ pub(super) enum Probe<T = Resolution> {
     Missing,
 }
 
-/// `getExportsOfModule` retains the selected export symbol, independently of
-/// the meanings obtained by resolving it. In particular, Alias-only entity
-/// lookup observes this symbol even when a declaration also supplies TYPE.
+/// `getExportsOfModule`: the meanings obtained by resolving a module export.
 #[derive(Clone)]
 pub(super) struct ExportLookup {
     pub(super) resolution: Resolution,
-    alias: Option<AliasRef>,
 }
 
 impl ExportLookup {
     fn direct(resolution: Resolution) -> Self {
-        Self {
-            resolution,
-            alias: None,
-        }
+        Self { resolution }
     }
 
     fn restrict(self, type_only: bool) -> Self {
-        Self {
-            resolution: restrict(self.resolution, type_only),
-            ..self
-        }
+        Self::direct(restrict(self.resolution, type_only))
     }
 }
 
@@ -229,7 +220,6 @@ impl From<u8> for LookupMeaning {
 struct EntryProbe {
     probe: Probe,
     value_origin: Option<ValueOrigin>,
-    type_alias_origin: Option<AliasRef>,
 }
 
 /// Where a scope's names are stored.
@@ -379,8 +369,6 @@ pub(super) enum States<'a> {
         aliases: &'a mut Vec<Vec<State>>,
         refs: &'a mut Vec<Vec<State>>,
         alias_origins: &'a mut Vec<Vec<Option<ValueOrigin>>>,
-        ref_origins: &'a mut Vec<Vec<Option<ValueOrigin>>>,
-        ref_type_alias_origins: &'a mut Vec<Vec<Option<AliasRef>>>,
     },
 }
 impl States<'_> {
@@ -393,11 +381,10 @@ impl States<'_> {
         }
     }
     fn set_state(&mut self, task: Task, state: State) {
-        if !matches!(state, State::Done(_)) {
-            self.set_origin(task, None);
-            if let Task::Ref(reference) = task {
-                self.set_type_alias(reference, None);
-            }
+        if !matches!(state, State::Done(_))
+            && let Task::Alias(alias) = task
+        {
+            self.set_origin(alias, None);
         }
         match self {
             Self::Loading { aliases, refs, .. } => match task {
@@ -406,24 +393,11 @@ impl States<'_> {
             },
         }
     }
-    fn set_origin(&mut self, task: Task, origin: Option<ValueOrigin>) {
+    fn set_origin(&mut self, alias: AliasRef, origin: Option<ValueOrigin>) {
         match self {
-            Self::Loading {
-                alias_origins,
-                ref_origins,
-                ..
-            } => match task {
-                Task::Alias(a) => alias_origins[a.file.index()][a.id.index()] = origin,
-                Task::Ref(r) => ref_origins[r.file.index()][r.id.index()] = origin,
-            },
-        }
-    }
-    fn set_type_alias(&mut self, reference: RefRef, alias: Option<AliasRef>) {
-        match self {
-            Self::Loading {
-                ref_type_alias_origins,
-                ..
-            } => ref_type_alias_origins[reference.file.index()][reference.id.index()] = alias,
+            Self::Loading { alias_origins, .. } => {
+                alias_origins[alias.file.index()][alias.id.index()] = origin
+            }
         }
     }
 }
@@ -572,7 +546,6 @@ impl<'a> Resolver<'a> {
             return EntryProbe {
                 probe: Probe::Missing,
                 value_origin: None,
-                type_alias_origin: None,
             };
         };
         let mut found = self.select_lookup_meanings(
@@ -615,7 +588,6 @@ impl<'a> Resolver<'a> {
                             value_origin: value_origin.or_else(|| {
                                 (mask & meaning::VALUE != 0).then_some(ValueOrigin::Alias(alias))
                             }),
-                            type_alias_origin: Some(alias),
                         };
                     }
                     Some(Resolution::Found(targets)) => {
@@ -634,7 +606,6 @@ impl<'a> Resolver<'a> {
                         return EntryProbe {
                             probe: Probe::Found(other.clone()),
                             value_origin,
-                            type_alias_origin: Some(alias),
                         };
                     }
                     Some(_) => {}
@@ -648,7 +619,6 @@ impl<'a> Resolver<'a> {
                 Probe::Found(Resolution::Found(found))
             },
             value_origin,
-            type_alias_origin: alias,
         }
     }
 
@@ -674,10 +644,7 @@ impl<'a> Resolver<'a> {
     fn probe_export_entry(&self, table: TableId, name: &str) -> Probe<ExportLookup> {
         let entry = self.probe_entry(table, name, meaning::ALL.into(), true, false);
         match entry.probe {
-            Probe::Found(resolution) => Probe::Found(ExportLookup {
-                resolution,
-                alias: entry.type_alias_origin,
-            }),
+            Probe::Found(resolution) => Probe::Found(ExportLookup::direct(resolution)),
             Probe::Need(need) => Probe::Need(need),
             Probe::Missing => Probe::Missing,
         }
@@ -1059,10 +1026,10 @@ impl<'a> Resolver<'a> {
                 } => {
                     let type_only = type_only || value_type_only;
                     if name == "default" {
-                        return Step::Done(ExportLookup {
-                            resolution: Resolution::Value { target, type_only },
-                            alias: export.alias,
-                        });
+                        return Step::Done(ExportLookup::direct(Resolution::Value {
+                            target,
+                            type_only,
+                        }));
                     }
                     return Step::Done(ExportLookup::direct(
                         self.value_property(&target, name, type_only)
@@ -1070,17 +1037,13 @@ impl<'a> Resolver<'a> {
                     ));
                 }
                 resolution => {
-                    return Step::Done(ExportLookup {
-                        resolution,
-                        alias: export.alias,
-                    });
+                    return Step::Done(ExportLookup::direct(resolution));
                 }
             };
             if name == "default" {
-                return Step::Done(ExportLookup {
-                    resolution: Resolution::Found(found.restrict(type_only)),
-                    alias: export.alias,
-                });
+                return Step::Done(ExportLookup::direct(Resolution::Found(
+                    found.restrict(type_only),
+                )));
             }
             type_only |= found.members_type_only(Reach::ExportAssignment);
             let target = found
@@ -1107,9 +1070,8 @@ impl<'a> Resolver<'a> {
         self.star_export(current, name, type_only)
     }
 
-    /// `getExportsOfModule` keeps the raw selected symbol alongside resolved
-    /// meanings. Pattern augmentation fills missing meanings and alias flags;
-    /// a later route does not replace an already selected alias declaration.
+    /// `getExportsOfModule`'s resolved meanings. Pattern augmentation fills
+    /// the meanings the module's own export lacks.
     pub(super) fn probe_export(&self, module: ModuleId, name: &str) -> Probe<ExportLookup> {
         let data = self.inputs.store.module(module);
         let own = self.probe_export_entry(data.exports, name);
@@ -1125,7 +1087,6 @@ impl<'a> Resolver<'a> {
                     (&mut own.resolution, pattern.resolution)
                 {
                     found.fill_missing(more, meaning::ALL, true);
-                    own.alias = own.alias.or(pattern.alias);
                 }
                 Probe::Found(own)
             }
@@ -1150,9 +1111,9 @@ impl<'a> Resolver<'a> {
             .rev()
             .map(|&(star, star_type_only)| (star, type_only || star_type_only))
             .collect();
-        let mut found: Vec<(Meanings, Option<AliasRef>)> = Vec::new();
+        let mut found: Vec<Meanings> = Vec::new();
         // Values, each once with whether every route to it is type-only.
-        let mut values: Vec<(ValueTarget, bool, Option<AliasRef>)> = Vec::new();
+        let mut values: Vec<(ValueTarget, bool)> = Vec::new();
         // Routes whose export of `name` does not resolve. They still export
         // the name, as TypeScript counts them: alone, the failure is the
         // result; beside another route, the name is ambiguous (TS2308).
@@ -1171,28 +1132,26 @@ impl<'a> Resolver<'a> {
                 Probe::Need(task) => return Step::Need(task),
                 Probe::Found(ExportLookup {
                     resolution: Resolution::Found(targets),
-                    alias,
                 }) => {
                     let targets = targets.restrict(route_type_only);
                     match found
                         .iter_mut()
-                        .find(|(other, _)| other.targets() == targets.targets())
+                        .find(|other| other.targets() == targets.targets())
                     {
-                        Some((existing, _)) => existing.merge_routes(targets),
-                        None => found.push((targets, alias)),
+                        Some(existing) => existing.merge_routes(targets),
+                        None => found.push(targets),
                     }
                 }
                 Probe::Found(ExportLookup {
                     resolution: Resolution::Value { target, type_only },
-                    alias,
                 }) => {
                     let type_only = type_only || route_type_only;
                     match values
                         .iter_mut()
-                        .find(|(other, _, _)| self.same_value(other, &target))
+                        .find(|(other, _)| self.same_value(other, &target))
                     {
-                        Some((_, existing, _)) => *existing &= type_only,
-                        None => values.push((target, type_only, alias)),
+                        Some((_, existing)) => *existing &= type_only,
+                        None => values.push((target, type_only)),
                     }
                 }
                 Probe::Found(resolution) => {
@@ -1211,17 +1170,11 @@ impl<'a> Resolver<'a> {
             ([], [], 0) => ExportLookup::direct(Resolution::Unresolved(
                 format!("`{name}` is not exported").into(),
             )),
-            ([(targets, alias)], [], 0) => ExportLookup {
-                resolution: Resolution::Found(*targets),
-                alias: *alias,
-            },
-            ([], [(target, type_only, alias)], 0) => ExportLookup {
-                resolution: Resolution::Value {
-                    target: target.clone(),
-                    type_only: *type_only,
-                },
-                alias: *alias,
-            },
+            ([targets], [], 0) => ExportLookup::direct(Resolution::Found(*targets)),
+            ([], [(target, type_only)], 0) => ExportLookup::direct(Resolution::Value {
+                target: target.clone(),
+                type_only: *type_only,
+            }),
             ([], [], 1) => failed.pop().unwrap().1,
             _ => ExportLookup::direct(Resolution::Unresolved(
                 format!("`{name}` is ambiguous among star exports").into(),
@@ -1300,10 +1253,7 @@ impl<'a> Resolver<'a> {
                     {
                         return Step::Done(ExportLookup::direct(Resolution::NotReference(reason)));
                     }
-                    return Step::Done(ExportLookup {
-                        resolution,
-                        alias: entry.type_alias_origin,
-                    });
+                    return Step::Done(ExportLookup::direct(resolution));
                 }
                 Probe::Need(task) => return Step::Need(task),
                 Probe::Missing => {}
@@ -1352,13 +1302,10 @@ impl<'a> Resolver<'a> {
                 _ => found,
             })
             .filter(|found| !found.is_empty());
-        Step::Done(ExportLookup {
-            resolution: match found {
-                Some(found) => Resolution::Found(found),
-                None => Resolution::Unresolved(format!("`{name}` is not a global property").into()),
-            },
-            alias: entry.type_alias_origin,
-        })
+        Step::Done(ExportLookup::direct(match found {
+            Some(found) => Resolution::Found(found),
+            None => Resolution::Unresolved(format!("`{name}` is not a global property").into()),
+        }))
     }
 
     /// The value of a JSON module: its only export, `export=`
@@ -1532,7 +1479,7 @@ impl<'a> Resolver<'a> {
             }
         };
         let type_only = data.type_only;
-        self.states.set_origin(Task::Alias(alias), value_origin);
+        self.states.set_origin(alias, value_origin);
         match step {
             Step::Done(resolution) => Step::Done(restrict(
                 match resolution {
@@ -1562,24 +1509,16 @@ impl<'a> Resolver<'a> {
                     data.type_context,
                 ) {
                     Step::Done(found) => {
-                        let alias = if data.meaning & meaning::TYPE != 0 {
-                            match self.lookup_alias(reference.file, scope, name) {
-                                Ok(alias) => alias,
-                                Err(failure) => return Step::Failed(failure),
-                            }
-                        } else {
-                            None
-                        };
-                        self.states
-                            .set_origin(Task::Ref(reference), found.value_origin);
-                        self.states.set_type_alias(reference, alias);
+                        // No reference retains the alias this lookup selects,
+                        // but its failures still fail the reference.
+                        if data.meaning & meaning::TYPE != 0
+                            && let Err(failure) = self.lookup_alias(reference.file, scope, name)
+                        {
+                            return Step::Failed(failure);
+                        }
                         Step::Done(found.resolution)
                     }
-                    Step::Need(need) => {
-                        self.states
-                            .set_origin(Task::Ref(reference), need.value_origin);
-                        Step::Need(need)
-                    }
+                    Step::Need(need) => Step::Need(need),
                     Step::Failed(failure) => Step::Failed(failure),
                 };
             }
@@ -1594,10 +1533,7 @@ impl<'a> Resolver<'a> {
                 if self.done(base).is_some_and(|resolution| matches!(resolution,
                     Resolution::Found(found) if found.targets().symbols().any(|symbol| self.inputs.store.is_global_this(symbol)))) {
                     return match self.global_member(name, data.meaning, data.type_context) {
-                        Step::Done(found) => {
-                            self.states.set_type_alias(reference, if data.meaning & meaning::TYPE != 0 { found.alias } else { None });
-                            Step::Done(found.resolution)
-                        }
+                        Step::Done(found) => Step::Done(found.resolution),
                         Step::Need(need) => Step::Need(need),
                         Step::Failed(failure) => Step::Failed(failure),
                     };
@@ -1636,20 +1572,10 @@ impl<'a> Resolver<'a> {
                     }
                 };
                 match self.member(qualifier, name, data.meaning, data.type_context) {
-                    Step::Done(found) => {
-                        self.states.set_type_alias(
-                            reference,
-                            if data.meaning & meaning::TYPE != 0 {
-                                found.alias
-                            } else {
-                                None
-                            },
-                        );
-                        Step::Done(restrict(
-                            found.resolution,
-                            qualifier.members_type_only(Reach::Qualified),
-                        ))
-                    }
+                    Step::Done(found) => Step::Done(restrict(
+                        found.resolution,
+                        qualifier.members_type_only(Reach::Qualified),
+                    )),
                     Step::Need(need) => Step::Need(need),
                     Step::Failed(failure) => Step::Failed(failure),
                 }
@@ -1669,17 +1595,7 @@ impl<'a> Resolver<'a> {
                         )
                     }
                     None => match self.module_member(module, name) {
-                        Step::Done(found) => {
-                            self.states.set_type_alias(
-                                reference,
-                                if data.meaning & meaning::TYPE != 0 {
-                                    found.alias
-                                } else {
-                                    None
-                                },
-                            );
-                            Step::Done(found.resolution)
-                        }
+                        Step::Done(found) => Step::Done(found.resolution),
                         Step::Need(need) => Step::Need(need),
                         Step::Failed(failure) => Step::Failed(failure),
                     },

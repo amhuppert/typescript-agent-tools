@@ -1147,7 +1147,7 @@ fn valid_project_requests_and_usage_errors() {
         // Conflicting operations.
         &[
             "--show",
-            "--references-direct",
+            "--references",
             "--project",
             "tsconfig.json",
             "--name",

@@ -1692,9 +1692,8 @@ fn a_batch_edit_s_cut_ambiguity_narrows_the_edit_in_its_file() {
 /// The printed command repeats the request's arguments as given, a
 /// repeated `--limit` each made `all`, an operand that needs quoting quoted,
 /// and the filters kept, but names no transport: the service and a direct
-/// load answer alike, so `--direct` is left out and `--references-direct`
-/// is `--references`, and every spelling of the request prints the same
-/// bytes.
+/// load answer alike, so `--direct` is left out, and both transports print
+/// the same bytes.
 #[test]
 fn the_printed_command_repeats_the_request_but_not_its_transport() {
     let service = Service::new(&[("my app.ts", &occurrences(5))]);
@@ -1713,11 +1712,7 @@ fn the_printed_command_repeats_the_request_but_not_its_transport() {
         "tsconfig.json",
     ];
     let mut printed = Vec::new();
-    for transport in [
-        &["--references"][..],
-        &["--references", "--direct"],
-        &["--references-direct"],
-    ] {
+    for transport in [&["--references"][..], &["--references", "--direct"]] {
         let output = run(&service, &[transport, &request[..]].concat());
         printed.push(stdout(&output, 0));
         let output = run(&service, &[transport, &request[..], &["--json"]].concat());

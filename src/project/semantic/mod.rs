@@ -361,7 +361,7 @@ fn invalid_at_location(
 
 /// Associate product provenance with the first matching captured input.
 /// This is exact display-name equality, not filesystem resolution or case folding.
-/// The equality owner charges each visit and bounds equal-length comparisons.
+/// Inputs are scanned in id order and compared by their exact display bytes.
 fn location_file(inputs: CheckerInputs<'_>, location: &Location) -> FileId {
     inputs
         .sources

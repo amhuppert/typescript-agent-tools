@@ -2,5 +2,5 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "tsparse",
   "description": "TypeScript 7 declaration navigation, semantic references, type inspection, and source-preserving code editing with tsparse",
-  "version": "0.1.1"
+  "version": "0.1.3"
 }

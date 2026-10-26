@@ -17,7 +17,6 @@ use super::{
     structure::MemberTable,
 };
 use crate::project::binding::NativePropertyKey;
-use crate::resources::Control;
 use crate::{
     analysis::SemanticFailureReason, references::Location, syntax_kind::SyntaxKind as K,
     types::PrimitiveName,
@@ -39,10 +38,10 @@ struct ObjectMembers {
     computed_symbol: bool,
 }
 impl ObjectMembers {
-    fn new(control: Option<Control>) -> Self {
+    fn new() -> Self {
         Self {
             table: Vec::new(),
-            positions: NameMap::new(control.clone()),
+            positions: NameMap::new(),
 
             array: Vec::new(),
             computed_string: false,
@@ -136,7 +135,7 @@ impl Evaluator<'_, '_> {
                         consumer,
                     )?;
                     let symbol_index = members.computed_symbol;
-                    members = ObjectMembers::new(self.control.clone());
+                    members = ObjectMembers::new();
                     members.computed_symbol = symbol_index;
                     spread
                 } else {
@@ -173,7 +172,7 @@ impl Evaluator<'_, '_> {
         &mut self,
         recipe: &ObjectLiteralRecipe,
     ) -> Result<(), DemandError> {
-        let mut seen = NameMap::<u8>::new(self.control.clone());
+        let mut seen = NameMap::<u8>::new();
         for member in &recipe.members {
             if member.stops_grammar {
                 break;
@@ -245,12 +244,12 @@ impl Evaluator<'_, '_> {
         };
         let constant = self.is_const_context(root, consumer)?;
         let mut flags = ObjectFlags::FRESH_LITERAL;
-        let mut members = ObjectMembers::new(self.control.clone());
+        let mut members = ObjectMembers::new();
         let mut all_properties = self
             .inputs
             .semantic_options()
             .strict_null_checks
-            .then(|| NameMap::new(self.control.clone()));
+            .then(NameMap::new);
         let mut spread = self.model.empty_object_type();
         let mut failure: Option<DemandError> = None;
         for member in &recipe.members {
@@ -289,7 +288,7 @@ impl Evaluator<'_, '_> {
                             constant,
                             consumer,
                         )?;
-                        members = ObjectMembers::new(self.control.clone());
+                        members = ObjectMembers::new();
                     }
                     let operand = member
                         .initializer

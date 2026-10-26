@@ -8,21 +8,22 @@ use super::globals::GlobalTypeLookup;
 use super::native_display::DiagnosticTypeFormat;
 use super::{Evaluator, facts::TypeFacts, relations::RelationKind};
 use crate::references::Location;
-use crate::resources::{FixedMap, complete_or_abort};
+use crate::resources::complete_or_abort;
+use std::collections::HashMap;
 
 pub(super) struct PromisesState {
     // Only nonnil native cachedTypes values become hits. Its explicit nil
     // writes remain misses; neither nil nor interruption installs a value here.
-    promised: FixedMap<TypeId, NativeCompletion<TypeId>>,
-    awaited: FixedMap<TypeId, NativeCompletion<TypeId>>,
+    promised: HashMap<TypeId, NativeCompletion<TypeId>>,
+    awaited: HashMap<TypeId, NativeCompletion<TypeId>>,
     stack: Vec<TypeId>,
 }
 
 impl PromisesState {
     pub(super) fn new() -> Self {
         Self {
-            promised: FixedMap::new(),
-            awaited: FixedMap::new(),
+            promised: HashMap::new(),
+            awaited: HashMap::new(),
             stack: Vec::new(),
         }
     }

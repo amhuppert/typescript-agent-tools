@@ -65,7 +65,10 @@ target; their partial results are identical.
   key order decides, as one ordered pass would. A speculative read never waits
   for a writer: a path that is not a regular file, such as a pipe, and any
   failure other than absence are left to a blocking read made in key order,
-  after which the observations up to the next such read are repeated. The
+  after which the observations up to the next such read are repeated. (Since
+  replaced: a path that is not a regular file is refused before it is read,
+  and validation is one parallel pass; see the [service
+  design](reference-service-design.md#freshness-and-failure-contract).) The
   service accepts connections from a thread blocked in `accept` instead of
   polling every 20 ms.
 - *Answering while validating* (`ProjectSession::execute`): a warm request is
@@ -79,8 +82,9 @@ target; their partial results are identical.
   collect each input as soon as the loader reserves it; the loader integrates
   captures in TypeScript's order, records each read where it uses it, and reports
   failures in that order. An input that needs different module semantics once
-  its package format is known is collected again, and so is a capture made
-  before a read in order that may have waited, such as of a pipe. More workers measured no
+  its package format is known is collected again, and so was a capture made
+  before a read in order that may have waited, such as of a pipe (since
+  replaced: no read waits, as a pipe is refused). More workers measured no
   faster: inputs are discovered only as the loader resolves their importers. A
   load asks each path's real path once, the index orders results by a
   precomputed rank of display names, and the binder's lookup-only maps use FxHash

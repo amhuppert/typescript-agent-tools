@@ -8,7 +8,7 @@ use super::super::model::{
 use super::{Evaluator, resolution};
 use crate::analysis::SemanticFailureReason;
 use crate::references::Location;
-use crate::resources::FixedMap;
+use std::collections::HashMap;
 
 use super::property_symbols::RecursionIdentity;
 
@@ -57,20 +57,20 @@ enum RawConstraint {
 /// `getResolvedBaseConstraint` and `getInferTypeParameters` keep distinct
 /// questions. Only their fixed-identity table backing is shared here.
 pub(super) struct ConstraintsState {
-    parameters: FixedMap<TypeId, ParameterAssociation>,
-    bases: FixedMap<TypeId, BaseState>,
-    raw: FixedMap<TypeId, NativeResult<Option<TypeId>>>,
-    inferred: FixedMap<TypeId, ()>,
+    parameters: HashMap<TypeId, ParameterAssociation>,
+    bases: HashMap<TypeId, BaseState>,
+    raw: HashMap<TypeId, NativeResult<Option<TypeId>>>,
+    inferred: HashMap<TypeId, ()>,
     conditional_depth: usize,
 }
 
 impl ConstraintsState {
     pub(super) fn new() -> Self {
         Self {
-            parameters: FixedMap::new(),
-            bases: FixedMap::new(),
-            raw: FixedMap::new(),
-            inferred: FixedMap::new(),
+            parameters: HashMap::new(),
+            bases: HashMap::new(),
+            raw: HashMap::new(),
+            inferred: HashMap::new(),
             conditional_depth: 0,
         }
     }

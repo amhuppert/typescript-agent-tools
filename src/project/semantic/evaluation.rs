@@ -96,9 +96,8 @@ pub(super) struct Evaluator<'p, 'w> {
     inputs: CheckerInputs<'p>,
     source: Source<'p, 'w>,
     model: Model,
-    value_types: crate::resources::FixedMap<BoundSymbol, TypeState>,
-    declared_types:
-        crate::resources::FixedMap<crate::project::binding::NativeSymbolIdentity, TypeState>,
+    value_types: HashMap<BoundSymbol, TypeState>,
+    declared_types: HashMap<crate::project::binding::NativeSymbolIdentity, TypeState>,
     resolution: resolution::TypeResolution,
     effects: effects::EffectsCache,
     enums: enums::EnumsState,
@@ -234,8 +233,8 @@ impl<'p, 'w> Evaluator<'p, 'w> {
                 inputs.semantic_options().exact_optional_property_types,
                 control.clone(),
             ),
-            value_types: crate::resources::FixedMap::new(),
-            declared_types: crate::resources::FixedMap::new(),
+            value_types: HashMap::new(),
+            declared_types: HashMap::new(),
             resolution: resolution::TypeResolution::default(),
             effects: effects::EffectsCache::default(),
             enums: enums::EnumsState::default(),
@@ -245,7 +244,7 @@ impl<'p, 'w> Evaluator<'p, 'w> {
             discriminants: discriminants::DiscriminantsState::default(),
             inference: inference::InferenceContexts::default(),
             intersections: intersections::IntersectionsState::default(),
-            unions: unions::UnionsState::new(control.clone()),
+            unions: unions::UnionsState::new(),
             indexed_access: indexed_access::IndexedAccessState::new(),
             keyof: keyof::KeyofState::new(),
             mapped: mapped::MappedState::new(),
@@ -259,7 +258,7 @@ impl<'p, 'w> Evaluator<'p, 'w> {
             conditional: conditional::ConditionalState::new(),
             globals: globals::GlobalsState::default(),
             initialization: initialization::Initialization::default(),
-            widening: widening::WideningState::new(control.clone()),
+            widening: widening::WideningState::new(),
             variables: variables::VariablesState::default(),
             promises: promises::PromisesState::new(),
             iteration: iteration::IterationState::default(),
@@ -359,10 +358,9 @@ impl<'p, 'w> Evaluator<'p, 'w> {
             .transpose()
     }
 
-    /// Publish a request-local demand only after its arena can retain it.
+    /// Publish a request-local demand in its arena.
     /// Native question caches attach the returned handle after this completes.
     fn register_demand(&mut self, entry: TypeDemandState) -> DemandId {
-        self.demands.reserve(1);
         let id = DemandId::new(self.demands.len());
         self.demands.push(entry);
         id
@@ -385,7 +383,6 @@ impl<'p, 'w> Evaluator<'p, 'w> {
             location: Some(super::location(self.inputs, root.file, root.span())),
             state: None,
         });
-        self.signature_demands.reserve(1);
         self.signature_demands.insert((root, question), demand);
         TypeDemand::Deferred(demand)
     }

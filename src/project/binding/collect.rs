@@ -716,7 +716,7 @@ impl<'a, 's> Collector<'a, 's> {
         self.check_coverage()?;
         self.capture_reference_tokens();
         self.facts.mixed_exports = self.mixed_exports();
-        let capture = super::flow::Graph::capture(self.ast);
+        let capture = super::flow::Graph::capture(self.ast)?;
         for name in &mut self.facts.names {
             name.flow = capture.read(name.span);
         }

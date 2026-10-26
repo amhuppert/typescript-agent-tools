@@ -750,7 +750,6 @@ impl<'src> Parser<'src> {
         }
         let result = self.probe(parse);
         if matches!(result, Ok(None)) {
-            self.failed_probes.reserve(1);
             self.failed_probes.insert(probe);
         }
         result
@@ -972,7 +971,7 @@ impl<'src> Parser<'src> {
             if token.kind != Kind::String {
                 raw_text = Some(Value::from(raw));
             }
-            let decoded = literals::decode(raw, self.control.as_ref())?;
+            let decoded = literals::decode(raw)?;
             template_flags = decoded.flags;
             if !allow_invalid_escape {
                 if let Some(message) = decoded.error {
@@ -1270,9 +1269,8 @@ fn decode_identifier<'s>(raw: &'s str, span: Span) -> Result<std::borrow::Cow<'s
 
 fn decode_string<'s>(
     token: Token<'s>,
-    control: Option<&Control>,
 ) -> std::result::Result<std::result::Result<Value<'s>, &'static str>, Stop> {
-    let decoded = literals::decode(literals::token_body(token), control)?;
+    let decoded = literals::decode(literals::token_body(token))?;
     Ok(match decoded.error {
         Some(error) => Err(error),
         None => Ok(decoded.into_public_text()?.0),

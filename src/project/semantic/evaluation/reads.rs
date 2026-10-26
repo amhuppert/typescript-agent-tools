@@ -1629,10 +1629,7 @@ impl Evaluator<'_, '_> {
                         ) && sequence
                             .read(self.reference_property_name_completion(target, consumer))?
                             == syntax.reference_name.as_ref().map(|name| {
-                                crate::project::binding::NativePropertyKey::fixed(
-                                    name.as_bytes(),
-                                    self.control.as_ref(),
-                                )
+                                crate::project::binding::NativePropertyKey::fixed(name.as_bytes())
                             })
                         {
                             source = required(syntax.left, "qualified reference has no left")?;

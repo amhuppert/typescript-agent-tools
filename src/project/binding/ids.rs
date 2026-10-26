@@ -63,8 +63,8 @@ impl TableId {
 impl super::site_map::PackedValue for ScopeId {
     type Packed = u32;
 
-    fn pack(self) -> Option<Self::Packed> {
-        Some(self.0.get())
+    fn pack(self) -> Self::Packed {
+        self.0.get()
     }
 
     fn unpack(value: Self::Packed) -> Self {

@@ -15,6 +15,7 @@ use crate::project::semantic::source::{
 };
 use crate::references::Location;
 use crate::resources::{CheckedKey, CheckedMap};
+use std::collections::HashMap;
 use std::sync::Arc;
 
 #[derive(Clone)]
@@ -52,9 +53,9 @@ enum Association {
 }
 
 pub(super) struct AnonymousState {
-    associations: crate::resources::FixedMap<TypeId, Association>,
-    outer_parameters: crate::resources::FixedMap<DeclarationIdentity, NativeResult<Vec<TypeId>>>,
-    type_literals: crate::resources::FixedMap<BoundTypeLiteral, NativeCompletion<TypeId>>,
+    associations: HashMap<TypeId, Association>,
+    outer_parameters: HashMap<DeclarationIdentity, NativeResult<Vec<TypeId>>>,
+    type_literals: HashMap<BoundTypeLiteral, NativeCompletion<TypeId>>,
     instantiations: CheckedMap<InstantiationKey, NativeResult<TypeId>>,
 }
 
@@ -63,9 +64,9 @@ impl AnonymousState {
     /// identities, child values and provisional publication stay operation-owned.
     pub(super) fn new() -> Self {
         Self {
-            associations: crate::resources::FixedMap::new(),
-            outer_parameters: crate::resources::FixedMap::new(),
-            type_literals: crate::resources::FixedMap::new(),
+            associations: HashMap::new(),
+            outer_parameters: HashMap::new(),
+            type_literals: HashMap::new(),
             instantiations: CheckedMap::new(),
         }
     }
@@ -484,10 +485,7 @@ impl Evaluator<'_, '_> {
                         entries
                             .iter()
                             .find(|(key, _)| {
-                                key == &NativePropertyKey::fixed(
-                                    b"\xfeconstructor".as_slice(),
-                                    self.control.as_ref(),
-                                )
+                                key == &NativePropertyKey::fixed(b"\xfeconstructor".as_slice())
                             })
                             .map(|(_, symbol)| *symbol)
                     });

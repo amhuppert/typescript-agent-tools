@@ -142,10 +142,12 @@ impl ProjectSession {
             // reload, which decides which inputs are required and reports
             // their failures; it never licenses an answer or makes the
             // unreadable path absent.
-            let current = matches!(
-                observations.unchanged_with(&|| superseded.store(true, Ordering::Relaxed)),
-                Ok(true)
-            );
+            let stale = || superseded.store(true, Ordering::Relaxed);
+            #[cfg(test)]
+            if self.tests.stale_while_validating {
+                stale();
+            }
+            let current = matches!(observations.unchanged_with(&stale), Ok(true));
             if !current {
                 // The stopped answer, a panic included, is for nobody: an
                 // ordinary reload never prepared it.
@@ -155,8 +157,9 @@ impl ProjectSession {
                 return None;
             }
             if superseded.load(Ordering::Relaxed) {
-                // An input differed and changed back before validation ended:
-                // the generation is current, but its answer was stopped.
+                // Validation reported the generation stale and still
+                // confirmed it: the generation is current, but its answer
+                // was stopped.
                 if let Ok(answering) = speculative {
                     let _ = answering.join();
                 }
@@ -192,6 +195,10 @@ impl ProjectSession {
                     None,
                 ),
             };
+            #[cfg(test)]
+            if let Some(while_loading) = &self.tests.while_loading {
+                while_loading();
+            }
             let observations = disk.finish();
             if !observations.unchanged()? {
                 return Err(InputError {
@@ -227,55 +234,42 @@ mod tests {
         /// Answers prepared while validating begin only once stopped, for at
         /// most this long.
         pub(super) answer_once_stopped: Option<std::time::Duration>,
+        /// Validation reports the generation stale, as it does on finding an
+        /// observation that differs, and goes on to confirm it.
+        pub(super) stale_while_validating: bool,
+        /// Runs once loading has read every input, before the check after
+        /// loading repeats its observations.
+        pub(super) while_loading: Option<Box<dyn Fn() + Send + Sync>>,
     }
 
-    /// An input that differs, then is restored before validation ends,
-    /// leaves the generation current although its prepared answer was
-    /// stopped: the session answers again rather than deliver the stopped
-    /// answer. The configuration, a pipe sorting before `z.ts`, restores
-    /// `z.ts` only once its third reader has begun.
-    #[cfg(unix)]
-    #[test]
-    fn a_stopped_answer_from_a_current_generation_is_made_again() {
-        use crate::types::TypeAnswer;
-        let directory =
-            std::env::temp_dir().join(format!("tsparse-answer-again-{}", std::process::id()));
+    /// A temporary directory, by its real path, with `files`.
+    fn directory(name: &str, files: &[(&str, &str)]) -> std::path::PathBuf {
+        let directory = std::env::temp_dir().join(format!("tsparse-{name}-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&directory);
         std::fs::create_dir_all(&directory).unwrap();
-        // Observations are keyed by real paths, and the configuration by the
-        // path it is given: give it the real one, so that it sorts first.
         let directory = std::fs::canonicalize(&directory).unwrap();
-        let (config, source) = (directory.join("aconfig.json"), directory.join("z.ts"));
-        std::fs::write(&source, "export const value = 1;\n").unwrap();
-        let made = std::process::Command::new("mkfifo")
-            .arg(&config)
-            .status()
-            .unwrap();
-        assert!(made.success());
-        let stop = Arc::new(AtomicBool::new(false));
-        let writer = {
-            let (config, source, stop) = (config.clone(), source.clone(), stop.clone());
-            std::thread::spawn(move || {
-                use std::io::Write;
-                for read in 1.. {
-                    let mut pipe = std::fs::OpenOptions::new()
-                        .write(true)
-                        .open(&config)
-                        .unwrap();
-                    if stop.load(std::sync::atomic::Ordering::SeqCst) {
-                        return;
-                    }
-                    if read == 3 {
-                        std::fs::write(&source, "export const value = 1;\n").unwrap();
-                    }
-                    let _ =
-                        pipe.write_all(br#"{"compilerOptions":{"noLib":true},"files":["z.ts"]}"#);
-                    drop(pipe);
-                    std::thread::sleep(std::time::Duration::from_millis(100));
-                }
-            })
-        };
-        let mut session = ProjectSession::new(&config).unwrap();
+        for (path, text) in files {
+            std::fs::write(directory.join(path), text).unwrap();
+        }
+        directory
+    }
+
+    /// An answer prepared while validating that was stopped is never
+    /// delivered, also when validation confirms the generation: the session
+    /// answers again. Validation in one pass reports staleness only for a
+    /// generation it does not confirm (`Observations::unchanged_with`), so a
+    /// hook reports it here.
+    #[test]
+    fn a_stopped_answer_from_a_current_generation_is_made_again() {
+        let directory = directory(
+            "answer-again",
+            &[
+                ("tsconfig.json", r#"{"compilerOptions":{"noLib":true}}"#),
+                ("z.ts", "export const value = 1;\n"),
+            ],
+        );
+        let source = directory.join("z.ts");
+        let mut session = ProjectSession::new(&directory.join("tsconfig.json")).unwrap();
         let summary = |session: &mut ProjectSession| match session.execute(ProjectRequest::Type(
             TypeRequest::new(TypeQuery::At {
                 file: source.clone(),
@@ -293,15 +287,83 @@ mod tests {
             Err(error) => Err(error),
         };
         assert_eq!(summary(&mut session).unwrap(), "1");
-        std::fs::write(&source, "export const value = 2;\n").unwrap();
         session.tests.answer_once_stopped = Some(std::time::Duration::from_secs(20));
+        session.tests.stale_while_validating = true;
         let answer = summary(&mut session);
-        stop.store(true, std::sync::atomic::Ordering::SeqCst);
-        drop(std::fs::File::open(&config));
-        writer.join().unwrap();
+        let _ = std::fs::remove_dir_all(&directory);
         assert_eq!(answer.unwrap(), "1");
         assert_eq!(session.generation(), 1);
-        let _ = std::fs::remove_dir_all(&directory);
+    }
+
+    /// Inputs that change after loading read them, while loading still runs,
+    /// fail the refresh rather than publish what was read: the check after
+    /// loading repeats every observation. Here a source's text changes, or a
+    /// symbolic link is retargeted, once loading has read it; the next
+    /// request publishes what is there.
+    #[test]
+    fn inputs_changed_while_loading_fail_the_refresh_then_publish() {
+        for retarget in [false, true] {
+            let directory = directory(
+                "changed-while-loading",
+                &[
+                    (
+                        "tsconfig.json",
+                        r#"{"compilerOptions":{"noLib":true},"files":["a.ts","link.ts"]}"#,
+                    ),
+                    ("a.ts", "export const before = 1;\n"),
+                    ("t1.ts", "export const firstTarget = 1;\n"),
+                    ("t2.ts", "export const secondTarget = 1;\n"),
+                ],
+            );
+            let link = directory.join("link.ts");
+            std::os::unix::fs::symlink(directory.join("t1.ts"), &link).unwrap();
+            let config = directory.join("tsconfig.json");
+            let mut session = ProjectSession::new(&config).unwrap();
+            let (source, target) = (directory.join("a.ts"), directory.join("t2.ts"));
+            session.tests.while_loading = Some(Box::new(move || {
+                if retarget {
+                    std::fs::remove_file(&link).unwrap();
+                    std::os::unix::fs::symlink(&target, &link).unwrap();
+                } else {
+                    std::fs::write(&source, "export const after_ = 1;\n").unwrap();
+                }
+            }));
+            let groups = |session: &mut ProjectSession, name: &str| {
+                session
+                    .execute(ProjectRequest::References(ReferenceQuery::Name {
+                        name: name.into(),
+                        file: None,
+                    }))
+                    .map(|response| match response {
+                        ProjectResponse::References(result) => result.groups.len(),
+                        other => panic!("{other:?}"),
+                    })
+            };
+            let refreshed = groups(&mut session, "before");
+            let generation = session.generation();
+            session.tests.while_loading = None;
+            let names = if retarget {
+                ["secondTarget", "firstTarget"]
+            } else {
+                ["after_", "before"]
+            };
+            let published = names.map(|name| groups(&mut session, name).unwrap());
+            let _ = std::fs::remove_dir_all(&directory);
+            match refreshed {
+                Err(AnalysisError::Input(error)) => {
+                    assert_eq!(error.kind, crate::analysis::InputErrorKind::Io);
+                    assert_eq!(
+                        error.message,
+                        "Project inputs changed during indexing; retry when writes have completed"
+                    );
+                    assert_eq!(error.path.as_ref(), Some(&config));
+                }
+                other => panic!("a refresh that read a changed input published: {other:?}"),
+            }
+            assert_eq!(generation, 0, "retarget: {retarget}");
+            assert_eq!(published, [1, 0], "retarget: {retarget}");
+            assert_eq!(session.generation(), 1, "retarget: {retarget}");
+        }
     }
 
     /// An answer prepared from a generation validation rejects is discarded,

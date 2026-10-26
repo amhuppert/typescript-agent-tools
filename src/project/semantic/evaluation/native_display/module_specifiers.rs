@@ -344,7 +344,7 @@ impl Evaluator<'_, '_> {
                 };
                 let Some(export) = self.reference_raw_table_lookup(
                     exports,
-                    &NativePropertyKey::fixed(b"export=".as_slice(), self.control.as_ref()),
+                    &NativePropertyKey::fixed(b"export=".as_slice()),
                     consumer,
                 )?
                 else {
