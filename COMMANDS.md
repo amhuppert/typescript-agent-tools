@@ -13,12 +13,14 @@
 | **Parse & Validate** | *(no operation flag)* | Parse a TypeScript/TSX file or stdin into a TypeScript 7 JSON AST. |
 | | `--check` | Validate syntax only and print a one-line verdict instead of the AST. |
 | **Navigate** | `--outline` | List a file's declarations in source order, indented by containment. |
+| | `--test-outline` | List a test file's `describe`/`it`/`test` calls and hooks in source order, indented by containment, with each test's name. |
 | | `--show` | Print one declaration's exact source with original line numbers. |
 | **Project Queries** | `--type` | Inspect the type (and optional structural graph) of a declaration or token. |
 | | `--references` | Group declarations and occurrences of a symbol or member across a project. |
+| | `--definition` | Print the declarations a name denotes, following import and export aliases. |
 | | `--constructs` | List the object literals that construct a type, and the properties each lacks. |
 | **Edit Code** | `--replace-body` | Preview replacing the body of a function, method, constructor, accessor, or arrow. |
-| | `--insert-after` | Preview inserting statements after a selected declaration's statement. |
+| | `--insert-after` | Preview inserting statements after a selected statement or declaration's statement. |
 | | `--edit-batch EDITS` | Preview multiple edits from a JSON batch file against the original files. |
 | | `--apply PLAN` | Write a saved edit plan's exact bytes after verifying file contents and identity. |
 | **Service & Health** | `--references-status` | Report the state of the project's background service without loading or refreshing. |
@@ -55,7 +57,7 @@ printf 'const x: number = 1;' | tsparse --check
 
 ## 2. Navigate Declarations
 
-Navigation commands work on a single file (no project loaded) or with `--project TSCONFIG` (queries the project's searched files via the background project service, or in-process with `--direct`).
+`--outline` and `--show` work on a single file (no project loaded) or with `--project TSCONFIG` (queries the project's searched files via the background project service, or in-process with `--direct`). `--test-outline` reads a single file only.
 
 ### `--outline`
 Lists one file's declarations in source order (`LINE:COLUMN kind signature`), indented by containment. Imports are grouped one line per import declaration.
@@ -74,6 +76,21 @@ tsparse --outline src/host.ts --depth all --limit all
 tsparse --outline --project tsconfig.json src/host.ts --json -o outline.json
 ```
 
+### `--test-outline`
+Lists one test file's test calls in source order (`LINE:COLUMN call name`), indented by containment, at every level: `describe`, `it`, and `test` with Vitest's modifiers (`only`, `skip`, `todo`, `concurrent`, `sequential`, `shuffle`, `fails`, and `each(...)`, `for(...)`, `skipIf(...)`, `runIf(...)` called before the test), and the hooks `beforeAll`, `beforeEach`, `afterAll`, and `afterEach`. Syntax alone decides what is a test call (no import check, no project). The name is the call's first argument as written, without line breaks. Each position is the test statement's first token, so `--show --at` prints the whole test and `--insert-after --at` inserts after it.
+
+```sh
+tsparse --test-outline FILE [--limit N|all] [--json [--pretty]] [-o OUTPUT]
+```
+
+- **`--limit N|all`**: Cap displayed entries (default `200`; removed when writing to `-o` without `--limit`).
+
+**Examples:**
+```sh
+tsparse --test-outline src/app.test.ts
+tsparse --test-outline src/app.test.ts --json -o tests.json
+```
+
 ### `--show`
 Prints a single declaration's exact source with original 1-based line numbers. Overloads, merged declarations, and shadowed locals remain distinct; ambiguous matches exit `1` and list each candidate's `FILE:LINE:COLUMN` and qualified selector.
 
@@ -81,8 +98,8 @@ Prints a single declaration's exact source with original 1-based line numbers. O
 tsparse --show (--name NAME [FILE] | --at [FILE:]LINE:COLUMN [FILE]) [--project TSCONFIG [--direct]] [--limit N|all] [--json [--pretty]] [-o OUTPUT]
 ```
 
-- **`--name NAME`**: Select by exact declared name or dotted containment path (e.g., `RunHost.run`). With `--project`, `FILE` is optional and searches all project files when omitted.
-- **`--at [FILE:]LINE:COLUMN`**: Select the declaration whose name or anchor is at the 1-based line and UTF-16 column.
+- **`--name NAME`**: Select by exact declared name or dotted containment path (e.g., `RunHost.run`). With `--project`, `FILE` is optional and searches all project files when omitted. An import or export specifier has a name only where it renames, so a miss on a name `FILE` imports or re-exports without renaming names each such specifier and the `--definition --at` command that finds its declaration (complete with `--project`, with the `TSCONFIG` placeholder without it).
+- **`--at [FILE:]LINE:COLUMN`**: Select the declaration whose name or anchor is at the 1-based line and UTF-16 column; where there is none, a statement's first token selects that statement (kind `statement`), such as an `it(...)` test or an `expect(...)` line.
 - **`--limit N|all`**: Cap displayed declaration lines (default `400`) and ambiguity candidates (default `50`).
 
 **Examples:**
@@ -137,6 +154,22 @@ tsparse --references --project tsconfig.json --name RunHost.observe --calls --no
 tsparse --references --project tsconfig.json --at src/app.ts:12:8 --pretty
 ```
 
+### `--definition`
+Prints the declarations of the symbols a position or name selects, following import and export aliases (including re-exports and `export *`) to the original declarations: one group per symbol, one `FILE:LINE:COLUMN` per declaration. A call or `new` lists every declaration of the callee, never one signature. A position in no identifier (a keyword, whitespace, a module specifier) or a name with no candidate exits `1` with `not_found`, never an empty result; a member position (a property access, a member's name, a literal key, a parameter property's modifier) exits `1` naming the `--references --at` command that finds the member's declarations.
+
+```sh
+tsparse --definition --project TSCONFIG (--name NAME [FILE] | --at [FILE:]LINE:COLUMN [FILE]) [--direct] [--json [--pretty]] [-o OUTPUT]
+```
+
+- **`--name NAME`**: One identifier (a dotted name is refused with the `--show --name` command that selects it). Selects every declaration, local import, or exported alias spelled exactly `NAME`; an optional `FILE` narrows the candidates to `FILE`, such as a name `FILE` only imports or re-exports.
+- **`--at [FILE:]LINE:COLUMN`**: Select the identifier at the given position, such as an import specifier, a use of an imported name, or a re-export.
+
+**Examples:**
+```sh
+tsparse --definition --project tsconfig.json --at src/app.ts:1:10
+tsparse --definition --project tsconfig.json --name formatTitle src/app.ts
+```
+
 ### `--constructs`
 Lists the object literals whose contextual type constructs the selected interface, class, or type alias (per union alternative, generic instantiations included), and the properties each does not certainly provide, optional ones included. Presence is the compiler's model of the literal: `absent`, or `unknown` through optional or conditional spreads, index signatures, or `any`. By default it examines the literals with a member naming one of the target's keys, or with no named member (`{}`, only spreads, only computed names); the header reads `N of M literals examined`, and a line counts the rest.
 
@@ -183,7 +216,7 @@ tsparse --replace-body --project tsconfig.json --name RunHost.start --from body.
 ```
 
 ### `--insert-after`
-Previews inserting complete statements after the statement designated by the selected declaration (in its file, block, namespace, or case clause).
+Previews inserting complete statements after the statement designated by the selected declaration (in its file, block, namespace, or case clause). Where no declaration is named or anchored at the position, `--at` on a statement's first token selects that statement, so statements can be inserted after a statement in a statement list, such as an `it(...)` test or an `expect(...)` line. A selected callback is refused; when its innermost enclosing statement is in a statement list and `--at` on that statement's first token selects only that statement, the refusal ends with `select it with --at LINE:COLUMN`, that position.
 
 ```sh
 tsparse --insert-after (--name NAME [FILE] | --at [FILE:]LINE:COLUMN [FILE]) --from FRAGMENT [--project TSCONFIG [--direct]] [--plan PLAN] [--limit N|all] [--json [--pretty]] [-o OUTPUT]
@@ -195,6 +228,7 @@ tsparse --insert-after (--name NAME [FILE] | --at [FILE:]LINE:COLUMN [FILE]) --f
 **Examples:**
 ```sh
 tsparse --insert-after --at src/host.ts:3:7 --from helpers.ts
+tsparse --insert-after --at src/host.test.ts:10:3 --from new-test.ts
 tsparse --insert-after --project tsconfig.json --name projectRunHalts --from helpers.ts --plan insert.plan.json
 ```
 
@@ -206,6 +240,7 @@ tsparse --edit-batch EDITS [--project TSCONFIG [--direct]] [--plan PLAN] [--limi
 ```
 
 - **`EDITS` format**: `{"edits": [{"operation": "replace_body"|"insert_after", "name"|"at": "...", "file": "...", "fragment"|"from": "..."}]}`.
+- **`at`**: Selects as `--show --at` does, so where no declaration is named or anchored, a statement's first token selects that statement for `insert_after`.
 
 **Example:**
 ```sh
@@ -228,7 +263,7 @@ tsparse --apply batch.plan.json
 
 ## 5. Service Administration & Diagnostics
 
-`--references-status`, `--references-stop`, and `--references-serve` manage the background project service that answers all `--project` queries (`--references`, `--type`, `--constructs`, `--outline`, `--show`, and project edits).
+`--references-status`, `--references-stop`, and `--references-serve` manage the background project service that answers all `--project` queries (`--references`, `--definition`, `--type`, `--constructs`, `--outline`, `--show`, and project edits).
 
 ### `--references-status`
 Reports whether the project's service is running, its PID, snapshot generation, build stamp, remaining idle time, and active memory/timeout limits. Does not load the project, check freshness, or reset the idle timer.
@@ -269,7 +304,7 @@ tsparse --doctor [--project TSCONFIG] [--json [--pretty]]
 | `--json` | Emit one structured JSON result or error document on stdout or `-o` (stderr remains empty). |
 | `--pretty` | Indent JSON output. Valid alone on `parse`, `--references`, and `--references-status`; requires `--json` elsewhere. |
 | `-o, --output FILE` | Write output to `FILE` instead of stdout. Removes default display `--limit` caps when `--limit` is omitted. |
-| `--limit N\|all` | Override default display caps (`200` occurrences/outline entries, `400` show/diff lines, `50` candidates). |
+| `--limit N\|all` | Override default display caps (`200` occurrences/outline entries/test-outline entries, `400` show/diff lines, `50` candidates). |
 | `-h, --help` | Print general help, or combine with an operation flag (`tsparse --references --help`) for operation help. |
 | `-V, --version` | Print `tsparse` version and build stamp. |
 

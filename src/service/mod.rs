@@ -39,6 +39,9 @@ use typescript_parser::project::{ProjectRequest, ProjectResponse, ProjectSession
 const STARTUP_WAIT: Duration = Duration::from_secs(10);
 const CLIENT_WAIT: Duration = Duration::from_secs(300);
 const SOCKET_WAIT: Duration = Duration::from_secs(5);
+/// How long a client about to start a service waits for the writer of a
+/// staged startup diagnostic (`Endpoint::discard_start_errors`).
+const STAGED_WRITER_WAIT: Duration = Duration::from_secs(5);
 const POLL: Duration = Duration::from_millis(20);
 const REQUEST_LIMIT: u64 = 1 << 20;
 /// The permissions of the runtime directory: everything for its owner, and
@@ -464,7 +467,13 @@ impl Endpoint {
 
     /// Remove the diagnostics an earlier start left, before this client
     /// starts a service whose diagnostic it will read: the published one and
-    /// an abandoned partial copy.
+    /// an abandoned partial copy. A staged copy's writer holds its lock while
+    /// it writes, and also while it dies mid-write: a process killed by a
+    /// signal that dumps core keeps its locks until the dump completes, about
+    /// a second where a helper such as apport receives it. So a held copy is
+    /// waited on, up to `STAGED_WRITER_WAIT`, until its writer publishes it,
+    /// which is then removed too, removes it, or dies, and it is reclaimed; a
+    /// copy still held then is left to its writer.
     fn discard_start_errors(&self) -> Result<(), Failure> {
         let cannot_remove = |path: &Path, error: io::Error| {
             Failure::new(
@@ -475,15 +484,22 @@ impl Endpoint {
                 ),
             )
         };
-        match std::fs::remove_file(&self.start_error) {
-            Ok(()) => {}
-            Err(error) if error.kind() == io::ErrorKind::NotFound => {}
-            Err(error) => return Err(cannot_remove(&self.start_error, error)),
-        }
-        // A copy another writer still holds is left to it.
-        match self.reclaim_staged_start_error() {
-            Ok(_) => Ok(()),
-            Err(error) => Err(cannot_remove(&self.staged_start_error, error)),
+        let waiting = Instant::now();
+        loop {
+            // The staged copy first: once it is gone, a writer that had
+            // created it has already published, and that is removed next.
+            let free = self
+                .reclaim_staged_start_error()
+                .map_err(|error| cannot_remove(&self.staged_start_error, error))?;
+            match std::fs::remove_file(&self.start_error) {
+                Ok(()) => {}
+                Err(error) if error.kind() == io::ErrorKind::NotFound => {}
+                Err(error) => return Err(cannot_remove(&self.start_error, error)),
+            }
+            if free || waiting.elapsed() >= STAGED_WRITER_WAIT {
+                return Ok(());
+            }
+            std::thread::sleep(POLL);
         }
     }
 

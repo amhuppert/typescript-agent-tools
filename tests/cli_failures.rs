@@ -271,7 +271,7 @@ fn usage_failures_print_their_code_in_text_and_are_documents_with_json() {
 #[test]
 fn a_usage_failure_about_json_or_an_argument_that_is_not_unicode_stays_text() {
     let fixture = fixture();
-    let json_scope = "usage.flag_scope: --json applies to: --outline, --show, --type, --references, --constructs, --replace-body, --insert-after, --edit-batch, --apply, --references-status, --doctor\n";
+    let json_scope = "usage.flag_scope: --json applies to: --outline, --test-outline, --show, --type, --references, --definition, --constructs, --replace-body, --insert-after, --edit-batch, --apply, --references-status, --doctor\n";
     for args in [
         &["--json", "host.ts"][..],
         &["--references-stop", "--json", "--project", "tsconfig.json"],

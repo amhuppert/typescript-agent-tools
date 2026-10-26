@@ -108,7 +108,13 @@ ambient one, and every other kind of site, such as a class, are
 `UnsupportedSite`. A class, interface, or enum, whose content is a member
 list, adds the remedy: `Shape cannot have its body replaced: this interface
 has no body to replace; member-list editing is not supported; select a
-declaration with a body`, such as one of a class's methods.
+declaration with a body`, such as one of a class's methods. A
+[statement site](navigation.md#statement-sites) designates its statement,
+not a callable in it, so it is `UnsupportedSite` too, also when the statement
+is a function declaration selected by its `export` or `function` keyword:
+`export function start() { … } cannot have its body replaced: a statement
+site has no body to replace; select the function, method, or arrow function
+by its name or anchor`. The function's name selects the function.
 
 The fragment is the complete new body: a block `{ ... }`, or, for an arrow
 function only, an expression. It replaces the body's tokens exactly: the
@@ -123,13 +129,77 @@ the checks below hold.
 
 The selected site designates a statement, as `--show` excerpts it: a binding
 designates its whole variable statement, a specifier its whole import or
-export declaration, and any other site itself. That statement must be an item
-of a statement list: a file, block (including a function body or class static
+export declaration, a [statement site](navigation.md#statement-sites) its
+statement, and any other site itself. That statement must be an item of a
+statement list: a file, block (including a function body or class static
 block), namespace body, or `case` or `default` clause. A binding in a loop
 header, a `catch` variable, a parameter property, a class or object member,
-a callback, and a declaration that is the unbraced body of a control-flow or
-labeled statement have no such list and are `UnsupportedSite`; selection never
-climbs to an enclosing statement instead.
+a callback, and a declaration or statement that is the unbraced body of an
+`if`, `else`, loop, `with`, or label, or a class static block's body, have no
+such list and are `UnsupportedSite`; selection never climbs to an enclosing
+statement instead. A selected callback designates itself and is refused;
+the refusal names the position that selects its enclosing statement when
+there is one (below).
+
+A statement site is how an edit inserts after a statement in a statement
+list that is not a declaration, such as a test call: `--at` on a statement's
+first token selects it when no entry is there. In the sample of
+[statement sites](navigation.md#statement-sites), with `new-test.ts` holding
+`it("new test", () => {});`,
+`tsparse --insert-after --at 10:3 /abs/edge-cases.test.ts --from new-test.ts`
+previews:
+
+```text
+/abs/edge-cases.test.ts:10:3: insert_after statement it.skip("skipped one", () => { … }): after the statement at 10:3-10:36
+validated: syntax and edit boundaries; not type-checked
+--- /abs/edge-cases.test.ts
++++ /abs/edge-cases.test.ts
+@@ -8,6 +8,7 @@
+   });
+   it.todo("writes later");
+   it.skip("skipped one", () => {});
++  it("new test", () => {});
+   test("with options", { timeout: 1000 }, async () => {});
+   it.skipIf(process.env.CI)("conditional", () => {});
+   test.concurrent("parallel", async () => {});
+preview only: save a plan with --plan PLAN to apply it
+```
+
+The edit document's `site` is the statement site with `"kind": "statement"`
+and its `depth`, here 2, since the `describe() callback` entry at depth 1
+contains the statement. A batch `insert_after` whose `at` selects a statement
+site inserts after it alike, and two insertions after one statement conflict,
+as two insertions at one place do. A statement site outside a statement list
+is refused without a remedy:
+`run() cannot have statements inserted after it: this statement is not a
+statement in a statement list (statements can be inserted only after a
+statement of a file, block, module block, or case clause)`.
+
+An insertion refused at a function or arrow function expression (a
+callback, an assigned or returned function, or a default-exported arrow)
+names the position that selects its innermost enclosing statement, its
+nearest ancestor that is a statement, which a function body or a `try`,
+`catch`, or `finally` block never is. The refusal names it only when that
+statement is an item of a statement list and `--at` on the start of its
+first token selects one site, which designates the statement: its statement
+site, or an entry that designates it, such as `export = f(…)`'s `export=`.
+The message then ends with
+`; to insert after the enclosing statement, select it with --at LINE:COLUMN`,
+a one-based line and UTF-16 column. In the sample,
+`tsparse --insert-after --at 5:30 /abs/edge-cases.test.ts --from new-test.ts`
+exits 1 with this on stderr, and the JSON `error.message` is the same text
+after `edit 1: `:
+
+```text
+/abs/edge-cases.test.ts:5:30: edit 1: <function> cannot have statements inserted after it: this function is not a statement in a statement list (statements can be inserted only after a statement of a file, block, module block, or case clause); to insert after the enclosing statement, select it with --at 5:3
+```
+
+`--at 5:3` selects line 5's `it.each(…)(…)` statement and inserts after it.
+Only the innermost statement is considered, so no remedy is printed for
+`if (c) f(() => {});`, whose innermost statement is the unbraced `if` body,
+or for `x => {};`, whose first token selects the arrow again. Every other
+refusal, at a class expression, member, parameter property, or loop or
+`catch` binding, is unchanged.
 
 The fragment is one or more complete statements; a fragment of only
 whitespace and comments inserts none and is rejected. It goes after the
@@ -211,7 +281,9 @@ whether it begins with a byte order mark, its original and proposed text, and
 each edit's operation, selected site with its anchor, fragment, and changes.
 Loading a plan reads no current file, fragment, or project: it prepares the
 recorded edits again, from their anchors, against the recorded originals, and
-accepts the plan only if that gives exactly the recorded proposed text. Its
+accepts the plan only if that gives exactly the recorded proposed text. A
+statement site's anchor, the start of its first token, selects the same
+statement site again, since no entry matched anywhere in that token. Its
 file names must be ones preparation would edit. A plan from another build of
 `tsparse` is refused; prepare it again. A plan
 changes nothing until applied.

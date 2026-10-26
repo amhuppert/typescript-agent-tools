@@ -170,6 +170,9 @@ file, since its standard streams are null: it writes the one staged copy,
 so a client reads a complete diagnostic or none. A staged copy whose lock no
 process holds was abandoned by a writer that died, and the next start or
 failing service removes it, so at most one of each file exists per endpoint.
+A writer killed while writing holds the lock until any core dump completes,
+so a start waits up to 5 seconds (`STAGED_WRITER_WAIT`) for a held copy's
+writer before it leaves the copy to it.
 Reclaiming the staged copy and reading the published diagnostic open them only
 as regular files, checked before opening, so a pipe or link at either path is
 reported rather than opened; removing an earlier published diagnostic before a

@@ -23,7 +23,25 @@ pub(super) enum Opening {
 
 /// A site that does not support an operation, and why.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(super) struct Unsupported(pub(super) String);
+pub(super) struct Unsupported {
+    pub(super) reason: String,
+    /// For an insertion refused at a function or arrow function
+    /// expression, which designates itself: the innermost statement
+    /// containing it, when that statement is an item of a statement list.
+    /// The refusal names its first token's position as the remedy when
+    /// `--at` there selects one site, which designates it
+    /// (`prepare::remedy`).
+    pub(super) enclosing: Option<NodeId>,
+}
+
+impl Unsupported {
+    fn new(reason: impl Into<String>) -> Self {
+        Self {
+            reason: reason.into(),
+            enclosing: None,
+        }
+    }
+}
 
 /// The kinds of syntax with a body a callable's caller runs.
 const CALLABLES: [SyntaxKind; 7] = [
@@ -49,13 +67,13 @@ pub(super) fn plan(
             let callable = callable(ast, site)?;
             let node = ast.node(callable);
             let Some(body) = syntax::id(node, "body") else {
-                return Err(Unsupported(format!(
+                return Err(Unsupported::new(format!(
                     "this {} has no body to replace (an overload, abstract member, or signature)",
                     describe(site)
                 )));
             };
             if node.flags & crate::compiler::node::AMBIENT != 0 {
-                return Err(Unsupported(format!(
+                return Err(Unsupported::new(format!(
                     "this {} is ambient; ambient declarations have no bodies to replace",
                     describe(site)
                 )));
@@ -69,7 +87,7 @@ pub(super) fn plan(
         Operation::InsertAfter => {
             let statement = site.designation;
             let Some((owner, index)) = statement_list(ast, statement) else {
-                return Err(Unsupported(match ast.node(statement).syntax_kind {
+                let reason = match ast.node(statement).syntax_kind {
                     SyntaxKind::VariableDeclarationList => {
                         "this binding is declared in a loop header, which has no statement list to insert into".into()
                     }
@@ -80,7 +98,17 @@ pub(super) fn plan(
                         "this {} is not a statement in a statement list (statements can be inserted only after a statement of a file, block, module block, or case clause)",
                         describe(site)
                     ),
-                }));
+                };
+                // Only a function or arrow expression's refusal may name a
+                // remedy, and only its innermost statement (design, "The
+                // callback refusal's remedy").
+                let enclosing = matches!(
+                    ast.node(site.node).syntax_kind,
+                    SyntaxKind::FunctionExpression | SyntaxKind::ArrowFunction
+                )
+                .then(|| innermost_statement(ast, site.node))
+                .filter(|&statement| statement_list(ast, statement).is_some());
+                return Err(Unsupported { reason, enclosing });
             };
             Ok((
                 Opening::Statements {
@@ -139,8 +167,15 @@ impl Opening {
 /// is directly a function or arrow function, inside any parentheses
 /// (`syntax::skip_parentheses`). Nothing else is unwrapped, so a call,
 /// condition, or assertion around a function does not make the binding
-/// eligible; such a function is selected by its own anchor.
+/// eligible; such a function is selected by its own anchor. A statement
+/// site designates its statement, never a callable, even when the statement
+/// is a function declaration, whose name selects the function.
 fn callable(ast: &Ast<'_>, site: Site) -> Result<NodeId, Unsupported> {
+    if site.kind == Kind::Statement {
+        return Err(Unsupported::new(
+            "a statement site has no body to replace; select the function, method, or arrow function by its name or anchor",
+        ));
+    }
     let node = ast.node(site.node);
     if CALLABLES.contains(&node.syntax_kind) {
         return Ok(site.node);
@@ -166,15 +201,16 @@ fn callable(ast: &Ast<'_>, site: Site) -> Result<NodeId, Unsupported> {
             | Kind::Property
             | Kind::EnumMember
             | Kind::Import
-            | Kind::Export => "",
+            | Kind::Export
+            | Kind::Statement => "",
         };
-        return Err(Unsupported(format!(
+        return Err(Unsupported::new(format!(
             "this {} has no body to replace{remedy}",
             describe(site)
         )));
     }
     let Some(initializer) = syntax::id(node, "initializer") else {
-        return Err(Unsupported(format!(
+        return Err(Unsupported::new(format!(
             "this {} has no initializer whose body could be replaced",
             describe(site)
         )));
@@ -182,7 +218,7 @@ fn callable(ast: &Ast<'_>, site: Site) -> Result<NodeId, Unsupported> {
     let inner = syntax::skip_parentheses(ast, initializer);
     match ast.node(inner).syntax_kind {
         SyntaxKind::FunctionExpression | SyntaxKind::ArrowFunction => Ok(inner),
-        _ => Err(Unsupported(format!(
+        _ => Err(Unsupported::new(format!(
             "this {}'s initializer is {}, not directly a function or arrow function; select a function inside it by its own position",
             describe(site),
             ast.node(inner).kind
@@ -209,6 +245,33 @@ fn statement_list(ast: &Ast<'_>, statement: NodeId) -> Option<(NodeId, usize)> {
             child != statement && span.start <= target.start && target.end <= span.end
         })?;
     }
+}
+
+/// The innermost statement containing `node`: its nearest ancestor that
+/// `syntax::is_statement` accepts, which a function body or a `try`,
+/// `catch`, or `finally` block never is. The descent from the root, through
+/// the child whose span contains `node`, records each ancestor's parent,
+/// which `is_statement` reads for a block.
+fn innermost_statement(ast: &Ast<'_>, node: NodeId) -> NodeId {
+    let target = ast.node(node).span;
+    let mut parents = vec![None; ast.nodes().len()];
+    let mut innermost = None;
+    let mut current = ast.root_id();
+    while current != node {
+        if syntax::is_statement(ast, &parents, current) {
+            innermost = Some(current);
+        }
+        let child = ast
+            .children(current)
+            .find(|&child| {
+                let span = ast.node(child).span;
+                child == node || (span.start <= target.start && target.end <= span.end)
+            })
+            .expect("a site's node lies in its tree");
+        parents[child.index()] = Some(current);
+        current = child;
+    }
+    innermost.expect("an expression lies in a statement")
 }
 
 /// A site's kind of syntax, for messages: its navigation kind.

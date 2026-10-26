@@ -1,7 +1,8 @@
 //! Declaration navigation: an outline of a file's declaration sites and the
 //! exact source of one selected declaration, for one named file
 //! (`outline_file`, `show_file`) or a project's searched files
-//! (`Project::outline`, `Project::show`, and `ProjectRequest`).
+//! (`Project::outline`, `Project::show`, and `ProjectRequest`); and, for one
+//! named file only, its test view (`test_outline_file`).
 //!
 //! ```no_run
 //! use std::path::Path;
@@ -27,18 +28,21 @@
 //! owns which syntax is a declaration, its kind, name, containment, ranges, and
 //! signature; the catalog (`catalog`) owns selection and pairs its records
 //! with the captured source they describe; `file` owns the complete file
-//! operation, from reading the file to its parsing policy. See
-//! `docs/navigation.md` for the contract and its differences from TypeScript's
-//! document symbols.
+//! operation, from reading the file to its parsing policy. The test view is
+//! no declaration catalog: `test_outline` owns which statements are test
+//! calls, a question TypeScript does not ask, and answers from the syntax
+//! tree. See `docs/navigation.md` for the contract and its differences from
+//! TypeScript's document symbols.
 
 mod catalog;
 mod file;
 mod names;
 mod projection;
 mod signature;
+mod test_outline;
 
 pub(crate) use catalog::{Catalog, Index, SiteSyntax, Syntax, outcome};
-pub use file::{outline_file, show_file};
+pub use file::{outline_file, show_file, test_outline_file};
 
 use crate::analysis::{InputError, InputErrorKind, QueryError};
 use crate::input::InputKind;
@@ -50,7 +54,9 @@ use std::path::{Path, PathBuf};
 
 /// The syntax family of a declaration site. Text and JSON output share this
 /// one vocabulary; a function-valued variable is still a `Variable`, and a
-/// class arrow field or object property is still a `Property`.
+/// class arrow field or object property is still a `Property`. A statement
+/// site, which `--at` selects on a statement's first token when no outline
+/// entry is there, is a `Statement`, whatever its syntax.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Kind {
@@ -72,6 +78,8 @@ pub enum Kind {
     EnumMember,
     Import,
     Export,
+    /// A statement site: never an outline entry.
+    Statement,
 }
 
 impl Kind {
@@ -94,6 +102,7 @@ impl Kind {
             Self::EnumMember => "enum_member",
             Self::Import => "import",
             Self::Export => "export",
+            Self::Statement => "statement",
         }
     }
 }
@@ -117,15 +126,18 @@ pub struct Declaration {
     /// Presentation: the declared name as written (identifiers decoded,
     /// string names quoted and escaped losslessly), or the label the catalog
     /// gives an unnamed site, such as `default` or `describe('x') callback`.
-    /// Never truncated, and never a lookup identity.
+    /// Never truncated, and never a lookup identity. A statement site has no
+    /// name, so its label is its statement's text without a final `;`,
+    /// rendered and abbreviated as a signature is, from its start.
     pub label: String,
     /// The exact declared name `--name` matches: a decoded identifier or
     /// private name, an exactly representable string name, or a numeric
     /// name's normalized text; a dotted namespace joins its segments. Absent
     /// for computed names, names with an unpaired surrogate, unnamed sites,
-    /// a default import's name, and an import or export specifier that does
-    /// not rename, which TypeScript's project-wide name search does not
-    /// count as declarations; all remain selectable by position.
+    /// statement sites, a default import's name, and an import or export
+    /// specifier that does not rename, which TypeScript's project-wide name
+    /// search does not count as declarations; all remain selectable by
+    /// position.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub key: Option<String>,
     /// The qualified name selecting this site by containment: the keys of
@@ -137,7 +149,8 @@ pub struct Declaration {
     pub selector: Option<String>,
     pub kind: Kind,
     /// Where `--at` selects this site: its name token, the first segment of a
-    /// dotted namespace, or the first token of an unnamed site.
+    /// dotted namespace, or the first token of an unnamed site or of a
+    /// statement site.
     pub anchor: SourcePosition,
     /// The declaration's source, from its first token, including decorators
     /// and modifiers, through its last token. A variable binding's range is
@@ -148,7 +161,7 @@ pub struct Declaration {
     /// and comments between tokens collapse to one space, nested bodies and
     /// long text abbreviate with `…`, and tokens are never altered. Absent
     /// where the label says more, such as callbacks, bindings in a pattern,
-    /// and import or export specifiers.
+    /// import or export specifiers, and statement sites.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub signature: Option<String>,
     /// Containment level: 1 for a declaration with no enclosing declaration.
@@ -171,8 +184,38 @@ pub struct Outline {
     pub entries: Vec<Declaration>,
 }
 
+/// A test file's test calls, the test view (`test_outline_file`).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TestOutline {
+    /// The file's absolute path, as file navigation names it.
+    pub file: String,
+    /// Every test call in source order; each entry's children follow it
+    /// with greater `depth`.
+    pub entries: Vec<TestEntry>,
+}
+
+/// One test call: an expression statement calling a hook or a test chain.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TestEntry {
+    /// The start of the statement's first token, its root or hook
+    /// identifier, where `--at` selects the statement as a statement site.
+    pub anchor: SourcePosition,
+    /// The hook's name, or the chain's root and each modifier after a `.`,
+    /// with `()` after a called modifier, in decoded names: `it.each()`.
+    pub call: String,
+    /// A test chain's first argument as written, without line breaks:
+    /// `"adds %i"` or `Widget.name`. Absent for a hook and for a call
+    /// without arguments.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    /// Containment level: 1 for a test call inside no other test call's
+    /// statement.
+    pub depth: usize,
+}
+
 /// What `show` selects: an exact name, optionally qualified by containment
-/// (`a.b.c`), or the anchor or name token at a position.
+/// (`a.b.c`), or the anchor or name token at a position, or, where there is
+/// none, the statement whose first token is there.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Selector {
@@ -216,7 +259,24 @@ pub enum ShowOutcome {
     /// Several matched, ordered by file and then source position; none is
     /// chosen.
     Ambiguous(Vec<Candidate>),
-    NotFound,
+    /// None matched. A name that missed one named file lists that file's
+    /// import and export specifiers that spell the name without declaring
+    /// it, in source order; any other miss lists none.
+    NotFound { specifiers: Vec<Specifier> },
+}
+
+/// An import or export specifier of the searched file that spells a name
+/// without declaring it, which `--name` therefore cannot select: its
+/// catalog entry has kind `import` or `export`, no key, and an identifier
+/// name decoded exactly to the name, as `import { a } from "m"`, a default
+/// import, or `export { a }` has. Matched by syntax alone: what it denotes
+/// is a definition's answer at its anchor.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Specifier {
+    /// `Import` or `Export`, the entry's kind.
+    pub kind: Kind,
+    /// The start of the specifier's name token, in the searched file.
+    pub anchor: SourcePosition,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

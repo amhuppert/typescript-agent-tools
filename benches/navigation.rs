@@ -154,7 +154,7 @@ impl Expect<'_> {
     /// Check `outcome` and describe it.
     fn check(self, name: &str, outcome: ShowOutcome) -> String {
         match (self, outcome) {
-            (Self::NotFound, ShowOutcome::NotFound) => "not found".into(),
+            (Self::NotFound, ShowOutcome::NotFound { .. }) => "not found".into(),
             (Self::Ambiguous, ShowOutcome::Ambiguous(candidates)) => {
                 format!("{} candidates", candidates.len())
             }

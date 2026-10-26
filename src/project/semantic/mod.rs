@@ -3,6 +3,7 @@
 
 mod constants;
 mod constructs;
+mod definition;
 mod evaluation;
 mod gaps;
 mod inputs;
@@ -44,7 +45,7 @@ use crate::analysis::{
     SemanticFailureReason, SemanticResourceReason,
 };
 use crate::references::Location;
-use crate::references::{ReferenceAnswer, ReferenceRequest};
+use crate::references::{DefinitionAnswer, ReferenceAnswer, ReferenceQuery, ReferenceRequest};
 use crate::types::{
     SelectionFailure, TypeAnswer, TypeOperation, TypeOutcome, TypeRequest, TypeResult,
     TypeSelection,
@@ -64,6 +65,23 @@ pub(super) fn references(
         );
         evaluator.ensure_initialized()?;
         reference_search::search(project, &request, &mut evaluator)
+    })
+}
+
+/// The declarations a selection denotes, selected in the worker and with
+/// the checker `references` uses, by the same selection owner.
+pub(super) fn definition(
+    project: &Project,
+    query: ReferenceQuery,
+    superseded: Option<&Superseded>,
+) -> Result<DefinitionAnswer, AnalysisError> {
+    worker(project, superseded, |parser, control| {
+        let mut evaluator = evaluation::Evaluator::new(
+            CheckerInputs::from_project(project, Some(&control)),
+            parser,
+        );
+        evaluator.ensure_initialized()?;
+        definition::definition(project, &query, &mut evaluator)
     })
 }
 

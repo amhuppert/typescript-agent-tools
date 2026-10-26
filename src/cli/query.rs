@@ -13,7 +13,7 @@ use super::request::{FileOperation, Query, Target};
 use crate::process_limits::{Context, Environment};
 use std::path::Path;
 use typescript_parser::analysis::AnalysisError;
-use typescript_parser::navigation::{outline_file, show_file};
+use typescript_parser::navigation::{outline_file, show_file, test_outline_file};
 use typescript_parser::project::{ProjectRequest, ProjectResponse, ProjectSession};
 
 /// An answer, or the failure that left none.
@@ -82,6 +82,7 @@ fn answer(target: &Target) -> Answer {
             FileOperation::Show(selector) => {
                 show_file(file, selector).map(|show| ProjectResponse::Show(Box::new(show)))
             }
+            FileOperation::TestOutline => test_outline_file(file).map(ProjectResponse::TestOutline),
         }),
         Target::Project {
             config,
@@ -154,8 +155,20 @@ fn delivery<'a>(
         Ok(ProjectResponse::Outline(outline)) => {
             navigation::outline(outline, query.depth, &query.display)
         }
-        Ok(ProjectResponse::Show(show)) => navigation::show(show, &query.display),
+        Ok(ProjectResponse::Show(show)) => {
+            navigation::show(show, &query.display, query.target.project())
+        }
+        Ok(ProjectResponse::TestOutline(outline)) => {
+            navigation::test_outline(outline, &query.display)
+        }
         Ok(ProjectResponse::Type(answer)) => super::types::answer(answer, &query.display),
+        Ok(ProjectResponse::Definition(answer)) => super::references::definition(
+            answer,
+            query
+                .target
+                .project()
+                .expect("only a project request asks for a definition"),
+        ),
         Ok(ProjectResponse::Constructs(answer)) => {
             super::constructs::answer(answer, &query.display)
         }

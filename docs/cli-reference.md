@@ -68,9 +68,11 @@ own documents, described in each operation's document.
 | --- | --- | --- |
 | [parse](#parse) | none | With no operation flag: parse one TypeScript file, or stdin, into a compiler-style JSON AST, or with --check only validate it. |
 | [outline](#outline) | `--outline` | List the declarations of one file in source order, one per line, indented by containment. |
+| [test-outline](#test-outline) | `--test-outline` | List the test calls of one test file in source order, one per line, indented by containment, with each test's name. |
 | [show](#show) | `--show` | Print one declaration's exact source with its original line numbers. |
 | [type](#type) | `--type` | Inspect the type of the selected declaration or token in one explicit project. |
 | [references](#references) | `--references` | Group the declarations and occurrences of the selected symbol in one explicit project. |
+| [definition](#definition) | `--definition` | Find the declarations the selected name denotes, following import and export aliases, in one explicit project. |
 | [constructs](#constructs) | `--constructs` | List the object literals that construct the selected interface, class, or type alias in one explicit project, and the properties each does not certainly provide. |
 | [replace-body](#replace-body) | `--replace-body` | Preview replacing the complete body of the selected function, method, constructor, accessor, or arrow function. |
 | [insert-after](#insert-after) | `--insert-after` | Preview inserting complete statements after the statement the selected declaration designates. |
@@ -158,6 +160,41 @@ Examples:
 
 Related: [show](#show), [references](#references). Document: [docs/navigation.md](navigation.md).
 
+## test-outline
+
+List the test calls of one test file in source order, one per line, indented by containment, with each test's name.
+
+```text
+tsparse --test-outline FILE [--limit N|all] [--json [--pretty]] [--output OUTPUT]
+```
+
+A test call is an expression statement that calls a hook (beforeAll, beforeEach, afterAll, or afterEach) or describe, it, or test with Vitest's modifiers: only, skip, todo, concurrent, sequential, shuffle, and fails, and each(...), for(...), skipIf(...), and runIf(...) called before the test. Syntax alone decides it, with no import check and no project, so Vitest globals count; a call wrapped in await, parentheses, or another operator is not one, and nothing inside a computed property name is listed. Each line is LINE:COLUMN, the call, such as it.each(), and the test's name, its first argument as written without line breaks; every level is shown. Each position is the test statement's first token, so --show --at prints the whole test and --insert-after --at inserts after it. Only FILE is read, and text and JSON name it absolutely.
+
+| Flag | Summary |
+| --- | --- |
+| `--test-outline` | List one test file's describe, it, and test calls and hooks, indented by containment. |
+| `--limit N|all` | Show at most N items of each list the operation bounds, or all of them; without it each list has a default, which -o removes. |
+| `--json` | Write one result document, also for a failure the analysis reports. |
+| `--pretty` | Indent JSON output: alone where the output is JSON, and with --json elsewhere. |
+| `-o, --output OUTPUT` | Write the result to OUTPUT instead of stdout; editing writes it only as a new file. |
+| `-h, --help` | Print help and exit. |
+| `-V, --version` | Print the version and exit. |
+
+A value flag may be given once. --pretty is valid only with --json. Display limits: at most 200 entries, in source order; --limit N|all sets them, -o without --limit removes them, and a cut's last line names the command that shows the rest.
+
+Examples:
+
+- `tsparse --test-outline src/app.test.ts`: Every suite, test, and hook with its position; the default shows 200 entries.
+- `tsparse --test-outline src/app.test.ts --json -o tests.json`: Every entry, nested by containment, as one document in a file.
+
+| Exit | Reports |
+| --- | --- |
+| 0 | The test view, which is empty for a file without test calls. |
+| 1 | A syntax error, a file past the parser's grammar budget, or unsupported input. |
+| 2 | A usage error, a file that cannot be read, or a result that cannot be written. |
+
+Related: [outline](#outline), [show](#show), [insert-after](#insert-after). Document: [docs/navigation.md](navigation.md).
+
 ## show
 
 Print one declaration's exact source with its original line numbers.
@@ -167,7 +204,7 @@ tsparse --show (--name NAME FILE | --at LINE:COLUMN FILE | --at FILE:LINE:COLUMN
 tsparse --show --project TSCONFIG (--name NAME [FILE] | --at LINE:COLUMN FILE | --at FILE:LINE:COLUMN) [--direct] [--limit N|all] [--json [--pretty]] [--output OUTPUT]
 ```
 
---name selects an exact declared name, and a.b.c selects c inside declarations named b and then a; an import or export specifier has a name only where it renames, and a default import never does. --at selects the declaration whose name or anchor is at the position. Overloads, merged declarations, and same-named locals are separate declarations: an ambiguous or missing selection exits 1 and lists each candidate's FILE:LINE:COLUMN and selector, on stderr or, with --json, in the document. With --project, FILE must be one of the files --references searches, --name without FILE searches all of them, and a printed FILE:LINE:COLUMN selects its declaration from any directory. Text names files absolutely; project JSON names them relative to the configuration's directory.
+--name selects an exact declared name, and a.b.c selects c inside declarations named b and then a; an import or export specifier has a name only where it renames, and a default import never does. So --name NAME FILE misses a name FILE imports or re-exports without renaming: the miss names each such specifier and the --definition --at command that finds its declaration, complete with --project and with the TSCONFIG placeholder without it; --json lists them in specifiers, with the command as next only when it is complete. --at selects the declaration whose name or anchor is at the position; where there is none, --at on a statement's first token selects that statement, such as an it(...) test or an expect(...) line. Overloads, merged declarations, and same-named locals are separate declarations: an ambiguous or missing selection exits 1 and lists each candidate's FILE:LINE:COLUMN and selector, on stderr or, with --json, in the document. With --project, FILE must be one of the files --references searches, --name without FILE searches all of them, and a printed FILE:LINE:COLUMN selects its declaration from any directory. Text names files absolutely; project JSON names them relative to the configuration's directory.
 
 | Flag | Summary |
 | --- | --- |
@@ -198,7 +235,7 @@ Examples:
 | 1 | An ambiguous or missing selection, a syntax error, unsupported input, or a project analysis failure. |
 | 2 | A usage error, a file that cannot be read, an invalid position, a file outside the project, a service that cannot be started or reached, or a result that cannot be written. |
 
-Related: [outline](#outline), [type](#type), [replace-body](#replace-body). Document: [docs/navigation.md](navigation.md).
+Related: [outline](#outline), [definition](#definition), [type](#type), [replace-body](#replace-body). Document: [docs/navigation.md](navigation.md).
 
 ## type
 
@@ -285,6 +322,44 @@ Examples:
 | 2 | A usage error or invalid position; a file the request or configuration names (the --project file, an extends target, a files entry) that does not exist, or a file or directory that cannot be read; a query file that is not one of the project's searched files; a service that cannot be started or reached; or a result that cannot be written. |
 
 Related: [show](#show), [type](#type), [references-status](#references-status). Document: [docs/references.md](references.md).
+
+## definition
+
+Find the declarations the selected name denotes, following import and export aliases, in one explicit project.
+
+```text
+tsparse --definition --project TSCONFIG (--at LINE:COLUMN FILE | --at FILE:LINE:COLUMN | --name NAME [FILE]) [--direct] [--json [--pretty]] [--output OUTPUT]
+```
+
+--at selects the identifier at the position (one-based line, UTF-16 column); --name selects every declaration, local import, or exported alias spelled exactly NAME, and FILE narrows the candidates to those in FILE, such as a name FILE only imports or re-exports. Each selected symbol is one group listing its declarations: the original declarations behind every import and export alias, in location order. A call or new lists every declaration of the callee, never one signature. Text prints a header with the selection and its counts, then each group and one FILE:LINE:COLUMN per declaration, naming files absolutely; --json writes the document instead, naming files relative to the configuration's directory. A position on a member (a property access, a member's name, a literal member name or key, or a parameter property's modifier) is not followed: it exits 1 naming the --references --at search that finds the member's declarations. A position in no identifier, such as a keyword, whitespace, or a module specifier, and a name with no candidate select nothing and exit 1, never an empty result. NAME is one identifier: --show --name takes a dotted one.
+
+| Flag | Summary |
+| --- | --- |
+| `--definition` | Find the declarations a name denotes, following import and export aliases, in one project. |
+| `--project TSCONFIG` | The project's configuration file, as spelled; no ancestor directory is searched. |
+| `--direct` | Load a fresh project in this process instead of asking the project's service. |
+| `--at [FILE:]LINE:COLUMN` | Select by position: a one-based line and UTF-16 column, in FILE or the FILE operand. |
+| `--name NAME` | Select by exact declared name; a dotted name such as RunHost.run selects by containment. |
+| `--json` | Write one result document, also for a failure the analysis reports. |
+| `--pretty` | Indent JSON output: alone where the output is JSON, and with --json elsewhere. |
+| `-o, --output OUTPUT` | Write the result to OUTPUT instead of stdout; editing writes it only as a new file. |
+| `-h, --help` | Print help and exit. |
+| `-V, --version` | Print the version and exit. |
+
+A value flag may be given once. --pretty is valid only with --json.
+
+Examples:
+
+- `tsparse --definition --project tsconfig.json --at src/app.ts:1:10`: The declaration an import resolves to, through re-exports.
+- `tsparse --definition --project tsconfig.json --name formatTitle src/app.ts`: The declarations of a name src/app.ts declares, imports, or exports.
+
+| Exit | Reports |
+| --- | --- |
+| 0 | One or more groups, each with its declarations. |
+| 1 | A missing selection, a member position (naming the --references search that finds its declarations), an unsupported or unresolved target, a semantic failure or limit while selecting, or a project analysis failure. |
+| 2 | A usage error, a file that cannot be read or another I/O failure, an invalid position, a file outside the project, an internal failure, a service that cannot be started or reached, or a result that cannot be written. |
+
+Related: [references](#references), [show](#show). Document: [docs/references.md](references.md).
 
 ## constructs
 
@@ -380,7 +455,7 @@ Preview inserting complete statements after the statement the selected declarati
 tsparse --insert-after (--name NAME [FILE] | --at LINE:COLUMN FILE | --at FILE:LINE:COLUMN) --from FRAGMENT [--project TSCONFIG [--direct]] [--plan PLAN] [--limit N|all] [--json [--pretty]] [--output OUTPUT]
 ```
 
-FRAGMENT holds complete statements, inserted after the statement the selected declaration designates (a binding's variable statement, a specifier's import or export) in its file, block, module block, or case clause. Selection is --show's, in FILE or, with --project, in the project's searched files; an ambiguous or missing selection changes nothing. The preview prints each selected site and a unified diff of the exact result, validated for syntax and edit boundaries (preserved syntax, comment directives, and JSDoc keep their meaning), not type-checked. Nothing is written unless --plan saves the edits to PLAN for --apply; --plan and --output are written only as new files, never as a file the command names. A fragment read from stdin cannot be read again by a command that shows what a cut withholds, so such a preview is never cut and refuses --limit N.
+FRAGMENT holds complete statements, inserted after the statement the selected declaration designates (a binding's variable statement, a specifier's import or export) in its file, block, module block, or case clause. Where no declaration is named or anchored at the position, --at on a statement's first token selects that statement, so statements can be inserted after a statement in a statement list, such as an it(...) test or an expect(...) line. A selected callback is refused; when its innermost enclosing statement is in a statement list and --at on that statement's first token selects only that statement, the refusal names that position. Selection is --show's, in FILE or, with --project, in the project's searched files; an ambiguous or missing selection changes nothing. The preview prints each selected site and a unified diff of the exact result, validated for syntax and edit boundaries (preserved syntax, comment directives, and JSDoc keep their meaning), not type-checked. Nothing is written unless --plan saves the edits to PLAN for --apply; --plan and --output are written only as new files, never as a file the command names. A fragment read from stdin cannot be read again by a command that shows what a cut withholds, so such a preview is never cut and refuses --limit N.
 
 | Flag | Summary |
 | --- | --- |
@@ -403,6 +478,7 @@ A value flag may be given once. --pretty is valid only with --json. Display limi
 Examples:
 
 - `tsparse --insert-after --at src/host.ts:3:7 --from statements.ts --json`: Insert the statements in statements.ts after the statement declaring the name at 3:7, previewed as a document.
+- `tsparse --insert-after --at src/host.test.ts:10:3 --from new-test.ts`: Insert after the statement whose first token is at 10:3, such as an it(...) test.
 
 | Exit | Reports |
 | --- | --- |
@@ -420,7 +496,7 @@ Preview several edits from a JSON file, all selected in the original files.
 tsparse --edit-batch EDITS [--project TSCONFIG [--direct]] [--plan PLAN] [--limit N|all] [--json [--pretty]] [--output OUTPUT]
 ```
 
-EDITS is {"edits": [{"operation": "replace_body" or "insert_after", "name" or "at", "file", "fragment" or "from"}]}: at is LINE:COLUMN with file, or FILE:LINE:COLUMN, paths are relative to the working directory, a member that is null is absent, and unknown fields are errors. An invalid batch reports every issue by its JSON path, such as edits[1].extra, before anything is read or prepared. Every edit is selected in the original files and the edits are prepared together. The preview prints each selected site and a unified diff of the exact result, validated for syntax and edit boundaries (preserved syntax, comment directives, and JSDoc keep their meaning), not type-checked. Nothing is written unless --plan saves the edits to PLAN for --apply; --plan and --output are written only as new files, never as a file the command names. A fragment read from stdin cannot be read again by a command that shows what a cut withholds, so such a preview is never cut and refuses --limit N.
+EDITS is {"edits": [{"operation": "replace_body" or "insert_after", "name" or "at", "file", "fragment" or "from"}]}: at is LINE:COLUMN with file, or FILE:LINE:COLUMN, paths are relative to the working directory, a member that is null is absent, and unknown fields are errors. An invalid batch reports every issue by its JSON path, such as edits[1].extra, before anything is read or prepared. at selects as --show --at does: where no declaration is named or anchored, a statement's first token selects that statement, and insert_after inserts after it when it is in a statement list, such as an it(...) test or an expect(...) line. Every edit is selected in the original files and the edits are prepared together. The preview prints each selected site and a unified diff of the exact result, validated for syntax and edit boundaries (preserved syntax, comment directives, and JSDoc keep their meaning), not type-checked. Nothing is written unless --plan saves the edits to PLAN for --apply; --plan and --output are written only as new files, never as a file the command names. A fragment read from stdin cannot be read again by a command that shows what a cut withholds, so such a preview is never cut and refuses --limit N.
 
 | Flag | Summary |
 | --- | --- |
@@ -491,7 +567,7 @@ Report the state of the project's service; it loads nothing, does not check fres
 tsparse --references-status --project TSCONFIG [--json] [--pretty] [--output OUTPUT]
 ```
 
---references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, --constructs, and --outline, --show, and edits with --project. On macOS and Linux, project queries reuse one service per configuration spelling and build, started automatically, which reloads the project when its inputs change. Status prints running: with the service's pid, generation (the number of snapshots it has published), build, idle timeout, and the idle time it has left, then limits: with the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with; or no service: TSCONFIG. --json prints the document instead: running, pid, generation, build, limits (max_memory_mb, query_timeout_ms), idle_secs, idle_remaining_secs, and started_unix; without a service running is false, generation 0, and every other field null; --pretty, with or without --json, prints it indented. It reads only TSPARSE_SERVICE_DIR, the private runtime directory (default /tmp/tsparse-UID, owned by this user with mode 0700).
+--references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --definition, --type, --constructs, and --outline, --show, and edits with --project. On macOS and Linux, project queries reuse one service per configuration spelling and build, started automatically, which reloads the project when its inputs change. Status prints running: with the service's pid, generation (the number of snapshots it has published), build, idle timeout, and the idle time it has left, then limits: with the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with; or no service: TSCONFIG. --json prints the document instead: running, pid, generation, build, limits (max_memory_mb, query_timeout_ms), idle_secs, idle_remaining_secs, and started_unix; without a service running is false, generation 0, and every other field null; --pretty, with or without --json, prints it indented. It reads only TSPARSE_SERVICE_DIR, the private runtime directory (default /tmp/tsparse-UID, owned by this user with mode 0700).
 
 | Flag | Summary |
 | --- | --- |
@@ -525,7 +601,7 @@ Stop the project's service and release its cache.
 tsparse --references-stop --project TSCONFIG
 ```
 
---references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, --constructs, and --outline, --show, and edits with --project. It prints stopped: pid N when it stopped a service, or no service: TSCONFIG when none was running, on stdout. The next project query starts a new service. A service keeps the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with, so stop it after changing them; --doctor --project TSCONFIG reports a service whose limits differ from this environment's. It reads only TSPARSE_SERVICE_DIR.
+--references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --definition, --type, --constructs, and --outline, --show, and edits with --project. It prints stopped: pid N when it stopped a service, or no service: TSCONFIG when none was running, on stdout. The next project query starts a new service. A service keeps the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with, so stop it after changing them; --doctor --project TSCONFIG reports a service whose limits differ from this environment's. It reads only TSPARSE_SERVICE_DIR.
 
 | Flag | Summary |
 | --- | --- |
@@ -555,7 +631,7 @@ Run the project's service in the foreground, for a supervisor, until it is idle.
 tsparse --references-serve --project TSCONFIG
 ```
 
---references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, --constructs, and --outline, --show, and edits with --project. A service exits after TSPARSE_SERVICE_IDLE_SECS idle seconds (default 600). Its runtime directory is TSPARSE_SERVICE_DIR (default /tmp/tsparse-UID): owned by this user with mode 0700, and short enough for a socket path of about 100 bytes. Its queries run under TSPARSE_MAX_MEMORY_MB (default 6144 MiB) and TSPARSE_QUERY_TIMEOUT_MS (default 60000); a limit failure exits the service and the next request starts a replacement, and memory sampling can overshoot. TSPARSE_SERVICE_IDLE_SECS, TSPARSE_MAX_MEMORY_MB, and TSPARSE_QUERY_TIMEOUT_MS must each be a positive integer. It prints nothing but a failure.
+--references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --definition, --type, --constructs, and --outline, --show, and edits with --project. A service exits after TSPARSE_SERVICE_IDLE_SECS idle seconds (default 600). Its runtime directory is TSPARSE_SERVICE_DIR (default /tmp/tsparse-UID): owned by this user with mode 0700, and short enough for a socket path of about 100 bytes. Its queries run under TSPARSE_MAX_MEMORY_MB (default 6144 MiB) and TSPARSE_QUERY_TIMEOUT_MS (default 60000); a limit failure exits the service and the next request starts a replacement, and memory sampling can overshoot. TSPARSE_SERVICE_IDLE_SECS, TSPARSE_MAX_MEMORY_MB, and TSPARSE_QUERY_TIMEOUT_MS must each be a positive integer. It prints nothing but a failure.
 
 | Flag | Summary |
 | --- | --- |
@@ -619,9 +695,11 @@ Related: [references-status](#references-status), [references-stop](#references-
 | `-h, --help` | stays on | Print help and exit. |
 | `-V, --version` | stays on | Print the version and exit. |
 | `--outline` | stays on | List one file's declarations, indented by containment. |
+| `--test-outline` | stays on | List one test file's describe, it, and test calls and hooks, indented by containment. |
 | `--show` | stays on | Print one declaration's exact source with its line numbers. |
 | `--type` | stays on | Inspect the type of a declaration or token in one project. |
 | `--references` | stays on | Group a symbol's declarations and occurrences in one project. |
+| `--definition` | stays on | Find the declarations a name denotes, following import and export aliases, in one project. |
 | `--constructs` | stays on | List the object literals that construct a type in one project, and the properties each lacks. |
 | `--replace-body` | stays on | Preview replacing the complete body of the selected declaration. |
 | `--insert-after` | stays on | Preview inserting statements after the selected declaration's statement. |

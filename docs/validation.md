@@ -299,7 +299,11 @@ answer at each watched name that follows the documented model: no symbol is
 case's `tool` field states where this tool's outcome is a failure, `error` with
 the kind and the compiler diagnostic (or position) it reports, or where a
 documented difference changes an answer, `names` with a `note` naming it. 460
-cases carry such a field, 52 of them with a note. `tools/json-probes.test.mjs`
+cases carry such a field, 52 of them with a note. A case's answers hold on a
+case-insensitive file system; `upper-file-files`, whose `Data.JSON` is a JSON
+input only where TypeScript folds case, adds `caseSensitive`, the `native` and
+`tool` that replace them where file names keep their case, which the Rust test
+reads after `Case::detect` and the runner after the compiler's `toPath`. `tools/json-probes.test.mjs`
 runs the re-derivation in the harness tests, which skip it without the
 compilers. Measured 2026-10-08, after the final review's fixes: every recorded
 answer of the 926 agrees with the compiler, and every case passes the Rust

@@ -355,7 +355,12 @@ fn selection_is_shows_selection_and_misses_or_ambiguity_change_nothing() {
         "{}",
     )]) {
         Prepared::Unselected(unselected) => {
-            assert_eq!(unselected.outcome, ShowOutcome::NotFound);
+            assert_eq!(
+                unselected.outcome,
+                ShowOutcome::NotFound {
+                    specifiers: Vec::new()
+                }
+            );
         }
         other => panic!("expected no selection, got {other:?}"),
     }
@@ -853,7 +858,12 @@ const c = () => 3;
         Prepared::Unselected(unselected) => {
             assert_eq!(
                 (unselected.edit, unselected.outcome),
-                (1, ShowOutcome::NotFound)
+                (
+                    1,
+                    ShowOutcome::NotFound {
+                        specifiers: Vec::new()
+                    }
+                )
             );
         }
         other => panic!("expected no selection, got {other:?}"),

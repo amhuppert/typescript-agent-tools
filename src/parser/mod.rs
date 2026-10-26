@@ -1110,6 +1110,10 @@ impl<'src> Parser<'src> {
         }
         Ok(modifiers)
     }
+    /// The only field attached after the fields it precedes in source; every
+    /// other field is pushed in source order. Navigation's statement walk
+    /// relies on that order, visiting `modifiers` first (`next_child` in
+    /// `navigation::projection`, whose test checks it).
     fn attach_modifiers(&mut self, id: NodeId, modifiers: Vec<NodeId>) -> Result<()> {
         if !modifiers.is_empty() {
             self.field(id, "modifiers", modifiers)?;

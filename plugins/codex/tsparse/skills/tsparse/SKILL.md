@@ -2,13 +2,14 @@
 name: tsparse
 description: Navigate, query, and edit TypeScript and TSX code with the
   `tsparse` CLI. Use when working in a TypeScript project (.ts, .tsx, .mts,
-  .cts, tsconfig.json) to list declarations in a file (`--outline`), read a
-  declaration's exact source (`--show`), find symbol or member references and
-  call sites across a project (`--references`), inspect types (`--type`), list
-  the object literals that construct a type and the properties each lacks
-  (`--constructs`), replace callable bodies or insert statements
-  (`--replace-body`, `--insert-after`, `--edit-batch`, `--apply`), or check
-  TypeScript 7 syntax (`--check`).
+  .cts, tsconfig.json) to list declarations in a file (`--outline`) or the
+  describe/it/test tree of a test file (`--test-outline`), read a declaration's
+  exact source (`--show`), find where an imported or used name is declared
+  (`--definition`), find symbol or member references and call sites across a
+  project (`--references`), inspect types (`--type`), list the object literals
+  that construct a type and the properties each lacks (`--constructs`), replace
+  callable bodies or insert statements (`--replace-body`, `--insert-after`,
+  `--edit-batch`, `--apply`), or check TypeScript 7 syntax (`--check`).
 ---
 
 # Working on TypeScript Projects with `tsparse`
@@ -22,13 +23,15 @@ Assume `tsparse` is on `PATH`; it builds and runs on macOS and Linux only. For a
 | Goal | Command | Why `tsparse` instead of text search / raw file reads |
 | --- | --- | --- |
 | Map what a file declares | `tsparse --outline src/host.ts` | Lists every declaration's `LINE:COLUMN`, kind, and one-line signature indented by containment without reading the full file. |
+| Map a test file's suites, tests, and hooks | `tsparse --test-outline src/host.test.ts` | Lists every `describe`/`it`/`test` call and hook at every level as `LINE:COLUMN call name` (`it.each() "adds %i"`); `--outline` lists a test only as its callback (`function it("…") callback`), and by default only two levels deep. |
 | Read one declaration's source | `tsparse --show --name RunHost.run src/host.ts` | Prints only that declaration with original line numbers; overloads and shadowed locals stay separate candidates instead of guessing. |
+| Find where a name is declared | `tsparse --definition --project tsconfig.json --at src/app.ts:1:10` | Follows import/export aliases and barrel re-exports from an import or a use to the original declarations, printing only their `FILE:LINE:COLUMN`s, at warm-query cost. |
 | Find all uses of a symbol | `tsparse --references --project tsconfig.json --name start` | Follows import/export renames and barrel re-exports while keeping shadowed bindings in separate groups. |
 | Find uses or callers of a member | `tsparse --references --project tsconfig.json --name RunHost.observe --calls --no-tests` | Matches members by resolved receiver type rather than property spelling, optionally restricted to call sites outside tests. |
 | Inspect a declaration or token type | `tsparse --type --project tsconfig.json --at src/host.ts:42:10` | Reports the resolved type summary (and a bounded structural graph with `--expand [--depth 0..32]`). |
 | Find every literal that builds a type, e.g. after adding a property | `tsparse --constructs --project tsconfig.json --name RunView --missing lane` | Lists each object literal TypeScript contextually types as the target (annotations, `satisfies`, returns, arguments, array elements, nested values; per union alternative; generic instantiations), with the properties it lacks, optional ones included, which the compiler never reports. By default it examines the literals naming one of the target's keys or none; `--all-literals` examines the rest, slowly. |
 | Replace a callable body | `tsparse --replace-body --name RunHost.run src/host.ts --from body.ts --plan run.plan.json` | Replaces only the body, preserves all surrounding bytes, and validates syntax, AST boundaries, `@ts-ignore`/`@ts-expect-error` reach, and JSDoc attachment before writing. |
-| Insert statements after a declaration | `tsparse --insert-after --name start src/host.ts --from stmts.ts --plan add.plan.json` | Inserts at the statement seam with matching indentation, line breaks, and automatic semicolon safety. |
+| Insert statements after a statement or declaration | `tsparse --insert-after --name start src/host.ts --from stmts.ts --plan add.plan.json` | Inserts at the statement seam with matching indentation, line breaks, and automatic semicolon safety. |
 | Apply a prepared edit plan | `tsparse --apply run.plan.json` | Verifies every target file's original bytes and inode identity before replacing, rolling back all files if any replacement fails. Replaced files keep only their permission mode. |
 | Check if a file or snippet parses | `tsparse --check src/host.ts` | Validates TypeScript 7 syntax in milliseconds and prints a one-line verdict (`ok: ...`). Does not type-check. |
 | Diagnose a project query or service failure | `tsparse --doctor --project tsconfig.json` | Checks build capabilities, `TSPARSE_*` variables, runtime directory permissions, config readability, and service state without loading the project. |
@@ -43,13 +46,15 @@ Every selector is exact so a typo or overloaded name never silently targets the 
 
 - **Exact names (`--name NAME`):** Case-sensitive, decoded identifier match with no fuzzy matching.
   - **Containment (`--name Parent.child`):** In `--show`, `--type`, `--constructs`, `--replace-body`, `--insert-after`, and `--references`, dotted names walk declaration containment (e.g., `createRunHost.startEligible` selects `startEligible` inside `createRunHost`).
-  - **Imports and exports:** An import or export specifier has a `--name` key only when it renames (`import { a as b }` has key `b`; `import { a }` has no key). Thus `--show --project tsconfig.json --name createThing` selects the original declaration of `createThing`, not every file that imports it.
+  - **Imports and exports:** An import or export specifier has a `--name` key only when it renames (`import { a as b }` has key `b`; `import { a }` has no key). Thus `--show --project tsconfig.json --name createThing` selects the original declaration of `createThing`, not every file that imports it, and `--show --name createThing src/app.ts` misses in a file that only imports it; that miss prints the `--definition` command to run ([below](#find-where-a-name-is-declared---definition)).
 - **Lexical vs. semantic member references (`--references`):**
   - A **bare name** (`--references --project tsconfig.json --name run`) performs a fast lexical search across declarations, imports, and export aliases, and ends with a hint listing any matching class/interface/object members it did not search (`N catalog members named run were not searched; search SELECTOR with --at FILE:LINE:COLUMN`).
   - A **dotted name** (`--references --project tsconfig.json --name RunHost.observe`) or **`--at` on a member token** performs a semantic member search across resolved receiver types.
 - **Positions (`--at`):** Uses 1-based line and 1-based UTF-16 column.
-  - Pass either `--at FILE:LINE:COLUMN` (the exact handle printed by `--show`, `--references`, and candidate lists—paste it directly with no `FILE` operand) or `--at LINE:COLUMN FILE` (the `LINE:COLUMN` printed under a file header in `--outline`). Giving a `FILE` operand alongside `--at FILE:LINE:COLUMN` is a usage error.
+  - Pass either `--at FILE:LINE:COLUMN` (the exact handle printed by `--show`, `--references`, `--definition`, and candidate lists—paste it directly with no `FILE` operand) or `--at LINE:COLUMN FILE` (the `LINE:COLUMN` printed under a file header in `--outline` or `--test-outline`). Giving a `FILE` operand alongside `--at FILE:LINE:COLUMN` is a usage error.
   - For constructor parameter properties (`constructor(public readonly id: string)`), the identifier `id` selects the lexical parameter; the first modifier (`public`) anchors the semantic class property.
+  - **Statements:** Where no declaration is named or anchored, `--at` on a statement's first token (the `it` of `it("adds", () => {...});`, the `expect` of an `expect(...)` line, the `import` of an import) selects that whole statement for `--show` and insertion, reported as kind `statement`. `--outline` does not list statements and they have no `--name`; take the line from `--show`'s line numbers and the column of the statement's first character (its indentation plus one).
+  - **Test files:** Start with `tsparse --test-outline FILE` instead of `--outline`. Each listed `LINE:COLUMN` is a test statement's first token, so `tsparse --show --at LINE:COLUMN FILE` prints that whole test and `tsparse --insert-after --at LINE:COLUMN FILE --from new-test.ts --plan PLAN` adds a test after it. It recognizes `describe`/`it`/`test` with Vitest's modifiers and the four `before`/`after` hooks by syntax alone; an `await`-wrapped call, Playwright's `test.describe`/`test.step`, and `suite` are not listed. It reads only FILE and takes no `--project`.
 - **Construction sites (`--constructs`):** Select the interface, class, or type alias by `--name` or by `--at` on its declaration name (a type reference in an annotation is `UnsupportedTarget`). Each site line reads `FILE:LINE:COLUMN lacks "lane"?, "status" (unknown)`: keys are quoted, `?` marks an optional property, `(unknown)` a property a spread, index signature, or `any` may provide. Aliases of intersections (`type Props = Base<string> & Extra`) match the literals annotated with them, a type parameter's constraint (and a class's `this`) stands for it, and a literal passed through an inferred type parameter (`const p: Plain = id({...})`) has the inferred type, not the target. Presence is the compiler's type of the literal, not the runtime object. Bases, intersection parts, and `Partial<T>`-style mapped forms are separate types; query them by name. A literal spread into another literal (`{id, ...(c ? {lane} : {})}`) belongs to the outer site. `--missing KEY` keeps the sites lacking the string key `KEY` (exact; `''` is a key); a key the target does not declare as a string key fails with `UnknownProperty` and the nearest key.
   - **Examined literals:** By default only literals with a member naming one of the target's keys, or with no named member (`{}`, only spreads, only computed names), are examined; the header reads `N of M literals examined` and a line counts the rest. Literals whose named members name only other keys can still construct the target (for example a type assertion such as `{other: 1} as Options`, a union context beside the member those keys choose or with a member accepting any key such as `View | {}`, or an excess-property error such as `{...base, other: 1}`): `--all-literals` examines them too, at several times the cost (about 75 s on a ~4,000-file project, past the default 60 s deadline), so narrow it with `--file` or `--no-tests` or raise `TSPARSE_QUERY_TIMEOUT_MS`. A target with an index signature, an empty alternative (`interface Empty {}`), or the global `Object` as an alternative always examines every literal.
   - **Partial answers are normal on real projects:** literals whose context needs flow narrowing, JSX attribute typing, or another unsupported form are located gaps (exit `1`, `coverage partial (N gaps: …)`); every site listed is still exact, and each gap names the literal to inspect by hand.
@@ -59,17 +64,28 @@ Every selector is exact so a typo or overloaded name never silently targets the 
     ```sh
     tsparse --references --project tsconfig.json --name run src/app.ts --file src/api.ts
     ```
-- **Ambiguity (`exit 1`):** Overloads, merged interfaces/namespaces, and same-named locals in separate blocks are distinct syntax sites. When `--name` matches more than one, `tsparse` exits `1` and lists every candidate's `FILE:LINE:COLUMN` and qualified selector. Re-run with the desired candidate's `--at FILE:LINE:COLUMN` or narrower `--name`.
+- **Ambiguity (`exit 1`):** Overloads, merged interfaces/namespaces, and same-named locals in separate blocks are distinct syntax sites. When `--name` matches more than one in `--show`, `--type`, an edit, or a dotted `--references` name, `tsparse` exits `1` and lists every candidate's `FILE:LINE:COLUMN` and qualified selector. Re-run with the desired candidate's `--at FILE:LINE:COLUMN` or narrower `--name`.
+- **Every symbol (`exit 0`):** When any symbol matches, a bare `--references` name and `--definition --name` select every symbol spelled NAME and print one group per symbol: same-named locals are separate groups, and an overload set or merged declaration is one group listing each declaration. Narrow with `FILE` or `--at` when you want one. With no match, a bare `--references` name exits `0` with no groups, while `--definition` exits `1` with `not_found`.
+
+## Find Where a Name Is Declared (`--definition`)
+
+`--definition` answers "where is this declared" from the file that uses the name: it follows import and export aliases (renames, barrel re-exports, `export *`) to the original declarations and prints one group per symbol, one `FILE:LINE:COLUMN` per declaration, and no uses.
+
+- **From an import or a use:** `tsparse --definition --project tsconfig.json --at src/app.ts:1:10`, on an import specifier, a re-export, a call, or any identifier.
+- **From a name a file imports:** `tsparse --definition --project tsconfig.json --name useProjectFilesQuery src/features/Dialog.tsx`. FILE narrows the candidates to that file's declarations, imports, and exports; without FILE, every one spelled NAME in the project. NAME is one identifier.
+- **Members are refused:** on a property access (`page.title`), a member's name, a literal key, or a parameter property's modifier, it exits `1` and prints a complete `tsparse --references --project … --at FILE:LINE:COLUMN` command, repeating your `--project` spelling, whose group header names the member's declaration (`declared at FILE:LINE:COLUMN`); run it as printed.
+- **Nothing selected exits `1`:** a keyword, whitespace, a module specifier, or a name with no candidate is `not_found`, never an empty result.
+- **The `--show --name` hint:** when `--show --name NAME FILE` misses a name FILE imports or re-exports without renaming, it prints one line per such specifier: `` `NAME` is imported at FILE:LINE:COLUMN; find its declaration with: tsparse --definition --project TSCONFIG --at FILE:LINE:COLUMN `` (`re-exported` for an export). With `--project` the command is complete, so run it as printed (in `--json`, `specifiers[].next.argv`); without `--project` it names the `TSCONFIG` placeholder, so substitute the project's `tsconfig.json`.
 
 ## Work with the Project Service and Cost Model
 
-Project queries (`--references`, `--type`, `--constructs`, and `--outline`/`--show`/edits with `--project`) require an explicit `--project TSCONFIG`. `tsparse` never searches ancestor directories for `tsconfig.json`, and it rejects configs with project `references` rather than searching partially (pass the specific subproject's `tsconfig.json` instead).
+Project queries (`--references`, `--definition`, `--type`, `--constructs`, and `--outline`/`--show`/edits with `--project`) require an explicit `--project TSCONFIG`. `tsparse` never searches ancestor directories for `tsconfig.json`, and it rejects configs with project `references` rather than searching partially (pass the specific subproject's `tsconfig.json` instead).
 
 `--project` queries automatically start and reuse a per-project background service (keyed by the exact `--project` path spelling and build, expiring after 10 idle minutes). Before each request, the service verifies that no captured source, config, or package manifest changed, rebuilding the snapshot when any input changed.
 
 Typical costs on a ~4,000-file TypeScript project:
-- **Single-file `--outline`, `--show`, `--check`, or edit without `--project`:** 5–20 ms (no project loaded).
-- **Warm project query (`--references` lexical, `--type`, `--outline`, `--show`):** 120–160 ms.
+- **Single-file `--outline`, `--test-outline`, `--show`, `--check`, or edit without `--project`:** 5–20 ms (no project loaded).
+- **Warm project query (`--references` lexical, `--definition`, `--type`, `--outline`, `--show`):** 120–160 ms.
 - **Cold start (first project query):** ~6 s (~1.6 GB service RSS).
 - **First project query after any file edit:** ~4.5 s (snapshot rebuild).
 - **Warm semantic member search (`--references --name Receiver.member`):** ~9–10 s.
@@ -77,7 +93,7 @@ Typical costs on a ~4,000-file TypeScript project:
 
 Follow these sequencing rules to keep queries fast:
 1. **Omit `--project` when one file suffices:** Use `tsparse --outline FILE` and `tsparse --show ... FILE` without `--project` when you already know the file path.
-2. **Batch project reads before editing:** Complete your `--references`, `--type`, and project-wide `--show` queries before modifying files so every query reuses the warm snapshot instead of triggering a rebuild.
+2. **Batch project reads before editing:** Complete your `--references`, `--definition`, `--type`, and project-wide `--show` queries before modifying files so every query reuses the warm snapshot instead of triggering a rebuild.
 3. **Parallelize independent warm queries:** Once the service is running, issue independent read queries concurrently; if the service is cold, let the first query start it so concurrent callers do not wait on the startup lock.
 4. **Keep `--direct` for debugging only:** `--direct` (as in `--references --direct`) loads the entire project in the CLI process (~6 s and ~2 GiB RSS every run). Use it only to rule out the service when diagnosing an issue.
 
@@ -91,6 +107,8 @@ Follow these sequencing rules to keep queries fast:
   - An arrow function returning an object literal must wrap it in parentheses—`({ ok: true })`—because `{ ok: true }` parses as a block with a labeled statement.
   - Interfaces, type aliases, enums, classes, and overload signatures have no callable body (`UnsupportedSite`); to edit a class method, select the method (`--name MyClass.myMethod`), not the class.
 - **`--insert-after`:** Inserts one or more complete statements after the statement designated by the selected declaration (a variable binding designates its whole variable statement; an import/export specifier designates its whole import/export declaration). The target statement must live in a file, block, namespace body, or `case`/`default` clause.
+  - To insert after another statement in a statement list, such as a sibling `it(...)` test or an `expect(...)` line, select it with `--at` on its first token (`--insert-after --at src/host.test.ts:10:3 --from new-test.ts`); `--test-outline` lists each test's position. A declaration named or anchored there wins: the first token of `x => {};` selects the arrow.
+  - A selected callback (an outline entry such as `function it("…") callback`) designates itself and is refused (`UnsupportedSite`); selection never climbs to the call. When its innermost enclosing statement is in a statement list and `--at` on that statement's first token selects only that statement, the refusal ends with `; to insert after the enclosing statement, select it with --at LINE:COLUMN`: re-run with that position. Otherwise it names none, as for a callback in the unbraced body of an `if`, `else`, loop, or label, or `x => {};`.
 
 ### Two-Step Workflow
 
@@ -136,7 +154,7 @@ Follow these sequencing rules to keep queries fast:
 ### Exit Codes
 - **`0` (Success):** Complete query result, valid syntax (`--check`), edit preview/plan saved, or plan applied (`applied` or `no_change`).
 - **`1` (No complete answer):** Ambiguous or missing selection, partial semantic coverage (`gaps` or `issues` present), syntax/analysis error, rejected edit (`Boundary`, `Attachment`, `Conflict`, `UnsupportedSite`), stale plan (`unchanged`), or `--doctor` finding.
-  - **Always read stdout/stderr on exit `1` before retrying:** an ambiguous selection lists the exact `--at FILE:LINE:COLUMN` candidates to pick from, and a partial reference or type query still delivers the occurrences/graph it resolved alongside the specific gaps.
+  - **Always read stdout/stderr on exit `1` before retrying:** an ambiguous selection lists the exact `--at FILE:LINE:COLUMN` candidates to pick from, a `--show --name` miss on an imported name and a `--definition` member position print the next command to run, and a partial reference or type query still delivers the occurrences/graph it resolved alongside the specific gaps.
 - **`2` (Usage, I/O, or transport failure):** Begins with a machine-greppable `CODE: message` on stderr (or in `error.code` with `--json`), followed by per-field `issues`, `why:`, and `next:` remedies.
 
 ### Display Caps (`--limit` and `-o`)
@@ -144,6 +162,7 @@ To protect context windows, stdout responses are capped by default (both in text
 - `--references`: `200` occurrences across groups
 - `--constructs`: `200` sites, `20` lacking properties per construction, and `50` gaps (one `--limit N` sets all three)
 - `--outline`: `200` entries (after `--depth` filtering)
+- `--test-outline`: `200` entries
 - `--show`: `400` declaration lines
 - Edit previews: `400` diff lines per changed file
 - Ambiguity diagnostics: `50` candidates

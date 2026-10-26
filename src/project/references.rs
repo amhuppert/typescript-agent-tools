@@ -6,9 +6,9 @@ use super::Project;
 use super::binding::{self, Index, OccurrenceTarget, SymbolId, roles};
 use crate::analysis::{AnalysisError, QueryError, QueryErrorKind};
 use crate::references::{
-    Location, NamedLocation, Occurrence, ReferenceBaseline, ReferenceCoverage, ReferenceFilters,
-    ReferenceGroup, ReferenceOperation, ReferenceOutcome, ReferenceQuery, ReferenceResult, Role,
-    UnsearchedMembers,
+    DefinitionGroup, Location, NamedLocation, Occurrence, ReferenceBaseline, ReferenceCoverage,
+    ReferenceFilters, ReferenceGroup, ReferenceOperation, ReferenceOutcome, ReferenceQuery,
+    ReferenceResult, Role, UnsearchedMembers,
 };
 use crate::source::SourcePosition;
 use std::path::PathBuf;
@@ -150,48 +150,19 @@ pub(super) fn lexical(
     selection: ReferenceQuery,
 ) -> Result<ReferenceResult, AnalysisError> {
     let index = &project.bindings.index;
-    let mut symbols = Vec::new();
-    let mut unsearched_members = UnsearchedMembers::default();
-    match query {
-        ReferenceQuery::At { file, position } => {
-            let id = project.searched_file(&file)?;
-            let text = &project.sources.get(id).text;
-            let offset = text
-                .offset(position)
-                .map_err(|error| QueryError::invalid_position(error, &file, Some(position)))?;
-            if let Some(occurrence) = index.occurrence_at(id, offset) {
-                let path = &project.sources.get(id).path;
-                symbols
-                    .extend_from_slice(selected(index, occurrence, || (path.clone(), position))?);
-            }
-        }
-        ReferenceQuery::Name { name, file } => {
+    let symbols = lexical_symbols(project, &query)?;
+    // This is an advisory about catalog entries, independent of the
+    // report filters and of whether the lexical question finds groups.
+    let unsearched_members = match &query {
+        ReferenceQuery::Name { name, file } if !name.contains('.') => {
             let only = file
                 .as_deref()
                 .map(|file| project.searched_file(file))
                 .transpose()?;
-            // This is an advisory about catalog entries, independent of the
-            // report filters and of whether the lexical question finds groups.
-            if !name.contains('.') {
-                unsearched_members = project.unsearched_members(&name, only);
-            }
-            for &candidate in index.candidates(&name) {
-                if only.is_some_and(|only| only != candidate.file) {
-                    continue;
-                }
-                let occurrence = index.occurrence(candidate);
-                let source = project.sources.get(candidate.file);
-                symbols.extend_from_slice(selected(index, occurrence, || {
-                    (
-                        source.path.clone(),
-                        source.text.position(occurrence.span.start),
-                    )
-                })?);
-            }
+            project.unsearched_members(name, only)
         }
-    }
-    symbols.sort();
-    symbols.dedup();
+        ReferenceQuery::Name { .. } | ReferenceQuery::At { .. } => UnsearchedMembers::default(),
+    };
     let mut groups: Vec<ReferenceGroup> = symbols
         .into_iter()
         .map(|symbol| group(project, index, symbol, filters))
@@ -211,6 +182,77 @@ pub(super) fn lexical(
         },
         unsearched_members,
     })
+}
+
+/// The symbols a lexical selection denotes, sorted and deduplicated: those
+/// of the identifier token containing a position, or of every declaration,
+/// local import, and exported alias spelled exactly a name, which FILE
+/// narrows to its own. A position in no identifier, or a name with no
+/// candidate, selects none. The one owner of lexical symbol selection, for
+/// reference searches and definitions alike.
+pub(super) fn lexical_symbols(
+    project: &Project,
+    query: &ReferenceQuery,
+) -> Result<Vec<SymbolId>, AnalysisError> {
+    let index = &project.bindings.index;
+    let mut symbols = Vec::new();
+    match query {
+        ReferenceQuery::At { file, position } => {
+            let id = project.searched_file(file)?;
+            let text = &project.sources.get(id).text;
+            let offset = text
+                .offset(*position)
+                .map_err(|error| QueryError::invalid_position(error, file, Some(*position)))?;
+            if let Some(occurrence) = index.occurrence_at(id, offset) {
+                let path = &project.sources.get(id).path;
+                symbols
+                    .extend_from_slice(selected(index, occurrence, || (path.clone(), *position))?);
+            }
+        }
+        ReferenceQuery::Name { name, file } => {
+            let only = file
+                .as_deref()
+                .map(|file| project.searched_file(file))
+                .transpose()?;
+            for &candidate in index.candidates(name) {
+                if only.is_some_and(|only| only != candidate.file) {
+                    continue;
+                }
+                let occurrence = index.occurrence(candidate);
+                let source = project.sources.get(candidate.file);
+                symbols.extend_from_slice(selected(index, occurrence, || {
+                    (
+                        source.path.clone(),
+                        source.text.position(occurrence.span.start),
+                    )
+                })?);
+            }
+        }
+    }
+    symbols.sort();
+    symbols.dedup();
+    Ok(symbols)
+}
+
+/// The declarations of `symbols`, one group per symbol, ordered by their
+/// first declarations as reference groups are: each group lists exactly
+/// the declarations the symbol's reference group does (`declarations`).
+pub(super) fn definition_groups(project: &Project, symbols: Vec<SymbolId>) -> Vec<DefinitionGroup> {
+    let index = &project.bindings.index;
+    let mut groups: Vec<DefinitionGroup> = symbols
+        .into_iter()
+        .map(|symbol| DefinitionGroup {
+            declarations: declarations(project, index, symbol),
+        })
+        .collect();
+    fn first(group: &DefinitionGroup) -> Option<&Location> {
+        group
+            .declarations
+            .first()
+            .map(|declaration| &declaration.location)
+    }
+    groups.sort_by(|a, b| first(a).cmp(&first(b)));
+    groups
 }
 
 fn first_location(group: &ReferenceGroup) -> Option<&Location> {
@@ -255,15 +297,21 @@ fn selected<'a>(
     })
 }
 
-fn group(project: &Project, index: &Index, symbol: SymbolId, filters: Filters) -> ReferenceGroup {
-    let declarations: Vec<NamedLocation> = index
+/// A symbol's declarations: its sites (`Index::sites`), in their order,
+/// at public locations.
+fn declarations(project: &Project, index: &Index, symbol: SymbolId) -> Vec<NamedLocation> {
+    index
         .sites(symbol)
         .iter()
         .map(|site| NamedLocation {
             name: site.name.to_string(),
             location: location(project, site.file, site.span),
         })
-        .collect();
+        .collect()
+}
+
+fn group(project: &Project, index: &Index, symbol: SymbolId, filters: Filters) -> ReferenceGroup {
+    let declarations = declarations(project, index, symbol);
     let occurrences = index
         .occurrences_of(symbol)
         .iter()

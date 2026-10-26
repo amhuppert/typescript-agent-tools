@@ -7,7 +7,9 @@ project's captured snapshot, over the files reference queries search, through
 the same local service as references. The Rust library exposes the same
 operations as `typescript_parser::navigation::outline_file` and `show_file`,
 and over a project's searched files as `Project::outline` and `Project::show`
-(see [Library](#library)). The design is recorded in
+(see [Library](#library)). `tsparse --test-outline` lists one test file's
+`describe`, `it`, and `test` calls and hooks ([test view](#test-view)), an
+addition with no TypeScript counterpart. The design is recorded in
 [navigation-design.md](navigation-design.md); this document describes the
 implemented behavior and where it deliberately differs from TypeScript 7.0.2.
 
@@ -24,6 +26,7 @@ tsparse --show --project tsconfig.json --name createRunHost.startEligible
 tsparse --show --project tsconfig.json --at 42:10 src/runs/host.ts --json
 tsparse --show --project tsconfig.json --at /abs/src/runs/host.ts:42:10
 tsparse --show --project tsconfig.json --direct --name startEligible src/runs/host.ts
+tsparse --test-outline src/runs/host.test.ts
 ```
 
 | Operation | Project | File | Selector | Options |
@@ -32,6 +35,7 @@ tsparse --show --project tsconfig.json --direct --name startEligible src/runs/ho
 | `--show` by name | optional | required without `--project`; optional with it, to narrow the search | `--name NAME` | `--limit N` or `--limit all`, `--json`, `--pretty` with `--json`, `-o` |
 | `--show` by position | optional | exactly one named file, as the operand or in `--at` | `--at LINE:COLUMN FILE` or `--at FILE:LINE:COLUMN` | `--limit N` or `--limit all`, `--json`, `--pretty` with `--json`, `-o` |
 | `--references` | required | required for `--at`, as for show; optional for `--name`, to narrow the candidates | exactly one of `--name` (one identifier), `--at` | `--calls`, `--no-tests`, `--file FILE`, `--limit N` or `--limit all`, `--json`, `--pretty` (alone, the indented document), `-o` ([find references](references.md)) |
+| `--test-outline` | none | exactly one named file | none | `--limit N` or `--limit all`, `--json`, `--pretty` with `--json`, `-o` ([test view](#test-view)) |
 
 `--direct` answers a project query (outline, show, or references with
 `--project`) in the CLI process instead of the [service](#project-mode).
@@ -112,14 +116,14 @@ See [the service](references.md#persistent-cli-service) for its lifecycle.
 
 One delivery policy applies to file navigation, direct project queries, and
 service answers alike. The [CLI reference](cli-reference.md#outline) lists
-the exit code of each outcome (also for [show](cli-reference.md#show)), as
-`tsparse --outline --help` and `tsparse --show --help` do; this table gives
-the channel that receives it:
+the exit code of each outcome (also for [show](cli-reference.md#show) and
+[test-outline](cli-reference.md#test-outline)), as `tsparse --OP --help`
+does; this table gives the channel that receives it:
 
 | Outcome | Text | JSON (`--json`) |
 | --- | --- | --- |
-| Outline, or one declaration found | Result on stdout or `-o` | `"outcome": "ok"` / `"found"` document on stdout or `-o` |
-| Ambiguous or missing selection | Diagnostic and candidate anchors on stderr | `"ambiguous"` / `"not_found"` document on stdout or `-o` |
+| Outline, test view, or one declaration found | Result on stdout or `-o` | `"outcome": "ok"` / `"found"` document on stdout or `-o` |
+| Ambiguous or missing selection | Diagnostic and candidate anchors, or a missed name's [import hint](#import-hint), on stderr | `"ambiguous"` / `"not_found"` document on stdout or `-o` |
 | Syntax error, unsupported input, project analysis failure (`Config`, `Binding`, `UnresolvedImport`) | `path:line:column: message` on stderr | `"error"` document on stdout or `-o` |
 | Unreadable file, invalid position, file outside the project | Diagnostic on stderr | `"error"` document on stdout or `-o` |
 | Usage error | `CODE: message` on stderr | `"error"` document on stdout, never `-o` |
@@ -154,7 +158,8 @@ followed by a second document. An empty file has an empty,
 successful outline. Unlike reference name queries, which succeed with no
 groups, a show selector that matches nothing exits 1. A position outside the
 file, past the end of its line, or inside a surrogate pair is invalid (exit 2);
-a valid position on no declaration name or anchor is a missing selection.
+a valid position on no declaration name or anchor and in no statement's first
+token ([statement sites](#statement-sites)) is a missing selection.
 
 ## The declaration catalog
 
@@ -199,7 +204,9 @@ assignment, `({ a = function fallback() {} } = value)`, lists `fallback`.
 
 Kinds are this tool's own vocabulary, shared by text and JSON. A
 function-valued variable is still a `variable`; a class arrow field or object
-property is still a `property`.
+property is still a `property`. One more kind, `statement`, belongs only to
+[statement sites](#statement-sites), which `--at` selects and which are never
+outline entries.
 
 ### Labels, keys, and selectors
 
@@ -234,7 +241,8 @@ nothing), a namespace import and `import x =` always, and a default import's
 name never. So `--name createThing` selects the function, not each file that
 imports or re-exports it, while `--name made` selects
 `import { createThing as made }`. A specifier without a key keeps its entry,
-label, and anchor, and `--at` on its name shows its whole declaration.
+label, and anchor, and `--at` on its name shows its whole declaration; a
+`--name` that misses its file names it ([import hint](#import-hint)).
 Only imports and exports follow workspace symbols: object-literal properties
 keep their keys (workspace symbols omit them), so a name shared by a
 declaration and a property, often a test mock, is ambiguous and `--at`
@@ -263,16 +271,116 @@ has no `selector` and is selected by position. Each entry's `selector` field is 
 exactly when `--name` can spell it.
 
 `--at LINE:COLUMN` selects the entries whose name token (any segment of a
-dotted namespace, a constructor's `constructor` keyword) or anchor contains
-the position; a name's end is outside it. An entry's **anchor** is its name's
-first character, the first segment of a dotted namespace, or the first token of
-an unnamed site (including decorators and modifiers). Outline entries and
-ambiguity candidates always carry an anchor that `--at` selects.
+dotted namespace, a constructor's `constructor` keyword, a computed name's
+whole `[…]`) or anchor contains the position; a name's end is outside it. One
+entry is found; several are candidates. Only when no entry matches does the
+position select a [statement site](#statement-sites). An entry's **anchor** is
+its name's first character, the first segment of a dotted namespace, or the
+first token of an unnamed site (including decorators and modifiers). Outline
+entries and ambiguity candidates always carry an anchor that `--at` selects.
 
 When several entries match, show lists every candidate rather than choosing:
 overloads, same-named locals in different blocks, merged declarations, and a
 renaming import or export beside a declaration of the same name all remain
 separate.
+
+### Statement sites
+
+When no entry matches a position, `--at` selects the statement whose first
+token contains it, from the token's first character up to but not including
+its end, as a **statement site**; otherwise the selection is missing, with
+the text `no declaration is named or anchored at this position` and exit 1.
+Every position that selects an entry keeps selecting exactly that entry or
+those candidates, so a statement site never shadows an entry. This is a
+deliberate addition: TypeScript's document symbols have no statements.
+
+A statement is any node of the final syntax tree that TypeScript's
+`IsStatement` accepts (`syntax::is_statement`): expression, control-flow,
+variable, declaration, import, and export statements, wherever they are,
+including the unbraced body of an `if`, `else`, loop, `with`, or label, and
+every block except a function body and a `try`, `catch`, or `finally` block,
+so a class static block's body is one. Its first token is the first token of
+its range (TypeScript's `getFirstToken`, `Ast::first_token_span`): decorators
+and modifiers included, leading comments and JSDoc excluded, scanned without
+the parser's rescans, so a statement that begins with a regular expression or
+JSX has `/`, `/=`, or `<` as its first token. A token is the first token of at
+most one statement, so a statement site is selected only alone, never among
+an ambiguous selection's candidates.
+
+In this file:
+
+```ts
+ 1 import { describe, it, test, beforeEach, expect } from "vitest";
+ 2 class Widget {}
+ 3 describe(Widget.name, () => {
+ 4   beforeEach(() => {});
+ 5   it.each([1, 2])("adds %i", (n) => { expect(n).toBeTruthy(); });
+ …
+10   it.skip("skipped one", () => {});
+```
+
+`--at 10:3` and `--at 10:4`, both in `it`, select line 10's statement, and
+`--at 10:5`, the `.`, selects nothing. `--at 4:3` selects the hook's
+statement and `--at 5:3` the `it.each` statement, while `--at 5:30`, the `(`
+of `(n)`, is the callback entry's anchor and still selects the callback.
+`--at 1:1`, on `import`, selects the import declaration (`--at 1:10`, on
+`describe`, still selects that specifier, with the same excerpt), and
+`--at 2:1`, on `class`, selects the class statement while `--at 2:7` selects
+the class. Likewise `export` in `export { a }` or `export function f() {}`,
+`function` in `function f() {}`, and `const` in `const x = 1;` select their
+whole statements. A position an entry claims keeps the entry: the first token
+of `x => {};` and `async () => {};` is the arrow's anchor;
+`export default function () {}`, `export default class {}`, and `export = f(…)`
+have entries anchored at `export`; and a statement inside a computed name,
+`[(() => { f(); })()]() {}`, lies in the member's name token. `@dec export
+class C {}` is one statement whose first token is `@`; its `export` and
+`class` begin no statement and select nothing. In `a: b: f();` the first
+tokens are `a`, `b`, and `f`, and in `if (a) if (b) f();` the two `if`s and
+`f`.
+
+A statement site is reported as a declaration of kind `statement`:
+
+- `label`: the statement's text without a final `;`, rendered as a signature
+  is: each run of whitespace and comments between tokens becomes one space,
+  function block bodies and class member lists become `{ … }`, a string,
+  template, or JSX text literal that spans lines becomes `…`, and past 160
+  characters the text is cut at the renderer's last boundary and ends with
+  `…`. With no name, the cut may fall at the start, so a statement whose first
+  160 characters hold no boundary, such as a long `a.b().c()…` chain, is `…`
+  alone. This is the one label that abbreviates: the rule that labels are
+  never truncated protects names, and a statement site has none. An empty
+  statement, `;`, has the empty label, so its text line ends `statement `
+  with the space before the label.
+- `anchor`: the start of its first token. `range`, and the excerpt `--show`
+  prints: the statement from its first token through its last, including a
+  final `;`. The `lines` display limit applies as to any excerpt.
+- `depth`: one more than the greatest depth among the outline entries whose
+  range contains the statement's range and differs from it, or 1. Show does
+  not print it; edit documents and plans, which serialize the whole site, do.
+- No `key`, `selector`, or `signature`, so `--name` never selects a statement
+  site. Statement sites are kept apart from the catalog's entries: the
+  outline, every entry, its place, and name selection, in a file or a
+  project, are unchanged.
+
+```text
+/abs/edge-cases.test.ts:10:3 statement it.skip("skipped one", () => { … })
+10 | it.skip("skipped one", () => {});
+```
+
+```json
+{"declaration":{"anchor":{"column":3,"line":10},"kind":"statement","label":"it.skip(\"skipped one\", () => { … })","range":{"end":{"column":36,"line":10},"start":{"column":3,"line":10}}},"file":"/abs/edge-cases.test.ts","operation":"show","outcome":"found","source":"it.skip(\"skipped one\", () => {});"}
+```
+
+With `--project`, through the service or `--direct`, a position selects as
+in the file, with files named as project results name them. Edits select
+the same sites: [statement insertion](editing.md#statement-insertion-e2)
+inserts after a statement site in a statement list, and its refusal at a
+callback names the position that selects the callback's innermost enclosing
+statement when that statement is in a statement list and the position
+selects only it;
+[body replacement](editing.md#body-replacement-e1) refuses one. `--type` and
+`--references` select tokens by their own rules, not catalog sites, and are
+unchanged.
 
 ### Ranges, excerpts, and signatures
 
@@ -345,7 +453,7 @@ the selection searched, absent when a project-wide name searched every file.
 {"operation":"show","outcome":"ambiguous","file":"/abs/src/host.ts","query":{"name":"overload"},
  "candidates":[{"file":"/abs/src/host.ts","label":"overload","kind":"function","key":"overload",
    "selector":"overload","anchor":{"line":7,"column":10}}, …]}
-{"operation":"show","outcome":"not_found","file":"/abs/src/host.ts","query":{"at":{"line":3,"column":5}}}
+{"operation":"show","outcome":"not_found","file":"/abs/src/host.ts","query":{"at":{"line":3,"column":12}}}
 {"operation":"outline","outcome":"error","file":"/abs/src/broken.ts","error":{"kind":"Syntax",
  "message":"Expected a binding identifier","path":"/abs/src/broken.ts","position":{"line":1,"column":7}}}
 ```
@@ -402,16 +510,55 @@ A diagnostic about the request's own file (`OutsideProject`,
 `InvalidPosition`) names it as the request spelled it; every other failure
 names the captured file by its canonical path.
 
+### Import hint
+
+`--show --name NAME FILE` selects declared names only, so it misses a name
+FILE imports or re-exports without declaring it. Such a miss, in file mode or
+project mode, keeps its first line and adds one line per specifier of FILE
+whose catalog entry has kind `import` or `export`, no key, and an identifier
+name decoded exactly to NAME, in source order: a default import, `import {
+a }` (also `import type { a }` and `import { type a }`), `export { a } from
+"m"`, and `export { a }`. A renaming specifier, a namespace import, and
+`import x =` have keys, so `--name` finds them; `export * as ns`, `export *`,
+and `export default x` have no entry; a string name (`export { "a-b" }`) and
+`export =` have no identifier name. Matching is by syntax alone, so an
+undeclared `export { a };` matches too; what a specifier denotes is
+`--definition`'s answer at its anchor ([references](references.md)).
+
+```text
+/abs/src/app.ts: no declaration matches `formatTitle`
+`formatTitle` is imported at /abs/src/app.ts:1:10; find its declaration with: tsparse --definition --project tsconfig.json --at /abs/src/app.ts:1:10
+```
+
+An `export` entry reads `re-exported`, and FILE is absolute in both places.
+In project mode the command is complete: it repeats the request's own
+`--project` spelling, quoted where a shell needs it, and names no `--direct`,
+so the service's and a direct answer are byte-identical. File mode knows no
+configuration, so the command names `--project`'s placeholder, `TSCONFIG`,
+for the caller to fill in. The `not_found` document gains `specifiers`, one
+object per line with `kind` and `anchor` (in the document's `file`), and
+`next` only where the command is complete:
+
+```json
+{"file":"src/app.ts","operation":"show","outcome":"not_found","project":"/abs/tsconfig.json","query":{"name":"formatTitle"},"specifiers":[{"anchor":{"column":10,"line":1},"kind":"import","next":{"argv":["tsparse","--definition","--project","tsconfig.json","--at","/abs/src/app.ts:1:10"]}}]}
+```
+
+A miss that matches no specifier, a missing `--at`, a project-wide `--name`
+without FILE, and an edit whose selection misses are unchanged. The facts
+come from FILE's complete catalog: in project mode one more projection of its
+captured text, only on a miss, as `--at` projects it, and a failure to
+project it fails the request as that input failure.
+
 ### Display limits
 
-Outline and show bound what they display; the library's results are always
-complete, and a cut is a rendering decision. Each list has a default, which
-`tsparse --outline --help --json` and `tsparse --show --help --json` publish
-under `limits`:
+Outline, show, and the test view bound what they display; the library's
+results are always complete, and a cut is a rendering decision. Each list has
+a default, which `tsparse --OP --help --json` publishes under `limits`:
 
 | List | Default | Counted |
 | --- | --- | --- |
 | Outline `entries` | 200 | after `--depth` chooses the levels, in source order |
+| Test view `entries` | 200 | in source order, every level |
 | Show `lines` | 400 | from the declaration's first line |
 | Show `candidates` | 50 | of an ambiguous selection, in the order they are listed |
 
@@ -500,7 +647,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 ```
 
 `Outline::entries` is the complete hierarchy in source order, each entry with
-its containment `depth`; display depth is the caller's choice. Failures are
+its containment `depth`; display depth is the caller's choice. A
+`Selector::At` that selects a [statement site](#statement-sites) finds a
+`Declaration` of kind `Kind::Statement`, which no outline entry has. Failures are
 `analysis::AnalysisError`s, the type every analysis operation reports, file
 or project: input failures (`Io`, `Syntax`, `ResourceLimit`, `Unsupported`) are
 `AnalysisError::Input` (`analysis::InputError`), and an invalid position is
@@ -576,6 +725,178 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
   the session's freshness validation, against 5–91 ms for file-only
   navigation of the same files ([Command Center
   performance](performance-command-center.md#current-state-2026-10-08)).
+
+## Test view
+
+`tsparse --test-outline FILE` lists one test file's test calls, its
+`describe`, `it`, and `test` calls and hooks, in source order, indented by
+containment, with each test's name. It is a deliberate addition with no
+TypeScript counterpart. TypeScript's document symbols list a test only as its
+callback (`it("adds") callback`), a table-driven test as `<function>`, and
+`it.todo("…")` not at all, and the outline keeps those labels because it
+ports them. So the test view has its own owner (`navigation::test_outline`),
+which ports no TypeScript function. Its rules are not document-symbol
+differences: the [table below](#differences-from-typescript-702-document-symbols)
+and the conformance runner do not cover it, and `--outline` is unchanged.
+
+FILE is [navigation input](#commands), read, classified, and parsed as for
+`--outline FILE`; only that file is read, with no project and no service. The
+operation takes `--limit`, `--json`, `--pretty` with `--json`, and `-o`, besides
+`--help` and `--version`. Any other flag, such as `--project`, `--direct`,
+`--depth`, `--at`, or `--name`, is a usage error that lists the operations
+accepting it, and so is stdin (`-`).
+
+**Test calls.** Syntax alone decides what is a test call, with no import
+check, so Vitest globals count. A test call is an expression statement whose
+expression is a call C with nothing wrapping it (no parentheses, `await`,
+`void`, or other operator), whose callee is:
+
+- a **hook**: an identifier named `beforeAll`, `beforeEach`, `afterAll`, or
+  `afterEach`; or
+- a **test chain**: an identifier named `describe`, `it`, or `test` (the
+  root); a property access `X.m`, where `X` is a test chain and `m` is
+  `only`, `skip`, `todo`, `concurrent`, `sequential`, `shuffle`, or `fails`;
+  or a call `X.m(…)`, where `m` is `each`, `for`, `skipIf`, or `runIf` and
+  its arguments, the table or condition, are not part of the chain.
+
+Names are decoded identifier names, compared exactly, and node kinds decide
+the rest, so `?.` and type arguments change nothing. Nothing else forms a
+chain: an element access, a non-null assertion, parentheses, a receiver such
+as `this.it`, another name, or a modifier in the other form (`it.each("n",
+fn)`, `it.skip(c)("n", fn)`). A tagged template is not a call, so
+``it.each`a | b`("n", fn)`` is not a test call, nor are `it.each(table);`
+alone, `test.extend(…)`, `test.describe(…)`, `await test.step(…)`,
+`suite(…)`, and `expect(…)`. The modifiers are Vitest 3.2.4's (the
+`@vitest/runner` types `ChainableTestAPI`, `ChainableSuiteAPI`, `TestAPI`, and
+`SuiteAPI`), so a modifier a later Vitest adds is a known gap. The list is
+fixed because fixture objects are often named `test`: `test.runtimeHost.advance(…)`
+is not a test. Playwright's `test.describe` and `test.step` are not
+recognized. Test calls count wherever their statements are, in helper
+functions, conditionals, loops, and unbraced bodies alike, except inside a
+computed property name: nothing inside the `[…]` that names a member is
+listed, because `--at` gives every position in it to the member
+([selection](#labels-keys-and-selectors)).
+
+**Entries.** Each entry has:
+
+- a **position**: the start of its statement's first token, the root or hook
+  identifier. No declaration names it and no unnamed site anchors it, so
+  `--at` there always selects the test's statement as a
+  [statement site](#statement-sites): `--show --at` prints the whole test,
+  and `--insert-after --at` inserts after it when the statement is in a
+  statement list.
+- a **call**: the hook's name, or the root and each modifier in source order
+  after a `.`, with `()` after a called modifier (`it.skip`, `it.each()`,
+  `describe.concurrent.each()`), spelled with the decoded names that matched,
+  so `\u0069t.skip(…)` is `it.skip`.
+- for a test chain, a **name**: C's first argument as written, from its
+  first token through its last, with every line break (LF, CR, U+2028,
+  U+2029) removed and nothing else changed or truncated:
+  `"adds %i"`, `` `handles ${"x"}` ``, `Widget.name`. For `.each`, `.for`,
+  `.skipIf`, and `.runIf`, C is the outer call, so
+  `it.each(table)("adds %i", fn)` is named `"adds %i"`. A callback-first
+  call is named by the whole callback, so `it(() => {`, `  expect(1);`, `});`
+  over three lines is `1:1 it () => {  expect(1);}`. A hook and a call
+  without arguments have no name.
+
+An entry's parent is the nearest test call whose statement contains its
+statement. Every other syntax is transparent, including calls that are not
+test calls, such as `test.describe(…)`, and an entry with no such ancestor is
+at the top level, even inside a helper function. Entries are ordered by
+position, which is a pre-order, and every level is shown; there is no
+`--depth`.
+
+**Output.** Text prints the file's absolute path, then one line per entry:
+two spaces per containment level, `LINE:COLUMN`, the call, and, when the
+entry has a name, a space and the name. For this file:
+
+```ts
+ 1 import { describe, it, test, beforeEach, expect } from "vitest";
+ 2 class Widget {}
+ 3 describe(Widget.name, () => {
+ 4   beforeEach(() => {});
+ 5   it.each([1, 2])("adds %i", (n) => { expect(n).toBeTruthy(); });
+ 6   describe.each([["a"], ["b"]])("case %s", (x) => {
+ 7     it(`handles ${"x"}`, () => {});
+ 8   });
+ 9   it.todo("writes later");
+10   it.skip("skipped one", () => {});
+11   test("with options", { timeout: 1000 }, async () => {});
+12   it.skipIf(process.env.CI)("conditional", () => {});
+13   test.concurrent("parallel", async () => {});
+14 });
+15 test.describe("playwright suite", () => {
+16   test("pw case", async ({ page }) => {
+17     await test.step("first step", async () => {});
+18   });
+19 });
+```
+
+```text
+/abs/edge-cases.test.ts
+3:1 describe Widget.name
+  4:3 beforeEach
+  5:3 it.each() "adds %i"
+  6:3 describe.each() "case %s"
+    7:5 it `handles ${"x"}`
+  9:3 it.todo "writes later"
+  10:3 it.skip "skipped one"
+  11:3 test "with options"
+  12:3 it.skipIf() "conditional"
+  13:3 test.concurrent "parallel"
+16:3 test "pw case"
+```
+
+Line 16's `test` is at the top level, since `test.describe(…)` is not a test
+call, and `await test.step(…)` is not listed. `--show --at 10:3` prints line
+10's whole statement, and `--insert-after --at 10:3` inserts after it
+([statement sites](#statement-sites)). The document is
+`{"operation":"test-outline","outcome":"ok","file":FILE,"entries":[…]}`, with
+the absolute FILE and each entry as
+`{"anchor":{"line","column"},"call","name","children":[…]}`: `name` is absent
+when the entry has none, and `children`, always present, nests the entries
+the text indents.
+
+```json
+{"entries":[{"anchor":{"column":1,"line":3},"call":"describe","children":[
+  {"anchor":{"column":3,"line":4},"call":"beforeEach","children":[]},
+  {"anchor":{"column":3,"line":5},"call":"it.each()","children":[],"name":"\"adds %i\""}, …],"name":"Widget.name"},
+ {"anchor":{"column":3,"line":16},"call":"test","children":[],"name":"\"pw case\""}],
+ "file":"/abs/edge-cases.test.ts","operation":"test-outline","outcome":"ok"}
+```
+
+**Bounds.** `--limit N|all` caps the entries in source order, by default 200
+([display limits](#display-limits)); with `-o` and no `--limit`, nothing is
+cut. A cut keeps a prefix, so every shown entry's parent is shown and the
+document nests the shown entries. The cut text ends with the shared cut line,
+and a cut document adds `display`, as an outline's does:
+
+```text
+/abs/edge-cases.test.ts
+3:1 describe Widget.name
+  4:3 beforeEach
+  5:3 it.each() "adds %i"
+… 8 more entries; see all with: tsparse --test-outline /abs/edge-cases.test.ts --limit all, or write them to a file with -o FILE
+```
+
+**Failures.** A file without test calls prints its path alone and exits 0;
+its document has `"entries": []`. Input failures are the outline's, through
+the same input owner (`navigation::file`), with the same exit codes and
+[channels](#exit-codes-and-channels): a file that cannot be read is `Io`
+(exit 2), a syntax error is `Syntax` (exit 1), a file nesting deeper than the
+parser's grammar budget is `ResourceLimit` (exit 1; 85 nested
+`describe("d", () => {` suites list and 86 fail, and other shapes reach the
+budget at other counts), and a JSON, JavaScript, or other file is
+`Unsupported` (exit 1). With `--json` each is an `error` document naming
+`test-outline`. A usage error and a result that cannot be written are each
+`CODE: message` (exit 2).
+
+**Library.** `navigation::test_outline_file(path)` returns a `TestOutline`
+with the absolute `file` and flat `entries` in source order, each a
+`TestEntry` with `anchor`, `call`, `name` (`None` without one), and `depth`, as
+`Outline::entries` are; its failures are the outline's `AnalysisError`s. The
+owner walks the final syntax tree with an explicit stack and walks a chain in
+a loop, so nothing recurses on input.
 
 ## Differences from TypeScript 7.0.2 document symbols
 

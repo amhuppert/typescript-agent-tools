@@ -8,8 +8,8 @@ mod support;
 use serde_json::{Value, json};
 use std::path::{Path, PathBuf};
 use std::process::Output;
-use support::Fixture;
 use support::service::Service;
+use support::{EDGE_CASES, Fixture};
 
 /// Containment and anchors as in `navigation_cli.rs`, whose file-mode
 /// expectations come from TypeScript 7.0.2's document symbols.
@@ -512,17 +512,19 @@ fn missing_selections_exit_1_naming_what_was_searched() {
                 "query": { "name": "absent" },
             })
         );
-        let output = project.run(&["--show", "--at", "3:5", "src/host.ts"]);
+        // `true` in `return true;` is neither an entry's target nor a
+        // statement's first token.
+        let output = project.run(&["--show", "--at", "3:12", "src/host.ts"]);
         assert_eq!(
             text_outcome(&output, 1),
             format!(
-                "{}:3:5: no declaration is named or anchored at this position\n",
+                "{}:3:12: no declaration is named or anchored at this position\n",
                 project.path("src/host.ts").display()
             )
         );
         assert_eq!(
             document(
-                &project.run(&["--show", "--json", "--at", "3:5", "src/host.ts"]),
+                &project.run(&["--show", "--json", "--at", "3:12", "src/host.ts"]),
                 1
             ),
             json!({
@@ -530,8 +532,17 @@ fn missing_selections_exit_1_naming_what_was_searched() {
                 "outcome": "not_found",
                 "project": project.config(),
                 "file": "src/host.ts",
-                "query": { "at": { "line": 3, "column": 5 } },
+                "query": { "at": { "line": 3, "column": 12 } },
             })
+        );
+        // Its `return` begins the statement, which it selects.
+        let output = project.run(&["--show", "--at", "3:5", "src/host.ts"]);
+        assert_eq!(
+            text_outcome(&output, 0),
+            format!(
+                "{}:3:5 statement return true\n3 | return true;\n",
+                project.path("src/host.ts").display()
+            )
         );
         project.check_no_service();
     }
@@ -1337,4 +1348,229 @@ fn each_spelling_of_a_configuration_owns_its_own_service() {
     );
     assert_eq!(status("link.json")["running"], false);
     assert_eq!(status("tsconfig.json")["pid"], spelled["pid"]);
+}
+
+/// The statement-site sample as a project file, with fragments.
+fn statement_project() -> Service {
+    Service::new(&[
+        ("src/edge-cases.test.ts", EDGE_CASES),
+        (
+            "src/vitest.d.ts",
+            "declare module \"vitest\" {\n  export const describe: any, it: any, test: any, beforeEach: any, expect: any;\n}\n",
+        ),
+        ("new-test.ts", "it(\"new test\", () => {});\n"),
+        ("body.ts", "{\n  return 2;\n}\n"),
+    ])
+}
+
+/// A JSON document of a successful or refused request, which `both` has
+/// already found byte-identical through the service and directly.
+fn agreed(output: &Output, code: i32) -> Value {
+    assert_eq!(output.status.code(), Some(code), "{output:?}");
+    serde_json::from_slice(&output.stdout).unwrap()
+}
+
+#[test]
+fn a_statement_site_is_selected_in_a_project_as_in_its_file() {
+    let service = statement_project();
+    let file = service.fixture.path("src/edge-cases.test.ts");
+    let config = service.fixture.path("tsconfig.json");
+    let output = service.both(&["--show", "--at", "10:3", "src/edge-cases.test.ts"]);
+    assert_eq!(
+        text_outcome(&output, 0),
+        format!(
+            "{}:10:3 statement it.skip(\"skipped one\", () => {{ … }})\n\
+             10 | it.skip(\"skipped one\", () => {{}});\n",
+            file.display()
+        )
+    );
+    let shown = agreed(
+        &service.both(&["--show", "--json", "--at", "10:4", "src/edge-cases.test.ts"]),
+        0,
+    );
+    assert_eq!(
+        shown,
+        json!({
+            "operation": "show",
+            "outcome": "found",
+            "project": config.to_str().unwrap(),
+            "file": "src/edge-cases.test.ts",
+            "declaration": {
+                "label": "it.skip(\"skipped one\", () => { … })",
+                "kind": "statement",
+                "anchor": { "line": 10, "column": 3 },
+                "range": { "start": { "line": 10, "column": 3 }, "end": { "line": 10, "column": 36 } },
+            },
+            "source": "it.skip(\"skipped one\", () => {});",
+        })
+    );
+    // File mode selects the same statement.
+    let output = service
+        .command()
+        .args(["--show", "--json", "--at", "10:4"])
+        .arg(&file)
+        .output()
+        .unwrap();
+    let in_file = document(&output, 0);
+    assert_eq!(in_file["declaration"], shown["declaration"]);
+    assert_eq!(in_file["source"], shown["source"]);
+    // The token's end selects nothing, in a project too.
+    let output = service.both(&["--show", "--at", "10:5", "src/edge-cases.test.ts"]);
+    assert_eq!(
+        text_outcome(&output, 1),
+        format!(
+            "{}:10:5: no declaration is named or anchored at this position\n",
+            file.display()
+        )
+    );
+}
+
+#[test]
+fn project_edits_at_a_statement_site_agree_through_the_service_and_directly() {
+    let service = statement_project();
+    let file = service.fixture.path("src/edge-cases.test.ts");
+    let insert = [
+        "--insert-after",
+        "--at",
+        "10:3",
+        "src/edge-cases.test.ts",
+        "--from",
+        "new-test.ts",
+    ];
+    let preview = agreed(&service.both(&[&insert[..], &["--json"]].concat()), 0);
+    let edit = &preview["files"][0];
+    assert_eq!(edit["file"], "src/edge-cases.test.ts");
+    assert_eq!(edit["edits"][0]["site"]["kind"], "statement");
+    assert_eq!(edit["edits"][0]["site"]["depth"], 2);
+    assert!(
+        edit["diff"]
+            .as_str()
+            .unwrap()
+            .contains("   it.skip(\"skipped one\", () => {});\n+  it(\"new test\", () => {});\n"),
+        "{preview}"
+    );
+    // A batch edit's position selects the same site.
+    std::fs::write(
+        service.fixture.path("edits.json"),
+        r#"{ "edits": [ { "operation": "insert_after", "at": "src/edge-cases.test.ts:10:4", "from": "new-test.ts" } ] }"#,
+    )
+    .unwrap();
+    let batch = agreed(&service.both(&["--edit-batch", "edits.json", "--json"]), 0);
+    assert_eq!(batch["files"], preview["files"]);
+    // Body replacement is refused alike.
+    let output = service.both(&[
+        "--replace-body",
+        "--at",
+        "10:3",
+        "src/edge-cases.test.ts",
+        "--from",
+        "body.ts",
+    ]);
+    assert_eq!(
+        text_outcome(&output, 1),
+        // Edit results name a project file relative to the configuration.
+        "src/edge-cases.test.ts:10:3: edit 1: it.skip(\"skipped one\", () => { … }) cannot have its body replaced: a statement site has no body to replace; select the function, method, or arrow function by its name or anchor\n"
+    );
+    // A callback's insertion refusal names its enclosing statement alike.
+    let output = service.both(&[
+        "--insert-after",
+        "--at",
+        "5:30",
+        "src/edge-cases.test.ts",
+        "--from",
+        "new-test.ts",
+    ]);
+    assert_eq!(
+        text_outcome(&output, 1),
+        "src/edge-cases.test.ts:5:30: edit 1: <function> cannot have statements inserted after it: this function is not a statement in a statement list (statements can be inserted only after a statement of a file, block, module block, or case clause); to insert after the enclosing statement, select it with --at 5:3\n"
+    );
+    // A plan the service saves replays the statement site and applies.
+    let output = service.run(&[&insert[..], &["--plan", "p.json"]].concat());
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    let output = service
+        .command()
+        .args(["--apply", "p.json"])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    let mut expected: Vec<&str> = EDGE_CASES.lines().collect();
+    expected.insert(10, "  it(\"new test\", () => {});");
+    assert_eq!(
+        std::fs::read_to_string(&file).unwrap(),
+        expected.join("\n") + "\n"
+    );
+}
+
+/// Statements before, around, and inside declarations: none of them may
+/// move a record's ordinal, which project name selection reads.
+const STATEMENTS_FIRST: &str = "\
+f();
+if (ready) g();
+{
+  h();
+}
+export function first() {
+  a();
+  b();
+}
+export function target() {
+  return 1;
+}
+export const later = 2;
+";
+
+#[test]
+fn statement_sites_leave_project_name_selection_and_the_outline_as_they_were() {
+    let service = Service::new(&[
+        ("src/many.ts", STATEMENTS_FIRST),
+        ("body.ts", "{\n  return 2;\n}\n"),
+    ]);
+    let file = service.fixture.path("src/many.ts");
+    let shown = agreed(&service.both(&["--show", "--json", "--name", "target"]), 0);
+    assert_eq!(shown["declaration"]["kind"], "function");
+    assert_eq!(
+        shown["declaration"]["anchor"],
+        json!({ "line": 10, "column": 17 })
+    );
+    assert_eq!(
+        shown["source"],
+        "export function target() {\n  return 1;\n}"
+    );
+    let shown = agreed(&service.both(&["--show", "--json", "--name", "later"]), 0);
+    assert_eq!(shown["source"], "export const later = 2;");
+    // The outline lists the records alone, as file mode does.
+    let outline = agreed(
+        &service.both(&["--outline", "--json", "--depth", "all", "src/many.ts"]),
+        0,
+    );
+    let output = service
+        .command()
+        .args(["--outline", "--json", "--depth", "all"])
+        .arg(&file)
+        .output()
+        .unwrap();
+    assert_eq!(outline["entries"], document(&output, 0)["entries"]);
+    let labels: Vec<&str> = outline["entries"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|entry| entry["label"].as_str().unwrap())
+        .collect();
+    assert_eq!(labels, ["first", "target", "later"]);
+    // A name-selected project edit replaces the named function's body.
+    let replace = ["--replace-body", "--name", "target", "--from", "body.ts"];
+    let preview = agreed(&service.both(&[&replace[..], &["--json"]].concat()), 0);
+    assert_eq!(preview["files"][0]["edits"][0]["site"]["label"], "target");
+    let output = service.run(&[&replace[..], &["--plan", "p.json"]].concat());
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    let output = service
+        .command()
+        .args(["--apply", "p.json"])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    assert_eq!(
+        std::fs::read_to_string(&file).unwrap(),
+        STATEMENTS_FIRST.replace("  return 1;", "  return 2;")
+    );
 }

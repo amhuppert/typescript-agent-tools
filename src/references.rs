@@ -121,6 +121,71 @@ pub enum ReferenceOperation {
     References,
 }
 
+/// The declarations a selection denotes, following import and export
+/// aliases (`Project::definition`), or why nothing was selected. The flat
+/// JSON documents are shared by the direct API, CLI and project service.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum DefinitionAnswer {
+    Selected(DefinitionResult),
+    Unselected(DefinitionSelection),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DefinitionResult {
+    pub operation: DefinitionOperation,
+    pub outcome: DefinitionOutcome,
+    /// As [`ReferenceResult::project`] names it.
+    pub project: PathBuf,
+    /// As [`ReferenceResult::selection`] echoes it.
+    pub selection: ReferenceQuery,
+    /// One group per selected symbol, ordered by its first declaration.
+    pub groups: Vec<DefinitionGroup>,
+}
+
+/// One selected symbol's declarations, as its reference group lists them
+/// ([`ReferenceGroup::declarations`]): in location order, including merged
+/// declarations outside the searched files.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DefinitionGroup {
+    pub declarations: Vec<NamedLocation>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum DefinitionOperation {
+    Definition,
+}
+
+/// A definition result lists every selected symbol's declarations.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum DefinitionOutcome {
+    Complete,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DefinitionSelection {
+    pub operation: DefinitionOperation,
+    pub project: PathBuf,
+    /// As [`ReferenceResult::selection`] echoes it.
+    pub selection: ReferenceQuery,
+    #[serde(flatten)]
+    pub outcome: DefinitionSelectionFailure,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "outcome", rename_all = "snake_case")]
+pub enum DefinitionSelectionFailure {
+    /// The position is in no identifier and no member site, or no
+    /// declaration, local import, or exported alias is spelled the name.
+    NotFound,
+    /// The position is a member site, whose member the reference selection
+    /// selected: a reference query at the same position (`ReferenceQuery::At`)
+    /// searches it and names its declarations. `name` is its decoded name.
+    Member { name: String },
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ReferenceOutcome {

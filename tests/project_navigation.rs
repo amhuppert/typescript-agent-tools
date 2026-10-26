@@ -104,7 +104,14 @@ fn without_files(outcome: ShowOutcome) -> ShowOutcome {
                 })
                 .collect(),
         ),
-        ShowOutcome::NotFound => ShowOutcome::NotFound,
+        ShowOutcome::NotFound { specifiers } => ShowOutcome::NotFound { specifiers },
+    }
+}
+
+/// A missing selection that lists no specifier.
+fn not_found() -> ShowOutcome {
+    ShowOutcome::NotFound {
+        specifiers: Vec::new(),
     }
 }
 
@@ -164,7 +171,7 @@ fn project_navigation_answers_as_file_navigation_for_every_searched_file() {
                 ShowOutcome::Ambiguous(candidates) => {
                     assert!(candidates.iter().all(|c| &c.file == relative))
                 }
-                ShowOutcome::NotFound => panic!("{relative}: an anchor selects its entry"),
+                ShowOutcome::NotFound { .. } => panic!("{relative}: an anchor selects its entry"),
             }
             if let Some(selector) = &entry.selector {
                 let in_file =
@@ -199,7 +206,7 @@ fn in_this_file(outcome: ShowOutcome, file: &str) -> Vec<Candidate> {
             anchor: found.declaration.anchor,
         }],
         ShowOutcome::Ambiguous(candidates) => candidates,
-        ShowOutcome::NotFound => Vec::new(),
+        ShowOutcome::NotFound { .. } => Vec::new(),
     }
     .into_iter()
     .filter(|candidate| candidate.file == file)
@@ -336,7 +343,7 @@ fn only_searched_files_are_navigable() {
     }
     // The dependency's declarations are not sites of the project's names.
     let shown = show(&project, name("helper", None));
-    assert_eq!(shown.outcome, ShowOutcome::NotFound);
+    assert_eq!(shown.outcome, not_found());
     assert_eq!(shown.file, None);
     assert_eq!(
         outline(&project, &fixture.path("src/app.ts")).entries.len(),
@@ -427,7 +434,7 @@ fn names_select_across_searched_files_and_candidates_round_trip_by_position() {
     );
 
     let missing = show(&project, name("absent", None));
-    assert_eq!(missing.outcome, ShowOutcome::NotFound);
+    assert_eq!(missing.outcome, not_found());
     assert_eq!(missing.query, Selector::Name("absent".into()));
     assert_eq!(
         show(&project, name("value", Some(&fixture.path("src/b.ts")))).file,
@@ -547,7 +554,7 @@ fn qualified_names_follow_dotted_namespaces_ambient_modules_and_global_augmentat
     for selector in ["a.b.k", "A", "A.C", "A.B.C.C", "m.C.k"] {
         assert_eq!(
             show(&project, name(selector, None)).outcome,
-            ShowOutcome::NotFound,
+            not_found(),
             "{selector}"
         );
     }
@@ -700,15 +707,18 @@ fn positions_select_names_and_anchors_and_invalid_positions_fail() {
     .outcome
     {
         ShowOutcome::Found(found) => Some(found.declaration.label),
-        ShowOutcome::NotFound => None,
+        ShowOutcome::NotFound { .. } => None,
         other => panic!("{other:?}"),
     };
     assert_eq!(found(at(1, 9)).as_deref(), Some("\u{1D465}y"));
     assert_eq!(found(at(2, 10)).as_deref(), Some("f"));
-    // Inside a declaration but not on its name, past a name, and line ends.
-    for position in [at(1, 1), at(1, 10), at(2, 16), at(3, 1)] {
+    // Inside a declaration but not on its name or a statement's first
+    // token, past a name, and line ends.
+    for position in [at(1, 13), at(1, 10), at(2, 16), at(3, 1)] {
         assert_eq!(found(position), None, "{position:?}");
     }
+    // A statement's first token that no entry claims selects the statement.
+    assert_eq!(found(at(1, 1)).as_deref(), Some("const \u{1D465}y = 1"));
     for (position, message) in [
         (at(0, 1), "line is outside the file"),
         (at(4, 1), "line is outside the file"),
@@ -907,7 +917,7 @@ fn sessions_answer_navigation_from_their_current_generation() {
     let found_label =
         |session: &mut ProjectSession, query| match session_show(session, query).unwrap().outcome {
             ShowOutcome::Found(found) => Some(found.declaration.label),
-            ShowOutcome::NotFound => None,
+            ShowOutcome::NotFound { .. } => None,
             other => panic!("{other:?}"),
         };
     assert_eq!(

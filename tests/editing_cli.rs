@@ -7,8 +7,8 @@ mod support;
 use serde_json::{Value, json};
 use std::io::Write as _;
 use std::process::{Command, Output, Stdio};
-use support::Fixture;
 use support::service::Service;
+use support::{EDGE_CASES, Fixture};
 
 const HOST: &str = "\
 export function start() {
@@ -1611,4 +1611,737 @@ fn a_reserved_name_that_cannot_be_looked_up_is_named() {
         "{message}"
     );
     assert!(!fixture.path("result.json").exists());
+}
+
+/// The statement-site design's sample, with its two fragments.
+fn edge_cases() -> Fixture {
+    Fixture::new(&[
+        ("edge-cases.test.ts", EDGE_CASES),
+        ("new-test.ts", "it(\"new test\", () => {});\n"),
+        ("new-hook.ts", "afterEach(() => {});\n"),
+        ("body.ts", "{\n  return 2;\n}\n"),
+    ])
+}
+
+fn edge_cases_text(fixture: &Fixture) -> String {
+    std::fs::read_to_string(fixture.path("edge-cases.test.ts")).unwrap()
+}
+
+/// `EDGE_CASES` with `line` inserted after its line `after`.
+fn edge_cases_with(after: usize, line: &str) -> String {
+    let mut lines: Vec<&str> = EDGE_CASES.lines().collect();
+    lines.insert(after, line);
+    lines.join("\n") + "\n"
+}
+
+#[test]
+fn insertion_at_a_statement_site_goes_after_the_whole_statement() {
+    let fixture = edge_cases();
+    let file = fixture.path("edge-cases.test.ts");
+    let file = file.to_str().unwrap();
+    let preview = |at: &str, from: &str| {
+        tsparse(
+            &fixture,
+            &[
+                "--insert-after",
+                "--at",
+                at,
+                "edge-cases.test.ts",
+                "--from",
+                from,
+            ],
+        )
+    };
+    let output = preview("10:3", "new-test.ts");
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    assert!(output.stderr.is_empty(), "{output:?}");
+    assert_eq!(
+        text(&output.stdout),
+        format!(
+            "{file}:10:3: insert_after statement it.skip(\"skipped one\", () => {{ … }}): after the statement at 10:3-10:36\n\
+             validated: syntax and edit boundaries; not type-checked\n\
+             --- {file}\n\
+             +++ {file}\n\
+             @@ -8,6 +8,7 @@\n   \
+             }});\n   \
+             it.todo(\"writes later\");\n   \
+             it.skip(\"skipped one\", () => {{}});\n\
+             +  it(\"new test\", () => {{}});\n   \
+             test(\"with options\", {{ timeout: 1000 }}, async () => {{}});\n   \
+             it.skipIf(process.env.CI)(\"conditional\", () => {{}});\n   \
+             test.concurrent(\"parallel\", async () => {{}});\n\
+             preview only: save a plan with --plan PLAN to apply it\n"
+        )
+    );
+    // The hook.
+    let output = preview("4:3", "new-hook.ts");
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    assert_eq!(
+        text(&output.stdout),
+        format!(
+            "{file}:4:3: insert_after statement beforeEach(() => {{ … }}): after the statement at 4:3-4:24\n\
+             validated: syntax and edit boundaries; not type-checked\n\
+             --- {file}\n\
+             +++ {file}\n\
+             @@ -2,6 +2,7 @@\n \
+             class Widget {{}}\n \
+             describe(Widget.name, () => {{\n   \
+             beforeEach(() => {{}});\n\
+             +  afterEach(() => {{}});\n   \
+             it.each([1, 2])(\"adds %i\", (n) => {{ expect(n).toBeTruthy(); }});\n   \
+             describe.each([[\"a\"], [\"b\"]])(\"case %s\", (x) => {{\n     \
+             it(`handles ${{\"x\"}}`, () => {{}});\n\
+             preview only: save a plan with --plan PLAN to apply it\n"
+        )
+    );
+    // The statement holding the `it.each` callback, whose anchor `5:30`
+    // still selects the callback itself, which insertion refuses.
+    let output = preview("5:3", "new-test.ts");
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    assert!(
+        text(&output.stdout).starts_with(&format!(
+            "{file}:5:3: insert_after statement it.each([1, 2])(\"adds %i\", (n) => {{ … }}): after the statement at 5:3-5:66\n"
+        )),
+        "{output:?}"
+    );
+    let output = preview("5:30", "new-test.ts");
+    assert_eq!(output.status.code(), Some(1), "{output:?}");
+    assert!(
+        text(&output.stderr).starts_with(&format!(
+            "{file}:5:30: edit 1: <function> cannot have statements inserted after it: this function is not a statement in a statement list"
+        )),
+        "{output:?}"
+    );
+    // The edit document's site is the whole statement site, with its depth:
+    // the `describe` callback at depth 1 contains the statement.
+    let document = json(
+        &tsparse(
+            &fixture,
+            &[
+                "--insert-after",
+                "--at",
+                "10:3",
+                "edge-cases.test.ts",
+                "--from",
+                "new-test.ts",
+                "--json",
+            ],
+        ),
+        0,
+    );
+    assert_eq!(
+        document["files"][0]["edits"][0]["site"],
+        json!({
+            "label": "it.skip(\"skipped one\", () => { … })",
+            "kind": "statement",
+            "anchor": { "line": 10, "column": 3 },
+            "range": {
+                "start": { "line": 10, "column": 3 },
+                "end": { "line": 10, "column": 36 },
+            },
+            "depth": 2,
+        })
+    );
+    assert_eq!(edge_cases_text(&fixture), EDGE_CASES);
+}
+
+#[test]
+fn a_saved_plan_of_a_statement_site_insertion_applies_inside_the_describe_callback() {
+    let fixture = edge_cases();
+    let output = tsparse(
+        &fixture,
+        &[
+            "--insert-after",
+            "--at",
+            "edge-cases.test.ts:10:3",
+            "--from",
+            "new-test.ts",
+            "--plan",
+            "plan.json",
+        ],
+    );
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    assert_eq!(edge_cases_text(&fixture), EDGE_CASES);
+    let output = tsparse(&fixture, &["--apply", "plan.json"]);
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    assert_eq!(
+        edge_cases_text(&fixture),
+        edge_cases_with(10, "  it(\"new test\", () => {});")
+    );
+}
+
+#[test]
+fn a_batch_inserts_after_the_statement_sites_its_positions_select() {
+    let fixture = edge_cases();
+    std::fs::write(
+        fixture.path("edits.json"),
+        r#"{ "edits": [
+            { "operation": "insert_after", "at": "4:3", "file": "edge-cases.test.ts", "from": "new-hook.ts" },
+            { "operation": "insert_after", "at": "edge-cases.test.ts:10:4", "from": "new-test.ts" }
+        ] }"#,
+    )
+    .unwrap();
+    let document = json(
+        &tsparse(
+            &fixture,
+            &["--edit-batch", "edits.json", "--plan", "p.json", "--json"],
+        ),
+        0,
+    );
+    let edits = &document["files"][0]["edits"];
+    assert_eq!(edits[0]["site"]["kind"], "statement");
+    assert_eq!(
+        edits[1]["site"]["anchor"],
+        json!({ "line": 10, "column": 3 })
+    );
+    let output = tsparse(&fixture, &["--apply", "p.json"]);
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    let mut expected: Vec<&str> = EDGE_CASES.lines().collect();
+    expected.insert(10, "  it(\"new test\", () => {});");
+    expected.insert(4, "  afterEach(() => {});");
+    assert_eq!(edge_cases_text(&fixture), expected.join("\n") + "\n");
+
+    // Two insertions after one statement conflict.
+    let fixture = edge_cases();
+    std::fs::write(
+        fixture.path("edits.json"),
+        r#"{ "edits": [
+            { "operation": "insert_after", "at": "10:3", "file": "edge-cases.test.ts", "from": "new-hook.ts" },
+            { "operation": "insert_after", "at": "10:4", "file": "edge-cases.test.ts", "from": "new-test.ts" }
+        ] }"#,
+    )
+    .unwrap();
+    let document = json(
+        &tsparse(&fixture, &["--edit-batch", "edits.json", "--json"]),
+        1,
+    );
+    assert_eq!(document["outcome"], "rejected");
+    assert_eq!(document["error"]["kind"], "Conflict");
+    assert!(
+        document["error"]["message"]
+            .as_str()
+            .unwrap()
+            .starts_with("edits 1 and 2 conflict: "),
+        "{document}"
+    );
+    assert_eq!(edge_cases_text(&fixture), EDGE_CASES);
+}
+
+const UNBRACED: &str = "\
+declare const ready: boolean;
+declare function run(): void;
+if (ready) run();
+else run();
+while (ready) run();
+label: run();
+class K {
+  static {
+    run();
+  }
+}
+do run(); while (ready);
+for (;;) run();
+for (const key in {}) run();
+for (const item of []) run();
+declare const scope: object;
+with (scope) run();
+switch (ready) { case true: run(); }
+namespace N { run(); }
+";
+
+#[test]
+fn a_statement_outside_a_statement_list_is_shown_but_refuses_insertion() {
+    let fixture = Fixture::new(&[("unbraced.ts", UNBRACED), ("statement.ts", "run();\n")]);
+    let file = fixture.path("unbraced.ts");
+    let file = file.to_str().unwrap();
+    let output = tsparse(&fixture, &["--show", "--at", "3:12", "unbraced.ts"]);
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    assert_eq!(
+        text(&output.stdout),
+        format!("{file}:3:12 statement run()\n3 | run();\n")
+    );
+    let insert = |at: &str, json: bool| {
+        let mut args = vec![
+            "--insert-after",
+            "--at",
+            at,
+            "unbraced.ts",
+            "--from",
+            "statement.ts",
+        ];
+        if json {
+            args.push("--json");
+        }
+        tsparse(&fixture, &args)
+    };
+    const REASON: &str = "cannot have statements inserted after it: this statement is not a statement in a statement list (statements can be inserted only after a statement of a file, block, module block, or case clause)";
+    // The bodies of `if`, `else`, each loop, `with`, and a label, and a
+    // class static block's body.
+    for (at, label) in [
+        ("3:12", "run()"),
+        ("4:6", "run()"),
+        ("5:15", "run()"),
+        ("6:8", "run()"),
+        ("8:10", "{ run(); }"),
+        ("12:4", "run()"),
+        ("13:10", "run()"),
+        ("14:23", "run()"),
+        ("15:24", "run()"),
+        ("17:14", "run()"),
+    ] {
+        let output = insert(at, false);
+        assert_eq!(output.status.code(), Some(1), "{at}: {output:?}");
+        assert!(output.stdout.is_empty(), "{at}");
+        assert_eq!(
+            text(&output.stderr),
+            format!("{file}:{at}: edit 1: {label} {REASON}\n"),
+            "{at}"
+        );
+        let document = json(&insert(at, true), 1);
+        assert_eq!(document["outcome"], "rejected", "{at}");
+        assert_eq!(document["error"]["kind"], "UnsupportedSite", "{at}");
+        assert_eq!(
+            document["error"]["message"],
+            format!("{label} {REASON}"),
+            "{at}"
+        );
+    }
+    // The `if` itself, and statements of the static block's body, a case
+    // clause, and a module block, are in statement lists.
+    for at in ["3:1", "9:5", "18:29", "19:15"] {
+        let output = insert(at, false);
+        assert_eq!(output.status.code(), Some(0), "{at}: {output:?}");
+    }
+    assert_eq!(std::fs::read_to_string(file).unwrap(), UNBRACED);
+}
+
+#[test]
+fn body_replacement_at_a_statement_site_is_refused() {
+    let fixture = edge_cases();
+    std::fs::write(
+        fixture.path("functions.ts"),
+        "export function start() {\n  return 1;\n}\nfunction plain() {}\n",
+    )
+    .unwrap();
+    const REASON: &str = "cannot have its body replaced: a statement site has no body to replace; select the function, method, or arrow function by its name or anchor";
+    let replace = |at: &str, file: &str| {
+        tsparse(
+            &fixture,
+            &["--replace-body", "--at", at, file, "--from", "body.ts"],
+        )
+    };
+    for (at, file, label) in [
+        (
+            "10:3",
+            "edge-cases.test.ts",
+            "it.skip(\"skipped one\", () => { … })",
+        ),
+        // A function declaration selected by its `export` or `function`
+        // keyword is a statement site, not the function.
+        ("1:1", "functions.ts", "export function start() { … }"),
+        ("4:1", "functions.ts", "function plain() { … }"),
+    ] {
+        let output = replace(at, file);
+        assert_eq!(output.status.code(), Some(1), "{at}: {output:?}");
+        assert!(output.stdout.is_empty(), "{at}");
+        assert_eq!(
+            text(&output.stderr),
+            format!(
+                "{}:{at}: edit 1: {label} {REASON}\n",
+                fixture.path(file).display()
+            ),
+            "{at}"
+        );
+    }
+    // The function's name selects the function, whose body is replaced.
+    let output = replace("4:10", "functions.ts");
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    // In a batch, the refusal names its edit.
+    std::fs::write(
+        fixture.path("edits.json"),
+        r#"{ "edits": [
+            { "operation": "insert_after", "at": "4:3", "file": "edge-cases.test.ts", "from": "new-hook.ts" },
+            { "operation": "replace_body", "at": "functions.ts:1:1", "from": "body.ts" }
+        ] }"#,
+    )
+    .unwrap();
+    let output = tsparse(&fixture, &["--edit-batch", "edits.json"]);
+    assert_eq!(output.status.code(), Some(1), "{output:?}");
+    assert_eq!(
+        text(&output.stderr),
+        format!(
+            "{}:1:1: edit 2: export function start() {{ … }} {REASON}\n",
+            fixture.path("functions.ts").display()
+        )
+    );
+    let document = json(
+        &tsparse(&fixture, &["--edit-batch", "edits.json", "--json"]),
+        1,
+    );
+    assert_eq!(document["error"]["kind"], "UnsupportedSite");
+    assert_eq!(document["error"]["edit"], 1);
+    assert_eq!(
+        document["error"]["message"],
+        format!("export function start() {{ … }} {REASON}")
+    );
+    assert_eq!(edge_cases_text(&fixture), EDGE_CASES);
+}
+
+/// Why an insertion is refused at a site of `kind` outside a statement list.
+fn outside_a_statement_list(kind: &str) -> String {
+    format!(
+        "this {kind} is not a statement in a statement list (statements can be inserted only after a statement of a file, block, module block, or case clause)"
+    )
+}
+
+/// The remedy a callback's insertion refusal names, for the enclosing
+/// statement whose first token starts at `at`.
+fn remedy(at: &str) -> String {
+    format!("; to insert after the enclosing statement, select it with --at {at}")
+}
+
+#[test]
+fn a_refused_callback_names_the_position_that_selects_its_enclosing_statement() {
+    let fixture = edge_cases();
+    let file = fixture.path("edge-cases.test.ts");
+    let file = file.to_str().unwrap();
+    let insert = |at: &str, json: bool| {
+        let mut args = vec![
+            "--insert-after",
+            "--at",
+            at,
+            "edge-cases.test.ts",
+            "--from",
+            "new-test.ts",
+        ];
+        if json {
+            args.push("--json");
+        }
+        tsparse(&fixture, &args)
+    };
+    let message = format!(
+        "<function> cannot have statements inserted after it: {}{}",
+        outside_a_statement_list("function"),
+        remedy("5:3")
+    );
+    let output = insert("5:30", false);
+    assert_eq!(output.status.code(), Some(1), "{output:?}");
+    assert!(output.stdout.is_empty(), "{output:?}");
+    assert_eq!(
+        text(&output.stderr),
+        format!("{file}:5:30: edit 1: {message}\n")
+    );
+    assert_eq!(
+        json(&insert("5:30", true), 1),
+        json!({
+            "effect": "none",
+            "error": {
+                "edit": 0,
+                "file": file,
+                "kind": "UnsupportedSite",
+                "message": message,
+                "position": { "column": 30, "line": 5 },
+                "proposed": null,
+            },
+            "operation": "edit",
+            "outcome": "rejected",
+        })
+    );
+    // The printed position inserts after the enclosing statement.
+    let stderr = text(&output.stderr);
+    let printed = stderr.trim_end().rsplit_once(" --at ").unwrap().1;
+    let output = insert(printed, false);
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    assert_eq!(
+        text(&output.stdout),
+        format!(
+            "{file}:5:3: insert_after statement it.each([1, 2])(\"adds %i\", (n) => {{ … }}): after the statement at 5:3-5:66\n\
+             validated: syntax and edit boundaries; not type-checked\n\
+             --- {file}\n\
+             +++ {file}\n\
+             @@ -3,6 +3,7 @@\n \
+             describe(Widget.name, () => {{\n   \
+             beforeEach(() => {{}});\n   \
+             it.each([1, 2])(\"adds %i\", (n) => {{ expect(n).toBeTruthy(); }});\n\
+             +  it(\"new test\", () => {{}});\n   \
+             describe.each([[\"a\"], [\"b\"]])(\"case %s\", (x) => {{\n     \
+             it(`handles ${{\"x\"}}`, () => {{}});\n   \
+             }});\n\
+             preview only: save a plan with --plan PLAN to apply it\n"
+        )
+    );
+    let output = tsparse(
+        &fixture,
+        &[
+            "--insert-after",
+            "--at",
+            &format!("edge-cases.test.ts:{printed}"),
+            "--from",
+            "new-test.ts",
+            "--plan",
+            "plan.json",
+        ],
+    );
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    let output = tsparse(&fixture, &["--apply", "plan.json"]);
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    assert_eq!(
+        edge_cases_text(&fixture),
+        edge_cases_with(5, "  it(\"new test\", () => {});")
+    );
+    // Each other callback of the sample names its own innermost statement:
+    // one of the file, of the `describe` callback, of the `describe.each`
+    // callback, and one that begins with `await`.
+    let fixture = edge_cases();
+    let file = fixture.path("edge-cases.test.ts");
+    let file = file.to_str().unwrap();
+    for (at, label, statement) in [
+        ("3:23", "describe() callback", "3:1"),
+        ("4:14", "beforeEach() callback", "4:3"),
+        ("7:26", "it(`handles ${\"x\"}`) callback", "7:5"),
+        ("17:35", "test.step(\"first step\") callback", "17:5"),
+    ] {
+        let output = tsparse(
+            &fixture,
+            &[
+                "--insert-after",
+                "--at",
+                at,
+                "edge-cases.test.ts",
+                "--from",
+                "new-test.ts",
+            ],
+        );
+        assert_eq!(output.status.code(), Some(1), "{at}: {output:?}");
+        assert_eq!(
+            text(&output.stderr),
+            format!(
+                "{file}:{at}: edit 1: {label} cannot have statements inserted after it: {}{}\n",
+                outside_a_statement_list("function"),
+                remedy(statement)
+            ),
+            "{at}"
+        );
+        let output = tsparse(
+            &fixture,
+            &[
+                "--insert-after",
+                "--at",
+                statement,
+                "edge-cases.test.ts",
+                "--from",
+                "new-test.ts",
+            ],
+        );
+        assert_eq!(output.status.code(), Some(0), "{statement}: {output:?}");
+        assert!(
+            text(&output.stdout)
+                .starts_with(&format!("{file}:{statement}: insert_after statement ")),
+            "{statement}: {output:?}"
+        );
+    }
+    assert_eq!(edge_cases_text(&fixture), EDGE_CASES);
+}
+
+#[test]
+fn a_batch_refusal_at_a_callback_names_the_same_remedy() {
+    let fixture = edge_cases();
+    let file = fixture.path("edge-cases.test.ts");
+    let file = file.to_str().unwrap();
+    std::fs::write(
+        fixture.path("edits.json"),
+        r#"{ "edits": [
+            { "operation": "insert_after", "at": "4:3", "file": "edge-cases.test.ts", "from": "new-hook.ts" },
+            { "operation": "insert_after", "at": "edge-cases.test.ts:5:30", "from": "new-test.ts" }
+        ] }"#,
+    )
+    .unwrap();
+    let message = format!(
+        "<function> cannot have statements inserted after it: {}{}",
+        outside_a_statement_list("function"),
+        remedy("5:3")
+    );
+    let output = tsparse(&fixture, &["--edit-batch", "edits.json"]);
+    assert_eq!(output.status.code(), Some(1), "{output:?}");
+    assert!(output.stdout.is_empty(), "{output:?}");
+    assert_eq!(
+        text(&output.stderr),
+        format!("{file}:5:30: edit 2: {message}\n")
+    );
+    let document = json(
+        &tsparse(&fixture, &["--edit-batch", "edits.json", "--json"]),
+        1,
+    );
+    assert_eq!(document["outcome"], "rejected");
+    assert_eq!(document["error"]["kind"], "UnsupportedSite");
+    assert_eq!(document["error"]["edit"], 1);
+    assert_eq!(document["error"]["message"], message);
+    assert_eq!(edge_cases_text(&fixture), EDGE_CASES);
+}
+
+/// Functions and arrows whose innermost enclosing statement is an item of a
+/// statement list that its first token selects: a file's, a block's of
+/// `try`, `catch`, and `finally`, a function body's, and a `case` clause's.
+const REMEDIED: &str = "\
+declare function f(callback: unknown): unknown;
+const bound = f(function named() {});
+try { f(() => {}); } catch { f(() => {}); } finally { f(() => {}); }
+function outer() { return () => {}; }
+/*\u{1F600}*/ f(async () => {});
+switch (bound) { case 1: f(() => {}); }
+export default () => {};
+";
+
+#[test]
+fn the_remedy_names_any_enclosing_statement_its_first_token_selects() {
+    let fixture = Fixture::new(&[
+        ("remedied.ts", REMEDIED),
+        (
+            "assigned.ts",
+            "declare function f(callback: unknown): unknown;\nexport = f(() => {});\n",
+        ),
+        ("statement.ts", "f(0);\n"),
+    ]);
+    let insert = |at: &str, file: &str, json: bool| {
+        let mut args = vec!["--insert-after", "--at", at, file, "--from", "statement.ts"];
+        if json {
+            args.push("--json");
+        }
+        tsparse(&fixture, &args)
+    };
+    // Each refusal, the position it names in UTF-16 columns, and the range of
+    // the statement that position selects. The `export =` statement is
+    // selected by its `export=` entry, which designates it; every other one
+    // is a statement site.
+    for (file, at, label, statement, end) in [
+        ("remedied.ts", "2:26", "named", "2:1", "2:38"),
+        ("remedied.ts", "3:9", "f() callback", "3:7", "3:19"),
+        ("remedied.ts", "3:32", "f() callback", "3:30", "3:42"),
+        ("remedied.ts", "3:57", "f() callback", "3:55", "3:67"),
+        ("remedied.ts", "4:27", "<function>", "4:20", "4:36"),
+        ("remedied.ts", "5:10", "f() callback", "5:8", "5:26"),
+        ("remedied.ts", "6:28", "f() callback", "6:26", "6:38"),
+        ("remedied.ts", "7:16", "default", "7:1", "7:25"),
+        ("assigned.ts", "2:12", "f() callback", "2:1", "2:22"),
+    ] {
+        let path = fixture.path(file);
+        let output = insert(at, file, false);
+        assert_eq!(output.status.code(), Some(1), "{at}: {output:?}");
+        assert_eq!(
+            text(&output.stderr),
+            format!(
+                "{}:{at}: edit 1: {label} cannot have statements inserted after it: {}{}\n",
+                path.display(),
+                outside_a_statement_list("function"),
+                remedy(statement)
+            ),
+            "{at}"
+        );
+        let document = json(&insert(statement, file, true), 0);
+        let site = &document["files"][0]["edits"][0]["site"];
+        let position = |text: &str| {
+            let (line, column) = text.split_once(':').unwrap();
+            json!({ "line": line.parse::<u64>().unwrap(), "column": column.parse::<u64>().unwrap() })
+        };
+        assert_eq!(site["anchor"], position(statement), "{at}");
+        assert_eq!(
+            site["range"],
+            json!({ "start": position(statement), "end": position(end) }),
+            "{at}"
+        );
+    }
+    assert_eq!(
+        std::fs::read_to_string(fixture.path("remedied.ts")).unwrap(),
+        REMEDIED
+    );
+}
+
+/// Refusals that name no remedy: callbacks whose innermost statement is an
+/// unbraced `if` or label body, an arrow statement whose first token selects
+/// the arrow again, and sites that are not functions: a parameter property,
+/// a method, a class expression, loop and `catch` bindings, and a method
+/// whose computed name holds an arrow and a statement, either of whose
+/// positions selects the method.
+const UNREMEDIED: &str = "\
+declare const ready: boolean;
+declare function f(callback: unknown): unknown;
+if (ready) f(() => {});
+x => {};
+class Members {
+  constructor(private readonly kept: number) {}
+  method() {}
+}
+const Expression = f(class {});
+for (const item of [1]) f(item);
+try {} catch (error) {}
+label: f(() => {});
+class Computed { [(() => { f(0); })()]() {} }
+";
+
+#[test]
+fn other_insertion_refusals_name_no_remedy() {
+    let fixture = Fixture::new(&[("refused.ts", UNREMEDIED), ("statement.ts", "f(0);\n")]);
+    let file = fixture.path("refused.ts");
+    let file = file.to_str().unwrap();
+    let reason = |kind: &str| outside_a_statement_list(kind);
+    // Each position, the selected site's anchor the refusal names, its
+    // label, and why it is refused.
+    for (at, anchor, label, reason) in [
+        ("3:14", (3, 14), "f() callback", reason("function")),
+        ("4:1", (4, 1), "<function>", reason("function")),
+        ("6:32", (6, 32), "kept", reason("property")),
+        ("7:3", (7, 3), "method", reason("method")),
+        ("9:22", (9, 22), "<class>", reason("class")),
+        (
+            "10:12",
+            (10, 12),
+            "item",
+            "this binding is declared in a loop header, which has no statement list to insert into"
+                .into(),
+        ),
+        (
+            "11:15",
+            (11, 15),
+            "error",
+            "this binding is a catch clause variable, which has no statement list to insert into"
+                .into(),
+        ),
+        ("12:10", (12, 10), "f() callback", reason("function")),
+        // The arrow, and the `f` of the statement in its body.
+        ("13:20", (13, 18), "[(() => { f(0); })()]", reason("method")),
+        ("13:28", (13, 18), "[(() => { f(0); })()]", reason("method")),
+    ] {
+        let message = format!("{label} cannot have statements inserted after it: {reason}");
+        let insert = |json: bool| {
+            let mut args = vec![
+                "--insert-after",
+                "--at",
+                at,
+                "refused.ts",
+                "--from",
+                "statement.ts",
+            ];
+            if json {
+                args.push("--json");
+            }
+            tsparse(&fixture, &args)
+        };
+        let output = insert(false);
+        assert_eq!(output.status.code(), Some(1), "{at}: {output:?}");
+        let (line, column) = anchor;
+        assert_eq!(
+            text(&output.stderr),
+            format!("{file}:{line}:{column}: edit 1: {message}\n"),
+            "{at}"
+        );
+        let document = json(&insert(true), 1);
+        assert_eq!(document["error"]["kind"], "UnsupportedSite", "{at}");
+        assert_eq!(document["error"]["message"], message, "{at}");
+        assert_eq!(
+            document["error"]["position"],
+            json!({ "line": line, "column": column }),
+            "{at}"
+        );
+    }
+    assert_eq!(std::fs::read_to_string(file).unwrap(), UNREMEDIED);
 }

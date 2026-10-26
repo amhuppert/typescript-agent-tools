@@ -14,6 +14,7 @@ use support::Fixture;
 const INVOCATIONS: &[(&str, &[&str])] = &[
     ("parse", &[]),
     ("outline", &["--outline", "app.ts"]),
+    ("test-outline", &["--test-outline", "app.ts"]),
     ("show", &["--show", "--name", "run", "app.ts"]),
     (
         "type",
@@ -23,6 +24,16 @@ const INVOCATIONS: &[(&str, &[&str])] = &[
         "references",
         &[
             "--references",
+            "--project",
+            "tsconfig.json",
+            "--name",
+            "run",
+        ],
+    ),
+    (
+        "definition",
+        &[
+            "--definition",
             "--project",
             "tsconfig.json",
             "--name",
@@ -281,7 +292,7 @@ fn a_flag_out_of_scope_names_exactly_the_operations_that_accept_it() {
     usage(
         &output,
         "usage.flag_scope",
-        "--json applies to: --outline, --show, --type, --references, --constructs, --replace-body, --insert-after, --edit-batch, --apply, --references-status, --doctor",
+        "--json applies to: --outline, --test-outline, --show, --type, --references, --definition, --constructs, --replace-body, --insert-after, --edit-batch, --apply, --references-status, --doctor",
         &["--json"],
     );
 }
@@ -440,8 +451,8 @@ fn references_direct_is_an_unknown_option() {
 #[test]
 fn a_service_action_refuses_the_flags_it_does_not_take() {
     let fixture = Fixture::new(&[]);
-    let pretty = "--pretty applies to: parse mode (no operation flag), --outline, --show, --type, --references, --constructs, --replace-body, --insert-after, --edit-batch, --apply, --references-status, --doctor";
-    let output = "--output applies to: parse mode (no operation flag), --outline, --show, --type, --references, --constructs, --replace-body, --insert-after, --edit-batch, --apply, --references-status";
+    let pretty = "--pretty applies to: parse mode (no operation flag), --outline, --test-outline, --show, --type, --references, --definition, --constructs, --replace-body, --insert-after, --edit-batch, --apply, --references-status, --doctor";
+    let output = "--output applies to: parse mode (no operation flag), --outline, --test-outline, --show, --type, --references, --definition, --constructs, --replace-body, --insert-after, --edit-batch, --apply, --references-status";
     for action in ["--references-stop", "--references-serve"] {
         for (flags, message) in [
             (&["--pretty"][..], pretty),

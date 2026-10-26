@@ -51,9 +51,9 @@ each group with its declarations and its occurrences by file, and any coverage
 gaps; `--json` writes the result document instead. The
 [CLI reference](docs/cli-reference.md#references) lists its flags and filters.
 
-Project queries (references, types, and outline and show with `--project`)
-automatically start a local service and reuse its snapshot across CLI
-invocations. Every query checks the captured inputs; changed sources,
+Project queries (references, definitions, types, and outline and show with
+`--project`) automatically start a local service and reuse its snapshot across
+CLI invocations. Every query checks the captured inputs; changed sources,
 configuration, or resolution inputs trigger a full rebuild. A failed refresh
 reports its error. A source, configuration, or package manifest that is not a
 regular file, such as a pipe, is refused with `PATH: not a regular file`

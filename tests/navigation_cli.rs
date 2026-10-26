@@ -6,7 +6,7 @@ mod support;
 use serde_json::{Value, json};
 use std::path::Path;
 use std::process::{Command, Output, Stdio};
-use support::Fixture;
+use support::{EDGE_CASES, Fixture};
 
 /// Containment follows TypeScript 7.0.2's document symbols for this shape
 /// (`startEligible` and `run` inside the factory; the shorthand is a
@@ -333,17 +333,19 @@ fn missing_targets_exit_1_with_the_selector() {
         text(&output.stderr),
         format!("{}: no declaration matches `absent`\n", file.display())
     );
-    let output = tsparse(&fixture, &["--show", "--at", "3:5", "host.ts"]);
+    // `true` in `return true;` is neither an entry's target nor a
+    // statement's first token.
+    let output = tsparse(&fixture, &["--show", "--at", "3:12", "host.ts"]);
     assert_eq!(output.status.code(), Some(1));
     assert_eq!(
         text(&output.stderr),
         format!(
-            "{}:3:5: no declaration is named or anchored at this position\n",
+            "{}:3:12: no declaration is named or anchored at this position\n",
             file.display()
         )
     );
     let json = json_output(
-        &tsparse(&fixture, &["--show", "--json", "--at", "3:5", "host.ts"]),
+        &tsparse(&fixture, &["--show", "--json", "--at", "3:12", "host.ts"]),
         1,
     );
     assert_eq!(
@@ -352,8 +354,18 @@ fn missing_targets_exit_1_with_the_selector() {
             "operation": "show",
             "outcome": "not_found",
             "file": file.to_str().unwrap(),
-            "query": { "at": { "line": 3, "column": 5 } },
+            "query": { "at": { "line": 3, "column": 12 } },
         })
+    );
+    // Its `return` begins the statement, which it selects.
+    let output = tsparse(&fixture, &["--show", "--at", "3:5", "host.ts"]);
+    assert_eq!(output.status.code(), Some(0));
+    assert_eq!(
+        text(&output.stdout),
+        format!(
+            "{}:3:5 statement return true\n3 | return true;\n",
+            file.display()
+        )
     );
 }
 
@@ -859,6 +871,150 @@ fn a_working_directory_that_is_not_unicode_is_unsupported_input() {
             .unwrap()
             .contains("dir-\u{FFFD}/x.ts: the file name is not Unicode")
     );
+}
+
+fn edge_cases() -> Fixture {
+    Fixture::new(&[("edge-cases.test.ts", EDGE_CASES)])
+}
+
+#[test]
+fn a_statement_s_first_token_selects_it_as_a_statement_site() {
+    let fixture = edge_cases();
+    let file = fixture.path("edge-cases.test.ts");
+    let name = file.to_str().unwrap();
+    // Any position in the first token selects the statement.
+    for at in ["10:3", "10:4"] {
+        let output = tsparse(&fixture, &["--show", "--at", at, "edge-cases.test.ts"]);
+        assert_eq!(output.status.code(), Some(0), "{at}: {output:?}");
+        assert!(output.stderr.is_empty(), "{at}");
+        assert_eq!(
+            text(&output.stdout),
+            format!(
+                "{name}:10:3 statement it.skip(\"skipped one\", () => {{ … }})\n\
+                 10 | it.skip(\"skipped one\", () => {{}});\n"
+            ),
+            "{at}"
+        );
+        let json = json_output(
+            &tsparse(
+                &fixture,
+                &["--show", "--json", "--at", at, "edge-cases.test.ts"],
+            ),
+            0,
+        );
+        assert_eq!(
+            json,
+            json!({
+                "declaration": {
+                    "anchor": { "column": 3, "line": 10 },
+                    "kind": "statement",
+                    "label": "it.skip(\"skipped one\", () => { … })",
+                    "range": {
+                        "end": { "column": 36, "line": 10 },
+                        "start": { "column": 3, "line": 10 },
+                    },
+                },
+                "file": name,
+                "operation": "show",
+                "outcome": "found",
+                "source": "it.skip(\"skipped one\", () => {});",
+            }),
+            "{at}"
+        );
+    }
+    // The token's end, the `.`, is outside it.
+    let output = tsparse(&fixture, &["--show", "--at", "10:5", "edge-cases.test.ts"]);
+    assert_eq!(output.status.code(), Some(1), "{output:?}");
+    assert!(output.stdout.is_empty());
+    assert_eq!(
+        text(&output.stderr),
+        format!("{name}:10:5: no declaration is named or anchored at this position\n")
+    );
+    // The hook, whose excerpt is its whole statement.
+    let output = tsparse(&fixture, &["--show", "--at", "4:3", "edge-cases.test.ts"]);
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    assert_eq!(
+        text(&output.stdout),
+        format!("{name}:4:3 statement beforeEach(() => {{ … }})\n4 | beforeEach(() => {{}});\n")
+    );
+    // A statement over several lines is excerpted whole, numbered as it is.
+    let output = tsparse(&fixture, &["--show", "--at", &format!("{name}:6:3")]);
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    assert_eq!(
+        text(&output.stdout),
+        format!(
+            "{name}:6:3 statement describe.each([[\"a\"], [\"b\"]])(\"case %s\", (x) => {{ … }})\n\
+             6 | describe.each([[\"a\"], [\"b\"]])(\"case %s\", (x) => {{\n\
+             7 |     it(`handles ${{\"x\"}}`, () => {{}});\n\
+             8 |   }});\n"
+        )
+    );
+}
+
+#[test]
+fn an_entry_s_position_keeps_selecting_the_entry() {
+    let fixture = edge_cases();
+    let file = fixture.path("edge-cases.test.ts");
+    let name = file.to_str().unwrap();
+    // The `it.each` callback's anchor, the `(` of `(n)`.
+    let output = tsparse(&fixture, &["--show", "--at", "5:30", "edge-cases.test.ts"]);
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    assert_eq!(
+        text(&output.stdout),
+        format!("{name}:5:30 function <function>\n5 | (n) => {{ expect(n).toBeTruthy(); }}\n")
+    );
+    // A class's name selects the class; its keyword, the statement.
+    let output = tsparse(
+        &fixture,
+        &["--show", "--json", "--at", "2:7", "edge-cases.test.ts"],
+    );
+    assert_eq!(json_output(&output, 0)["declaration"]["kind"], "class");
+    let output = tsparse(
+        &fixture,
+        &["--show", "--json", "--at", "2:1", "edge-cases.test.ts"],
+    );
+    let json = json_output(&output, 0);
+    assert_eq!(json["declaration"]["kind"], "statement");
+    assert_eq!(json["declaration"]["label"], "class Widget { … }");
+    assert_eq!(json["source"], "class Widget {}");
+}
+
+#[test]
+fn an_import_keyword_selects_its_declaration_as_a_statement_site() {
+    let fixture = edge_cases();
+    let file = fixture.path("edge-cases.test.ts");
+    let name = file.to_str().unwrap();
+    let output = tsparse(&fixture, &["--show", "--at", "1:1", "edge-cases.test.ts"]);
+    assert_eq!(output.status.code(), Some(0), "{output:?}");
+    assert_eq!(
+        text(&output.stdout),
+        format!(
+            "{name}:1:1 statement import {{ describe, it, test, beforeEach, expect }} from \"vitest\"\n\
+             1 | import {{ describe, it, test, beforeEach, expect }} from \"vitest\";\n"
+        )
+    );
+    // A statement site has no key, selector, or signature.
+    let json = json_output(
+        &tsparse(
+            &fixture,
+            &["--show", "--json", "--at", "1:1", "edge-cases.test.ts"],
+        ),
+        0,
+    );
+    let declaration = json["declaration"].as_object().unwrap();
+    let mut fields: Vec<&str> = declaration.keys().map(String::as_str).collect();
+    fields.sort_unstable();
+    assert_eq!(fields, ["anchor", "kind", "label", "range"]);
+    // A specifier's name still selects the specifier, with the same excerpt.
+    let specifier = json_output(
+        &tsparse(
+            &fixture,
+            &["--show", "--json", "--at", "1:10", "edge-cases.test.ts"],
+        ),
+        0,
+    );
+    assert_eq!(specifier["declaration"]["kind"], "import");
+    assert_eq!(specifier["source"], json["source"]);
 }
 
 #[test]

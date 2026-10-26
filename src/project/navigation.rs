@@ -154,12 +154,10 @@ impl Project {
                 let display = self.sources.get(id).display.as_str();
                 let selector = Selector::At(position);
                 let outcome = self.project_file(id, |catalog| {
-                    let records = catalog
+                    let selection = catalog
                         .select(&selector)
                         .map_err(|error| navigation::invalid_position(error, &file, &selector))?;
-                    Ok::<_, AnalysisError>(navigation::outcome(
-                        records.into_iter().map(|record| (display, catalog, record)),
-                    ))
+                    Ok::<_, AnalysisError>(navigation::outcome(display, catalog, &selection))
                 })??;
                 (selector, Some(display.to_owned()), outcome)
             }
@@ -176,8 +174,16 @@ impl Project {
     /// the indexes alone, which describe several matches as candidates, and
     /// the one match's file projected again for its source. Every name
     /// selection, in a project or a single file, follows the index's rule.
+    /// A name that misses `only` lists the specifiers of its complete
+    /// catalog that spell it, which only projecting it again gives, as for
+    /// a position; a failure to project it fails the request.
     fn show_name(&self, name: &str, only: Option<FileId>) -> Result<ShowOutcome, AnalysisError> {
         Ok(match self.name_sites(name, only)? {
+            Named::Other(ShowOutcome::NotFound { .. }) if let Some(file) = only => {
+                ShowOutcome::NotFound {
+                    specifiers: self.project_file(file, |catalog| catalog.specifiers(name))?,
+                }
+            }
             Named::One(NameSite {
                 display,
                 file,
@@ -207,7 +213,9 @@ impl Project {
     ) -> Result<Named<'_>, AnalysisError> {
         let mut matches = self.declaration_name_sites(name, only)?;
         Ok(match matches.len() {
-            0 => Named::Other(ShowOutcome::NotFound),
+            0 => Named::Other(ShowOutcome::NotFound {
+                specifiers: Vec::new(),
+            }),
             1 => Named::One(matches.remove(0)),
             _ => Named::Other(ShowOutcome::Ambiguous(
                 matches.iter().map(NameSite::candidate).collect(),
@@ -302,5 +310,116 @@ impl Project {
                 None,
             ))
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Captured;
+    use crate::analysis::{AnalysisError, InputErrorKind};
+    use crate::navigation::{Index, Kind, ShowOutcome, ShowQuery, Specifier};
+    use crate::project::{Project, ProjectRequest, ProjectResponse};
+    use crate::source::{SourcePosition, SourceText};
+    use std::path::PathBuf;
+    use std::sync::Arc;
+
+    /// A temporary directory, removed on drop, a failed assertion included.
+    struct Removed(PathBuf);
+
+    impl Drop for Removed {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.0);
+        }
+    }
+
+    /// A name that misses FILE lists FILE's specifiers from its captured
+    /// text projected again. When that projection fails, the request fails
+    /// with that input failure, the one `--show --at` gives, and never
+    /// answers `not_found`. The fault, captured text that no longer parses,
+    /// is made after loading, since loading captures only text that parses.
+    #[test]
+    fn a_failed_projection_of_file_fails_a_missed_name() {
+        let directory =
+            std::env::temp_dir().join(format!("tsparse-reprojection-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&directory);
+        std::fs::create_dir_all(&directory).unwrap();
+        let directory = std::fs::canonicalize(&directory).unwrap();
+        let _remove = Removed(directory.clone());
+        std::fs::write(
+            directory.join("tsconfig.json"),
+            r#"{ "compilerOptions": { "noLib": true } }"#,
+        )
+        .unwrap();
+        std::fs::write(directory.join("lib.ts"), "export const a = 1;\n").unwrap();
+        let app = directory.join("app.ts");
+        std::fs::write(&app, "import { a } from \"./lib\";\nexport const b = a;\n").unwrap();
+        let mut project = Project::load(&directory.join("tsconfig.json")).unwrap();
+        let show = |project: &Project, query: ShowQuery| match project
+            .execute(ProjectRequest::Show(query))
+        {
+            Ok(ProjectResponse::Show(show)) => Ok(show.outcome),
+            Ok(other) => panic!("{other:?}"),
+            Err(error) => Err(error),
+        };
+        let missed = || ShowQuery::Name {
+            name: "a".into(),
+            file: Some(app.clone()),
+        };
+        let at = SourcePosition {
+            line: 1,
+            column: 10,
+        };
+        assert_eq!(
+            show(&project, missed()).unwrap(),
+            ShowOutcome::NotFound {
+                specifiers: vec![Specifier {
+                    kind: Kind::Import,
+                    anchor: at,
+                }],
+            }
+        );
+
+        let id = project.searched_file(&app).unwrap();
+        project.navigation.files[id.index()] = Some(Captured::Index(Arc::new(
+            Index::without_sites(Arc::new(SourceText::new("import { a } from;\n".into()))),
+        )));
+        let failure = show(&project, missed()).unwrap_err();
+        let AnalysisError::Input(input) = &failure else {
+            panic!("{failure:?}");
+        };
+        assert_eq!(input.kind, InputErrorKind::Syntax, "{input:?}");
+        assert!(
+            input
+                .message
+                .starts_with("captured text no longer parses: "),
+            "{input:?}"
+        );
+        assert_eq!(input.path.as_deref(), Some(app.as_path()));
+        // `--show --at` projects the file the same way and fails alike.
+        assert_eq!(
+            show(
+                &project,
+                ShowQuery::At {
+                    file: app.clone(),
+                    position: at,
+                }
+            )
+            .unwrap_err(),
+            failure
+        );
+        // A miss across the project names no file, so it projects none.
+        assert_eq!(
+            show(
+                &project,
+                ShowQuery::Name {
+                    name: "absent".into(),
+                    file: None,
+                }
+            )
+            .unwrap(),
+            ShowOutcome::NotFound {
+                specifiers: Vec::new()
+            }
+        );
     }
 }

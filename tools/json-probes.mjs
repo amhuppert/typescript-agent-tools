@@ -32,7 +32,11 @@
 //                are compiler options), or its exit status when it fails.
 //
 // Cases may also carry `tool`, the Rust tool's expected outcome, which the
-// Rust tests read; this runner never changes it. Without --update the runner
+// Rust tests read; this runner never changes it. A case's answers hold on a
+// case-insensitive file system; one whose answers differ where file names keep
+// their case adds `caseSensitive`, a `native` and `tool` that replace them
+// there. The compiler's own case policy (`toPath`) selects the `native` this
+// runner compares and updates. Without --update the runner
 // compares each recorded `native` with a fresh answer and exits 1 on any
 // difference; --update rewrites `native` instead. --only selects cases by
 // name.
@@ -178,14 +182,18 @@ export function runFixture(semantic, file, { update = false, only } = {}) {
   const api = new semantic.API({ tsserverPath: semantic.binary, cwd: base });
   const differences = [];
   try {
+    if (typeof api.toPath !== 'function') throw new Error('Pinned API canonical filename operation is missing');
+    const caseProbe = path.join(base, '__JsonProbes_CASE_Probe__');
+    const caseSensitive = api.toPath(caseProbe) === caseProbe;
     for (const spec of fixture.cases) {
       if (only && !only.includes(spec.name)) continue;
       const root = path.join(base, spec.name);
       fs.mkdirSync(root, { recursive: true });
       const native = probe(semantic, api, root, spec, spec.files['tsconfig.json'] === undefined ? fixture.config : undefined);
-      if (!isDeepStrictEqual(native, spec.native)) {
-        differences.push({ file: path.basename(file), name: spec.name, recorded: spec.native ?? null, native });
-        if (update) spec.native = native;
+      const answers = caseSensitive && spec.caseSensitive ? spec.caseSensitive : spec;
+      if (!isDeepStrictEqual(native, answers.native)) {
+        differences.push({ file: path.basename(file), name: spec.name, recorded: answers.native ?? null, native });
+        if (update) answers.native = native;
       }
     }
   } finally {

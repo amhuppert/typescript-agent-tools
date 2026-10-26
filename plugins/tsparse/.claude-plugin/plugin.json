@@ -1,7 +1,7 @@
 {
   "name": "tsparse",
-  "description": "TypeScript 7 declaration navigation, semantic references, type inspection, construction sites, and source-preserving code editing with tsparse",
-  "version": "0.1.4",
+  "description": "TypeScript 7 declaration navigation, go-to-definition, semantic references, type inspection, construction sites, and source-preserving code editing with tsparse",
+  "version": "0.4.0",
   "author": {
     "name": "Alex Huppert"
   },

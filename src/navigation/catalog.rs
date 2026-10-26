@@ -1,13 +1,13 @@
 //! The declaration catalog of one captured source: projected records, the
-//! selection rules over them, and their public form. Outline and show use
-//! the same records; selection reads only keys, containment, and targets,
-//! never syntax. A selection index owns name selection and the facts that
+//! statement sites beside them, the selection rules over both, and their
+//! public form. Outline and show use the same records; selection reads only
+//! keys, containment, targets, and statements' first tokens, never syntax. A selection index owns name selection and the facts that
 //! describe a keyed site, for a snapshot's captured index and a catalog's
 //! records alike. A catalog holds the source its records describe, so no
 //! caller can pair it with other text, such as another generation's.
 
-use super::projection::{self, Detail, Record};
-use super::{Candidate, Declaration, Found, Kind, Selector, ShowOutcome, SourceRange};
+use super::projection::{self, Detail, Record, StatementSite};
+use super::{Candidate, Declaration, Found, Kind, Selector, ShowOutcome, SourceRange, Specifier};
 use crate::analysis::Parser;
 use crate::source::{PositionError, SourceText};
 use crate::{Ast, Diagnostic, NodeId};
@@ -18,6 +18,10 @@ use std::sync::Arc;
 #[derive(Debug)]
 pub(crate) struct Catalog {
     records: Vec<Record>,
+    /// The statement sites, ordered by first token: a collection apart from
+    /// `records`, so the outline, record ordinals, and `index` are the
+    /// records' alone.
+    statements: Vec<StatementSite>,
     /// The selection index of `records`, which owns name selection and the
     /// key, selector, and candidate of each keyed record, as it does for a
     /// snapshot's captured index; it holds the text `records` describe.
@@ -31,24 +35,33 @@ impl Catalog {
             std::ptr::eq(ast.source(), source.as_str()),
             "a catalog describes the text its syntax tree was parsed from"
         );
-        let records = projection::project(ast, Detail::Complete);
+        let (records, statements) = projection::complete(ast);
         let index = Index::of(&records, source);
-        Self { records, index }
+        Self {
+            records,
+            statements,
+            index,
+        }
     }
 
-    /// The records a name or position selects, in source order. A position
-    /// outside the text is an error; one that names no site selects nothing.
-    pub(crate) fn select(&self, selector: &Selector) -> Result<Vec<usize>, PositionError> {
+    /// What a name or position selects. A name selects records only. A
+    /// position selects the records anchored at it or with a target that
+    /// contains it, in source order; only when there are none, the
+    /// statement whose first token contains it, from the token's first
+    /// character up to but not including its end. A position outside the
+    /// text is an error; one that names no site selects no record.
+    pub(crate) fn select(&self, selector: &Selector) -> Result<Selection, PositionError> {
         Ok(match selector {
-            Selector::Name(name) => self
-                .index
-                .select_name(name)
-                .into_iter()
-                .map(|site| self.index.record(site))
-                .collect(),
+            Selector::Name(name) => Selection::Records(
+                self.index
+                    .select_name(name)
+                    .into_iter()
+                    .map(|site| self.index.record(site))
+                    .collect(),
+            ),
             Selector::At(position) => {
                 let offset = self.index.source.offset(*position)?;
-                (0..self.records.len())
+                let records: Vec<usize> = (0..self.records.len())
                     .filter(|&index| {
                         let record = &self.records[index];
                         record.anchor == offset
@@ -57,9 +70,43 @@ impl Catalog {
                                 .iter()
                                 .any(|target| target.start <= offset && offset < target.end)
                     })
-                    .collect()
+                    .collect();
+                if records.is_empty()
+                    && let Some(statement) = self.statement_at(offset)
+                {
+                    Selection::Statement(statement)
+                } else {
+                    Selection::Records(records)
+                }
             }
         })
+    }
+
+    /// The statement site whose first token contains `offset`. First tokens
+    /// are ordered and never overlap, since a token is the first token of at
+    /// most one statement.
+    fn statement_at(&self, offset: usize) -> Option<usize> {
+        let at = self
+            .statements
+            .partition_point(|statement| statement.first.end <= offset);
+        self.statements
+            .get(at)
+            .filter(|statement| statement.first.start <= offset)
+            .map(|_| at)
+    }
+
+    /// The import and export specifiers that spell `name` without
+    /// declaring it, in source order: the records whose `unkeyed_alias`,
+    /// which the projection gives only such specifiers, is exactly `name`.
+    pub(crate) fn specifiers(&self, name: &str) -> Vec<Specifier> {
+        self.records
+            .iter()
+            .filter(|record| record.unkeyed_alias.as_deref() == Some(name))
+            .map(|record| Specifier {
+                kind: record.kind,
+                anchor: self.index.source.position(record.anchor),
+            })
+            .collect()
     }
 
     /// Every declaration, in source order.
@@ -69,6 +116,14 @@ impl Catalog {
             .collect()
     }
 
+    /// The selected site with its exact source, in `file`.
+    pub(crate) fn selected(&self, site: SelectedSite, file: &str) -> Found {
+        match site {
+            SelectedSite::Record(index) => self.found(index, file),
+            SelectedSite::Statement(statement) => self.found_statement(statement, file),
+        }
+    }
+
     /// The selected declaration with its exact source, in `file`.
     pub(crate) fn found(&self, index: usize, file: &str) -> Found {
         let range = self.records[index].range;
@@ -76,6 +131,32 @@ impl Catalog {
             file: file.to_owned(),
             declaration: self.declaration(index),
             source: self.index.source.as_str()[range.start..range.end].to_owned(),
+        }
+    }
+
+    /// The selected statement site with its exact source, in `file`: a
+    /// declaration of kind `Statement`, without a key, selector, or
+    /// signature.
+    pub(crate) fn found_statement(&self, statement: usize, file: &str) -> Found {
+        let source = &self.index.source;
+        let statement = &self.statements[statement];
+        let range = statement.range;
+        Found {
+            file: file.to_owned(),
+            declaration: Declaration {
+                label: statement.label.clone(),
+                key: None,
+                selector: None,
+                kind: Kind::Statement,
+                anchor: source.position(statement.first.start),
+                range: SourceRange {
+                    start: source.position(range.start),
+                    end: source.position(range.end),
+                },
+                signature: None,
+                depth: statement.depth,
+            },
+            source: source.as_str()[range.start..range.end].to_owned(),
         }
     }
 
@@ -127,6 +208,38 @@ pub(crate) struct Syntax<'t, 'src> {
     catalog: Catalog,
 }
 
+/// What a selector selects in one catalog.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) enum Selection {
+    /// Records, by ordinal, in source order: one is found, several are
+    /// candidates, and none is a missing selection.
+    Records(Vec<usize>),
+    /// A statement site, by its place among the catalog's statement sites,
+    /// which is selected only alone.
+    Statement(usize),
+}
+
+impl Selection {
+    /// The one site selected, if exactly one is.
+    pub(crate) fn single(&self) -> Option<SelectedSite> {
+        match self {
+            Self::Records(records) => match records[..] {
+                [record] => Some(SelectedSite::Record(record)),
+                _ => None,
+            },
+            Self::Statement(statement) => Some(SelectedSite::Statement(*statement)),
+        }
+    }
+}
+
+/// One selected site of a catalog: a record, by ordinal, or a statement
+/// site, by its place among the statement sites.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum SelectedSite {
+    Record(usize),
+    Statement(usize),
+}
+
 /// One selected site's syntax in a `Syntax`'s tree.
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct SiteSyntax {
@@ -134,7 +247,8 @@ pub(crate) struct SiteSyntax {
     pub(crate) node: NodeId,
     /// What the site designates as a whole, which `show` excerpts: a
     /// binding's variable statement, a specifier's import or export
-    /// declaration, and otherwise the site's node (`projection::Record`).
+    /// declaration, and otherwise the site's node (`projection::Record`),
+    /// which for a statement site is the statement.
     pub(crate) designation: NodeId,
     pub(crate) kind: Kind,
 }
@@ -156,13 +270,25 @@ impl<'t, 'src> Syntax<'t, 'src> {
         &self.catalog
     }
 
-    /// The syntax of the record at `index`.
-    pub(crate) fn site(&self, index: usize) -> SiteSyntax {
-        let record = &self.catalog.records[index];
-        SiteSyntax {
-            node: record.node,
-            designation: record.designation,
-            kind: record.kind,
+    /// The syntax of a selected site.
+    pub(crate) fn site(&self, site: SelectedSite) -> SiteSyntax {
+        match site {
+            SelectedSite::Record(index) => {
+                let record = &self.catalog.records[index];
+                SiteSyntax {
+                    node: record.node,
+                    designation: record.designation,
+                    kind: record.kind,
+                }
+            }
+            SelectedSite::Statement(statement) => {
+                let node = self.catalog.statements[statement].node;
+                SiteSyntax {
+                    node,
+                    designation: node,
+                    kind: Kind::Statement,
+                }
+            }
         }
     }
 }
@@ -174,10 +300,10 @@ type Segments<'a> = SmallVec<[&'a str; 1]>;
 /// each with its key, nearest keyed container, kind, and anchor, enough to
 /// select by name and to describe candidates. It is the one owner of those
 /// facts: a catalog derives its keys, selectors, and candidates from the
-/// index of its own records. Ranges, signatures, and unkeyed sites, which
-/// only a position selects, are left to the complete catalog, which
-/// projecting the same text again gives, with each site at its `record`
-/// ordinal.
+/// index of its own records. Ranges, signatures, unkeyed sites, and
+/// statement sites, which only a position selects, are left to the complete
+/// catalog, which projecting the same text again gives, with each site at
+/// its `record` ordinal.
 #[derive(Debug)]
 pub(crate) struct Index {
     sites: Vec<Site>,
@@ -381,6 +507,18 @@ impl Index {
         Some(segments.join("."))
     }
 
+    /// An index of `source` with no sites, whatever the text: a test's
+    /// stand-in for captured text that projecting again fails to parse,
+    /// which loading never captures.
+    #[cfg(test)]
+    pub(crate) fn without_sites(source: Arc<SourceText>) -> Self {
+        Self {
+            sites: Vec::new(),
+            labels: Vec::new(),
+            source,
+        }
+    }
+
     /// The captured text the index describes.
     pub(crate) fn source(&self) -> &SourceText {
         &self.source
@@ -401,25 +539,25 @@ fn narrow(value: usize) -> u32 {
     u32::try_from(value).expect("a file's records and offsets fit in u32")
 }
 
-/// The outcome of the records a selection matched, each with its catalog
-/// and its file's name for results, in result order: one match is found,
-/// several are candidates, and none is not found.
-pub(crate) fn outcome<'a>(
-    matches: impl IntoIterator<Item = (&'a str, &'a Catalog, usize)>,
-) -> ShowOutcome {
-    let mut matches: Vec<(&str, &Catalog, usize)> = matches.into_iter().collect();
-    match matches.len() {
-        0 => ShowOutcome::NotFound,
-        1 => {
-            let (file, catalog, index) = matches.remove(0);
-            ShowOutcome::Found(catalog.found(index, file))
-        }
-        _ => ShowOutcome::Ambiguous(
-            matches
-                .into_iter()
-                .map(|(file, catalog, index)| catalog.candidate(index, file))
+/// The outcome of a selection in `catalog`, whose file results name
+/// `file`: one site, a record or a statement site, is found, several
+/// records are candidates, and none is not found, listing no specifier: a
+/// show that misses a name fills them (`Catalog::specifiers`), and an
+/// edit's selection lists none.
+pub(crate) fn outcome(file: &str, catalog: &Catalog, selection: &Selection) -> ShowOutcome {
+    match selection {
+        Selection::Records(records) if records.len() > 1 => ShowOutcome::Ambiguous(
+            records
+                .iter()
+                .map(|&index| catalog.candidate(index, file))
                 .collect(),
         ),
+        selection => match selection.single() {
+            Some(site) => ShowOutcome::Found(catalog.selected(site, file)),
+            None => ShowOutcome::NotFound {
+                specifiers: Vec::new(),
+            },
+        },
     }
 }
 

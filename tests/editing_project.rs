@@ -235,7 +235,12 @@ fn a_site_is_selected_in_its_file_when_bound() {
     let Outcome::Unselected(unselected) = editing::bind(&selection).unwrap() else {
         panic!("expected no selection");
     };
-    assert_eq!(unselected.outcome, ShowOutcome::NotFound);
+    assert_eq!(
+        unselected.outcome,
+        ShowOutcome::NotFound {
+            specifiers: Vec::new()
+        }
+    );
     assert_eq!(unselected.file.as_deref(), Some("src/other.ts"));
 }
 

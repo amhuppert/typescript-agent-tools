@@ -33,7 +33,9 @@ pub use session::ProjectSession;
 use crate::analysis::{AnalysisError, InputError, InputErrorKind, QueryError, QueryErrorKind};
 use crate::constructs::{ConstructsAnswer, ConstructsRequest};
 use crate::navigation::{Outline, Show, ShowQuery};
-use crate::references::{ReferenceAnswer, ReferenceQuery, ReferenceRequest, ReferenceResult};
+use crate::references::{
+    DefinitionAnswer, ReferenceAnswer, ReferenceQuery, ReferenceRequest, ReferenceResult,
+};
 use crate::types::{TypeAnswer, TypeQuery, TypeRequest};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
@@ -202,6 +204,9 @@ impl Project {
             ProjectRequest::Type(request) => {
                 ProjectResponse::Type(Box::new(self.type_of_unless(request, superseded)?))
             }
+            ProjectRequest::Definition(query) => {
+                ProjectResponse::Definition(Box::new(self.definition_unless(query, superseded)?))
+            }
             ProjectRequest::Constructs(request) => {
                 ProjectResponse::Constructs(Box::new(self.constructs_unless(request, superseded)?))
             }
@@ -230,6 +235,25 @@ impl Project {
         superseded: Option<&semantic::Superseded>,
     ) -> Result<ReferenceAnswer, AnalysisError> {
         semantic::references(self, request, superseded)
+    }
+
+    /// Find the declarations that the identifier at a position, or every
+    /// declaration, local import, and exported alias spelled an exact name,
+    /// denotes, following import and export aliases to the original
+    /// declarations. It selects as `references` does: a member position
+    /// answers `member`, naming no declaration, and a selection of nothing
+    /// answers `not_found`. A dotted name is an `InvalidRequest`.
+    pub fn definition(&self, query: ReferenceQuery) -> Result<DefinitionAnswer, AnalysisError> {
+        self.definition_unless(query, None)
+    }
+
+    /// `definition`, stopping as `execute_unless` describes.
+    fn definition_unless(
+        &self,
+        query: ReferenceQuery,
+        superseded: Option<&semantic::Superseded>,
+    ) -> Result<DefinitionAnswer, AnalysisError> {
+        semantic::definition(self, query, superseded)
     }
 
     /// Establish the selected type from this captured generation, then present
@@ -303,6 +327,8 @@ pub enum ProjectRequest {
     References(ReferenceQuery),
     ReferenceSearch(ReferenceRequest),
     Type(TypeRequest),
+    /// The declarations a selection denotes (`Project::definition`).
+    Definition(ReferenceQuery),
     Constructs(ConstructsRequest),
     /// The outline of one searched file (`Project::outline`).
     Outline {
@@ -348,8 +374,15 @@ impl ProjectRequest {
                     file: Some(file), ..
                 },
             )
+            | Self::Definition(
+                ReferenceQuery::At { file, .. }
+                | ReferenceQuery::Name {
+                    file: Some(file), ..
+                },
+            )
             | Self::Outline { file } => vec![file],
-            Self::References(ReferenceQuery::Name { file: None, .. }) => vec![],
+            Self::References(ReferenceQuery::Name { file: None, .. })
+            | Self::Definition(ReferenceQuery::Name { file: None, .. }) => vec![],
             Self::ReferenceSearch(request) => match &mut request.query {
                 ReferenceQuery::At { file, .. }
                 | ReferenceQuery::Name {
@@ -412,16 +445,21 @@ impl SpelledOperand {
     }
 }
 
-/// The result of a `ProjectRequest`, of the same operation.
+/// The result of a `ProjectRequest`, of the same operation, or of a file
+/// operation no project answers (`TestOutline`).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ProjectResponse {
     References(ReferenceResult),
     ReferenceSearch(Box<ReferenceAnswer>),
     Type(Box<TypeAnswer>),
+    Definition(Box<DefinitionAnswer>),
     Constructs(Box<ConstructsAnswer>),
     Outline(Outline),
     /// Boxed: a found declaration is far larger than the other responses.
     Show(Box<Show>),
     /// A selection, which `crate::editing::bind` prepares.
     Edit(Box<crate::editing::Selected>),
+    /// A file's test view, which no `ProjectRequest` produces: file
+    /// navigation answers it, and file answers reach delivery as responses.
+    TestOutline(crate::navigation::TestOutline),
 }

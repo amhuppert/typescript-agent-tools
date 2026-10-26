@@ -68,9 +68,11 @@ pub(crate) fn documents(operation: OperationId) -> Option<Documents> {
         OperationId::Apply => Some(UNAPPLIED),
         OperationId::Parse
         | OperationId::Outline
+        | OperationId::TestOutline
         | OperationId::Show
         | OperationId::Type
         | OperationId::References
+        | OperationId::Definition
         | OperationId::Constructs
         | OperationId::ReferencesStatus
         | OperationId::ReferencesStop
@@ -598,7 +600,7 @@ fn unselected_delivery<'a>(
     };
     let edit = unselected.edit;
     let document = {
-        let mut document = navigation::show_json(&show, display);
+        let mut document = navigation::show_json(&show, display, project);
         document["operation"] = json!("edit");
         document["effect"] = json!("none");
         document["edit"] = json!(edit);
@@ -607,7 +609,7 @@ fn unselected_delivery<'a>(
     let text = format!(
         "edit {}: {}",
         edit + 1,
-        navigation::show_text(&show, display)
+        navigation::show_text(&show, display, project)
     );
     Delivery {
         code: delivery::UNSELECTED,

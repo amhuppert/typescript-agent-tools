@@ -25,10 +25,12 @@ use std::collections::HashMap;
 use std::fmt::Write as _;
 use std::path::Path;
 use typescript_parser::references::{
-    Location, MemberSuggestion, Occurrence, ReferenceAnswer, ReferenceFilters, ReferenceGap,
-    ReferenceGroup, ReferenceOutcome, ReferenceQuery, ReferenceResult, ReferenceSelection,
+    DefinitionAnswer, DefinitionResult, DefinitionSelection, DefinitionSelectionFailure, Location,
+    MemberSuggestion, Occurrence, ReferenceAnswer, ReferenceFilters, ReferenceGap, ReferenceGroup,
+    ReferenceOutcome, ReferenceQuery, ReferenceResult, ReferenceSelection,
     ReferenceSelectionFailure,
 };
+use typescript_parser::source::SourcePosition;
 
 /// A reference answer. Without `--json` its form is its text, unless
 /// `pretty`: `--pretty` alone keeps the indented document references have
@@ -138,18 +140,10 @@ fn result_text(result: &ReferenceResult, cap: Cap) -> String {
         .collect();
     files.sort_unstable();
     files.dedup();
-    let subject = match &result.selection {
-        ReferenceQuery::Name { name, .. } => format!("`{name}` "),
-        ReferenceQuery::At { file, position } => format!(
-            "at {}:{}:{}: ",
-            file_text(project, file),
-            position.line,
-            position.column
-        ),
-    };
     let mut text = format!(
-        "{}: {subject}{}, {} in {}{}{}; coverage {}, {}",
+        "{}: {}{}, {} in {}{}{}; coverage {}, {}",
         project.display(),
+        subject(project, &result.selection),
         count(result.groups.len(), "group", "groups"),
         count(occurrences().count(), "occurrence", "occurrences"),
         count(files.len(), "file", "files"),
@@ -168,6 +162,17 @@ fn result_text(result: &ReferenceResult, cap: Cap) -> String {
     members_text(&mut text, result);
     cap.end(&mut text, total, returned, None, None);
     text
+}
+
+/// How a result's header names its selection: `` `NAME` ``, or
+/// `at FILE:LINE:COLUMN:`, each followed by a space.
+fn subject(project: &Path, selection: &ReferenceQuery) -> String {
+    match selection {
+        ReferenceQuery::Name { name, .. } => format!("`{name}` "),
+        ReferenceQuery::At { file, position } => {
+            format!("at {}: ", position_text(project, file, *position))
+        }
+    }
 }
 
 /// `group N: NAME, declared at FILE:LINE:COLUMN, …`, then the first `kept`
@@ -358,6 +363,139 @@ fn unselected_text(selection: &ReferenceSelection) -> String {
     }
 }
 
+/// A definition answer (design, "Result" and "Member positions"): a result
+/// is text on stdout or `-o`, exiting 0; a missing selection or a member
+/// position is a diagnostic on stderr, or its document, exiting 1, so that a
+/// selection of nothing never reads as no declaration. `config` is the request's
+/// `--project` spelling, which the command a member position names repeats.
+pub(crate) fn definition<'a>(answer: &'a DefinitionAnswer, config: &'a str) -> Delivery<'a> {
+    Delivery {
+        code: match answer {
+            DefinitionAnswer::Selected(_) => 0,
+            DefinitionAnswer::Unselected(_) => delivery::UNSELECTED,
+        },
+        text_is_result: matches!(answer, DefinitionAnswer::Selected(_)),
+        document: Box::new(move |writer, pretty| match answer {
+            DefinitionAnswer::Selected(result) => write_document(writer, result, pretty),
+            DefinitionAnswer::Unselected(selection) => match &selection.outcome {
+                DefinitionSelectionFailure::Member { .. } => {
+                    #[derive(Serialize)]
+                    struct Next<'a> {
+                        #[serde(flatten)]
+                        selection: &'a DefinitionSelection,
+                        next: serde_json::Value,
+                    }
+                    let next = Next {
+                        selection,
+                        next: serde_json::json!({ "argv": member_search(selection, config) }),
+                    };
+                    write_document(writer, &next, pretty)
+                }
+                DefinitionSelectionFailure::NotFound => write_document(writer, selection, pretty),
+            },
+        }),
+        text: Some(Box::new(move || match answer {
+            DefinitionAnswer::Selected(result) => definition_text(result),
+            DefinitionAnswer::Unselected(selection) => {
+                unselected_definition_text(selection, config)
+            }
+        })),
+    }
+}
+
+/// The header, `CONFIG: SELECTION N groups, M declarations` with the FILE
+/// operand that narrowed the candidates, then each group, named by its first
+/// declaration, with one `FILE:LINE:COLUMN` per declaration and, where a
+/// declaration is spelled otherwise, that spelling in parentheses. Every
+/// group and declaration is shown.
+fn definition_text(result: &DefinitionResult) -> String {
+    let project = &result.project;
+    let declarations = result
+        .groups
+        .iter()
+        .map(|group| group.declarations.len())
+        .sum();
+    let mut text = format!(
+        "{}: {}{}, {}{}",
+        project.display(),
+        subject(project, &result.selection),
+        count(result.groups.len(), "group", "groups"),
+        count(declarations, "declaration", "declarations"),
+        narrowed(project, &result.selection),
+    );
+    for (index, group) in result.groups.iter().enumerate() {
+        let name = group
+            .declarations
+            .first()
+            .map_or("", |declaration| declaration.name.as_str());
+        let _ = write!(text, "\ngroup {}: {name}", index + 1);
+        for declaration in &group.declarations {
+            let _ = write!(
+                text,
+                "\n  {}",
+                location_text(project, &declaration.location)
+            );
+            if declaration.name != name {
+                let _ = write!(text, " ({})", declaration.name);
+            }
+        }
+    }
+    text
+}
+
+/// The diagnostic of a definition that selected no declaration: at a
+/// member position, the member and the search that finds its declarations;
+/// at a position in no identifier, what a definition follows; and for a name,
+/// what it searched.
+fn unselected_definition_text(selection: &DefinitionSelection, config: &str) -> String {
+    let project = &selection.project;
+    let at = match &selection.selection {
+        ReferenceQuery::At { file, position } => position_text(project, file, *position),
+        ReferenceQuery::Name { .. } => project.display().to_string(),
+    };
+    match (&selection.outcome, &selection.selection) {
+        (DefinitionSelectionFailure::Member { name }, _) => format!(
+            "{at}: `{name}` is a member, which {} does not follow; find its declarations with: {}",
+            FlagId::Definition,
+            command_line::render(&member_search(selection, config))
+        ),
+        (DefinitionSelectionFailure::NotFound, ReferenceQuery::At { .. }) => format!(
+            "{at}: no identifier is at this position; {} follows identifiers, not keywords or string literals",
+            FlagId::Definition
+        ),
+        (DefinitionSelectionFailure::NotFound, ReferenceQuery::Name { name, .. }) => format!(
+            "{at}: no declaration, import, or export matches `{name}`{}",
+            narrowed(project, &selection.selection)
+        ),
+    }
+}
+
+/// The reference search that a selection a definition did not follow asks
+/// of the same selection: `tsparse --references --project CONFIG` with the
+/// selection, its file absolute, as the request spelled `--project` and
+/// naming no transport, so the service's and a direct answer print the
+/// same command.
+fn member_search(selection: &DefinitionSelection, config: &str) -> Vec<String> {
+    let project = &selection.project;
+    let mut argv = vec![
+        "tsparse".to_string(),
+        FlagId::References.to_string(),
+        FlagId::Project.to_string(),
+        config.to_string(),
+    ];
+    match &selection.selection {
+        ReferenceQuery::At { file, position } => argv.extend([
+            FlagId::At.to_string(),
+            position_text(project, file, *position),
+        ]),
+        ReferenceQuery::Name { name, file } => {
+            argv.extend([FlagId::Name.to_string(), name.clone()]);
+            argv.extend(file.as_deref().map(|file| file_text(project, file)));
+        }
+    }
+    argv
+}
+
 /// `; candidates narrowed to FILE` when the FILE operand narrowed a name's
 /// candidates, so no group cannot read as no reference.
 fn narrowed(project: &Path, selection: &ReferenceQuery) -> String {
@@ -406,6 +544,16 @@ fn filter_flags(project: &Path, filters: &ReferenceFilters) -> Vec<(FlagId, Opti
 /// files: text, so this conversion is exact.
 pub(super) fn file_text(project: &Path, file: &Path) -> String {
     place(Some(project), &file.to_string_lossy())
+}
+
+/// A selection's `FILE:LINE:COLUMN`, FILE absolute.
+fn position_text(project: &Path, file: &Path, position: SourcePosition) -> String {
+    format!(
+        "{}:{}:{}",
+        file_text(project, file),
+        position.line,
+        position.column
+    )
 }
 
 pub(super) fn location_text(project: &Path, location: &Location) -> String {

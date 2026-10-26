@@ -534,6 +534,23 @@
           "Data.JSON"
         ],
         "diagnostics": []
+      },
+      "caseSensitive": {
+        "native": {
+          "program": [
+            "main.ts"
+          ],
+          "diagnostics": [
+            "TS6054 -"
+          ]
+        },
+        "tool": {
+          "error": [
+            "Config",
+            "tsconfig.json:1:112"
+          ],
+          "note": "TypeScript reports this diagnostic without a position; this tool reports it at the value"
+        }
       }
     },
     {

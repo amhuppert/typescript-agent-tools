@@ -100,19 +100,26 @@ pub(super) fn source_text<'s>(ast: &Ast<'s>, id: NodeId) -> &'s str {
     &ast.source()[span.start..span.end]
 }
 
+/// A node's source text as a label writes it: `source_text` with every line
+/// break (`lexer::line_break`) removed, as TypeScript's `cleanCallbackText`
+/// removes them from a callback's arguments. Nothing else changes, and
+/// nothing is truncated, a product rule shared by every label.
+pub(super) fn written(ast: &Ast<'_>, id: NodeId) -> String {
+    source_text(ast, id).replace(crate::lexer::line_break, "")
+}
+
 /// TypeScript's `getUnnamedNodeLabel` label for an anonymous function: the
 /// callee of a call it is passed to, with the call's string and template
-/// arguments as written, as `name(args) callback`. The callee must be a name
-/// or property-access chain (`getCallExpressionName`); other callees give
-/// `None`. As in `cleanCallbackText`, line breaks are removed; unlike it,
-/// nothing is truncated, a product rule shared by every label.
+/// arguments as written (`written`), as `name(args) callback`. The callee
+/// must be a name or property-access chain (`getCallExpressionName`), whose
+/// decoded names hold no line break; other callees give `None`.
 pub(super) fn callback(ast: &Ast<'_>, call: NodeId) -> Option<String> {
     let node = ast.node(call);
     let name = call_expression_name(ast, syntax::id(node, "expression")?);
     if name.is_empty() {
         return None;
     }
-    let arguments: Vec<&str> = syntax::ids(node, "arguments")
+    let arguments: Vec<String> = syntax::ids(node, "arguments")
         .iter()
         .filter(|&&argument| {
             matches!(
@@ -122,10 +129,9 @@ pub(super) fn callback(ast: &Ast<'_>, call: NodeId) -> Option<String> {
                     | SyntaxKind::TemplateExpression
             )
         })
-        .map(|&argument| source_text(ast, argument))
+        .map(|&argument| written(ast, argument))
         .collect();
-    let label = format!("{name}({}) callback", arguments.join(", "));
-    Some(label.replace(crate::lexer::line_break, ""))
+    Some(format!("{name}({}) callback", arguments.join(", ")))
 }
 
 /// TypeScript's `getCallExpressionName`: an identifier or private name, or

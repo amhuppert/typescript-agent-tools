@@ -15,6 +15,7 @@ operation; a text match cannot tell a symbol from its spelling.
 | When you need | Use | Instead of text search because |
 | --- | --- | --- |
 | What a file declares, and where | `--outline` | it lists each declaration with its `LINE:COLUMN` and signature, indented by containment, so you need not read the file |
+| A test file's suites, tests, and hooks | `--test-outline` | it lists every `describe`, `it`, and `test` call and hook with its `LINE:COLUMN` and the test's name, at every level; each position selects that test's statement for `--show --at` and `--insert-after --at` |
 | One declaration's source | `--show` | it prints exactly that declaration with its original line numbers; overloads and same-named locals are separate candidates, never a guess |
 | Every use of a symbol | `--references` | it follows import and export aliases and keeps shadowed bindings and same-named symbols apart |
 | Every use or call of a member | `--references` with a dotted `--name`, and `--calls` for calls | member identity follows resolved receiver types, not spelling |
@@ -33,6 +34,7 @@ Keep text search for:
 | Task | First command |
 | --- | --- |
 | Learn what a file declares | `tsparse --outline src/host.ts` |
+| Learn a test file's tests, or where to add one | `tsparse --test-outline src/host.test.ts` |
 | Read one declaration | `tsparse --show --project tsconfig.json --name RunHost.run` |
 | Find every use of a function, variable, class, or import | `tsparse --references --project tsconfig.json --name start` |
 | Find a method's calls outside tests | `tsparse --references --project tsconfig.json --name RunHost.observe --calls --no-tests` |
@@ -48,7 +50,7 @@ Then:
 
 - Select by position with `--at FILE:LINE:COLUMN`, as `--show`, reference
   occurrences, and candidate lists print it, or with `--at LINE:COLUMN FILE`,
-  as an outline prints `LINE:COLUMN` under its file.
+  as an outline or a test view prints `LINE:COLUMN` under its file.
 - `--name` is exact. A dotted `--name RunHost.run` selects `run` inside
   `RunHost`.
 - With `--references`, a bare name searches lexical declarations, local

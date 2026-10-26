@@ -1,7 +1,8 @@
 //! Navigation output: the text and JSON forms of outline and show results,
-//! for file navigation and project navigation alike. Renderers lay out
-//! library results; they make no declaration or selection decisions, and
-//! `super::delivery` decides where each form goes.
+//! for file navigation and project navigation alike, and of the test view,
+//! which only file navigation gives. Renderers lay out library results;
+//! they make no declaration or selection decisions, and `super::delivery`
+//! decides where each form goes.
 //!
 //! A project result names its configuration in `project` and its files
 //! relative to that configuration's directory, as the library does; JSON
@@ -10,16 +11,20 @@
 //! file, so a printed `FILE:LINE:COLUMN` is an operand for `--at` from any
 //! working directory.
 //!
-//! An outline shows at most its cap of the entries `--depth` shows, show
-//! at most its cap of a declaration's lines, from its first, and of an
-//! ambiguous selection's candidates (`super::delivery::Cap`).
+//! An outline shows at most its cap of the entries `--depth` shows, the
+//! test view at most its cap of its entries, show at most its cap of a
+//! declaration's lines, from its first, and of an ambiguous selection's
+//! candidates (`super::delivery::Cap`).
 
+use super::command_line;
 use super::delivery::{Cap, Delivery, Display, write_document};
-use super::registry::{CANDIDATES, ENTRIES, FlagId, LINES};
+use super::registry::{self, CANDIDATES, ENTRIES, FlagId, LINES, TEST_ENTRIES};
 use serde_json::{Value, json};
 use std::fmt::Write as _;
 use std::path::{Component, Path, PathBuf};
-use typescript_parser::navigation::{self, Declaration, Kind, Outline, Selector, ShowOutcome};
+use typescript_parser::navigation::{
+    self, Declaration, Kind, Outline, Selector, ShowOutcome, Specifier, TestEntry, TestOutline,
+};
 
 /// How many outline levels to display; parsing and the catalog never
 /// depend on it.
@@ -107,19 +112,69 @@ impl Kept {
     }
 }
 
+/// A test view, shown to its cap of entries: the file, then per entry
+/// `LINE:COLUMN call[ name]`, indented two spaces per level, and nested by
+/// containment in JSON. The cap keeps a prefix in source order, so every
+/// shown entry's parent is shown.
+pub(crate) fn test_outline<'a>(outline: &'a TestOutline, display: &'a Display) -> Delivery<'a> {
+    let cap = display.cap(&TEST_ENTRIES);
+    let total = outline.entries.len();
+    let returned = cap.shown(total);
+    let shown = &outline.entries[..returned];
+    Delivery {
+        code: 0,
+        text_is_result: true,
+        document: Box::new(move |writer, pretty| {
+            let mut document = json!({
+                "operation": "test-outline",
+                "outcome": "ok",
+                "file": outline.file,
+                "entries": test_entries(shown),
+            });
+            if let Some(display) = cap.display(total, returned) {
+                document["display"] = display;
+            }
+            write_document(writer, &document, pretty)
+        }),
+        text: Some(Box::new(move || {
+            let mut text = outline.file.clone();
+            for entry in shown {
+                let indent = "  ".repeat(entry.depth - 1);
+                let anchor = entry.anchor;
+                let _ = write!(
+                    text,
+                    "\n{indent}{}:{} {}",
+                    anchor.line, anchor.column, entry.call
+                );
+                if let Some(name) = &entry.name {
+                    let _ = write!(text, " {name}");
+                }
+            }
+            cap.end(&mut text, total, returned, None, None);
+            text
+        })),
+    }
+}
+
 /// A show result: a found declaration exits 0, and an ambiguous or missing
-/// selection exits 1.
-pub(crate) fn show<'a>(show: &'a navigation::Show, display: &'a Display) -> Delivery<'a> {
+/// selection exits 1. `config` is the request's `--project` spelling, which
+/// the commands a missed name's specifiers name repeat, or `None` in file
+/// mode.
+pub(crate) fn show<'a>(
+    show: &'a navigation::Show,
+    display: &'a Display,
+    config: Option<&'a str>,
+) -> Delivery<'a> {
     Delivery {
         text_is_result: matches!(show.outcome, ShowOutcome::Found(_)),
         code: match show.outcome {
             ShowOutcome::Found(_) => 0,
-            ShowOutcome::Ambiguous(_) | ShowOutcome::NotFound => super::delivery::UNSELECTED,
+            ShowOutcome::Ambiguous(_) | ShowOutcome::NotFound { .. } => super::delivery::UNSELECTED,
         },
         document: Box::new(move |writer, pretty| {
-            write_document(writer, &show_json(show, display), pretty)
+            write_document(writer, &show_json(show, display, config), pretty)
         }),
-        text: Some(Box::new(move || show_text(show, display))),
+        text: Some(Box::new(move || show_text(show, display, config))),
     }
 }
 
@@ -167,8 +222,9 @@ pub(crate) fn place(project: Option<&Path>, file: &str) -> String {
 }
 
 /// A show result's document, with at most its cap of the declaration's
-/// lines or of the candidates.
-pub(crate) fn show_json(show: &navigation::Show, display: &Display) -> Value {
+/// lines or of the candidates, and a missed name's `specifiers`, each with
+/// its command as `next` only where `config` completes it.
+pub(crate) fn show_json(show: &navigation::Show, display: &Display, config: Option<&str>) -> Value {
     let mut document = json!({ "operation": "show" });
     project(&mut document, show.project.as_deref());
     // The searched file; absent when a name searched every file.
@@ -215,18 +271,68 @@ pub(crate) fn show_json(show: &navigation::Show, display: &Display) -> Value {
                 document["display"] = display;
             }
         }
-        ShowOutcome::NotFound => {
+        ShowOutcome::NotFound { specifiers } => {
             document["outcome"] = json!("not_found");
             scope(&mut document);
             document["query"] = json!(show.query);
+            if !specifiers.is_empty() {
+                let list: Vec<Value> = specifiers
+                    .iter()
+                    .map(|specifier| {
+                        let mut value = json!({
+                            "anchor": specifier.anchor,
+                            "kind": specifier.kind,
+                        });
+                        if let Some(config) = config {
+                            value["next"] = json!({
+                                "argv": definition_at(show, specifier, config),
+                            });
+                        }
+                        value
+                    })
+                    .collect();
+                document["specifiers"] = list.into();
+            }
         }
     }
     document
 }
 
+/// The definition that a specifier a name missed denotes: `tsparse
+/// --definition --project CONFIG --at FILE:LINE:COLUMN` at its name, its
+/// file absolute, naming no transport, so the service's and a direct answer
+/// print the same command.
+fn definition_at(show: &navigation::Show, specifier: &Specifier, config: &str) -> Vec<String> {
+    vec![
+        "tsparse".to_owned(),
+        FlagId::Definition.to_string(),
+        FlagId::Project.to_string(),
+        config.to_owned(),
+        FlagId::At.to_string(),
+        specifier_place(show, specifier),
+    ]
+}
+
+/// A specifier's anchor as an `--at` operand, in the show's file, absolute.
+fn specifier_place(show: &navigation::Show, specifier: &Specifier) -> String {
+    format!(
+        "{}:{}:{}",
+        scope(show),
+        specifier.anchor.line,
+        specifier.anchor.column
+    )
+}
+
 /// A show result's text, with at most its cap of the declaration's lines,
-/// numbered as the whole declaration is, or of the candidates.
-pub(crate) fn show_text(show: &navigation::Show, display: &Display) -> String {
+/// numbered as the whole declaration is, or of the candidates; a missed
+/// name adds one line per specifier that spells it, naming the command that
+/// finds its declaration, with `--project`'s placeholder where `config` is
+/// `None`.
+pub(crate) fn show_text(
+    show: &navigation::Show,
+    display: &Display,
+    config: Option<&str>,
+) -> String {
     let place = |file: &str| place(show.project.as_deref(), file);
     match &show.outcome {
         ShowOutcome::Found(found) => {
@@ -289,9 +395,27 @@ pub(crate) fn show_text(show: &navigation::Show, display: &Display) -> String {
             cap.end(&mut text, candidates.len(), returned, None, None);
             text
         }
-        ShowOutcome::NotFound => match &show.query {
+        ShowOutcome::NotFound { specifiers } => match &show.query {
             Selector::Name(name) => {
-                format!("{}: no declaration matches `{name}`", scope(show))
+                let mut text = format!("{}: no declaration matches `{name}`", scope(show));
+                let config = config.unwrap_or(match FlagId::Project.flag().kind {
+                    registry::Kind::Value(placeholder) => placeholder,
+                    registry::Kind::Boolean => unreachable!("--project takes a value"),
+                });
+                for specifier in specifiers {
+                    let how = match specifier.kind {
+                        Kind::Export => "re-exported",
+                        // The catalog lists only import and export entries.
+                        _ => "imported",
+                    };
+                    let _ = write!(
+                        text,
+                        "\n`{name}` is {how} at {}; find its declaration with: {}",
+                        specifier_place(show, specifier),
+                        command_line::render(&definition_at(show, specifier, config))
+                    );
+                }
+                text
             }
             Selector::At(at) => format!(
                 "{}:{}:{}: no declaration is named or anchored at this position",
@@ -333,14 +457,14 @@ fn optional(value: &mut Value, field: &str, text: &Option<String>) {
 
 /// The parent of each entry and its number of children, from the
 /// pre-order depths.
-fn structure(entries: &[Declaration]) -> (Vec<Option<usize>>, Vec<usize>) {
+fn structure<T>(entries: &[T], depth: impl Fn(&T) -> usize) -> (Vec<Option<usize>>, Vec<usize>) {
     let mut parents = Vec::with_capacity(entries.len());
     let mut children = vec![0; entries.len()];
     let mut open: Vec<usize> = Vec::new();
     for (index, entry) in entries.iter().enumerate() {
         while open
             .last()
-            .is_some_and(|&last| entries[last].depth >= entry.depth)
+            .is_some_and(|&last| depth(&entries[last]) >= depth(entry))
         {
             open.pop();
         }
@@ -366,7 +490,7 @@ fn shown(depth: Depth, level: usize) -> bool {
 /// those its cap withholds are counted in `display`. Every kept entry's
 /// parent is kept, as the cap keeps a prefix of the entries in source order.
 fn nested(entries: &[Declaration], depth: Depth, kept: &[bool]) -> Value {
-    let (parents, counts) = structure(entries);
+    let (parents, counts) = structure(entries, |entry| entry.depth);
     let mut lists: Vec<Vec<Value>> = vec![Vec::new(); entries.len()];
     let mut roots = Vec::new();
     for index in (0..entries.len()).rev() {
@@ -395,6 +519,30 @@ fn nested(entries: &[Declaration], depth: Depth, kept: &[bool]) -> Value {
     Value::Array(roots)
 }
 
+/// The test view's `entries`, each nested under its parent's `children`,
+/// built bottom-up without recursion, as `nested` builds an outline's.
+fn test_entries(entries: &[TestEntry]) -> Value {
+    let (parents, _) = structure(entries, |entry| entry.depth);
+    let mut lists: Vec<Vec<Value>> = vec![Vec::new(); entries.len()];
+    let mut roots = Vec::new();
+    for (index, entry) in entries.iter().enumerate().rev() {
+        let mut children = std::mem::take(&mut lists[index]);
+        children.reverse();
+        let mut value = json!({
+            "anchor": entry.anchor,
+            "call": entry.call,
+            "children": children,
+        });
+        optional(&mut value, "name", &entry.name);
+        match parents[index] {
+            Some(parent) => lists[parent].push(value),
+            None => roots.push(value),
+        }
+    }
+    roots.reverse();
+    Value::Array(roots)
+}
+
 /// The most imported names one outline line lists; a long import
 /// declaration would otherwise fill a line with names an agent rarely needs.
 const IMPORT_NAMES: usize = 8;
@@ -411,7 +559,7 @@ const IMPORT_NAMES: usize = 8;
 /// declaration's others, as it counts those past the eighth, so it never
 /// reads as the whole declaration.
 fn outline_text(file: &str, entries: &[Declaration], depth: Depth, kept: &[bool]) -> String {
-    let (_, counts) = structure(entries);
+    let (_, counts) = structure(entries, |entry| entry.depth);
     let mut text = file.to_owned();
     let mut index = 0;
     while index < entries.len() {

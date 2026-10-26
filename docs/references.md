@@ -6,6 +6,8 @@ as `typescript_parser::project::Project::find_references`, with query and result
 types in `typescript_parser::references`. The design is recorded in
 [find-references-design.md](find-references-design.md); this document describes
 the implemented behavior and where it deliberately differs from TypeScript.
+`tsparse --definition` prints the declarations the same selection denotes
+([go to definition](#go-to-definition)).
 
 ## Command
 
@@ -94,8 +96,9 @@ pipe's writer.
 
 ## Persistent CLI service
 
-Ordinary CLI project queries use a local service: reference and type
-queries, and [outline and show](navigation.md#project-mode) with `--project`.
+Ordinary CLI project queries use a local service: reference, definition,
+construction, and type queries, and [outline and show](navigation.md#project-mode)
+with `--project`.
 One service per absolute configuration spelling answers these through one
 session request boundary, which checks the captured filesystem inputs before
 every request and loads a new generation after any change; there is no second
@@ -119,9 +122,10 @@ A runtime directory that does not exist, or whose path runs through a file,
 holds no service: status reports none there and stop has none to stop.
 `--references-stop --project CONFIG` stops it and prints `stopped: pid N`, or
 `no service: CONFIG` when none was running. These three flags administer the
-project service, which answers every project query (`--references`, `--type`,
-and `--outline`, `--show`, and edits with `--project`), whatever their names
-say. `--direct` performs a fresh load in the CLI process through the
+project service, which answers every project query (`--references`,
+`--definition`, `--type`, `--constructs`, and `--outline`, `--show`, and edits
+with `--project`), whatever their names say. `--direct` performs a fresh load
+in the CLI process through the
 same request boundary, giving the same output and exit code.
 `--references-serve --project CONFIG` runs the service in the foreground for a
 supervisor. Background services use null standard streams and a separate process
@@ -216,8 +220,9 @@ writing, and renames it into place once complete. The client that started it
 reports that failure with its code, as `--references-serve` prints it (for
 example `transport.lock: Project service lock …`), and removes the file. A staged copy whose writer died, for
 example when it was killed while writing, is removed by the next start or the
-next failing service and never read; one whose writer holds its lock is left
-to it. A staged path naming anything but a regular file, such as a pipe or a
+next failing service and never read. A start waits up to 5 seconds for the
+writer of a copy whose lock is held, since a writer killed while writing holds
+it until any core dump completes, and leaves a copy still held then to it. A staged path naming anything but a regular file, such as a pipe or a
 symbolic link, is reported without opening or removing it, and so is a
 published diagnostic of another kind when the client reads it after a failed
 start. A client removes an earlier published diagnostic, of any kind but a
@@ -498,6 +503,218 @@ Declarations that have no identifier use an anchor: an anonymous default export
 `default` keyword, `export = expression` is named `export=` at its `=`, a module file used as a namespace (`import * as ns`, `import x =
 require()`, `export * as ns`) is named by its path at line 1, column 1, and an
 ambient module (`declare module "x"`) is named `x` at its string literal.
+
+## Go to definition
+
+`tsparse --definition` prints the declarations that the identifier at a
+position, or a name, denotes, following import and export aliases to the
+original declarations. It reads the declarations of the symbols the reference
+selection selects, so its groups' declarations are exactly the ones a
+reference search's groups list; the library operation is
+`Project::definition(ReferenceQuery)`, also
+`ProjectRequest::Definition(query)`, answering a `DefinitionAnswer` from
+`typescript_parser::references`. The design is recorded in
+[definition-and-import-hints-design.md](definition-and-import-hints-design.md).
+
+```sh
+tsparse --definition --project ./tsconfig.json --at src/app.ts:1:10
+tsparse --definition --project ./tsconfig.json --at 1:10 src/app.ts
+tsparse --definition --project ./tsconfig.json --name formatTitle src/app.ts
+tsparse --definition --project ./tsconfig.json --name formatTitle --json
+```
+
+It runs only in project mode. It takes `--project`, `--direct`, exactly one of
+`--at` and `--name`, `--json` (with `--pretty` to indent the document), and
+`-o OUTPUT`; a value flag given twice, `--pretty` without `--json`, and any
+other flag (`--limit`, `--calls`, `--file`, `--depth`, …) are usage errors,
+as are stdin (FILE `-`, whether the operand or the file of `--at
+FILE:LINE:COLUMN`) and two FILE operands. NAME is one identifier: a dotted NAME
+selects a member by containment, which a definition does not follow, so it
+is refused (`usage.invalid_value`, exit 2) with the command that selects it,
+`next: tsparse --show --project TSCONFIG --name NAME`, `--project` as the
+request spelled it, without FILE (which `--show` reads as narrowing the
+declarations) or `--direct`. Through the library a dotted name is
+`InvalidRequest` (exit 2).
+
+### Definition selection
+
+The reference selection owner decides what is selected, in the per-request
+semantic worker `--references` uses:
+
+1. `--at FILE:LINE:COLUMN`: FILE must be a searched file (`OutsideProject`,
+   exit 2) and the position inside it (`InvalidPosition`, exit 2). A position
+   in a member site whose identifier, if any, denotes no symbol is a **member
+   position** (a property access such as `page.title` or `this.n`, a member's
+   name, a literal member name or key such as `"q"` or `obj["q"]`, a parameter
+   property's modifier such as `public`, a JSX attribute): the member is
+   selected as `--references --at` selects it, and the answer is the `member`
+   outcome, or the failure of selecting it.
+2. Otherwise the identifier at the position gives its symbols, as
+   `--references --at` does ([lexical selection](#lexical-selection)), or is a
+   refused token (`UnsupportedTarget`) or an unresolved one
+   (`UnresolvedTarget`). A name with a lexical target ends here even where its
+   syntax is member access, as `formatTitle` in `lib.formatTitle` does.
+3. Otherwise nothing is selected: `not_found`. That is a position in
+   whitespace, a comment, punctuation, a keyword, a module specifier, a string
+   specifier name, or the argument of a type's `import("./m")`.
+
+`--name NAME [FILE]` selects every candidate spelled exactly NAME (decoded,
+case-sensitive): declaration names, local import names, and exported alias
+names, only those in FILE when it is given. So `--name useProjectFilesQuery
+RegisterDocumentDialog.tsx` answers for a file that only imports the name:
+its import specifier is a candidate. A name FILE only uses is no candidate;
+`--at` selects such a use. A refused or unresolved candidate fails the request
+with its error at its location. The selected symbols are deduplicated, so two
+aliases of one symbol give one group and two shadowed declarations matched by
+one name give two; nothing is ever ambiguous.
+
+### Definition result
+
+One group per selected symbol, listing its declarations (`Index::sites`) in
+location order: the original declarations behind every import and export
+alias, including declarations merged into the symbol and those in dependencies
+and standard libraries. Groups are ordered by their first declaration. Every
+group and declaration is printed; nothing is cut, so the operation takes no
+`--limit`. Text, on stdout or `-o`, exit 0:
+
+```text
+/work/tsconfig.json: at /work/src/app.ts:1:10: 1 group, 1 declaration
+group 1: formatTitle
+  /work/src/lib.ts:1:17
+```
+
+With `--name` the header names the selection as `` `NAME` `` and ends
+`; candidates narrowed to FILE` when FILE narrowed it. A group is named by its
+first declaration; a declaration spelled otherwise shows its spelling in
+parentheses: a namespace import of `src/lib.ts`, which `src/augment.ts`
+augments with `declare module "./lib"`, lists `group 1: ./lib`, the
+augmentation, then `/work/src/lib.ts:1:1 (src/lib.ts)`. Files are
+absolute, so each line is an `--at` operand from any directory; a declaration
+at a name token is also a `--show --at` operand, one at a synthetic anchor
+(`default`, `export=`, a module's `1:1`) is not. `--json` writes the document
+instead, files relative to the configuration's directory:
+
+```json
+{"operation":"definition","outcome":"complete","project":"/work/tsconfig.json","selection":{"at":{"file":"src/app.ts","position":{"line":1,"column":10}}},"groups":[{"declarations":[{"name":"formatTitle","location":{"file":"src/lib.ts","start":{"line":1,"column":17},"end":{"line":1,"column":28}}}]}]}
+```
+
+A **missing selection** exits 1, never an empty success, unlike
+`--references`, which answers no groups: an agent must not read "no groups"
+as "no declaration exists". The text is a diagnostic on stderr,
+
+```text
+/work/src/app.ts:1:1: no identifier is at this position; --definition follows identifiers, not keywords or string literals
+/work/tsconfig.json: no declaration, import, or export matches `nothing`[; candidates narrowed to FILE]
+```
+
+and the document, on stdout or `-o`, is
+`{"operation":"definition","project":…,"selection":…,"outcome":"not_found"}`.
+
+A **member position** exits 1 with the search that finds the member's
+declarations, `--references` at the same position, whose header names them.
+It is rendered so a shell reads it back, with `--project` as the request
+spelled it and no `--direct`, so the service and a direct answer print the
+same bytes:
+
+```text
+/work/src/app.ts:4:29: `title` is a member, which --definition does not follow; find its declarations with: tsparse --references --project tsconfig.json --at /work/src/app.ts:4:29
+```
+
+```json
+{"operation":"definition","project":"/work/tsconfig.json","selection":{"at":{"file":"src/app.ts","position":{"line":4,"column":29}}},"outcome":"member","name":"title","next":{"argv":["tsparse","--references","--project","tsconfig.json","--at","/work/src/app.ts:4:29"]}}
+```
+
+`name` is the member's decoded name; the library's `member` outcome carries
+it, and the CLI adds `next`. The search repeats the position through the same
+selection owner, so it selects the same member; it can still stop at a
+semantic limit or report partial coverage, as any member search can. When
+selecting the member fails, that failure is the answer and no search is
+named: a member with no symbol, such as a property of `any`, is
+``UnresolvedTarget`` (`` `foo` has no reference symbol at this site ``,
+exit 1); a JSX attribute is `UnsupportedSemantic` with reason
+`jsx_typing_required` (exit 1); and any character of a JSX namespaced
+attribute such as `xlink:href` fails today with `Internal` (`canonical
+semantic declaration association is not retained`, exit 2), as
+`--references --at` does there.
+
+Every other failure is delivered as a reference query's is: a refused token
+(a label, `import.meta`, `new.target`, `arguments`, `undefined`,
+`globalThis`, an intrinsic JSX tag, a tuple label, an import attribute, a
+qualified member in a type position) is `UnsupportedTarget` and a name with
+no declaration among the program inputs `UnresolvedTarget`, each
+`FILE:LINE:COLUMN: message` on stderr or an `error` document, exit 1; a
+semantic failure or limit while selecting, and every load failure, exit 1;
+`OutsideProject`, `InvalidPosition`, `Io`, and `Internal` exit 2. The
+[CLI reference](cli-reference.md#definition) lists what each exit code
+reports.
+
+The worker, its checker initialization, and the selection are those of
+`--references` at the same selection; the answer then reads the index's
+declarations and builds no occurrence list, so a definition costs at most
+what the reference search costs, and on a warm service both are dominated by
+the input check.
+
+### Definition differences from TypeScript 7.0.2
+
+A definition returns, for an identifier, the declarations of the symbols it
+denotes after following import and export aliases. TypeScript 7.0.2 answers
+`textDocument/definition` (`internal/ls/definition.go`) more broadly:
+
+- **K1. Calls and `new`.** TypeScript adds the called signature: at a local
+  or namespace-qualified call it answers the resolved overload alone, and at
+  such a `new` the class declarations and the constructor without a merged
+  interface; through an import alias it keeps every declaration and appends
+  the called one; at `super(…)` it answers the base class and its
+  constructor. Here no signature is selected: every call and `new` lists the
+  symbol's declarations in location order, never a constructor, and `super`
+  is a missing selection.
+- **K2. Locations of declarations without a name.** An anonymous default
+  export, `export =` of an expression other than a name, and a module used as
+  a namespace keep the reference model's anchors (`default` at the `default`
+  keyword, `export=` at the `=`, the module's path at `1:1`), where
+  TypeScript starts at the declaration's first token, and at a file's first
+  token after leading trivia. The declaration is the same.
+- **K3. Unresolved modules.** TypeScript answers the import specifier itself.
+  Here a module that does not resolve in a file TypeScript checks fails the
+  load (`UnresolvedImport`, exit 1), and in a file it skips, such as one under
+  `// @ts-nocheck`, the names it imports are `UnresolvedTarget` (exit 1).
+- **K4. Members.** TypeScript follows a property of a value (`obj.method`,
+  `this.n`), a member declaration's name, an enum member, a private name, a
+  JSX attribute, a binding element's property name, an object literal key, a
+  string or numeric literal member name or key, a parameter property's
+  modifier, and an index signature. Here every position the reference
+  selection sends to its member path answers `member`, or the failure of
+  selecting the member, and a qualified member in a type position
+  (`let x: E.A`) is `UnsupportedTarget`, as `--references --at` reports it.
+- **K5. Keywords and labels.** TypeScript answers `this`, `super`, `return`,
+  `await`, `yield`, `case`, `default`, `override`, and labels, maps a keyword
+  before a declaration's name (`function`, `class`, an `export`, the `import`
+  of `import x = require()`) to that name, and a class's `constructor` keyword
+  to its constructor. Here a keyword is a missing selection, unless it is a
+  parameter property's modifier (K4), and a label is `UnsupportedTarget`
+  (`label`). Neither compiler answers the `import` of an import declaration,
+  nor does TypeScript 7.0.2 answer the `static` of a class static block.
+- **K6. File references and string names.** TypeScript answers a module
+  specifier, the argument of a type's `import("./m")`, and a
+  `/// <reference>` with their files, and a string-literal specifier name
+  (`export { "f-g" } from`) with its target. Here each is a missing
+  selection.
+- **K7. The lexical model's differences.** Every difference of the lexical
+  model applies unchanged ([loading and lexical
+  differences](#loading-and-lexical-differences-from-typescript-702)), such as
+  a name that two `export *` declarations supply with different targets being
+  unresolved.
+- **K8. Shorthand names and binding elements.** At the name of an object
+  binding element without a property name that is not a rest element
+  (`const { a } = source`), TypeScript answers the matching property of the
+  pattern's type; here the name declares the binding and answers it. At a
+  shorthand property name TypeScript answers the name's own declarations
+  without resolving an alias, then the contextual type's property, so `{ b }`
+  typed `Shape` adds `Shape.b`, and `{ formatTitle }` of an imported name
+  answers the import specifier. Here a shorthand name is a use of its value:
+  it answers the value's declarations, and an imported one follows its alias
+  to the original declaration, as every other use of the import does. A use
+  of such a binding, and a rest element's name, answer the same in both.
 
 ## Lexical selection
 

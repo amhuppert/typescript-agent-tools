@@ -24,12 +24,20 @@ test('every maintained probe records the compiler answer and states any tool exp
   assert.ok(files.length > 0, `no fixtures under ${FIXTURES}`);
   for (const file of files) {
     const fixture = readFixture(file);
-    for (const spec of fixture.cases) {
+    // Each case's own answers, and those that replace them on a
+    // case-sensitive file system.
+    const answers = fixture.cases.flatMap(spec => {
       const where = `${path.basename(file)} ${spec.name}`;
-      const native = spec.native;
+      if (!spec.caseSensitive) return [{ where, spec, answer: spec }];
+      const unknown = Object.keys(spec.caseSensitive).filter(key => !['native', 'tool'].includes(key));
+      assert.deepEqual(unknown, [], `${where}: unknown caseSensitive fields`);
+      return [{ where, spec, answer: spec }, { where: `${where} (case-sensitive)`, spec, answer: spec.caseSensitive }];
+    });
+    for (const { where, spec, answer } of answers) {
+      const native = answer.native;
       assert.ok(native && Array.isArray(native.program) && Array.isArray(native.diagnostics), `${where}: no recorded answer`);
       if (spec.watch) assert.ok(Array.isArray(native.names), `${where}: watched names without answers`);
-      const tool = spec.tool;
+      const tool = answer.tool;
       if (!tool) continue;
       const unknown = Object.keys(tool).filter(key => !['error', 'names', 'note'].includes(key));
       assert.deepEqual(unknown, [], `${where}: unknown tool fields`);

@@ -15,7 +15,7 @@ use typescript_parser::analysis::{
     AnalysisError, InputError, InputErrorKind, QueryError, QueryErrorKind,
 };
 use typescript_parser::navigation::{
-    self, Declaration, Kind, Outline, Selector, Show, ShowOutcome,
+    self, Declaration, Kind, Outline, Selector, Show, ShowOutcome, Specifier,
 };
 use typescript_parser::source::SourcePosition;
 
@@ -91,7 +91,13 @@ fn candidates(path: &Path, selector: Selector) -> Vec<SourcePosition> {
 
 fn missing(path: &Path, selector: Selector) {
     let outcome = show(path, selector.clone()).outcome;
-    assert_eq!(outcome, ShowOutcome::NotFound, "{selector:?}");
+    assert_eq!(
+        outcome,
+        ShowOutcome::NotFound {
+            specifiers: Vec::new()
+        },
+        "{selector:?}"
+    );
 }
 
 #[test]
@@ -642,10 +648,19 @@ function default 15:1
         "import Req = require(\"./other\");"
     );
     // A default import and a specifier that does not rename declare no
-    // name (`computeDeclarationMap`), so they have no key; their names
-    // still select them by position.
+    // name (`computeDeclarationMap`), so they have no key, and a name that
+    // misses lists them; their names still select them by position.
     for (selector, anchor) in [("def", at(2, 8)), ("Only", at(2, 36))] {
-        missing(&path, name(selector));
+        assert_eq!(
+            show(&path, name(selector)).outcome,
+            ShowOutcome::NotFound {
+                specifiers: vec![Specifier {
+                    kind: Kind::Import,
+                    anchor,
+                }],
+            },
+            "{selector}"
+        );
         let (import_site, source) = found(&path, Selector::At(anchor));
         assert_eq!((import_site.key, source.as_str()), (None, import));
     }
@@ -978,9 +993,19 @@ fn selection_by_position_accepts_names_and_anchors_only() {
         found(&path, Selector::At(at(5, 29))).0.label,
         "createRunHost"
     );
-    // Inside a declaration but not on its name: no selection.
-    for position in [at(5, 1), at(5, 30), at(39, 22), at(26, 3)] {
+    // Inside a declaration but not on its name or a statement's first
+    // token: no selection.
+    for position in [at(5, 30), at(39, 22), at(26, 17)] {
         missing(&path, Selector::At(position));
+    }
+    // A statement's first token that no entry claims selects the statement.
+    for (position, source) in [
+        (at(5, 1), "export function createRunHost("),
+        (at(26, 3), "const inner = 1;"),
+    ] {
+        let (declaration, excerpt) = found(&path, Selector::At(position));
+        assert_eq!(declaration.kind.as_str(), "statement", "{position:?}");
+        assert!(excerpt.starts_with(source), "{excerpt}");
     }
     missing(&path, name("absent"));
     missing(&path, name("createRunHost.absent"));
@@ -1296,4 +1321,541 @@ fn relative_paths_resolve_against_the_working_directory() {
     let outline = outline(relative);
     assert!(Path::new(&outline.file).is_absolute());
     assert!(Path::new(&outline.file).ends_with(relative));
+}
+
+/// Each kind of statement, at its first token, and the tokens of its
+/// syntax that are no statement's first token.
+const STATEMENTS: &str = r#""use strict";
+label: inner: f();
+if (a) if (b) g(); else h();
+@dec export class C {
+  static {
+    s();
+  }
+}
+export default x;
+export { y };
+namespace A.B {
+  k();
+}
+for (const i of [1]) continue;
+switch (v) {
+  case 1:
+    m();
+  default:
+    n();
+}
+try {
+  p();
+} catch {
+  q();
+} finally {
+  r();
+}
+/a/.test(t);
+;
+{
+  u();
+}
+function outer() {
+  return () => {
+    deep();
+  };
+}
+const w = 1;
+do ; while (w)
+while (w) break;
+throw w;
+debugger;
+interface I {}
+type T = 1;
+enum E { A }
+declare module "m" {}
+import z = require("m");
+export * from "m";
+export const e1 = 1;
+export function ef() {}
+for (let j = 0; j < 1; j++) fj();
+for (const key in o) fk();
+with (o) wk();
+export as namespace NS;
+export import ea = A.B;
+import { im } from "m";
+/=a/.test(t);
+@wrap(() => { dw(); }) class W {
+  @mark(() => { dm(); }) method(@param(() => { dp(); }) x = (() => { di(); })()) { db(); }
+}
+"#;
+
+/// The position of `needle`'s first occurrence in `text`, plus `offset`
+/// bytes.
+fn at_text(text: &str, needle: &str, offset: usize) -> SourcePosition {
+    let start = text
+        .find(needle)
+        .unwrap_or_else(|| panic!("{needle:?} is not in the text"));
+    position(text, start + offset)
+}
+
+/// The first token of these statements: an identifier or keyword, a
+/// string, or one punctuator.
+fn first_token(source: &str) -> &str {
+    let word = source
+        .find(|c: char| !c.is_ascii_alphanumeric())
+        .unwrap_or(source.len());
+    if word > 0 {
+        &source[..word]
+    } else if let Some(rest) = source.strip_prefix('"') {
+        &source[..rest.find('"').unwrap() + 2]
+    } else {
+        &source[..1]
+    }
+}
+
+#[test]
+fn a_statement_s_first_token_selects_the_statement_when_no_entry_is_there() {
+    let file = Fixture::new(&[("statements.ts", STATEMENTS)]);
+    let path = file.path("statements.ts");
+    for (needle, offset, label, source, depth) in [
+        ("\"use strict\"", 0, "\"use strict\"", "\"use strict\";", 1),
+        ("label:", 0, "label: inner: f()", "label: inner: f();", 1),
+        ("inner:", 0, "inner: f()", "inner: f();", 1),
+        ("f();", 0, "f()", "f();", 1),
+        (
+            "if (a)",
+            0,
+            "if (a) if (b) g(); else h()",
+            "if (a) if (b) g(); else h();",
+            1,
+        ),
+        (
+            "if (b)",
+            0,
+            "if (b) g(); else h()",
+            "if (b) g(); else h();",
+            1,
+        ),
+        ("g();", 0, "g()", "g();", 1),
+        ("h();", 0, "h()", "h();", 1),
+        (
+            "@dec",
+            0,
+            "@dec export class C { … }",
+            "@dec export class C {\n  static {\n    s();\n  }\n}",
+            1,
+        ),
+        // A class static block's body, inside the class entry.
+        ("{\n    s();", 0, "{ s(); }", "{\n    s();\n  }", 2),
+        ("s();", 0, "s()", "s();", 2),
+        (
+            "export default x",
+            0,
+            "export default x",
+            "export default x;",
+            1,
+        ),
+        ("export { y }", 0, "export { y }", "export { y };", 1),
+        (
+            "namespace A.B",
+            0,
+            "namespace A.B { k(); }",
+            "namespace A.B {\n  k();\n}",
+            1,
+        ),
+        ("k();", 0, "k()", "k();", 2),
+        (
+            "for (",
+            0,
+            "for (const i of [1]) continue",
+            "for (const i of [1]) continue;",
+            1,
+        ),
+        ("continue", 0, "continue", "continue;", 1),
+        (
+            "switch",
+            0,
+            "switch (v) { case 1: m(); default: n(); }",
+            "switch (v) {\n  case 1:\n    m();\n  default:\n    n();\n}",
+            1,
+        ),
+        ("m();", 0, "m()", "m();", 1),
+        ("n();", 0, "n()", "n();", 1),
+        (
+            "try {",
+            0,
+            "try { p(); } catch { q(); } finally { r(); }",
+            "try {\n  p();\n} catch {\n  q();\n} finally {\n  r();\n}",
+            1,
+        ),
+        ("p();", 0, "p()", "p();", 1),
+        ("q();", 0, "q()", "q();", 1),
+        ("r();", 0, "r()", "r();", 1),
+        // The lexer scans `/` there, without the parser's rescan.
+        ("/a/", 0, "/a/.test(t)", "/a/.test(t);", 1),
+        // An empty statement's text without its `;` is empty.
+        ("\n;\n", 1, "", ";", 1),
+        ("{\n  u();", 0, "{ u(); }", "{\n  u();\n}", 1),
+        ("u();", 0, "u()", "u();", 1),
+        // The function entry has the statement's range, so it adds no level.
+        (
+            "function outer",
+            0,
+            "function outer() { … }",
+            "function outer() {\n  return () => {\n    deep();\n  };\n}",
+            1,
+        ),
+        (
+            "return () =>",
+            0,
+            "return () => { … }",
+            "return () => {\n    deep();\n  };",
+            2,
+        ),
+        ("deep();", 0, "deep()", "deep();", 3),
+        ("const w", 0, "const w = 1", "const w = 1;", 1),
+        ("do ;", 0, "do ; while (w)", "do ; while (w)", 1),
+        ("do ;", 3, "", ";", 1),
+        (
+            "while (w) break",
+            0,
+            "while (w) break",
+            "while (w) break;",
+            1,
+        ),
+        ("break", 0, "break", "break;", 1),
+        ("throw w", 0, "throw w", "throw w;", 1),
+        ("debugger", 0, "debugger", "debugger;", 1),
+        ("interface I", 0, "interface I {}", "interface I {}", 1),
+        ("type T", 0, "type T = 1", "type T = 1;", 1),
+        ("enum E", 0, "enum E { A }", "enum E { A }", 1),
+        (
+            "declare module",
+            0,
+            "declare module \"m\" {}",
+            "declare module \"m\" {}",
+            1,
+        ),
+        (
+            "import z",
+            0,
+            "import z = require(\"m\")",
+            "import z = require(\"m\");",
+            1,
+        ),
+        (
+            "export * from",
+            0,
+            "export * from \"m\"",
+            "export * from \"m\";",
+            1,
+        ),
+        (
+            "export const e1",
+            0,
+            "export const e1 = 1",
+            "export const e1 = 1;",
+            1,
+        ),
+        (
+            "export function ef",
+            0,
+            "export function ef() { … }",
+            "export function ef() {}",
+            1,
+        ),
+        (
+            "for (let j",
+            0,
+            "for (let j = 0; j < 1; j++) fj()",
+            "for (let j = 0; j < 1; j++) fj();",
+            1,
+        ),
+        ("fj();", 0, "fj()", "fj();", 1),
+        (
+            "for (const key",
+            0,
+            "for (const key in o) fk()",
+            "for (const key in o) fk();",
+            1,
+        ),
+        ("fk();", 0, "fk()", "fk();", 1),
+        ("with (o)", 0, "with (o) wk()", "with (o) wk();", 1),
+        ("wk();", 0, "wk()", "wk();", 1),
+        (
+            "export as namespace",
+            0,
+            "export as namespace NS",
+            "export as namespace NS;",
+            1,
+        ),
+        (
+            "export import ea",
+            0,
+            "export import ea = A.B",
+            "export import ea = A.B;",
+            1,
+        ),
+        (
+            "import { im }",
+            0,
+            "import { im } from \"m\"",
+            "import { im } from \"m\";",
+            1,
+        ),
+        // The lexer scans `/=` there, without the parser's rescan.
+        ("/=a/", 0, "/=a/.test(t)", "/=a/.test(t);", 1),
+        (
+            "@wrap",
+            0,
+            "@wrap(() => { … }) class W { … }",
+            "@wrap(() => { dw(); }) class W {\n  @mark(() => { dm(); }) method(@param(() => { dp(); }) x = (() => { di(); })()) { db(); }\n}",
+            1,
+        ),
+        // Statements in decorators, a parameter's initializer, and a body,
+        // in source order though the parser stores modifiers last.
+        ("dw();", 0, "dw()", "dw();", 2),
+        ("dm();", 0, "dm()", "dm();", 3),
+        ("dp();", 0, "dp()", "dp();", 3),
+        ("di();", 0, "di()", "di();", 3),
+        ("db();", 0, "db()", "db();", 3),
+    ] {
+        let start = at_text(STATEMENTS, needle, offset);
+        // Every position in the first token selects it: here its first and
+        // last characters.
+        let last = at_text(STATEMENTS, needle, offset + first_token(source).len() - 1);
+        for position in [start, last] {
+            let (declaration, excerpt) = found(&path, Selector::At(position));
+            assert_eq!(
+                declaration.kind.as_str(),
+                "statement",
+                "{needle:?} at {position:?}"
+            );
+            assert_eq!(declaration.label, label, "{needle:?}");
+            assert_eq!(excerpt, source, "{needle:?}");
+            assert_eq!(declaration.anchor, start, "{needle:?}");
+            assert_eq!(declaration.range.start, start, "{needle:?}");
+            assert_eq!(declaration.depth, depth, "{needle:?}");
+            assert_eq!(
+                (
+                    &declaration.key,
+                    &declaration.selector,
+                    &declaration.signature
+                ),
+                (&None, &None, &None),
+                "{needle:?}"
+            );
+        }
+    }
+    // Tokens that begin no statement: a decorator's name and the modifiers
+    // and keywords after `@dec`, `static`, a clause keyword, the inside of a
+    // regular expression, a loop header's declarations, and the keyword
+    // after `export`.
+    for (needle, offset) in [
+        ("@dec", 1),
+        ("export class C", 0),
+        ("class C", 0),
+        ("static {", 0),
+        ("case 1", 0),
+        ("default:", 0),
+        ("catch {", 0),
+        ("finally {", 0),
+        ("/a/", 1),
+        ("const i", 0),
+        ("export function ef", 7),
+        ("for (let j", 4),
+        ("let j", 0),
+        ("const key", 0),
+        ("with (o)", 5),
+        ("export as namespace", 7),
+        ("export import ea", 7),
+        // Past `/=`, the first token, inside the regular expression.
+        ("/=a/", 2),
+    ] {
+        missing(&path, Selector::At(at_text(STATEMENTS, needle, offset)));
+    }
+    // `/=` is one token: its `=` selects the statement too.
+    assert_eq!(
+        found(&path, Selector::At(at_text(STATEMENTS, "/=a/", 1)))
+            .0
+            .label,
+        "/=a/.test(t)"
+    );
+    // Names select their entries, as before.
+    for (needle, kind) in [
+        ("C {", "class"),
+        ("B {", "namespace"),
+        ("y }", "export"),
+        ("i of", "variable"),
+        ("outer", "function"),
+        ("() => {\n    deep", "function"),
+        ("\"m\" {}", "module"),
+        ("z =", "import"),
+        ("ef()", "function"),
+    ] {
+        let (declaration, _) = found(&path, Selector::At(at_text(STATEMENTS, needle, 0)));
+        assert_eq!(declaration.kind.as_str(), kind, "{needle:?}");
+    }
+    // Statement sites are never outline entries.
+    assert!(
+        outline(&path)
+            .entries
+            .iter()
+            .all(|entry| entry.kind.as_str() != "statement")
+    );
+}
+
+#[test]
+fn statement_sites_begin_after_every_line_break_and_kind_of_trivia() {
+    // CR, LF, CRLF, U+2028, and U+2029 each end a line; a leading BOM, a
+    // tab, NBSP, a space, a block comment with an astral character, a line
+    // comment, and JSDoc precede statements and are never their first
+    // tokens. Columns count UTF-16 units from the character after the BOM.
+    let file_source = "\u{FEFF}a();\rb();\nc();\r\nd();\u{2028}e();\u{2029}\tf();\n\u{A0}/* 😀 */ g();\n // line\n h();\n/** doc */\ni();\n";
+    let shebang = "#!/usr/bin/env node\nrun();\n";
+    let file = Fixture::new(&[("breaks.ts", file_source), ("shebang.ts", shebang)]);
+    let path = file.path("breaks.ts");
+    for (label, line, column) in [
+        ("a", 1, 1),
+        ("b", 2, 1),
+        ("c", 3, 1),
+        ("d", 4, 1),
+        ("e", 5, 1),
+        ("f", 6, 2),
+        ("g", 7, 11),
+        ("h", 9, 2),
+        ("i", 11, 1),
+    ] {
+        let (declaration, excerpt) = found(&path, Selector::At(at(line, column)));
+        assert_eq!(declaration.kind.as_str(), "statement", "{label}");
+        assert_eq!(declaration.label, format!("{label}()"));
+        assert_eq!(excerpt, format!("{label}();"));
+        assert_eq!(declaration.anchor, at(line, column), "{label}");
+        assert_eq!(declaration.range.start, at(line, column), "{label}");
+        assert_eq!(declaration.range.end, at(line, column + 4), "{label}");
+    }
+    // The trivia before them: the tab, NBSP, the block comment, the line
+    // comment's indentation and text, and JSDoc.
+    for (line, column) in [
+        (6, 1),
+        (7, 1),
+        (7, 2),
+        (7, 5),
+        (8, 1),
+        (8, 2),
+        (9, 1),
+        (10, 1),
+    ] {
+        missing(&path, Selector::At(at(line, column)));
+    }
+    // A shebang line is trivia too.
+    let path = file.path("shebang.ts");
+    assert_eq!(found(&path, Selector::At(at(2, 1))).0.label, "run()");
+    missing(&path, Selector::At(at(1, 1)));
+}
+
+#[test]
+fn a_jsx_statement_s_first_token_is_its_opening_angle_bracket() {
+    // The lexer scans `<` there, without the parser's rescan.
+    let file = Fixture::new(&[("view.tsx", "const view = 1;\n<div>{view}</div>;\n")]);
+    let path = file.path("view.tsx");
+    let (declaration, excerpt) = found(&path, Selector::At(at(2, 1)));
+    assert_eq!(declaration.kind.as_str(), "statement");
+    assert_eq!(declaration.label, "<div>{view}</div>");
+    assert_eq!(excerpt, "<div>{view}</div>;");
+    missing(&path, Selector::At(at(2, 2)));
+}
+
+#[test]
+fn an_entry_at_a_statement_s_first_token_keeps_the_position() {
+    let file = Fixture::new(&[
+        (
+            "precedence.ts",
+            "x => {};\nasync () => {};\nexport default function () {}\nclass K { [(() => { cf(); })()]() {} }\n",
+        ),
+        ("equals.ts", "export = f(() => {});\n"),
+    ]);
+    let path = file.path("precedence.ts");
+    // An arrow's entry is anchored at the statement's first token.
+    for position in [at(1, 1), at(2, 1)] {
+        let (declaration, _) = found(&path, Selector::At(position));
+        assert_eq!(
+            (declaration.kind, declaration.label.as_str()),
+            (Kind::Function, "<function>")
+        );
+    }
+    let (declaration, source) = found(&path, Selector::At(at(3, 1)));
+    assert_eq!(
+        (declaration.kind, declaration.label.as_str()),
+        (Kind::Function, "default")
+    );
+    assert_eq!(source, "export default function () {}");
+    // A statement inside a computed name lies in the member's name token.
+    let (declaration, _) = found(&path, Selector::At(at(4, 21)));
+    assert_eq!(declaration.kind, Kind::Method);
+    let (declaration, source) = found(&file.path("equals.ts"), Selector::At(at(1, 1)));
+    assert_eq!(
+        (declaration.kind, declaration.label.as_str()),
+        (Kind::Export, "export=")
+    );
+    assert_eq!(source, "export = f(() => {});");
+}
+
+#[test]
+fn a_statement_label_abbreviates_only_past_the_signature_limit() {
+    // `f("…")` around a string of `length - 5` characters is `length`
+    // characters long; the string is one literal, with a boundary on each
+    // side.
+    let call = |length: usize| format!("f(\"{}\")", "a".repeat(length - 5));
+    let source = format!(
+        "{};\n{};\n{};\na{};\n",
+        call(159),
+        call(160),
+        call(161),
+        ".b()".repeat(50),
+    );
+    let file = Fixture::new(&[("labels.ts", &source)]);
+    let path = file.path("labels.ts");
+    let label = |line: usize| found(&path, Selector::At(at(line, 1))).0.label;
+    assert_eq!(label(1), call(159));
+    assert_eq!(label(2), call(160));
+    // Over the limit, the text is cut at its last boundary, after the
+    // string.
+    assert_eq!(label(3), format!("f(\"{}\"…", "a".repeat(156)));
+    // No boundary in the first 160 characters, and no name to keep.
+    assert_eq!(label(4), "…");
+    // The excerpt is never cut.
+    assert_eq!(
+        found(&path, Selector::At(at(3, 1))).1,
+        format!("{};", call(161))
+    );
+}
+
+#[test]
+fn statement_labels_render_only_as_far_as_they_reach() {
+    // Each of 250 nested blocks is a statement whose label reaches its cut
+    // long before the 200,000-element array inside them all, so building
+    // every label stays linear in the file.
+    let (depth, items) = (250, 200_000);
+    let source = format!(
+        "{}f([{}]);{}\n",
+        "{ ".repeat(depth),
+        "1, ".repeat(items),
+        " }".repeat(depth)
+    );
+    let file = Fixture::new(&[("nested.ts", &source)]);
+    let path = file.path("nested.ts");
+    let start = std::time::Instant::now();
+    let (outer, _) = found(&path, Selector::At(at(1, 1)));
+    let elapsed = start.elapsed();
+    // The cut falls before the space the renderer would write next.
+    assert_eq!(outer.label, format!("{}{{…", "{ ".repeat(79)));
+    let (inner, source) = found(&path, Selector::At(at(1, 2 * depth + 1)));
+    assert!(inner.label.starts_with("f([1, 1, 1,"), "{}", inner.label);
+    assert!(inner.label.ends_with("1, 1,…"), "{}", inner.label);
+    assert!(inner.label.chars().count() <= 162, "{}", inner.label);
+    assert_eq!(inner.depth, 1);
+    assert!(source.starts_with("f([1, 1,") && source.ends_with("]);"));
+    assert!(
+        elapsed < std::time::Duration::from_secs(5),
+        "show took {elapsed:?}"
+    );
 }

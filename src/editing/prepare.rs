@@ -16,7 +16,7 @@ use super::{
 use crate::analysis::{AnalysisError, InputError, Parser};
 use crate::navigation::{self, Selector, Syntax};
 use crate::source::{PositionError, SourceText};
-use crate::{Ast, Diagnostic};
+use crate::{Ast, Diagnostic, NodeId};
 use std::path::Path;
 use std::sync::Arc;
 
@@ -107,22 +107,24 @@ pub(super) fn prepare(
     let mut planned = Vec::with_capacity(requests.len());
     for request in requests {
         let catalog = syntax.catalog();
-        let matches = catalog
+        let selection = catalog
             .select(&request.selector)
             .map_err(|error| Failure::Position(error, request.selector.clone()))?;
-        let [index] = matches[..] else {
+        let Some(selected) = selection.single() else {
             return Err(Failure::Unselected {
                 edit: request.edit,
                 query: request.selector.clone(),
-                outcome: Box::new(navigation::outcome(
-                    matches.into_iter().map(|index| (display, catalog, index)),
-                )),
+                outcome: Box::new(navigation::outcome(display, catalog, &selection)),
             });
         };
-        let site = catalog.found(index, display).declaration;
+        let site = catalog.selected(selected, display).declaration;
         // A batch is prepared again from each site's anchor, which must
-        // select the site alone.
-        if catalog.select(&Selector::At(site.anchor)) != Ok(vec![index]) {
+        // select the site alone, whether a record or a statement site.
+        if catalog
+            .select(&Selector::At(site.anchor))
+            .map(|selection| selection.single())
+            != Ok(Some(selected))
+        {
             return Err(reject(
                 RejectionKind::UnsupportedSite,
                 "this site's anchor also selects another declaration, so the edit could not be prepared again from it".into(),
@@ -133,7 +135,7 @@ pub(super) fn prepare(
         let (opening, seam) = policy::plan(
             request.operation,
             syntax.ast(),
-            syntax.site(index),
+            syntax.site(selected),
             request.fragment,
             request.edit,
         )
@@ -141,13 +143,14 @@ pub(super) fn prepare(
             reject(
                 RejectionKind::UnsupportedSite,
                 format!(
-                    "{} cannot {}: {}",
+                    "{} cannot {}: {}{}",
                     site.label,
                     match request.operation {
                         Operation::ReplaceBody => "have its body replaced",
                         Operation::InsertAfter => "have statements inserted after it",
                     },
-                    unsupported.0
+                    unsupported.reason,
+                    remedy(&syntax, source, unsupported.enclosing)
                 ),
                 Some(request.edit),
                 source.offset(site.anchor).ok(),
@@ -208,6 +211,30 @@ pub(super) fn prepare(
     let composition =
         Composition::new(source.as_str(), settled).expect("settling keeps every change's span");
     check(&composition, &parse(&composition)?)
+}
+
+/// The remedy a refusal names for `enclosing`, the innermost statement in a
+/// statement list around a refused function or arrow function
+/// (`policy::Unsupported::enclosing`): the position of its first token,
+/// when `--at` there selects one site, which designates that statement;
+/// otherwise nothing.
+fn remedy(syntax: &Syntax<'_, '_>, source: &SourceText, enclosing: Option<NodeId>) -> String {
+    let Some(statement) = enclosing else {
+        return String::new();
+    };
+    let at = source.position(syntax.ast().first_token_span(statement).start);
+    match syntax
+        .catalog()
+        .select(&Selector::At(at))
+        .expect("a token's start is a position in its file")
+        .single()
+    {
+        Some(selected) if syntax.site(selected).designation == statement => format!(
+            "; to insert after the enclosing statement, select it with --at {}:{}",
+            at.line, at.column
+        ),
+        Some(_) | None => String::new(),
+    }
 }
 
 /// Run every check of the final text: protected syntax corresponds, each

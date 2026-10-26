@@ -1,8 +1,10 @@
 //! Declaration projection: one final syntax tree to its declaration sites.
 //!
 //! This module alone knows syntax: which nodes are declaration sites, their
-//! kinds, names, containment, anchors, ranges, excerpts, and signatures.
-//! Selection and rendering see only `Record`s.
+//! kinds, names, containment, anchors, ranges, excerpts, and signatures,
+//! and, beside them in a complete projection, the statement sites `--at`
+//! selects where no declaration site is (`StatementSite`). Selection and
+//! rendering see only `Record`s and `StatementSite`s.
 //!
 //! Inclusion, containment, and labels port TypeScript 7.0.2's document
 //! symbols (`getDocumentSymbolsForChildren`, `newDocumentSymbol`, and
@@ -22,11 +24,14 @@
 //! label that repeats a long callee chain, a projection's work is linear in
 //! the tree and its text. A selection projection (`Detail::Selection`)
 //! renders no signature and no unnamed site's label, which its index
-//! discards.
+//! discards, and no statement sites. Statement sites take a second walk of
+//! the final tree, also with an explicit stack, and one label each, which
+//! the signature renderer stops at its cut.
 
 use super::Kind;
 use super::names::{self, Name};
 use super::signature::{self, Spec};
+use crate::hash::FastMap;
 use crate::lexer::Lexer;
 use crate::syntax::{self, has_modifier};
 use crate::syntax_kind::SyntaxKind;
@@ -45,6 +50,13 @@ pub(super) struct Record {
     /// The exact lookup key's segments, empty without a key. Only a dotted
     /// namespace (`namespace A.B.C`) has more than one.
     pub(super) key: SmallVec<[String; 1]>,
+    /// The decoded name of an import or export specifier site that declares
+    /// none (`alias_naming`): a default import, or an import or export
+    /// specifier that does not rename, named by an identifier. `--name`
+    /// cannot select such a site, so a name that misses its file reports it
+    /// (`Catalog::specifiers`). `None` for every other site, including a
+    /// string name, which is no identifier.
+    pub(super) unkeyed_alias: Option<String>,
     pub(super) anchor: usize,
     /// Where `--at` selects this site: its name tokens, or its anchor token.
     pub(super) targets: SmallVec<[Span; 1]>,
@@ -64,6 +76,26 @@ pub(super) struct Record {
     pub(super) designation: NodeId,
 }
 
+/// One statement of the final tree, which `--at` on its first token selects
+/// when no record matches there. Not a record: the catalog keeps statement
+/// sites apart, so records, their ordinals, and indexes never see them.
+#[derive(Debug)]
+pub(super) struct StatementSite {
+    /// The first token (`Ast::first_token_span`), whose start is the anchor.
+    pub(super) first: Span,
+    /// The excerpt `show` returns: the statement's token span, with its
+    /// final `;`.
+    pub(super) range: Span,
+    /// One more than the greatest depth among the records whose range
+    /// contains `range` and differs from it, or 1 when there is none.
+    pub(super) depth: usize,
+    /// The signature renderer's text for `range` without a final `;`, with
+    /// no name, so it abbreviates from the start.
+    pub(super) label: String,
+    /// The statement, held as `Record::node` is.
+    pub(super) node: NodeId,
+}
+
 /// What a projection renders besides each site's selection facts: its
 /// kind, containment, key, anchor, `--at` targets, and range, and the label
 /// of a named site, which a selection index keeps when it differs from the
@@ -79,28 +111,19 @@ pub(super) enum Detail {
 
 /// The declaration sites of `ast` in source order, in `detail`.
 pub(super) fn project(ast: &Ast<'_>, detail: Detail) -> Vec<Record> {
-    let mut projection = Projection {
-        ast,
-        detail,
-        // Only signatures read the literals, and a selection renders none.
-        literals: match detail {
-            Detail::Complete => ast.literal_token_spans(),
-            Detail::Selection => Vec::new(),
-        },
-        records: Vec::new(),
-        work: Vec::new(),
-    };
-    projection.children(ast.root_id(), None, None);
-    while let Some(work) = projection.work.pop() {
-        match work {
-            Work::Visit(visit) => projection.visit(visit),
-            Work::ParameterProperties {
-                constructor,
-                container,
-            } => projection.parameter_properties(constructor, container),
-        }
-    }
+    let mut projection = Projection::new(ast, detail);
+    projection.records();
     projection.records
+}
+
+/// The complete projection of `ast`: exactly `project`'s records in
+/// `Detail::Complete`, and beside them the statement sites, ordered by
+/// first token, from a second walk of the final tree.
+pub(super) fn complete(ast: &Ast<'_>) -> (Vec<Record>, Vec<StatementSite>) {
+    let mut projection = Projection::new(ast, Detail::Complete);
+    projection.records();
+    let statements = projection.statements();
+    (projection.records, statements)
 }
 
 struct Projection<'a, 'src> {
@@ -146,10 +169,53 @@ enum Statement {
     Declaration(NodeId),
 }
 
+/// The records designating a node's ancestors, as a statement's depth
+/// reads them. Their ranges nest from the outside in, so those equal to a
+/// statement's range, which its depth excludes, are the nearest ones.
+#[derive(Clone, Copy, Default)]
+struct Enclosing {
+    /// The nearest designated ancestors' shared range and their greatest
+    /// depth.
+    nearest: Option<(Span, usize)>,
+    /// The greatest depth among the designated ancestors with wider ranges,
+    /// or 0.
+    outer: usize,
+}
+
+impl Enclosing {
+    /// The ancestry of a child of a node that `designated` describes.
+    fn with(self, designated: Option<(usize, Span)>) -> Self {
+        let Some((depth, range)) = designated else {
+            return self;
+        };
+        match self.nearest {
+            Some((nearest, deepest)) if nearest == range => Self {
+                nearest: Some((range, deepest.max(depth))),
+                outer: self.outer,
+            },
+            nearest => Self {
+                nearest: Some((range, depth)),
+                outer: self.outer.max(nearest.map_or(0, |(_, deepest)| deepest)),
+            },
+        }
+    }
+
+    /// The greatest depth among the designated ancestors whose range
+    /// differs from `range`, or 0.
+    fn depth(self, range: Span) -> usize {
+        match self.nearest {
+            Some((nearest, deepest)) if nearest != range => self.outer.max(deepest),
+            _ => self.outer,
+        }
+    }
+}
+
 /// A site's naming: its label, key, anchor, and `--at` targets.
 struct Naming {
     label: String,
     key: SmallVec<[String; 1]>,
+    /// `Record::unkeyed_alias`.
+    unkeyed_alias: Option<String>,
     anchor: usize,
     targets: SmallVec<[Span; 1]>,
     /// Where abbreviation may begin in its signature.
@@ -180,6 +246,94 @@ const UNTRAVERSED: [&str; 6] = [
 ];
 
 impl<'a, 'src> Projection<'a, 'src> {
+    fn new(ast: &'a Ast<'src>, detail: Detail) -> Self {
+        Self {
+            ast,
+            detail,
+            // Only signatures read the literals, and a selection renders none.
+            literals: match detail {
+                Detail::Complete => ast.literal_token_spans(),
+                Detail::Selection => Vec::new(),
+            },
+            records: Vec::new(),
+            work: Vec::new(),
+        }
+    }
+
+    /// Project every declaration site into `records`.
+    fn records(&mut self) {
+        self.children(self.ast.root_id(), None, None);
+        while let Some(work) = self.work.pop() {
+            match work {
+                Work::Visit(visit) => self.visit(visit),
+                Work::ParameterProperties {
+                    constructor,
+                    container,
+                } => self.parameter_properties(constructor, container),
+            }
+        }
+    }
+
+    /// Every statement of the final tree (`syntax::is_statement`, which
+    /// reads each node's parent, recorded here as the walk pushes it), with
+    /// its first token, range, depth, and label, ordered by first token.
+    /// One walk with an explicit stack, in source order: each node before
+    /// its children, which `next_child` gives in source order, so the
+    /// statements need no sort. Each label is rendered only as far as the
+    /// signature cut. Depth reads the records, already projected:
+    /// along each node's ancestry it carries the greatest depth of records
+    /// designating an ancestor, with their ranges nested outside in, so the
+    /// records whose range equals a statement's are the nearest ones.
+    fn statements(&self) -> Vec<StatementSite> {
+        let ast = self.ast;
+        // The greatest depth among the records designating each node, and
+        // their range, which is the node's own.
+        let mut designated: FastMap<NodeId, (usize, Span)> = FastMap::default();
+        for record in &self.records {
+            designated
+                .entry(record.designation)
+                .and_modify(|(depth, _)| *depth = (*depth).max(record.depth))
+                .or_insert((record.depth, record.range));
+        }
+        let mut parents: Vec<Option<NodeId>> = vec![None; ast.nodes().len()];
+        let mut statements = Vec::new();
+        let mut stack = vec![(ast.root_id(), Enclosing::default())];
+        while let Some((id, enclosing)) = stack.pop() {
+            if syntax::is_statement(ast, &parents, id) {
+                let range = self.own_range(id);
+                let label = self.render(
+                    id,
+                    Spec {
+                        parts: smallvec![self.without_separator(range)],
+                        name_end: range.start,
+                    },
+                );
+                statements.push(StatementSite {
+                    first: ast.first_token_span(id),
+                    range,
+                    depth: enclosing.depth(range) + 1,
+                    label,
+                    node: id,
+                });
+            }
+            let inner = enclosing.with(designated.get(&id).copied());
+            let start = stack.len();
+            let mut next = Child { field: 0, item: 0 };
+            while let Some(child) = next_child(ast, id, &mut next, None) {
+                parents[child.index()] = Some(id);
+                stack.push((child, inner));
+            }
+            stack[start..].reverse();
+        }
+        debug_assert!(
+            statements
+                .windows(2)
+                .all(|pair| pair[0].first.end <= pair[1].first.start),
+            "the walk gives statements in source order, each with its own first token"
+        );
+        statements
+    }
+
     /// Visit the children of `node` that may hold declarations, in source
     /// order: a function's body only, a class-like's members only, and any
     /// other node's children outside `UNTRAVERSED`. This is the compiler's
@@ -468,11 +622,12 @@ impl<'a, 'src> Projection<'a, 'src> {
             Some(expression) if ast.node(expression).syntax_kind == SyntaxKind::Identifier => {
                 ast.token_span(expression)
             }
-            _ => self.first_token(v.node),
+            _ => ast.first_token_span(v.node),
         };
         let naming = Naming {
             label: "export=".into(),
             key: SmallVec::new(),
+            unkeyed_alias: None,
             anchor: target.start,
             targets: smallvec![target],
             name_end: self.own_range(v.node).start,
@@ -567,6 +722,7 @@ impl<'a, 'src> Projection<'a, 'src> {
             kind,
             label: naming.label,
             key: naming.key,
+            unkeyed_alias: naming.unkeyed_alias,
             anchor: naming.anchor,
             targets: naming.targets,
             range: self.own_range(designation),
@@ -586,7 +742,7 @@ impl<'a, 'src> Projection<'a, 'src> {
         if let Some(name) = syntax::id(node, "name") {
             return Some(self.named(name));
         }
-        let anchor = self.first_token(v.node);
+        let anchor = self.ast.first_token_span(v.node);
         let label = match node.syntax_kind {
             FunctionExpression | ArrowFunction | ClassExpression => {
                 match self.assigned_name(v) {
@@ -621,6 +777,7 @@ impl<'a, 'src> Projection<'a, 'src> {
         Some(Naming {
             label,
             key: SmallVec::new(),
+            unkeyed_alias: None,
             anchor: anchor.start,
             targets,
             name_end: anchor.start,
@@ -634,6 +791,7 @@ impl<'a, 'src> Projection<'a, 'src> {
         Naming {
             label,
             key: key.into_iter().collect(),
+            unkeyed_alias: None,
             anchor: target.start,
             targets: smallvec![target],
             name_end: target.end,
@@ -650,11 +808,15 @@ impl<'a, 'src> Projection<'a, 'src> {
     /// A namespace import and `import x =` keep their keys. So a name
     /// selects the declaration an import or a re-export without renaming
     /// refers to, not every file that mentions it; such a site keeps its
-    /// label, anchor, and `--at` targets.
+    /// label, anchor, and `--at` targets, and, when an identifier names it,
+    /// its decoded name as `unkeyed_alias`.
     fn alias_naming(&self, name: NodeId, keyed: bool) -> Naming {
         let mut naming = self.named(name);
         if !keyed {
             naming.key.clear();
+            if self.ast.node(name).syntax_kind == SyntaxKind::Identifier {
+                naming.unkeyed_alias = self.ast.identifier_name(name).map(str::to_owned);
+            }
         }
         naming
     }
@@ -823,15 +985,6 @@ impl<'a, 'src> Projection<'a, 'src> {
             range.end -= 1;
         }
         range
-    }
-
-    fn first_token(&self, node: NodeId) -> Span {
-        let start = self.own_range(node).start;
-        let token = Lexer::new(self.ast.source(), start).next();
-        Span {
-            start,
-            end: token.end.max(start),
-        }
     }
 
     /// Where a class-like's member list opens, after its modifiers, name,
@@ -1023,5 +1176,83 @@ fn next_child(ast: &Ast<'_>, id: NodeId, next: &mut Child, skip: Option<&str>) -
         }
         next.field += 1;
         next.item = 0;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Child, next_child};
+
+    /// Every decorator and modifier position, which the parser attaches
+    /// after the fields they precede.
+    const MODIFIERS: &str = r#"
+@a(() => { a1(); }) export class C1 {
+  @m(() => { m1(); }) method(@p(() => { p1(); }) x = (() => { p2(); })()) { m2(); }
+  @f(() => { f1(); }) field = (() => { f2(); })();
+  @g(() => { g1(); }) get acc() { g2(); return 1; }
+  @s(() => { s1(); }) set acc(v) { s2(); }
+  constructor(@q(() => { q1(); }) private readonly y = (() => { q2(); })()) { q3(); }
+  @i(() => { i1(); }) accessor auto = (() => { i2(); })();
+}
+export @b(() => { b1(); }) class C2 extends (class { x() { b2(); } }) {}
+const e = @d(() => { d1(); }) class { @n(() => { n1(); }) k() { n2(); } };
+export default @h(() => { h1(); }) class {}
+export const arrow = async () => { r1(); };
+export async function* generator() { yield 1; }
+export declare namespace N { const n: 1; }
+"#;
+
+    /// The statement walk gives statements in source order, which
+    /// `Catalog::select`'s search by first token needs, without sorting,
+    /// because `next_child` gives every node's children in source order: the
+    /// parser pushes each field in source order but `modifiers`
+    /// (`Parser::attach_modifiers`), which `next_child` visits first. A
+    /// parser change that attaches another field late fails here for any
+    /// fixture that uses it.
+    #[test]
+    fn next_child_gives_every_fixture_node_s_children_in_source_order() {
+        let mut sources = vec![("modifiers.ts".to_owned(), MODIFIERS.to_owned())];
+        let mut pending = vec![std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures")];
+        while let Some(directory) = pending.pop() {
+            for entry in std::fs::read_dir(&directory).unwrap() {
+                let path = entry.unwrap().path();
+                if path.is_dir() {
+                    pending.push(path);
+                } else if path.extension().is_some_and(|extension| {
+                    ["ts", "tsx", "mts", "cts"].contains(&extension.to_str().unwrap())
+                }) && let Ok(text) = std::fs::read_to_string(&path)
+                {
+                    sources.push((path.to_str().unwrap().to_owned(), text));
+                }
+            }
+        }
+        let mut checked = 0;
+        for (name, text) in &sources {
+            // Some fixtures are syntax errors on purpose.
+            let Ok(ast) =
+                crate::parse_with_options(text, crate::ParseOptions::for_file(name.as_str()))
+            else {
+                continue;
+            };
+            checked += 1;
+            for id in ast.walk() {
+                let mut next = Child { field: 0, item: 0 };
+                let mut previous = 0;
+                while let Some(child) = next_child(&ast, id, &mut next, None) {
+                    let span = ast.token_span(child);
+                    if span.start == span.end {
+                        continue;
+                    }
+                    assert!(
+                        span.start >= previous,
+                        "{name}: a {} child at byte {} precedes an earlier child",
+                        ast.node(id).kind,
+                        span.start
+                    );
+                    previous = span.start;
+                }
+            }
+        }
+        assert!(checked > 1000, "only {checked} sources parsed");
     }
 }

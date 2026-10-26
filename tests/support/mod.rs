@@ -52,6 +52,30 @@ impl<T: std::fmt::Debug> QueryFailure for Result<T, AnalysisError> {
     }
 }
 
+/// The sample test file of the statement-site design
+/// (`docs/statement-sites-and-test-view-design.md`, "Examples"), whose
+/// outputs that design states.
+pub const EDGE_CASES: &str = r#"import { describe, it, test, beforeEach, expect } from "vitest";
+class Widget {}
+describe(Widget.name, () => {
+  beforeEach(() => {});
+  it.each([1, 2])("adds %i", (n) => { expect(n).toBeTruthy(); });
+  describe.each([["a"], ["b"]])("case %s", (x) => {
+    it(`handles ${"x"}`, () => {});
+  });
+  it.todo("writes later");
+  it.skip("skipped one", () => {});
+  test("with options", { timeout: 1000 }, async () => {});
+  it.skipIf(process.env.CI)("conditional", () => {});
+  test.concurrent("parallel", async () => {});
+});
+test.describe("playwright suite", () => {
+  test("pw case", async ({ page }) => {
+    await test.step("first step", async () => {});
+  });
+});
+"#;
+
 /// The configuration of most test projects: no standard library.
 pub const CONFIG: &str = r#"{ "compilerOptions": { "noLib": true } }"#;
 

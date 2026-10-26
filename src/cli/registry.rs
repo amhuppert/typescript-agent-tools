@@ -19,9 +19,11 @@ pub(crate) enum FlagId {
     Help,
     Version,
     Outline,
+    TestOutline,
     Show,
     Type,
     References,
+    Definition,
     Constructs,
     ReplaceBody,
     InsertAfter,
@@ -149,6 +151,11 @@ pub(crate) static FLAGS: [Flag; FlagId::COUNT] = [
         "List one file's declarations, indented by containment.",
     ),
     switch(
+        FlagId::TestOutline,
+        "--test-outline",
+        "List one test file's describe, it, and test calls and hooks, indented by containment.",
+    ),
+    switch(
         FlagId::Show,
         "--show",
         "Print one declaration's exact source with its line numbers.",
@@ -162,6 +169,11 @@ pub(crate) static FLAGS: [Flag; FlagId::COUNT] = [
         FlagId::References,
         "--references",
         "Group a symbol's declarations and occurrences in one project.",
+    ),
+    switch(
+        FlagId::Definition,
+        "--definition",
+        "Find the declarations a name denotes, following import and export aliases, in one project.",
     ),
     switch(
         FlagId::Constructs,
@@ -376,9 +388,11 @@ pub(crate) fn nearest(spelling: &str) -> Option<&'static Flag> {
 pub(crate) enum OperationId {
     Parse,
     Outline,
+    TestOutline,
     Show,
     Type,
     References,
+    Definition,
     Constructs,
     ReplaceBody,
     InsertAfter,
@@ -473,6 +487,13 @@ pub(crate) const ENTRIES: Bounded = Bounded {
     list: List::Entries,
     default: 200,
     summary: "entries of the levels --depth shows",
+};
+/// The test view's entries, which it shows at every level, so the summary
+/// names no `--depth`.
+pub(crate) const TEST_ENTRIES: Bounded = Bounded {
+    list: List::Entries,
+    default: 200,
+    summary: "entries, in source order",
 };
 pub(crate) const CANDIDATES: Bounded = Bounded {
     list: List::Candidates,
@@ -614,6 +635,13 @@ const NAVIGATION_FAILURES: ExitMeaning = ExitMeaning {
     meaning: "A usage error, a file that cannot be read, an invalid position, a file outside the project, a service that cannot be started or reached, or a result that cannot be written.",
 };
 
+/// Exit 2 of the operations that select in a project's semantic worker,
+/// type and definition.
+const SEMANTIC_FAILURES: ExitMeaning = ExitMeaning {
+    code: 2,
+    meaning: "A usage error, a file that cannot be read or another I/O failure, an invalid position, a file outside the project, an internal failure, a service that cannot be started or reached, or a result that cannot be written.",
+};
+
 /// The exit codes of a previewed edit, wherever its edits come from.
 const PREVIEW: ExitMeaning = ExitMeaning {
     code: 0,
@@ -644,7 +672,7 @@ macro_rules! preview_details {
 /// wording"). The help index states it, and so does each action's entry.
 macro_rules! service_administration {
     () => {
-        "--references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --type, --constructs, and --outline, --show, and edits with --project."
+        "--references-status, --references-stop, and --references-serve administer the project service, which answers every project query: --references, --definition, --type, --constructs, and --outline, --show, and edits with --project."
     };
 }
 
@@ -756,11 +784,61 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         limits: &[ENTRIES],
     },
     Operation {
+        id: OperationId::TestOutline,
+        name: "test-outline",
+        flag: Some(F::TestOutline),
+        summary: "List the test calls of one test file in source order, one per line, indented by containment, with each test's name.",
+        details: "A test call is an expression statement that calls a hook (beforeAll, beforeEach, afterAll, or afterEach) or describe, it, or test with Vitest's modifiers: only, skip, todo, concurrent, sequential, shuffle, and fails, and each(...), for(...), skipIf(...), and runIf(...) called before the test. Syntax alone decides it, with no import check and no project, so Vitest globals count; a call wrapped in await, parentheses, or another operator is not one, and nothing inside a computed property name is listed. Each line is LINE:COLUMN, the call, such as it.each(), and the test's name, its first argument as written without line breaks; every level is shown. Each position is the test statement's first token, so --show --at prints the whole test and --insert-after --at inserts after it. Only FILE is read, and text and JSON name it absolutely.",
+        usage: &[
+            "tsparse --test-outline FILE [--limit N|all] [--json [--pretty]] [--output OUTPUT]",
+        ],
+        flags: &[F::Limit, F::Json, F::Pretty, F::Output],
+        examples: &[
+            Example {
+                args: &["--test-outline", "src/app.test.ts"],
+                summary: "Every suite, test, and hook with its position; the default shows 200 entries.",
+            },
+            Example {
+                args: &[
+                    "--test-outline",
+                    "src/app.test.ts",
+                    "--json",
+                    "-o",
+                    "tests.json",
+                ],
+                summary: "Every entry, nested by containment, as one document in a file.",
+            },
+        ],
+        exits: &[
+            ExitMeaning {
+                code: 0,
+                meaning: "The test view, which is empty for a file without test calls.",
+            },
+            ExitMeaning {
+                code: 1,
+                meaning: "A syntax error, a file past the parser's grammar budget, or unsupported input.",
+            },
+            ExitMeaning {
+                code: 2,
+                meaning: "A usage error, a file that cannot be read, or a result that cannot be written.",
+            },
+        ],
+        related: &[
+            OperationId::Outline,
+            OperationId::Show,
+            OperationId::InsertAfter,
+        ],
+        doc: "docs/navigation.md",
+        repeat: RepeatedValue::Reject,
+        pretty: Some(Pretty::WithJson),
+        limits: &[TEST_ENTRIES],
+    },
+    Operation {
         id: OperationId::Show,
         name: "show",
         flag: Some(F::Show),
         summary: "Print one declaration's exact source with its original line numbers.",
-        details: "--name selects an exact declared name, and a.b.c selects c inside declarations named b and then a; an import or export specifier has a name only where it renames, and a default import never does. --at selects the declaration whose name or anchor is at the position. Overloads, merged declarations, and same-named locals are separate declarations: an ambiguous or missing selection exits 1 and lists each candidate's FILE:LINE:COLUMN and selector, on stderr or, with --json, in the document. With --project, FILE must be one of the files --references searches, --name without FILE searches all of them, and a printed FILE:LINE:COLUMN selects its declaration from any directory. Text names files absolutely; project JSON names them relative to the configuration's directory.",
+        details: "--name selects an exact declared name, and a.b.c selects c inside declarations named b and then a; an import or export specifier has a name only where it renames, and a default import never does. So --name NAME FILE misses a name FILE imports or re-exports without renaming: the miss names each such specifier and the --definition --at command that finds its declaration, complete with --project and with the TSCONFIG placeholder without it; --json lists them in specifiers, with the command as next only when it is complete. --at selects the declaration whose name or anchor is at the position; where there is none, --at on a statement's first token selects that statement, such as an it(...) test or an expect(...) line. Overloads, merged declarations, and same-named locals are separate declarations: an ambiguous or missing selection exits 1 and lists each candidate's FILE:LINE:COLUMN and selector, on stderr or, with --json, in the document. With --project, FILE must be one of the files --references searches, --name without FILE searches all of them, and a printed FILE:LINE:COLUMN selects its declaration from any directory. Text names files absolutely; project JSON names them relative to the configuration's directory.",
         usage: &[
             "tsparse --show (--name NAME FILE | --at LINE:COLUMN FILE | --at FILE:LINE:COLUMN) [--limit N|all] [--json [--pretty]] [--output OUTPUT]",
             "tsparse --show --project TSCONFIG (--name NAME [FILE] | --at LINE:COLUMN FILE | --at FILE:LINE:COLUMN) [--direct] [--limit N|all] [--json [--pretty]] [--output OUTPUT]",
@@ -818,6 +896,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         ],
         related: &[
             OperationId::Outline,
+            OperationId::Definition,
             OperationId::Type,
             OperationId::ReplaceBody,
         ],
@@ -889,10 +968,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
                 code: 1,
                 meaning: "A partial answer, an ambiguous or missing selection, an unsupported or unresolved target, an analysis failure, or a memory, time, depth, or output limit.",
             },
-            ExitMeaning {
-                code: 2,
-                meaning: "A usage error, a file that cannot be read or another I/O failure, an invalid position, a file outside the project, an internal failure, a service that cannot be started or reached, or a result that cannot be written.",
-            },
+            SEMANTIC_FAILURES,
         ],
         related: &[OperationId::Show, OperationId::References],
         doc: "docs/types.md",
@@ -1005,6 +1081,64 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         repeat: RepeatedValue::LastValue,
         pretty: Some(Pretty::Alone),
         limits: &[OCCURRENCES],
+    },
+    Operation {
+        id: OperationId::Definition,
+        name: "definition",
+        flag: Some(F::Definition),
+        summary: "Find the declarations the selected name denotes, following import and export aliases, in one explicit project.",
+        details: "--at selects the identifier at the position (one-based line, UTF-16 column); --name selects every declaration, local import, or exported alias spelled exactly NAME, and FILE narrows the candidates to those in FILE, such as a name FILE only imports or re-exports. Each selected symbol is one group listing its declarations: the original declarations behind every import and export alias, in location order. A call or new lists every declaration of the callee, never one signature. Text prints a header with the selection and its counts, then each group and one FILE:LINE:COLUMN per declaration, naming files absolutely; --json writes the document instead, naming files relative to the configuration's directory. A position on a member (a property access, a member's name, a literal member name or key, or a parameter property's modifier) is not followed: it exits 1 naming the --references --at search that finds the member's declarations. A position in no identifier, such as a keyword, whitespace, or a module specifier, and a name with no candidate select nothing and exit 1, never an empty result. NAME is one identifier: --show --name takes a dotted one.",
+        usage: &[
+            "tsparse --definition --project TSCONFIG (--at LINE:COLUMN FILE | --at FILE:LINE:COLUMN | --name NAME [FILE]) [--direct] [--json [--pretty]] [--output OUTPUT]",
+        ],
+        flags: &[
+            F::Project,
+            F::Direct,
+            F::At,
+            F::Name,
+            F::Json,
+            F::Pretty,
+            F::Output,
+        ],
+        examples: &[
+            Example {
+                args: &[
+                    "--definition",
+                    "--project",
+                    "tsconfig.json",
+                    "--at",
+                    "src/app.ts:1:10",
+                ],
+                summary: "The declaration an import resolves to, through re-exports.",
+            },
+            Example {
+                args: &[
+                    "--definition",
+                    "--project",
+                    "tsconfig.json",
+                    "--name",
+                    "formatTitle",
+                    "src/app.ts",
+                ],
+                summary: "The declarations of a name src/app.ts declares, imports, or exports.",
+            },
+        ],
+        exits: &[
+            ExitMeaning {
+                code: 0,
+                meaning: "One or more groups, each with its declarations.",
+            },
+            ExitMeaning {
+                code: 1,
+                meaning: "A missing selection, a member position (naming the --references search that finds its declarations), an unsupported or unresolved target, a semantic failure or limit while selecting, or a project analysis failure.",
+            },
+            SEMANTIC_FAILURES,
+        ],
+        related: &[OperationId::References, OperationId::Show],
+        doc: "docs/references.md",
+        repeat: RepeatedValue::Reject,
+        pretty: Some(Pretty::WithJson),
+        limits: &[],
     },
     Operation {
         id: OperationId::Constructs,
@@ -1164,24 +1298,36 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         flag: Some(F::InsertAfter),
         summary: "Preview inserting complete statements after the statement the selected declaration designates.",
         details: concat!(
-            "FRAGMENT holds complete statements, inserted after the statement the selected declaration designates (a binding's variable statement, a specifier's import or export) in its file, block, module block, or case clause. Selection is --show's, in FILE or, with --project, in the project's searched files; an ambiguous or missing selection changes nothing. ",
+            "FRAGMENT holds complete statements, inserted after the statement the selected declaration designates (a binding's variable statement, a specifier's import or export) in its file, block, module block, or case clause. Where no declaration is named or anchored at the position, --at on a statement's first token selects that statement, so statements can be inserted after a statement in a statement list, such as an it(...) test or an expect(...) line. A selected callback is refused; when its innermost enclosing statement is in a statement list and --at on that statement's first token selects only that statement, the refusal names that position. Selection is --show's, in FILE or, with --project, in the project's searched files; an ambiguous or missing selection changes nothing. ",
             preview_details!()
         ),
         usage: &[
             "tsparse --insert-after (--name NAME [FILE] | --at LINE:COLUMN FILE | --at FILE:LINE:COLUMN) --from FRAGMENT [--project TSCONFIG [--direct]] [--plan PLAN] [--limit N|all] [--json [--pretty]] [--output OUTPUT]",
         ],
         flags: EDIT_FLAGS,
-        examples: &[Example {
-            args: &[
-                "--insert-after",
-                "--at",
-                "src/host.ts:3:7",
-                "--from",
-                "statements.ts",
-                "--json",
-            ],
-            summary: "Insert the statements in statements.ts after the statement declaring the name at 3:7, previewed as a document.",
-        }],
+        examples: &[
+            Example {
+                args: &[
+                    "--insert-after",
+                    "--at",
+                    "src/host.ts:3:7",
+                    "--from",
+                    "statements.ts",
+                    "--json",
+                ],
+                summary: "Insert the statements in statements.ts after the statement declaring the name at 3:7, previewed as a document.",
+            },
+            Example {
+                args: &[
+                    "--insert-after",
+                    "--at",
+                    "src/host.test.ts:10:3",
+                    "--from",
+                    "new-test.ts",
+                ],
+                summary: "Insert after the statement whose first token is at 10:3, such as an it(...) test.",
+            },
+        ],
         exits: EDIT_EXITS,
         related: &[
             OperationId::ReplaceBody,
@@ -1199,7 +1345,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         flag: Some(F::EditBatch),
         summary: "Preview several edits from a JSON file, all selected in the original files.",
         details: concat!(
-            "EDITS is {\"edits\": [{\"operation\": \"replace_body\" or \"insert_after\", \"name\" or \"at\", \"file\", \"fragment\" or \"from\"}]}: at is LINE:COLUMN with file, or FILE:LINE:COLUMN, paths are relative to the working directory, a member that is null is absent, and unknown fields are errors. An invalid batch reports every issue by its JSON path, such as edits[1].extra, before anything is read or prepared. Every edit is selected in the original files and the edits are prepared together. ",
+            "EDITS is {\"edits\": [{\"operation\": \"replace_body\" or \"insert_after\", \"name\" or \"at\", \"file\", \"fragment\" or \"from\"}]}: at is LINE:COLUMN with file, or FILE:LINE:COLUMN, paths are relative to the working directory, a member that is null is absent, and unknown fields are errors. An invalid batch reports every issue by its JSON path, such as edits[1].extra, before anything is read or prepared. at selects as --show --at does: where no declaration is named or anchored, a statement's first token selects that statement, and insert_after inserts after it when it is in a statement list, such as an it(...) test or an expect(...) line. Every edit is selected in the original files and the edits are prepared together. ",
             preview_details!()
         ),
         usage: &[

@@ -153,9 +153,20 @@ pub(crate) enum Target {
 pub(crate) enum FileOperation {
     Outline,
     Show(Selector),
+    /// The test view, which only file navigation answers.
+    TestOutline,
 }
 
 impl Target {
+    /// The configuration a project request names, as the request spelled
+    /// it, for the commands an answer prints; `None` in file mode.
+    pub(crate) fn project(&self) -> Option<&str> {
+        match self {
+            Self::File { .. } => None,
+            Self::Project { config, .. } => Some(config),
+        }
+    }
+
     /// The operation's name in documents.
     pub(crate) fn operation(&self) -> &'static str {
         match self {
@@ -167,6 +178,10 @@ impl Target {
                 request: ProjectRequest::Outline { .. },
                 ..
             } => "outline",
+            Self::File {
+                operation: FileOperation::TestOutline,
+                ..
+            } => "test-outline",
             Self::File {
                 operation: FileOperation::Show(_),
                 ..
@@ -191,6 +206,10 @@ impl Target {
                 request: ProjectRequest::Type(_),
                 ..
             } => "type",
+            Self::Project {
+                request: ProjectRequest::Definition(_),
+                ..
+            } => "definition",
             Self::Project {
                 request: ProjectRequest::Constructs(_),
                 ..
@@ -576,9 +595,11 @@ fn validate(flags: Flags) -> Result<Request, Refusal> {
     let request = match operation.id {
         OperationId::Parse => Ok(parse_mode(flags)),
         OperationId::Outline => navigation(operation, true, flags),
+        OperationId::TestOutline => test_outline(operation, flags),
         OperationId::Show => navigation(operation, false, flags),
         OperationId::Type => type_query(operation, flags),
         OperationId::References => references(operation, flags),
+        OperationId::Definition => definition(operation, flags),
         OperationId::Constructs => constructs(operation, flags),
         OperationId::ReplaceBody => edit(operation, EditOperation::ReplaceBody, flags),
         OperationId::InsertAfter => edit(operation, EditOperation::InsertAfter, flags),
@@ -808,6 +829,70 @@ fn references(operation: &'static Operation, flags: Flags) -> Result<Request, Fa
     }))
 }
 
+/// Definition: `--references`'s selection, without its filters, of one
+/// identifier, since a dotted name selects a member by containment, which a
+/// definition does not follow; the refusal names the `--show` that selects
+/// it, with the request's `--project` spelling and without FILE, which
+/// `--show` would read as narrowing the declarations.
+fn definition(operation: &'static Operation, flags: Flags) -> Result<Request, Failure> {
+    let project = required_project(operation, &flags)?;
+    // FILE `-` is stdin, whether the operand or `--at FILE:LINE:COLUMN`
+    // names it, and the project's files are the only ones read.
+    let stdin = || {
+        Failure::new(
+            Code::Operands,
+            format!("{operation} reads files from the project, not stdin"),
+        )
+    };
+    let file = flags.files.first().cloned();
+    if file.as_deref() == Some("-") {
+        return Err(stdin());
+    }
+    let query = match (flags.value(FlagId::At), flags.value(FlagId::Name)) {
+        (Some(at), None) => {
+            let (file, position) = location(&at, file, &format!("{operation} {}", FlagId::At))?;
+            if file.as_os_str() == "-" {
+                return Err(stdin());
+            }
+            ReferenceQuery::At { file, position }
+        }
+        (None, Some(name)) if name.contains('.') => {
+            return Err(Failure::new(
+                Code::InvalidValue,
+                format!(
+                    "{operation} {} takes one identifier, not {name}: a dotted name selects a member by containment, which {operation} does not follow",
+                    FlagId::Name
+                ),
+            )
+            .with_next(vec![
+                "tsparse".into(),
+                FlagId::Show.to_string(),
+                FlagId::Project.to_string(),
+                project,
+                FlagId::Name.to_string(),
+                name,
+            ]));
+        }
+        (None, Some(name)) => ReferenceQuery::Name {
+            name,
+            file: file.map(PathBuf::from),
+        },
+        _ => return Err(one_selection(operation)),
+    };
+    Ok(Request::Query(Query {
+        target: Target::Project {
+            config: project,
+            request: ProjectRequest::Definition(query),
+            direct: flags.has(FlagId::Direct),
+        },
+        format: flags.format(),
+        pretty: flags.has(FlagId::Pretty),
+        depth: Depth::default(),
+        output: flags.value(FlagId::Output),
+        display: flags.display(operation, false)?,
+    }))
+}
+
 fn constructs(operation: &'static Operation, flags: Flags) -> Result<Request, Failure> {
     let project = required_project(operation, &flags)?;
     let file = flags.files.first().cloned();
@@ -868,15 +953,7 @@ fn navigation(
             "--direct applies to project queries; file navigation always runs directly",
         ));
     }
-    let file = match flags.files.first() {
-        Some(file) if file == "-" => {
-            return Err(Failure::new(
-                Code::Operands,
-                format!("{operation} reads a named FILE, not stdin"),
-            ));
-        }
-        file => file.cloned(),
-    };
+    let file = named_file(operation, &flags)?;
     let query = |target, depth| {
         Ok(Request::Query(Query {
             target,
@@ -953,6 +1030,36 @@ fn navigation(
         _ => return Err(one_selection(operation)),
     };
     query(target, Depth::default())
+}
+
+/// The FILE operand of a navigation operation, which reads a named file,
+/// never stdin.
+fn named_file(operation: &Operation, flags: &Flags) -> Result<Option<String>, Failure> {
+    match flags.files.first() {
+        Some(file) if file == "-" => Err(Failure::new(
+            Code::Operands,
+            format!("{operation} reads a named FILE, not stdin"),
+        )),
+        file => Ok(file.cloned()),
+    }
+}
+
+/// The test view of one named file: file navigation only, showing every
+/// level, so its registry entry takes neither `--project` nor `--depth`.
+fn test_outline(operation: &'static Operation, flags: Flags) -> Result<Request, Failure> {
+    let file = named_file(operation, &flags)?
+        .ok_or_else(|| Failure::new(Code::Operands, format!("{operation} requires a FILE")))?;
+    Ok(Request::Query(Query {
+        target: Target::File {
+            file: PathBuf::from(file),
+            operation: FileOperation::TestOutline,
+        },
+        format: flags.format(),
+        pretty: flags.has(FlagId::Pretty),
+        depth: Depth::default(),
+        output: flags.value(FlagId::Output),
+        display: flags.display(operation, false)?,
+    }))
 }
 
 /// An editing command delivering `action` as the flags ask.
@@ -1162,9 +1269,11 @@ mod tests {
             },
             Request::Query(query) => match query.target.operation() {
                 "outline" => OperationId::Outline,
+                "test-outline" => OperationId::TestOutline,
                 "show" => OperationId::Show,
                 "type" => OperationId::Type,
                 "references" => OperationId::References,
+                "definition" => OperationId::Definition,
                 "constructs" => OperationId::Constructs,
                 other => panic!("a query for {other}"),
             },

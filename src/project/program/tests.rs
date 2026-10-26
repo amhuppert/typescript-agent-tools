@@ -3451,8 +3451,14 @@ fn compiler_probe_projects_load_and_answer_as_recorded() {
                 files.push(("tsconfig.json", fixture["config"].as_str().unwrap()));
             }
             let project = Project::new(&files);
-            let native = &case["native"];
-            let tool = &case["tool"];
+            // A case's answers hold on a case-insensitive file system; its
+            // `caseSensitive` answers replace them where names keep their case.
+            let answers = match (Case::detect(), case.get("caseSensitive")) {
+                (Case::Sensitive, Some(sensitive)) => sensitive,
+                (Case::Sensitive, None) | (Case::Insensitive, _) => case,
+            };
+            let native = &answers["native"];
+            let tool = &answers["tool"];
             // Loading includes binding, which settles missing modules.
             let loaded = crate::project::Project::load(&project.root.join("tsconfig.json"));
             if let Some(error) = tool["error"].as_array() {

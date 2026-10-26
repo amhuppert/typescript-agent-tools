@@ -42,6 +42,9 @@ codegen-units = 1
 # the same (docs/validation.md#selecting-rust-tests).
 [profile.test]
 opt-level = 1
+# Line tables keep panic locations and backtraces. With full debug info each
+# test executable was about 146 MB, and the full suite needed about 43 GB.
+debug = "line-tables-only"
 
 [[bench]]
 name = "references"
