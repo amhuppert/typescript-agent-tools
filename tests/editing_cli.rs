@@ -656,7 +656,7 @@ fn a_target_that_cannot_be_replaced_is_refused() {
     std::fs::write(fixture.path("latin.ts"), b"function start() {}\n\xff\n").unwrap();
     std::fs::write(fixture.path("linked.ts"), "function start() {}\n").unwrap();
     std::fs::hard_link(fixture.path("linked.ts"), fixture.path("other.ts")).unwrap();
-    let mut refused = vec![
+    let refused = vec![
         ("pipe.ts", 1, "Unsupported", "not a regular file"),
         ("latin.ts", 2, "Io", "stream did not contain valid UTF-8"),
         (
@@ -667,7 +667,8 @@ fn a_target_that_cannot_be_replaced_is_refused() {
         ),
     ];
     #[cfg(target_os = "macos")]
-    {
+    let refused = {
+        let mut refused = refused;
         std::fs::write(fixture.path("flagged.ts"), "function start() {}\n").unwrap();
         let status = Command::new("chflags")
             .arg("hidden")
@@ -681,7 +682,8 @@ fn a_target_that_cannot_be_replaced_is_refused() {
             "Unsupported",
             "the file has flags (0x8000, such as hidden or uchg) that replacing it would drop",
         ));
-    }
+        refused
+    };
     for (file, code, kind, message) in refused {
         let output = tsparse(
             &fixture,
@@ -711,7 +713,7 @@ fn a_target_changed_after_planning_is_refused_with_its_reason() {
     use std::os::unix::fs::PermissionsExt;
     let changed = "it was replaced, or its permissions or flags changed";
     type Change = fn(&Fixture);
-    let mut changes: Vec<(&str, Change, &str)> = vec![
+    let changes: Vec<(&str, Change, &str)> = vec![
         (
             "hard link",
             |f| std::fs::hard_link(f.path("host.ts"), f.path("other.ts")).unwrap(),
@@ -727,18 +729,22 @@ fn a_target_changed_after_planning_is_refused_with_its_reason() {
         ),
     ];
     #[cfg(target_os = "macos")]
-    changes.push((
-        "flags",
-        |f| {
-            let status = Command::new("chflags")
-                .arg("hidden")
-                .arg(f.path("host.ts"))
-                .status()
-                .unwrap();
-            assert!(status.success());
-        },
-        changed,
-    ));
+    let changes = {
+        let mut changes = changes;
+        changes.push((
+            "flags",
+            |f| {
+                let status = Command::new("chflags")
+                    .arg("hidden")
+                    .arg(f.path("host.ts"))
+                    .status()
+                    .unwrap();
+                assert!(status.success());
+            },
+            changed,
+        ));
+        changes
+    };
     for (name, change, reason) in changes {
         let fixture = fixture();
         save_plan(&fixture, "host.ts", "p.json");

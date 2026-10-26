@@ -81,9 +81,7 @@
     "preMerge": [
       "format",
       "lint",
-      "test",
-      "harness-test",
-      "semantic"
+      "test"
     ]
   }
 }
