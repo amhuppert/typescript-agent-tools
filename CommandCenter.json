@@ -42,7 +42,8 @@
         },
         "cost": 4,
         "description": "Run the Rust tests that changes since the last passing run can affect (every target after a library, build, or toolchain change), explicit library/binary/integration roots, or one supported resource/reuse test module file; four build jobs, four test executables at once with two threads each",
-        "pathArgs": "paths"
+        "pathArgs": "paths",
+        "timeoutMs": 3600000
       },
       "harness-test": {
         "command": {
@@ -51,7 +52,8 @@
         },
         "cost": 2,
         "description": "Run the Node harness tests that changes since the last passing run can affect, or explicit existing tools/*.test.mjs files, with two workers, and report skipped tests; HARNESS_REQUIRE_COMPILERS=1 fails on skips",
-        "pathArgs": "paths"
+        "pathArgs": "paths",
+        "timeoutMs": 3600000
       },
       "semantic": {
         "command": {
