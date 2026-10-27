@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { compilerHookOracle, typeOracle } from './type-oracle.mjs';
 import { lineStarts, position } from './semantic-oracle.mjs';
+import { scratchPath } from './harness-scratch.mjs';
 
 const root = fileURLToPath(new URL('../fixtures/types/constant-positions/', import.meta.url));
 const source = fs.readFileSync(path.join(root, 'positions.ts'), 'utf8');
@@ -72,7 +73,7 @@ test('native literal preludes consume healthy globals before selecting the token
       event.event === 'exit' && event.errorType), [], marker);
     rows.push({ marker, answer });
   }
-  fs.writeFileSync('.cc/temp/stage68-constant-positions-native.json', JSON.stringify(rows, null, 2) + '\n');
+  fs.writeFileSync(scratchPath('stage68-constant-positions-native.json'), JSON.stringify(rows, null, 2) + '\n');
 });
 
 test('a healthy selected tagged literal can still consume missing-global recovery', async () => {
@@ -82,7 +83,7 @@ test('a healthy selected tagged literal can still consume missing-global recover
   assert.deepEqual([answer.kind, answer.summary, answer.errorType], ['expression', '"tagged"', false]);
   const api = await typeOracle(path.join(root, 'missing-globals.json'), request(offset('tagToken')));
   assert.deepEqual(api.prelude.map(row => row.kind), ['TaggedTemplateExpression']);
-  fs.writeFileSync('.cc/temp/stage68-constant-positions-missing-native.json', JSON.stringify(answer, null, 2) + '\n');
+  fs.writeFileSync(scratchPath('stage68-constant-positions-missing-native.json'), JSON.stringify(answer, null, 2) + '\n');
   const errors = answer.beforeSummary.displayAcquisitions.filter(event =>
     event.event === 'exit' && event.errorType);
   const annotation = Buffer.byteLength(source.slice(0, source.indexOf('TemplateStringsArray')), 'utf8');

@@ -5,6 +5,7 @@ import path from 'node:path';
 import {test} from 'node:test';
 import {compilerHookOracle, typeOracle} from './type-oracle.mjs';
 import {lineStarts, position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 
 const globals = `interface Object {}\ninterface Function {}\ninterface Array<T> { length: number; [n: number]: T }\ninterface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T }\ninterface String { readonly length: number }\ninterface Number {}\ninterface Boolean {}\ninterface RegExp {}\ninterface IArguments {}\ninterface CallableFunction extends Function {}\ninterface NewableFunction extends Function {}\n`;
 
@@ -29,7 +30,7 @@ async function observe(t, name, body, noCheck = false, acquisitions = true) {
     restrictive: Object.entries(native.beforeSummary.observations).filter(([key]) => key.startsWith('restrictive:'))
       .map(([key, value]) => ({key, ...value})),
     errors: (native.beforeSummary.displayAcquisitions ?? []).filter(event => event.event === 'exit' && event.errorType)};
-  fs.writeFileSync(`.cc/temp/stage60-conditional-${name}-${noCheck}.json`, JSON.stringify(observed, null, 2) + '\n');
+  fs.writeFileSync(scratchPath(`stage60-conditional-${name}-${noCheck}.json`), JSON.stringify(observed, null, 2) + '\n');
   return observed;
 }
 
@@ -45,7 +46,7 @@ test('native conditional restrictive cache candidate final queries', async t => 
   const rows = [];
   for (const [name, body] of cases) {
     rows.push(await observe(t, name, body));
-    fs.writeFileSync('.cc/temp/stage60-restrictive-candidates.json', JSON.stringify(rows, null, 2) + '\n');
+    fs.writeFileSync(scratchPath('stage60-restrictive-candidates.json'), JSON.stringify(rows, null, 2) + '\n');
   }
   assert.equal(rows.length, 6);
 });
@@ -65,7 +66,7 @@ test('native conditional tail exact boundary and later acquired operand', async 
       // errorType recovery is observable without inventing a source span.
       assert.equal(row.tail, undefined);
       rows.push(row);
-      fs.writeFileSync('.cc/temp/stage60-conditional-tail.json', JSON.stringify(rows, null, 2) + '\n');
+      fs.writeFileSync(scratchPath('stage60-conditional-tail.json'), JSON.stringify(rows, null, 2) + '\n');
     }
     const row = await observe(t, 'tailContinuation', build + 'type /*#query*/Result = [Build<1000>, MissingAfterTail][number];\n', noCheck, true);
     assert.deepEqual(row.failures, ['conditional_tail_limit']);
@@ -73,13 +74,13 @@ test('native conditional tail exact boundary and later acquired operand', async 
     assert.deepEqual(row.codes, [2589, 2304]);
     assert.equal(row.tail, undefined);
     rows.push(row);
-    fs.writeFileSync('.cc/temp/stage60-conditional-tail.json', JSON.stringify(rows, null, 2) + '\n');
+    fs.writeFileSync(scratchPath('stage60-conditional-tail.json'), JSON.stringify(rows, null, 2) + '\n');
     for (const [count, later] of [[999, false], [1000, false], [1001, false], [1000, true]]) {
       const target = later ? `[Build<${count}>, MissingAfterTail][number]` : `Build<${count}>`;
       const expression = await observe(t, later ? 'tailExpressionContinuation' : `tailExpression${count}`,
         build + `const /*#query*/query = (null as ${target}).length;\n`, noCheck, true);
       rows.push(expression);
-      fs.writeFileSync('.cc/temp/stage60-conditional-tail.json', JSON.stringify(rows, null, 2) + '\n');
+      fs.writeFileSync(scratchPath('stage60-conditional-tail.json'), JSON.stringify(rows, null, 2) + '\n');
       assert.equal(expression.summary, count === 999 ? '999' : 'any');
       assert.equal(expression.errorType, count !== 999);
       assert.deepEqual(expression.failures, count === 999 ? [] : ['conditional_tail_limit']);
@@ -104,7 +105,7 @@ test('native lightweight string transitions retain the same conditional tail bou
         build + `const /*#query*/query = (null as ${target}).length;\n`, noCheck, true);
       row.elapsedMilliseconds = performance.now() - start;
       rows.push(row);
-      fs.writeFileSync('.cc/temp/stage62-conditional-tail-lightweight.json', JSON.stringify(rows, null, 2) + '\n');
+      fs.writeFileSync(scratchPath('stage62-conditional-tail-lightweight.json'), JSON.stringify(rows, null, 2) + '\n');
       assert.equal(row.summary, count === 999 ? '999' : 'any');
       assert.equal(row.errorType, count !== 999);
       assert.deepEqual(row.failures, count === 999 ? [] : ['conditional_tail_limit']);
@@ -124,7 +125,7 @@ test('native restrictive same-result candidate installs then observes its own ca
   for (const noCheck of [false, true]) {
     const row = await observe(t, 'restrictiveMarker', body, noCheck, true);
     rows.push(row);
-    fs.writeFileSync('.cc/temp/stage62-restrictive-marker.json', JSON.stringify(rows, null, 2) + '\n');
+    fs.writeFileSync(scratchPath('stage62-restrictive-marker.json'), JSON.stringify(rows, null, 2) + '\n');
     assert.equal(row.summary, 'MissingFilter');
     assert.equal(row.errorType, true);
     assert.deepEqual(row.codes, [2304]);

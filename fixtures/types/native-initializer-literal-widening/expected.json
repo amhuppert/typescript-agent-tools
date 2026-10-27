@@ -1,0 +1,416 @@
+[
+  {
+    "file": "cases.ts",
+    "name": "local",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "imported",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "renamed",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "starred",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "namespaced",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "mutable",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "legacy",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "number",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "boolean",
+    "summary": "boolean",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "member",
+    "summary": "Choice",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "enumDirect",
+    "summary": "Choice",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "template",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "substituted",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "asserted",
+    "summary": "\"asserted-value\"",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "recordKey",
+    "summary": "\"record-value\"",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "objectKey",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "shapeKey",
+    "summary": "\"shape-value\"",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "propertyImported",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "propertyNamespaced",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "propertyNumber",
+    "summary": "number",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "propertyBoolean",
+    "summary": "boolean",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "propertyMember",
+    "summary": "Choice",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "propertyAsserted",
+    "summary": "\"asserted-value\"",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "fieldLocal",
+    "summary": "\"local-value\"",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "fieldImported",
+    "summary": "\"string-value\"",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "fieldRenamed",
+    "summary": "\"string-value\"",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "fieldStarred",
+    "summary": "\"string-value\"",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "fieldNamespaced",
+    "summary": "\"string-value\"",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "fieldMutable",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "fieldLegacy",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "fieldNumber",
+    "summary": "1",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "fieldBoolean",
+    "summary": "true",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "fieldMember",
+    "summary": "Choice.Second",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "fieldEnumDirect",
+    "summary": "Choice.Second",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "fieldTemplate",
+    "summary": "\"template-value\"",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "fieldSubstituted",
+    "summary": "\"string-value-suffix\"",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "fieldAsserted",
+    "summary": "\"asserted-value\"",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "fieldRecordKey",
+    "summary": "\"record-value\"",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "fieldObjectKey",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "fieldShapeKey",
+    "summary": "\"shape-value\"",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "staticField",
+    "summary": "\"string-value\"",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "mutableField",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "privateReadonly",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "protectedReadonly",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "publicReadonly",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "readonlyOnly",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "overridden",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "privateOnly",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "publicOnly",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "plain",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "propertyPrivateReadonly",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "propertyProtectedReadonly",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "propertyPublicReadonly",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "propertyReadonlyOnly",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "propertyOverridden",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "propertyFieldImported",
+    "summary": "\"string-value\"",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "functionParameter",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "arrowParameter",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "letLocal",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "constLocal",
+    "summary": "\"string-value\"",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "letNamespaced",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "cases.ts",
+    "name": "letRenamed",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "calls.ts",
+    "name": "sourcesCall",
+    "summary": "Sources",
+    "errorType": false
+  },
+  {
+    "file": "calls.ts",
+    "name": "formsCall",
+    "summary": "Forms",
+    "errorType": false
+  },
+  {
+    "file": "calls.ts",
+    "name": "called",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "calls.ts",
+    "name": "arrowed",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "calls.ts",
+    "name": "described",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "calls.ts",
+    "name": "outsidePublicReadonly",
+    "summary": "string",
+    "errorType": false
+  },
+  {
+    "file": "calls.ts",
+    "name": "outsideReadonlyOnly",
+    "summary": "string",
+    "errorType": false
+  }
+]

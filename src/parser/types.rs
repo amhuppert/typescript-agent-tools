@@ -351,7 +351,9 @@ impl<'src> Parser<'src> {
             return Ok(id);
         }
         if self.at("{") {
-            if let Some(mapped) = self.probe(Self::mapped_type)? {
+            if self.mapped_type_ahead()?
+                && let Some(mapped) = self.probe(Self::mapped_type)?
+            {
                 return Ok(mapped);
             }
             let members = self.type_members()?;
@@ -701,6 +703,30 @@ impl<'src> Parser<'src> {
             fields.push(("typeArguments", self.type_arguments()?.into()));
         }
         self.finish(ImportType, start, fields)
+    }
+    /// Native `nextIsStartOfMappedType`, by tokens alone: in a JSDoc
+    /// comment `expect` records a missing token rather than failing, so only
+    /// this lookahead keeps `{ k: number }` a type literal there.
+    fn mapped_type_ahead(&mut self) -> Result<bool> {
+        self.look_ahead(|p| {
+            p.bump()?;
+            if p.at("+") || p.at("-") {
+                p.bump()?;
+                return Ok(p.at("readonly"));
+            }
+            if p.at("readonly") {
+                p.bump()?;
+            }
+            if !p.at("[") {
+                return Ok(false);
+            }
+            p.bump()?;
+            if !p.is_identifier()? {
+                return Ok(false);
+            }
+            p.bump()?;
+            Ok(p.at("in"))
+        })
     }
     fn mapped_type(&mut self) -> Result<Option<NodeId>> {
         let mut committed = false;

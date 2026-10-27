@@ -74,6 +74,21 @@ for (const source of [
   'const {default: x} = y;', 'const x = {default: 1};', 'const x = obj.for;',
   'const \\u0066or = 1;', 'const \\u0061sync = 1;', 'import for from "pkg";',
 ]) add(source, /<(?:p|UI|x\s*:|T extends)/.test(source));
+// TypeScript 7 parses a namespace declared with `module`, whose tree is
+// compared while --check must reject it (TS1540); the keyword decides whether
+// a string name, a dotted name, or a missing block is allowed.
+for (const source of [
+  'module X {}', 'declare module X { const a: number; }', 'export module X { export const a = 1; }',
+  'module A.B.C { export const a = 1; }', 'declare module A.B {}', 'namespace A.B { module C {} }',
+  'function f() { module X {} }', 'module "x" {}', 'declare module "x";', 'export {}; declare global {}',
+  'module\nX\n{}', 'module\nX {}', 'export module\nX {}', 'export namespace\nX {}',
+  'module X;', 'namespace X;', 'module A.B;', 'declare namespace "x" {}', 'declare module "x".y {}',
+  // Names after a dot are identifier names (parseIdentifierName); the first is a binding identifier.
+  'export declare module A.default { const n: number; }', 'export declare module A.\\u0064efault { const n: number; }',
+  'namespace A.class {}', 'namespace A.cl\\u0061ss.if {}', 'namespace A.\\u{64}efault {}', 'module A.await.yield {}',
+  'namespace A.#x {}', 'namespace A.#\\u0078 {}', 'namespace A.#\\u{78} {}', 'namespace A.#\\u{78}.\\u{79} {}',
+  'module A.#x {}', 'module A.#\\u0078 {}', 'module A.#\\u{78} {}', 'namespace default {}', 'namespace \\u0064efault {}',
+]) add(source);
 let passed = 0, invalid = 0;
 const failures = [];
 for (const { source, jsx } of cases) {

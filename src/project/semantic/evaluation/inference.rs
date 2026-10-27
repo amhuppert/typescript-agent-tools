@@ -60,6 +60,9 @@ struct InferenceContext {
     fixing_mapper: MapperId,
     non_fixing_mapper: MapperId,
     no_default: bool,
+    /// `InferenceFlagsAnyDefault`, a call in a JavaScript file's: a type
+    /// parameter nothing is inferred for is `any` rather than `unknown`.
+    any_default: bool,
     skipped_generic_function: bool,
     return_mapper: Option<MapperId>,
     outer_return_mapper: Option<MapperId>,
@@ -178,6 +181,7 @@ impl Evaluator<'_, '_> {
             fixing_mapper,
             non_fixing_mapper,
             no_default,
+            any_default: false,
             skipped_generic_function: false,
             return_mapper: None,
             outer_return_mapper: None,
@@ -210,11 +214,13 @@ impl Evaluator<'_, '_> {
         let signature = original.signature.clone();
         let comparer = original.comparer;
         let no_default = original.no_default || no_default;
+        let any_default = original.any_default;
         let failure = original.failure.clone();
         let skipped_generic_function = original.skipped_generic_function;
         let cloned =
             self.new_inference_context_worker(infos, signature, comparer, no_default, failure);
         self.inference.contexts[cloned.index()].skipped_generic_function = skipped_generic_function;
+        self.inference.contexts[cloned.index()].any_default = any_default;
         Some(cloned)
     }
 
@@ -332,15 +338,21 @@ impl Evaluator<'_, '_> {
         sequence.finish(result)
     }
 
+    /// The context `chooseOverload` and `inferSignatureInstantiationForOverloadFailure`
+    /// infer a call's type arguments in: `AnyDefault` for a call in a
+    /// JavaScript file (`IsInJSFile`).
     pub(super) fn new_call_inference_context(
         &mut self,
         signature: &Signature,
+        javascript: bool,
     ) -> InferenceContextId {
-        self.new_inference_context(
+        let context = self.new_inference_context(
             signature.type_parameter_types().to_vec(),
             Some(signature),
             None,
-        )
+        );
+        self.inference.contexts[context.index()].any_default = javascript;
+        context
     }
 
     /// `inferTypeArguments` owns return-context acquisition before this and
@@ -829,9 +841,10 @@ impl Evaluator<'_, '_> {
                         sequence.read(self.inferred_type_completion(context, index, consumer))?,
                     );
                 }
-                sequence.read(
-                    self.get_signature_instantiation_completion(signature, arguments, consumer),
-                )
+                let javascript = self.signature_in_javascript_file(contextual)?;
+                sequence.read(self.get_signature_instantiation_completion(
+                    signature, arguments, javascript, consumer,
+                ))
             })();
             if let Err(error) = &result {
                 self.fail_inference_context(context, error.clone());
@@ -1096,6 +1109,7 @@ impl Evaluator<'_, '_> {
                                     .map(|args| args.to_vec())
                                     .unwrap_or_default(),
                                 &parameters,
+                                false,
                                 consumer,
                             ),
                         )?;
@@ -1107,6 +1121,7 @@ impl Evaluator<'_, '_> {
                                     .map(|args| args.to_vec())
                                     .unwrap_or_default(),
                                 &parameters,
+                                false,
                                 consumer,
                             ),
                         )?;
@@ -2487,12 +2502,10 @@ impl Evaluator<'_, '_> {
         let candidates = self.inferred_candidate_completion(context, index, consumer);
         let result = match candidates {
             Ok(candidates) => {
-                // Native AnyDefault is the JavaScript call branch. Project
-                // admission is TS-only, so the absent inference is Unknown.
-                let unknown = self.model.special(SpecialName::Unknown);
+                let absent = self.absent_inference(context);
                 let provisional = candidates
                     .clone()
-                    .map(|(inferred, _)| inferred.unwrap_or(unknown));
+                    .map(|(inferred, _)| inferred.unwrap_or(absent));
                 self.inference.contexts[context.index()].infos[index].inferred =
                     Some(Ok(provisional));
                 candidates.and_then(|(inferred, fallback)| {
@@ -2730,11 +2743,22 @@ impl Evaluator<'_, '_> {
                 }
             }
             Ok((
-                inferred.unwrap_or_else(|| self.model.special(SpecialName::Unknown)),
+                inferred.unwrap_or_else(|| self.absent_inference(context)),
                 assign_final,
             ))
         })();
         sequence.finish(result)
+    }
+
+    /// `getInferredType`'s type for a parameter nothing was inferred for:
+    /// `any` under `AnyDefault`, else `unknown`.
+    fn absent_inference(&mut self, context: InferenceContextId) -> TypeId {
+        self.model
+            .special(if self.inference.contexts[context.index()].any_default {
+                SpecialName::Any
+            } else {
+                SpecialName::Unknown
+            })
     }
 
     fn inference_compare_completion(

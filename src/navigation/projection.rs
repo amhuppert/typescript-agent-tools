@@ -1204,13 +1204,19 @@ export declare namespace N { const n: 1; }
 
     /// The statement walk gives statements in source order, which
     /// `Catalog::select`'s search by first token needs, without sorting,
-    /// because `next_child` gives every node's children in source order: the
-    /// parser pushes each field in source order but `modifiers`
+    /// because `next_child` gives every node's written children in source order: the
+    /// parser pushes each written field in source order but `modifiers`
     /// (`Parser::attach_modifiers`), which `next_child` visits first. A
     /// parser change that attaches another field late fails here for any
-    /// fixture that uses it.
+    /// fixture that uses it. TypeScript's `reparseHosted` also attaches a
+    /// JavaScript variable's JSDoc type from before its host; those nodes
+    /// are outside the written syntax (`Ast::source_children`). Check the
+    /// resulting JavaScript statement list as well as its written children.
     #[test]
     fn next_child_gives_every_fixture_node_s_children_in_source_order() {
+        use crate::input::{Case, InputKind};
+
+        let case = Case::detect();
         let mut sources = vec![("modifiers.ts".to_owned(), MODIFIERS.to_owned())];
         let mut pending = vec![std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures")];
         while let Some(directory) = pending.pop() {
@@ -1218,15 +1224,20 @@ export declare namespace N { const n: 1; }
                 let path = entry.unwrap().path();
                 if path.is_dir() {
                     pending.push(path);
-                } else if path.extension().is_some_and(|extension| {
-                    ["ts", "tsx", "mts", "cts"].contains(&extension.to_str().unwrap())
-                }) && let Ok(text) = std::fs::read_to_string(&path)
-                {
-                    sources.push((path.to_str().unwrap().to_owned(), text));
+                } else if matches!(
+                    InputKind::of(crate::input::exact_path(&path).unwrap(), case),
+                    InputKind::TypeScript | InputKind::JavaScript
+                ) {
+                    // Invalid UTF-8 fixtures cannot produce an AST; I/O failures still fail.
+                    let bytes = std::fs::read(&path).unwrap();
+                    if let Ok(text) = String::from_utf8(bytes) {
+                        sources.push((crate::input::exact_path(&path).unwrap().to_owned(), text));
+                    }
                 }
             }
         }
         let mut checked = 0;
+        let mut javascript = std::collections::BTreeSet::new();
         for (name, text) in &sources {
             // Some fixtures are syntax errors on purpose.
             let Ok(ast) =
@@ -1235,10 +1246,29 @@ export declare namespace N { const n: 1; }
                 continue;
             };
             checked += 1;
-            for id in ast.walk() {
+            if InputKind::of(name, case) == InputKind::JavaScript {
+                javascript.insert(
+                    std::path::Path::new(name)
+                        .extension()
+                        .unwrap()
+                        .to_str()
+                        .unwrap(),
+                );
+                let (_, statements) = super::complete(&ast);
+                assert!(
+                    statements
+                        .windows(2)
+                        .all(|pair| pair[0].first.end <= pair[1].first.start),
+                    "{name}: JavaScript statements are out of source order"
+                );
+            }
+            for id in ast.source_walk() {
                 let mut next = Child { field: 0, item: 0 };
                 let mut previous = 0;
                 while let Some(child) = next_child(&ast, id, &mut next, None) {
+                    if ast.is_reparsed(child) {
+                        continue;
+                    }
                     let span = ast.token_span(child);
                     if span.start == span.end {
                         continue;
@@ -1254,5 +1284,11 @@ export declare namespace N { const n: 1; }
             }
         }
         assert!(checked > 1000, "only {checked} sources parsed");
+        for extension in ["js", "jsx", "mjs", "cjs"] {
+            assert!(
+                javascript.contains(extension),
+                "no .{extension} source-order fixture parsed"
+            );
+        }
     }
 }

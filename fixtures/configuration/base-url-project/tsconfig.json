@@ -1,0 +1,91 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "importHelpers": true,
+    "tsBuildInfoFile": ".tsbuildinfo",
+    "jsx": "react-jsx",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "noErrorTruncation": false,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "paths": {
+      "@/*": ["src/*"],
+      "@checks-client/*": ["checks/client/*"],
+      "@checks-host/*": ["checks/host/*"],
+      "@checks-common/*": ["checks/common/*"],
+      "third*": ["third/*"],
+      "map-kit": ["./node_modules/map-kit/dist/map-kit.d.ts"]
+    },
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "sourceRoot": "/",
+    "strict": true,
+    "target": "ES2017",
+    "allowJs": true,
+    "plugins": [
+      {
+        "name": "editor-plugin"
+      }
+    ]
+  },
+  "include": [
+    "bench/**.ts",
+    "ambient.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "support/**/*.ts",
+    "support/**/*.tsx",
+    ".preview/main.ts",
+    ".preview/theme.tsx",
+    "types/*.ts",
+    "types/*.d.ts",
+    "settings.ts",
+    "checks/**/*.ts",
+    "scripts/**/*.ts",
+    "fakes/**/*.ts",
+    "fakes/**/*.tsx",
+    ".build/types/**/*.ts",
+    ".build/dev/types/**/*.ts",
+    ".build/dev/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "archive",
+    ".build",
+    ".scratch",
+    "coverage",
+    "preview-output"
+  ],
+  "watchOptions": {
+    "watchFile": "useFsEvents",
+    "watchDirectory": "useFsEvents",
+    "fallbackPolling": "dynamicpriority",
+    "excludeDirectories": [
+      "**/node_modules",
+      ".build",
+      ".git",
+      "coverage",
+      "preview-output"
+    ]
+  },
+  "files": ["types/globals.d.ts"],
+  "ts-node": {
+    "transpileOnly": true,
+    "files": true,
+    "preferTsExts": true,
+    "require": ["path-aliases/register"],
+    "compilerOptions": {
+      "module": "CommonJS",
+      "moduleResolution": "node"
+    }
+  }
+}

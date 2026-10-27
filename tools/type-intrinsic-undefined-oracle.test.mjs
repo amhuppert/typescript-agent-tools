@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {typeOracle} from './type-oracle.mjs';
 import {lineStarts,position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 const root=fileURLToPath(new URL('../fixtures/types/native-intrinsic-undefined/',import.meta.url));
 test('native undefined intrinsic identity, shadows and aliases',async()=>{
  const observations=[];
@@ -14,7 +15,7 @@ test('native undefined intrinsic identity, shadows and aliases',async()=>{
  for(const question of questions){
   const source=fs.readFileSync(path.join(root,question.file),'utf8');const label=`/*#${question.marker}*/`;const offset=source.indexOf(label)+label.length;
   const answer=await typeOracle(path.join(root,question.config),{at:{file:question.file,...position(lineStarts(source),offset)},properties:false});
-  observations.push({...question,answer});fs.writeFileSync('.cc/temp/native-intrinsic-undefined.json',JSON.stringify(observations,null,2));
+  observations.push({...question,answer});fs.writeFileSync(scratchPath('native-intrinsic-undefined.json'),JSON.stringify(observations,null,2));
   assert.equal(answer.compiler,'7.0.2');
   const loose=question.config==='loose.json';
   const expected={direct:'undefined',constant:loose?'any':'undefined',automatic:'any',automaticRead:loose?'any':'number',parenthesized:'any',queried:loose?'any':'undefined',shadow:'number',shadowVariable:'number',localTypeOnly:loose?'any':'undefined',assignment:'any',imported:'any',declaredAlias:'1',globalType:'any',globalValue:'string'};

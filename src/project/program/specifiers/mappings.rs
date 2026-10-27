@@ -6,6 +6,9 @@ impl Generator<'_> {
     /// `getLocalModuleSpecifier`, for RelativePreferenceExternalNonRelative.
     /// A package spelling can request pathsOnly; the relative candidate still
     /// runs first whenever the native pathsOnly/paths gate admits the worker.
+    /// `baseUrl` follows 5.6.3's `getLocalModuleSpecifier`: it admits the
+    /// worker, is the base, and its path is the non-relative name when no
+    /// package import or `paths` name applies.
     pub(super) fn local(
         &self,
         target: &str,
@@ -26,15 +29,10 @@ impl Generator<'_> {
             ))
         });
         let relative = self.ending(&unprocessed, &endings)?;
-        if options.paths.is_none() && !options.package_imports {
+        if options.paths.is_none() && options.base_url.is_none() && !options.package_imports {
             return Ok((!paths_only).then_some(relative));
         }
-        let base = options
-            .paths
-            .as_ref()
-            .filter(|paths| !paths.patterns.is_empty())
-            .map_or(self.env.cwd.as_str(), |paths| paths.base.as_str());
-        let base = paths::resolve(&self.env.cwd, base);
+        let base = local_base(options, &self.env.cwd);
         let relative_to_base = same_volume_relative(target, &base, self.env.case);
         if relative_to_base.is_empty() {
             return Ok((!paths_only).then_some(relative));
@@ -55,11 +53,25 @@ impl Generator<'_> {
             None
         };
         if paths_only {
-            return Ok(from_paths);
+            return Ok(from_paths.filter(|name| !name.is_empty()));
         }
-        let Some(non_relative) = imports.or(from_paths) else {
-            return Ok(Some(relative));
+        // `maybeNonRelative`. Only an unmatched `paths` lookup gives way to
+        // the path from `baseUrl`; an empty `paths` name leaves no
+        // non-relative name. 5.6.3 processes the path from `baseUrl` without
+        // a host: an `index` file loses `/index` even beside a file that
+        // would collide, and the name asks nothing of the file system.
+        let non_relative = match (imports, from_paths) {
+            (Some(name), _) | (None, Some(name)) => name,
+            (None, None) if options.base_url.is_some() => {
+                let result: Result<_, std::convert::Infallible> =
+                    endings::process(&relative_to_base, &endings, options, |_| Ok(false));
+                result.expect("no collision question")
+            }
+            (None, None) => String::new(),
         };
+        if non_relative.is_empty() {
+            return Ok(Some(relative));
+        }
         if !paths::is_relative(&non_relative) {
             let project = if self.env.config_file.is_empty() {
                 self.env.cwd.as_str()
@@ -115,6 +127,20 @@ impl Generator<'_> {
     }
 }
 
+/// `getLocalModuleSpecifier`'s base directory, which loading's capture
+/// shares: `baseUrl` when set, else the `paths` base when there are
+/// patterns (`getPathsBasePath`), else the working directory.
+pub(super) fn local_base(options: &SpecifierOptions, cwd: &str) -> String {
+    let base = options.base_url.as_deref().or_else(|| {
+        options
+            .paths
+            .as_ref()
+            .filter(|paths| !paths.patterns.is_empty())
+            .map(|paths| paths.base.as_str())
+    });
+    paths::resolve(cwd, base.unwrap_or(cwd))
+}
+
 /// `getRelativePathIfInSameVolume`: both paths are interpreted relative to
 /// the directory argument. Rooted results mean different volumes.
 pub(super) fn same_volume_relative(path: &str, directory: &str, case: Case) -> String {
@@ -160,7 +186,9 @@ pub(super) fn root_dirs_relative(
 
 /// `tryGetModuleNameFromPaths` / `validateEnding`. Literal (non-star)
 /// patterns compare exactly even on insensitive hosts; star boundaries use
-/// native stringutil's case-aware prefix/suffix operation.
+/// native stringutil's case-aware prefix/suffix operation. The first match
+/// ends the search with its name, which is empty for an empty key or for a
+/// `*` key whose star matched nothing; `None` means no pattern matched.
 pub(super) fn reverse_paths<E>(
     target: &str,
     patterns: &[(String, Vec<String>)],
@@ -193,8 +221,7 @@ pub(super) fn reverse_paths<E>(
                     {
                         let star = &value[prefix.len()..value.len() - suffix.len()];
                         if !paths::is_relative(star) {
-                            let result = key.replacen('*', star, 1);
-                            return Ok((!result.is_empty()).then_some(result));
+                            return Ok(Some(key.replacen('*', star, 1)));
                         }
                     }
                 }
@@ -202,14 +229,14 @@ pub(super) fn reverse_paths<E>(
                 .iter()
                 .any(|(ending, value)| *ending != Ending::Minimal && value == pattern)
             {
-                return Ok((!key.is_empty()).then(|| key.clone()));
+                return Ok(Some(key.clone()));
             } else {
                 for (ending, value) in candidates {
                     if ending == Ending::Minimal
                         && value == pattern
                         && value == process(target, &[Ending::Minimal])?
                     {
-                        return Ok((!key.is_empty()).then(|| key.clone()));
+                        return Ok(Some(key.clone()));
                     }
                 }
             }

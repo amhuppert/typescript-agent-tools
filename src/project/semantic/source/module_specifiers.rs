@@ -53,25 +53,23 @@ impl Source<'_, '_> {
                 .and_then(parent)
                 .and_then(parent)
                 .and_then(module_specifier),
-            K::ImportType => id(node, "argument")
-                .filter(|&node| ast.node(node).syntax_kind == K::LiteralType)
-                .and_then(|node| id(ast.node(node), "literal")),
+            K::ImportType => syntax::literal_import_type_specifier(ast, node),
             _ => None,
         };
         let Some(literal) = literal.filter(|&node| ast.node(node).syntax_kind == K::StringLiteral)
         else {
             return Ok(None);
         };
-        for site in bindings.reference_module_sites(declaration.file) {
+        if let Some(site) = super::reference_import_tracker::retained_module_site(
+            bindings,
+            captured,
+            declaration.file,
+            literal,
+        )? {
             let facts = bindings.reference_module_site(site);
-            if !facts.implicit
-                && super::reference_import_tracker::captured_module_literal(captured, facts.span)?
-                    == literal
-            {
-                return Ok(Some(
-                    semantics.resolution_mode(configured, facts.kind, facts.mode),
-                ));
-            }
+            return Ok(Some(
+                semantics.resolution_mode(configured, facts.kind, facts.mode),
+            ));
         }
         // A TS require call is a valid syntax context for module spelling but
         // is not a dependency gathered by collectModuleReferences. Its usage

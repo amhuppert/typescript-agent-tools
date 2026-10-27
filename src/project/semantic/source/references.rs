@@ -68,6 +68,12 @@ pub(in crate::project::semantic) enum ReferenceSymbolRecipe {
         object: TypeExpression,
         name: String,
     },
+    /// `isImportTypeQualifierPart`: the symbol `getTypeFromImportTypeNode`
+    /// links to this qualifier name.
+    ImportTypeQualifier {
+        import: TypeExpression,
+        name: ExpressionRoot,
+    },
     Absent,
     Pending(&'static str),
 }
@@ -210,6 +216,19 @@ impl Source<'_, '_> {
             return Ok(R::Pending(
                 "native meta-property name requires its dedicated type/symbol producer",
             ));
+        }
+        // getSymbolOfNameOrPropertyAccessExpression asks an import type for
+        // any of its qualifier names before climbing to a qualified parent.
+        if matches!(ast.node(id).syntax_kind, K::Identifier | K::QualifiedName)
+            && let Some(import) = crate::syntax::import_type_of_qualifier_part(ast, parents, id)
+        {
+            return Ok(R::ImportTypeQualifier {
+                import: super::type_expression(inputs, root.file, captured, parents, import),
+                name: ExpressionRoot {
+                    file: root.file,
+                    site: crate::project::binding::flow::Site::new(ast, id),
+                },
+            });
         }
         if matches!(
             ast.node(id).syntax_kind,

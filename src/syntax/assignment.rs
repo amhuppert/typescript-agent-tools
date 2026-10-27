@@ -216,3 +216,98 @@ pub(crate) fn access_kind(
         result
     }
 }
+
+/// TypeScript's `JSDeclarationKind`: the declaration an assignment or
+/// `Object.defineProperty` call may make (`GetAssignmentDeclarationKind`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum AssignmentDeclarationKind {
+    None,
+    /// `module.exports = value`.
+    ModuleExports,
+    /// `exports.name = value` or `module.exports.name = value`.
+    ExportsProperty,
+    /// `this.name = value`.
+    ThisProperty,
+    /// `entity.name = value` or `entity["name"] = value`.
+    Property,
+    /// `Object.defineProperty(entity, "name", descriptor)`.
+    ObjectDefinePropertyValue,
+    /// `Object.defineProperty(exports, "name", descriptor)`.
+    ObjectDefinePropertyExports,
+}
+
+/// TypeScript `GetAssignmentDeclarationKind`, a syntax question: whether
+/// the binder declares anything for it is the binder's. `javascript` is
+/// `IsInJSFile`; outside JavaScript only a property assignment counts.
+pub(crate) fn assignment_declaration_kind(
+    ast: &Ast<'_>,
+    node: NodeId,
+    javascript: bool,
+) -> AssignmentDeclarationKind {
+    use AssignmentDeclarationKind as Kind;
+    let syntax = ast.node(node);
+    match syntax.syntax_kind {
+        SyntaxKind::BinaryExpression => {
+            let (Some(operator), Some(left), Some(right)) = (
+                id(syntax, "operatorToken"),
+                id(syntax, "left"),
+                id(syntax, "right"),
+            ) else {
+                return Kind::None;
+            };
+            let access = ast.node(left).syntax_kind;
+            if ast.node(operator).syntax_kind != SyntaxKind::EqualsToken
+                || !matches!(
+                    access,
+                    SyntaxKind::PropertyAccessExpression | SyntaxKind::ElementAccessExpression
+                )
+            {
+                return Kind::None;
+            }
+            let Some(receiver) = id(ast.node(left), "expression") else {
+                return Kind::None;
+            };
+            let exports = |id: NodeId| {
+                ast.node(id).syntax_kind == SyntaxKind::Identifier
+                    && ast.identifier_name(id) == Some("exports")
+            };
+            if javascript {
+                if super::is_module_exports_access_expression(ast, left) && !exports(right) {
+                    return Kind::ModuleExports;
+                }
+                if (super::is_module_exports_access_expression(ast, receiver) || exports(receiver))
+                    && super::element_or_property_access_name(ast, left).is_some()
+                {
+                    return Kind::ExportsProperty;
+                }
+                if ast.node(receiver).syntax_kind == SyntaxKind::ThisKeyword {
+                    return Kind::ThisProperty;
+                }
+            }
+            let entity = super::is_entity_name_expression_ex(ast, receiver, javascript);
+            let identifier_name = id(ast.node(left), "name")
+                .is_some_and(|name| ast.node(name).syntax_kind == SyntaxKind::Identifier);
+            if entity
+                && (access == SyntaxKind::ElementAccessExpression
+                    || access == SyntaxKind::PropertyAccessExpression && identifier_name)
+            {
+                Kind::Property
+            } else {
+                Kind::None
+            }
+        }
+        SyntaxKind::CallExpression
+            if javascript && super::is_bindable_object_define_property_call(ast, node) =>
+        {
+            let target = super::ids(syntax, "arguments")[0];
+            let exports = ast.node(target).syntax_kind == SyntaxKind::Identifier
+                && ast.identifier_name(target) == Some("exports");
+            if exports || super::is_module_exports_access_expression(ast, target) {
+                Kind::ObjectDefinePropertyExports
+            } else {
+                Kind::ObjectDefinePropertyValue
+            }
+        }
+        _ => Kind::None,
+    }
+}

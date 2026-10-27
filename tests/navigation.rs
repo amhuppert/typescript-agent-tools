@@ -1302,7 +1302,6 @@ fn inputs_outside_typescript_and_unreadable_files_are_typed_failures() {
     ]);
     for (name, kind) in [
         ("data.json", InputErrorKind::Unsupported),
-        ("script.js", InputErrorKind::Unsupported),
         ("notes.txt", InputErrorKind::Unsupported),
         ("missing.ts", InputErrorKind::Io),
         ("dir.ts", InputErrorKind::Io),
@@ -1313,6 +1312,8 @@ fn inputs_outside_typescript_and_unreadable_files_are_typed_failures() {
     }
     let error = input_error(navigation::outline_file(&file.path("data.json")));
     assert_eq!(error.message, "JSON files are not navigation input");
+    // JavaScript is navigation input (tests/javascript_syntax.rs).
+    assert!(navigation::outline_file(&file.path("script.js")).is_ok());
 }
 
 #[test]

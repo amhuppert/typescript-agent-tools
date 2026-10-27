@@ -8,19 +8,24 @@ pub(super) struct ModulePath {
     pub(super) in_node_modules: bool,
 }
 
-/// `GetEachFileNameOfModule` / `getAllModulePathsWorker`. Project-reference
-/// redirects and the global typings cache are absent in the admitted program.
-/// Symlink alternatives retain raw spellings independently of source identity.
+/// `GetEachFileNameOfModule` / `getAllModulePathsWorker`. A module's names
+/// are its file's path and the paths of the files that redirect to it as
+/// duplicates of its package (`GetRedirectTargets`,
+/// `SpecifierEnvironment::file_names_of`), each with its symlink
+/// alternatives under the file's own symlinked ancestors. Project-reference
+/// redirects and the global typings cache are absent in the admitted
+/// program. Symlink alternatives retain raw spellings independently of
+/// source identity.
 pub(super) fn ordered(
     env: &SpecifierEnvironment,
     importer: &str,
     target: &str,
 ) -> Result<Vec<ModulePath>, SpecifierInputError> {
-    let target = paths::resolve(&env.cwd, target);
+    let targets = env.file_names_of(target);
     let symlinks = env.symlinks.as_ref().map_err(Clone::clone)?;
     let mut all = BTreeMap::new();
-    let mut filter_ignored = !ignored_path(&target);
-    for real in paths::ancestors(paths::parent(&target)) {
+    let mut filter_ignored = !targets.iter().all(|target| ignored_path(target));
+    for real in paths::ancestors(paths::parent(&targets[0])) {
         let key = format!("{}/", real.trim_end_matches('/'));
         let Some(aliases) = symlinks.directories_by_realpath(&key, env.case) else {
             continue;
@@ -29,30 +34,34 @@ pub(super) fn ordered(
         if paths::starts_with_directory(importer, real, env.case) {
             break;
         }
-        if !paths::starts_with_directory(&target, real, env.case) {
-            continue;
-        }
-        let relative = paths::relative_with_case(real, &target, &env.cwd, env.case);
-        for alias in aliases {
-            let name = paths::resolve(alias, &relative);
-            all.insert(
-                name.clone(),
-                ModulePath {
-                    in_node_modules: contains_node_modules(&name),
-                    file_name: name,
-                },
-            );
-            filter_ignored = true;
+        for target in &targets {
+            if !paths::starts_with_directory(target, real, env.case) {
+                continue;
+            }
+            let relative = paths::relative_with_case(real, target, &env.cwd, env.case);
+            for alias in aliases {
+                let name = paths::resolve(alias, &relative);
+                all.insert(
+                    name.clone(),
+                    ModulePath {
+                        in_node_modules: contains_node_modules(&name),
+                        file_name: name,
+                    },
+                );
+                filter_ignored = true;
+            }
         }
     }
-    if !(filter_ignored && ignored_path(&target)) {
-        all.insert(
-            target.clone(),
-            ModulePath {
-                in_node_modules: contains_node_modules(&target),
-                file_name: target,
-            },
-        );
+    for target in targets {
+        if !(filter_ignored && ignored_path(&target)) {
+            all.insert(
+                target.clone(),
+                ModulePath {
+                    in_node_modules: contains_node_modules(&target),
+                    file_name: target,
+                },
+            );
+        }
     }
     let compare = |a: &ModulePath, b: &ModulePath| {
         a.file_name
@@ -146,33 +155,42 @@ pub(super) fn for_any_importer(
     importers: &mut ImporterPresence<'_>,
     target: &str,
 ) -> Result<Vec<ModulePath>, SpecifierInputError> {
-    let target = paths::resolve(&env.cwd, target);
+    let targets = env.file_names_of(target);
     let symlinks = env.symlinks.as_ref().map_err(Clone::clone)?;
     let mut names = BTreeMap::new();
     let mut first_level_inside = None;
-    for real in paths::ancestors(paths::parent(&target)) {
+    for real in paths::ancestors(paths::parent(&targets[0])) {
         let key = format!("{}/", real.trim_end_matches('/'));
         let Some(aliases) = symlinks.directories_by_realpath(&key, env.case) else {
             continue;
         };
+        // Every level holds the module's own file, the first of its names,
+        // so the first symlinked level is where `ordered` first breaks for
+        // an inside importer, which is inside every later (enclosing) level
+        // too.
         let (inside, outside) = importers.of(real);
-        if !paths::starts_with_directory(&target, real, env.case) {
-            // `ordered` breaks here for an inside importer; that importer is
-            // inside every later (enclosing) level too.
-            continue;
-        }
         first_level_inside.get_or_insert(inside);
         if !outside {
             continue;
         }
-        let relative = paths::relative_with_case(real, &target, &env.cwd, env.case);
-        for alias in aliases {
-            let name = paths::resolve(alias, &relative);
-            names.insert(name.clone(), contains_node_modules(&name));
+        for target in &targets {
+            if !paths::starts_with_directory(target, real, env.case) {
+                continue;
+            }
+            let relative = paths::relative_with_case(real, target, &env.cwd, env.case);
+            for alias in aliases {
+                let name = paths::resolve(alias, &relative);
+                names.insert(name.clone(), contains_node_modules(&name));
+            }
         }
     }
-    if !ignored_path(&target) || first_level_inside != Some(false) {
-        names.insert(target.clone(), contains_node_modules(&target));
+    // An ignored name is dropped for an importer that filters ignored
+    // names: one that added an alias, or any when some name is not ignored.
+    let filters_all = targets.iter().any(|target| !ignored_path(target));
+    for target in targets {
+        if !ignored_path(&target) || !filters_all && first_level_inside != Some(false) {
+            names.insert(target.clone(), contains_node_modules(&target));
+        }
     }
     Ok(names
         .into_iter()

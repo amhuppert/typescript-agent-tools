@@ -1,0 +1,1 @@
+export const K = "k";

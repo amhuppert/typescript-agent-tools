@@ -55,11 +55,11 @@ load and do not establish native performance or profile admission.
 | Rust tests | The full suite passes, with three platform skips for file names that are not UTF-8, which the host's macOS file system refuses (2026-10-20, the agent-facing CLI work's uncommitted tree on `7d3abaf` after its final verification's second review, registered `test` run `vrun-a38a107f-7f28-4d0f-a342-d4a260578273`). `list_configured_program`, ignored by default, writes a real project's program for `tools/program-inputs.mjs` and `tools/name-selection.mjs` ([Command Center checkpoint](#command-center-checkpoint)), and the probe test loads the maintained compiler probes ([JSON and configuration probes](#json-and-configuration-probes)). Parser coverage includes nested `for` declaration and expression contexts, committed syntax/depth diagnostics, depth exhaustion during speculative parsing, flat comparison lists of 35, 36, and 400 items and a 40,000-item list within a time limit, type-argument closers joined to `=` or `>`, module indicators, `@deprecated` collection after a `#!` line and each line break, file-name rules for JSX and declaration context, malformed hexadecimal escapes, tagged-template cooking and flags, unpaired surrogate preservation, closed stdout for help/version output, deep syntax on ordinary worker-thread stacks and on the deep budget's documented stack, final-tree walking, token spans, UTF-16 offsets, and iterative serialization of a 10,000-operator chain. Reference loading covers uninspectable packages and directory entries, reference directives after every line terminator and with each whitespace character in each position, TypeScript 7's directive attribute rules, a byte order mark before `#!`, JSX pragma whitespace, strict package manifests, `tsconfig.json` comments and escapes, JSON nesting just under, at, and over the limit, package `imports` chains at and past the limit in a dependency, names with a NUL character, and unsupported literal inputs. A test that cannot run on the current platform prints a `SKIP` line that the test gate reports. [Earlier runs](validation-history.md#rust-tests). |
 | Validation-runner tests | All 353 `tools/*.test.mjs` files pass: 1,117 tests, zero skips, in three registered `harness-test` runs, since one run of every file can exceed the server's one-hour limit on a loaded machine (2026-10-20, the agent-facing CLI work's uncommitted tree on `7d3abaf` after its final verification's second review: files 1–176 in `vrun-728833a3-69d5-40b1-af0b-65e0c4fe395d`, 632 tests; 177–265 in `vrun-1e4e9313-d5d2-4865-aced-5f7b94aa0e5e`, 207; 266–353 in `vrun-7ff64c45-5d2f-432e-bdf9-652c445cf1a0`, 278). [Earlier runs](validation-history.md#validation-runner-tests). |
 | Formatting and lint | `cargo fmt --all -- --check` and Clippy with `--all-targets --no-deps -- -D warnings`, the registered `format` and `lint` commands, pass (2026-10-20, the agent-facing CLI work's uncommitted tree on `7d3abaf` after its final verification's second review; `vrun-628f4038-5722-49d9-9729-a3194cffae0b` and `vrun-aa7b54c3-99d9-43ff-a2e3-934875a9e571`). [Earlier runs](validation-history.md#formatting-and-lint). |
-| Authored AST comparisons | 105/105 cases match the compiler API projection, including positions, context flags, and scanner hints. |
-| Authored native checks | 168/168 positive and negative cases match TypeScript 7.0.2. |
+| Authored AST comparisons | 106/106 cases match the compiler API projection, including positions, context flags, and scanner hints (2026-10-24). |
+| Authored native checks | 171/171 positive and negative cases match TypeScript 7.0.2, including namespaces declared with `module` (2026-10-24). |
 | Upstream native corpus | 14,935/14,935 virtual files pass the acceptance comparison, including 792 invalid cases; 7,574,481 source bytes. Last run in full on 2026-10-17, at `2a59e7c` ([single-thread work](performance-single-thread-opportunities.md#implementation-status)). |
-| Upstream API corpus | 14,920/14,920 cases pass, including 14,143 full syntax-tree comparisons and 777 invalid-input rejection checks; 7,568,169 source bytes. Fifteen units using syntax removed in TypeScript 7 are excluded from this TypeScript 6 API oracle and included in the native sweep. Last run in full on 2026-10-17, at `2a59e7c` ([single-thread work](performance-single-thread-opportunities.md#implementation-status)). |
-| Generated grammar combinations | 818/818 cases pass, including 79 invalid combinations. |
+| Upstream API corpus | 14,920/14,920 cases pass, including 14,143 full syntax-tree comparisons and 777 invalid-input rejection checks; 7,568,169 source bytes. Fifteen units using syntax removed in TypeScript 7 are excluded from this TypeScript 6 API oracle and included in the native sweep. Last run in full on 2026-10-17, at `2a59e7c` ([single-thread work](performance-single-thread-opportunities.md#implementation-status)). Since 2026-10-24, namespaces declared with `module` count as TypeScript 7 syntax rather than removed syntax: their trees are compared and `--check` must reject them (TS1540); the full corpus has not been re-run since. The TypeScript-Go checkout's own `testdata` cases (389 units at `2bd066d`) pass, `moduleKeywordSkipLibCheck.ts` included, except `jsxMultilineAttributeStringValues2.tsx`, whose multi-line attribute strings the TypeScript 6 API rejects and the parser accepted before and after this change. |
+| Generated grammar combinations | 852/852 cases pass, including 101 invalid combinations, with positions, flags, and scanner hints (2026-10-24). |
 | Standard declarations | All 108 `.d.ts` files shipped with TypeScript 7.0.2 parse successfully; 3,785,246 bytes. |
 | Compiler/declaration AST sweep | 185/185 files match positions, flags, and scanner hints; 13,185,321 bytes. This includes 77 compiler source files and 108 standard declarations. |
 | Identifier classification | The exhaustive native baseline covers all 1,114,112 Unicode code points for identifier-start and identifier-part acceptance. The current Rust test checks every code point against the recorded fixture. The updated native harness also passes a 4,096-code-point smoke check in an isolated output directory. |
@@ -68,9 +68,9 @@ load and do not establish native performance or profile admission.
 
 The upstream corpus is `tests/cases/conformance` and `tests/cases/compiler` at TypeScript 7.0.2 commit `1e4744d68260a7cb91b62b12edc3f6a2187faaf1`. The compiler-source corpus is from TypeScript 6.0.3 commit `050880ce59e30b356b686bd3144efe24f875ebc8`.
 
-The upstream native harness uses `--noCheck --noResolve --noEmit` to isolate syntax. Unquoted `module` declarations and missing operands after `throw` also receive strict grammar checks because the compiler can defer these errors to its checker. Authored tests confirm the corresponding native diagnostics. API runners share one classifier for TypeScript 7's removed syntax, deferred grammar errors, and ignored AMD module-name comments.
+The upstream native harness uses `--noCheck --noResolve --noEmit` to isolate syntax. Namespaces declared with `module` (TS1540) and missing operands after `throw` also receive strict checks because the compiler defers these errors to its checker. Authored tests confirm the corresponding native diagnostics. API runners share one classifier for TypeScript 7's removed syntax, deferred errors, and ignored AMD module-name comments.
 
-The four API runners (`conformance`, `grammar-corpus`, `source-corpus`, and `upstream-corpus`) also share one comparison, `compareSource` in [the oracle module](../tools/reference-oracle.mjs). It parses a source with the compiler API and, when TypeScript 7 still has its syntax, with the Rust CLI. Invalid inputs, and every input under upstream `--check-only`, run with `--check`. It returns facts: eligibility, validity and diagnostics, the CLI outcome, and the first disagreement with the oracle. A disagreement is a process failure, accepted invalid syntax, rejected valid syntax, or the first differing tree path from `firstDifference`. Each runner decides what those facts mean:
+The four API runners (`conformance`, `grammar-corpus`, `source-corpus`, and `upstream-corpus`) also share one comparison, `compareSource` in [the oracle module](../tools/reference-oracle.mjs). It parses a source with the compiler API and, when TypeScript 7 still has its syntax, with the Rust CLI. A source TypeScript 7 parses whole has its tree compared, including a namespace declared with `module`, whose only error is the checker's TS1540. Invalid inputs, that namespace among them, and every input under upstream `--check-only`, run with `--check`. It returns facts: eligibility, validity and diagnostics, whether the tree is compared (`parsed`), the CLI outcomes, and the first disagreement with the oracle. A disagreement is a process failure, accepted invalid syntax, rejected valid syntax, or the first differing tree path from `firstDifference`. Each runner decides what those facts mean:
 
 - Authored AST fixtures fail unless they are eligible and valid.
 - Generated grammar combinations fail when ineligible.
@@ -111,7 +111,10 @@ The library tests in `project::session::reuse_tests` and
 responses and compare them with fresh projects. They cover source/fact/navigation
 sharing, current file identities, module status and library roles, JSON and BOM
 changes, synthetic requests, obsolete-input release, resolution invalidation,
-and failures. Deterministic resolver counters distinguish reuse from recomputation.
+and failures, including a type reference's origin as part of its reuse
+identity, a `baseUrl` target appearing and disappearing, a type root gaining a
+name, and an installed compiler version change that selects other package
+files. Deterministic resolver counters distinguish reuse from recomputation.
 The existing session integration tests also exercise exact observations, FIFO
 reads, and files changing during construction.
 
@@ -184,12 +187,12 @@ Without paths, the changed command runs the test files that the changes since th
 | another module under `tools/` | the test files whose closure holds it, and those that name `scripts/` when a validation script names it |
 | `src/`, `tests/`, `examples/`, `benches/`, `vendor/`, `build.rs`, `Cargo.toml`, `Cargo.lock`, `.cargo/` | the test files whose closure runs the Rust tool or Cargo (it names `tsparse`, `cargo`, `reference_batch`, or a `target/` directory: 27 of 352 on 2026-10-19), those that name the changed file, and for `vendor/` those that name `vendor/` |
 | `fixtures/` | the test files whose closure names the fixture; a directory below `fixtures/<area>/` that holds it, such as a fixture project whose other files a test names; `fixtures/`, `fixtures/<area>`, or another holding directory as a whole (followed by a quote or `${`); or a `'fixtures'` path segment |
-| `scripts/`, `docs/`, `memory-bank/`, `README.md`, `AGENTS.md`, `CommandCenter.json`, `LICENSE`, `.gitignore`, and other files under `tools/` | the test files whose closure names that directory or file |
+| `scripts/`, `docs/`, `memory-bank/`, `plugins/` (the agent plugins and their generated packages), top-level Markdown such as `README.md`, `AGENTS.md`, and `SHARED_AGENTS_BLOCK.md`, `CommandCenter.json`, `LICENSE`, `.gitignore`, and other files under `tools/` | the test files whose closure names that directory or file |
 | anything else, such as package files | every test file |
 
 The base works as for Rust tests, recorded in `target/validation/harness-tests-passed.tree` with the Node version and each compiler variable's value, size, and time; a change to any of them runs every test file. `test` and `harness-test` allow 60 minutes (`timeoutMs` in `CommandCenter.json`); other commands get Command Center's global default. Most harness tests check the pinned compilers, so their time is the compilers': in a 58-file sample, two workers took 607 s, four 564 s, and eight 384 s at a load near 13.
 
-Compiler variables that are set are used as they are. Unset ones are filled from the canonical checkout's `.cache/compiler-oracles`: `TYPE_SCRIPT_API` from `typescript-6.0.3/package/lib/typescript.js`, and the TypeScript 7.0.2 semantic API and native compiler as for the [`semantic` command](#reference-semantics). A test whose compiler is still missing skips with a stated reason. On success the wrapper prints one line, for example:
+Compiler variables that are set are used as they are. Unset ones are filled from the canonical checkout's `.cache/compiler-oracles`: `TYPE_SCRIPT_API` from `typescript-6.0.3/package/lib/typescript.js`, and the TypeScript 7.0.2 semantic API and native compiler as for the [`semantic` command](#reference-semantics). `TYPE_SCRIPT_56_API`, behind the [5.6.3 tools](#typescript-563-oracle), is filled from `typescript-5.6.3/package` the same way, and strict mode's check before the run and the compiler values recorded with a pass include it. A test whose compiler is still missing skips with a stated reason. On success the wrapper prints one line, for example:
 
 ```text
 harness tests: 74 total, 67 executed, 67 passed, 7 skipped (HARNESS_REQUIRE_COMPILERS=1 fails on skips)
@@ -230,7 +233,7 @@ The registered `semantic` validation command, `scripts/validate/semantic-full.sh
 
 | Check | Result and scope |
 | --- | --- |
-| Marker fixtures | 46 projects in `fixtures/references`, 1,655/1,655 markers agree with the oracle, last counted 2026-10-08 after the final review's fixes. The registered `semantic` command, which runs this check, passed again on 2026-10-20 on the agent-facing CLI work's uncommitted tree on `7d3abaf` after its final verification's second review (`vrun-867ee4be-2750-450c-96af-fd0f92fa5abd`). They include the marked binding cases formerly inline in `tests/binding.rs`; conflicting, shadowed, diamond, and cyclic star exports; a named re-export cycle; conditional package `exports` with `customConditions` and per-format conditions; `typesVersions` with and without `exports`; a parent-directory `extends` that declares `paths`; `typeRoots` and `types` inside and outside `node_modules`; and `this` in type queries and a member missing from a namespace without exports. `tests/reference_fixtures.rs` checks the same markers, including roles, against the Rust tool. [Earlier runs and the projects each added](validation-history.md#marker-fixtures). |
+| Marker fixtures | 46 projects in `fixtures/references`, 1,655/1,655 markers agree with the oracle, last counted 2026-10-08 after the final review's fixes. A 47th, `module-keyword-namespaces` (namespaces declared with `module` in dependencies under `skipLibCheck`, keyword names after a dot included), was added on 2026-10-24: its 34 markers agree with the oracle, and the registered `semantic` command passed with it. The registered `semantic` command, which runs this check, passed again on 2026-10-20 on the agent-facing CLI work's uncommitted tree on `7d3abaf` after its final verification's second review (`vrun-867ee4be-2750-450c-96af-fd0f92fa5abd`). They include the marked binding cases formerly inline in `tests/binding.rs`; conflicting, shadowed, diamond, and cyclic star exports; a named re-export cycle; conditional package `exports` with `customConditions` and per-format conditions; `typesVersions` with and without `exports`; a parent-directory `extends` that declares `paths`; `typeRoots` and `types` inside and outside `node_modules`; and `this` in type queries and a member missing from a namespace without exports. `tests/reference_fixtures.rs` checks the same markers, including roles, against the Rust tool. [Earlier runs and the projects each added](validation-history.md#marker-fixtures). |
 | Tool comparison | All 1,655 fixture tokens and 524 name queries match, last counted 2026-10-08 after the final review's fixes. Outcomes: 1,208 groups, 346 unsupported, 101 unresolved. Normalizations: 9 `builtin`, 5 `ambiguousStarExport`, 4 `nonReference:globalAugmentation`, 4 `unresolvedProperty`, 2 `nonReference:thisTypeQuery`, and one each of `missingNamespaceExport`, `nonReference:metaProperty`, and `nonReference:thisParameter`. The registered `semantic` command, which runs this check, passed again on 2026-10-20 on the agent-facing CLI work's uncommitted tree on `7d3abaf` after its final verification's second review (`vrun-867ee4be-2750-450c-96af-fd0f92fa5abd`). Documented differences are separate projects in `fixtures/reference-exceptions`, each recording the compiler's and this tool's answers: `tests/reference_exceptions.rs` checks the tool's, and a real-oracle test in `tools/semantic-oracle.test.mjs` the compiler's, so neither side is a constant. Group matching ignores a declaration that several groups list, as a one-way pattern augmentation does, as it ignores a token in several groups. Measured 2026-10-05 and not re-run since: the 37 marked temporary projects of `tests/references.rs` and `tests/reference_loading.rs`, kept with `TSPARSE_KEEP_FIXTURES=1`, match on 426 of 436 queried tokens and 116 of 119 name queries. The rest are documented differences: the star re-export diamond with a type-only first route, and a dependency's partly exported overloads (TS2383), which the tool merges leniently into one group with an extra declaration. One further project is a 5,000-level nesting stress file that the tool rejects by design. [Earlier runs](validation-history.md#tool-comparison). |
 | Generated combinations | Measured 2026-10-06, after the second design review's fixes. `tools/reference-combinations.mjs` writes deterministic three-file projects that combine declaration kinds and merges, barrel and import forms, type-only imports, shadowing parameters, locals, and type parameters, and value, type, `typeof`, and qualified uses. Merges are generated only in orders TypeScript accepts. With `--count=400`, all 16,864 tokens and 5,760 name queries match, including roles. Outcomes: 13,857 groups, 2,158 unsupported, 849 unresolved. Normalizations: 567 `unresolvedProperty`, 372 `typeOnlyValue`, 74 `missingNamespaceExport`, 47 `unresolvedReceiver`. [Earlier runs](validation-history.md#generated-combinations). |
 | TypeScript compiler | Recorded with commit a44bc42 (2026-10-05), from position queries before roles and name queries were compared; not re-run since. A copy of the TypeScript 6.0.3 compiler sources (43 files, 9.4 MB of modules), with `noLib`, shorthand ambient declarations for its Node.js imports, and a stub for its build-generated diagnostics file: all 365,899 tokens match. |
@@ -404,6 +407,279 @@ The `semantic` command runs this comparison over `fixtures/navigation` with the 
 | Project navigation | `tests/project_navigation.rs` passes in the latest full Rust run (Rust tests, above). For every declaration of 14 files (13 checked-in fixtures and a declaration file) loaded as one project, it checks that `Project::outline` equals file navigation's entries and that each anchor's and selector's `Project::show` equals file navigation's outcome, also across the project. It also covers qualified names through namespaces, ambient modules, and a global augmentation, across the project and narrowed to a file; `OutsideProject` paths and query paths that are not Unicode; cross-file ambiguity; positions on no site and invalid positions; long callback chains and flat lists; and a session serving source and configuration changes to outline and show. [Earlier runs and what each added](validation-history.md#project-navigation). |
 | Command-line compatibility | 2026-10-08, after the round-5 review fixes, against `8edbc1f`: 1,153 unoptimized-build invocations (file outline and show in text and JSON, by name and position, missing names and invalid positions, over every navigation fixture; project outline, show, and reference queries by name, narrowed name, and position over every reference fixture's first six files, and outside-project failures) give the same exit status and stderr, and byte-identical stdout except six reference results whose library declarations name the vendored libraries relative to each build's checkout. On unchanged Command Center, optimized builds give byte-identical `--direct` answers to an outline of the largest file (`--json --depth all`, 1,541,232 bytes), a unique-name show (`incumbent.haltReason.message`), and a reference query (`TicketChildSummary`). The intended differences, which these inputs do not reach, are a query path that is not Unicode (now `Unsupported`, never a file) and a working directory that cannot be read (now `Io` in both entries, previously `OutsideProject` directly and a transport failure through the service). [Earlier runs](validation-history.md#command-line-compatibility). |
 
+## TypeScript 5.6.3 oracle
+
+The TypeScript 5.6 dialect's acceptance is checked against the pinned TypeScript 5.6.3 compiler API. It is an oracle for that dialect alone and never replaces the 6.0.3 syntax oracle or the 7.0.2 semantic oracle. `TYPE_SCRIPT_56_API` names the 5.6.3 package directory, the one holding `package.json` and `lib/`; unset, the tools look in the canonical checkout's `.cache/compiler-oracles/typescript-5.6.3/package`, found from any linked worktree through `git rev-parse --git-common-dir`. The package's `package.json` must say 5.6.3; a missing or other package exits 2 with the reason. [`tools/ts56-compiler.mjs`](../tools/ts56-compiler.mjs) owns the lookup and the 5.6.3 configuration parse for every tool.
+
+With `incremental: true`, 5.6.3 writes `.tsbuildinfo` into the project whenever it checks or emits, even with `--noEmit`. Every 5.6.3 `tsc` run therefore passes `--incremental false`, and every program built through the API has `incremental` forced false. A `composite` configuration cannot run the program comparison, since 5.6.3 refuses `--incremental false` there (TS6379). Even so, never run either tool on a real project checkout: clone it under `$TMPDIR` with `cp -cR` and run on the clone.
+
+`tools/program-inputs.mjs --oracle=5.6` compares the Rust listing of `list_configured_program` with 5.6.3's program, as the default mode does with 7.0.2's. The order comes from `lib/tsc.js -p TSCONFIG --listFilesOnly --incremental false`, which the API's program must list too. Provenance comes from `isSourceFileDefaultLibrary` (`library`) and `isSourceFileFromExternalLibrary` (`dependency`). A library from the package's `lib` directory is named by its file name, and any other file by its canonical path relative to the configuration's directory. 5.6.3 lists a package-id duplicate (a second installed copy of the same package name and version, a SourceFile with `redirectInfo`) as an input of its own, where 7.0.2 lists only the first copy. The 5.6 mode therefore treats the copy as a spelling of `redirectInfo.redirectTarget`: it leaves the order and the file set, the target keeps its own position (5.6.3 lists a copy it meets while its target's own imports are processed before the target, where 7.0.2 lists only the target, after those imports), and the report (default `.cache/program-inputs-5.6.json`) lists each copy and its target under `redirects`. The listing `list_configured_program` writes records this tool's redirects too, which must name the same copies with the same targets (a `redirect` difference otherwise). Without `--oracle`, the 7.0.2 comparison is unchanged.
+
+`tools/ts56-oracle.mjs` answers position queries through the 5.6.3 language service, over a host built from the parsed configuration. `type FILE:LINE:COLUMN` reports `getQuickInfoAtPosition` as its `displayPartsToString` text and span. `references FILE:LINE:COLUMN` reports each `findReferences` reference's file, one-based start, and TypeScript's `isDefinition` and `isWriteAccess`. `specifier IMPORTER=TARGET` reports `moduleSpecifiers.getModuleSpecifiers` for TARGET's module from IMPORTER with the preferences the checker's `getSpecifierForModuleSymbol` gives it, the module names the TypeScript 5.6 dialect's spelling tests expect; an `index` collision question resolves its name against the tool's working directory, as 5.6.3's host does. FILE, IMPORTER, and TARGET are relative to the configuration's directory. LINE and COLUMN are one-based, with the column in UTF-16 code units as for tsparse's `--at`, and lines break where 5.6.3's line map breaks them. It prints one JSON document. A bad query exits 1 before any answer, and a run that cannot start exits 2. Harness tests call `ts56Oracle(config, queries)` for the same document.
+
+```sh
+cp -cR /abs/app "$TMPDIR/app"
+TSPARSE_PROGRAM_CONFIG=$TMPDIR/app/tsconfig.json TSPARSE_PROGRAM_LISTING=$TMPDIR/listing.json \
+  cargo test --offline --release --lib -- --ignored --exact project::program::tests::list_configured_program
+node tools/program-inputs.mjs "$TMPDIR/listing.json" "$TMPDIR/app/tsconfig.json" --oracle=5.6
+node tools/ts56-oracle.mjs "$TMPDIR/app/tsconfig.json" type src/a.ts:1:14 references src/a.ts:1:14
+```
+
+The TypeScript 5.6 dialect's option catalog (`src/project/program/config/catalog_5_6.rs`) is data `tools/ts56-option-catalog.mjs` extracts from the same package's `lib/typescript.js`: `optionDeclarations` with each list's element declaration, enumeration keys and the keys TS6046 lists, and the `--build`-only names, with the file's SHA-256. `node tools/ts56-option-catalog.mjs` rewrites it and `--check` exits 1 when it differs; `tools/ts56-option-catalog.test.mjs` re-extracts it byte for byte, checks the recorded hash, and checks every enumeration's TS6046 list and every list element's name against the diagnostics the compiler reports, skipping with the reason when the package is not found.
+
+The dialect's library catalog (`src/project/program/libraries/catalog_5_6.rs`) is data `tools/ts56-library-catalog.mjs` extracts the same way: `libs` in declaration order, its two repeated names at both places, `libMap` with the last file of a repeated name, and `getDefaultLibFileName` for each `target` key and for any other target, with the file's SHA-256. The declarations themselves are not extracted: the dialect reads the installed compiler's `lib` directory. `node tools/ts56-library-catalog.mjs` rewrites it and `--check` exits 1 when it differs; `tools/ts56-library-catalog.test.mjs` re-extracts it byte for byte, checks the recorded hash, the 88 names, 86 files, and target defaults, that every cataloged file is in the package's `lib` and every `/// <reference lib>` in one names a library, skipping with the reason when the package is not found. The Rust unit tests in `src/project/program/libraries.rs` check the catalog's provenance and its program-order positions, and `src/project/program/config/catalog.rs` that the option catalog's `lib` enumeration is the same `libMap`.
+
+Library selection under the dialect is pinned in Rust at `Project::load` and query results, against 5.6.3's `tsc --listFilesOnly --incremental false` and `tools/ts56-oracle.mjs` on scratch copies, beside 7.0.2's answers for the same projects: the program tests in `src/project/program/tests.rs` (the libraries Artemis's `lib` and `target` select, which `tools/program-inputs.mjs --oracle=5.6` also compares, each target's default, `/// <reference lib>` names and their TS2726 and TS2727 messages, a missing or unreadable installed file, library and dependency roles, replacement packages, and program order around them, where routes overlap, and by where a library lies) and `tests/typescript_5_6_libraries.rs` (binding, `--type` answers through the service and directly, overload answers that program order decides, including where two routes reach one file, where a replacement or a referenced file lies beneath the installed `lib`, however its reference path is spelled, and where the package or its `lib` is a link, a replacement's `typesVersions` read with each dialect's version, session refreshes, including a package whose `package.json` links elsewhere and is relinked and a linked `lib` retargeted, and the CLI from another directory). They install a copy of the pinned 5.6.3 package as the project's compiler, found as the tools find it, and skip with the reason when it is not found. Where an answer depends on where the installed libraries lie, reproduce it with the project's own copy: its `lib/tsc.js`, or `tools/ts56-oracle.mjs` with `TYPE_SCRIPT_56_API` naming the project's `node_modules/typescript`, since the oracle otherwise reads the libraries of the package it loads.
+
+Module and type-reference resolution under the dialect is pinned in Rust the same way, against 5.6.3's `tsc --listFilesOnly --traceResolution --incremental false` and native 7.0.2's on scratch copies, run from the copy's real path (native `tsc` keeps a symbolic-link working directory as given): `tests/typescript_5_6_resolution.rs` (`paths` before `baseUrl`, a matched pattern's missing substitutions, exact and wildcard keys and ties, `rootDirs`, `typesVersions` patterns, the declaring file of `baseUrl` and `paths`, ranges selected by the installed version and by 7.0.2, and an Artemis-shaped project through `Project` queries and the CLI, whose answers are `tools/ts56-oracle.mjs`'s), `tests/type_reference_roots.rs` (type roots and the origin of a type name, under both dialects), and the session refresh tests named above. Module names the checker spells are pinned in `src/project/program/tests.rs` against `tools/ts56-oracle.mjs specifier` and against TS2305 messages, in which 5.6.3's `tsc` and native 7.0.2 spell a module afresh when a CommonJS file's only imports of it use the `import` mode. `--type` output never shows these names: both compilers' quick info names a module by its file whenever no module resolver host is given, as `--type` does. A `baseUrl` name the checker needs is therefore proven in two parts: the generated names equal 5.6.3's `getLocalModuleSpecifier` (those spelling tests), and `a_type_query_spells_a_base_url_module_from_captured_inputs` in `tests/typescript_5_6_resolution.rs` shows a `--type` request that demands such a name completing from captured inputs alone. Those `tsc` runs replace the fixtures' `noLib` with a `lib` (`"lib": ["es2022"]`): without libraries `tsc` reports TS2318 for the missing global types and then no semantic diagnostic at all.
+
+Configuration reading is pinned in Rust instead. Each configuration experiment, run on a scratch copy through 5.6.3 (`getParsedCommandLineOfConfigFile`, and `tsc --showConfig` or `--noEmit`, with `--incremental false`) and native 7.0.2 (`tsc --showConfig` and `--listFilesOnly`), is a loading assertion under both dialects in `src/project/program/config/conversion_tests.rs` that names its experiment: the effective options, the searched files, or the failure. `fixtures/configuration/base-url-project` is a synthetic `tsconfig.json` with the option and pattern shapes of Artemis's, under neutral names: `baseUrl` `.`, six base-relative `paths` patterns (an `@/*` alias, three `@x-y/*` aliases, a `prefix*` pattern, and an exact pattern into a package's `dist`), the same compiler options and value shapes, `include` and `exclude` patterns of the same kinds, `watchOptions`, a one-entry `files` list, and a `ts-node` section with its own `compilerOptions`. It sits beside a 5.6.3 manifest, stubs of the three library files its `lib` names, and two source stubs; the tests compare its effective options with 5.6.3's `--showConfig` of a copy, and `tests/typescript_5_6_configuration.rs` checks that the TypeScript 7 dialect still refuses its `baseUrl`, as `Unsupported`, where native 7.0.2 reports TS5102. No tracked fixture holds Artemis's files. Expected outcomes come from those runs, never from this tool's output; where the tool deliberately differs, the test says so and [references](references.md#compiler-selection) records it.
+
+`tools/ts56-oracle.test.mjs` and `tools/program-inputs-56.test.mjs` run both tools on small projects under the system's temporary directory. They cover quick info and references through an import, each line break and an astral character's UTF-16 columns, module specifiers through `baseUrl`, bad queries and their exits, a library's name, the duplicate package's redirect, a redirect 5.6.3 lists before its target, and the absence of `.tsbuildinfo` although the projects set `incremental: true`. With the 7.0.2 compilers, one test also checks that the folded 5.6.3 program is the one 7.0.2 lists. The tests skip, with the reason, when the 5.6.3 package is not found. Run each file through the registered `harness-test` command.
+
+JavaScript inputs are pinned in Rust at `Project::load` and query results, against native 7.0.2 and 5.6.3 on scratch copies (`tsc --pretty false --listFiles --incremental false`, `tools/type-oracle.mjs`, `tools/ts56-oracle.mjs`, and declaration emit, `--declaration --emitDeclarationOnly`, which shows whether a JavaScript assignment or JSDoc tag gave an export a member or a type): `tests/javascript_admission.rs` (inputs by `allowJs` and `maxNodeModuleJsDepth`, including a file reached deeply and then shallowly, untyped modules, constants modules' types and references), `tests/javascript_syntax.rs` (TypeScript-only syntax in each JavaScript extension, under every checking option, file-local commands), `tests/javascript_checking.rs` (each `checkJs` state against each pragma, both dialects), `tests/javascript_semantics.rs` (plain ES module answers and the located query refusals), `tests/javascript_hosted_types.rs` (a variable's JSDoc `@type` under both dialects, a later declaration's, types with JavaScript-only meaning, mapped and literal types by their tokens, and JavaScript's type-argument defaults beside TypeScript's), `tests/javascript_commonjs.rs` (a `module.exports = name` module shaped like a web framework's configuration: default-import, member, in-module, and `import("...")` types, references, the module's own `module` variable, constructs that declare nothing, and session refreshes of its `@type` and exports), and `tests/javascript_refusals.rs` with the classifier's unit tests (each refused construct, every other CommonJS form among them, by each route and checking state, dependency tolerance, constructs TypeScript gives no JavaScript-only meaning, each dialect's own refusals and JSDoc ownership, what only 7.0.2 gives meaning, refused in both dialects by each route and from a dependency, and session refreshes, including a dialect change with the JavaScript unchanged). Refusals are this tool's capability limits, so their expected outcome is the refusal itself; the compilers decide which constructs have JavaScript-only meaning. [references.md](references.md#typescripts-javascript-only-branches) maps each `IsInJSFile` site to its test.
+
+Package identity is pinned in Rust at `Project::load` and query results, against both compilers on scratch copies run from their real path (`tsc --explainFiles --listFilesOnly --incremental false`, whose `with packageId` and `File redirects to file` lines show each id and redirect; an assignment such as `const check: Same = "yes"` for each identity probe; declaration emit, `--declaration --emitDeclarationOnly`, for a module named through a redirect; `tools/ts56-oracle.mjs` and `tools/semantic-oracle.mjs` for references). `tests/package_redirects.rs` covers one identity for a class with a protected member and a unique symbol in both dialects and `deduplicatePackages` under 7.0.2, the copy collection meets first in both import orders, peers (different, equal, and absent installed versions, the order and validity rules of each dialect, versionless peer manifests, and a store of linked package directories with and without `preserveSymlinks`), which routes carry an id (relative and `paths` names of a file and of a directory, a substitution with its extension, an `exports` subpath and a `typesVersions` substitution, a type reference, the route that first reaches a file), failures only a redirected copy reaches (a syntax error, an unreadable file, a missing reference, and a lookup that cannot read a `package.json`, also when a file that stays in the program meets the same lookup afterwards), the `name` and `version` each compiler reads (an empty name, repeated fields, a peer's repeated `version`), references through a redirect, the refusal of every request that names a redirected file, provenance where a root's reference reaches a redirected copy (the provenance `tools/program-inputs.mjs` reports with and without `--oracle=5.6`, through an outline of the file only the copy references), 5.6.3 following the target's references from the copy it processes again (a global interface the copy's own `note.d.ts` merges, which `--type` and `--outline` show under 5.6 only, its missing `note.d.ts`, reported unless `skipLibCheck` skips it, an augmentation of that `note.d.ts`, which applies under 5.6 and is TS2664 under 7.0.2, and an unreadable `package.json` that only lookups from the copy's location meet, which fails the load under 5.6 only, ahead of an unreadable input imported earlier), and a session refreshing each input of an id, a copy's directory link retargeted included, with and without `preserveSymlinks`. `tests/reference_loading.rs` pins that a lookup failure is ordered among the inputs' failures by the file that met it. `src/project/program/tests/redirects.rs` checks the program's inputs, its redirects, the rewired request, `FileLookup`'s refusal, a redirect met inside its target's imports, a `types` package that redirects only under 5.6, module names generated through a redirect (5.6.3's `getModuleSpecifiers` and both compilers' declaration emit), each input's provenance where a route without a package lookup reaches a redirected copy, directly, through a dependency file it reaches again, or met through a directory's id under 5.6, and the inputs and redirects 5.6.3's processing of such a copy again adds for each kind of its target's subtasks (a reference path, an import, a type reference) and each route (a root's reference, a dependency file a root reaches again, the copy as a root), with the library reference that adds nothing.
+
+A construct joins `REFUSED_5_6` in `tests/javascript_refusals.rs` when 5.6.3 gives it meaning and 7.0.2 does not, `REFUSED_7` when 7.0.2 gives it meaning and 5.6.3 does not (both dialects refuse it, as both answer through the binder and checker that port 7.0.2 for the supported slice alone), and an admitted case when neither does. Decide meaning from both compilers on a scratch project: the JavaScript file's own declaration emit (`--declaration --emitDeclarationOnly`) shows a member, class, or namespace the binder declared; a TypeScript consumer's emit (`export const v = expression;`) or `tools/ts56-oracle.mjs`'s quick info shows a type a tag gave. Do not read types from TS2322 messages, which widen a literal source (`"x"` prints as `string`). Where emit shows nothing, as for a binder declaration the checker does not merge into a type, read 5.6.3's binder state through its API (`program.getTypeChecker()`, then a symbol's `exports` or `members`); `src/project/binding/javascript/typescript_5_6.rs` names the 5.6.3 function each decision ports.
+
+## Artemis acceptance 2026-10-27
+
+Artemis revision `294b702c63a3a93f2d1bd01b5974e318a1994e86`, with its
+unchanged configuration and installed TypeScript **5.6.3**, loads through
+the native TypeScript 5.6 dialect. Every requested command family was
+exercised. This is a completed comparison with qualified compatibility:
+partial answers and refusals below remain real limits, not equivalent
+answers. TypeScript 7.0.2 remains the semantic authority; the pinned 5.6.3
+compiler governs dialect comparisons. No alternate configuration, stubs,
+source exclusions or dependency upgrades were used to make the project
+load. Compiler and editing work used disposable clones, with incremental
+compilation disabled for compiler programs.
+
+The oracle audit captured 125 commands and 250 stdout/stderr outputs; all
+250 output hashes verified. The input inventories and the hashes of all
+7,896 inputs plus `tsconfig.json` agreed across the real checkout, a
+protected clean copy and the disposable comparison clone: 7,897 checks, zero
+mismatches. The real checkout's status stayed empty and its revision
+unchanged through the oracle, service and editing audits.
+
+### Inputs, operations and oracle answers
+
+| Comparison | Result |
+| --- | --- |
+| Unique program inputs | 7,896 in both tools: 4,977 project, 2,845 dependency and 74 standard-library files. Project inputs include three JavaScript files. No missing/extra inputs or provenance differences. |
+| Package redirects | All 18 primary/duplicate relationships agree. Native's raw 7,914 SourceFiles include redirects; the tool records them separately from its unique semantic inputs. |
+| Program order | 858 unequal indexed rows, caused entirely by four moved files: React global declarations, csstype, React index and jsx-runtime. Removing those four makes the remaining order identical. See the retained predicate difference below. |
+| Parse and syntax check | Representative `.ts`, `.tsx` and `.js` inputs succeed. Native syntax diagnostics are empty; top-level spans and source endpoints agree for 4, 9 and 5 statements. Whole-tree numeric-kind serialization identity with 5.6.3 is not claimed. |
+| Navigation | Local/project outline and show agree byte for byte. Definitions reach the CommonJS and barrel declarations. The printed import-miss definition command succeeds. Test outline and statement selection return the complete test statement at lines 4–8. Doctor passes seven checks. |
+| Lexical references | `useItracingAccessLevel`: 25/25; name and position agree. Calls: 8/8. JavaScript `COLORS`: 140/140, including a renamed import; unrelated local `COLORS`: 2/2. |
+| Member references | `AccessTokenSynchronizer.loadToken`: 11/12; `AppConfigSource.getPublicAppConfig`: 5/30; `ITRACING_ACCESS_LEVELS.FULL`: 13/15. No extras. All 39 candidate gaps were classified; 11 are native non-targets and 28 are omitted targets. Causes are recorded below. |
+| Reference scope | All 71 `SWRConfig` and 1,151 `fireEvent` project references agree. Native additionally reports two and one dependency occurrences, respectively; the tool's documented project-only occurrence scope excludes those. |
+| Types and depth-2 expansion | 19 cases cover hooks, props, DOM, awaited fetch, typed arrays, Jest, Node, aliases, barrels, baseUrl, JavaScript/CommonJS, augmentation and constructor-parameter widening. Seventeen underlying types agree, allowing the explicitly classified presentation/order differences below. Two typed-array queries refuse. Successful expansions have zero issues and identify depth truncation. |
+| DOM expansion | All 183 declaration identities survive comparison: 181 direct member-type string matches and two ordering-only differences from distinct `PointerEventsCheck` symbols. Names and optional flags all match. Explicit property-list normalization leaves no unexplained type difference. Component props, callback parameters/returns and hook return literals also agree. |
+| Constructions | Four correct `FetchTokenResult` sites, no missed targets. Broad search examines 5,028 candidates with 1,284 gaps: 861 `flow_required`, 256 `jsx_typing_required`, 165 `unsupported_semantic_form`, two `error_type`. A larger native scan of 5,081 candidates confirms all reported gaps are non-targets. File-filtered search returns the same four sites with no gaps. |
+
+### Service, resources and invalidation
+
+Twelve representative queries have byte-identical stdout, stderr and exit
+status through direct and service execution: lexical/member references,
+filtered calls, JavaScript/CommonJS references, type summaries, expansion,
+library-dependent types, outline and show. The existing partial
+`flow_required` answer is identical too. Doctor passes before and after;
+`--doctor --direct` is outside the CLI's supported flag scope.
+
+| Measurement | Observed result |
+| --- | --- |
+| First cold query | 8,002.894 ms |
+| Twenty ordinary warm samples | 583.115–1,967.427 ms; median 852.583 ms |
+| Repeated cold query | 3,134.105 ms |
+| Fifteen repeated warm samples | 634.109–805.482 ms; median 673.856 ms |
+| After real-project queries | 1,925.703 MiB RSS; 1,807.736 MiB physical footprint |
+| Generation 15 after one cold load and fourteen source refreshes | 2,716.891 MiB RSS; 3,126.269 MiB physical footprint |
+| After another 20.057 seconds idle | 2,523.594 MiB RSS; 3,126.378 MiB physical footprint |
+
+Memory was measured with macOS `proc_pid_rusage`, including physical
+footprint (compressed memory included). The 6,144 MiB configured limit is
+not a measurement; status has no memory field. Every one of the fifteen
+generations matched a fresh direct load. After a full load the physical
+footprint was 1,685–1,808 MiB; refreshes raised it past 3,000 MiB by
+generation 10, and from generation 12 through 15 and 20 seconds of idling it
+held at 3,123–3,130 MiB (3.28 GB at its last sample). That exceeds the
+[operating envelope](../ENVELOPE.md)'s working ceiling of about 2 GB of
+retained memory per service, and every warm sample misses its 100–200 ms
+target. Load averages were roughly 9–11 on 18 logical CPUs during the
+repeated timing sample. No controlled-load baseline or allocation breakdown
+establishes product cost, dominant retained structures, an unbounded leak,
+or TypeScript 5.6 causation.
+
+Invalidation passed for source edits (25 → 26 references), paths mapping
+selection, dependency declarations and versions, installed compiler
+manifest changes (5.6.3 → 5.7.3 → 5.6.3), installed library declarations,
+a JavaScript value (24000 → 24001), and a nested duplicate-package version
+(identity-dependent answer changes from “same” to “different”). Each
+service answer equals a fresh direct load. Repeated failed refreshes return
+errors for type, references and show without stale answers; repair restores
+correct answers. The compiler-manifest mutation proves invalidation, not
+compatibility with an actual 5.7 implementation.
+
+### Restricted environment and lock correction
+
+The preserved macOS sandbox transcript demonstrates the full-project
+journey: an inaccessible default directory with `TMPDIR` unset returns
+`transport.directory`, exit 2, and both variable remedies. A permitted
+scratch `TMPDIR` succeeds in 16.10 s. Doctor names the selection rule and
+reports 102 of 103 socket-path bytes; status and stop identify and terminate
+the same process. Explicit-directory precedence, privacy refusals for
+0750/0705/0755, and socket lengths 102/103/104 bytes are covered: `TMPDIR`
+is selected at 102 and 103, skipped at 104. The original redirected query
+JSON was not retained; the transcript proves successful service operation,
+not byte equality of that unavailable response.
+
+Acceptance also reproduced a separate case: an existing readable mode-0700
+default directory whose lock writes are denied. It returned `transport.lock`
+without a directory remedy, while doctor passed its metadata checks. This
+small correction reuses `runtime::Rule::remedy` for all lock failures,
+including failures relayed from the child service. The OS cause, lock path,
+`transport.lock` identity and exit 2 remain intact. Text prints the `next:`
+remedy on stderr; JSON includes `error.remedy` with no stderr.
+
+`tests/runtime_directory.rs` first failed on the missing final CLI remedy,
+then passed with the correction. Reverting only the service change again
+fails exactly the two lock tests, each on its missing `next:` remedy, while
+the other seven pass. Its sandbox cases cover unset, empty,
+relative and overlong `TMPDIR`, plus selected `TMPDIR` and explicit
+`TSPARSE_SERVICE_DIR`; existing socket tests cover one byte below, at and
+above the limit. `tests/service_startup.rs` verifies child-failure relay and
+foreground output, including a diagnostic that cannot be written. This is
+service product policy, not a compiler rule. Doctor still checks metadata
+and socket length rather than lock writability; that separate limit remains.
+
+The runtime tests also cover a child-only lock failure when the client
+selected `TMPDIR`: text and JSON must retain the client's remedy, even
+though the child receives an explicit runtime directory. Substituting the
+child's selection rule makes that regression test fail. Sandbox directory
+denials are checked independently for each response, allowing either the
+creation or inspection failure with the exact cause and remedy; the test
+does not assume the default directory stays present or absent between
+requests.
+
+The corrected CLI was also rerun against a fresh disposable Artemis clone.
+With `TMPDIR` unset or skipped for a 104-byte socket path, both text and JSON
+retain the permission error and exit 2 while naming both remedies and the
+selection reason. With a writable `TMPDIR`, all 25 hook references return
+and stdout, stderr and exit status match a fresh direct query byte for byte.
+Status/stop/status confirm the service was terminated. This follow-up used
+an optimized debug build under concurrent validation load; its 25.95 s
+service start and 5.42 s direct query are functional evidence, not comparable
+release-performance samples.
+
+Finally, a release build of the corrected tree ran the originally failing
+service-backed query (`--references --name useItracingAccessLevel --limit
+all`) read-only on the real checkout, with a scratch `TMPDIR`. Doctor passed
+all seven checks, selecting `TMPDIR/tsparse-UID` with 90 of 103 socket-path
+bytes. The query exited 0 with 25 occurrences in 11 files, complete; the
+cold and warm service answers equal `--direct` byte for byte, and
+status/stop/status confirm the service ended. The checkout's status and
+revision were unchanged before and after.
+
+### Editing on a disposable copy
+
+Body replacement, statement insertion and a three-edit batch across two
+files were planned, inspected and applied. Direct/service previews agree;
+complete output bytes match independently constructed expectations,
+preserving comments, declarations and surrounding formatting. Of 8,591
+tracked clone entries, only the two intended TypeScript files changed.
+
+Changed contents, a deleted target and replacement by a new inode with
+identical bytes all refuse as `Stale`, exit 1, effect unchanged, with no
+leftovers. The contents case used project preparation; deletion and inode
+replacement used file-local preparation. All exercise the shared apply-time
+checks. Overlapping batches refuse without partial writes. JavaScript and
+duplicate-package targets refuse in direct/service JSON and text modes;
+apply also refuses altered plans naming JavaScript via targets or aliases.
+
+The edited project loads, both edited files pass syntax checks, and the
+final direct/service reference answers agree. All baseline 25 and final 29
+reference start/end ranges match 5.6.3: four added, none removed. Definition
+and write flags agree under a syntax-checked projection for this corpus;
+this is not general equivalence with raw compiler flags. The immediate
+post-apply byte proof establishes the tool's output; a later stale-content
+restoration script wrote the final hook copy, whose equality establishes
+preservation separately. The protected source/configuration inventory of
+9,569 entries stayed unchanged (excluding dependencies, Git metadata and
+build output from that particular inventory). All measurement/editing
+services were stopped.
+
+### Remaining issues and resolved audit artifacts
+
+| Item | Cause, scope and disposition |
+| --- | --- |
+| JSX-runtime admission/order | **Retained compatibility difference.** 5.6.3 `collectExternalModuleReferences` considers JavaScript, and non-declaration files when effective `isolatedModules` is true or the file is an external module. This tool keeps 7.0.2's JSX/TSX-only predicate. React global/csstype/index appear at 658–660 and jsx-runtime at 935, versus native indices 78–81. React has 149 empty interfaces, 133 with bases, but only Event, EventTarget, FormData and Blob cross same-named declarations; their React declarations have neither members nor bases. No contributed member/base/overload sequence changes in this program, and EventTarget definitions are path-sorted. Documentation now states the limit; a port affecting admission, module status, diagnostics and refresh across both dialects is deferred beyond this local correction. No general equivalence is claimed. |
+| Installed-compiler filename normalization | **Open harness defect, not compatibility.** `tools/ts56-compiler.mjs::programFileName` shortens every file directly in the selected compiler's lib directory. Selecting Artemis's installed API falsely renames imported `node_modules/typescript/lib/typescript.d.ts`, adding one missing/extra pair and one order row. The pinned-oracle run isolates the artifact and has only the 858 genuine ordering rows. A future regression should preserve dependency paths while shortening standard libraries only. |
+| `loadToken` references | **Existing flow coverage.** One omitted native target at `api-manager.ts:100:66` needs schema narrowing at `schemas/util.ts:170:16`. The readonly parameter-property widening regression is resolved; no `overload_recovery` gap remains. |
+| `getPublicAppConfig` references | **Existing flow/JSX coverage.** Twenty-five native targets are omitted among 27 candidates: 26 `flow_required` candidates depend on `schemas/util.ts:170:16`; one `jsx_typing_required` candidate has its cause at `pendo-provider.tsx:151:5`. Candidates at `pendo-provider.tsx:93:31` and `pages/_app.tsx:121:43` are native non-targets. |
+| `ITRACING_ACCESS_LEVELS.FULL` references | **Existing flow coverage.** Two omitted targets at `use-product-category.ts:159:58` and `itracing/paths.tsx:22:52`, among eleven explicit flow gaps. Causes are schema narrowing at `schemas/util.ts:170:16` and `paths.tsx:23:7`; another non-target candidate depends on `profile-preview.tsx:180:12`. Nine candidates are native non-targets. |
+| Typed array at `delivery.ts:85:9` | **Existing flow coverage.** Native returns `Uint8Array`; summary/expansion refuse `flow_required` at 85:38 because evaluating the initializer requires narrowing its match result. An independent typed-array control agrees, excluding missing libraries as the cause. |
+| Typed array at `prepare-report.spec.ts:507:11` | **Existing error recovery boundary.** Native returns `Uint8Array`; the tool refuses a consumed `error_type` at `sharp/dist/index.d.mts:665:63`. Sharp's generic Buffer annotation conflicts with installed @types/node 20.10.0's nongeneric Buffer. Neither compiler selects its only alternate `typesVersions` branch (≤4.8). Native recovers and continues; no incorrect compatibility input was found. |
+| SWRConfig union and DOM member ordering | **Retained TS7 checker ordering.** The same SWRConfiguration/callback alternatives print in reversed order. Both distinct `PointerEventsCheck` mapped types print numeric properties 1,2 instead of native 2,1: ApiLevel declares Trigger=2 before Call=1, and 5.6 creation/type-id ordering differs from 7's stable type ordering. All constituents and compared structures agree. |
+| QuickInfo labels | **Presentation distinction.** Qualified `jest.Expect`/`NodeJS.Process` and a call-specialized matcher signature differ from queried underlying types `Expect`/`Process` and the generic matcher. Supplemental `getTypeAtLocation` agrees; no ambient package is missing. |
+| Broad construction gaps | **Existing checker coverage.** All 1,284 gaps are native non-targets: 861 `flow_required`, 256 `jsx_typing_required`, 165 `unsupported_semantic_form` and two `error_type`. Filtering returns the same four target sites without gaps. No missing 5.6 inputs caused these refusals. |
+| Flow and JSX coverage | **Pre-existing checker limits, kept.** Every `flow_required` and `jsx_typing_required` gap above comes from operations the checker does not implement yet ([types design](types-design.md): flow narrowing and JSX typing). The flow and JSX member-reference gaps have the counts and causes an earlier probe of this project recorded before 5.6 compatibility existed. All of them are reported as partial answers, not as matches. Implementing either operation is checker work beyond this acceptance. |
+| Construction/type failure-reason propagation | **Open recovery-path investigation.** At `svg-utils.ts:309:3`, direct type reports `flow_required` from `schemas/util.ts:170:16`; constructions reports `error_type` during contextual recovery with the schema cause included. Native gives `OrganizationPositionMap \| undefined`; the literal is a non-target and there is no invalid-access diagnostic. Preserve this distinction until a focused synthetic reproduction establishes the intended reason. |
+| Retained service memory | **Open, cause unknown.** Physical footprint reaches 3,126 MiB (RSS 2,717 MiB) after one load and fourteen refreshes, and stays there after 20 seconds idle (3,126 MiB, 3.28 GB; RSS 2,524 MiB). The envelope's working ceiling is about 2 GB; the configured limit of 6,144 MiB is not reached. Direct and service answers still agree exactly. No allocation profile exists, so neither the dominant structures nor a TypeScript 5.6 cause is known. Compare a TS7 project of similar size and profile retained allocations before choosing a correction; that work is larger than this acceptance's small fixes. |
+| Warm latency | **Open, cause unknown.** Above target in both sample sets. A controlled-load baseline is needed to separate contention from product cost. |
+| Doctor writability | **Open metadata limitation.** Mode/ownership and socket-length checks can pass when sandbox policy denies lock writes. The lock remedy is corrected; doctor does not attempt a lock write. |
+| Editing harness runtime | **Open pre-existing harness issue.** `tools/editing-flows.mjs` hardcodes `/tmp`; the acceptance runner honored supplied `TMPDIR` and stopped its service. A follow-up should use `os.tmpdir()` and test under restrictions. |
+| Installed skill cache | **External environment maintenance.** Cached v0.1.3 still excluded project JavaScript. Current repository guidance describes the supported slice and editing refusals; refreshing the global installation remains separate. |
+| Redirect representation and dependency occurrences | **Intentional scope/normalization.** Eighteen redirect SourceFiles become separate redirect records; dependency reference occurrences are excluded. No identity or project occurrence is lost. |
+| Ancestor @types layout | **Resolved environmental difference.** A mirrored layout with two roots containing the same 83 package names selects the same inputs/redirects as the standalone clone; nearer packages satisfy duplicate names. |
+| Temporary DOM comparator | **Resolved audit defect.** Display-name keys collapsed 183 identities into 178. The corrected comparator preserves declaration origins and proves 181 direct matches plus two ordering differences, superseding 182 plus one. |
+| Editing expectation and setup artifacts | **Resolved, no product defect.** The initial insertion expectation omitted the documented blank separator and was corrected before apply. Bash replaced a denied zsh heredoc operation. The manifest reader hashes symlink spellings rather than reading directory targets. The final report includes all three stale states and their preparation modes. |
+| Restricted response retention | **Evidence limitation.** The original successful sandbox query's redirected JSON is unavailable; only the preserved transcript is claimed. Future evidence should retain the full response and hash. That exact-profile run was made from an unrestricted shell: inside an already sandboxed runner, a nested `sandbox-exec` exits 71 (`sandbox_apply: Operation not permitted`) before `tsparse` starts, which is a limit of that environment, not a product failure. |
+| Refused-construct probe | **Resolved audit artifact.** The first failed-refresh probe assigned `exports.name = 1` inside an existing ES module and expected a refusal; both entries accepted it, correctly. 5.6.3's `setCommonJsModuleIndicator` returns false for a file with explicit module syntax, so the file stays an ES module. The failed-refresh evidence uses a JSDoc `@param` tag instead, which the tool refuses as `Unsupported`. |
+
+### Regression checks and distribution surfaces
+
+Full-scope format, lint and the full registered semantic check pass. Rust
+and semantic validation ran sequentially. The full registered harness passes
+all 1,148 tests, with zero skips. The full registered Rust suite passes. Three tests
+cannot run because this macOS filesystem rejects non-UTF-8 names:
+
+- `a_saved_plan_whose_path_is_not_unicode_is_named_lossily_without_a_command`
+- `a_working_directory_that_is_not_unicode_is_unsupported_input`
+- `an_included_file_without_a_unicode_name_is_unsupported`
+
+Two maintenance entry points are intentionally ignored by the ordinary
+suite: `list_configured_program` needs explicit configuration/output paths,
+and `write_reference` writes generated documentation. The latter was run
+explicitly to regenerate the CLI reference.
+
+The frozen application-corpus journeys and load baseline were not run:
+that external corpus is not present on this machine. This is a missing
+corpus, not a passing journey or a skipped compiler comparison.
+
+The agent surfaces were checked for behavior clauses against their code
+owners, in addition to coverage of all 16 operations:
+
+| Surface | Implementation spot-check |
+| --- | --- |
+| `COMMANDS.md` | `compatibility::select`/`describe` and `doctor::compatibility`: any 5.x selects 5.6, only 5.6.3 is validated, and doctor reports compiler identity and library source. Configuration's 5.6 owner supplies `Config` versus `Unsupported` refusals; `Program::file_lookup` supplies the duplicate-copy refusal and primary-file remedy. Namespace diagnostics, import types, widening, JavaScript, selectors, caps and editing were also checked. |
+| `plugins/tsparse/skills/tsparse/SKILL.md` | The same compatibility/refusal owners, JavaScript binding rules and editing policy match its detailed workflow guidance. `runtime::Rule::remedy` and `Endpoint::lock_error` match its lock guidance. Its cost paragraph is self-contained for installed users and makes no latency guarantee. |
+| `SHARED_AGENTS_BLOCK.md` | Its operation summaries match the registry; compiler selection, configuration refusals, duplicate-copy behavior and directory/lock/privacy remedies match the same owners. |
+| `docs/cli-reference.md` | Regenerated from `src/cli/registry.rs` and the failure-code registry. Doctor's compatibility details and `transport.lock`'s remedy description agree with the implementation; the generation drift test checks the complete reference. |
+| Plugin metadata and Codex package | Both plugins report 0.4.3 and the compatibility scope. Regeneration with the hook's `skill-sync` command produces matching skill bodies, with only generated frontmatter wrapping, and matching metadata. |
+
+The registry's `write_reference` generates `docs/cli-reference.md` only;
+`COMMANDS.md` is handwritten and was checked and updated separately.
+Directory creation/inspection and lock failures name directory-selection
+remedies; privacy failures retain permission or ownership remedies such as
+`chmod 700`. The JSX-runtime owner's comment now names its pinned TypeScript
+7 functions and the deliberately retained 5.6 collection difference.
+
+The bounded lock correction changes no compiler rule, dialect selection,
+parser, binder, checker or editing contract. Existing flow, JSX and recovery
+limits and larger resource work are recorded rather than expanded here.
+
 ## Editing
 
 Source-preserving editing ([editing](editing.md)) is checked by behavior-level
@@ -520,3 +796,21 @@ cargo test --offline
 ```
 
 The generator requires complete classifications and refuses a dependency that lacks a compiler-supported identifier character. Generated ranges and their native compiler version are recorded in `fixtures/identifier-ranges.json`.
+
+### Navigation and construction compatibility
+
+`tests/compatibility_operations.rs` exercises definitions, executable import
+hints, construction sites, test outlines and statement selection together on
+a synthetic 5.6 project with `baseUrl` and `paths`. It compares direct and
+service answers, covers JavaScript `.js`, `.jsx`, `.mjs` and `.cjs` inputs in
+both dialects, statement-edit refusals, load-time capability refusals, TS1540,
+and requests naming package redirects. Definition locations and contextual
+properties come from 5.6.3's language service and checker on scratch projects
+with incremental compilation disabled. Test outlines and statement selection
+are product contracts, with no compiler operation to compare.
+
+Import hints name an existing specifier's definition command. Inverse module
+naming is checked separately by
+`module_spelling_names_targets_from_base_url_under_5_6` against
+`tools/ts56-oracle.mjs`'s `specifier` query; the same captured naming
+environment supplies all semantic presentations.

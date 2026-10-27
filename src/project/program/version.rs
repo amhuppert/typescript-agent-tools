@@ -1,25 +1,97 @@
 //! npm-style version ranges, as TypeScript evaluates `typesVersions` keys and
-//! `types@<range>` export conditions against its own version.
+//! `types@<range>` export conditions against its own version, and the
+//! version a package manifest declares.
 
 use std::cmp::Ordering;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-struct Version {
+pub(super) struct Version {
     major: u64,
     minor: u64,
     patch: u64,
     prerelease: Vec<String>,
 }
 
-/// The pinned reference compiler's version.
-fn typescript() -> Version {
-    Version::new(7, 0, 2)
+impl Version {
+    /// A package manifest's `version`, as npm's `semver.valid` reads one
+    /// (SemVer 2.0.0): three numeric components without leading zeros, then
+    /// an optional `-` prerelease of dot-separated identifiers, each numeric
+    /// without a leading zero or alphanumeric with hyphens, and an optional
+    /// `+` build of dot-separated alphanumeric identifiers, which no
+    /// comparison reads. Anything else, `5.6`, `v5.6.3`, or a component past
+    /// `u64::MAX` included, is no version.
+    pub(super) fn parse(text: &str) -> Option<Self> {
+        let identifier = |part: &str| {
+            !part.is_empty()
+                && part
+                    .bytes()
+                    .all(|byte| byte.is_ascii_alphanumeric() || byte == b'-')
+        };
+        let numeric = |part: &str| {
+            !part.is_empty()
+                && part.bytes().all(|byte| byte.is_ascii_digit())
+                && (part == "0" || !part.starts_with('0'))
+        };
+        let (rest, build) = match text.split_once('+') {
+            Some((rest, build)) => (rest, Some(build)),
+            None => (text, None),
+        };
+        if build.is_some_and(|build| !build.split('.').all(identifier)) {
+            return None;
+        }
+        let (core, prerelease) = match rest.split_once('-') {
+            Some((core, prerelease)) => (core, Some(prerelease)),
+            None => (rest, None),
+        };
+        let prerelease = match prerelease {
+            None => Vec::new(),
+            Some(prerelease) => {
+                let parts: Vec<&str> = prerelease.split('.').collect();
+                let valid = |part: &&str| {
+                    identifier(part)
+                        && (!part.bytes().all(|byte| byte.is_ascii_digit()) || numeric(part))
+                };
+                if !parts.iter().all(valid) {
+                    return None;
+                }
+                parts.into_iter().map(str::to_owned).collect()
+            }
+        };
+        let components: Vec<&str> = core.split('.').collect();
+        let [major, minor, patch] = components.as_slice() else {
+            return None;
+        };
+        let number = |part: &str| numeric(part).then(|| part.parse::<u64>().ok()).flatten();
+        Some(Self {
+            major: number(major)?,
+            minor: number(minor)?,
+            patch: number(patch)?,
+            prerelease,
+        })
+    }
+
+    /// The major component, which selects a compiler's dialect.
+    pub(super) fn major(&self) -> u64 {
+        self.major
+    }
 }
 
-/// Whether `range` admits the reference compiler's version. TypeScript
-/// treats a range that does not parse as not matching.
-pub(super) fn matches_typescript(range: &str) -> bool {
-    let version = typescript();
+/// The pinned reference compiler's version, the semantic authority of
+/// every dialect.
+pub(super) const REFERENCE: &str = "7.0.2";
+
+impl Version {
+    /// `REFERENCE`.
+    pub(super) fn reference() -> Self {
+        Self::parse(REFERENCE).expect("the reference version is a version")
+    }
+}
+
+/// Whether `range` admits `version` (`VersionRange.test`), as a compiler
+/// evaluates a `typesVersions` key or a `types@` condition against its own
+/// version, the dialect's (`compatibility::Dialect::typescript`). A range
+/// that does not parse matches nothing.
+pub(super) fn matches_typescript(range: &str, version: &Version) -> bool {
     parse_range(range).is_some_and(|alternatives| {
         alternatives.is_empty()
             || alternatives.iter().any(|comparators| {
@@ -321,10 +393,41 @@ fn parse_comparator(text: &str, comparators: &mut Vec<Comparator>) -> Option<()>
 
 #[cfg(test)]
 mod tests {
-    use super::matches_typescript;
+    use super::{REFERENCE, Version, matches_typescript};
+
+    #[test]
+    fn a_manifest_version_is_a_full_semver_version() {
+        for (text, major) in [
+            ("5.6.3", Some(5)),
+            ("0.0.0", Some(0)),
+            ("7.0.2", Some(7)),
+            ("5.7.0-beta", Some(5)),
+            ("5.7.0-dev.20241001", Some(5)),
+            ("5.7.0-rc.1+sha.abc-1", Some(5)),
+            ("5.6.3+build", Some(5)),
+            ("5.6", None),
+            ("5", None),
+            ("v5.6.3", None),
+            ("5.6.3.1", None),
+            ("05.6.3", None),
+            ("5.06.3", None),
+            ("5.6.3-", None),
+            ("5.6.3-01", None),
+            ("5.6.3-a..b", None),
+            ("5.6.3+", None),
+            ("5.6.3+a_b", None),
+            (" 5.6.3", None),
+            ("latest", None),
+            ("", None),
+            ("99999999999999999999.0.0", None),
+        ] {
+            assert_eq!(Version::parse(text).map(|v| v.major()), major, "{text:?}");
+        }
+    }
 
     #[test]
     fn evaluates_ranges_against_the_reference_compiler() {
+        let version = Version::parse(REFERENCE).unwrap();
         for (range, expected) in [
             ("*", true),
             ("", true),
@@ -350,7 +453,31 @@ mod tests {
             ("not a range", false),
             ("01.2", false),
         ] {
-            assert_eq!(matches_typescript(range), expected, "{range}");
+            assert_eq!(matches_typescript(range, &version), expected, "{range}");
+        }
+    }
+
+    /// A range is evaluated against the version given, at, below and above
+    /// its bounds; 5.6.3's `VersionRange.test` agrees on 5.6.3.
+    #[test]
+    fn evaluates_ranges_against_the_version_given() {
+        for (version, expected) in [
+            ("5.6.3", true),
+            ("5.6.2", false),
+            ("5.7.0", false),
+            ("5.6.4-beta", true),
+            ("7.0.2", false),
+        ] {
+            let version = Version::parse(version).unwrap();
+            assert_eq!(
+                matches_typescript(">=5.6.3 <5.7", &version),
+                expected,
+                "{version:?}"
+            );
+        }
+        let typescript = Version::parse("5.6.3").unwrap();
+        for (range, expected) in [("<6", true), ("5.x", true), ("^5.4", true), (">=7", false)] {
+            assert_eq!(matches_typescript(range, &typescript), expected, "{range}");
         }
     }
 }

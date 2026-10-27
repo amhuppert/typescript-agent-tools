@@ -1,5 +1,6 @@
 //! Work avoidance is checked through a published session response, together
 //! with equality to a fresh project. Counters are isolated by fixture path.
+use super::super::test_compiler::{BASE_OPTIONS, DIALECTS, Dialect, MANIFEST, manifest};
 use crate::project::{Project, ProjectRequest, ProjectResponse, ProjectSession};
 use crate::references::ReferenceQuery;
 use std::collections::HashMap;
@@ -75,6 +76,12 @@ impl Fixture {
         let path = self.0.join(name);
         std::fs::create_dir_all(path.parent().unwrap()).unwrap();
         std::fs::write(path, text).unwrap();
+    }
+
+    /// Make the installed compiler claim `version`, as the integration
+    /// tests' `support::Fixture::claim_compiler` does.
+    fn claim_compiler(&self, version: &str) {
+        self.write(MANIFEST, &manifest(version));
     }
 
     fn config(&self) -> PathBuf {
@@ -580,4 +587,248 @@ fn changed_symlinks_and_demanded_failures_refresh_without_old_dependencies() {
     assert_eq!(declaration(&answer), "a.ts");
     assert_eq!(session.generation(), 3);
     fixture.assert_fresh(&answer, "value");
+}
+
+/// A type name the configuration infers and one a directive writes are
+/// separate lookups (`TypeReferenceOrigin`): under explicit roots only the
+/// written one falls back to `node_modules`. When an automatic name appears
+/// that a directive already resolved, from the same directory and in the
+/// same mode, the refreshed answer is a fresh load's TS2688, not the
+/// directive's saved package. Automatic names are 5.6's omitted `types` and
+/// TypeScript 7's `"*"`.
+#[test]
+fn inferred_and_written_type_names_are_separate_reusable_lookups() {
+    use crate::source::SourcePosition;
+    for dialect in DIALECTS {
+        let fixture = Fixture::new();
+        fixture.claim_compiler(dialect.version());
+        let options = match dialect {
+            Dialect::TypeScript56 => {
+                r#""strict":true,"target":"es2022","module":"esnext","moduleResolution":"bundler","esModuleInterop":true"#
+            }
+            Dialect::TypeScript7 => r#""types":["*"]"#,
+        };
+        fixture.write(
+            "tsconfig.json",
+            &format!(
+                r#"{{"compilerOptions":{{"noLib":true,"typeRoots":["./types"],{options}}},"files":["a.ts"]}}"#
+            ),
+        );
+        fixture.write("a.ts", "/// <reference types=\"x\" />\nvalue;\n");
+        fixture.write(
+            "node_modules/@types/x/index.d.ts",
+            "declare const value: number;\n",
+        );
+        fixture.write("types/other/index.d.ts", "declare const other: number;\n");
+        let request = ProjectRequest::References(ReferenceQuery::At {
+            file: fixture.0.join("a.ts"),
+            position: SourcePosition { line: 2, column: 1 },
+        });
+        let mut session = ProjectSession::new(&fixture.config()).unwrap();
+        assert_eq!(
+            declaration(&session.execute(request.clone()).unwrap()),
+            "node_modules/@types/x/index.d.ts",
+            "{dialect:?}"
+        );
+        // `x` becomes an automatic name: a type root directory without a
+        // package, which reads no file the directive's lookup observed.
+        fixture.write("types/x/README.md", "not a package\n");
+        let refreshed = session.execute(request.clone()).map_err(|e| e.to_string());
+        let fresh = Project::load(&fixture.config())
+            .and_then(|project| project.execute(request.clone()))
+            .map_err(|e| e.to_string());
+        assert_eq!(refreshed, fresh, "{dialect:?}");
+        let error = fresh.expect_err("an inferred name fell back to node_modules");
+        assert!(
+            error.contains("Cannot find type definition file for 'x'"),
+            "{error}"
+        );
+    }
+}
+
+/// The declaration a refreshed session finds for the use at `line:1` of
+/// `a.ts`, which must equal a fresh load's answer; either may fail alike.
+fn refreshed_declaration(
+    fixture: &Fixture,
+    session: &mut ProjectSession,
+    line: usize,
+) -> Result<String, String> {
+    use crate::source::SourcePosition;
+    let request = ProjectRequest::References(ReferenceQuery::At {
+        file: fixture.0.join("a.ts"),
+        position: SourcePosition { line, column: 1 },
+    });
+    let refreshed = session.execute(request.clone()).map_err(|e| e.to_string());
+    let fresh = Project::load(&fixture.config())
+        .and_then(|project| project.execute(request))
+        .map_err(|e| e.to_string());
+    assert_eq!(refreshed, fresh);
+    refreshed.map(|answer| declaration(&answer).to_owned())
+}
+
+/// A file appearing under `baseUrl` takes a bare name from the package, and
+/// the package has it again once the file is removed.
+#[test]
+fn a_base_url_target_appearing_and_disappearing_refreshes_resolution() {
+    let fixture = Fixture::new();
+    fixture.claim_compiler("5.6.3");
+    fixture.write(
+        "tsconfig.json",
+        &format!(r#"{{"compilerOptions":{{{BASE_OPTIONS},"baseUrl":"."}},"files":["a.ts"]}}"#),
+    );
+    fixture.write("a.ts", "import { value } from 'lib/thing';\nvalue;\n");
+    fixture.write(
+        "node_modules/lib/thing.d.ts",
+        "export declare const value: number;\n",
+    );
+    let mut session = ProjectSession::new(&fixture.config()).unwrap();
+    let mut answer = |step: &str| {
+        let answer = refreshed_declaration(&fixture, &mut session, 2);
+        answer.unwrap_or_else(|error| panic!("{step}: {error}"))
+    };
+    assert_eq!(answer("package"), "node_modules/lib/thing.d.ts");
+    fixture.write("lib/thing.ts", "export const value = 1;\n");
+    assert_eq!(answer("under baseUrl"), "lib/thing.ts");
+    std::fs::remove_file(fixture.0.join("lib/thing.ts")).unwrap();
+    assert_eq!(answer("removed"), "node_modules/lib/thing.d.ts");
+}
+
+/// Under explicit roots a written reference falls back to `node_modules`
+/// until a root has the name: first its package directory, then its
+/// declaration file, which wins; an automatic name appears with a root's
+/// new directory. 5.6 reads automatic names from an omitted `types`.
+#[test]
+fn type_root_entries_appearing_refresh_type_references() {
+    let fixture = Fixture::new();
+    fixture.claim_compiler("5.6.3");
+    fixture.write(
+        "tsconfig.json",
+        &format!(
+            r#"{{"compilerOptions":{{{}}},"files":["a.ts"]}}"#,
+            BASE_OPTIONS.replace(
+                r#""types":[]"#,
+                r#""typeRoots":["./types","./node_modules/@types"]"#
+            )
+        ),
+    );
+    fixture.write("a.ts", "/// <reference types=\"x\" />\nvalue;\nlater;\n");
+    // Neither root has `x`: the reference falls back to `node_modules`
+    // above `a.ts`, which has no `@types/x` yet.
+    let mut session = ProjectSession::new(&fixture.config()).unwrap();
+    let error = refreshed_declaration(&fixture, &mut session, 2).unwrap_err();
+    assert!(
+        error.contains("Cannot find type definition file for 'x'"),
+        "{error}"
+    );
+    fixture.write(
+        "node_modules/@types/x/index.d.ts",
+        "declare const value: number;\n",
+    );
+    assert_eq!(
+        refreshed_declaration(&fixture, &mut session, 2).unwrap(),
+        "node_modules/@types/x/index.d.ts"
+    );
+    fixture.write("types/x/index.d.ts", "declare const value: number;\n");
+    assert_eq!(
+        refreshed_declaration(&fixture, &mut session, 2).unwrap(),
+        "types/x/index.d.ts"
+    );
+    fixture.write("types/x.d.ts", "declare const value: number;\n");
+    assert_eq!(
+        refreshed_declaration(&fixture, &mut session, 2).unwrap(),
+        "types/x.d.ts"
+    );
+    // A new `@types` directory is an automatic name, resolved in its root.
+    fixture.write(
+        "node_modules/@types/later/index.d.ts",
+        "declare const later: number;\n",
+    );
+    assert_eq!(
+        refreshed_declaration(&fixture, &mut session, 3).unwrap(),
+        "node_modules/@types/later/index.d.ts"
+    );
+}
+
+/// An installed compiler version change selects another `typesVersions`
+/// entry and `types@` condition, with source and packages unchanged: `tv`
+/// and `cond` map only for `>=5.6.3 <5.7`, `tv7` only for `>=7`, which
+/// TypeScript 7's own version admits whatever other release is installed.
+#[test]
+fn an_installed_version_change_refreshes_package_selection() {
+    let fixture = Fixture::new();
+    fixture.claim_compiler("5.6.3");
+    fixture.write(
+        "tsconfig.json",
+        &format!(r#"{{"compilerOptions":{{{BASE_OPTIONS}}},"files":["a.ts"]}}"#),
+    );
+    fixture.write(
+        "a.ts",
+        "import { tv } from 'tv/sub';\nimport { cond } from 'cond';\nimport { tv7 } from 'tv7/sub';\ntv;\ncond;\ntv7;\n",
+    );
+    fixture.write(
+        "node_modules/tv/package.json",
+        r#"{"name":"tv","version":"1.0.0","typesVersions":{">=5.6.3 <5.7":{"*":["ts56/*"]}}}"#,
+    );
+    fixture.write("node_modules/tv/sub.d.ts", "export declare const tv: 1;\n");
+    fixture.write(
+        "node_modules/tv/ts56/sub.d.ts",
+        "export declare const tv: 2;\n",
+    );
+    fixture.write(
+        "node_modules/cond/package.json",
+        r#"{"name":"cond","version":"1.0.0","exports":{".":{"types@>=5.6.3 <5.7":"./ts56.d.ts","types":"./index.d.ts"}}}"#,
+    );
+    fixture.write(
+        "node_modules/cond/index.d.ts",
+        "export declare const cond: 1;\n",
+    );
+    fixture.write(
+        "node_modules/cond/ts56.d.ts",
+        "export declare const cond: 2;\n",
+    );
+    fixture.write(
+        "node_modules/tv7/package.json",
+        r#"{"name":"tv7","version":"1.0.0","typesVersions":{">=7":{"*":["ts7/*"]}}}"#,
+    );
+    fixture.write(
+        "node_modules/tv7/sub.d.ts",
+        "export declare const tv7: 1;\n",
+    );
+    fixture.write(
+        "node_modules/tv7/ts7/sub.d.ts",
+        "export declare const tv7: 2;\n",
+    );
+    let mut session = ProjectSession::new(&fixture.config()).unwrap();
+    let mut answers = |step: &str| {
+        [4, 5, 6].map(|line| {
+            refreshed_declaration(&fixture, &mut session, line)
+                .unwrap_or_else(|error| panic!("{step}: {error}"))
+        })
+    };
+    let at_5_6 = [
+        "node_modules/tv/ts56/sub.d.ts",
+        "node_modules/cond/ts56.d.ts",
+        "node_modules/tv7/sub.d.ts",
+    ];
+    let outside = [
+        "node_modules/tv/sub.d.ts",
+        "node_modules/cond/index.d.ts",
+        "node_modules/tv7/sub.d.ts",
+    ];
+    let at_7 = [
+        "node_modules/tv/sub.d.ts",
+        "node_modules/cond/index.d.ts",
+        "node_modules/tv7/ts7/sub.d.ts",
+    ];
+    assert_eq!(answers("5.6.3"), at_5_6);
+    fixture.claim_compiler("5.7.0");
+    assert_eq!(answers("5.7.0"), outside);
+    fixture.claim_compiler("5.6.3");
+    assert_eq!(answers("5.6.3 again"), at_5_6);
+    fixture.claim_compiler("7.0.2");
+    assert_eq!(answers("7.0.2"), at_7);
+    fixture.claim_compiler("6.0.3");
+    assert_eq!(answers("6.0.3"), at_7);
+    fixture.claim_compiler("5.6.3");
+    assert_eq!(answers("5.6.3 last"), at_5_6);
 }

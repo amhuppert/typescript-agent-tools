@@ -454,11 +454,16 @@ impl Evaluator<'_, '_> {
                 if self.reference_resolved_symbol_if_any(left_node)?.is_none()
                     && self.source.containing_class(declaration)?.is_some()
                 {
-                    // isUncheckedJSSuggestion is false for admitted TS sources.
+                    let is_unchecked_js = self.is_unchecked_js_suggestion(
+                        left_node,
+                        None,
+                        true,
+                        &recipe.left.location,
+                    )?;
                     sequence.read(self.report_nonexistent_property_completion(
                         declaration,
                         right,
-                        false,
+                        is_unchecked_js,
                         &recipe.left.location,
                     ))?;
                 }
@@ -947,7 +952,7 @@ impl Evaluator<'_, '_> {
             .root
             .ok_or_else(|| super::super::internal("assignment left has no actual node"))?;
         // GetAssignmentDeclarationKind's exports suppression requires a JS
-        // source file. This semantic profile admits TypeScript sources only.
+        // source file's CommonJS `exports`, which binding refuses.
         let dot = node.site.kind == K::PropertyAccessExpression;
         let mut sequence = NativeSequence::new();
         let result = (|| {

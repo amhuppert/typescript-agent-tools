@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {compilerHookOracle, typeOracle} from './type-oracle.mjs';
 import {lineStarts, position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 
 const root = fileURLToPath(new URL('../fixtures/types/native-await-context/', import.meta.url));
 const source = fs.readFileSync(path.join(root, 'cases.ts'), 'utf8');
@@ -32,7 +33,7 @@ test('native await operand contexts preserve absent, annotated, return and nil s
       else assert.equal(observations.promiseLikeFactory.emptyRecovery, config === 'missing.json');
       const recovery = config === 'missing.json' && ['annotation', 'return'].includes(marker);
       assert.deepEqual(native.beforeSummary.diagnosticCodes, recovery ? [2318] : []);
-      fs.writeFileSync(`.cc/temp/await-context-${config}-${marker}.json`, JSON.stringify(native, null, 2)+'\n');
+      fs.writeFileSync(scratchPath(`await-context-${config}-${marker}.json`), JSON.stringify(native, null, 2)+'\n');
     }
   }
 });

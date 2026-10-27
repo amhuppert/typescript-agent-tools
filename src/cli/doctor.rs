@@ -107,16 +107,10 @@ pub(crate) fn run(request: &Doctor) -> Result<(), Delivered> {
 
 /// Every check, in order.
 fn checks(project: Option<&str>) -> Vec<Check> {
-    let mut checks = vec![
-        build(),
-        environment(),
-        Check {
-            name: "runtime directory",
-            outcome: service::inspect_directory(project).map_err(|failure| (&failure).into()),
-        },
-    ];
+    let mut checks = vec![build(), environment(), runtime_directory(project)];
     if let Some(config) = project {
         checks.push(configuration(config));
+        checks.push(compatibility(config));
         let status = service::observe(config);
         checks.push(service_check(config, &status));
         checks.push(service_limits(config, &status));
@@ -186,6 +180,27 @@ fn environment() -> Check {
     }
 }
 
+/// The runtime directory a project query would use, as the service's
+/// endpoint chooses and observes it: the directory and the rule that chose
+/// it, then what it found, or the failure a query would report there with
+/// its remedy, so a finding still says why that directory was chosen.
+fn runtime_directory(project: Option<&str>) -> Check {
+    let outcome = match service::inspect_directory(project) {
+        Err(failure) => Err((&failure).into()),
+        Ok(inspection) => match inspection.found {
+            Ok(found) => Ok(format!("{} {found}", inspection.chosen)),
+            Err(failure) => Err(Finding {
+                detail: format!("{}: {}", inspection.chosen, failure.message()),
+                ..(&failure).into()
+            }),
+        },
+    };
+    Check {
+        name: "runtime directory",
+        outcome,
+    }
+}
+
 /// The configuration as given, its absolute form, which keys its service,
 /// and whether it can be read, which reading it without waiting answers;
 /// nothing parses it.
@@ -211,6 +226,24 @@ fn configuration(config: &str) -> Check {
                 absolute.display()
             ))),
         },
+    }
+}
+
+/// The compiler the configuration's project is read for, as loading
+/// selects it (`project::compatibility`), without reading the
+/// configuration's contents: a selection loading would refuse is a finding.
+fn compatibility(config: &str) -> Check {
+    Check {
+        name: "compatibility",
+        outcome: typescript_parser::project::compatibility(Path::new(config)).map_err(|error| {
+            Finding {
+                remedy: Some(
+                    "repair or reinstall the TypeScript package that manifest belongs to, or remove it"
+                        .into(),
+                ),
+                ..Finding::new(error.to_string())
+            }
+        }),
     }
 }
 

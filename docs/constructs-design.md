@@ -186,9 +186,10 @@ and `D`, after discrimination (`getApparentTypeOfContextualType` split at
 each step; one owner composes them). Absent context means no site. There is no checking prelude: `getContextualType`
 is asked on demand, and an argument context resolves its own call. Removing
 revision 2's outermost-first prelude changed no pinned compiler answer and
-turned 84 `ApiError` gaps on Command Center into sites. When no constituent
-of `I`, or of the apparent forms tried below, is an instance of a target
-alternative, the literal is not a site before `D` is asked: discrimination keeps a subset of the constituents, so it
+turned 84 `ApiError` gaps on the construction benchmark project into sites.
+When no constituent of `I`, or of the apparent forms tried below, is an
+instance of a target alternative, the literal is not a site before `D` is
+asked: discrimination keeps a subset of the constituents, so it
 cannot add one, and asking it could only fail (a narrowed discriminant read
 was a spurious gap).
 
@@ -314,10 +315,10 @@ Nothing outside `semantic` sees a `TypeId`; results own their data.
 
 ## Measurement gate
 
-Command Center (4,275 searched files, 110,159 object literals), macOS Intel
-i9, release build, load average 3–4 during the runs. Direct times include
-about 7 s of loading; peak is the process's physical footprint, the loaded
-project included.
+The construction benchmark project (4,275 searched files, 110,159 object
+literals), macOS Intel i9, release build, load average 3–4 during the runs.
+Direct times include about 7 s of loading; peak is the process's physical
+footprint, the loaded project included.
 
 | Run | Examined | Time | Peak | Sites | Gaps |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -368,8 +369,8 @@ reviewer's concurrent `ApiError` run took 43.5 s with identical counts).
    constructions an optional-property migration needs. Revision 3's default
    adds every literal with no named member and names the universe in the
    result.
-2. **Exhaustive by default.** About 60–75 s and 6 GB on Command Center, past
-   the deadline; kept as `--all-literals`.
+2. **Exhaustive by default.** About 60–75 s and 6 GB on the construction
+   benchmark project, past the deadline; kept as `--all-literals`.
 3. **Parallel or chunked checkers.** Each checker rebuilds the same demanded
    closure, so throughput per thread fell 2–3× and chunking repeats the
    warm-up; slower than one checker at every setting measured.
@@ -511,4 +512,3 @@ member kinds `checkObjectLiteral` renames are one predicate
 (`renamed_member`), shared by the checked-literal path and the key owner;
 the oracle's `AgentOracleMemberKey` follows the same kinds; accessor, data
 and getter-only rows pin it in both universes.
-

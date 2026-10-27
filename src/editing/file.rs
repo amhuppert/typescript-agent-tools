@@ -46,28 +46,49 @@ fn failure(kind: InputErrorKind, message: impl Into<String>, path: &Path) -> Inp
     }
 }
 
+/// A name `admit` refuses: for the file's kind, by the product policy that
+/// only TypeScript files are edited, or for how it names the file.
+#[derive(Debug)]
+pub(super) struct Refused {
+    pub(super) error: InputError,
+    pub(super) file_kind: bool,
+}
+
+impl From<Refused> for InputError {
+    fn from(refused: Refused) -> Self {
+        refused.error
+    }
+}
+
 /// The name an editable file is analyzed by: `path` exactly, which must be
 /// absolute and name a TypeScript file under the case policy. Capturing a
 /// file and replaying a recorded one both admit their names here.
-pub(super) fn admit(path: &Path) -> Result<&str, InputError> {
+pub(super) fn admit(path: &Path) -> Result<&str, Refused> {
+    let named = |error| Refused {
+        error,
+        file_kind: false,
+    };
     if !path.is_absolute() {
-        return Err(failure(
+        return Err(named(failure(
             InputErrorKind::Unsupported,
             "an edited file is named by an absolute path",
             path,
-        ));
+        )));
     }
-    let name = crate::input::exact_path(path)?;
+    let name = crate::input::exact_path(path).map_err(named)?;
     match InputKind::of(name, Case::detect()) {
         InputKind::TypeScript => Ok(name),
-        kind => Err(failure(
-            InputErrorKind::Unsupported,
-            format!(
-                "{} files cannot be edited; editing needs a .ts, .tsx, .mts, or .cts file",
-                kind.label()
+        kind => Err(Refused {
+            error: failure(
+                InputErrorKind::Unsupported,
+                format!(
+                    "{} files cannot be edited; editing needs a .ts, .tsx, .mts, or .cts file",
+                    kind.label()
+                ),
+                path,
             ),
-            path,
-        )),
+            file_kind: true,
+        }),
     }
 }
 
@@ -160,16 +181,19 @@ impl Captured {
         referent: PathBuf,
         identity: Identity,
         image: Vec<u8>,
-    ) -> Result<Self, InputError> {
+    ) -> Result<Self, Refused> {
         for name in std::iter::once(&path).chain(&aliases) {
             admit(name)?;
         }
         if !referent.is_absolute() {
-            return Err(failure(
-                InputErrorKind::Unsupported,
-                "a recorded file resolves to an absolute path",
-                &referent,
-            ));
+            return Err(Refused {
+                error: failure(
+                    InputErrorKind::Unsupported,
+                    "a recorded file resolves to an absolute path",
+                    &referent,
+                ),
+                file_kind: false,
+            });
         }
         Ok(Self {
             path,

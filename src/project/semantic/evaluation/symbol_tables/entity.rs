@@ -86,9 +86,10 @@ impl Evaluator<'_, '_> {
         sequence.finish(result)
     }
 
-    /// `resolveQualifiedName` probes the complete own exports with the requested
-    /// meaning, then retries an alias target only when that first probe misses.
-    fn entity_export_completion(
+    /// `getSymbol(getExportsOfSymbol(parent), name, meaning)`, the exports
+    /// probe of `resolveQualifiedName` and `getTypeFromImportTypeNode`.
+    /// resolveQualifiedName retries an alias target only when this misses.
+    pub(in crate::project::semantic::evaluation) fn entity_export_completion(
         &mut self,
         parent: ReferenceSymbol,
         name: &str,

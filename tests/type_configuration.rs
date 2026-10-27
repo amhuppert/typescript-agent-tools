@@ -6,8 +6,9 @@
 mod support;
 
 use support::Fixture;
-use typescript_parser::analysis::InputErrorKind;
+use typescript_parser::analysis::{AnalysisError, InputErrorKind};
 use typescript_parser::project::Project;
+use typescript_parser::types::{TypeAnswer, TypeQuery, TypeRequest};
 
 fn configuration(options: &str) -> String {
     format!(r#"{{"compilerOptions":{{"noLib":true,"types":[],{options}}},"files":["a.ts"]}}"#)
@@ -164,6 +165,25 @@ fn explicit_null_sensitive_option_requires_strict_null_checks() {
     fixture.load();
 }
 
+/// Whether `b.js` is a program input: its `b` is a selectable declaration.
+fn javascript_is_an_input(fixture: &Fixture) -> bool {
+    let project = Project::load(&fixture.path("tsconfig.json"))
+        .map_err(support::input_error)
+        .unwrap_or_else(|error| panic!("{error}"));
+    let answer = project.type_of(TypeRequest::new(TypeQuery::Name {
+        name: "b".into(),
+        file: None,
+    }));
+    match answer {
+        Ok(TypeAnswer::Selected(answer)) => {
+            assert_eq!(answer.description.summary, "1");
+            true
+        }
+        Ok(TypeAnswer::Unselected(_)) | Err(AnalysisError::Query(_)) => false,
+        Err(error) => panic!("{error}"),
+    }
+}
+
 #[test]
 fn check_js_enables_js_inputs_unless_allow_js_is_explicitly_false() {
     for check_js in ["true", "false", "null"] {
@@ -174,22 +194,14 @@ fn check_js_enables_js_inputs_unless_allow_js_is_explicitly_false() {
             let fixture = Fixture::new(&[
                 ("tsconfig.json", &config),
                 ("a.ts", "export {};\n"),
-                ("b.js", "export {};\n"),
+                ("b.js", "export const b = 1;\n"),
             ]);
             let enabled = match allow_js {
                 Some("true") => true,
                 Some("false") => false,
                 _ => check_js == "true",
             };
-            let result =
-                Project::load(&fixture.path("tsconfig.json")).map_err(support::input_error);
-            if enabled {
-                let error = result.unwrap_err();
-                assert_eq!(error.kind, InputErrorKind::Unsupported, "{config}: {error}");
-                assert!(error.message.contains("JavaScript"), "{config}: {error}");
-            } else {
-                result.unwrap();
-            }
+            assert_eq!(javascript_is_an_input(&fixture), enabled, "{config}");
         }
     }
     for (base, own, enabled) in [
@@ -219,15 +231,8 @@ fn check_js_enables_js_inputs_unless_allow_js_is_explicitly_false() {
             ("tsconfig.json", &leaf),
             ("base.json", &base),
             ("a.ts", "export {};\n"),
-            ("b.js", "export {};\n"),
+            ("b.js", "export const b = 1;\n"),
         ]);
-        let result = Project::load(&fixture.path("tsconfig.json")).map_err(support::input_error);
-        if enabled {
-            let error = result.unwrap_err();
-            assert_eq!(error.kind, InputErrorKind::Unsupported, "{leaf}: {error}");
-            assert!(error.message.contains("JavaScript"));
-        } else {
-            result.unwrap();
-        }
+        assert_eq!(javascript_is_an_input(&fixture), enabled, "{leaf}");
     }
 }

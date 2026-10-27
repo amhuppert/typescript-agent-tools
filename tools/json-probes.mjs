@@ -182,14 +182,15 @@ export function runFixture(semantic, file, { update = false, only } = {}) {
   const api = new semantic.API({ tsserverPath: semantic.binary, cwd: base });
   const differences = [];
   try {
-    if (typeof api.toPath !== 'function') throw new Error('Pinned API canonical filename operation is missing');
     const caseProbe = path.join(base, '__JsonProbes_CASE_Probe__');
-    const caseSensitive = api.toPath(caseProbe) === caseProbe;
     for (const spec of fixture.cases) {
       if (only && !only.includes(spec.name)) continue;
       const root = path.join(base, spec.name);
       fs.mkdirSync(root, { recursive: true });
       const native = probe(semantic, api, root, spec, spec.files['tsconfig.json'] === undefined ? fixture.config : undefined);
+      // API.updateSnapshot initializes the compiler's canonical filename operation.
+      if (typeof api.toPath !== 'function') throw new Error('Pinned API canonical filename operation is missing');
+      const caseSensitive = api.toPath(caseProbe) === caseProbe;
       const answers = caseSensitive && spec.caseSensitive ? spec.caseSensitive : spec;
       if (!isDeepStrictEqual(native, answers.native)) {
         differences.push({ file: path.basename(file), name: spec.name, recorded: answers.native ?? null, native });

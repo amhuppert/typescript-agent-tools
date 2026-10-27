@@ -7,18 +7,28 @@
 //! Markers are comments, so the same sources remain valid TypeScript.
 #![allow(dead_code)]
 
+mod compiler;
 pub mod service;
 
+#[allow(
+    unused_imports,
+    reason = "every test crate compiles support but uses only some of it"
+)]
+pub use compiler::{BASE_OPTIONS, DIALECTS, Dialect, MANIFEST, manifest, typescript_5_6};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
+use std::sync::LazyLock;
 use std::sync::atomic::{AtomicUsize, Ordering};
-use typescript_parser::analysis::{AnalysisError, InputError, QueryError, QueryErrorKind};
+use typescript_parser::analysis::{
+    AnalysisError, InputError, InputErrorKind, QueryError, QueryErrorKind,
+};
 use typescript_parser::project::{Project, ProjectRequest, ProjectResponse, ProjectSession};
 use typescript_parser::references::{
     Location, ReferenceGroup, ReferenceQuery, ReferenceResult, Role,
 };
 use typescript_parser::source::SourcePosition;
+use typescript_parser::types::{TypeAnswer, TypeQuery, TypeRequest};
 
 /// A reference query through a session's one request boundary.
 pub fn references(
@@ -114,6 +124,20 @@ pub fn load_error(files: &[(&str, &str)]) -> InputError {
         .expect_err("the project should fail to load")
 }
 
+/// A configuration of `BASE_OPTIONS` whose roots are the `.ts` files beside
+/// it.
+pub static BASE_CONFIG: LazyLock<String> =
+    LazyLock::new(|| format!(r#"{{"compilerOptions":{{{BASE_OPTIONS}}},"include":["*.ts"]}}"#));
+
+/// What every JavaScript refusal says this tool reads, after the construct
+/// (`JsUnsupported::message` in `src/project/binding/javascript.rs`).
+pub const JAVASCRIPT_SLICE: &str = "tsparse reads JavaScript as plain ES modules or one CommonJS module.exports, and JSDoc only as a variable's @type";
+
+/// The message of a load refused at the JavaScript `construct`.
+pub fn unsupported_javascript(construct: &str) -> String {
+    format!("unsupported JavaScript: {construct} ({JAVASCRIPT_SLICE})")
+}
+
 /// The directory of the checked-in marker fixtures.
 pub fn fixtures_root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/references")
@@ -191,6 +215,31 @@ impl Fixture {
         self.root.join(relative)
     }
 
+    /// `files` and the compiler that selects `dialect`, its manifest at
+    /// `MANIFEST`: TypeScript 7 installs a 7.0.2 manifest rather than no
+    /// package, which selects the same dialect.
+    pub fn with_dialect(dialect: Dialect, files: &[(&str, &str)]) -> Self {
+        let manifest = dialect.manifest();
+        let mut all = files.to_vec();
+        all.push((MANIFEST, &manifest));
+        Self::new(&all)
+    }
+
+    /// Install a copy of the TypeScript package at `package` as this
+    /// project's compiler, `node_modules/typescript`: its manifest, its
+    /// standard library declarations, and `typescript.d.ts`.
+    pub fn install_compiler(&self, package: &Path) {
+        compiler::install(package, &self.root);
+    }
+
+    /// Make the installed compiler claim `version`, keeping its
+    /// declarations, or install a manifest alone that claims it.
+    pub fn claim_compiler(&self, version: &str) {
+        let path = self.path(MANIFEST);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        std::fs::write(path, manifest(version)).unwrap();
+    }
+
     pub fn load(&self) -> Project {
         self.load_config("tsconfig.json")
     }
@@ -198,6 +247,65 @@ impl Fixture {
     pub fn load_config(&self, config: &str) -> Project {
         Project::load(&self.path(config))
             .unwrap_or_else(|error| panic!("project failed to load: {error}"))
+    }
+
+    /// Load `tsconfig.json`, whose failure must be an input failure.
+    pub fn try_load(&self) -> Result<Project, InputError> {
+        self.try_load_config("tsconfig.json")
+    }
+
+    /// Load `config`, whose failure must be an input failure.
+    pub fn try_load_config(&self, config: &str) -> Result<Project, InputError> {
+        Project::load(&self.path(config)).map_err(input_error)
+    }
+
+    /// The summary of the type at `line:column` of `file`.
+    pub fn type_at(
+        &self,
+        project: &Project,
+        file: &str,
+        line: usize,
+        column: usize,
+    ) -> Result<String, AnalysisError> {
+        let answer = project.type_of(TypeRequest::new(TypeQuery::At {
+            file: self.path(file),
+            position: SourcePosition { line, column },
+        }))?;
+        match answer {
+            TypeAnswer::Selected(answer) => Ok(answer.description.summary),
+            TypeAnswer::Unselected(selection) => panic!("{file}:{line}:{column}: {selection:?}"),
+        }
+    }
+
+    /// `type_at` of a query that must succeed.
+    pub fn summary_at(&self, project: &Project, file: &str, line: usize, column: usize) -> String {
+        self.type_at(project, file, line, column)
+            .unwrap_or_else(|error| panic!("{file}:{line}:{column}: {error}"))
+    }
+
+    /// Assert that `error` refuses `file` at `at`, one-based, with `message`,
+    /// such as an `unsupported_javascript` one.
+    pub fn assert_refused(
+        &self,
+        error: &InputError,
+        file: &str,
+        at: (usize, usize),
+        message: &str,
+        context: &str,
+    ) {
+        assert_eq!(
+            error.kind,
+            InputErrorKind::Unsupported,
+            "{context}: {error}"
+        );
+        assert_eq!(error.message, message, "{context}");
+        assert_eq!(
+            error.path.as_deref(),
+            Some(self.path(file).as_path()),
+            "{context}"
+        );
+        let position = error.position.as_ref().expect("a refusal is located");
+        assert_eq!((position.line, position.column), at, "{context}");
     }
 
     pub fn markers(&self) -> Vec<Marker> {

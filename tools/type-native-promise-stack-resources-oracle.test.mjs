@@ -4,6 +4,7 @@ import path from 'node:path';
 import {test} from 'node:test';
 import {compilerHookOracle} from './type-oracle.mjs';
 import {lineStarts, position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 
 test('native awaited stack grows with nesting and stays shallow for flat width', async () => {
   const rows = [];
@@ -24,7 +25,7 @@ test('native awaited stack grows with nesting and stays shallow for flat width',
       rows.push({config, family, file, size, summary: answer.summary, counters,
         diagnosticCodes: answer.beforeSummary.diagnosticCodes, compiler: answer.compiler,
         sourceCommit: answer.sourceCommit, inputHashes: answer.inputHashes});
-      fs.writeFileSync('.cc/temp/native-promise-stack-resources.json', JSON.stringify(rows, null, 2)+'\n');
+      fs.writeFileSync(scratchPath('native-promise-stack-resources.json'), JSON.stringify(rows, null, 2)+'\n');
       assert.equal(answer.compiler, '7.0.2');
       assert.equal(answer.checkerCount, 1);
       assert.equal(answer.summary, 'number');

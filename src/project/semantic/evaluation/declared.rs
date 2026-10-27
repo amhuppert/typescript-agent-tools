@@ -310,6 +310,7 @@ impl Evaluator<'_, '_> {
             TypeExpressionForm::Query(root) => {
                 self.type_from_type_query_completion(*root, &expression.location)
             }
+            TypeExpressionForm::Import(root) => self.import_type_node_completion(expression, *root),
             TypeExpressionForm::TypeLiteral { anchor, alias } => {
                 self.type_literal_type_completion(expression, *anchor, alias.as_ref())
             }

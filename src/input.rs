@@ -181,6 +181,39 @@ pub(crate) fn to_file_name_lower_case(text: &str) -> Cow<'_, str> {
     Cow::Owned(text.chars().map(file_name_lower_char).collect())
 }
 
+/// TypeScript 5.6.3's `toFileNameLowerCase`, which names standard libraries
+/// under the TypeScript 5.6 dialect (`getLibNameFromLibReference`): each
+/// run of characters outside `[İıßa-z0-9\\/:\-_. ]` lowered
+/// as a whole by JavaScript's `toLowerCase` (`crate::strings::to_lower_js`),
+/// so U+0130 stays, as in `to_file_name_lower_case`, and a capital sigma is
+/// final by its run alone: `AΣ.b` is `aς.b` where TypeScript 7 gives `aσ.b`.
+pub(crate) fn to_file_name_lower_case_5_6(text: &str) -> Cow<'_, str> {
+    let kept = |c: char| matches!(c, '\u{130}' | '\u{131}' | '\u{DF}' | 'a'..='z' | '0'..='9' | '\\' | '/' | ':' | '-' | '_' | '.' | ' ');
+    if text.chars().all(kept) {
+        return Cow::Borrowed(text);
+    }
+    let lower = |run: &str| {
+        String::from_utf8(crate::strings::to_lower_js(run.as_bytes()))
+            .expect("lowering text keeps it text")
+    };
+    let mut result = String::with_capacity(text.len());
+    let mut run = None;
+    for (index, c) in text.char_indices() {
+        if !kept(c) {
+            run.get_or_insert(index);
+            continue;
+        }
+        if let Some(start) = run.take() {
+            result.push_str(&lower(&text[start..index]));
+        }
+        result.push(c);
+    }
+    if let Some(start) = run {
+        result.push_str(&lower(&text[start..]));
+    }
+    Cow::Owned(result)
+}
+
 fn file_name_lower_char(c: char) -> char {
     if c == '\u{130}' {
         return c;

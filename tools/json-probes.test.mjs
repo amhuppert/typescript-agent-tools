@@ -88,6 +88,15 @@ test('real compiler: every maintained probe answer agrees with TypeScript 7.0.2'
   }
 });
 
+test('real compiler: the first selected probe uses the compiler filename case policy', { skip: compilerUnavailable }, async () => {
+  const semantic = await loadSemanticApi();
+  let differences;
+  assert.doesNotThrow(() => {
+    differences = runFixture(semantic, path.join(FIXTURES, 'inputs.json'), { only: ['upper-file-files'] });
+  }, 'a fresh compiler API must be initialized before choosing its recorded case variant');
+  assert.deepEqual(differences, []);
+});
+
 test('real compiler: a wrong recorded answer is reported, and update rewrites only it', { skip: compilerUnavailable }, async t => {
   const semantic = await loadSemanticApi();
   const directory = temporary(t);

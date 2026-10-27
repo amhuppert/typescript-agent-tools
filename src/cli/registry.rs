@@ -7,9 +7,8 @@
 //! printed commands leave unquoted (`super::command_line`), and help and
 //! the generated reference (`super::help`) derive from these tables.
 
-use crate::process_limits::{
-    default_idle_secs, default_memory_mb, default_service_dir_prefix, default_timeout_ms,
-};
+use crate::process_limits::{default_idle_secs, default_memory_mb, default_timeout_ms};
+use crate::service::runtime::default_service_dir_prefix;
 use FlagId as F;
 use std::fmt;
 
@@ -304,7 +303,7 @@ pub(crate) static FLAGS: [Flag; FlagId::COUNT] = [
     switch(
         FlagId::Tsx,
         "--tsx",
-        "Parse JSX, as a .tsx or .jsx file name already does.",
+        "Parse JSX, as a .tsx or JavaScript file name already does.",
     ),
     switch(
         FlagId::Check,
@@ -676,6 +675,18 @@ macro_rules! service_administration {
     };
 }
 
+/// The rule that chooses the service's runtime directory
+/// (`service::runtime::choose`), as help states it.
+macro_rules! runtime_directory {
+    () => {
+        concat!(
+            "TSPARSE_SERVICE_DIR when it is set; otherwise TMPDIR/tsparse-UID when TMPDIR is a non-empty absolute path short enough for socket paths; otherwise ",
+            default_service_dir_prefix!(),
+            "UID"
+        )
+    };
+}
+
 /// [`service_administration`] as the help index states it.
 pub(crate) const SERVICE_ADMINISTRATION: &str = service_administration!();
 
@@ -686,7 +697,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         name: "parse",
         flag: None,
         summary: "With no operation flag: parse one TypeScript file, or stdin, into a compiler-style JSON AST, or with --check only validate it.",
-        details: "Reads stdin when FILE is omitted or is -. A .tsx or .jsx file name, in any case, enables JSX, as --tsx does for stdin. The AST has TypeScript's node kinds and positions; a syntax error is FILE:LINE:COLUMN: message on stderr, with a one-based line and UTF-16 column. --check prints no AST but one line on stdout, ok: FILE parses as TypeScript 7 (jsx: off), or jsx: on, with - for stdin; it checks syntax only, and --pretty and --output change nothing then.",
+        details: "Reads stdin when FILE is omitted or is -. A .tsx, .jsx, .js, .mjs, or .cjs file name, in any case, enables JSX, as --tsx does for stdin, and a JavaScript file name also rejects TypeScript-only syntax, such as a type annotation, as TypeScript does in a JavaScript file. The AST has TypeScript's node kinds and positions; a syntax error is FILE:LINE:COLUMN: message on stderr, with a one-based line and UTF-16 column. --check prints no AST but one line on stdout, ok: FILE parses as TypeScript 7 (jsx: off), or jsx: on, with - for stdin; it checks syntax only, and also fails, as TypeScript 7 does, on a namespace declared with module (TS1540), whose AST is still written without --check; --pretty and --output change nothing then.",
         usage: &["tsparse [--tsx] [--check] [--pretty] [--output OUTPUT] [FILE|-]"],
         flags: &[F::Tsx, F::Check, F::Pretty, F::Output],
         examples: &[
@@ -788,7 +799,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         name: "test-outline",
         flag: Some(F::TestOutline),
         summary: "List the test calls of one test file in source order, one per line, indented by containment, with each test's name.",
-        details: "A test call is an expression statement that calls a hook (beforeAll, beforeEach, afterAll, or afterEach) or describe, it, or test with Vitest's modifiers: only, skip, todo, concurrent, sequential, shuffle, and fails, and each(...), for(...), skipIf(...), and runIf(...) called before the test. Syntax alone decides it, with no import check and no project, so Vitest globals count; a call wrapped in await, parentheses, or another operator is not one, and nothing inside a computed property name is listed. Each line is LINE:COLUMN, the call, such as it.each(), and the test's name, its first argument as written without line breaks; every level is shown. Each position is the test statement's first token, so --show --at prints the whole test and --insert-after --at inserts after it. Only FILE is read, and text and JSON name it absolutely.",
+        details: "A test call is an expression statement that calls a hook (beforeAll, beforeEach, afterAll, or afterEach) or describe, it, or test with Vitest's modifiers: only, skip, todo, concurrent, sequential, shuffle, and fails, and each(...), for(...), skipIf(...), and runIf(...) called before the test. Syntax alone decides it, with no import check and no project, so Vitest globals count; a call wrapped in await, parentheses, or another operator is not one, and nothing inside a computed property name is listed. Each line is LINE:COLUMN, the call, such as it.each(), and the test's name, its first argument as written without line breaks; every level is shown. Each position is the test statement's first token, so --show --at prints the whole test and --insert-after --at inserts after it. Only FILE is read, and text and JSON name it absolutely. TypeScript and JavaScript files are accepted as by --outline; JavaScript statements can be shown, but editing them is refused. File-only navigation reads no configuration and does not apply project diagnostics such as TS1540.",
         usage: &[
             "tsparse --test-outline FILE [--limit N|all] [--json [--pretty]] [--output OUTPUT]",
         ],
@@ -981,7 +992,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         name: "references",
         flag: Some(F::References),
         summary: "Group the declarations and occurrences of the selected symbol in one explicit project.",
-        details: "--at selects the identifier at the position (one-based line, UTF-16 column). A bare NAME selects every lexical declaration, local import, or exported alias spelled exactly NAME and lists the matching members it did not search; a dotted NAME such as RunHost.observe selects a member, whose identity follows resolved receiver types, not spelling. FILE narrows the candidates; --file FILE then keeps only their occurrences in FILE. Import and export aliases join their underlying symbol; shadowed bindings form separate groups; an incomplete search reports partial coverage and its gaps. Text prints a header with the selection, its counts, and the filters that bound them, each group with its declarations and its occurrences by file (a renamed alias's spelling in parentheses), each gap, and one line counting the members a bare name did not search and naming the --at that searches one; files are named absolutely, and an ambiguous or missing selection is a diagnostic on stderr. --json writes the result document instead, which also delivers analysis failures as documents and names files relative to the configuration's directory; --pretty without --json writes that document indented. Supported: one configuration and its inherited settings; .ts, .tsx, .mts, and .cts sources and declarations; node16, nodenext, and bundler resolution; installed packages with declarations; and JSON modules where resolveJsonModule allows them, though positions inside JSON are not selectable. Standard libraries follow target, lib, noLib, and lib references, from the TypeScript 7.0.2 declarations vendored with this build: their declarations join groups, but their files are never searched. Project references are not followed, so a configuration that needs them is rejected rather than searched partially, and JavaScript inputs are not supported.",
+        details: "--at selects the identifier at the position (one-based line, UTF-16 column). A bare NAME selects every lexical declaration, local import, or exported alias spelled exactly NAME and lists the matching members it did not search; a dotted NAME such as RunHost.observe selects a member, whose identity follows resolved receiver types, not spelling. FILE narrows the candidates; --file FILE then keeps only their occurrences in FILE. Import and export aliases join their underlying symbol; shadowed bindings form separate groups; an incomplete search reports partial coverage and its gaps. Text prints a header with the selection, its counts, and the filters that bound them, each group with its declarations and its occurrences by file (a renamed alias's spelling in parentheses), each gap, and one line counting the members a bare name did not search and naming the --at that searches one; files are named absolutely, and an ambiguous or missing selection is a diagnostic on stderr. --json writes the result document instead, which also delivers analysis failures as documents and names files relative to the configuration's directory; --pretty without --json writes that document indented. Supported: one configuration and its inherited settings; .ts, .tsx, .mts, and .cts sources and declarations; under allowJs, .js, .jsx, .mjs, and .cjs sources as plain ES modules or with one top-level module.exports = name, where other CommonJS, require, and JSDoc beyond a variable's @type fail loading at the construct; node16, nodenext, and bundler resolution; installed packages with declarations; and JSON modules where resolveJsonModule allows them, though positions inside JSON are not selectable. Standard libraries follow target, lib, noLib, and lib references, from the TypeScript 7.0.2 declarations vendored with this build, or for a project whose installed compiler is TypeScript 5 from that compiler's own lib directory by TypeScript 5.6.3's rules: their declarations join groups, but their files are never searched. Project references are not followed, so a configuration that needs them is rejected rather than searched partially.",
         usage: &[
             "tsparse --references --project TSCONFIG (--at LINE:COLUMN FILE | --at FILE:LINE:COLUMN | --name NAME [FILE]) [--direct] [--calls] [--no-tests] [--file FILE] [--limit N|all] [--json] [--pretty] [--output OUTPUT]",
         ],
@@ -1414,7 +1425,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
             },
             ExitMeaning {
                 code: 1,
-                meaning: "A plan another build wrote or whose edits no longer give its text, or a file changed since preparing (effect unchanged); preparing again resolves it.",
+                meaning: "A plan another build wrote or whose edits no longer give its text, or a file changed since preparing (effect unchanged), which preparing again resolves; or a plan that records a file editing refuses, such as a JavaScript file (Unsupported, naming the file).",
             },
             ExitMeaning {
                 code: 2,
@@ -1438,9 +1449,9 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         summary: "Report the state of the project's service; it loads nothing, does not check freshness, and does not extend the service's idle time.",
         details: concat!(
             service_administration!(),
-            " On macOS and Linux, project queries reuse one service per configuration spelling and build, started automatically, which reloads the project when its inputs change. Status prints running: with the service's pid, generation (the number of snapshots it has published), build, idle timeout, and the idle time it has left, then limits: with the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with; or no service: TSCONFIG. --json prints the document instead: running, pid, generation, build, limits (max_memory_mb, query_timeout_ms), idle_secs, idle_remaining_secs, and started_unix; without a service running is false, generation 0, and every other field null; --pretty, with or without --json, prints it indented. It reads only TSPARSE_SERVICE_DIR, the private runtime directory (default ",
-            default_service_dir_prefix!(),
-            "UID, owned by this user with mode 0700)."
+            " On macOS and Linux, project queries reuse one service per configuration spelling and build, started automatically, which reloads the project when its inputs change. Status prints running: with the service's pid, generation (the number of snapshots it has published), build, idle timeout, and the idle time it has left, then limits: with the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with; or no service: TSCONFIG. --json prints the document instead: running, pid, generation, build, limits (max_memory_mb, query_timeout_ms), idle_secs, idle_remaining_secs, and started_unix; without a service running is false, generation 0, and every other field null; --pretty, with or without --json, prints it indented. It reads only the private runtime directory, owned by this user with mode 0700: ",
+            runtime_directory!(),
+            ". Environments that choose different runtime directories, such as a shell and a sandbox with another TMPDIR, have separate services; the same TSPARSE_SERVICE_DIR in both shares one."
         ),
         usage: &[
             "tsparse --references-status --project TSCONFIG [--json] [--pretty] [--output OUTPUT]",
@@ -1484,7 +1495,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         summary: "Stop the project's service and release its cache.",
         details: concat!(
             service_administration!(),
-            " It prints stopped: pid N when it stopped a service, or no service: TSCONFIG when none was running, on stdout. The next project query starts a new service. A service keeps the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with, so stop it after changing them; --doctor --project TSCONFIG reports a service whose limits differ from this environment's. It reads only TSPARSE_SERVICE_DIR."
+            " It prints stopped: pid N when it stopped a service, or no service: TSCONFIG when none was running, on stdout. The next project query starts a new service. A service keeps the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with, so stop it after changing them; --doctor --project TSCONFIG reports a service whose limits differ from this environment's. It reads only the runtime directory, which TSPARSE_SERVICE_DIR and TMPDIR choose."
         ),
         usage: &["tsparse --references-stop --project TSCONFIG"],
         flags: SERVICE_FLAGS,
@@ -1517,9 +1528,9 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
             service_administration!(),
             " A service exits after TSPARSE_SERVICE_IDLE_SECS idle seconds (default ",
             default_idle_secs!(),
-            "). Its runtime directory is TSPARSE_SERVICE_DIR (default ",
-            default_service_dir_prefix!(),
-            "UID): owned by this user with mode 0700, and short enough for a socket path of about 100 bytes. Its queries run under TSPARSE_MAX_MEMORY_MB (default ",
+            "). Its runtime directory is ",
+            runtime_directory!(),
+            ": owned by this user with mode 0700, and short enough for a socket path of about 100 bytes; a project query passes the directory it chose to the service it starts. Its queries run under TSPARSE_MAX_MEMORY_MB (default ",
             default_memory_mb!(),
             " MiB) and TSPARSE_QUERY_TIMEOUT_MS (default ",
             default_timeout_ms!(),
@@ -1556,7 +1567,7 @@ pub(crate) static OPERATIONS: [Operation; OperationId::COUNT] = [
         name: "doctor",
         flag: Some(F::Doctor),
         summary: "Check what project queries depend on, one line per check; it loads nothing and starts nothing.",
-        details: "Checks, in order: build (the version, build stamp, platform, and whether the project service, --apply, and memory monitoring work here); environment (each TSPARSE_* variable, its value or default, and each invalid value); runtime directory (its path, that it is a private directory of this user's with mode 0700 or does not exist yet, and the length of its socket paths beside the longest a socket address holds). With --project: configuration (the spelling as given, its absolute form, and that it can be read; another spelling of the same file has its own service); service (no service, with any startup diagnostic an earlier start left, which the next start removes; or its pid, generation, build, idle timeout and the time it has left, and when it started); and service limits (the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with beside this environment's, since a service keeps the environment it started with). Each check is one line, CHECK: detail; a finding adds its why and next lines, and a last line says ok: N checks pass or findings: and the checks with one. A check that cannot be performed is a finding. --json prints one document with an entry per check: name, status (pass or finding), detail, and a finding's why, next.argv, or remedy. Every transport failure of a project query ends with the doctor's command for its configuration.",
+        details: "Checks, in order: build (the version, build stamp, platform, and whether the project service, --apply, and memory monitoring work here); environment (each TSPARSE_* variable, its value or default, and each invalid value); runtime directory (its path and the rule that chose it, which a finding also names before its failure unless no directory could be chosen, as for a configuration whose service cannot be named or a TSPARSE_SERVICE_DIR that cannot be made absolute: TSPARSE_SERVICE_DIR, TMPDIR/tsparse-UID, or /tmp/tsparse-UID with why TMPDIR was not used; that it is a private directory of this user's with mode 0700 or does not exist yet; and the length of its socket paths beside the longest a socket address holds). With --project: configuration (the spelling as given, its absolute form, and that it can be read; another spelling of the same file has its own service); compatibility (the TypeScript package installed nearest the configuration, by its manifest and version, or none; the dialect it selects, TypeScript 5.6 for any 5.x and TypeScript 7 otherwise, with validated for 5.6.3 only for a 5.x other than 5.6.3; TypeScript 7.0.2 as the semantic authority; and the standard library's source; a manifest that is unreadable or names no version is a finding, as loading would fail); service (no service, with any startup diagnostic an earlier start left, which the next start removes; or its pid, generation, build, idle timeout and the time it has left, and when it started); and service limits (the TSPARSE_MAX_MEMORY_MB and TSPARSE_QUERY_TIMEOUT_MS it started with beside this environment's, since a service keeps the environment it started with). Each check is one line, CHECK: detail; a finding adds its why and next lines, and a last line says ok: N checks pass or findings: and the checks with one. A check that cannot be performed is a finding. --json prints one document with an entry per check: name, status (pass or finding), detail, and a finding's why, next.argv, or remedy. Every transport failure of a project query ends with the doctor's command for its configuration. Directory creation/inspection and lock failures also name writable TMPDIR/TSPARSE_SERVICE_DIR remedies, including why TMPDIR was skipped; privacy failures instead name a permission or ownership remedy such as chmod 700. A passing runtime metadata check does not prove lock writability.",
         usage: &["tsparse --doctor [--project TSCONFIG] [--json [--pretty]]"],
         flags: &[F::Project, F::Json, F::Pretty],
         examples: &[

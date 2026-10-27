@@ -19,9 +19,10 @@
 //   reference_batch, or a target/ directory), and those that name the
 //   changed file; for vendor/, also those that name vendor/, which read the
 //   vendored TypeScript libraries;
-// - files no module imports (scripts/, docs/, memory-bank/, and top-level
-//   documents and settings), and other files under tools/: the tests whose
-//   closure names the directory or file;
+// - files no module imports (scripts/, docs/, memory-bank/, the agent
+//   plugins and their generated packages under plugins/, and top-level
+//   documents, any Markdown file among them, and settings), and other files
+//   under tools/: the tests whose closure names the directory or file;
 // - a fixture: the tests whose closure names a path that reaches it (see
 //   readsFixture);
 // - anything else, such as package files: every test.
@@ -98,9 +99,9 @@ for (const file of changed) {
     for (const test of tests) if (RUST_TOOL.test(closure(test).text)) selected.add(test);
     mentioning(file);
     if (file.startsWith('vendor/')) mentioning('vendor/');
-  } else if (/^(?:scripts|docs|memory-bank)\//.test(file)) {
+  } else if (/^(?:scripts|docs|memory-bank|plugins)\//.test(file)) {
     mentioning(file.slice(0, file.indexOf('/') + 1));
-  } else if (['README.md', 'AGENTS.md', 'CommandCenter.json', 'LICENSE', '.gitignore'].includes(file)) {
+  } else if (['CommandCenter.json', 'LICENSE', '.gitignore'].includes(file) || /^[^/]+\.md$/.test(file)) {
     mentioning(file);
   } else if (file.startsWith('fixtures/')) {
     for (const test of tests) if (readsFixture(closure(test).text, file)) selected.add(test);

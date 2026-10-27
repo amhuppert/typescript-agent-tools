@@ -74,6 +74,10 @@ pub struct Node<'src> {
     pub fields: Fields<'src>,
     pub(crate) syntax_kind: crate::syntax_kind::SyntaxKind,
     pub(crate) possible_top_level_await: bool,
+    /// A JSDoc type the parser reparsed into a JavaScript declaration
+    /// (`crate::parser::jsdoc`, TypeScript's `NodeFlagsReparsed`): part of
+    /// the tree TypeScript binds and checks, not of the written syntax.
+    pub(crate) reparsed: bool,
     // Native TS7 parser metadata is distinct from the public TS6 AST flags.
     pub(crate) native_jsdoc: Option<crate::parser::jsdoc::Attachment>,
     // Native scanner bytes only when the public UTF-16 projection loses their
@@ -298,7 +302,7 @@ impl<'src> Ast<'src> {
     /// Whitespace-only JSX text holds neither and may be scanned as trivia.
     pub(crate) fn literal_token_spans(&self) -> Vec<Span> {
         let mut spans: Vec<Span> = self
-            .walk()
+            .source_walk()
             .filter(|&id| {
                 matches!(
                     self.node(id).syntax_kind,
@@ -329,7 +333,31 @@ impl<'src> Ast<'src> {
             .filter(|(key, _)| *key != "assertClause")
             .map(|(key, value)| (*key, value))
     }
-    /// Child links in field order, of the logical fields (`logical_fields`).
+    /// Whether `id` is a JSDoc type the parser reparsed into a JavaScript
+    /// declaration, which only the bound and checked tree contains.
+    pub(crate) fn is_reparsed(&self, id: NodeId) -> bool {
+        self.node(id).reparsed
+    }
+    /// `children` of the written syntax: without the JSDoc types the parser
+    /// reparsed into it, which TypeScript's own syntax checks and the
+    /// public tree leave out (`NodeFlagsReparsed`).
+    pub(crate) fn source_children(&self, id: NodeId) -> impl Iterator<Item = NodeId> + '_ {
+        self.children(id).filter(|&child| !self.is_reparsed(child))
+    }
+    /// `walk` of the written syntax (`source_children`).
+    pub(crate) fn source_walk(&self) -> impl Iterator<Item = NodeId> + '_ {
+        let mut stack = vec![self.root];
+        std::iter::from_fn(move || {
+            let id = stack.pop()?;
+            let start = stack.len();
+            stack.extend(self.source_children(id));
+            stack[start..].reverse();
+            Some(id)
+        })
+    }
+    /// Child links in field order, of the logical fields (`logical_fields`),
+    /// including the JSDoc types the parser reparsed into a JavaScript
+    /// declaration, as TypeScript binds and checks them.
     pub fn children(&self, id: NodeId) -> impl Iterator<Item = NodeId> + '_ {
         self.logical_fields(id)
             .flat_map(|(_, value)| match value {
@@ -392,13 +420,19 @@ impl Serialize for Ast<'_> {
 impl Serialize for NodeView<'_, '_> {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         let node = self.ast.node(self.id);
-        let mut map = serializer.serialize_map(Some(4 + node.fields.len()))?;
+        let reparsed = node
+            .fields
+            .iter()
+            .filter(|(_, value)| matches!(value, Value::Node(id) if self.ast.is_reparsed(*id)))
+            .count();
+        let mut map = serializer.serialize_map(Some(4 + node.fields.len() - reparsed))?;
         map.serialize_entry("kind", &node.syntax_kind.number())?;
         map.serialize_entry("pos", &self.ast.utf16_offset(node.span.start))?;
         map.serialize_entry("end", &self.ast.utf16_offset(node.span.end))?;
         map.serialize_entry("flags", &node.flags)?;
         for (key, value) in &node.fields {
             match value {
+                Value::Node(id) if self.ast.is_reparsed(*id) => {}
                 Value::Node(id) => map.serialize_entry(key, &self.ast.view(*id))?,
                 Value::Nodes(ids) => map.serialize_entry(key, &NodeList { ast: self.ast, ids })?,
                 Value::Text(text) => map.serialize_entry(key, text)?,

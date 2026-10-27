@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {typeOracle} from './type-oracle.mjs';
 import {lineStarts,position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 const root=fileURLToPath(new URL('../fixtures/types/graph-labels/',import.meta.url));
 const source=fs.readFileSync(path.join(root,'cases.ts'),'utf8');
 test('native same-named aliases keep unqualified root summaries and generic arguments',async()=>{
@@ -14,7 +15,7 @@ test('native same-named aliases keep unqualified root summaries and generic argu
   const answer=await typeOracle(path.join(root,config),{at:{file:'cases.ts',...position(lineStarts(source),source.indexOf(tag)+tag.length)},properties:marker!=='array'});
   rows.push({config,marker,summary:answer.summary,errorType:answer.errorType,properties:answer.properties?.map(p=>[p.name,p.summary,p.errorType])});
  }
- fs.writeFileSync('.cc/temp/graph-labels-native.json',JSON.stringify(rows,null,2));
+ fs.writeFileSync(scratchPath('graph-labels-native.json'),JSON.stringify(rows,null,2));
  for(const row of rows){
   assert.equal(row.errorType,false);
   assert.equal(row.summary,{forward:'Forward',reverse:'Reverse',array:'Same<string>[]'}[row.marker]);

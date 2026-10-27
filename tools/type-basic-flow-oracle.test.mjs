@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { compilerHookOracle, typeOracle } from './type-oracle.mjs';
 import { lineStarts, position } from './semantic-oracle.mjs';
+import { scratchPath } from './harness-scratch.mjs';
 
 const directory = fileURLToPath(new URL('../fixtures/types/native-basic-flow/', import.meta.url));
 const source = fs.readFileSync(path.join(directory, 'flow.ts'), 'utf8');
@@ -43,7 +44,7 @@ test('native mutation joins restore actual declared reference identity', async (
       const witness = Object.entries(answer.beforeSummary.observations).find(([key, value]) =>
         key.startsWith('referenceFlow:') && value.referenceEnd === end)?.[1];
       observations.push({ config, marker, witness });
-      fs.writeFileSync('.cc/temp/native-basic-flow-identity.json', JSON.stringify(observations, null, 2));
+      fs.writeFileSync(scratchPath('native-basic-flow-identity.json'), JSON.stringify(observations, null, 2));
       assert.equal(answer.summary, 'number | "ready"', `${config}: ${marker}`);
       assert.equal(witness?.sameDeclared, true, `${config}: ${marker}`);
       assert.equal(witness?.errorType, false, `${config}: ${marker}`);

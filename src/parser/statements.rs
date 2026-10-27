@@ -818,61 +818,78 @@ impl<'src> Parser<'src> {
         self.attach_modifiers(id, modifiers)?;
         Ok(id)
     }
+    /// TypeScript's `parseModuleDeclaration`. `global`, or `module` before a
+    /// string, begins an ambient module declaration, whose block is optional
+    /// (`parseAmbientExternalModuleDeclaration`); `namespace` or `module`
+    /// before an identifier begins a namespace declaration, whose name may
+    /// be dotted and whose block is required
+    /// (`parseModuleOrNamespaceDeclaration`). TypeScript 7 keeps the keyword
+    /// on the node (`Keyword`); the syntax API, whose tree this is, keeps
+    /// `namespace` as the `Namespace` flag of each declaration of a dotted
+    /// name. A namespace declared with `module` is an error of TypeScript 7's
+    /// checker, not its parser (`crate::source_diagnostics`).
     fn namespace(&mut self, start: usize, modifiers: Vec<NodeId>) -> Result<NodeId> {
         let token = self.bump()?;
-        if token.raw == "module" && self.current.kind != Kind::String {
-            return Err(self.error("TypeScript 7 requires namespace for namespace declarations"));
-        }
         let global = token.raw == "global";
-        let name = if global {
-            self.make(
-                Identifier,
-                token.full_start,
-                token.end,
-                fields![("escapedText", token.raw.into())],
-            )?
-        } else if self.current.kind == Kind::String {
-            self.literal()?
+        let id = if global || token.raw == "module" && self.current.kind == Kind::String {
+            let name = if global {
+                self.make(
+                    Identifier,
+                    token.full_start,
+                    token.end,
+                    fields![("escapedText", token.raw.into())],
+                )?
+            } else {
+                self.literal()?
+            };
+            let mut fields = fields![("name", name.into())];
+            if self.at("{") {
+                fields.push(("body", self.block(ModuleBlock)?.into()));
+            } else {
+                self.semi()?;
+            }
+            let id = self.finish(ModuleDeclaration, start, fields)?;
+            if global {
+                self.nodes[id.0].flags |= node_flags::GLOBAL_AUGMENTATION;
+            }
+            id
         } else {
-            self.binding_identifier()?
-        };
-        let mut fields = fields![("name", name.into())];
-        if self.eat(".")? {
-            let nested_start = self.pos();
-            let nested_name = self.binding_identifier()?;
-            let body = self.namespace_tail(nested_start, nested_name)?;
-            fields.push(("body", body.into()));
-        } else if self.at("{") {
-            fields.push(("body", self.block(ModuleBlock)?.into()));
-        } else {
-            self.semi()?;
-        }
-        let id = self.finish(ModuleDeclaration, start, fields)?;
-        self.nodes[id.0].flags |= if global {
-            node_flags::GLOBAL_AUGMENTATION
-        } else if token.raw == "namespace" {
-            node_flags::NAMESPACE
-        } else {
-            0
+            let keyword = if token.raw == "namespace" {
+                node_flags::NAMESPACE
+            } else {
+                0
+            };
+            let name = self.binding_identifier()?;
+            let body = self.namespace_body(keyword)?;
+            let id = self.finish(
+                ModuleDeclaration,
+                start,
+                fields![("name", name.into()), ("body", body.into())],
+            )?;
+            self.nodes[id.0].flags |= keyword;
+            id
         };
         self.attach_modifiers(id, modifiers)?;
         Ok(id)
     }
-    fn namespace_tail(&mut self, start: usize, name: NodeId) -> Result<NodeId> {
+    /// A namespace declaration's body after its name: its block or, after a
+    /// dot, the declaration of the next name, which has the same `keyword`
+    /// flag and is nested. That name is an identifier name, which may be a
+    /// keyword (`parseModuleOrNamespaceDeclaration`).
+    fn namespace_body(&mut self, keyword: u32) -> Result<NodeId> {
+        if !self.eat(".")? {
+            return self.block(ModuleBlock);
+        }
+        let start = self.pos();
+        let name = self.identifier_name()?;
         self.nest(|p| {
-            let body = if p.eat(".")? {
-                let pos = p.pos();
-                let name = p.binding_identifier()?;
-                p.namespace_tail(pos, name)?
-            } else {
-                p.block(ModuleBlock)?
-            };
+            let body = p.namespace_body(keyword)?;
             let id = p.finish(
                 ModuleDeclaration,
                 start,
                 fields![("name", name.into()), ("body", body.into())],
             )?;
-            p.nodes[id.0].flags |= node_flags::NAMESPACE | node_flags::NESTED_NAMESPACE;
+            p.nodes[id.0].flags |= keyword | node_flags::NESTED_NAMESPACE;
             Ok(id)
         })
     }
@@ -1099,7 +1116,9 @@ impl<'src> Parser<'src> {
             "var" | "let" | "const" | "using" | "await" => {
                 self.variable_statement(start, modifiers)
             }
-            "namespace" | "module" => self.namespace(start, modifiers),
+            "namespace" | "module" if self.declaration_head(&modifiers)? => {
+                self.namespace(start, modifiers)
+            }
             "import" => self.import_declaration(start, modifiers),
             _ => Err(self.error("Expected exported declaration")),
         }

@@ -24,12 +24,14 @@ compile_error!("tsparse builds on macOS and Linux only; see ENVELOPE.md");
 
 pub mod analysis;
 pub mod ast;
+mod checking;
 mod compiler;
 pub mod constructs;
 pub mod editing;
 mod hash;
 mod identifier_exclusions;
 mod input;
+mod javascript_syntax;
 mod json;
 mod lexer;
 pub mod navigation;
@@ -41,12 +43,14 @@ pub mod project;
 pub mod references;
 mod resources;
 pub mod source;
+mod source_diagnostics;
 mod spelling;
 mod strings;
 mod syntax;
 mod syntax_kind;
 pub mod types;
 pub use ast::{Ast, Diagnostic, Fields, Node, NodeId, NodeView, Span, Value};
+pub use source_diagnostics::source_errors;
 
 #[derive(Debug, Clone)]
 pub struct ParseOptions {
@@ -106,9 +110,10 @@ impl Default for ParseOptions {
 
 impl ParseOptions {
     /// The options TypeScript derives from a file's name, with the default
-    /// budget: JSX for a `.tsx` or `.jsx` extension in any case
-    /// (`getScriptKindFromFileName`), and declaration context from the exact
-    /// name (`isDeclarationFileName`), so `G.D.TS` is not a declaration file.
+    /// budget: JSX for a `.tsx`, `.jsx`, `.js`, `.mjs`, or `.cjs` extension
+    /// in any case (`getScriptKindFromFileName`, `getLanguageVariant`), and
+    /// declaration context from the exact name (`isDeclarationFileName`), so
+    /// `G.D.TS` is not a declaration file.
     pub fn for_file(file_name: impl Into<String>) -> Self {
         let file_name = file_name.into();
         Self {
@@ -120,6 +125,16 @@ impl ParseOptions {
 
     pub(crate) fn declaration_file(&self) -> bool {
         declaration_file_name(&self.file_name)
+    }
+
+    /// Whether the file is JavaScript, by its script kind: the parser's
+    /// `isJavaScript`, which gives every node the `JavaScriptFile` context
+    /// flag that TypeScript's `IsInJSFile` reads.
+    pub(crate) fn javascript_file(&self) -> bool {
+        matches!(
+            script_kind(&self.file_name),
+            ScriptKind::Js | ScriptKind::Jsx
+        )
     }
 }
 
@@ -159,9 +174,14 @@ pub(crate) fn script_kind(file_name: &str) -> ScriptKind {
     .map_or(ScriptKind::Unknown, |(_, kind)| kind)
 }
 
-/// Whether a file's script kind parses JSX.
+/// Whether a file's script kind parses with TypeScript's JSX language
+/// variant (`getLanguageVariant`): TSX and every JavaScript kind. JSON's
+/// variant is JSX too, which no JSON text can show.
 fn jsx_file_name(name: &str) -> bool {
-    matches!(script_kind(name), ScriptKind::Tsx | ScriptKind::Jsx)
+    matches!(
+        script_kind(name),
+        ScriptKind::Tsx | ScriptKind::Jsx | ScriptKind::Js
+    )
 }
 
 /// TypeScript's declaration file names: `.d.ts`, `.d.mts`, `.d.cts`, or an

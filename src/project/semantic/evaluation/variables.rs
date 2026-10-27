@@ -1111,7 +1111,7 @@ impl Evaluator<'_, '_> {
         self.non_undefined_assignment_type_completion(ty, &facts.location)?.and_then(|without| {
             self.declaration_initializer_type_completion(&facts, CheckMode::NORMAL, None)?.and_then(|initial| {
                 self.union_type_reduced_completion(vec![without, initial], UnionReduction::Subtype, None, None, &facts.location)
-                    ?.and_then(|ty| self.widened_literal_for_initializer_completion(&facts, ty))
+                    ?.and_then(|ty| self.widen_type_inferred_from_initializer_completion(&facts, ty))
             })
         })
         })
@@ -1300,7 +1300,7 @@ impl Evaluator<'_, '_> {
                         return self
                             .declaration_initializer_type_completion(&facts, mode, None)?
                             .and_then(|ty| {
-                                self.widened_literal_for_initializer_completion(&facts, ty)?
+                                self.widen_type_inferred_from_initializer_completion(&facts, ty)?
                                     .and_then(|ty| {
                                         self.add_optionality_completion(
                                             ty,
@@ -1485,8 +1485,9 @@ impl Evaluator<'_, '_> {
         })
     }
 
-    /// `getWidenedLiteralTypeForInitializer`: const/readonly preserve literal
-    /// freshness. Whole structural widening belongs to the symbol wrapper.
+    /// `getWidenedLiteralTypeForInitializer`: constant and
+    /// `isDeclarationReadonly` declarations preserve literal freshness. Whole
+    /// structural widening belongs to the symbol wrapper.
     fn widened_literal_for_initializer_completion(
         &mut self,
         facts: &VariableFacts,
@@ -1497,6 +1498,18 @@ impl Evaluator<'_, '_> {
         } else {
             self.widened_literal_type_completion(ty, &facts.location)
         }
+    }
+
+    /// `widenTypeInferredFromInitializer`: the initializer's widened literal
+    /// type, with a JavaScript file's empty initializers widened further
+    /// (`widen_javascript_initializer`).
+    fn widen_type_inferred_from_initializer_completion(
+        &mut self,
+        facts: &VariableFacts,
+        ty: TypeId,
+    ) -> NativeResult<TypeId> {
+        self.widened_literal_for_initializer_completion(facts, ty)?
+            .and_then_value(|widened| self.widen_javascript_initializer(facts.javascript, widened))
     }
 
     /// `widenTypeForVariableLikeDeclaration` is shared by every declaration

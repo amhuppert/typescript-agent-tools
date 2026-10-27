@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
+import {scratchPath} from './harness-scratch.mjs';
 import {compilerHookOracle} from './type-oracle.mjs';
 
 // Q5's expected answers: the pinned 7.0.2 checker's contextual types before
@@ -29,8 +30,7 @@ for (const [fixture, configs] of [['constructs', ['tsconfig.json', 'loose.json']
       for (const row of rows) for (const literal of row.literals) {
         if (literal.contextIsTarget) assert.ok(literal.constructed?.length || literal.discriminatedAway, `${row.name} ${literal.at}`);
       }
-      fs.mkdirSync('.cc/temp', {recursive: true});
-      fs.writeFileSync(`.cc/temp/types-${fixture}-${config}`, JSON.stringify(rows, null, 2) + '\n');
+      fs.writeFileSync(scratchPath(`types-${fixture}-${config}`), JSON.stringify(rows, null, 2) + '\n');
       const expected = path.join(root, `expected-${config}`);
       if (fs.existsSync(expected)) assert.deepEqual(rows, JSON.parse(fs.readFileSync(expected, 'utf8')));
       else assert.equal(rows.length, targets.length);

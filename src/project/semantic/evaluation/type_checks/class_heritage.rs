@@ -136,6 +136,7 @@ impl Evaluator<'_, '_> {
                             self.instantiated_constructors_for_type_arguments_completion(
                                 static_base,
                                 &base.type_arguments,
+                                self.inputs.in_javascript_file(base.reference.file),
                                 consumer,
                             ),
                         )? {

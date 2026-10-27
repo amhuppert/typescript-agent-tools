@@ -942,8 +942,16 @@ impl SignatureFlags {
     pub(super) fn is_construct(self) -> bool {
         self.0 & (1 << 2) != 0
     }
-    /// `getSignatureFromDeclaration`'s admitted TS declaration facts. JS and
-    /// optional-chain signature flags have distinct later factory operations.
+    /// `SignatureFlagsIsUntypedSignatureInJSFile`.
+    pub(super) fn with_untyped_javascript(self) -> Self {
+        Self(self.0 | (1 << 6))
+    }
+    pub(super) fn is_untyped_javascript(self) -> bool {
+        self.0 & (1 << 6) != 0
+    }
+    /// `getSignatureFromDeclaration`'s syntactic declaration facts. The
+    /// untyped-JavaScript and optional-chain flags have distinct later
+    /// factory operations.
     pub(super) fn declared(
         rest: bool,
         specialized: bool,

@@ -8,7 +8,7 @@
 //! A final component without `.`, `*`, or `?` names a directory and gains
 //! `/**/*`. An `exclude` match also excludes everything beneath it.
 
-use super::config::{Config, Spec, Specs};
+use super::config::{Config, Options, Spec, Specs};
 use super::paths;
 use super::{Origin, disk, io_error};
 use crate::analysis::{InputError, InputErrorKind};
@@ -29,9 +29,9 @@ const PACKAGE_FOLDERS: [&str; 3] = ["node_modules", "bower_components", "jspm_pa
 /// The include pattern of a configuration without `files` or `include`.
 const DEFAULT_INCLUDE: &str = "**/*";
 
-/// The root inputs a configuration selects. JavaScript files take part in
-/// extension priority, then are rejected as unsupported inputs; JSON files
-/// are inputs like TypeScript files.
+/// The root inputs a configuration selects. JavaScript files are inputs
+/// like TypeScript and JSON files under `allowJs`; without it, `include`
+/// selects none, and a `files` entry naming one is TS6504.
 pub(super) fn roots(
     config: &Config,
     case: Case,
@@ -42,11 +42,10 @@ pub(super) fn roots(
         return Err(no_inputs(config));
     }
     for root in &roots {
-        let kind = InputKind::of(&root.path, case);
-        if kind != InputKind::JavaScript {
+        if config.options.allow_js || InputKind::of(&root.path, case) != InputKind::JavaScript {
             continue;
         }
-        let message = format!("{} inputs are not supported", kind.label());
+        let message = needs_allow_js(&root.path);
         return Err(match &root.origin {
             Some(origin) => origin.error(InputErrorKind::Unsupported, message),
             None => InputError {
@@ -60,15 +59,18 @@ pub(super) fn roots(
     Ok(roots)
 }
 
+/// TS6504, TypeScript's diagnostic for a JavaScript file named as an input
+/// without `allowJs`; this tool reports it as an unsupported input, as it
+/// did before JavaScript inputs were supported.
+pub(super) fn needs_allow_js(name: &str) -> String {
+    format!("File '{name}' is a JavaScript file. Did you mean to enable the 'allowJs' option?")
+}
+
 /// TypeScript's TS18003 message.
 fn no_inputs(config: &Config) -> InputError {
     let specs = |specs: &Option<Specs>| {
-        let entries: Vec<String> = specs
-            .iter()
-            .flat_map(|specs| &specs.entries)
-            .map(|spec| format!("{:?}", spec.text))
-            .collect();
-        format!("[{}]", entries.join(","))
+        let written = specs.as_ref().map_or(&[][..], |specs| &specs.written);
+        format!("[{}]", written.join(","))
     };
     let include = if config.include.is_none() && config.files.is_none() {
         format!("[{DEFAULT_INCLUDE:?}]")
@@ -108,7 +110,7 @@ fn select(config: &Config, case: Case, disk: &disk::Disk) -> Result<Vec<Root>, I
     let key = |path: &str| case.fold(path).into_owned();
     let mut literal: HashSet<String> = HashSet::new();
     for spec in config.files.iter().flat_map(|specs| &specs.entries) {
-        let path = literal_file(spec, options.resolve_json_module, case, disk)?;
+        let path = literal_file(spec, options, case, disk)?;
         if literal.insert(key(&path)) {
             roots.push(Root {
                 path,
@@ -211,17 +213,18 @@ fn select(config: &Config, case: Case, disk: &disk::Disk) -> Result<Vec<Root>, I
     Ok(roots)
 }
 
-/// A listed file must exist. JavaScript entries, present or not, are
-/// selected here, for extension priority, and rejected with the other roots.
+/// A listed file must exist. JavaScript entries without `allowJs`, present
+/// or not, are selected here, for extension priority, and rejected with the
+/// other roots.
 fn literal_file(
     spec: &Spec,
-    json: bool,
+    options: &Options,
     case: Case,
     disk: &disk::Disk,
 ) -> Result<String, InputError> {
-    match literal_input(&spec.path, json, case, disk)? {
+    match literal_input(&spec.path, options, case, disk)? {
         Literal::Found(path) => Ok(path),
-        Literal::Unsupported(_) => Ok(spec.path.clone()),
+        Literal::JavaScript => Ok(spec.path.clone()),
         Literal::Missing => Err(spec.origin.error(
             InputErrorKind::Io,
             format!("File '{}' not found", spec.text),
@@ -243,39 +246,51 @@ pub(super) enum Literal {
     /// An extension that names no program input under the options, such as
     /// `.css`, or `.json` without `resolveJsonModule`.
     UnsupportedExtension,
-    /// A JavaScript input, which this tool does not read, whether or not it
-    /// exists; TypeScript rejects both forms of literal name alike.
-    Unsupported(InputKind),
+    /// A JavaScript name without `allowJs`, whether or not the file exists;
+    /// TypeScript rejects both forms alike (TS6504).
+    JavaScript,
 }
 
 /// TypeScript's literal file rule (`getSourceFileFromReference`): a name
 /// with a program-input extension must exist as written, and a name without
-/// an extension may omit `.ts`, `.tsx`, or `.d.ts`, never `.json`. `.json`
-/// is a program-input extension only with `resolveJsonModule` (`json`).
+/// an extension may omit an extension of the first supported group, `.ts`,
+/// `.tsx`, or `.d.ts`, and under `allowJs` `.js` or `.jsx`, never `.json`.
+/// `.json` is a program-input extension only with `resolveJsonModule`, and
+/// the JavaScript extensions only with `allowJs` (`GetSupportedExtensions`).
 /// Existing is `FileExists`, any entry but a directory: one that is not a
 /// regular file, such as a pipe, is found, and refused where it is read
 /// (`disk`). Each caller decides how to report the outcome.
 pub(super) fn literal_input(
     path: &str,
-    json: bool,
+    options: &Options,
     case: Case,
     disk: &disk::Disk,
 ) -> Result<Literal, InputError> {
     let kind = InputKind::of(path, case);
-    if kind == InputKind::JavaScript {
-        return Ok(Literal::Unsupported(kind));
+    if kind == InputKind::JavaScript && !options.allow_js {
+        return Ok(Literal::JavaScript);
     }
-    let candidates: Vec<String> =
-        if kind == InputKind::TypeScript || kind == InputKind::Json && json {
-            vec![path.to_owned()]
-        } else if paths::basename(path).contains('.') {
-            return Ok(Literal::UnsupportedExtension);
+    let supported = match kind {
+        InputKind::TypeScript | InputKind::JavaScript => true,
+        InputKind::Json => options.resolve_json_module,
+        InputKind::Other => false,
+    };
+    let candidates: Vec<String> = if supported {
+        vec![path.to_owned()]
+    } else if paths::basename(path).contains('.') {
+        return Ok(Literal::UnsupportedExtension);
+    } else {
+        let javascript: &[&str] = if options.allow_js {
+            &[".js", ".jsx"]
         } else {
-            [".ts", ".tsx", ".d.ts"]
-                .iter()
-                .map(|extension| format!("{path}{extension}"))
-                .collect()
+            &[]
         };
+        [".ts", ".tsx", ".d.ts"]
+            .iter()
+            .chain(javascript)
+            .map(|extension| format!("{path}{extension}"))
+            .collect()
+    };
     for candidate in candidates {
         if disk
             .file_exists(&candidate)

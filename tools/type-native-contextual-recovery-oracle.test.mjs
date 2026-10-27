@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {compilerHookOracle, typeOracle} from './type-oracle.mjs';
 import {lineStarts, position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 
 const root = fileURLToPath(new URL('../fixtures/types/native-contextual-recovery/', import.meta.url));
 const source = fs.readFileSync(path.join(root, 'cases.ts'), 'utf8');
@@ -22,7 +23,7 @@ for (const profile of ['strict', 'nocheck']) {
         .map(({operation, pos, end, declarationPos, declarationEnd, name}) => ({operation, pos, end, declarationPos, declarationEnd, name}));
       rows.push({name: marker[1], summary: native.summary, errorType: native.errorType,
         codes: native.beforeSummary.diagnosticCodes, demandFailures: native.beforeSummary.demandFailures, errors});
-      fs.writeFileSync(`.cc/temp/native-contextual-recovery-${profile}.json`, JSON.stringify(rows, null, 2) + '\n');
+      fs.writeFileSync(scratchPath(`native-contextual-recovery-${profile}.json`), JSON.stringify(rows, null, 2) + '\n');
     }
     assert.equal(rows.length, 5);
     assert.deepEqual(JSON.parse(JSON.stringify(rows)), JSON.parse(fs.readFileSync(path.join(root, `expected-${profile}.json`), 'utf8')));

@@ -114,6 +114,94 @@ fn levenshtein_with_max(source: &[char], target: &[char], limit: f64) -> Option<
     (previous[target.len()] <= limit).then_some(previous[target.len()])
 }
 
+/// TypeScript 5.6.3's `getSpellingSuggestion`, which the TypeScript 5.6
+/// dialect's configuration asks of an unknown option name: the nearest of
+/// `candidates` by `levenshteinWithMax`, the first of equally near ones, or
+/// none. Unlike TypeScript 7's rule (`suggestion`), every length counts
+/// UTF-16 code units, so an astral character counts twice, and a candidate
+/// shorter than three units must equal the name after JavaScript's
+/// `toLowerCase`.
+pub(crate) fn typescript_5_6_suggestion<'a>(
+    name: &str,
+    candidates: impl IntoIterator<Item = &'a str>,
+) -> Option<&'a str> {
+    let units: Vec<u16> = name.encode_utf16().collect();
+    let length = units.len() as f64;
+    let maximum_difference = 2f64.max((length * 0.34).floor());
+    let mut best_distance = (length * 0.4).floor() + 1.;
+    let lowered = crate::strings::to_lower_js(name.as_bytes());
+    let mut best = None;
+    for candidate in candidates {
+        let candidate_units: Vec<u16> = candidate.encode_utf16().collect();
+        if (candidate_units.len() as f64 - length).abs() > maximum_difference
+            || candidate == name
+            || candidate_units.len() < 3
+                && crate::strings::to_lower_js(candidate.as_bytes()) != lowered
+        {
+            continue;
+        }
+        if let Some(distance) =
+            levenshtein_with_max_utf16(&units, &candidate_units, best_distance - 0.1)
+        {
+            best_distance = distance;
+            best = Some(candidate);
+        }
+    }
+    best
+}
+
+/// TypeScript 5.6.3's `levenshteinWithMax` over UTF-16 code units:
+/// insertion and deletion cost one, substitution two, and a substitution of
+/// units that JavaScript's `toLowerCase` lowers alike, each on its own, one
+/// tenth. A surrogate lowers to itself.
+fn levenshtein_with_max_utf16(source: &[u16], target: &[u16], max: f64) -> Option<f64> {
+    fn lower(unit: u16) -> Result<Vec<u8>, u16> {
+        char::from_u32(u32::from(unit))
+            .map(|c| crate::strings::to_lower_js(c.encode_utf8(&mut [0; 4]).as_bytes()))
+            .ok_or(unit)
+    }
+    let target_lowered: Vec<_> = target.iter().map(|&unit| lower(unit)).collect();
+    let mut previous: Vec<f64> = (0..=target.len()).map(|j| j as f64).collect();
+    let mut current = vec![0.; target.len() + 1];
+    let big = max + 0.01;
+    let length = target.len() as f64;
+    for (index, &unit) in source.iter().enumerate() {
+        let i = (index + 1) as f64;
+        let min_j = (if i > max { i - max } else { 1. }).ceil() as usize;
+        let max_j = (if length > max + i { max + i } else { length }).floor() as usize;
+        let unit_lowered = lower(unit);
+        current[0] = i;
+        let mut column_minimum = i;
+        current[1..min_j.min(target.len() + 1)].fill(big);
+        for j in min_j..=max_j {
+            let substitution = previous[j - 1]
+                + if unit_lowered == target_lowered[j - 1] {
+                    0.1
+                } else {
+                    2.
+                };
+            let distance = if unit == target[j - 1] {
+                previous[j - 1]
+            } else {
+                (previous[j] + 1.)
+                    .min(current[j - 1] + 1.)
+                    .min(substitution)
+            };
+            current[j] = distance;
+            column_minimum = column_minimum.min(distance);
+        }
+        if max_j < target.len() {
+            current[max_j + 1..].fill(big);
+        }
+        if column_minimum > max {
+            return None;
+        }
+        std::mem::swap(&mut previous, &mut current);
+    }
+    let result = previous[target.len()];
+    (result <= max).then_some(result)
+}
+
 /// Go `strings.EqualFold` compares simple Unicode fold orbits without full
 /// string expansions or locale. These exceptional orbits are the pinned Go
 /// Unicode 17 caseOrbit entries not already joined by simple lowercase.

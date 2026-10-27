@@ -11,14 +11,15 @@ mod declarations;
 mod expression;
 mod import_export;
 pub(crate) use import_export::{
-    is_reference_import, is_reference_import_type_literal, is_reference_traversal_header,
-    reference_export_node,
+    import_type_of_qualifier_part, is_reference_import, is_reference_import_type_literal,
+    is_reference_traversal_header, literal_import_type_specifier, reference_export_node,
 };
 mod optional;
 mod reference_search;
 mod returns;
 pub(crate) use assignment::{
-    AccessKind, access_kind, assignment_target, is_assignment_expression, is_assignment_operator,
+    AccessKind, AssignmentDeclarationKind, access_kind, assignment_declaration_kind,
+    assignment_target, is_assignment_expression, is_assignment_operator,
     is_destructuring_assignment, is_literal_destructuring_pattern,
 };
 pub(crate) use declarations::{
@@ -41,15 +42,16 @@ pub(crate) fn is_var_const_flags(flags: u32) -> bool {
     flags & (LET | CONST | USING) == CONST
 }
 pub(crate) use expression::{
-    DottedNameStep, dotted_name_step, is_dotted_name, is_entity_name_expression, is_expression,
-    is_expression_node, is_false_expression, is_import_call, is_late_bindable_ast,
-    is_left_hand_side_expression, is_part_of_type_node,
+    DottedNameStep, dotted_name_step, is_dotted_name, is_entity_name_expression,
+    is_entity_name_expression_ex, is_expression, is_expression_node, is_false_expression,
+    is_import_call, is_late_bindable_ast, is_left_hand_side_expression, is_part_of_type_node,
 };
 pub(crate) use optional::{
     is_expression_of_optional_chain_root, is_optional_chain, is_optional_chain_root,
     is_outermost_optional_chain,
 };
 pub(crate) use reference_search::{
+    is_bindable_object_define_property_call, is_bindable_static_name_expression,
     is_string_or_numeric_literal_like, is_valid_reference_position,
     parameter_property_reference_anchor, reference_occurrence_range,
 };
@@ -766,6 +768,20 @@ pub(crate) fn is_parameter_property_declaration<'src>(
         .any(|modifier| has_modifier(ast, node, modifier))
 }
 
+/// TypeScript `isDeclarationReadonly` (checker/utilities.go): a combined
+/// `readonly` modifier, except on a parameter property, which is readonly as
+/// a property but keeps a mutable parameter's literal widening.
+pub(crate) fn is_declaration_readonly(
+    ast: &Ast<'_>,
+    parents: &[Option<NodeId>],
+    id: NodeId,
+) -> bool {
+    combined_modifier_flags(ast, parents, id) & modifiers::READONLY != 0
+        && !parents[id.index()].is_some_and(|parent| {
+            is_parameter_property_declaration(ast, ast.node(id), ast.node(parent))
+        })
+}
+
 /// `HasSyntacticModifier` for one token kind through the shared modifier owner.
 pub(crate) fn has_modifier<'s>(ast: &Ast<'s>, node: &Node<'s>, kind: SyntaxKind) -> bool {
     modifier_flags(ast, node) & modifiers::flag(kind) != 0
@@ -1186,30 +1202,30 @@ pub(crate) fn is_external_module_import_equals_declaration(ast: &Ast<'_>, node: 
 /// TypeScript `IsModuleExportsAccessExpression` uses the actual receiver and
 /// GetElementOrPropertyAccessName; only an element argument skips parentheses.
 pub(crate) fn is_module_exports_access_expression(ast: &Ast<'_>, node: NodeId) -> bool {
-    let node = ast.node(node);
-    if !matches!(
-        node.syntax_kind,
+    let syntax = ast.node(node);
+    matches!(
+        syntax.syntax_kind,
         SyntaxKind::PropertyAccessExpression | SyntaxKind::ElementAccessExpression
-    ) || id(node, "expression")
-        .is_none_or(|receiver| ast.identifier_name(receiver) != Some("module"))
-    {
-        return false;
-    }
-    let name = if node.syntax_kind == SyntaxKind::PropertyAccessExpression {
-        id(node, "name").filter(|&name| ast.node(name).syntax_kind == SyntaxKind::Identifier)
-    } else {
-        id(node, "argumentExpression")
+    ) && id(syntax, "expression")
+        .is_some_and(|receiver| ast.identifier_name(receiver) == Some("module"))
+        && element_or_property_access_name(ast, node).is_some_and(|name| matches!(ast.node(name).field("text").or_else(|| ast.node(name).field("escapedText")), Some(Value::Text(text)) if text.as_ref() == "exports"))
+}
+
+/// TypeScript `GetElementOrPropertyAccessName`: a property access's
+/// identifier name, or an element access's string or numeric literal
+/// argument, without its parentheses. Other names, such as a private name
+/// or a computed argument, are none.
+pub(crate) fn element_or_property_access_name(ast: &Ast<'_>, node: NodeId) -> Option<NodeId> {
+    let node = ast.node(node);
+    match node.syntax_kind {
+        SyntaxKind::PropertyAccessExpression => {
+            id(node, "name").filter(|&name| ast.node(name).syntax_kind == SyntaxKind::Identifier)
+        }
+        SyntaxKind::ElementAccessExpression => id(node, "argumentExpression")
             .map(|argument| skip_parentheses(ast, argument))
-            .filter(|&argument| {
-                matches!(
-                    ast.node(argument).syntax_kind,
-                    SyntaxKind::StringLiteral
-                        | SyntaxKind::NoSubstitutionTemplateLiteral
-                        | SyntaxKind::NumericLiteral
-                )
-            })
-    };
-    name.is_some_and(|name| matches!(ast.node(name).field("text").or_else(|| ast.node(name).field("escapedText")), Some(Value::Text(text)) if text.as_ref() == "exports"))
+            .filter(|&argument| is_string_or_numeric_literal_like(ast, argument)),
+        _ => None,
+    }
 }
 
 /// TypeScript `IsCallLikeExpression`, including the binary instanceof

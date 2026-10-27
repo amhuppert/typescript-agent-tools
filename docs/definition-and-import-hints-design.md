@@ -1,23 +1,24 @@
 # Definitions and import hints: technical design
 
-Status: proposed, 2026-10-26, from tsparse friction a Codex agent reported in
-remote-ai-manager ("Improve Docs Tab Features"). Reviewed the same day
-against the tree at commit `c91c68e` and a release build of that tree (the
-binary predates the commit, and `cargo build --release` reported it
-current): every statement below about current behavior cites the code it
-was checked against. Every TypeScript answer in [cases](#cases) and
-[out of scope](#out-of-scope-positions) was taken from the TypeScript 7.0.2
-native compiler's language server, on the source and positions recorded in
-[the probe](#the-probe); TypeScript's code is cited from the pinned
-typescript-go commit and from TypeScript 5.9.3's compiled source. The user selected both parts:
-a **go-to-definition operation**, `--definition`, and a **hint** when
-`--show --name` misses a name that the file imports or re-exports. A related
-case is already handled: `--at` on an `import` or `export` keyword selects
-the whole declaration as a statement site
-([statement sites](statement-sites-and-test-view-design.md)). The behavior
-contract, once implemented, lives in [references](references.md) (the
-operation and its differences from TypeScript) and
-[navigation](navigation.md) (the hint).
+Status: proposed, 2026-10-26, from tsparse friction reported while
+improving a documentation interface in the navigation example project.
+Reviewed the same day against the tree at commit `c91c68e` and a release
+build of that tree (the binary predates the commit, and `cargo build
+--release` reported it current): every statement below about current
+behavior cites the code it was checked against. Every TypeScript answer
+in [cases](#cases) and [out of scope](#out-of-scope-positions) was taken
+from the TypeScript 7.0.2 native compiler's language server, on the
+source and positions recorded in [the probe](#the-probe); TypeScript's
+code is cited from the pinned typescript-go commit and from TypeScript
+5.9.3's compiled source. The user selected both parts: a
+**go-to-definition operation**, `--definition`, and a **hint** when
+`--show --name` misses a name that the file imports or re-exports. A
+related case is already handled: `--at` on an `import` or `export`
+keyword selects the whole declaration as a statement site ([statement
+sites](statement-sites-and-test-view-design.md)). The behavior contract,
+once implemented, lives in [references](references.md) (the operation
+and its differences from TypeScript) and [navigation](navigation.md)
+(the hint).
 
 ## Operating envelope
 
@@ -32,7 +33,7 @@ already handles, or crosses a trust boundary.
 
 ## Problem
 
-Reproduced on remote-ai-manager:
+Reproduced on the navigation example project:
 
 - `--show --name useProjectFilesQuery RegisterDocumentDialog.tsx` prints
   ``…/RegisterDocumentDialog.tsx: no declaration matches `useProjectFilesQuery` ``

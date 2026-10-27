@@ -22,12 +22,14 @@ mod facts;
 mod functions;
 mod generics;
 mod globals;
+mod import_types;
 pub(super) use globals::ReferenceDisplay;
 mod indexed_access;
 mod inference;
 mod instantiation_expressions;
 mod intersections;
 mod iteration;
+mod javascript;
 mod json;
 mod keyof;
 mod literal_values;
@@ -144,6 +146,7 @@ pub(super) struct Evaluator<'p, 'w> {
     native_members: members::MemberValuesState,
     anonymous: anonymous::AnonymousState,
     aliases: aliases::AliasesState,
+    import_types: import_types::ImportTypesState,
     signature_demands: HashMap<(SignatureRoot, SignatureQuestion), DemandId>,
     demands: Vec<TypeDemandState>,
 }
@@ -281,6 +284,7 @@ impl<'p, 'w> Evaluator<'p, 'w> {
             native_members: members::MemberValuesState::new(),
             anonymous: anonymous::AnonymousState::new(),
             aliases: aliases::AliasesState::new(),
+            import_types: import_types::ImportTypesState::default(),
             signature_demands: HashMap::new(),
             demands: Vec::new(),
         }

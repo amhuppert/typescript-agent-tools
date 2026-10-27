@@ -7,7 +7,8 @@ use super::config::Config;
 pub(super) use super::manifest::PackageInfo;
 use super::paths;
 use super::resolve::Resolver;
-use super::{ProgramFile, disk, specifiers};
+use super::version::Version;
+use super::{ProgramFile, Redirect, disk, specifiers};
 use crate::analysis::InputError;
 use crate::input::Case;
 use crate::project::sources::Sources;
@@ -21,6 +22,8 @@ use std::sync::Arc;
 pub(super) struct SpecifierOptions {
     pub(super) module_resolution: ModuleResolutionKind,
     pub(super) paths: Option<SpecifierPaths>,
+    /// `baseUrl` (TypeScript 5.6 dialect), independently of `paths`.
+    pub(super) base_url: Option<String>,
     pub(super) root_dirs: Vec<String>,
     pub(super) custom_conditions: Vec<String>,
     pub(super) package_exports: bool,
@@ -31,6 +34,9 @@ pub(super) struct SpecifierOptions {
     pub(super) out_dir: Option<String>,
     pub(super) declaration_dir: Option<String>,
     pub(super) common_source_directory: String,
+    /// The dialect's compiler version, which package ranges are evaluated
+    /// against here as in resolution.
+    pub(super) typescript: Version,
 }
 
 #[derive(Debug, Clone)]
@@ -143,6 +149,14 @@ pub(super) fn ignored_path(path: &str) -> bool {
     path.contains("/node_modules/.") || path.contains("/.git") || path.contains(".#")
 }
 
+/// The program whose module names generation spells: its inputs, their
+/// captured facts, and the files that redirect to them.
+pub(super) struct Inputs<'p> {
+    pub(super) sources: &'p Sources,
+    pub(super) files: &'p [ProgramFile],
+    pub(super) redirects: &'p [Redirect],
+}
+
 #[derive(Debug)]
 pub(in crate::project) struct SpecifierEnvironment {
     pub(super) options: SpecifierOptions,
@@ -153,6 +167,9 @@ pub(in crate::project) struct SpecifierEnvironment {
     planning_failure: Option<SpecifierInputError>,
     files: HashMap<String, Result<bool, SpecifierInputError>>,
     packages: HashMap<String, Result<Option<Arc<PackageInfo>>, SpecifierInputError>>,
+    /// `Program.GetRedirectTargets`: by an input's identity key, the files
+    /// that redirect to it, in the order collection met them.
+    redirects: HashMap<String, Vec<String>>,
 }
 
 impl SpecifierEnvironment {
@@ -165,9 +182,13 @@ impl SpecifierEnvironment {
         case: Case,
         disk: &disk::Disk,
         resolver: &mut Resolver<'_>,
-        sources: &Sources,
-        files: &[ProgramFile],
+        inputs: Inputs<'_>,
     ) -> Self {
+        let Inputs {
+            sources,
+            files,
+            redirects,
+        } = inputs;
         let options = &config.options;
         let mut env = Self {
             options: SpecifierOptions {
@@ -176,6 +197,7 @@ impl SpecifierEnvironment {
                     base: paths.base.clone(),
                     patterns: paths.patterns.clone(),
                 }),
+                base_url: options.base_url.clone(),
                 root_dirs: options.root_dirs.clone(),
                 custom_conditions: options.custom_conditions.clone(),
                 package_exports: options.package_exports,
@@ -190,6 +212,7 @@ impl SpecifierEnvironment {
                 common_source_directory: trailing_separator(
                     options.root_dir.as_deref().unwrap_or(&config.dir),
                 ),
+                typescript: options.compiler.dialect().typescript().clone(),
             },
             case,
             cwd: cwd.to_owned(),
@@ -198,7 +221,17 @@ impl SpecifierEnvironment {
             planning_failure: None,
             files: HashMap::new(),
             packages: HashMap::new(),
+            redirects: HashMap::new(),
         };
+        for redirect in redirects {
+            let target = sources.get(redirect.target).path.to_str();
+            let key = case.key(target.expect("captured paths are exact text"));
+            let path = redirect
+                .path
+                .to_str()
+                .expect("captured paths are exact text");
+            env.redirects.entry(key).or_default().push(path.to_owned());
+        }
         let importers: Vec<String> = sources
             .ids()
             .map(|id| {
@@ -258,6 +291,25 @@ impl SpecifierEnvironment {
             }
         }
         env
+    }
+
+    /// The names of `target`'s module (`GetEachFileNameOfModule`): its own
+    /// path, then each file that redirects to it, absolute against the
+    /// working directory.
+    pub(super) fn file_names_of(&self, target: &str) -> Vec<String> {
+        let target = paths::resolve(&self.cwd, target);
+        let redirects = self
+            .redirects
+            .get(&self.case.key(&target))
+            .map_or(&[][..], Vec::as_slice);
+        let mut names = Vec::with_capacity(1 + redirects.len());
+        names.push(target);
+        names.extend(
+            redirects
+                .iter()
+                .map(|redirect| paths::resolve(&self.cwd, redirect)),
+        );
+        names
     }
 
     /// Include the complete filename itself: native single-file packages may

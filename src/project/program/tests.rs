@@ -26,8 +26,11 @@
 //!   errors. Effective strict-family inputs are retained in the snapshot.
 //!   `docs/types-options.md` classifies the remaining accepted options.
 
+use super::test_compiler::{self, BASE_OPTIONS, MANIFEST, manifest, typescript_5_6};
 use super::*;
 use std::sync::atomic::{AtomicUsize, Ordering};
+
+mod redirects;
 
 struct Project {
     root: PathBuf,
@@ -112,11 +115,19 @@ fn inputs(program: &Program) -> Vec<&str> {
         .collect()
 }
 
-/// Inputs in program order as `tsc --listFilesOnly` names them: a vendored
-/// standard library by its file name, any other input by its display path.
+/// Inputs in program order as `tsc --listFilesOnly` names them: a standard
+/// library from the dialect's directory, the vendored TypeScript 7.0.2 one
+/// or the installed compiler's, by its file name, any other input by its
+/// display path.
 fn listed(program: &Program) -> Vec<String> {
-    let vendored = std::fs::canonicalize(libraries::directory()).unwrap();
-    listed_in(program, &paths::from_path(&vendored).unwrap())
+    let compiler = &program.options.compiler;
+    let directory = compiler
+        .dialect()
+        .libraries()
+        .directory(compiler.package_directory(), &disk::Disk::default())
+        .unwrap();
+    let directory = std::fs::canonicalize(directory).unwrap();
+    listed_in(program, &paths::from_path(&directory).unwrap())
 }
 
 fn sorted(mut paths: Vec<&str>) -> Vec<&str> {
@@ -159,7 +170,8 @@ fn resolved(program: &Program, from: &str, specifier: &str) -> String {
         ModuleResolution::Missing => "missing".into(),
         ModuleResolution::Unchecked => "unchecked".into(),
         ModuleResolution::Unsupported(_) => "unsupported".into(),
-        ModuleResolution::NotAdmitted(_) => "not admitted".into(),
+        ModuleResolution::NotAdmitted(..) => "not admitted".into(),
+        ModuleResolution::Untyped(_) => "untyped".into(),
     }
 }
 
@@ -695,11 +707,15 @@ fn empty_programs_follow_the_no_inputs_rule() {
 }
 
 #[test]
-fn javascript_roots_are_unsupported_json_roots_are_inputs_and_shadowed_javascript_is_not_a_root() {
+fn javascript_roots_need_allow_js_json_roots_are_inputs_and_shadowed_javascript_is_not_a_root() {
     let project = Project::new(&[
         (
             "allowjs.json",
             r#"{ "compilerOptions": { "noLib": true, "allowJs": true }, "include": ["src"] }"#,
+        ),
+        (
+            "listed.json",
+            r#"{ "compilerOptions": { "noLib": true }, "files": ["src/a.js"] }"#,
         ),
         (
             "shadowed.json",
@@ -730,9 +746,12 @@ fn javascript_roots_are_unsupported_json_roots_are_inputs_and_shadowed_javascrip
         ("lib/b.js", ""),
         ("data/d.json", "{}"),
     ]);
-    let error = project.error("allowjs.json");
+    assert_eq!(inputs(&project.load("allowjs.json")), ["src/a.js"]);
+    // TS6504 for a JavaScript file named without allowJs.
+    let error = project.error("listed.json");
     assert_eq!(error.kind, InputErrorKind::Unsupported);
-    assert_eq!(project.display(error.path.as_ref().unwrap()), "src/a.js");
+    assert_eq!(project.display(error.path.as_ref().unwrap()), "listed.json");
+    assert!(error.message.contains("allowJs"), "{error}");
     assert_eq!(inputs(&project.load("shadowed.json")), ["lib/b.ts"]);
     // TypeScript 7.0.2 (`tsc --listFilesOnly`): an include spec ending in
     // `.json` selects JSON files, after the other wildcard matches, only
@@ -752,6 +771,7 @@ fn javascript_roots_are_unsupported_json_roots_are_inputs_and_shadowed_javascrip
             "allowjs.json",
             "json.json",
             "jsonoff.json",
+            "listed.json",
             "plain.json",
             "shadowed.json",
             "star.json"
@@ -990,7 +1010,8 @@ fn relative_specifiers_follow_extension_and_directory_rules() {
             ("./tsxfile.js", "src/tsxfile.tsx"),
             ("./jsxfile.jsx", "src/jsxfile.tsx"),
             ("./both.js", "src/both.ts"),
-            ("./onlyjs.js", "unsupported"),
+            // JavaScript without allowJs is an untyped module.
+            ("./onlyjs.js", "untyped"),
             // `nodenext` turns `resolveJsonModule` on; TS1543's import
             // attribute rule does not change the resolution.
             ("./data.json", "src/data.json"),
@@ -1212,7 +1233,7 @@ fn package_metadata_exports_and_type_versions() {
         ("typesonly", "node_modules/@types/typesonly/index.d.ts"),
         ("exptv", "node_modules/exptv/e.d.ts"),
         ("nested/deep", "node_modules/nested/deep/d.d.ts"),
-        ("jsonly", "unsupported"),
+        ("jsonly", "untyped"),
         ("nullblock", "missing"),
     ] {
         assert_eq!(
@@ -2419,17 +2440,67 @@ fn long_extends_chains_load_in_linear_time() {
         .map(|(a, b)| (a.as_str(), b.as_str()))
         .collect();
     let project = Project::new(&files);
+    // A host may hold the first read of a newly written file, as a file
+    // scanner does, for milliseconds per file: a cost of the host, not of
+    // loading, which the time limit bounds. Every file is read once first.
+    for (name, _) in &files {
+        std::fs::read(project.root.join(name)).unwrap();
+    }
     let config = project.root.join("tsconfig.json");
+    // Linear time is budgeted in the CPU time of the thread that loads,
+    // which resolves the whole `extends` chain: elapsed time also counts
+    // every wait for a file to open, which a host that inspects each open,
+    // or a loaded machine, can make far longer than the loading itself. CPU
+    // time counts system time too, so re-reading or re-hashing the chain for
+    // each link still exceeds the budget. Elapsed time only guards against
+    // a hang.
     let (send, receive) = std::sync::mpsc::channel();
     std::thread::spawn(move || {
-        let program = load_on_parsing_thread(&config).unwrap();
-        let inputs: Vec<String> = inputs(&program).into_iter().map(str::to_owned).collect();
-        send.send(inputs).unwrap();
+        let loaded = crate::analysis::on_parsing_thread("tsparse-test-load", |parser| {
+            let started = thread_cpu_time();
+            let program = load(&config, &super::disk::Disk::default(), parser).unwrap();
+            let spent = thread_cpu_time() - started;
+            let inputs: Vec<String> = inputs(&program).into_iter().map(str::to_owned).collect();
+            (inputs, spent)
+        })
+        .unwrap();
+        send.send(loaded).unwrap();
     });
-    let inputs = receive
-        .recv_timeout(std::time::Duration::from_secs(20))
+    let (inputs, spent) = receive
+        .recv_timeout(std::time::Duration::from_secs(600))
         .expect("loading should finish");
     assert_eq!(inputs, ["app.ts"]);
+    assert!(
+        spent < std::time::Duration::from_secs(20),
+        "loading took {spent:?} of CPU time"
+    );
+}
+
+/// The CPU time, user and system, the calling thread has used, which no
+/// wait counts (`clock_gettime` with `CLOCK_THREAD_CPUTIME_ID`).
+fn thread_cpu_time() -> std::time::Duration {
+    use std::ffi::{c_int, c_long};
+    /// `struct timespec`, whose fields are `long` on 64-bit macOS and Linux.
+    #[repr(C)]
+    struct Timespec {
+        seconds: c_long,
+        nanoseconds: c_long,
+    }
+    unsafe extern "C" {
+        fn clock_gettime(clock: c_int, time: *mut Timespec) -> c_int;
+    }
+    const CLOCK_THREAD_CPUTIME_ID: c_int = if cfg!(target_os = "macos") { 16 } else { 3 };
+    let mut time = Timespec {
+        seconds: 0,
+        nanoseconds: 0,
+    };
+    // SAFETY: `time` is a live, writable `struct timespec`.
+    let status = unsafe { clock_gettime(CLOCK_THREAD_CPUTIME_ID, &mut time) };
+    assert_eq!(status, 0, "{}", std::io::Error::last_os_error());
+    std::time::Duration::new(
+        u64::try_from(time.seconds).unwrap(),
+        u32::try_from(time.nanoseconds).unwrap(),
+    )
 }
 
 #[test]
@@ -2936,7 +3007,7 @@ fn replacement_libraries_are_commonjs_scripts_without_package_scopes() {
 fn library_copy(project: &Project) -> String {
     let copy = project.root.join("vendored");
     std::fs::create_dir_all(&copy).unwrap();
-    for entry in std::fs::read_dir(libraries::directory()).unwrap() {
+    for entry in std::fs::read_dir(libraries::vendored_directory()).unwrap() {
         let entry = entry.unwrap();
         std::fs::copy(entry.path(), copy.join(entry.file_name())).unwrap();
     }
@@ -3010,6 +3081,933 @@ fn listed_in(program: &Program, directory: &str) -> Vec<String> {
             }
         })
         .collect()
+}
+
+// Standard libraries under the TypeScript 5.6 dialect: the installed
+// compiler's own declarations, selected by 5.6.3's catalog. Each list is
+// 5.6.3's `tsc --listFilesOnly --incremental false` for the same
+// configuration, with the compiler's libraries named by file name.
+
+/// Artemis's `lib: ["dom", "dom.iterable", "esnext"]` with `target: ES2017`:
+/// 74 libraries, `esnext.array` and `esnext.string` ordered by the first of
+/// their two places in `libs`.
+const ARTEMIS_5_6: &str = "lib.es5.d.ts lib.es2015.d.ts lib.es2016.d.ts lib.es2017.d.ts lib.es2018.d.ts lib.es2019.d.ts lib.es2020.d.ts lib.es2021.d.ts lib.es2022.d.ts lib.es2023.d.ts lib.esnext.d.ts lib.dom.d.ts lib.dom.iterable.d.ts lib.es2015.core.d.ts lib.es2015.collection.d.ts lib.es2015.generator.d.ts lib.es2015.iterable.d.ts lib.es2015.promise.d.ts lib.es2015.proxy.d.ts lib.es2015.reflect.d.ts lib.es2015.symbol.d.ts lib.es2015.symbol.wellknown.d.ts lib.es2016.array.include.d.ts lib.es2016.intl.d.ts lib.es2017.date.d.ts lib.es2017.object.d.ts lib.es2017.sharedmemory.d.ts lib.es2017.string.d.ts lib.es2017.intl.d.ts lib.es2017.typedarrays.d.ts lib.es2018.asyncgenerator.d.ts lib.es2018.asynciterable.d.ts lib.es2018.intl.d.ts lib.es2018.promise.d.ts lib.es2018.regexp.d.ts lib.es2019.array.d.ts lib.es2019.object.d.ts lib.es2019.string.d.ts lib.es2019.symbol.d.ts lib.es2019.intl.d.ts lib.es2020.bigint.d.ts lib.es2020.date.d.ts lib.es2020.promise.d.ts lib.es2020.sharedmemory.d.ts lib.es2020.string.d.ts lib.es2020.symbol.wellknown.d.ts lib.es2020.intl.d.ts lib.es2020.number.d.ts lib.es2021.promise.d.ts lib.es2021.string.d.ts lib.es2021.weakref.d.ts lib.es2021.intl.d.ts lib.es2022.array.d.ts lib.es2022.error.d.ts lib.es2022.intl.d.ts lib.es2022.object.d.ts lib.es2022.sharedmemory.d.ts lib.es2022.string.d.ts lib.es2022.regexp.d.ts lib.es2023.array.d.ts lib.es2023.collection.d.ts lib.es2023.intl.d.ts lib.esnext.array.d.ts lib.esnext.collection.d.ts lib.esnext.intl.d.ts lib.esnext.disposable.d.ts lib.esnext.string.d.ts lib.esnext.promise.d.ts lib.esnext.decorators.d.ts lib.esnext.object.d.ts lib.esnext.regexp.d.ts lib.esnext.iterator.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts";
+/// `target: ES2015` without `lib`: `lib.es6.d.ts` first.
+const ES2015_DEFAULT_5_6: &str = "lib.es6.d.ts lib.es5.d.ts lib.es2015.d.ts lib.dom.d.ts lib.dom.iterable.d.ts lib.webworker.importscripts.d.ts lib.scripthost.d.ts lib.es2015.core.d.ts lib.es2015.collection.d.ts lib.es2015.generator.d.ts lib.es2015.iterable.d.ts lib.es2015.promise.d.ts lib.es2015.proxy.d.ts lib.es2015.reflect.d.ts lib.es2015.symbol.d.ts lib.es2015.symbol.wellknown.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts";
+/// `target: ES2017` without `lib`: the `.full` default last.
+const ES2017_DEFAULT_5_6: &str = "lib.es5.d.ts lib.es2015.d.ts lib.es2016.d.ts lib.es2017.d.ts lib.dom.d.ts lib.dom.iterable.d.ts lib.webworker.importscripts.d.ts lib.scripthost.d.ts lib.es2015.core.d.ts lib.es2015.collection.d.ts lib.es2015.generator.d.ts lib.es2015.iterable.d.ts lib.es2015.promise.d.ts lib.es2015.proxy.d.ts lib.es2015.reflect.d.ts lib.es2015.symbol.d.ts lib.es2015.symbol.wellknown.d.ts lib.es2016.array.include.d.ts lib.es2016.intl.d.ts lib.es2017.date.d.ts lib.es2017.object.d.ts lib.es2017.sharedmemory.d.ts lib.es2017.string.d.ts lib.es2017.intl.d.ts lib.es2017.typedarrays.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts lib.es2017.full.d.ts";
+/// `target: ESNext` without `lib`.
+const ESNEXT_DEFAULT_5_6: &str = "lib.es5.d.ts lib.es2015.d.ts lib.es2016.d.ts lib.es2017.d.ts lib.es2018.d.ts lib.es2019.d.ts lib.es2020.d.ts lib.es2021.d.ts lib.es2022.d.ts lib.es2023.d.ts lib.esnext.d.ts lib.dom.d.ts lib.dom.iterable.d.ts lib.dom.asynciterable.d.ts lib.webworker.importscripts.d.ts lib.scripthost.d.ts lib.es2015.core.d.ts lib.es2015.collection.d.ts lib.es2015.generator.d.ts lib.es2015.iterable.d.ts lib.es2015.promise.d.ts lib.es2015.proxy.d.ts lib.es2015.reflect.d.ts lib.es2015.symbol.d.ts lib.es2015.symbol.wellknown.d.ts lib.es2016.array.include.d.ts lib.es2016.intl.d.ts lib.es2017.date.d.ts lib.es2017.object.d.ts lib.es2017.sharedmemory.d.ts lib.es2017.string.d.ts lib.es2017.intl.d.ts lib.es2017.typedarrays.d.ts lib.es2018.asyncgenerator.d.ts lib.es2018.asynciterable.d.ts lib.es2018.intl.d.ts lib.es2018.promise.d.ts lib.es2018.regexp.d.ts lib.es2019.array.d.ts lib.es2019.object.d.ts lib.es2019.string.d.ts lib.es2019.symbol.d.ts lib.es2019.intl.d.ts lib.es2020.bigint.d.ts lib.es2020.date.d.ts lib.es2020.promise.d.ts lib.es2020.sharedmemory.d.ts lib.es2020.string.d.ts lib.es2020.symbol.wellknown.d.ts lib.es2020.intl.d.ts lib.es2020.number.d.ts lib.es2021.promise.d.ts lib.es2021.string.d.ts lib.es2021.weakref.d.ts lib.es2021.intl.d.ts lib.es2022.array.d.ts lib.es2022.error.d.ts lib.es2022.intl.d.ts lib.es2022.object.d.ts lib.es2022.sharedmemory.d.ts lib.es2022.string.d.ts lib.es2022.regexp.d.ts lib.es2023.array.d.ts lib.es2023.collection.d.ts lib.es2023.intl.d.ts lib.esnext.array.d.ts lib.esnext.collection.d.ts lib.esnext.intl.d.ts lib.esnext.disposable.d.ts lib.esnext.string.d.ts lib.esnext.promise.d.ts lib.esnext.decorators.d.ts lib.esnext.object.d.ts lib.esnext.regexp.d.ts lib.esnext.iterator.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts lib.esnext.full.d.ts";
+
+/// Options both dialects read alike, beside the `lib` and `target` a test
+/// sets: without `target`, TypeScript 5's default is ES5, which the
+/// TypeScript 5.6 dialect refuses.
+const MODERN: &str = r#""types": [], "strict": true, "module": "esnext", "moduleResolution": "bundler", "esModuleInterop": true"#;
+
+impl Project {
+    /// Install a copy of the TypeScript package at `package` as this
+    /// project's compiler (`test_compiler::install`). Returns the real path
+    /// of the copy's `lib`.
+    fn install_compiler(&self, package: &Path) -> String {
+        let installed = test_compiler::install(package, &self.root);
+        paths::from_path(&std::fs::canonicalize(installed.join("lib")).unwrap()).unwrap()
+    }
+}
+
+/// The TypeScript 5.6 dialect reads the installed compiler's `lib`
+/// directory and selects its files by 5.6.3's catalog: Artemis's library
+/// list, and each target's default (ES2015's `lib.es6.d.ts`, ES2016 to
+/// ES2023's `.full` files, ESNext's), every one a library, never searched.
+/// The same Artemis options under TypeScript 7 read the vendored 7.0.2
+/// declarations exactly as before.
+#[test]
+fn typescript_5_6_reads_the_installed_compilers_libraries() {
+    let Some(package) = typescript_5_6("typescript_5_6_reads_the_installed_compilers_libraries")
+    else {
+        return;
+    };
+    let config = |options: &str| {
+        format!(r#"{{ "compilerOptions": {{ {MODERN}, {options} }}, "files": ["a.ts"] }}"#)
+    };
+    let project = Project::new(&[
+        ("a.ts", "export {}\n"),
+        (
+            "artemis.json",
+            &config(r#""lib": ["dom", "dom.iterable", "esnext"], "target": "ES2017""#),
+        ),
+        ("es2015.json", &config(r#""target": "ES2015""#)),
+        ("es2017.json", &config(r#""target": "es2017""#)),
+        ("esnext.json", &config(r#""target": "ESNext""#)),
+    ]);
+    let lib = project.install_compiler(&package);
+    for (name, libraries) in [
+        ("artemis.json", ARTEMIS_5_6),
+        ("es2015.json", ES2015_DEFAULT_5_6),
+        ("es2017.json", ES2017_DEFAULT_5_6),
+        ("esnext.json", ESNEXT_DEFAULT_5_6),
+    ] {
+        let program = project.load(name);
+        assert_eq!(
+            listed_in(&program, &lib),
+            expected(libraries, &["a.ts"]),
+            "{name}"
+        );
+        assert_eq!(searched(&program), ["a.ts"], "{name}");
+        for id in program.sources.ids() {
+            let library = program.sources.get(id).path.starts_with(&lib);
+            let origin = program.files[id.index()].diagnostics.origin();
+            assert_eq!(library, origin == FileOrigin::DefaultLibrary, "{name}");
+        }
+    }
+    assert_eq!(ARTEMIS_5_6.split_whitespace().count(), 74);
+    project.write(&[(MANIFEST, &manifest("7.0.2"))]);
+    assert_eq!(
+        listed(&project.load("artemis.json")),
+        expected(DOM_ESNEXT, &["a.ts"])
+    );
+}
+
+/// `lib: ["es5", "dom"]` under TypeScript 7.0.2.
+const CORE_AND_DOM_ES5: &str = "lib.es5.d.ts lib.es2015.d.ts lib.dom.d.ts lib.es2015.core.d.ts lib.es2015.collection.d.ts lib.es2015.generator.d.ts lib.es2015.iterable.d.ts lib.es2015.promise.d.ts lib.es2015.proxy.d.ts lib.es2015.reflect.d.ts lib.es2015.symbol.d.ts lib.es2015.symbol.wellknown.d.ts lib.es2018.asynciterable.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts";
+/// `lib: ["es5"]` and a reference to `es2024`, under TypeScript 7.0.2.
+const ES5_AND_ES2024: &str = "lib.es5.d.ts lib.es2015.d.ts lib.es2016.d.ts lib.es2017.d.ts lib.es2018.d.ts lib.es2019.d.ts lib.es2020.d.ts lib.es2021.d.ts lib.es2022.d.ts lib.es2023.d.ts lib.es2024.d.ts lib.es2015.core.d.ts lib.es2015.collection.d.ts lib.es2015.generator.d.ts lib.es2015.iterable.d.ts lib.es2015.promise.d.ts lib.es2015.proxy.d.ts lib.es2015.reflect.d.ts lib.es2015.symbol.d.ts lib.es2015.symbol.wellknown.d.ts lib.es2016.array.include.d.ts lib.es2016.intl.d.ts lib.es2017.arraybuffer.d.ts lib.es2017.date.d.ts lib.es2017.object.d.ts lib.es2017.sharedmemory.d.ts lib.es2017.string.d.ts lib.es2017.intl.d.ts lib.es2017.typedarrays.d.ts lib.es2018.asyncgenerator.d.ts lib.es2018.asynciterable.d.ts lib.es2018.intl.d.ts lib.es2018.promise.d.ts lib.es2018.regexp.d.ts lib.es2019.array.d.ts lib.es2019.object.d.ts lib.es2019.string.d.ts lib.es2019.symbol.d.ts lib.es2019.intl.d.ts lib.es2020.bigint.d.ts lib.es2020.date.d.ts lib.es2020.promise.d.ts lib.es2020.sharedmemory.d.ts lib.es2020.string.d.ts lib.es2020.symbol.wellknown.d.ts lib.es2020.intl.d.ts lib.es2020.number.d.ts lib.es2021.promise.d.ts lib.es2021.string.d.ts lib.es2021.weakref.d.ts lib.es2021.intl.d.ts lib.es2022.array.d.ts lib.es2022.error.d.ts lib.es2022.intl.d.ts lib.es2022.object.d.ts lib.es2022.string.d.ts lib.es2022.regexp.d.ts lib.es2023.array.d.ts lib.es2023.collection.d.ts lib.es2023.intl.d.ts lib.es2024.arraybuffer.d.ts lib.es2024.collection.d.ts lib.es2024.object.d.ts lib.es2024.promise.d.ts lib.es2024.regexp.d.ts lib.es2024.sharedmemory.d.ts lib.es2024.string.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts";
+/// `lib: ["es5"]` and a reference to `webworker`, under TypeScript 7.0.2.
+const ES5_AND_WEBWORKER: &str = "lib.es5.d.ts lib.es2015.d.ts lib.webworker.d.ts lib.es2015.core.d.ts lib.es2015.collection.d.ts lib.es2015.generator.d.ts lib.es2015.iterable.d.ts lib.es2015.promise.d.ts lib.es2015.proxy.d.ts lib.es2015.reflect.d.ts lib.es2015.symbol.d.ts lib.es2015.symbol.wellknown.d.ts lib.es2018.asynciterable.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts";
+
+/// A `/// <reference lib>` under the TypeScript 5.6 dialect names a library
+/// by `libMap` key only, lowered as 5.6.3's `toFileNameLowerCase` lowers it,
+/// and an unknown one is TS2727 with 5.6.3's suggestion from `libs`, or
+/// TS2726 without one. TypeScript 7 also accepts the file a name selects
+/// and keeps its own lowering and wording, which has no suggestion.
+#[test]
+fn typescript_5_6_library_references_name_libraries_only() {
+    let Some(package) = typescript_5_6("typescript_5_6_library_references_name_libraries_only")
+    else {
+        return;
+    };
+    /// What `lib: ["es5"]` and the reference load: the libraries in
+    /// program order, or the reference's message.
+    type Outcome = Result<&'static str, &'static str>;
+    let only = |file: &'static str| -> &'static str {
+        match file {
+            "lib.es2015.promise.d.ts" => {
+                "lib.es5.d.ts lib.es2015.promise.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts"
+            }
+            "lib.webworker.d.ts" => {
+                "lib.es5.d.ts lib.webworker.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts"
+            }
+            "lib.esnext.array.d.ts" => {
+                "lib.es5.d.ts lib.esnext.array.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts"
+            }
+            _ => unreachable!(),
+        }
+    };
+    let es5 = "lib.es5.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts";
+    let cases: [(&str, Outcome, Outcome); 11] = [
+        (
+            "lib.es2015.promise.d.ts",
+            Err(
+                "Cannot find lib definition for 'lib.es2015.promise.d.ts'. Did you mean 'es2018.promise'?",
+            ),
+            Ok(only("lib.es2015.promise.d.ts")),
+        ),
+        (
+            "ES2015.Promise",
+            Ok(only("lib.es2015.promise.d.ts")),
+            Ok(only("lib.es2015.promise.d.ts")),
+        ),
+        (
+            "es2015.promis",
+            Err("Cannot find lib definition for 'es2015.promis'. Did you mean 'es2015.promise'?"),
+            Err("Cannot find lib definition for 'es2015.promis'"),
+        ),
+        (
+            "es2024",
+            Err("Cannot find lib definition for 'es2024'. Did you mean 'es2020'?"),
+            Ok(ES5_AND_ES2024),
+        ),
+        // U+0130 stays, and the rest lowers.
+        (
+            "esnext.\u{130}ntl",
+            Err("Cannot find lib definition for 'esnext.\u{130}ntl'. Did you mean 'esnext.intl'?"),
+            Err("Cannot find lib definition for 'esnext.\u{130}ntl'"),
+        ),
+        // KELVIN SIGN lowers to `k`.
+        (
+            "WEBWOR\u{212A}ER",
+            Ok(only("lib.webworker.d.ts")),
+            Ok(ES5_AND_WEBWORKER),
+        ),
+        // 5.6.3 lowers a capital sigma as final by its run alone.
+        (
+            "A\u{3a3}.b",
+            Err("Cannot find lib definition for 'a\u{3c2}.b'"),
+            Err("Cannot find lib definition for 'a\u{3c3}.b'"),
+        ),
+        (
+            "lib.es5.d.ts",
+            Err("Cannot find lib definition for 'lib.es5.d.ts'"),
+            Ok(es5),
+        ),
+        // A name declared twice selects its last file.
+        (
+            "esnext.array",
+            Ok(only("lib.esnext.array.d.ts")),
+            Ok(only("lib.esnext.array.d.ts")),
+        ),
+        (
+            "",
+            Err("Cannot find lib definition for ''"),
+            Err("Cannot find lib definition for ''"),
+        ),
+        (
+            "lib.esnext.full.d.ts",
+            Err("Cannot find lib definition for 'lib.esnext.full.d.ts'"),
+            Err("Cannot find lib definition for 'lib.esnext.full.d.ts'"),
+        ),
+    ];
+    let project = Project::new(&[
+        (
+            "tsconfig.json",
+            &format!(
+                r#"{{ "compilerOptions": {{ {MODERN}, "target": "es2017", "lib": ["es5"] }}, "files": ["a.ts"] }}"#
+            ),
+        ),
+        (
+            "nolib.json",
+            &format!(
+                r#"{{ "compilerOptions": {{ {MODERN}, "target": "es2017", "noLib": true }}, "files": ["a.ts"] }}"#
+            ),
+        ),
+    ]);
+    let installed = project.install_compiler(&package);
+    let vendored =
+        paths::from_path(&std::fs::canonicalize(libraries::vendored_directory()).unwrap()).unwrap();
+    for (version, directory) in [("5.6.3", &installed), ("7.0.2", &vendored)] {
+        project.write(&[(MANIFEST, &manifest(version))]);
+        for (name, typescript_5_6, typescript_7) in &cases {
+            let reference = format!("/// <reference lib=\"{name}\" />\nexport {{}}\n");
+            project.write(&[("a.ts", &reference)]);
+            let outcome = if version == "5.6.3" {
+                typescript_5_6
+            } else {
+                typescript_7
+            };
+            match (project.try_load("tsconfig.json"), outcome) {
+                (Ok(program), Ok(libraries)) => assert_eq!(
+                    listed_in(&program, directory),
+                    expected(libraries, &["a.ts"]),
+                    "{version} {name}"
+                ),
+                (Err(error), Err(message)) => assert_eq!(
+                    (error.kind, error.position, error.message.as_str()),
+                    (InputErrorKind::UnresolvedImport, position(1, 21), *message),
+                    "{version} {name}"
+                ),
+                (outcome, expected) => panic!(
+                    "{version} {name}: {:?}, expected {expected:?}",
+                    outcome.map(|program| listed_in(&program, directory))
+                ),
+            }
+        }
+        // `noLib` ignores every reference, unknown ones included.
+        project.write(&[(
+            "a.ts",
+            "/// <reference lib=\"lib.es2015.promise.d.ts\" />\nexport {}\n",
+        )]);
+        assert_eq!(listed(&project.load("nolib.json")), ["a.ts"], "{version}");
+    }
+}
+
+/// A file the TypeScript 5.6 dialect's catalog selects but the installed
+/// compiler lacks is an `Io` failure naming it, whether it is the target's
+/// default, a file the default references, or a `lib` entry: the vendored
+/// TypeScript 7.0.2 copy never stands in for it. So is one that cannot be
+/// read.
+#[test]
+fn a_library_missing_from_the_installed_compiler_is_an_io_error() {
+    let Some(package) =
+        typescript_5_6("a_library_missing_from_the_installed_compiler_is_an_io_error")
+    else {
+        return;
+    };
+    let config = |options: &str| {
+        format!(r#"{{ "compilerOptions": {{ {MODERN}, {options} }}, "files": ["a.ts"] }}"#)
+    };
+    let project = Project::new(&[
+        ("a.ts", "export {}\n"),
+        ("es2017.json", &config(r#""target": "es2017""#)),
+        (
+            "dom.json",
+            &config(r#""target": "es2017", "lib": ["es5", "dom"]"#),
+        ),
+    ]);
+    let lib = project.install_compiler(&package);
+    for (config, name) in [
+        ("es2017.json", "lib.es2017.full.d.ts"),
+        ("es2017.json", "lib.es2015.core.d.ts"),
+        ("dom.json", "lib.dom.d.ts"),
+    ] {
+        project.load(config);
+        let path = Path::new(&lib).join(name);
+        let saved = std::fs::read(&path).unwrap();
+        std::fs::remove_file(&path).unwrap();
+        let error = project.error(config);
+        assert_eq!(error.kind, InputErrorKind::Io, "{config} {name}: {error}");
+        assert_eq!(
+            error.path.as_deref(),
+            Some(path.as_path()),
+            "{config} {name}"
+        );
+        std::fs::write(&path, saved).unwrap();
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let path = Path::new(&lib).join("lib.es5.d.ts");
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o000)).unwrap();
+        if std::fs::read(&path).is_ok() {
+            eprintln!(
+                "SKIP a_library_missing_from_the_installed_compiler_is_an_io_error: permissions are not enforced, as for the superuser"
+            );
+        } else {
+            let error = project.error("dom.json");
+            assert_eq!(error.kind, InputErrorKind::Io, "{error}");
+            assert_eq!(error.path.as_deref(), Some(path.as_path()));
+        }
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o644)).unwrap();
+    }
+}
+
+/// Under the TypeScript 5.6 dialect a library read from the installed
+/// compiler's `node_modules/typescript/lib` is a default library, never
+/// searched or external, while `typescript/lib/typescript.d.ts` beside it,
+/// which a package imports, is a dependency like any other package file.
+#[test]
+fn installed_libraries_are_libraries_and_the_compiler_api_is_a_dependency() {
+    let Some(package) =
+        typescript_5_6("installed_libraries_are_libraries_and_the_compiler_api_is_a_dependency")
+    else {
+        return;
+    };
+    let project = Project::new(&[
+        (
+            "tsconfig.json",
+            &format!(
+                r#"{{ "compilerOptions": {{ {MODERN}, "target": "es2017", "lib": ["es5"] }}, "files": ["a.ts"] }}"#
+            ),
+        ),
+        (
+            "a.ts",
+            "import { kind } from \"dep\";\nexport const k = kind;\n",
+        ),
+        (
+            "node_modules/dep/package.json",
+            r#"{ "name": "dep", "types": "index.d.ts" }"#,
+        ),
+        (
+            "node_modules/dep/index.d.ts",
+            "import type * as ts from \"typescript\";\nexport declare const kind: ts.SyntaxKind;\n",
+        ),
+    ]);
+    let lib = project.install_compiler(&package);
+    let program = project.load("tsconfig.json");
+    assert_eq!(
+        listed_in(&program, &lib),
+        [
+            "lib.es5.d.ts",
+            "lib.decorators.d.ts",
+            "lib.decorators.legacy.d.ts",
+            "typescript.d.ts",
+            "node_modules/dep/index.d.ts",
+            "a.ts"
+        ]
+    );
+    assert_eq!(searched(&program), ["a.ts"]);
+    let origins: Vec<FileOrigin> = program
+        .files
+        .iter()
+        .map(|file| file.diagnostics.origin())
+        .collect();
+    assert_eq!(
+        origins,
+        [
+            FileOrigin::DefaultLibrary,
+            FileOrigin::DefaultLibrary,
+            FileOrigin::DefaultLibrary,
+            FileOrigin::Dependency,
+            FileOrigin::Dependency,
+            FileOrigin::Project
+        ]
+    );
+}
+
+/// Under the TypeScript 5.6 dialect a `@typescript/lib-*` package beside
+/// the configuration replaces every library `pathForLibFile` locates, by
+/// 5.6.3's own lookup (`resolveLibrary`): `{ moduleResolution: Node10 }`
+/// without the project's `paths`, `baseUrl`, `moduleSuffixes`, or
+/// `preserveSymlinks`, and without package `exports`, so a link resolves to
+/// its target. The target's default library, which 5.6.3 reads without
+/// `pathForLibFile`, is never replaced, though the libraries it references
+/// are. TypeScript 7 looks a package up only under `libReplacement`, with
+/// the configured resolver as a `require`, and replaces the default too.
+/// Each list is the compiler's, run from another directory with its own
+/// competing `@typescript/lib-dom`.
+#[test]
+fn typescript_5_6_replaces_libraries_by_its_own_lookup() {
+    let Some(package) = typescript_5_6("typescript_5_6_replaces_libraries_by_its_own_lookup")
+    else {
+        return;
+    };
+    let config = |options: &str| {
+        format!(
+            r#"{{ "compilerOptions": {{ {MODERN}, "target": "ES2017"{options} }}, "files": ["a.ts"] }}"#
+        )
+    };
+    let dom = r#", "lib": ["es5", "dom"]"#;
+    let scripthost = r#", "lib": ["es5", "scripthost"]"#;
+    let configs: Vec<(String, String)> = [
+        ("five-plain", dom.to_owned()),
+        (
+            "five-paths",
+            format!(r#"{dom}, "paths": {{ "@typescript/lib-dom": ["./mapped/lib-dom.d.ts"] }}"#),
+        ),
+        ("five-base-url", format!(r#"{dom}, "baseUrl": "./base""#)),
+        ("five-suffix", format!(r#"{dom}, "moduleSuffixes": [".ios", ""]"#)),
+        ("five-default", String::new()),
+        (
+            "five-linked-suffix",
+            format!(r#"{scripthost}, "moduleSuffixes": [".ios", ""]"#),
+        ),
+        (
+            "five-linked-preserve",
+            format!(r#"{scripthost}, "preserveSymlinks": true"#),
+        ),
+        ("seven-plain", format!(r#"{dom}, "libReplacement": true"#)),
+        ("seven-off", dom.to_owned()),
+        (
+            "seven-paths",
+            format!(
+                r#"{dom}, "libReplacement": true, "paths": {{ "@typescript/lib-dom": ["./mapped/lib-dom.d.ts"] }}"#
+            ),
+        ),
+        (
+            "seven-linked-suffix",
+            format!(r#"{scripthost}, "libReplacement": true, "moduleSuffixes": [".ios", ""]"#),
+        ),
+        (
+            "seven-linked-preserve",
+            format!(r#"{scripthost}, "libReplacement": true, "preserveSymlinks": true"#),
+        ),
+        ("seven-default", r#", "libReplacement": true"#.to_owned()),
+    ]
+    .into_iter()
+    .map(|(name, options)| (format!("{name}.json"), config(&options)))
+    .collect();
+    let mut files: Vec<(&str, &str)> = vec![
+        ("a.ts", "export {}\n"),
+        (
+            "node_modules/@typescript/lib-dom/package.json",
+            r#"{ "name": "@typescript/lib-dom", "types": "index.d.ts", "exports": { ".": { "types": "./exported.d.ts" } } }"#,
+        ),
+        (
+            "node_modules/@typescript/lib-dom/index.d.ts",
+            "declare var fromIndex: number;\n",
+        ),
+        (
+            "node_modules/@typescript/lib-dom/exported.d.ts",
+            "declare var fromExports: number;\n",
+        ),
+        (
+            "node_modules/@typescript/lib-dom/index.ios.d.ts",
+            "declare var fromSuffix: number;\n",
+        ),
+        ("mapped/lib-dom.d.ts", "declare var fromPaths: number;\n"),
+        (
+            "base/@typescript/lib-dom/index.d.ts",
+            "declare var fromBaseUrl: number;\n",
+        ),
+        (
+            "node_modules/@typescript/lib-es2017/package.json",
+            r#"{ "name": "@typescript/lib-es2017" }"#,
+        ),
+        (
+            "node_modules/@typescript/lib-es2017/index.d.ts",
+            "declare var es2017Index: number;\n",
+        ),
+        (
+            "node_modules/@typescript/lib-es2017/full.d.ts",
+            "declare var es2017Full: number;\n",
+        ),
+        (
+            "store/sh/package.json",
+            r#"{ "name": "@typescript/lib-scripthost", "types": "index.d.ts" }"#,
+        ),
+        ("store/sh/index.d.ts", "declare var linked: number;\n"),
+        (
+            "store/sh/index.ios.d.ts",
+            "declare var linkedSuffix: number;\n",
+        ),
+    ];
+    files.extend(
+        configs
+            .iter()
+            .map(|(name, text)| (name.as_str(), text.as_str())),
+    );
+    let project = Project::new(&files);
+    project.link("node_modules/@typescript/lib-scripthost", "../../store/sh");
+    let installed = project.install_compiler(&package);
+    let vendored =
+        paths::from_path(&std::fs::canonicalize(libraries::vendored_directory()).unwrap()).unwrap();
+    let es5 = "lib.es5.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts";
+    let replaced = |replacement: &str| format!("{es5} {replacement}");
+    let cases = [
+        (
+            "five-plain",
+            replaced("node_modules/@typescript/lib-dom/index.d.ts"),
+        ),
+        (
+            "five-paths",
+            replaced("node_modules/@typescript/lib-dom/index.d.ts"),
+        ),
+        (
+            "five-base-url",
+            replaced("node_modules/@typescript/lib-dom/index.d.ts"),
+        ),
+        (
+            "five-suffix",
+            replaced("node_modules/@typescript/lib-dom/index.d.ts"),
+        ),
+        (
+            "five-default",
+            "lib.dom.iterable.d.ts lib.webworker.importscripts.d.ts node_modules/@typescript/lib-es2017/index.d.ts node_modules/@typescript/lib-dom/index.d.ts store/sh/index.d.ts lib.es2017.full.d.ts".into(),
+        ),
+        ("five-linked-suffix", replaced("store/sh/index.d.ts")),
+        ("five-linked-preserve", replaced("store/sh/index.d.ts")),
+        (
+            "seven-plain",
+            replaced("node_modules/@typescript/lib-dom/exported.d.ts"),
+        ),
+        ("seven-off", CORE_AND_DOM_ES5.into()),
+        ("seven-paths", replaced("mapped/lib-dom.d.ts")),
+        ("seven-linked-suffix", replaced("store/sh/index.ios.d.ts")),
+        (
+            "seven-linked-preserve",
+            replaced("node_modules/@typescript/lib-scripthost/index.d.ts"),
+        ),
+        (
+            "seven-default",
+            "node_modules/@typescript/lib-es2017/full.d.ts".into(),
+        ),
+    ];
+    for (name, libraries) in cases {
+        let (version, directory) = if name.starts_with("five") {
+            ("5.6.3", &installed)
+        } else {
+            ("7.0.2", &vendored)
+        };
+        project.write(&[(MANIFEST, &manifest(version))]);
+        let program = project.load(&format!("{name}.json"));
+        assert_eq!(
+            listed_in(&program, directory),
+            expected(&libraries, &["a.ts"]),
+            "{name}"
+        );
+        assert_eq!(searched(&program), ["a.ts"], "{name}");
+    }
+}
+
+/// Program order around a replacement library, as each compiler lists it:
+/// 5.6.3's `createProgram` processes the type packages before the
+/// libraries, so a type package precedes the files a replacement reaches by
+/// an import or a `/// <reference types>`, and a replacement it references
+/// precedes one a `lib` entry names; a file a library reaches by `/// <reference path>` is
+/// ordered with the libraries (`processReferencedFiles(file, isDefaultLib)`).
+/// TypeScript 7.0.2 adds the library tasks first and orders a referenced
+/// file with the other inputs. Each list is the compiler's `tsc
+/// --listFilesOnly`, 7.0.2's under `libReplacement`.
+#[test]
+fn program_order_around_replacements_is_each_compilers() {
+    let Some(package) = typescript_5_6("program_order_around_replacements_is_each_compilers")
+    else {
+        return;
+    };
+    let config = |types: &str, lib: &str, replacing: bool| {
+        let replacing = if replacing {
+            r#", "libReplacement": true"#
+        } else {
+            ""
+        };
+        format!(
+            r#"{{ "compilerOptions": {{ "types": ["{types}"], "strict": true, "module": "esnext", "moduleResolution": "bundler", "esModuleInterop": true, "target": "ES2017", "lib": [{lib}]{replacing} }}, "files": ["a.ts"] }}"#
+        )
+    };
+    let dom = r#""es5", "dom""#;
+    let both = r#""es5", "dom", "scripthost""#;
+    let configs = [
+        ("pick.json", config("picker", dom, false)),
+        ("pick-replacing.json", config("picker", dom, true)),
+        ("tie.json", config("tie", both, false)),
+        ("tie-replacing.json", config("tie", both, true)),
+    ];
+    let mut files: Vec<(&str, &str)> = vec![
+        ("a.ts", "export {}\n"),
+        (
+            "node_modules/picker/package.json",
+            r#"{ "name": "picker", "types": "index.d.ts" }"#,
+        ),
+        ("node_modules/picker/index.d.ts", "export {}\n"),
+        (
+            "node_modules/pickref/package.json",
+            r#"{ "name": "pickref", "types": "index.d.ts" }"#,
+        ),
+        ("node_modules/pickref/index.d.ts", "export {}\n"),
+        (
+            "node_modules/tie/package.json",
+            r#"{ "name": "tie", "types": "index.d.ts" }"#,
+        ),
+        (
+            "node_modules/tie/index.d.ts",
+            "/// <reference lib=\"scripthost\" />\n",
+        ),
+        (
+            "node_modules/@typescript/lib-dom/package.json",
+            r#"{ "name": "@typescript/lib-dom", "types": "index.d.ts" }"#,
+        ),
+        ("node_modules/@typescript/lib-dom/pick.d.ts", "export {}\n"),
+        (
+            "node_modules/@typescript/lib-scripthost/package.json",
+            r#"{ "name": "@typescript/lib-scripthost", "types": "index.d.ts" }"#,
+        ),
+        (
+            "node_modules/@typescript/lib-scripthost/index.d.ts",
+            "export {}\n",
+        ),
+    ];
+    files.extend(configs.iter().map(|(name, text)| (*name, text.as_str())));
+    let project = Project::new(&files);
+    project.install_compiler(&package);
+    let libraries = "lib.es5.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts";
+    let dom = "node_modules/@typescript/lib-dom/index.d.ts";
+    let pick = "node_modules/@typescript/lib-dom/pick.d.ts";
+    let picker = "node_modules/picker/index.d.ts";
+    let pickref = "node_modules/pickref/index.d.ts";
+    let scripthost = "node_modules/@typescript/lib-scripthost/index.d.ts";
+    let tie = "node_modules/tie/index.d.ts";
+    let listing = |inputs: &[&str]| expected(libraries, inputs);
+    for (variant, text, config, typescript_5_6, typescript_7) in [
+        (
+            "import",
+            "import \"./pick\";\n",
+            "pick",
+            listing(&[dom, "a.ts", picker, pick]),
+            listing(&[dom, "a.ts", pick, picker]),
+        ),
+        (
+            "reference types",
+            "/// <reference types=\"pickref\" />\n",
+            "pick",
+            listing(&[dom, "a.ts", picker, pickref]),
+            listing(&[dom, "a.ts", pickref, picker]),
+        ),
+        (
+            "reference path",
+            "/// <reference path=\"./pick.d.ts\" />\n",
+            "pick",
+            listing(&[pick, dom, "a.ts", picker]),
+            listing(&[dom, "a.ts", pick, picker]),
+        ),
+        // A file the reference reaches in the compiler's directory is
+        // ordered by its name there under 5.6.3, and is the installed
+        // package's file, not a library, under 7.0.2.
+        (
+            "reference path into the compiler",
+            "/// <reference path=\"../../typescript/lib/lib.es2015.core.d.ts\" />\n",
+            "pick",
+            expected(
+                "lib.es5.d.ts lib.es2015.core.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts",
+                &[dom, "a.ts", picker],
+            ),
+            listing(&[
+                dom,
+                "a.ts",
+                "node_modules/typescript/lib/lib.es2015.core.d.ts",
+                picker,
+            ]),
+        ),
+        (
+            "two replacements",
+            "export {}\n",
+            "tie",
+            listing(&[scripthost, dom, "a.ts", tie]),
+            listing(&[dom, scripthost, "a.ts", tie]),
+        ),
+    ] {
+        project.write(&[("node_modules/@typescript/lib-dom/index.d.ts", text)]);
+        for (version, config, inputs) in [
+            ("5.6.3", format!("{config}.json"), typescript_5_6),
+            ("7.0.2", format!("{config}-replacing.json"), typescript_7),
+        ] {
+            project.write(&[(MANIFEST, &manifest(version))]);
+            assert_eq!(
+                listed(&project.load(&config)),
+                inputs,
+                "{version} {variant}"
+            );
+        }
+    }
+}
+
+/// Where two routes reach one file, 5.6.3 orders it by the route that
+/// processes it first, depth first with the type packages before the
+/// libraries, and then orders the libraries by each file's own path,
+/// anywhere beneath its `lib` directory, by file name
+/// (`getDefaultLibFilePriority`). TypeScript 7.0.2 orders a file by the
+/// library task it loads first, and none of these files lies beneath its
+/// own directory. Each list is the compiler's `tsc --listFilesOnly`, 7.0.2's
+/// under `libReplacement`.
+#[test]
+fn overlapping_routes_and_library_locations_order_as_each_compiler_lists() {
+    let Some(package) =
+        typescript_5_6("overlapping_routes_and_library_locations_order_as_each_compiler_lists")
+    else {
+        return;
+    };
+    const PICKER: &str = r#"{ "name": "picker", "types": "index.d.ts" }"#;
+    const LIB_DOM: &str = r#"{ "name": "@typescript/lib-dom", "types": "index.d.ts" }"#;
+    const LIB_SCRIPTHOST: &str =
+        r#"{ "name": "@typescript/lib-scripthost", "types": "index.d.ts" }"#;
+    let es5 = "lib.es5.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts";
+    let dom = "node_modules/@typescript/lib-dom/index.d.ts";
+    let shared = "node_modules/@typescript/lib-dom/shared.d.ts";
+    let scripthost = "node_modules/@typescript/lib-scripthost/index.d.ts";
+    let other = "node_modules/picker/other.d.ts";
+    let picker = "node_modules/picker/index.d.ts";
+    type Case<'a> = (
+        &'a str,
+        &'a str,
+        &'a str,
+        Vec<(&'a str, &'a str)>,
+        Vec<String>,
+        Vec<String>,
+    );
+    let cases: Vec<Case> = vec![
+        (
+            "a type package imports the replacement",
+            "picker",
+            r#""es5", "dom""#,
+            vec![
+                ("node_modules/picker/package.json", PICKER),
+                (
+                    "node_modules/picker/index.d.ts",
+                    "import \"./other\";\nimport \"@typescript/lib-dom\";\n",
+                ),
+                ("node_modules/picker/other.d.ts", "export {}\n"),
+                ("node_modules/@typescript/lib-dom/package.json", LIB_DOM),
+                ("node_modules/@typescript/lib-dom/index.d.ts", "export {}\n"),
+            ],
+            expected(es5, &["a.ts", other, dom, picker]),
+            expected(es5, &[dom, "a.ts", other, picker]),
+        ),
+        (
+            "a type package references the replacement's path",
+            "picker",
+            r#""es5", "dom""#,
+            vec![
+                ("node_modules/picker/package.json", PICKER),
+                (
+                    "node_modules/picker/index.d.ts",
+                    "/// <reference path=\"./other.d.ts\" />\n/// <reference path=\"../@typescript/lib-dom/index.d.ts\" />\n",
+                ),
+                ("node_modules/picker/other.d.ts", "export {}\n"),
+                ("node_modules/@typescript/lib-dom/package.json", LIB_DOM),
+                ("node_modules/@typescript/lib-dom/index.d.ts", "export {}\n"),
+            ],
+            expected(es5, &["a.ts", other, dom, picker]),
+            expected(es5, &[dom, "a.ts", other, picker]),
+        ),
+        (
+            "a library references a path another library imports",
+            "picker",
+            r#""es5", "dom", "scripthost""#,
+            vec![
+                ("node_modules/picker/package.json", PICKER),
+                ("node_modules/picker/index.d.ts", "export {}\n"),
+                ("node_modules/@typescript/lib-dom/package.json", LIB_DOM),
+                (
+                    "node_modules/@typescript/lib-dom/index.d.ts",
+                    "/// <reference path=\"./shared.d.ts\" />\n",
+                ),
+                (
+                    "node_modules/@typescript/lib-dom/shared.d.ts",
+                    "export {}\n",
+                ),
+                (
+                    "node_modules/@typescript/lib-scripthost/package.json",
+                    LIB_SCRIPTHOST,
+                ),
+                (
+                    "node_modules/@typescript/lib-scripthost/index.d.ts",
+                    "import \"../lib-dom/shared\";\n",
+                ),
+            ],
+            expected(es5, &[shared, dom, scripthost, "a.ts", picker]),
+            expected(es5, &[dom, scripthost, "a.ts", shared, picker]),
+        ),
+        (
+            "a library imports a file another library references by path",
+            "picker",
+            r#""es5", "dom", "scripthost""#,
+            vec![
+                ("node_modules/picker/package.json", PICKER),
+                ("node_modules/picker/index.d.ts", "export {}\n"),
+                ("node_modules/@typescript/lib-dom/package.json", LIB_DOM),
+                (
+                    "node_modules/@typescript/lib-dom/index.d.ts",
+                    "import \"./shared\";\n",
+                ),
+                (
+                    "node_modules/@typescript/lib-dom/shared.d.ts",
+                    "export {}\n",
+                ),
+                (
+                    "node_modules/@typescript/lib-scripthost/package.json",
+                    LIB_SCRIPTHOST,
+                ),
+                (
+                    "node_modules/@typescript/lib-scripthost/index.d.ts",
+                    "/// <reference path=\"../lib-dom/shared.d.ts\" />\n",
+                ),
+            ],
+            expected(es5, &[dom, scripthost, "a.ts", picker, shared]),
+            expected(es5, &[dom, scripthost, "a.ts", shared, picker]),
+        ),
+        (
+            "a replacement resolves to the installed library",
+            "",
+            r#""es5", "scripthost", "dom""#,
+            vec![(
+                "node_modules/@typescript/lib-dom/package.json",
+                r#"{ "name": "@typescript/lib-dom", "types": "../../typescript/lib/lib.dom.d.ts" }"#,
+            )],
+            expected(
+                "lib.es5.d.ts lib.dom.d.ts lib.scripthost.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts",
+                &["a.ts"],
+            ),
+            expected(
+                "lib.es5.d.ts lib.scripthost.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts",
+                &["node_modules/typescript/lib/lib.dom.d.ts", "a.ts"],
+            ),
+        ),
+        (
+            "a replacement references a path beneath the installed lib",
+            "",
+            r#""es5", "dom", "scripthost""#,
+            vec![
+                ("node_modules/@typescript/lib-dom/package.json", LIB_DOM),
+                ("node_modules/@typescript/lib-dom/index.d.ts", "export {}\n"),
+                (
+                    "node_modules/@typescript/lib-scripthost/package.json",
+                    LIB_SCRIPTHOST,
+                ),
+                (
+                    "node_modules/@typescript/lib-scripthost/index.d.ts",
+                    "/// <reference path=\"../../typescript/lib/nested/lib.es2015.core.d.ts\" />\n",
+                ),
+                (
+                    "node_modules/typescript/lib/nested/lib.es2015.core.d.ts",
+                    "export {}\n",
+                ),
+            ],
+            expected(
+                "lib.es5.d.ts nested/lib.es2015.core.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts",
+                &[dom, scripthost, "a.ts"],
+            ),
+            expected(
+                es5,
+                &[
+                    dom,
+                    scripthost,
+                    "a.ts",
+                    "node_modules/typescript/lib/nested/lib.es2015.core.d.ts",
+                ],
+            ),
+        ),
+    ];
+    for (name, types, lib, files, typescript_5_6, typescript_7) in cases {
+        let types = if types.is_empty() {
+            String::new()
+        } else {
+            format!(r#""{types}""#)
+        };
+        let options = format!(
+            r#""types": [{types}], "strict": true, "module": "esnext", "moduleResolution": "bundler", "esModuleInterop": true, "target": "ES2017", "lib": [{lib}]"#
+        );
+        let five = format!(r#"{{ "compilerOptions": {{ {options} }}, "files": ["a.ts"] }}"#);
+        let seven = format!(
+            r#"{{ "compilerOptions": {{ {options}, "libReplacement": true }}, "files": ["a.ts"] }}"#
+        );
+        let mut all = vec![
+            ("a.ts", "export {}\n"),
+            ("five.json", five.as_str()),
+            ("seven.json", seven.as_str()),
+        ];
+        all.extend(files);
+        let project = Project::new(&all);
+        project.install_compiler(&package);
+        assert_eq!(
+            listed(&project.load("five.json")),
+            typescript_5_6,
+            "5.6.3: {name}"
+        );
+        project.write(&[(MANIFEST, &manifest("7.0.2"))]);
+        assert_eq!(
+            listed(&project.load("seven.json")),
+            typescript_7,
+            "7.0.2: {name}"
+        );
+    }
+}
+
+/// Under TypeScript 7 every replacement is ordered last, even one that
+/// resolves into this build's vendored declarations, which only stand in
+/// for 7.0.2's own directory: native 7.0.2's `tsc --listFilesOnly` under
+/// `libReplacement` lists the scripthost replacement and then the vendored
+/// `lib.dom.d.ts` after the located libraries, in `lib` order.
+#[test]
+fn a_typescript_7_replacement_in_the_vendored_directory_is_ordered_last() {
+    let vendored = paths::combine(&libraries::vendored_directory(), "lib.dom.d.ts");
+    let manifest = format!(
+        r#"{{ "name": "@typescript/lib-dom", "types": {} }}"#,
+        serde_json::to_string(&vendored).unwrap()
+    );
+    let project = Project::new(&[
+        ("a.ts", "export {}\n"),
+        (
+            "tsconfig.json",
+            r#"{ "compilerOptions": { "types": [], "lib": ["es5", "scripthost", "dom"], "libReplacement": true }, "files": ["a.ts"] }"#,
+        ),
+        ("node_modules/@typescript/lib-dom/package.json", &manifest),
+        (
+            "node_modules/@typescript/lib-scripthost/package.json",
+            r#"{ "name": "@typescript/lib-scripthost", "types": "index.d.ts" }"#,
+        ),
+        (
+            "node_modules/@typescript/lib-scripthost/index.d.ts",
+            "export {}\n",
+        ),
+    ]);
+    assert_eq!(
+        listed(&project.load("tsconfig.json")),
+        expected(
+            "lib.es5.d.ts lib.es2015.d.ts lib.es2015.core.d.ts lib.es2015.collection.d.ts lib.es2015.generator.d.ts lib.es2015.iterable.d.ts lib.es2015.promise.d.ts lib.es2015.proxy.d.ts lib.es2015.reflect.d.ts lib.es2015.symbol.d.ts lib.es2015.symbol.wellknown.d.ts lib.es2018.asynciterable.d.ts lib.decorators.d.ts lib.decorators.legacy.d.ts",
+            &[
+                "node_modules/@typescript/lib-scripthost/index.d.ts",
+                "lib.dom.d.ts",
+                "a.ts"
+            ]
+        )
+    );
 }
 
 /// TypeScript keeps an empty directive value and reports it where it looks
@@ -3390,7 +4388,7 @@ fn probe_expectation(target: &str) -> (&'static str, Vec<String>) {
 /// The program as `tools/json-probes.mjs` records it: `GetSourceFiles` order,
 /// a standard library as `lib:<name>`, and an external library's file marked.
 fn probe_program(program: &Program) -> Vec<String> {
-    let vendored = std::fs::canonicalize(libraries::directory()).unwrap();
+    let vendored = std::fs::canonicalize(libraries::vendored_directory()).unwrap();
     let vendored = paths::from_path(&vendored).unwrap();
     program
         .sources
@@ -3626,7 +4624,9 @@ fn compiler_probe_projects_load_and_answer_as_recorded() {
 /// configuration selects, in program order, each with its provenance, for
 /// comparison with the pinned compiler's `tsc --listFilesOnly` and its
 /// API's `getSourceFileMetadata` (`docs/validation.md`, Command Center
-/// checkpoint). `TSPARSE_PROGRAM_CONFIG` names the configuration and
+/// checkpoint), and each file that redirects to an input as a duplicate of
+/// its package, with that input, for comparison with 5.6.3's
+/// `redirectInfo`. `TSPARSE_PROGRAM_CONFIG` names the configuration and
 /// `TSPARSE_PROGRAM_LISTING` the JSON file to write.
 #[test]
 #[ignore = "needs TSPARSE_PROGRAM_CONFIG and TSPARSE_PROGRAM_LISTING"]
@@ -3635,19 +4635,37 @@ fn list_configured_program() {
     let output = std::env::var_os("TSPARSE_PROGRAM_LISTING").expect("TSPARSE_PROGRAM_LISTING");
     let program = load_on_parsing_thread(Path::new(&config))
         .unwrap_or_else(|error| panic!("{} failed to load: {error}", config.display()));
+    // Only a standard library is named by its file name, as the compiler
+    // comparison names it: another file in the compiler's `lib` directory,
+    // such as `typescript.d.ts`, keeps its path.
     let files: Vec<serde_json::Value> = listed(&program)
         .into_iter()
-        .zip(&program.files)
-        .map(|(file, input)| {
-            let origin = match input.diagnostics.origin() {
-                FileOrigin::Project => "project",
-                FileOrigin::Dependency => "dependency",
-                FileOrigin::DefaultLibrary => "library",
+        .zip(program.sources.ids().zip(&program.files))
+        .map(|(file, (id, input))| {
+            let (origin, file) = match input.diagnostics.origin() {
+                FileOrigin::Project => ("project", program.sources.get(id).display.clone()),
+                FileOrigin::Dependency => ("dependency", program.sources.get(id).display.clone()),
+                FileOrigin::DefaultLibrary => ("library", file),
             };
             serde_json::json!({ "file": file, "origin": origin })
         })
         .collect();
-    let listing = serde_json::json!({ "config": program.config, "files": files });
+    let directory = program.config.parent().unwrap().to_str().unwrap();
+    let redirects: Vec<serde_json::Value> = program
+        .redirects
+        .iter()
+        .map(|redirect| {
+            serde_json::json!({
+                "file": paths::relative(directory, redirect.path.to_str().unwrap()),
+                "target": program.sources.get(redirect.target).display,
+            })
+        })
+        .collect();
+    let listing = serde_json::json!({
+        "config": program.config,
+        "files": files,
+        "redirects": redirects,
+    });
     std::fs::write(&output, serde_json::to_vec_pretty(&listing).unwrap()).unwrap();
 }
 
@@ -3835,6 +4853,349 @@ fn manifest_edges_match_native_loaded_files_and_fresh_spellings() {
         let spelling: String = serde_json::from_str(expected["display"].as_str().unwrap()).unwrap();
         assert_eq!(actual.first(), Some(&spelling), "{name}: {actual:?}");
     }
+}
+
+/// The checker's fresh spelling of `target`'s module from `importer`, both
+/// display paths of `program`'s project, with no written import to reuse.
+fn spelled(fixture: &Project, program: &Program, importer: &str, target: &str) -> Vec<String> {
+    use super::specifiers::{ImportingFile, module_specifiers};
+    let path = |display: &str| {
+        let (id, _) = file(program, display);
+        program.sources.get(id).path.to_str().unwrap().to_owned()
+    };
+    let (id, _) = file(program, importer);
+    let mode = program.files[id.index()]
+        .module_semantics
+        .default_resolution_mode;
+    let importer = path(importer);
+    module_specifiers(
+        &program.specifier_environment,
+        ImportingFile {
+            file_name: &importer,
+            default_mode: mode,
+            imports: &[],
+        },
+        &path(target),
+        mode,
+        None,
+    )
+    .unwrap_or_else(|error| panic!("{}: {error:?}", fixture.root.display()))
+}
+
+/// Reverse naming reads `typesVersions` and `types@` conditions with the
+/// same compiler version as resolution: the installed one under the 5.6
+/// dialect, at, below and above a range, and 7.0.2 under TypeScript 7.
+/// 5.6.3's `getModuleSpecifiers` with the checker's preferences
+/// (`tools/ts56-oracle.mjs` `specifier`) gives the matching range's
+/// spellings and, for a range no version matches, the others.
+#[test]
+fn module_spelling_reads_package_ranges_with_the_compiler_version() {
+    for (version, matches) in [
+        ("5.6.3", true),
+        ("5.6.2", false),
+        ("5.7.0", false),
+        ("7.0.2", false),
+    ] {
+        let manifest = manifest(version);
+        let project = Project::new(&[
+            (
+                "tsconfig.json",
+                &format!(
+                    r#"{{"compilerOptions":{{{BASE_OPTIONS}}},"files":["main.ts","other.ts"]}}"#
+                ),
+            ),
+            (MANIFEST, &manifest),
+            (
+                "main.ts",
+                "/// <reference path=\"node_modules/tv/ts56/sub.d.ts\" />\n/// <reference path=\"node_modules/cond/ts56.d.ts\" />\nimport \"tv/sub\";\nimport \"cond\";\n",
+            ),
+            ("other.ts", "export const other = 1;\n"),
+            (
+                "node_modules/tv/package.json",
+                r#"{"name":"tv","version":"1.0.0","typesVersions":{">=5.6.3 <5.7":{"*":["ts56/*"]}}}"#,
+            ),
+            ("node_modules/tv/sub.d.ts", "export {};\n"),
+            ("node_modules/tv/ts56/sub.d.ts", "export {};\n"),
+            (
+                "node_modules/cond/package.json",
+                r#"{"name":"cond","version":"1.0.0","exports":{".":{"types@>=5.6.3 <5.7":"./ts56.d.ts","types":"./index.d.ts"}}}"#,
+            ),
+            ("node_modules/cond/ts56.d.ts", "export {};\n"),
+            ("node_modules/cond/index.d.ts", "export {};\n"),
+        ]);
+        let program = project.load("tsconfig.json");
+        let expected: &[(&str, &str)] = if matches {
+            &[
+                ("node_modules/tv/ts56/sub.d.ts", "tv/sub"),
+                ("node_modules/cond/ts56.d.ts", "cond"),
+            ]
+        } else {
+            &[
+                ("node_modules/tv/ts56/sub.d.ts", "tv/ts56/sub"),
+                ("node_modules/tv/sub.d.ts", "tv/sub"),
+                ("node_modules/cond/ts56.d.ts", "./node_modules/cond/ts56"),
+                ("node_modules/cond/index.d.ts", "cond"),
+            ]
+        };
+        for (target, spelling) in expected {
+            assert_eq!(
+                spelled(&project, &program, "other.ts", target),
+                [*spelling],
+                "{version}: {target}"
+            );
+        }
+    }
+}
+
+/// The same version decides a fresh import-mode spelling, which each
+/// compiler shows when a CommonJS file's only imports of a target use the
+/// `import` mode: a range only 5.6.3 admits and one only 7.0.2 admits each
+/// map one dialect's name. Expected names are the TS2305 messages of
+/// 5.6.3's `tsc` and native 7.0.2's for this layout with `"lib":
+/// ["es2022"]` in place of `noLib`, which would stop `tsc` at TS2318 before
+/// any semantic diagnostic, and an import of a missing member beside each
+/// import (`Module '"tv7/ts7/sub.js"'` and `'"tv/sub.js"'` from 5.6.3;
+/// `'"tv7/sub.js"'` and `'"tv/ts56/sub.js"'` from 7.0.2).
+#[test]
+fn import_mode_spelling_maps_the_dialect_versions_range() {
+    use super::specifiers::{ImportingFile, module_specifiers};
+    use crate::project::binding::ResolutionMode;
+    for (version, expected) in [
+        (
+            "5.6.3",
+            [
+                ("node_modules/tv7/ts7/sub.d.ts", "tv7/ts7/sub.js"),
+                ("node_modules/tv/ts56/sub.d.ts", "tv/sub.js"),
+            ],
+        ),
+        (
+            "7.0.2",
+            [
+                ("node_modules/tv7/ts7/sub.d.ts", "tv7/sub.js"),
+                ("node_modules/tv/ts56/sub.d.ts", "tv/ts56/sub.js"),
+            ],
+        ),
+    ] {
+        let manifest = manifest(version);
+        let project = Project::new(&[
+            (
+                "tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true,"types":[],"strict":true,"target":"es2022","module":"nodenext","moduleResolution":"nodenext","esModuleInterop":true},"files":["use.cts"]}"#,
+            ),
+            (MANIFEST, &manifest),
+            (
+                "use.cts",
+                "import type { present } from \"./node_modules/tv7/ts7/sub.js\" with { \"resolution-mode\": \"import\" };\nimport type { p2 } from \"./node_modules/tv/ts56/sub.js\" with { \"resolution-mode\": \"import\" };\n",
+            ),
+            (
+                "node_modules/tv7/package.json",
+                r#"{"name":"tv7","version":"1.0.0","typesVersions":{">=7":{"*":["ts7/*"]}}}"#,
+            ),
+            (
+                "node_modules/tv7/ts7/sub.d.ts",
+                "export declare const present: number;\n",
+            ),
+            ("node_modules/tv7/sub.d.ts", "export {};\n"),
+            (
+                "node_modules/tv/package.json",
+                r#"{"name":"tv","version":"1.0.0","typesVersions":{">=5.6.3 <5.7":{"*":["ts56/*"]}}}"#,
+            ),
+            (
+                "node_modules/tv/ts56/sub.d.ts",
+                "export declare const p2: number;\n",
+            ),
+            ("node_modules/tv/sub.d.ts", "export {};\n"),
+        ]);
+        let program = project.load("tsconfig.json");
+        let path = |display: &str| {
+            let (id, _) = file(&program, display);
+            program.sources.get(id).path.to_str().unwrap().to_owned()
+        };
+        let (id, _) = file(&program, "use.cts");
+        let importer = path("use.cts");
+        for (target, spelling) in expected {
+            let spelled = module_specifiers(
+                &program.specifier_environment,
+                ImportingFile {
+                    file_name: &importer,
+                    default_mode: program.files[id.index()]
+                        .module_semantics
+                        .default_resolution_mode,
+                    imports: &[],
+                },
+                &path(target),
+                Some(ResolutionMode::Import),
+                Some(ResolutionMode::Import),
+            )
+            .unwrap_or_else(|error| panic!("{version}: {target}: {error:?}"));
+            assert_eq!(spelled, [spelling], "{version}: {target}");
+        }
+    }
+}
+
+/// `getLocalModuleSpecifier` with `baseUrl` (5.6 dialect): the path from
+/// `baseUrl` is the non-relative name when no package import or `paths`
+/// name applies, processed for its ending as 5.6.3 does, without asking
+/// whether an `index` file collides with a sibling; the checker's
+/// project-relative preference takes it only for a target across the
+/// project's boundary or in another package scope, and a name that climbs
+/// out of `baseUrl` stays relative. `baseUrl` may come from an inherited
+/// configuration and is the base even when `paths` is empty. Expected
+/// spellings are 5.6.3's `getModuleSpecifiers` with the checker's
+/// preferences (`tools/ts56-oracle.mjs` `specifier`), from `src/deep/use.ts`
+/// under `app/`; TypeScript 7 has no `baseUrl`.
+#[test]
+fn module_spelling_names_targets_from_base_url_under_5_6() {
+    let options = BASE_OPTIONS;
+    let include = r#""include":["src","../shared","scoped"]"#;
+    for (name, version, config, expected) in [
+        (
+            "baseUrl above the project",
+            "5.6.3",
+            format!(r#"{{"compilerOptions":{{{options},"baseUrl":".."}},{include}}}"#),
+            &[
+                ("../shared/lib.ts", "shared/lib"),
+                ("../shared/sub/index.ts", "shared/sub"),
+                ("src/x.ts", "../x"),
+                ("scoped/thing.ts", "app/scoped/thing"),
+            ][..],
+        ),
+        (
+            "a paths name before the baseUrl name",
+            "5.6.3",
+            format!(
+                r#"{{"compilerOptions":{{{options},"baseUrl":"..","paths":{{"lib/*":["shared/*"]}}}},{include}}}"#
+            ),
+            &[("../shared/lib.ts", "lib/lib"), ("src/x.ts", "../x")][..],
+        ),
+        // An empty `paths` name, from an empty key or a `*` that matches
+        // nothing, is still the `paths` answer: 5.6.3 then has no
+        // non-relative name and keeps the relative one, not the path from
+        // `baseUrl`.
+        (
+            "an empty key's empty name",
+            "5.6.3",
+            format!(
+                r#"{{"compilerOptions":{{{options},"baseUrl":"..","paths":{{"":["shared/lib.ts"]}}}},{include}}}"#
+            ),
+            &[("../shared/lib.ts", "../../../shared/lib")][..],
+        ),
+        (
+            "a star's empty name",
+            "5.6.3",
+            format!(
+                r#"{{"compilerOptions":{{{options},"baseUrl":"..","paths":{{"*":["shared/lib*"]}}}},{include}}}"#
+            ),
+            &[("../shared/lib.ts", "../../../shared/lib")][..],
+        ),
+        (
+            "empty paths",
+            "5.6.3",
+            format!(r#"{{"compilerOptions":{{{options},"baseUrl":"..","paths":{{}}}},{include}}}"#),
+            &[("../shared/lib.ts", "shared/lib")][..],
+        ),
+        (
+            "a name climbing out of baseUrl",
+            "5.6.3",
+            format!(r#"{{"compilerOptions":{{{options},"baseUrl":"./src"}},{include}}}"#),
+            &[
+                ("../shared/lib.ts", "../../../shared/lib"),
+                ("scoped/thing.ts", "../../scoped/thing"),
+            ][..],
+        ),
+        (
+            "baseUrl inherited",
+            "5.6.3",
+            format!(
+                r#"{{"extends":"./base/tsconfig.base.json","compilerOptions":{{{options}}},{include}}}"#
+            ),
+            &[("../shared/lib.ts", "shared/lib")][..],
+        ),
+        (
+            "TypeScript 7",
+            "7.0.2",
+            format!(r#"{{"compilerOptions":{{{options}}},{include}}}"#),
+            &[
+                ("../shared/lib.ts", "../../../shared/lib"),
+                ("scoped/thing.ts", "../../scoped/thing"),
+            ][..],
+        ),
+    ] {
+        let manifest = manifest(version);
+        let project = Project::new(&[
+            ("app/tsconfig.json", &config),
+            (MANIFEST, &manifest),
+            ("shared/lib.ts", "export const lib = 1;\n"),
+            ("shared/sub/index.ts", "export const sub = 1;\n"),
+            ("shared/sub.ts", "export const subFile = 1;\n"),
+            ("app/src/x.ts", "export const x = 1;\n"),
+            ("app/src/deep/use.ts", "export const use = 1;\n"),
+            ("app/scoped/package.json", r#"{"name":"scoped"}"#),
+            ("app/scoped/thing.ts", "export const thing = 1;\n"),
+            (
+                "app/base/tsconfig.base.json",
+                r#"{"compilerOptions":{"baseUrl":"../.."}}"#,
+            ),
+        ]);
+        let program = project.load("app/tsconfig.json");
+        for (target, spelling) in expected {
+            assert_eq!(
+                spelled(&project, &program, "src/deep/use.ts", target),
+                [*spelling],
+                "{name}: {target}"
+            );
+        }
+    }
+    // The fresh spelling a type query demands in the integration test of
+    // the same layout, from a CommonJS importer under `nodenext`.
+    let project = Project::new(&[
+        (
+            "app/tsconfig.json",
+            r#"{"compilerOptions":{"noLib":true,"types":[],"strict":true,"target":"es2022","module":"nodenext","moduleResolution":"nodenext","esModuleInterop":true,"baseUrl":".."},"files":["use.cts","../shared/target.d.ts"]}"#,
+        ),
+        (MANIFEST, &manifest("5.6.3")),
+        (
+            "app/use.cts",
+            "import type { present } from \"shared/target.js\" with { \"resolution-mode\": \"import\" };\n",
+        ),
+        (
+            "shared/target.d.ts",
+            "export declare const present: number;\n",
+        ),
+    ]);
+    let program = project.load("app/tsconfig.json");
+    assert_eq!(
+        spelled(&project, &program, "use.cts", "../shared/target.d.ts"),
+        ["shared/target"]
+    );
+    // In the `import` mode of that file's only import, the name 5.6.3's
+    // `tsc` shows for the module (TS2305, `Module '"shared/target.js"' has
+    // no exported member`, for import-mode imports of missing members from
+    // `shared/target.js` and `../shared/target.js` beside this one, with
+    // `"lib": ["es2022"]` in place of `noLib`).
+    let importer = program
+        .sources
+        .get(file(&program, "use.cts").0)
+        .path
+        .clone();
+    let target = program
+        .sources
+        .get(file(&program, "../shared/target.d.ts").0)
+        .path
+        .clone();
+    let spelled = super::specifiers::module_specifiers(
+        &program.specifier_environment,
+        super::specifiers::ImportingFile {
+            file_name: importer.to_str().unwrap(),
+            default_mode: Some(crate::project::binding::ResolutionMode::Require),
+            imports: &[],
+        },
+        target.to_str().unwrap(),
+        Some(crate::project::binding::ResolutionMode::Import),
+        Some(crate::project::binding::ResolutionMode::Import),
+    )
+    .unwrap();
+    assert_eq!(spelled, ["shared/target.js"]);
 }
 
 /// Inputs are captured on worker threads ahead of the loader, yet every
@@ -4064,4 +5425,179 @@ fn a_bundler_package_type_forces_module_semantics_on_its_scripts() {
             "node_modules/cjspkg/script.ts"
         );
     }
+}
+
+/// JavaScript that package lookups find, by `maxNodeModuleJsDepth`: the
+/// program TypeScript 7.0.2 lists (`tsc --listFiles --incremental false`).
+/// `jsdeep` is first met through the typed package two lookups deep, which
+/// elides it at depth 1, then loaded through the local chain one lookup
+/// deep; 7.0.2's `collectFiles` lists it where the elided route met it,
+/// before the typed package. (5.6.3 lists it after the typed package, where
+/// it processed the file, a node_modules order difference docs/references.md
+/// records; the inputs are the same.)
+#[test]
+fn node_modules_javascript_follows_max_node_module_js_depth() {
+    let config = |depth: &str| {
+        format!(
+            r#"{{ "compilerOptions": {{ "allowJs": true, {depth} "module": "esnext", "moduleResolution": "bundler", "noLib": true, "types": [], "noEmit": true }}, "include": ["src"] }}"#
+        )
+    };
+    let unset = config("");
+    let zero = config(r#""maxNodeModuleJsDepth": 0,"#);
+    let one = config(r#""maxNodeModuleJsDepth": 1,"#);
+    let fraction = config(r#""maxNodeModuleJsDepth": 1.5,"#);
+    let negative = config(r#""maxNodeModuleJsDepth": -1,"#);
+    let project = Project::new(&[
+        ("unset.json", &unset),
+        ("zero.json", &zero),
+        ("one.json", &one),
+        ("fraction.json", &fraction),
+        ("negative.json", &negative),
+        (
+            "node_modules/jspkg/package.json",
+            r#"{ "name": "jspkg", "version": "1.0.0", "main": "index.js" }"#,
+        ),
+        (
+            "node_modules/jspkg/index.js",
+            "import { d } from \"jsdep\";\nexport const v = 1;\nexport const fromDep = d;\n",
+        ),
+        (
+            "node_modules/jsdep/package.json",
+            r#"{ "name": "jsdep", "version": "1.0.0", "main": "index.js" }"#,
+        ),
+        ("node_modules/jsdep/index.js", "export const d = \"dep\";\n"),
+        (
+            "node_modules/typed/package.json",
+            r#"{ "name": "typed", "version": "1.0.0", "types": "index.d.ts" }"#,
+        ),
+        (
+            "node_modules/typed/index.d.ts",
+            "export { w } from \"jsdeep\";\n",
+        ),
+        (
+            "node_modules/jsdeep/package.json",
+            r#"{ "name": "jsdeep", "version": "1.0.0", "main": "index.js" }"#,
+        ),
+        ("node_modules/jsdeep/index.js", "export const w = 42;\n"),
+        (
+            "src/app.ts",
+            "import { v, fromDep } from \"jspkg\";\nexport const x = v;\nexport const y = fromDep;\n",
+        ),
+        (
+            "src/deep.ts",
+            "import { w } from \"typed\";\nimport \"./local1\";\nexport const z = w;\n",
+        ),
+        ("src/local1.ts", "import \"./local2\";\nexport {};\n"),
+        (
+            "src/local2.ts",
+            "import { w } from \"jsdeep\";\nexport const again = w;\n",
+        ),
+    ]);
+    let none = [
+        "src/app.ts",
+        "node_modules/typed/index.d.ts",
+        "src/local2.ts",
+        "src/local1.ts",
+        "src/deep.ts",
+    ];
+    for config in ["unset.json", "zero.json", "negative.json"] {
+        let program = project.load(config);
+        assert_eq!(listed(&program), none, "{config}");
+        assert_eq!(resolved(&program, "src/app.ts", "jspkg"), "untyped");
+        assert_eq!(
+            resolved(&program, "node_modules/typed/index.d.ts", "jsdeep"),
+            "untyped"
+        );
+    }
+    for config in ["one.json", "fraction.json"] {
+        let program = project.load(config);
+        assert_eq!(
+            listed(&program),
+            [
+                "node_modules/jspkg/index.js",
+                "src/app.ts",
+                "node_modules/jsdeep/index.js",
+                "node_modules/typed/index.d.ts",
+                "src/local2.ts",
+                "src/local1.ts",
+                "src/deep.ts",
+            ],
+            "{config}"
+        );
+        assert_eq!(
+            resolved(&program, "node_modules/jspkg/index.js", "jsdep"),
+            "untyped"
+        );
+        // The elided route names the file a later route loaded.
+        assert_eq!(
+            resolved(&program, "node_modules/typed/index.d.ts", "jsdeep"),
+            "node_modules/jsdeep/index.js"
+        );
+        assert_eq!(
+            searched(&program),
+            [
+                "src/app.ts",
+                "src/deep.ts",
+                "src/local1.ts",
+                "src/local2.ts"
+            ]
+        );
+    }
+}
+
+/// A JavaScript file imports the helpers under `importHelpers`, a script
+/// too (`resolveImportsAndModuleAugmentations`' `isJavaScriptFile`), while
+/// only a JSX or TSX file, by its script kind, imports the automatic JSX
+/// runtime: a `.js` file that parses JSX does not (native 7.0.2 `tsc
+/// --listFilesOnly`; 5.6.3 imports the runtime into every JavaScript file
+/// and TypeScript module, a difference docs/references.md records).
+#[test]
+fn javascript_files_import_helpers_and_only_jsx_files_the_jsx_runtime() {
+    let config = |include: &str| {
+        format!(
+            r#"{{ "compilerOptions": {{ "allowJs": true, "jsx": "react-jsx", "importHelpers": true, "noLib": true, "types": [], "module": "esnext", "moduleResolution": "bundler" }}, "files": ["{include}"] }}"#
+        )
+    };
+    let (js, jsx, script) = (config("a.js"), config("b.jsx"), config("c.js"));
+    let project = Project::new(&[
+        ("js.json", &js),
+        ("jsx.json", &jsx),
+        ("script.json", &script),
+        ("a.js", "export const e = <div/>;\n"),
+        ("b.jsx", "export const e = <div/>;\n"),
+        ("c.js", "var s = 1;\n"),
+        (
+            "node_modules/react/package.json",
+            r#"{ "name": "react", "version": "18.0.0", "types": "index.d.ts" }"#,
+        ),
+        ("node_modules/react/index.d.ts", "export {};\n"),
+        (
+            "node_modules/react/jsx-runtime.d.ts",
+            "export declare function jsx(...a: any[]): any;\n",
+        ),
+        (
+            "node_modules/tslib/package.json",
+            r#"{ "name": "tslib", "version": "2.0.0", "types": "tslib.d.ts" }"#,
+        ),
+        (
+            "node_modules/tslib/tslib.d.ts",
+            "export declare function __assign(...a: any[]): any;\n",
+        ),
+    ]);
+    assert_eq!(
+        listed(&project.load("js.json")),
+        ["node_modules/tslib/tslib.d.ts", "a.js"]
+    );
+    assert_eq!(
+        listed(&project.load("jsx.json")),
+        [
+            "node_modules/tslib/tslib.d.ts",
+            "node_modules/react/jsx-runtime.d.ts",
+            "b.jsx"
+        ]
+    );
+    assert_eq!(
+        listed(&project.load("script.json")),
+        ["node_modules/tslib/tslib.d.ts", "c.js"]
+    );
 }

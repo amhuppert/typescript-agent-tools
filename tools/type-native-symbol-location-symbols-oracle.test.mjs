@@ -4,6 +4,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {loadSemanticApi} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 const root = fileURLToPath(new URL('../fixtures/types/native-symbol-location/', import.meta.url));
 test('symbol-location syntax evidence preserves nil and proves the actual variable header', async () => {
   const native = await loadSemanticApi(), config = path.join(root, 'tsconfig.json');
@@ -33,7 +34,7 @@ test('symbol-location syntax evidence preserves nil and proves the actual variab
         }) ?? []});
     }
     }
-    fs.writeFileSync('.cc/temp/native-symbol-location-symbols.json', JSON.stringify(rows, null, 2) + '\n');
+    fs.writeFileSync(scratchPath('native-symbol-location-symbols.json'), JSON.stringify(rows, null, 2) + '\n');
     for (const name of ['ordinaryLiteral', 'surrogateLiteral', 'surrogateTemplate'])
       assert.equal(rows.find(row => row.name === name).flags, null, name);
     for (const name of ['transientVariable', 'transientClosure']) {

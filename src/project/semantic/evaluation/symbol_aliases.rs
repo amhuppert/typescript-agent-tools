@@ -848,11 +848,44 @@ impl Evaluator<'_, '_> {
                     ))?
                     .is_none());
             }
-            // Accepted source files are TypeScript or JSON; JavaScript programs
-            // are rejected by the program admission owner before semantic queries.
-            Ok(self
+            // A TypeScript file has a synthetic default only with `export =`;
+            // a JavaScript file only where its external module indicator is
+            // absent or the file itself, and it has no `__esModule` export.
+            // Its `export=` is a `module.exports` assignment, which binding
+            // admits only where the CommonJS indicator alone makes the file
+            // a module. Another script is a module by its format or
+            // `moduleDetection`, which this tool does not read.
+            let Some(file) = file else {
+                unreachable!("a declaration file answered above");
+            };
+            if !self.inputs.in_javascript_file(file) {
+                return Ok(self
+                    .own_module_export(module, "export=", consumer)?
+                    .is_some());
+            }
+            if self.source.has_module_syntax(file)? {
+                return Ok(false);
+            }
+            if self
                 .own_module_export(module, "export=", consumer)?
-                .is_some())
+                .is_some()
+            {
+                return Ok(sequence
+                    .read(self.resolve_export_by_name_completion(
+                        module,
+                        None,
+                        "__esModule",
+                        dont_resolve,
+                        consumer,
+                    ))?
+                    .is_none());
+            }
+            Err(super::super::unsupported_demand_at_location(
+                self.inputs,
+                consumer,
+                crate::analysis::SemanticFailureReason::JavascriptSemanticsRequired,
+                "a default import of a JavaScript module without ES module syntax needs its synthetic default",
+            ))
         })();
         sequence.finish(result)
     }

@@ -15,7 +15,7 @@ use crate::source::{self, SourceText};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-/// The complete declaration outline of a TypeScript file.
+/// The complete declaration outline of a TypeScript or JavaScript file.
 pub fn outline_file(path: &Path) -> Result<Outline, AnalysisError> {
     navigate(path, |file, catalog| {
         Ok(Outline {
@@ -26,7 +26,7 @@ pub fn outline_file(path: &Path) -> Result<Outline, AnalysisError> {
     })
 }
 
-/// The declaration a selector chooses in a TypeScript file, with its exact
+/// The declaration a selector chooses in a TypeScript or JavaScript file, with its exact
 /// source, or every candidate when it is ambiguous; a name that selects
 /// nothing lists the file's specifiers that spell it.
 pub fn show_file(path: &Path, selector: &Selector) -> Result<Show, AnalysisError> {
@@ -49,7 +49,7 @@ pub fn show_file(path: &Path, selector: &Selector) -> Result<Show, AnalysisError
     })
 }
 
-/// The test calls of a TypeScript file, its test view, answered from its
+/// The test calls of a TypeScript or JavaScript file, its test view, answered from its
 /// syntax tree (`test_outline`).
 pub fn test_outline_file(path: &Path) -> Result<TestOutline, AnalysisError> {
     parsed(path, |file, ast, source| {
@@ -95,14 +95,14 @@ fn parsed<T: Send>(
         .map_err(|error| failure(InputErrorKind::Io, error.to_string(), path))?;
     let name = crate::input::exact_path(&file)?;
     match InputKind::of(name, Case::detect()) {
-        InputKind::TypeScript => {}
-        kind @ (InputKind::JavaScript | InputKind::Json) => {
+        InputKind::TypeScript | InputKind::JavaScript => {}
+        kind @ InputKind::Json => {
             return Err(super::not_navigation_input(kind, &file).into());
         }
         InputKind::Other => {
             return Err(failure(
                 InputErrorKind::Unsupported,
-                "navigation input needs a .ts, .tsx, .mts, or .cts extension",
+                "navigation input needs a .ts, .tsx, .mts, .cts, .js, .jsx, .mjs, or .cjs extension",
                 &file,
             ));
         }

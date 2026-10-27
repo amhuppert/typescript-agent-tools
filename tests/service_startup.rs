@@ -171,29 +171,49 @@ fn diagnosed(code: &str, message: &str) -> String {
     if !code.starts_with("transport.") {
         return message.to_string();
     }
-    let end = ["\n  why: ", "\n  next: "]
-        .iter()
-        .filter_map(|line| message.find(line))
-        .min()
-        .unwrap_or(message.len() - 1);
+    let end = message_end(message);
     format!("{}{DIAGNOSE}{}", &message[..end], &message[end..])
 }
 
+/// Where the message of a failure's text, which ends with a newline, ends:
+/// before its first `why` or `next` line, or else before that newline.
+fn message_end(message: &str) -> usize {
+    ["\n  why: ", "\n  next: "]
+        .iter()
+        .filter_map(|line| message.find(line))
+        .min()
+        .unwrap_or(message.len() - 1)
+}
+
 /// A failure with `code` and `message`, which ends with a newline: exit 2,
-/// and with `json` one document on stdout and nothing on stderr, or else
-/// nothing on stdout and exactly `code: message` on stderr. A transport
-/// failure's message ends by naming the doctor (`diagnosed`).
+/// and with `json` one document on stdout and nothing on stderr, whose
+/// message is the text's before any `why` or `next` line, or else nothing
+/// on stdout and exactly `code: message` on stderr. A transport failure's
+/// message ends by naming the doctor (`diagnosed`).
 fn refused(output: &Output, code: &str, message: &str, json: bool, context: &str) {
-    let message = &diagnosed(code, message);
+    // These fixtures explicitly select their private runtime directory.
+    // A lock failure received from the child must retain that remedy too.
+    let message = if code == "transport.lock" {
+        format!("{message}  next: {UNCREATABLE}\n")
+    } else {
+        message.to_owned()
+    };
+    let message = &diagnosed(code, &message);
     assert_eq!(output.status.code(), Some(2), "{context}: {output:?}");
     if json {
         assert!(output.stderr.is_empty(), "{context}: {output:?}");
         let document: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
         assert_eq!(document["outcome"], "error", "{context}: {document}");
         assert_eq!(document["error"]["code"], code, "{context}: {document}");
+        if code == "transport.lock" {
+            assert_eq!(
+                document["error"]["remedy"], UNCREATABLE,
+                "{context}: {document}"
+            );
+        }
         assert_eq!(
             document["error"]["message"],
-            message.strip_suffix('\n').unwrap(),
+            message[..message_end(message)],
             "{context}"
         );
     } else {
@@ -345,6 +365,10 @@ const CLOSED: &str = "a service could not create its socket or record why it fai
 /// The remedy for a runtime directory that is not this user's directory.
 const ANOTHER_DIRECTORY: &str =
     "set TSPARSE_SERVICE_DIR to a new path or to a private directory this user owns";
+
+/// The remedy for a directory `TSPARSE_SERVICE_DIR` names that cannot be
+/// created.
+const UNCREATABLE: &str = "set TSPARSE_SERVICE_DIR to a path in a directory this user can write, or unset it and set TMPDIR to such a directory";
 
 /// The commands a transport failure reaches, as text and as documents:
 /// project queries of every operation, project edits, and the service
@@ -669,7 +693,7 @@ fn a_runtime_directory_that_cannot_be_created_is_named_with_its_cause() {
                 &finished(command),
                 "transport.directory",
                 &format!(
-                    "Project service directory {} cannot be created: {cause}\n",
+                    "Project service directory {} cannot be created: {cause}\n  next: {UNCREATABLE}\n",
                     directory.display()
                 ),
                 args.contains(&"--json"),
@@ -993,7 +1017,7 @@ fn a_diagnostic_that_cannot_be_written_completely_is_never_reported_as_the_cause
         assert_eq!(
             String::from_utf8_lossy(&served.stderr),
             format!(
-                "transport.lock: {}; the startup diagnostic cannot be written to {}: {too_large}; run: tsparse --doctor --project {}\n",
+                "transport.lock: {}; the startup diagnostic cannot be written to {}: {too_large}; run: tsparse --doctor --project {}\n  next: {UNCREATABLE}\n",
                 cause.trim_end(),
                 recorded.display(),
                 config.display()

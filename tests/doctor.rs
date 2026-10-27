@@ -1,8 +1,8 @@
 // validation: run alone: its services must become ready within ten seconds, and it reads a service's idle time in seconds, which other test executables' load can break.
 //! `--doctor` reports, one line per check, what project queries depend on:
 //! the build, the environment, the runtime directory, and with `--project`
-//! the configuration, the project's service, and the limits that service
-//! inherited. It loads nothing and starts nothing, exits 1 when a check
+//! the configuration, the compiler it is read for, the project's service,
+//! and the limits that service inherited. It loads nothing and starts nothing, exits 1 when a check
 //! finds something, and each finding's printed `next` clears it.
 //! `--references-status` reports a running service's identity, idle time,
 //! and limits in text and JSON; `--version` names the build a service
@@ -125,7 +125,7 @@ fn budget(directory: &Path) -> String {
 
 fn private_line(directory: &Path) -> String {
     format!(
-        "runtime directory: {} is a private directory owned by this user with mode 0700; {}",
+        "runtime directory: {} (TSPARSE_SERVICE_DIR) is a private directory owned by this user with mode 0700; {}",
         directory.display(),
         budget(directory)
     )
@@ -133,7 +133,7 @@ fn private_line(directory: &Path) -> String {
 
 fn absent_line(directory: &Path) -> String {
     format!(
-        "runtime directory: {} does not exist yet; a project query creates it with mode 0700; {}",
+        "runtime directory: {} (TSPARSE_SERVICE_DIR) does not exist yet; a project query creates it with mode 0700; {}",
         directory.display(),
         budget(directory)
     )
@@ -145,6 +145,10 @@ fn configuration_line(service: &Service) -> String {
         service.fixture.path("tsconfig.json").display()
     )
 }
+
+/// The compatibility line of a project with no TypeScript package
+/// (`tests/doctor_compatibility.rs` covers the others).
+const COMPATIBILITY: &str = "compatibility: no TypeScript package is installed in or above the configuration's directory; read with the TypeScript 7 dialect; semantics: TypeScript 7.0.2; standard library: the vendored TypeScript 7.0.2 declarations";
 
 const NO_SERVICE: &str =
     "service: no service is running for tsconfig.json; the next project query starts one";
@@ -391,7 +395,7 @@ fn a_runtime_directory_that_is_not_private_is_a_finding_whose_next_fixes_it() {
         assert_eq!(
             found,
             format!(
-                "{}\n{}\nruntime directory: Project service directory must be a private directory owned by this user with mode 0700: {directory}\n  why: {why}\n  next: chmod 700 {directory}\nfindings: runtime directory\n",
+                "{}\n{}\nruntime directory: {directory} (TSPARSE_SERVICE_DIR): Project service directory must be a private directory owned by this user with mode 0700: {directory}\n  why: {why}\n  next: chmod 700 {directory}\nfindings: runtime directory\n",
                 build_line(),
                 environment_line(&service, None, None),
             ),
@@ -416,7 +420,7 @@ fn a_runtime_directory_that_is_not_private_is_a_finding_whose_next_fixes_it() {
         json!({
             "name": "runtime directory",
             "status": "finding",
-            "detail": format!("Project service directory must be a private directory owned by this user with mode 0700: {directory}"),
+            "detail": format!("{directory} (TSPARSE_SERVICE_DIR): Project service directory must be a private directory owned by this user with mode 0700: {directory}"),
             "remedy": "set TSPARSE_SERVICE_DIR to a new path or to a private directory this user owns",
         })
     );
@@ -457,7 +461,7 @@ fn the_socket_path_budget_is_checked_under_at_and_over_the_platform_limit() {
         json!({
             "name": "runtime directory",
             "status": "finding",
-            "detail": format!("socket paths in {} take {} bytes, more than the {limit} a socket address holds", over.display(), limit + 1),
+            "detail": format!("{} (TSPARSE_SERVICE_DIR): socket paths in {} take {} bytes, more than the {limit} a socket address holds", over.display(), over.display(), limit + 1),
             "remedy": "set a shorter TSPARSE_SERVICE_DIR",
         })
     );
@@ -564,7 +568,7 @@ fn a_service_started_with_other_limits_is_a_finding_until_it_is_stopped() {
     assert_eq!(
         idle,
         format!(
-            "{}\n{}\n{}\n{}\n{NO_SERVICE}\n{}\nok: 6 checks pass\n",
+            "{}\n{}\n{}\n{}\n{COMPATIBILITY}\n{NO_SERVICE}\n{}\nok: 7 checks pass\n",
             build_line(),
             environment_line(&service, None, None),
             private_line(&service.runtime),
@@ -576,7 +580,7 @@ fn a_service_started_with_other_limits_is_a_finding_until_it_is_stopped() {
     assert_eq!(
         report(&project_doctor(&service, &[], &raised), 0)
             .lines()
-            .nth(5),
+            .nth(6),
         Some(no_service_limits("6144", "120000").as_str())
     );
     for (inherited, current, limits) in [
@@ -602,9 +606,9 @@ fn a_service_started_with_other_limits_is_a_finding_until_it_is_stopped() {
         start(&service, inherited);
         let found = report(&project_doctor(&service, &[], current), 1);
         let lines: Vec<&str> = found.lines().collect();
-        assert!(lines[4].starts_with("service: running: pid "), "{found}");
+        assert!(lines[5].starts_with("service: running: pid "), "{found}");
         assert_eq!(
-            &lines[5..],
+            &lines[6..],
             [
                 format!("service limits: {limits}").as_str(),
                 "  why: a service keeps the environment it started with",
@@ -618,7 +622,7 @@ fn a_service_started_with_other_limits_is_a_finding_until_it_is_stopped() {
         assert_eq!(output.status.code(), Some(1), "{output:?}");
         let found_json: Value = serde_json::from_slice(&output.stdout).unwrap();
         assert_eq!(
-            found_json["checks"][5],
+            found_json["checks"][6],
             json!({
                 "name": "service limits",
                 "status": "finding",
@@ -632,8 +636,8 @@ fn a_service_started_with_other_limits_is_a_finding_until_it_is_stopped() {
         let stopped = shell(&service, printed_next(&found), current);
         assert!(stopped.status.success(), "{stopped:?}");
         let cleared = report(&project_doctor(&service, &[], current), 0);
-        assert_eq!(cleared.lines().nth(4), Some(NO_SERVICE), "{cleared}");
-        assert_eq!(cleared.lines().last(), Some("ok: 6 checks pass"));
+        assert_eq!(cleared.lines().nth(5), Some(NO_SERVICE), "{cleared}");
+        assert_eq!(cleared.lines().last(), Some("ok: 7 checks pass"));
     }
 }
 
@@ -647,10 +651,11 @@ fn a_service_with_this_environments_limits_passes() {
     let status = status(&service);
     let passed = report(&output, 0);
     let lines: Vec<&str> = passed.lines().collect();
-    assert_eq!(lines.len(), 7, "{passed}");
+    assert_eq!(lines.len(), 8, "{passed}");
     assert_eq!(lines[3], configuration_line(&service));
+    assert_eq!(lines[4], COMPATIBILITY);
     let pid = status["pid"].as_u64().unwrap();
-    let running = lines[4]
+    let running = lines[5]
         .strip_prefix(&format!(
             "service: running: pid {pid}, generation 1, build {BUILD}, idle 1h, "
         ))
@@ -666,20 +671,21 @@ fn a_service_with_this_environments_limits_passes() {
     let started_unix = status["started_unix"].as_i64().unwrap();
     assert!(before <= started_unix && started_unix <= after, "{status}");
     assert_eq!(
-        lines[5],
+        lines[6],
         "service limits: TSPARSE_MAX_MEMORY_MB 6144 and TSPARSE_QUERY_TIMEOUT_MS 60000, as in this environment"
     );
-    assert_eq!(lines[6], "ok: 6 checks pass");
+    assert_eq!(lines[7], "ok: 7 checks pass");
     // The document's entries say the same.
     let output = project_doctor(&service, &["--json"], &[]);
     assert_eq!(output.status.code(), Some(0), "{output:?}");
     let passed = document(output);
     assert_eq!(passed["outcome"], "pass");
     assert_eq!(passed["project"], "tsconfig.json");
-    assert_eq!(passed["checks"][4]["name"], "service");
-    assert_eq!(passed["checks"][4]["status"], "pass");
+    assert_eq!(passed["checks"][4]["name"], "compatibility");
+    assert_eq!(passed["checks"][5]["name"], "service");
+    assert_eq!(passed["checks"][5]["status"], "pass");
     assert!(
-        passed["checks"][4]["detail"]
+        passed["checks"][5]["detail"]
             .as_str()
             .unwrap()
             .starts_with(&format!(
@@ -688,7 +694,7 @@ fn a_service_with_this_environments_limits_passes() {
         "{passed}"
     );
     assert_eq!(
-        passed["checks"][5],
+        passed["checks"][6],
         json!({
             "name": "service limits",
             "status": "pass",
@@ -927,7 +933,7 @@ fn every_transport_failure_names_the_doctor_which_reports_its_cause() {
     let found = report(&diagnosed, 1);
     assert!(
         found.contains(&format!(
-            "\nruntime directory: Project service directory must be a private directory owned by this user with mode 0700: {}\n",
+            "\nruntime directory: {0} (TSPARSE_SERVICE_DIR): Project service directory must be a private directory owned by this user with mode 0700: {0}\n",
             service.runtime.display()
         )),
         "{found}"
@@ -976,7 +982,7 @@ fn the_doctor_reports_what_an_earlier_start_left_and_removes_nothing() {
         "{NO_SERVICE}; the last start that failed recorded transport.lock: Project service lock {}: {cause}",
         lock.display()
     );
-    let line = |output: &Output| report(output, 0).lines().nth(4).unwrap().to_string();
+    let line = |output: &Output| report(output, 0).lines().nth(5).unwrap().to_string();
     assert_eq!(line(&project_doctor(&service, &[], &[])), failed);
     std::fs::write(&staged, "transport.lo").unwrap();
     assert_eq!(
@@ -992,7 +998,7 @@ fn the_doctor_reports_what_an_earlier_start_left_and_removes_nothing() {
     std::fs::create_dir(&recorded).unwrap();
     let found = report(&project_doctor(&service, &[], &[]), 1);
     assert_eq!(
-        found.lines().nth(4),
+        found.lines().nth(5),
         Some(
             format!(
                 "service: the startup diagnostic {} cannot be read: not a regular file",
@@ -1058,6 +1064,10 @@ fn the_doctor_takes_no_file() {
     );
 }
 
+/// The remedy for a directory `TSPARSE_SERVICE_DIR` names that cannot be
+/// created.
+const UNCREATABLE: &str = "set TSPARSE_SERVICE_DIR to a path in a directory this user can write, or unset it and set TMPDIR to such a directory";
+
 /// A runtime directory that does not exist passes only where a project
 /// query could create it, since a query creates only the directory itself:
 /// its parent must be a directory this user can write and search.
@@ -1101,12 +1111,18 @@ fn a_runtime_directory_that_cannot_be_created_is_a_finding() {
             let found = report(&doctor(&service, args, &env), 1);
             let lines: Vec<&str> = found.lines().collect();
             assert_eq!(
-                lines[2],
-                format!("runtime directory: {message}"),
+                lines[2..4],
+                [
+                    format!(
+                        "runtime directory: {} (TSPARSE_SERVICE_DIR): {message}",
+                        directory.display()
+                    ),
+                    format!("  next: {UNCREATABLE}")
+                ],
                 "{context} {args:?}"
             );
             assert!(
-                lines[3..lines.len() - 1]
+                lines[4..lines.len() - 1]
                     .iter()
                     .all(|line| !line.starts_with("  ")),
                 "{context} {args:?}: {found}"
@@ -1119,9 +1135,9 @@ fn a_runtime_directory_that_cannot_be_created_is_a_finding() {
                 "{context} {args:?}: {found}"
             );
             if !args.is_empty() {
-                assert_eq!(lines[4], NO_SERVICE, "{context}: {found}");
+                assert_eq!(lines[6], NO_SERVICE, "{context}: {found}");
                 assert_eq!(
-                    lines[5],
+                    lines[7],
                     no_service_limits("6144", "60000"),
                     "{context}: {found}"
                 );
@@ -1133,7 +1149,12 @@ fn a_runtime_directory_that_cannot_be_created_is_a_finding() {
             assert_eq!(document["outcome"], "findings", "{context} {args:?}");
             assert_eq!(
                 document["checks"][2],
-                json!({"name": "runtime directory", "status": "finding", "detail": message}),
+                json!({
+                    "name": "runtime directory",
+                    "status": "finding",
+                    "detail": format!("{} (TSPARSE_SERVICE_DIR): {message}", directory.display()),
+                    "remedy": UNCREATABLE,
+                }),
                 "{context} {args:?}"
             );
         }

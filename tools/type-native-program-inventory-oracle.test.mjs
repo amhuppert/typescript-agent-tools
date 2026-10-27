@@ -4,10 +4,11 @@ import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {test} from 'node:test';
 import {compilerHookOracle} from './type-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 const hash=text=>createHash('sha256').update(text).digest('hex');
 
 for(const bom of ['', '\uFEFF'])test('native replay publishes its actual ordered sources and provenance (BOM='+Boolean(bom)+')',async t=>{
-  const root=fs.realpathSync(fs.mkdtempSync(path.resolve('.cc/temp/native-program-inventory-')));
+  const root=fs.realpathSync(fs.mkdtempSync(scratchPath('native-program-inventory-')));
   t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
   const a='export const answer=42;\n';
   const z='import {answer} from "./a";\nexport const query=answer;\n';

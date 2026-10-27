@@ -17,6 +17,74 @@ pub(crate) struct Tags {
     pub(crate) deprecated: Option<Span>,
     // withJSDoc also sees tags parsed during child/speculative grammar work.
     has_deprecated: bool,
+    /// Each comment's own tags (`JSDoc.Tags`), in order: what TypeScript's
+    /// JavaScript reparser reads (`reparseTags`).
+    pub(crate) comments: Vec<Vec<TagFacts>>,
+    /// Where each import type whose argument is a string literal begins, in
+    /// the type expressions of the comments' own tags
+    /// (`IsLiteralImportTypeNode`), which TypeScript's loader follows from a
+    /// JavaScript file (`ForEachDynamicImportOrRequireCall`).
+    pub(crate) import_types: Vec<usize>,
+}
+
+/// One of a comment's own tags, as the JavaScript reparser reads it.
+#[derive(Debug, Clone)]
+pub(crate) struct TagFacts {
+    /// From its `@` to its end.
+    pub(crate) span: Span,
+    /// The tag's name as written, such as `returns`.
+    pub(crate) name: String,
+    pub(crate) syntax: TagSyntax,
+    /// The range of its type expression's type, the node `reparseHosted`
+    /// clones (`TypeExpression().Type()`), for a tag with one.
+    pub(crate) type_span: Option<Span>,
+    /// Whether that type needed recovery from a syntax error, which leaves
+    /// a tree this parser does not shape as TypeScript's does.
+    pub(crate) type_recovered: bool,
+}
+
+/// What a tag holds, for each tag `reparseHosted` or `reparseUnhosted` reads.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) enum TagSyntax {
+    /// `@type`, whose type expression is never absent.
+    Type,
+    Satisfies,
+    This,
+    /// `@return` or `@returns`, with or without a type expression.
+    Return {
+        typed: bool,
+    },
+    Template,
+    /// `@param`, `@arg` or `@argument`.
+    Parameter {
+        /// The identifier it names (empty where missing), or None for a
+        /// qualified name.
+        name: Option<String>,
+        bracketed: bool,
+        typed: bool,
+        /// Its type is `T=`.
+        optional_type: bool,
+    },
+    /// `@public`, `@private`, `@protected`, `@readonly` or `@override`.
+    Modifier,
+    Implements,
+    /// `@augments` or `@extends`: the class name's identifiers, and whether
+    /// it has type arguments.
+    Augments {
+        class: Vec<String>,
+        type_arguments: bool,
+    },
+    /// `@typedef`, with a type expression where it has a type or children.
+    Typedef {
+        typed: bool,
+    },
+    Callback,
+    Overload,
+    /// `@import`, with or without an import clause.
+    Import {
+        clause: bool,
+    },
+    Other,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -44,6 +112,78 @@ struct Tag {
     span: Span,
     name: Option<NodeId>,
     ty: Option<NodeId>,
+    syntax: TagSyntax,
+    /// `ty` needed recovery from a syntax error (`TagFacts::type_recovered`).
+    recovered: bool,
+}
+
+/// A hosted `@type`'s type, cloned out of its comment's own arena: its
+/// nodes in pre-order, the type first, linked by index within this list.
+pub(super) struct ReparsedType<'src> {
+    nodes: Vec<Node<'src>>,
+}
+
+/// `addDeepCloneReparse`'s copy of the subtree at `root` of `nodes`: each
+/// node once, in pre-order, its links renumbered within the copy.
+fn clone_subtree<'src>(nodes: &[Node<'src>], root: NodeId) -> ReparsedType<'src> {
+    let mut order = Vec::new();
+    let mut index = std::collections::HashMap::new();
+    let mut stack = vec![root];
+    while let Some(id) = stack.pop() {
+        if index.contains_key(&id.0) {
+            continue;
+        }
+        index.insert(id.0, order.len());
+        order.push(id);
+        let start = stack.len();
+        for (_, value) in &nodes[id.0].fields {
+            match value {
+                Value::Node(child) => stack.push(*child),
+                Value::Nodes(children) => stack.extend(children.iter().copied()),
+                _ => {}
+            }
+        }
+        stack[start..].reverse();
+    }
+    let renumber = |id: &mut NodeId| id.0 = index[&id.0];
+    let nodes = order
+        .iter()
+        .map(|id| {
+            let mut node = nodes[id.0].clone();
+            for (_, value) in &mut node.fields {
+                match value {
+                    Value::Node(child) => renumber(child),
+                    Value::Nodes(children) => children.iter_mut().for_each(renumber),
+                    _ => {}
+                }
+            }
+            node
+        })
+        .collect();
+    ReparsedType { nodes }
+}
+
+/// The declaration a hosted `@type` of `host`, whose type spans
+/// `type_span`, gave its type (`reparseHosted`, `Parser::reparse_hosted_type`):
+/// the variable declaration, or one of the variable statement's, whose
+/// annotation is that reparsed type.
+pub(crate) fn reparsed_type_declaration(
+    ast: &Ast<'_>,
+    host: NodeId,
+    type_span: Span,
+) -> Option<NodeId> {
+    let node = ast.node(host);
+    let declarations = match node.syntax_kind {
+        VariableDeclaration => vec![host],
+        VariableStatement => crate::syntax::id(node, "declarationList")
+            .map(|list| crate::syntax::ids(ast.node(list), "declarations").to_vec())
+            .unwrap_or_default(),
+        _ => return None,
+    };
+    declarations.into_iter().find(|&declaration| {
+        crate::syntax::id(ast.node(declaration), "type")
+            .is_some_and(|ty| ast.is_reparsed(ty) && ast.node(ty).span == type_span)
+    })
 }
 
 /// Native `parseJSDocForNode`. Each fragment borrows the original source
@@ -57,19 +197,22 @@ pub(crate) fn parse_for_node(
     options: ParseOptions,
     control: Option<Control>,
 ) -> Result<Arc<Tags>> {
-    parse_for_node_in_context(source, kind, attachment, options, control, None)
+    parse_for_node_in_context(source, kind, attachment, options, control, None, None)
 }
 
 /// `parseJSDocComment` preserves the live parser context when called by
 /// `withJSDoc`. The lazy `parseJSDocForNode` entry instead initializes a new
 /// parser; notably, its Await/Yield restrictions do not come from the node.
-fn parse_for_node_in_context(
-    source: &str,
+/// With `hosted`, it receives the types of the last comment's `@type` tags,
+/// in order, which `reparseHosted` reads.
+fn parse_for_node_in_context<'src>(
+    source: &'src str,
     kind: SyntaxKind,
     attachment: &Attachment,
     options: ParseOptions,
     control: Option<Control>,
     context: Option<GrammarContext>,
+    mut hosted: Option<&mut Vec<ReparsedType<'src>>>,
 ) -> Result<Arc<Tags>> {
     let mut facts = Tags::default();
     for comment in crate::lexer::jsdoc_comments_controlled(
@@ -90,8 +233,15 @@ fn parse_for_node_in_context(
         if let Some(context) = context {
             parser.context = context.with(node_flags::JSDOC);
         }
-        parser.jsdoc_comment(comment.start, &mut facts)?;
+        let mut types = Vec::new();
+        parser.jsdoc_comment(comment.start, &mut facts, &mut types)?;
         parser.check_budget()?;
+        if let Some(hosted) = hosted.as_deref_mut() {
+            *hosted = types
+                .into_iter()
+                .map(|ty| clone_subtree(&parser.nodes, ty))
+                .collect();
+        }
     }
 
     Ok(Arc::new(facts))
@@ -148,20 +298,78 @@ impl<'s> Parser<'s> {
             possible_deprecated: flags.deprecated,
             parsed: None,
         };
-        if flags.see_or_link {
+        let kind = self.nodes[id.0].syntax_kind;
+        // TypeScript parses a JavaScript file's JSDoc eagerly and reparses
+        // its tags (`reparseTags`); this parser reparses a variable's
+        // `@type` alone, which every other tag's refusal leaves the only one
+        // with meaning (`crate::project::binding::javascript`).
+        let reparsed = self.javascript && matches!(kind, VariableStatement | VariableDeclaration);
+        let mut types = Vec::new();
+        if flags.see_or_link || reparsed {
             let facts = parse_for_node_in_context(
                 self.lexer.src,
-                self.nodes[id.0].syntax_kind,
+                kind,
                 &attachment,
                 self.options.clone(),
                 self.control.clone(),
                 Some(self.context),
+                reparsed.then_some(&mut types),
             )?;
             attachment.possible_deprecated |= facts.has_deprecated;
             attachment.parsed = Some(facts);
         }
         self.nodes[id.0].native_jsdoc = Some(attachment);
+        for ty in types {
+            self.reparse_hosted_type(id, ty)?;
+        }
         Ok(())
+    }
+
+    /// `reparseHosted` of a `@type` at a variable statement or declaration:
+    /// the statement's first declaration without a type, or the declaration
+    /// itself without one, takes a copy of the tag's type as its annotation
+    /// (`addDeepCloneReparse`), marked as reparsed. Where none is left, the
+    /// tag's other meaning, a function's full signature, is not reparsed.
+    fn reparse_hosted_type(&mut self, host: NodeId, ty: ReparsedType<'s>) -> Result<()> {
+        let untyped =
+            |p: &Self, declaration: NodeId| p.nodes[declaration.0].field("type").is_none();
+        let target = match self.nodes[host.0].syntax_kind {
+            VariableDeclaration => Some(host).filter(|&host| untyped(self, host)),
+            _ => match self.nodes[host.0].field("declarationList") {
+                Some(Value::Node(list)) => match self.nodes[list.0].field("declarations") {
+                    Some(Value::Nodes(declarations)) => declarations
+                        .iter()
+                        .copied()
+                        .find(|&declaration| untyped(self, declaration)),
+                    _ => None,
+                },
+                _ => None,
+            },
+        };
+        let Some(target) = target else {
+            return Ok(());
+        };
+        let base = self.nodes.len();
+        for mut node in ty.nodes {
+            for (_, value) in &mut node.fields {
+                match value {
+                    Value::Node(child) => child.0 += base,
+                    Value::Nodes(children) => children.iter_mut().for_each(|child| child.0 += base),
+                    _ => {}
+                }
+            }
+            node.reparsed = true;
+            node.possible_top_level_await = false;
+            self.nodes.push(node);
+        }
+        // In TypeScript's field order: before the initializer.
+        let fields = &mut self.nodes[target.0].fields;
+        let at = fields
+            .iter()
+            .position(|(key, _)| *key == "initializer")
+            .unwrap_or(fields.len());
+        fields.insert(at, ("type", Value::Node(NodeId(base))));
+        self.refresh_await_summary(target)
     }
 
     fn jsdoc_next(&mut self) -> Result<()> {
@@ -276,24 +484,6 @@ impl<'s> Parser<'s> {
         }
     }
 
-    /// Native parser `isIdentifier`, distinct from IdentifierName, which
-    /// also admits reserved keywords. JSDoc's scanner decodes keyword escapes.
-    pub(super) fn jsdoc_is_identifier(&self) -> Result<bool> {
-        if self.current.kind != Kind::Word {
-            return Ok(false);
-        }
-        let name = decode_identifier(
-            self.current.raw,
-            Span {
-                start: self.current.start,
-                end: self.current.end,
-            },
-        )?;
-        Ok(!(reserved_word(&name)
-            || name == "yield" && self.context.contains(YIELD)
-            || name == "await" && self.context.contains(AWAIT)))
-    }
-
     /// Native `createMissingIdentifier` does not consume the unexpected token.
     /// Only the private JSDoc parser enables this recovery; interruption stays
     /// distinct from the syntax diagnostics that native discards for comments.
@@ -311,7 +501,12 @@ impl<'s> Parser<'s> {
 
     /// Native `parseJSDocCommentWorker`, retaining only actual tag facts while
     /// preserving scanner state, fences, links and tag-body advancement.
-    fn jsdoc_comment(&mut self, start: usize, facts: &mut Tags) -> Result<()> {
+    fn jsdoc_comment(
+        &mut self,
+        start: usize,
+        facts: &mut Tags,
+        hosted: &mut Vec<NodeId>,
+    ) -> Result<()> {
         let mut indent = start + 4 - self.lexer.src[..start].rfind('\n').map_or(0, |at| at + 1);
         let mut state = State::Asterisk;
         let mut ticks = 0;
@@ -324,6 +519,7 @@ impl<'s> Parser<'s> {
             state = State::Beginning;
             indent = 0;
         }
+        facts.comments.push(Vec::new());
         loop {
             self.check_budget()?;
             if !self.at("`") && ticks != 0 {
@@ -336,9 +532,34 @@ impl<'s> Parser<'s> {
                 break;
             }
             if self.at("@") && !fenced && self.lexer.can_follow_jsdoc_at() {
-                let tag = self.jsdoc_tag(indent, facts)?;
+                let nodes = self.nodes.len();
+                let (tag, name) = self.jsdoc_named_tag(indent, facts)?;
                 if tag.kind == TagKind::Deprecated && facts.deprecated.is_none() {
                     facts.deprecated = Some(tag.span);
+                }
+                self.literal_import_types(nodes, &mut facts.import_types);
+                let ty = tag.ty.and_then(|expression| {
+                    let expression = &self.nodes[expression.0];
+                    match expression.field("type") {
+                        Some(Value::Node(ty)) if expression.syntax_kind == JSDocTypeExpression => {
+                            Some(*ty)
+                        }
+                        _ => None,
+                    }
+                });
+                if tag.syntax == TagSyntax::Type
+                    && let Some(ty) = ty
+                {
+                    hosted.push(ty);
+                }
+                if let Some(tags) = facts.comments.last_mut() {
+                    tags.push(TagFacts {
+                        span: tag.span,
+                        name,
+                        syntax: tag.syntax,
+                        type_span: ty.map(|ty| self.nodes[ty.0].span),
+                        type_recovered: tag.recovered,
+                    });
                 }
                 state = State::Beginning;
             } else if self.jsdoc_newline() {
@@ -681,14 +902,16 @@ impl<'s> Parser<'s> {
         }
     }
 
-    fn jsdoc_import(&mut self) -> Result<()> {
+    /// Whether the import has an import clause.
+    fn jsdoc_import(&mut self) -> Result<bool> {
         let pos = self.pos();
-        let name = if self.jsdoc_is_identifier()? {
+        let name = if self.is_identifier()? {
             Some(self.identifier()?)
         } else {
             None
         };
-        if name.is_some() || self.at("*") || self.at("{") {
+        let clause = name.is_some() || self.at("*") || self.at("{");
+        if clause {
             self.import_clause(name, pos, Some(TypeKeyword), true)?;
             self.expect("from")?;
         }
@@ -705,17 +928,44 @@ impl<'s> Parser<'s> {
             self.bump()?;
             self.import_attribute_body(pos)?;
         }
-        Ok(())
+        Ok(clause)
     }
 
     fn jsdoc_tag(&mut self, indent: usize, facts: &mut Tags) -> Result<Tag> {
+        self.jsdoc_named_tag(indent, facts).map(|(tag, _)| tag)
+    }
+
+    /// A tag and its name as written.
+    fn jsdoc_named_tag(&mut self, indent: usize, facts: &mut Tags) -> Result<(Tag, String)> {
         self.nest(|p| {
             let start = p.current.start;
             p.jsdoc_next()?;
             let tag_name = p.jsdoc_identifier()?;
+            let name = p.jsdoc_name(tag_name).to_owned();
             let indent_text = p.jsdoc_skip_indent()?;
             p.jsdoc_tag_body(start, tag_name, indent, indent_text, facts)
+                .map(|tag| (tag, name))
         })
+    }
+
+    /// Where each import type with a string-literal argument among the nodes
+    /// from `first` on begins (`IsLiteralImportTypeNode`). A speculative
+    /// parse that was rolled back has left none of its nodes.
+    fn literal_import_types(&self, first: usize, starts: &mut Vec<usize>) {
+        for node in &self.nodes[first..] {
+            if node.syntax_kind != ImportType {
+                continue;
+            }
+            let Some(Value::Node(argument)) = node.field("argument") else {
+                continue;
+            };
+            let argument = &self.nodes[argument.0];
+            if argument.syntax_kind == LiteralType
+                && matches!(argument.field("literal"), Some(Value::Node(literal)) if self.nodes[literal.0].syntax_kind == StringLiteral)
+            {
+                starts.push(node.span.start);
+            }
+        }
     }
 
     fn jsdoc_tag_body(
@@ -729,6 +979,8 @@ impl<'s> Parser<'s> {
         let mut kind = TagKind::Other;
         let mut ty = None;
         let mut name = None;
+        let mut syntax = TagSyntax::Other;
+        let mut recovered = false;
         match self.jsdoc_name(tag_name) {
             "deprecated" => {
                 kind = TagKind::Deprecated;
@@ -738,24 +990,32 @@ impl<'s> Parser<'s> {
                 return self.jsdoc_parameter_tag(start, false, indent, facts);
             }
             "return" | "returns" | "exception" | "throws" => {
+                ty = self.jsdoc_try_type()?;
                 if matches!(self.jsdoc_name(tag_name), "return" | "returns") {
                     kind = TagKind::Return;
+                    syntax = TagSyntax::Return {
+                        typed: ty.is_some(),
+                    };
                 }
-                ty = self.jsdoc_try_type()?;
             }
             "type" | "this" | "satisfies" => {
-                kind = if self.jsdoc_name(tag_name) == "this" {
-                    TagKind::This
-                } else {
-                    TagKind::Type
+                (kind, syntax) = match self.jsdoc_name(tag_name) {
+                    "this" => (TagKind::This, TagSyntax::This),
+                    "type" => (TagKind::Type, TagSyntax::Type),
+                    _ => (TagKind::Type, TagSyntax::Satisfies),
                 };
-                ty = Some(self.jsdoc_type_expression(self.jsdoc_name(tag_name) != "satisfies")?);
+                let omit_braces = self.jsdoc_name(tag_name) != "satisfies";
+                let (expression, error) =
+                    self.recover_types(|p| p.jsdoc_type_expression(omit_braces))?;
+                ty = Some(expression);
+                recovered = error.is_some();
                 if kind == TagKind::This {
                     self.jsdoc_skip_space()?;
                 }
             }
             "template" => {
                 kind = TagKind::Template;
+                syntax = TagSyntax::Template;
                 if self.at("{") {
                     ty = Some(self.jsdoc_type_expression(false)?);
                 }
@@ -782,26 +1042,38 @@ impl<'s> Parser<'s> {
             }
             "implements" | "augments" | "extends" => {
                 let braced = self.eat("{")?;
-                self.jsdoc_identifier()?;
+                let mut class = vec![self.jsdoc_identifier()?];
                 while self.eat(".")? {
-                    self.jsdoc_identifier()?;
+                    class.push(self.jsdoc_identifier()?);
                 }
                 self.lexer.set_jsdoc_leading_asterisks(true);
-                let result = if self.type_open() {
+                let type_arguments = self.type_open();
+                let result = if type_arguments {
                     self.type_arguments().map(|_| ())
                 } else {
                     Ok(())
                 };
                 self.lexer.set_jsdoc_leading_asterisks(false);
                 result?;
+                syntax = if self.jsdoc_name(tag_name) == "implements" {
+                    TagSyntax::Implements
+                } else {
+                    TagSyntax::Augments {
+                        class: class
+                            .into_iter()
+                            .map(|name| self.jsdoc_name(name).to_owned())
+                            .collect(),
+                        type_arguments,
+                    }
+                };
                 if braced {
                     self.jsdoc_skip_space()?;
                     self.expect("}")?;
                 }
             }
             "see" => {
-                let plain = self.jsdoc_is_identifier()?
-                    && !self.lexer.src[self.current.end..].starts_with("://");
+                let plain =
+                    self.is_identifier()? && !self.lexer.src[self.current.end..].starts_with("://");
                 let braced = self.at("{")
                     && self.look_ahead(|p| {
                         p.bump()?;
@@ -818,6 +1090,9 @@ impl<'s> Parser<'s> {
                 }
             }
             "typedef" => return self.jsdoc_typedef(start, indent, indent_text, facts),
+            "public" | "private" | "protected" | "readonly" | "override" => {
+                syntax = TagSyntax::Modifier;
+            }
             "callback" | "overload" => {
                 let callback = self.jsdoc_name(tag_name) == "callback";
                 if callback {
@@ -838,10 +1113,18 @@ impl<'s> Parser<'s> {
                         start,
                         end: if comment { self.pos() } else { signature_end },
                     },
+                    syntax: if callback {
+                        TagSyntax::Callback
+                    } else {
+                        TagSyntax::Overload
+                    },
+                    recovered: false,
                 });
             }
             "import" => {
-                self.jsdoc_import()?;
+                syntax = TagSyntax::Import {
+                    clause: self.jsdoc_import()?,
+                };
             }
             _ => {}
         }
@@ -854,6 +1137,8 @@ impl<'s> Parser<'s> {
                 start,
                 end: self.pos(),
             },
+            syntax,
+            recovered,
         })
     }
 
@@ -917,6 +1202,19 @@ impl<'s> Parser<'s> {
                 }
             }
         }
+        let syntax = if property {
+            TagSyntax::Other
+        } else {
+            TagSyntax::Parameter {
+                name: (self.nodes[name.0].syntax_kind == Identifier)
+                    .then(|| self.jsdoc_name(name).to_owned()),
+                bracketed,
+                typed: ty.is_some(),
+                optional_type: ty.is_some_and(|ty| {
+                    matches!(self.nodes[ty.0].field("type"), Some(Value::Node(inner)) if self.nodes[inner.0].syntax_kind == JSDocOptionalType)
+                }),
+            }
+        };
         Ok(Tag {
             kind: if property {
                 TagKind::Property
@@ -929,6 +1227,8 @@ impl<'s> Parser<'s> {
             },
             name: Some(name),
             ty,
+            syntax,
+            recovered: false,
         })
     }
 
@@ -1012,6 +1312,8 @@ impl<'s> Parser<'s> {
                                 },
                                 name: None,
                                 ty: Some(ty),
+                                syntax: TagSyntax::Type,
+                                recovered: false,
                             }))
                         }
                         "prop" | "property" if target == 1 => self
@@ -1113,6 +1415,10 @@ impl<'s> Parser<'s> {
             span: Span { start, end },
             name: Some(name),
             ty,
+            syntax: TagSyntax::Typedef {
+                typed: ty.is_some() || has_children,
+            },
+            recovered: false,
         })
     }
 }

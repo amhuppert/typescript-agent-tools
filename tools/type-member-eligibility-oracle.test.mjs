@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {compilerHookOracle} from './type-oracle.mjs';
 import {lineStarts,position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 
 const root=fileURLToPath(new URL('../fixtures/types/member-reference-eligibility/',import.meta.url));
 function at(file,marker){
@@ -25,7 +26,7 @@ test('native reference eligibility and location meanings preserve all admitted s
  for(const [file,marker] of [['globals.d.ts','lengthDeclaration'],['cases.ts','constNamespace'],['cases.ts','valueNamespace'],['globals.d.ts','ambientDeclaration']]){
   const answer=await compilerHookOracle(path.join(root,'tsconfig.json'),{operation:'member',at:at(file,marker)});
   rows.push({file,marker,answer});
-  fs.writeFileSync('.cc/temp/member-eligibility-native.json',JSON.stringify(rows,null,2));
+  fs.writeFileSync(scratchPath('member-eligibility-native.json'),JSON.stringify(rows,null,2));
  }
  for(const {marker,answer} of rows){
   assert.equal(answer.compiler,'7.0.2');

@@ -1,7 +1,21 @@
 //! Import/export syntax questions shared by reference capture and traversal.
 
 use super::{id, walk_up_binding_elements_and_patterns};
-use crate::{Ast, NodeId, syntax_kind::SyntaxKind as K};
+use crate::{Ast, Node, NodeId, syntax_kind::SyntaxKind as K};
+
+/// TypeScript `IsLiteralImportTypeNode`: an ImportType whose argument is the
+/// literal type of a string literal, which names its module. Returns that
+/// string literal; any other argument names no module.
+pub(crate) fn literal_import_type_specifier(ast: &Ast<'_>, node: &Node<'_>) -> Option<NodeId> {
+    if node.syntax_kind != K::ImportType {
+        return None;
+    }
+    let argument = id(node, "argument")?;
+    let literal = id(ast.node(argument), "literal")?;
+    (ast.node(argument).syntax_kind == K::LiteralType
+        && ast.node(literal).syntax_kind == K::StringLiteral)
+        .then_some(literal)
+}
 
 /// `getSearchesFromDirectImports` reports the literal argument of an
 /// unqualified import type for export-equals. It is a single reference, not
@@ -11,18 +25,26 @@ pub(crate) fn is_reference_import_type_literal(
     parents: &[Option<NodeId>],
     node: NodeId,
 ) -> bool {
-    if ast.node(node).syntax_kind != K::StringLiteral {
-        return false;
+    parents[node.index()]
+        .and_then(|literal| parents[literal.index()])
+        .is_some_and(|import| literal_import_type_specifier(ast, ast.node(import)) == Some(node))
+}
+
+/// TypeScript `isImportTypeQualifierPart`: the ImportType whose qualifier
+/// is this entity name or contains it at any depth of its QualifiedName chain.
+pub(crate) fn import_type_of_qualifier_part(
+    ast: &Ast<'_>,
+    parents: &[Option<NodeId>],
+    mut node: NodeId,
+) -> Option<NodeId> {
+    let mut parent = parents[node.index()]?;
+    while ast.node(parent).syntax_kind == K::QualifiedName {
+        node = parent;
+        parent = parents[parent.index()]?;
     }
-    let Some(literal) = parents[node.index()] else {
-        return false;
-    };
-    ast.node(literal).syntax_kind == K::LiteralType
-        && id(ast.node(literal), "literal") == Some(node)
-        && parents[literal.index()].is_some_and(|import| {
-            ast.node(import).syntax_kind == K::ImportType
-                && id(ast.node(import), "argument") == Some(literal)
-        })
+    (ast.node(parent).syntax_kind == K::ImportType
+        && id(ast.node(parent), "qualifier") == Some(node))
+    .then_some(parent)
 }
 
 /// TypeScript `getExportNode`; a variable use must not inherit the export

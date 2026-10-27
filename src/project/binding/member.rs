@@ -110,7 +110,7 @@ pub(super) fn declaration_key(ast: &Ast<'_>, node: &Node<'_>) -> MemberKey {
     MemberKey::Dynamic
 }
 
-fn literal_key(ast: &Ast<'_>, node: &Node<'_>) -> MemberKey {
+pub(super) fn literal_key(ast: &Ast<'_>, node: &Node<'_>) -> MemberKey {
     if let Some(bytes) = ast.cooked_literal(node) {
         return match std::str::from_utf8(bytes) {
             Ok(text) => MemberKey::Text(text.into()),

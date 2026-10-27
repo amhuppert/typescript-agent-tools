@@ -1,6 +1,6 @@
 # Declaration navigation
 
-`tsparse --outline` lists the declarations of one TypeScript file, and
+`tsparse --outline` lists the declarations of one TypeScript or JavaScript file, and
 `tsparse --show` prints the exact source of one of them. Without `--project`
 they read only the named file; with `--project TSCONFIG` they answer from the
 project's captured snapshot, over the files reference queries search, through
@@ -62,10 +62,13 @@ and qualified names are show's containment selectors. An argument that is
 not Unicode is a usage error, since a request names its file exactly. Argument
 paths are relative to the working directory.
 
-Navigation input is a `.ts`, `.tsx`, `.mts`, or `.cts` file, including
-declaration files, classified by the same rule as project inputs (case-folded
-on case-insensitive file systems). JSON, JavaScript, and other files are
-unsupported input. A file that does not parse is a syntax error; there is no
+Navigation input is a `.ts`, `.tsx`, `.mts`, `.cts`, `.js`, `.jsx`, `.mjs`, or
+`.cjs` file, including declaration files, classified by the same rule as project
+inputs (case-folded on case-insensitive file systems). A JavaScript file parses
+with JSX. File-only navigation does not report the TypeScript-only syntax
+diagnostics that `--check` reports in JavaScript, or the TS1540 diagnostic
+for `module X {}`. Project navigation follows the selected dialect
+and the project loading policy. JSON and other files are unsupported input. A file that does not parse is a syntax error; there is no
 partial outline.
 
 The file is read as TypeScript reads it (`decodeBytes` in
@@ -87,7 +90,9 @@ directory, matched lexically under the project's case policy. Dependency and
 standard-library files and files outside the configuration's inputs are
 `OutsideProject`, whose message names the configuration whose `files`,
 `include`, and `exclude`, or those of a configuration it extends, decide which
-files are searched; a searched JSON module is `Unsupported`. `--show --name`
+files are searched; a searched JSON module is `Unsupported`, and so is a
+duplicate copy of a package that the program reads from another file, whose
+message names that file ([package identity](references.md#package-identity)). `--show --name`
 without a file searches every searched file, and candidates across files are
 ordered by file and then position. The whole project loads as for references:
 a project that fails to load answers no operation, and its failure is never
@@ -142,6 +147,11 @@ private), and a failed write leave no outcome: each is a failure with a
 category and a code from the [CLI reference](cli-reference.md#failure-codes),
 whose text is `CODE: message` and whose document is
 `{"operation", "outcome": "error", "error": {"category", "code", "message"}}`.
+A lock failure (`transport.lock`, exit `2`) retains its path and OS cause,
+and names the selected runtime directory's `TMPDIR`/`TSPARSE_SERVICE_DIR`
+remedy, including why `TMPDIR` was skipped. A passing doctor metadata
+check does not prove permission to create or open a lock.
+
 A failure with a remedy adds it: a runtime directory of this user's that is
 not private prints `  why: …` and `  next: chmod 700 DIR`, which the document
 gives as `why` and `next: {"argv": [...]}`, and a remedy that is not one
@@ -692,7 +702,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
   and default-library files, and files outside the configuration's inputs, are
   `OutsideProject`. A searched JSON module is `Unsupported` ("JSON files are
   not navigation input"), as in file navigation, naming the module by its
-  canonical path, as other input failures do. A path names a file only by its
+  canonical path, as other input failures do. A duplicate copy of a package,
+  which the program reads from another file, is `Unsupported` too, naming
+  the package id and that file
+  ([package identity](references.md#package-identity)). A path names a file only by its
   exact text: a path that is not Unicode is `Unsupported` for every operation,
   as in file navigation, even when its lossy form, with U+FFFD for each
   invalid byte, is a searched file's name.
@@ -886,10 +899,15 @@ the same input owner (`navigation::file`), with the same exit codes and
 (exit 2), a syntax error is `Syntax` (exit 1), a file nesting deeper than the
 parser's grammar budget is `ResourceLimit` (exit 1; 85 nested
 `describe("d", () => {` suites list and 86 fail, and other shapes reach the
-budget at other counts), and a JSON, JavaScript, or other file is
+budget at other counts), and a JSON or other non-source file is
 `Unsupported` (exit 1). With `--json` each is an `error` document naming
 `test-outline`. A usage error and a result that cannot be written are each
 `CODE: message` (exit 2).
+
+JavaScript test files are accepted by the same file reader. Their listed
+positions select statements for `--show`; every edit entry point still refuses
+JavaScript. The view reads no project, so a project capability refusal or
+TS1540 does not prevent this syntax-only listing.
 
 **Library.** `navigation::test_outline_file(path)` returns a `TestOutline`
 with the absolute `file` and flat `entries` in source order, each a
@@ -918,7 +936,7 @@ to an entry's descendants:
 | `merged` | No merging: a later namespace, ambient module, or `declare global` block, or a property assignment, declaration, or signature, parameter property, or accessor (not a shorthand) that shares its name with a sibling class, function, or variable, stays a separate entry with its own children. The compiler merges such a property into every same-named sibling, so it lists the property's contents once under each; the copies are `merged` too | The compiler keeps only the first span; each site must stay selectable with its own excerpt. |
 | `untraversed` | No entries from parameters, types, type parameters, decorators, or heritage clauses | They contribute to signatures. The compiler lists them inside initializers and class headers but not for function declarations; one rule is easier to predict. |
 | `expando` | No entries for `f.x = …` expando assignments; a function assigned there is an entry labelled by the assigned name where the assignment is | Assignments are not declaration syntax. The compiler moves the assignment's entry under `f`; the declarations inside the assigned function must still match, contained where the assignment is. |
-| `jsdoc` | No entries for JSDoc `@typedef` and `@callback` tags | In TypeScript files they declare nothing; the compiler lists them in every file kind (and a comment that mentions `@typedef` mid-sentence becomes one). JavaScript binding is outside this delivery. The compiler entry's range must lie inside a JSDoc comment. |
+| `jsdoc` | No entries for JSDoc `@typedef` and `@callback` tags | In TypeScript files they declare nothing; in a JavaScript file they declare types, which project loading refuses ([references.md](references.md#refused-javascript)); the compiler lists them in every file kind (and a comment that mentions `@typedef` mid-sentence becomes one). The compiler entry's range must lie inside a JSDoc comment. |
 | `truncated` | Labels are never truncated | The compiler cuts names and callback text at 150 characters plus `...`; exact names are identities here. |
 
 Kinds map to the compiler's `SymbolKind` as follows: `function` 12; `variable`,

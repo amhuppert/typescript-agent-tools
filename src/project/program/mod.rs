@@ -12,6 +12,7 @@
 //! (`collectFiles`).
 
 mod capture;
+mod compatibility;
 mod config;
 mod diagnostics;
 mod directives;
@@ -24,6 +25,11 @@ pub(in crate::project) mod paths;
 mod resolve;
 pub(in crate::project) mod specifier_environment;
 pub(in crate::project) mod specifiers;
+/// The compiler a test project installs, shared with the integration tests'
+/// `support`.
+#[cfg(test)]
+#[path = "../../../tests/support/compiler.rs"]
+mod test_compiler;
 #[cfg(test)]
 mod tests;
 mod version;
@@ -34,13 +40,16 @@ use super::sources::{FileId, SourceFile, Sources};
 use crate::ScriptKind;
 use crate::analysis::Parser;
 use crate::analysis::{InputError, InputErrorKind};
+use crate::checking::Code;
 use crate::input::Case;
 use crate::source::SourcePosition;
 use config::{Config, Detection};
 use diagnostics::{Checking, FileOrigin, Unchecked};
 use directives::Directive;
 use libraries::Library;
-use resolve::{FileFormat, NotAdmitted, Resolved, Resolver};
+use resolve::{
+    Admission, FileFormat, NotAdmitted, PackageId, Resolved, Resolver, TypeReferenceOrigin,
+};
 use std::collections::{HashMap, VecDeque};
 use std::path::{Path, PathBuf};
 
@@ -51,6 +60,7 @@ pub(super) use module_semantics::{FileModuleSemantics, ModuleKind};
 pub(super) use paths::FileLookup;
 pub(super) use paths::{from_path as native_file_name, remove_file_extension};
 pub(super) use resolve::is_relative_name;
+pub(super) use resolve::{untyped_augmentation_message, untyped_message};
 
 /// Reusable file products and resolution decisions of the last successfully
 /// published generation.
@@ -97,6 +107,33 @@ pub(super) struct Program {
     pub(super) semantic: SemanticOptions,
     pub(super) specifier_environment:
         Result<specifier_environment::SpecifierEnvironment, InputError>,
+    /// The files collection met as duplicates of a package another input
+    /// already is, in the order it met them (`Redirect`).
+    pub(super) redirects: Vec<Redirect>,
+    /// The effective options loading read, which tests inspect beside the
+    /// program they select.
+    #[cfg(test)]
+    options: config::Options,
+}
+
+/// A file that is a copy of a package another program input already is:
+/// both have one package id, and TypeScript's `collectFiles` keeps the copy
+/// it meets first, depth first, as the program's input (the target) and
+/// redirects the other to it (`redirectTargetsMap`, `redirectFilesByPath`).
+/// The redirected file is no input of its own: a request resolving to it
+/// reaches the target, and what only it reaches leaves the program. Its text
+/// was still read and parsed, so that a session sees it change.
+#[derive(Debug)]
+pub(super) struct Redirect {
+    /// The file's identity path, as an input of its own would have it.
+    path: PathBuf,
+    /// Normalized absolute paths through which it was reached, its identity
+    /// included, each of which names the target instead.
+    spellings: Vec<String>,
+    /// The input the file redirects to.
+    target: FileId,
+    /// The package id the two files share.
+    package: PackageId,
 }
 
 impl Program {
@@ -113,6 +150,16 @@ impl Program {
             );
             for path in &file.paths {
                 lookup.insert(path, id, file.search);
+            }
+        }
+        for redirect in &self.redirects {
+            let reason = format!(
+                "a duplicate copy of package '{}', which the program reads from '{}' instead (TypeScript's package deduplication); name that file",
+                redirect.package,
+                self.sources.get(redirect.target).display
+            );
+            for spelling in &redirect.spellings {
+                lookup.insert_duplicate(spelling, reason.clone());
             }
         }
         lookup
@@ -149,7 +196,7 @@ pub(super) fn load(
     disk: &disk::Disk,
     parser: &Parser,
 ) -> Result<Program, InputError> {
-    load_with_libraries(config, disk, parser, &libraries::directory())
+    load_program(config, disk, parser, None, None)
 }
 
 pub(super) fn load_reusing(
@@ -159,32 +206,39 @@ pub(super) fn load_reusing(
     previous: &Reuse,
 ) -> Result<(Program, Reuse), InputError> {
     let mut next = Reuse::default();
-    let program = load_program(
-        config,
-        disk,
-        parser,
-        &libraries::directory(),
-        Some((previous, &mut next)),
-    )?;
+    let program = load_program(config, disk, parser, None, Some((previous, &mut next)))?;
     Ok((program, next))
 }
 
-/// `load` with the standard library declarations in `library_dir`, the
-/// vendored directory except where a test removes data from a copy.
+/// What the doctor reports of the compiler a configuration's project is
+/// read for (`compatibility::CompilerSelection::describe`): the selection
+/// loading makes, through `disk`, from the configuration's canonical
+/// directory, which reads neither the configuration's contents nor any
+/// input.
+pub(super) fn compatibility(config: &Path, disk: &disk::Disk) -> Result<String, InputError> {
+    let path = std::path::absolute(config).map_err(|error| io_error(config, &error))?;
+    let selection = compatibility::select(&config::directory(&path, disk)?, disk)?;
+    selection.describe(version::REFERENCE, disk)
+}
+
+/// `load` with the standard library declarations in `library_dir` in place
+/// of the dialect's directory, for a test that removes data from a copy of
+/// the vendored declarations.
+#[cfg(test)]
 fn load_with_libraries(
     config: &Path,
     disk: &disk::Disk,
     parser: &Parser,
     library_dir: &str,
 ) -> Result<Program, InputError> {
-    load_program(config, disk, parser, library_dir, None)
+    load_program(config, disk, parser, Some(library_dir), None)
 }
 
 fn load_program(
     config: &Path,
     disk: &disk::Disk,
     parser: &Parser,
-    library_dir: &str,
+    library_dir: Option<&str>,
     reuse: Option<(&Reuse, &mut Reuse)>,
 ) -> Result<Program, InputError> {
     // `Program.GetCurrentDirectory` belongs to the module-spelling host. An
@@ -196,6 +250,15 @@ fn load_program(
         .and_then(|cwd| paths::from_path(&cwd).map(|cwd| paths::normalize(&cwd)));
     let path = std::path::absolute(config).map_err(|error| io_error(config, &error))?;
     let config = config::load(&path, disk, parser)?;
+    // Where the dialect's compiler reads its standard libraries.
+    let compiler = &config.options.compiler;
+    let library_dir = match library_dir {
+        Some(directory) => directory.to_owned(),
+        None => compiler
+            .dialect()
+            .libraries()
+            .directory(compiler.package_directory(), disk)?,
+    };
     let case = Case::detect();
     let roots = files::roots(&config, case, disk)?;
     // Inputs are captured ahead of the loader while it reserves them.
@@ -221,32 +284,131 @@ fn load_program(
             disk,
             parser,
             case,
-            library_dir,
+            library_dir: &library_dir,
             ids: HashMap::new(),
             queue: VecDeque::new(),
             sources: Sources::default(),
             loaded: Vec::new(),
             edges: Vec::new(),
-            search_roots: Vec::new(),
             root_tasks: Vec::new(),
             reached: Vec::new(),
             libraries: Vec::new(),
             navigated: Vec::new(),
+            depths: Vec::new(),
             library_ids: HashMap::new(),
             program_only: Vec::new(),
             captures,
             next_captures,
+            packages: Vec::new(),
+            program_only_fallbacks: HashMap::new(),
+            borrowed: HashMap::new(),
+            borrowed_failures: Vec::new(),
         };
-        let loaded = loader.load_all(&roots);
-        // An unreadable manifest or type root may have caused another failure.
-        loader.resolver.check_reads()?;
-        loaded?;
-        loader.settle_program_only()?;
-        // Provenance is known only now that the dependency graph is complete.
-        let search = loader.search();
-        let order = loader.program_order();
-        let renumbered = loader.sources.reorder(&order);
+        // A lookup failure is the failure of the root tasks or of the file
+        // that met it (`Loader::load_all`).
+        loader.load_all(&roots)?;
+        loader.settle_program_only();
+        // Each redirect collection processes again restarts the walk once
+        // its borrowed subtasks are loaded (`Loader::borrow`): a walk per such
+        // redirect, which projects rarely have.
+        let collected = loop {
+            match loader.program_order() {
+                Collection::Collected(collected) => break collected,
+                Collection::Borrows { redirect, target } => loader.borrow(redirect, target)?,
+            }
+        };
+        loader.finish_program_only();
+        // The first input in load order whose capture failed and that stays
+        // in the program fails the load (`Loader::failed`).
+        let mut kept = vec![false; loader.loaded.len()];
+        for old in &collected.order {
+            kept[old.index()] = true;
+        }
+        if let Some(error) = loader
+            .loaded
+            .iter_mut()
+            .zip(&kept)
+            .find_map(|(loaded, kept)| loaded.failure.take().filter(|_| *kept))
+        {
+            return Err(error);
+        }
+        loader.borrowed_failure()?;
+        // Provenance is known only now that the program is collected.
+        let search = loader.search(&collected);
+        // A dependency's JavaScript with a construct this tool refuses is no
+        // input, so that none of its declarations is bound; a request that
+        // names it is unsupported, which only a project file's request
+        // reports (docs/references.md, JavaScript inputs).
+        let javascript = config.options.compiler.dialect().javascript();
+        let refused: Vec<Option<String>> = loader
+            .sources
+            .ids()
+            .zip(&loader.loaded)
+            .map(|(old, loaded)| {
+                let refusal = loaded.facts.javascript_refusal(javascript)?;
+                let source = loader.sources.get(old);
+                let position = source.text.position(refusal.span.start);
+                (!search[old.index()] && loader.libraries[old.index()].is_none()).then(|| {
+                    format!(
+                        "{}:{}:{}: {}",
+                        source.display,
+                        position.line,
+                        position.column,
+                        refusal.message()
+                    )
+                })
+            })
+            .collect();
         let spelled_dir = path.parent().unwrap_or(Path::new("/"));
+        let Collected {
+            mut order,
+            redirects,
+            ..
+        } = collected;
+        // What names a redirected file names the input it redirects to
+        // (`filesByPath`), and the redirect's own spellings name it.
+        let mut redirected: Vec<Option<FileId>> = vec![None; loader.loaded.len()];
+        let mut redirect_records = Vec::with_capacity(redirects.len());
+        for Redirected {
+            file: redirect,
+            target,
+            package,
+            ..
+        } in redirects
+        {
+            redirected[redirect.index()] = Some(target);
+            let source = loader.sources.get(redirect);
+            let mut spellings = std::mem::take(&mut loader.reached[redirect.index()]);
+            let identity = paths::from_path(&source.path)?;
+            if !spellings.contains(&identity) {
+                spellings.insert(0, identity);
+            }
+            if let Some(spelled) = spelled_under(spelled_dir, &source.display)
+                && !spellings.contains(&spelled)
+            {
+                spellings.push(spelled);
+            }
+            redirect_records.push((
+                Redirect {
+                    path: source.path.clone(),
+                    spellings,
+                    target,
+                    package,
+                },
+                target,
+            ));
+        }
+        order.retain(|old| refused[old.index()].is_none());
+        let renumbered = loader.sources.reorder(&order);
+        let redirects: Vec<Redirect> = redirect_records
+            .into_iter()
+            .filter_map(|(redirect, target)| {
+                Some(Redirect {
+                    target: renumbered[target.index()]?,
+                    ..redirect
+                })
+            })
+            .collect();
         let mut loaded: Vec<Option<Loaded>> = loader.loaded.into_iter().map(Some).collect();
         let mut files = Vec::with_capacity(order.len());
         for (id, old) in loader.sources.ids().zip(order) {
@@ -260,6 +422,77 @@ fn load_program(
                 FileOrigin::Dependency
             };
             let diagnostics = Diagnostics::new(origin, loaded.checking);
+            let source = loader.sources.get(id);
+            let text = &source.text;
+            // TypeScript reports a project file's syntactic diagnostics
+            // before any other, the earliest first: the dialect's first error
+            // of TypeScript-only syntax, or a parameter decorator's TS1206
+            // where that is syntactic, as the generation's dialect decides
+            // afresh for captured candidates.
+            let policy = config.options.compiler.dialect().source_diagnostics();
+            let syntax = policy
+                .javascript_syntax(loaded.facts.javascript_syntax())
+                .filter(|_| diagnostics.reports_syntax())
+                .map(|error| (error.span.start, error.message.clone()));
+            let decorator = (!config.options.semantic.experimental_decorators)
+                .then(|| {
+                    diagnostics.reported_parameter_decorator(
+                        text,
+                        loaded.facts.parameter_decorators(),
+                        policy,
+                    )
+                })
+                .flatten();
+            let decorator_message = || crate::javascript_syntax::DECORATORS_NOT_VALID.to_owned();
+            let first = match (syntax, decorator) {
+                (Some(syntax), Some(decorator))
+                    if decorator.syntactic && decorator.offset < syntax.0 =>
+                {
+                    Some((decorator.offset, decorator_message()))
+                }
+                (Some(syntax), _) => Some(syntax),
+                (None, Some(decorator)) => Some((decorator.offset, decorator_message())),
+                (None, None) => None,
+            };
+            if let Some((offset, message)) = first {
+                return Err(InputError {
+                    kind: InputErrorKind::Syntax,
+                    message,
+                    path: Some(source.path.clone()),
+                    position: Some(text.position(offset)),
+                });
+            }
+            // The first reported error of the file's syntax, in source order,
+            // fails as a syntax error. Which candidates are errors is the
+            // generation's dialect's, decided afresh for captured facts.
+            if let Some(error) = loaded
+                .facts
+                .source_candidates()
+                .iter()
+                .filter(|candidate| policy.is_error(candidate))
+                .map(|candidate| &candidate.diagnostic)
+                .find(|error| diagnostics.reports(text, error.span.start, Code::MODULE_KEYWORD))
+            {
+                return Err(InputError {
+                    kind: InputErrorKind::Syntax,
+                    message: error.message.clone(),
+                    path: Some(source.path.clone()),
+                    position: Some(text.position(error.span.start)),
+                });
+            }
+            // A project file's JavaScript this tool refuses fails at the
+            // construct, whatever checks the file: a capability limit, not a
+            // diagnostic.
+            if let Some(refusal) = loaded.facts.javascript_refusal(javascript)
+                && !diagnostics.tolerates_unsupported_input()
+            {
+                return Err(InputError {
+                    kind: InputErrorKind::Unsupported,
+                    message: refusal.message(),
+                    path: Some(source.path.clone()),
+                    position: Some(text.position(refusal.span.start)),
+                });
+            }
             if let Some(error) = loaded.unsupported {
                 if !diagnostics.tolerates_unsupported_input() {
                     return Err(error);
@@ -267,11 +500,10 @@ fn load_program(
             }
             // The first reported missing reference directive target, in source
             // order.
-            let text = &loader.sources.get(id).text;
             if let Some((_, error)) = loaded
                 .missing
                 .into_iter()
-                .find(|&(offset, _)| diagnostics.reports(text, offset))
+                .find(|&(offset, _)| diagnostics.reports_inclusion(text, offset))
             {
                 return Err(error);
             }
@@ -282,9 +514,21 @@ fn load_program(
             let modules = loaded
                 .modules
                 .into_iter()
-                .map(|module| match module {
+                .enumerate()
+                .map(|(request, module)| match module {
                     ModuleResolution::File(target) => {
-                        ModuleResolution::File(renumbered[target.index()])
+                        let target = redirected[target.index()].unwrap_or(target);
+                        match (renumbered[target.index()], &refused[target.index()]) {
+                            (Some(target), _) => ModuleResolution::File(target),
+                            (None, Some(refusal)) => ModuleResolution::Unsupported(refusal.clone()),
+                            // A file only a redirected file reached, which a
+                            // request names by a route that adds no file for
+                            // it, is no input after all.
+                            (None, None) => loader
+                                .program_only_fallbacks
+                                .remove(&(old, request))
+                                .expect("an input left out is refused, or redirected away"),
+                        }
                     }
                     other => other,
                 })
@@ -332,14 +576,19 @@ fn load_program(
                 case,
                 disk,
                 &mut loader.resolver,
-                &loader.sources,
-                &files,
+                specifier_environment::Inputs {
+                    sources: &loader.sources,
+                    files: &files,
+                    redirects: &redirects,
+                },
             )
         });
         if let Some(next) = next_resolutions {
             *next = loader.resolver.take_reuse();
         }
         Ok(Program {
+            #[cfg(test)]
+            options: config.options.clone(),
             semantic: config.options.semantic.clone(),
             preserve_const_enums: config.options.preserve_const_enums,
             config: PathBuf::from(&config.file),
@@ -347,6 +596,7 @@ fn load_program(
             sources: loader.sources,
             files,
             specifier_environment,
+            redirects,
         })
     })
 }
@@ -401,7 +651,8 @@ struct Loader<'a> {
     config: &'a Config,
     resolver: Resolver<'a>,
     case: Case,
-    /// The vendored standard library declarations.
+    /// The standard library declarations of the dialect's compiler
+    /// (`libraries::Catalog::directory`).
     library_dir: &'a str,
     /// File identity keys to the ids `Sources` reserved for them.
     ids: HashMap<String, FileId>,
@@ -413,13 +664,13 @@ struct Loader<'a> {
     /// Per captured file, by id.
     loaded: Vec<Loaded>,
     /// Per captured file: its dependencies, TypeScript's subtasks in its
-    /// order, and whether each edge is external.
-    edges: Vec<Vec<(FileId, bool)>>,
-    /// Roots, local type packages, and root libraries: where TypeScript's
-    /// files at depth zero are reached from.
-    search_roots: Vec<FileId>,
-    /// Roots, root libraries, then type packages: TypeScript's root tasks.
-    root_tasks: Vec<FileId>,
+    /// order.
+    edges: Vec<Vec<Edge>>,
+    /// Roots, then root libraries and type packages in the order the
+    /// catalog adds them (`libraries::Catalog::tasks`): TypeScript's root
+    /// tasks. Those at depth zero are where its files at depth zero are
+    /// reached from.
+    root_tasks: Vec<RootTask>,
     /// Paths through which each id was reached, by id.
     reached: Vec<Vec<String>>,
     /// By id: the standard library a library route first reached it as.
@@ -427,21 +678,82 @@ struct Loader<'a> {
     /// By id: whether its reservation guessed it searched and so captured
     /// its catalog (`capture::Job::navigation`).
     navigated: Vec<bool>,
-    /// Each library file's id once captured: `pathForLibFile`'s cache.
-    library_ids: HashMap<&'static str, FileId>,
-    /// Requests, by importing file and request index, that resolved to a
-    /// file the loader does not add for them, with that file's path: a
-    /// `.tsx` file without `jsx` (`NotAdmitted::Jsx`), or a module
-    /// augmentation's target (`shouldAddFile`). Settled once every input is
-    /// known (`settle_program_only`).
-    program_only: Vec<(FileId, usize, String)>,
+    /// Each library file's id once captured, and how `pathForLibFile`
+    /// located it: its cache.
+    library_ids: HashMap<&'static str, (FileId, Library, Option<InputError>)>,
+    /// By id: the fewest package lookups any route so far took to reach
+    /// it, TypeScript's `lowestDepth`; its own subtasks are one deeper per
+    /// lookup when it is loaded (`filesParser.start`).
+    depths: Vec<usize>,
+    /// Requests that resolved to a file the loader does not add for them,
+    /// in the order they were met; settled once every input is known
+    /// (`settle_program_only`).
+    program_only: Vec<ProgramOnly>,
     /// Inputs being captured ahead of `load_file`, as `enqueue_as` reserves
     /// them.
     captures: &'a capture::Captures<'a>,
+    /// By id: the first package id a route to it gave (`record_package`).
+    packages: Vec<Option<PackageId>>,
+    /// What a request `settle_program_only` resolved to a file another
+    /// route makes an input means if that file leaves the program after
+    /// all, by importer and request.
+    program_only_fallbacks: HashMap<(FileId, usize), ModuleResolution>,
+    /// By redirect that collection processes again: its target's
+    /// subtasks, followed from the redirect's location (`borrow`).
+    borrowed: HashMap<FileId, Vec<Edge>>,
+    /// What following those subtasks met that a project file reports, by
+    /// redirect, with its target (`borrow`).
+    borrowed_failures: Vec<BorrowedFailures>,
+}
+
+/// The missing and unsupported reference targets that following a
+/// target's subtasks from its redirect's location met (`Loader::borrow`).
+struct BorrowedFailures {
+    target: FileId,
+    missing: Vec<(usize, InputError)>,
+    unsupported: Option<InputError>,
+}
+
+/// A request that resolved to a file the loader does not add for it: a
+/// `.tsx` or `.jsx` file without `jsx` (`NotAdmitted::Jsx`), a module
+/// augmentation's target (`shouldAddFile`), or JavaScript that is not an
+/// input on this route. TypeScript's checker names the file where another
+/// route makes it an input (`resolveExternalModule`).
+struct ProgramOnly {
+    importer: FileId,
+    request: usize,
+    /// The resolved file's path, or for an elided subtask the path its
+    /// route would load it by.
+    target: String,
+    /// The request's resolution where no route makes `target` an input.
+    otherwise: ModuleResolution,
+    /// For JavaScript elided at its depth on this route, the importer's
+    /// subtask, by its position among the importer's edges: TypeScript
+    /// keeps that subtask, which a shallower route may load later, and
+    /// `collectFiles` then lists the file where this route reached it.
+    subtask: Option<usize>,
+    /// The package id the request's resolution gave the file.
+    package: Option<PackageId>,
+}
+
+/// One of TypeScript's root tasks (`processAllProgramFiles`): a root, a
+/// root library, or a type package.
+struct RootTask {
+    file: FileId,
+    route: libraries::Route,
+    /// The package id the task gives its file.
+    package: Option<PackageId>,
+    /// The package lookups the task took (`currentNodeModulesDepth`): one
+    /// for a type package found in `node_modules`, none otherwise.
+    depth: usize,
 }
 
 /// One captured input whose provenance is not yet known.
 struct Loaded {
+    /// The depth its subtasks first started from.
+    depth: usize,
+    /// Its module format (`impliedNodeFormat`).
+    format: FileFormat,
     module_semantics: FileModuleSemantics,
     facts: FileFacts,
     modules: Vec<ModuleResolution>,
@@ -458,12 +770,116 @@ struct Loaded {
     /// (`capture::Job::navigation`), whose catalog the final pass builds if
     /// it is searched after all.
     navigation: Option<Captured>,
+    /// What capturing the input met instead, when it failed: an input that
+    /// cannot be read, does not parse, or names a target loading cannot
+    /// follow keeps no facts or edges, and fails the load only if it stays
+    /// in the program (`Loader::failed`).
+    failure: Option<InputError>,
+}
+
+/// One dependency of a captured file: a TypeScript subtask.
+#[derive(Debug, Clone)]
+struct Edge {
+    target: FileId,
+    /// Whether it crosses into an external library.
+    external: bool,
+    /// What kind of reference or import it is.
+    route: libraries::Route,
+    /// The package id the route's resolution gave the target.
+    package: Option<PackageId>,
+}
+
+/// What walking the program gives (`Loader::program_order`).
+enum Collection {
+    Collected(Collected),
+    /// The walk processes `redirect` again, whose target's subtasks from
+    /// its location are not loaded yet (`Loader::borrow`).
+    Borrows {
+        redirect: FileId,
+        target: FileId,
+    },
+}
+
+/// What `collectFiles` makes of the walked program (`Loader::program_order`).
+struct Collected {
+    /// The program's inputs in program order.
+    order: Vec<FileId>,
+    /// Each file met as a duplicate of a package, in the order collection
+    /// met them.
+    redirects: Vec<Redirected>,
+    /// By file: whether collection met it, last, without a package lookup,
+    /// where its processing clears 5.6.3's
+    /// `sourceFilesFoundSearchingNodeModules`.
+    at_depth_zero: Vec<bool>,
+}
+
+/// A file collection met as a duplicate of a package.
+struct Redirected {
+    file: FileId,
+    /// The input collection met first with the same package id.
+    target: FileId,
+    package: PackageId,
+}
+
+/// Collection's state while it walks the program (`Loader::program_order`).
+struct Walk {
+    catalog: libraries::Catalog,
+    /// `resolve::Rules::first_route_package_id`.
+    first_route: bool,
+    /// `resolve::Rules::collected_provenance`: whether a route at depth
+    /// zero processes again a file a package lookup met.
+    reprocesses: bool,
+    deduplicate: bool,
+    /// By file: whether the walk has met it.
+    walked: Vec<bool>,
+    /// By file: whether a package lookup met it and no route at depth zero
+    /// has since (`sourceFilesFoundSearchingNodeModules`).
+    in_packages: Vec<bool>,
+    placements: Vec<Option<libraries::Placement>>,
+    order: Vec<FileId>,
+    primaries: HashMap<PackageId, FileId>,
+    redirects: Vec<Redirected>,
+    /// Each redirect's target.
+    redirected: HashMap<FileId, FileId>,
+    /// The files whose subtasks the walk is following, innermost last.
+    frames: Vec<Frame>,
+}
+
+/// A file whose subtasks the walk is following.
+struct Frame {
+    file: FileId,
+    /// Whether they are a redirect's borrowed subtasks (`Loader::borrow`)
+    /// rather than its own.
+    borrowed: bool,
+    /// The next subtask to follow.
+    next: usize,
+    /// The package lookups on the route that met the file.
+    depth: usize,
+    /// Whether the file is listed once its subtasks are followed: not when
+    /// it is processed again.
+    listed: bool,
+}
+
+/// What following one file's references and imports gives
+/// (`Loader::subtasks`).
+struct Subtasks {
+    /// The inputs they add, in TypeScript's subtask order.
+    edges: Vec<Edge>,
+    /// What each module request names.
+    modules: Vec<ModuleResolution>,
+    /// The reference directives whose targets are missing, in source order.
+    missing: Vec<(usize, InputError)>,
+    /// The first unsupported reference path target.
+    unsupported: Option<InputError>,
+    /// Requests whose resolved file this route does not add.
+    program_only: Vec<ProgramOnly>,
 }
 
 /// What following one reference directive produced.
 enum Followed {
-    /// An edge to an input, and whether it crosses into an external library.
-    Edge(FileId, bool),
+    /// An edge to an input, whether it crosses into an external library, its
+    /// route, and the package id the route gives the input.
+    Edge(FileId, bool, libraries::Route, Option<PackageId>),
     /// Nothing to follow, such as a library reference under `noLib`.
     Nothing,
     /// No input exists; an error where the directive is reported.
@@ -478,59 +894,115 @@ impl Loader<'_> {
     /// select, and everything they reach, as `processAllProgramFiles` adds
     /// root tasks.
     fn load_all(&mut self, roots: &[files::Root]) -> Result<(), InputError> {
-        for root in roots {
-            let id = self.enqueue_as(&root.path, None, true)?;
-            self.search_roots.push(id);
-            self.root_tasks.push(id);
-        }
-        for file in libraries::roots(&self.config.options, !roots.is_empty()) {
-            let id = self.library(file)?;
-            self.search_roots.push(id);
-            self.root_tasks.push(id);
-        }
-        if !roots.is_empty() {
-            self.type_packages()?;
-        }
+        // The root tasks are the program's whatever collection keeps: a
+        // failure their lookups meet fails the load, the first met first.
+        let tasks = self.root_tasks(roots);
+        self.resolver.check_reads()?;
+        tasks?;
+        self.load_queued();
+        Ok(())
+    }
+
+    /// Capture each queued input and what it reaches; an input that fails
+    /// is kept as such (`failed`).
+    fn load_queued(&mut self) {
         while let Some((path, id)) = self.queue.pop_front() {
-            self.load_file(path, id)?;
+            if let Err(error) = self.load_file(path.clone(), id) {
+                // A lookup failure the file met before this one is its first.
+                let error = match self.resolver.check_reads() {
+                    Err(earlier) => earlier,
+                    Ok(()) => error,
+                };
+                self.failed(id, path, error);
+            }
+        }
+    }
+
+    /// Reserve the roots, the root libraries, and the type packages, in the
+    /// order `processAllProgramFiles` adds root tasks.
+    fn root_tasks(&mut self, roots: &[files::Root]) -> Result<(), InputError> {
+        for root in roots {
+            let id = self.enqueue_as(&root.path, None, true, 0)?;
+            self.root_tasks.push(RootTask {
+                file: id,
+                route: libraries::Route::Other,
+                package: None,
+                depth: 0,
+            });
+        }
+        let catalog = self.config.options.compiler.dialect().libraries();
+        for task in catalog.tasks(&self.config.options, !roots.is_empty()) {
+            match task {
+                libraries::Task::Library(request) => {
+                    let (id, library) = self.library(request)?;
+                    self.root_tasks.push(RootTask {
+                        file: id,
+                        route: libraries::Route::Library(library),
+                        package: None,
+                        depth: 0,
+                    });
+                }
+                libraries::Task::TypePackages => self.type_packages()?,
+            }
         }
         Ok(())
     }
 
-    /// The id of an input, queueing it on first sight. Identity is the real
-    /// path unless `preserveSymlinks` is set.
-    fn enqueue(&mut self, path: &str) -> Result<FileId, InputError> {
-        self.enqueue_as(path, None, false)
+    /// The id of an input, queueing it on first sight, reached `depth`
+    /// package lookups deep. Identity is the real path unless
+    /// `preserveSymlinks` is set.
+    fn enqueue(&mut self, path: &str, depth: usize) -> Result<FileId, InputError> {
+        self.enqueue_as(path, None, false, depth)
     }
 
     /// The id of a standard library file, as `pathForLibFile` locates it:
-    /// in the vendored directory unless `libReplacement` finds its
-    /// `@typescript/lib-*` package, resolved like a `require` from the
-    /// configuration's directory (`resolveLibrary`). Replacement files are
-    /// still libraries: never searched and never external.
-    fn library(&mut self, file: &'static str) -> Result<FileId, InputError> {
-        if let Some(&id) = self.library_ids.get(file) {
-            return Ok(id);
+    /// in the catalog's directory unless a `@typescript/lib-*` package
+    /// replaces it (`libraries::Catalog::replacement`). Replacement files
+    /// are still libraries: never searched and never external.
+    fn library(&mut self, request: libraries::Request) -> Result<(FileId, Library), InputError> {
+        let file = request.file;
+        if let Some((id, library, failure)) = self.library_ids.get(file).cloned() {
+            // The replacement lookup's failure belongs to every request it
+            // answers (`Resolver::isolated`).
+            self.resolver.relatch(failure.as_ref());
+            return Ok((id, library));
         }
-        let replacement = if libraries::replaceable(&self.config.options, file) {
-            self.replacement(file)?
-        } else {
-            None
-        };
+        let outer = self.resolver.begin_isolation();
+        let replacement = self.replacement(request);
+        let failure = self.resolver.end_isolation(outer);
+        let replacement = replacement?;
         let replaced = replacement.is_some();
-        let path = replacement.unwrap_or_else(|| paths::combine(self.library_dir, file));
-        let id = self.enqueue_as(&path, Some(Library { file, replaced }), false)?;
-        self.library_ids.insert(file, id);
-        Ok(id)
+        // The program names a replacement by its resolved file name, as
+        // `pathForLibFile` does; a link it was reached through is another
+        // spelling of it.
+        let (path, spelled) =
+            replacement.unwrap_or_else(|| (paths::combine(self.library_dir, file), None));
+        let library = Library { file, replaced };
+        // A library route never takes a package lookup.
+        let id = self.enqueue_as(&path, Some(library), false, 0)?;
+        if let Some(spelled) = spelled {
+            self.spell(id, &spelled);
+        }
+        self.library_ids.insert(file, (id, library, failure));
+        Ok((id, library))
     }
 
-    /// The installed `@typescript/lib-*` package replacing `file`, if any.
-    fn replacement(&mut self, file: &'static str) -> Result<Option<String>, InputError> {
-        let package = libraries::replacement_package(file);
-        let from = libraries::replacement_lookup(&self.config.dir, file);
-        let resolved =
-            self.resolver
-                .module(&package, &from, Some(binding::ResolutionMode::Require));
+    /// The installed `@typescript/lib-*` package replacing `request`'s
+    /// file, if any: its resolved file name and the spelling it was reached
+    /// through, when that differs.
+    fn replacement(
+        &mut self,
+        request: libraries::Request,
+    ) -> Result<Option<(String, Option<String>)>, InputError> {
+        let catalog = self.config.options.compiler.dialect().libraries();
+        let Some((package, resolved)) = catalog.replacement(
+            request,
+            &self.config.options,
+            &self.config.dir,
+            &mut self.resolver,
+        ) else {
+            return Ok(None);
+        };
         let reason = match resolved {
             Resolved::File { path, .. } if crate::script_kind(&path) == ScriptKind::Json => {
                 format!(
@@ -538,16 +1010,20 @@ impl Loader<'_> {
                     self.display(&path)
                 )
             }
+            // TypeScript reports TS6504 without `allowJs`, and would read a
+            // JavaScript library with it: outside the supported inputs.
+            Resolved::File {
+                path, extension, ..
+            } if extension.is_javascript() => format!(
+                "resolves to the JavaScript file '{}', which has no TypeScript declarations",
+                self.display(&path)
+            ),
             Resolved::File {
                 path,
                 original_path,
                 ..
-            } => return Ok(Some(original_path.unwrap_or(path))),
+            } => return Ok(Some((path, original_path))),
             Resolved::Missing => return Ok(None),
-            Resolved::JavaScript(target) => format!(
-                "resolves to the JavaScript file '{}', which has no TypeScript declarations",
-                self.display(&target.path)
-            ),
             Resolved::TooDeep => format!(
                 "follows more than {} package imports redirects",
                 resolve::MAX_IMPORTS_CHAIN
@@ -578,17 +1054,34 @@ impl Loader<'_> {
     /// first; the first route decides, as in TypeScript's `collectFiles`.
     /// A `searched_route` is one searching follows from a searched input: a
     /// configuration root, or a reference path of an input guessed searched.
+    /// `depth` is the route's, which lowers the input's own (`revisit`).
     fn enqueue_as(
         &mut self,
         path: &str,
         library: Option<Library>,
         searched_route: bool,
+        depth: usize,
     ) -> Result<FileId, InputError> {
+        let (id, known) = self.reserve(path, library, searched_route, depth)?;
+        if known {
+            self.revisit(id, depth)?;
+        }
+        Ok(id)
+    }
+
+    /// The id of an input and whether it was already known, reserving and
+    /// queueing it, at `depth`, on first sight (`enqueue_as`).
+    fn reserve(
+        &mut self,
+        path: &str,
+        library: Option<Library>,
+        searched_route: bool,
+        depth: usize,
+    ) -> Result<(FileId, bool), InputError> {
         let identity = self.identity(path)?;
         let key = self.case.key(&identity);
-        let lexical = paths::normalize(path);
-        let id = match self.ids.get(&key) {
-            Some(&id) => id,
+        let (id, known) = match self.ids.get(&key) {
+            Some(&id) => (id, true),
             None => {
                 let id = self.sources.reserve();
                 self.ids.insert(key, id);
@@ -618,40 +1111,160 @@ impl Loader<'_> {
                 self.reached.push(Vec::new());
                 self.libraries.push(library);
                 self.navigated.push(navigation);
-                id
+                self.depths.push(depth);
+                self.packages.push(None);
+                (id, false)
             }
         };
+        self.spell(id, path);
+        Ok((id, known))
+    }
+
+    /// A route `depth` package lookups deep reaches a known input `id`. A
+    /// depth lower than any route's before is its own from now on, which a
+    /// queued input's subtasks start from when it loads. A loaded input
+    /// whose dialect reprocesses it (`resolve::Rules::reprocesses`) follows
+    /// its subtasks again from there, to a fixed point: each reaches its
+    /// target lower too, and a JavaScript subtask elided on a deeper route
+    /// is an input once within `maxNodeModuleJsDepth`, where that route met
+    /// it (`collectFiles`).
+    fn revisit(&mut self, id: FileId, depth: usize) -> Result<(), InputError> {
+        let rules = self.config.options.compiler.dialect().resolution();
+        let mut work = vec![(id, depth)];
+        while let Some((id, depth)) = work.pop() {
+            if depth >= self.depths[id.index()] {
+                continue;
+            }
+            self.depths[id.index()] = depth;
+            let Some(loaded) = self.loaded.get(id.index()) else {
+                continue;
+            };
+            let elided: Vec<usize> = (0..self.program_only.len())
+                .filter(|&at| {
+                    self.program_only[at].importer == id && self.program_only[at].subtask.is_some()
+                })
+                .collect();
+            let revisit = resolve::Revisit {
+                depth,
+                max_depth: self.config.options.max_node_module_js_depth,
+                elided: !elided.is_empty(),
+                found_in_packages: loaded.depth > 0,
+            };
+            if !rules.reprocesses(revisit) {
+                continue;
+            }
+            for edge in &self.edges[id.index()] {
+                work.push((edge.target, depth + usize::from(edge.external)));
+            }
+            // Elided JavaScript is always found through a package lookup.
+            let route = depth + 1;
+            if self.beyond_js_depth(route) {
+                continue;
+            }
+            for at in elided.into_iter().rev() {
+                let pending = self.program_only.remove(at);
+                let position = pending.subtask.expect("an elided subtask");
+                let (target, known) = self.reserve(&pending.target, None, false, route)?;
+                if known {
+                    work.push((target, route));
+                }
+                self.record_package(target, pending.package.as_ref());
+                self.loaded[id.index()].modules[pending.request] = ModuleResolution::File(target);
+                self.edges[id.index()].insert(
+                    position,
+                    Edge {
+                        target,
+                        external: true,
+                        route: libraries::Route::Other,
+                        package: pending.package,
+                    },
+                );
+                // Later elided subtasks of this file follow the new edge.
+                for later in &mut self.program_only[at..] {
+                    if later.importer == id
+                        && let Some(position) = &mut later.subtask
+                    {
+                        *position += 1;
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Record `path` as a spelling through which `id` was reached.
+    fn spell(&mut self, id: FileId, path: &str) {
+        let lexical = paths::normalize(path);
         if !self.reached[id.index()].contains(&lexical) {
             self.reached[id.index()].push(lexical);
         }
-        Ok(id)
     }
 
-    /// The `types` entries, expanding `*` to every package in the type roots.
+    /// Record the package id a route gives `id`: TypeScript 7's task data
+    /// keeps the first one any route brings, even a route that elides the
+    /// file (`filesParser.start`), in the order the routes start, which
+    /// this loader's reservation order stands for.
+    fn record_package(&mut self, id: FileId, package: Option<&PackageId>) {
+        let recorded = &mut self.packages[id.index()];
+        if recorded.is_none() {
+            recorded.clone_from(&package.cloned());
+        }
+    }
+
+    /// The type packages the configuration selects (`config::Types`):
+    /// every package in the type roots, or the listed ones, a wildcard
+    /// standing for every package in its place.
     fn type_packages(&mut self) -> Result<(), InputError> {
         let config = self.config;
+        // An automatic package that cannot be resolved is the
+        // configuration's error, as TypeScript reports it without a place.
+        let automatic = Origin {
+            path: config.path.clone(),
+            position: None,
+        };
         let mut names: Vec<(String, &Origin)> = Vec::new();
-        for (name, origin) in &config.options.types {
-            if name == "*" {
-                for automatic in self.resolver.automatic_types() {
-                    names.push((automatic, origin));
+        match &config.options.types {
+            config::Types::Automatic => {
+                for name in self.resolver.automatic_types() {
+                    names.push((name, &automatic));
                 }
-            } else {
-                names.push((name.clone(), origin));
+            }
+            config::Types::Listed(entries) => {
+                for (name, origin) in entries {
+                    match name {
+                        config::TypeName::Wildcard => {
+                            for name in self.resolver.automatic_types() {
+                                names.push((name, origin));
+                            }
+                        }
+                        config::TypeName::Package(name) => names.push((name.clone(), origin)),
+                    }
+                }
             }
         }
         for (name, origin) in names {
-            let Some(found) = self.resolver.type_reference(&name, &config.dir, None) else {
+            let Some(found) = self.resolver.type_reference(
+                &name,
+                &config.dir,
+                None,
+                TypeReferenceOrigin::Inferred,
+            ) else {
                 return Err(origin.error(
                     InputErrorKind::UnresolvedImport,
                     format!("Cannot find type definition file for '{name}'"),
                 ));
             };
-            let id = self.enqueue(found.reached_path())?;
-            self.root_tasks.push(id);
-            if !found.external {
-                self.search_roots.push(id);
-            }
+            // An automatic type directive's subtask, one lookup deep when
+            // external.
+            let depth = usize::from(found.external);
+            let id = self.enqueue(found.reached_path(), depth)?;
+            self.record_package(id, found.package.as_ref());
+            self.root_tasks.push(RootTask {
+                file: id,
+                route: libraries::Route::Other,
+                package: found.package.clone(),
+                depth,
+            });
         }
         Ok(())
     }
@@ -683,7 +1296,8 @@ impl Loader<'_> {
         };
         let declaration = paths::is_declaration(&path);
         let module_semantics = self.resolver.module_semantics(format, json);
-        let jsx = crate::ParseOptions::for_file(path.as_str()).jsx;
+        let script = crate::script_kind(&path);
+        let javascript = matches!(script, ScriptKind::Js | ScriptKind::Jsx);
         let (navigation, mut facts, collected_module) = match parsed.contents? {
             capture::Contents::Json(facts) => (Some(Captured::Json), facts, None),
             capture::Contents::TypeScript {
@@ -705,7 +1319,7 @@ impl Loader<'_> {
                         .parse(source.as_str(), &path)
                         .map_err(|error| InputError::unparsable(error, &source, &file_path))?;
                     let indicators = binding::ModuleIndicators::of(&ast);
-                    capture::collect(&ast, &source, indicators, module, &file_path)?
+                    capture::collect(&ast, &source, indicators, module, self.parser, &file_path)?
                 };
                 (navigation, facts, Some((indicators, module)))
             }
@@ -737,9 +1351,10 @@ impl Loader<'_> {
         // before JSX and written requests. Helpers are loaded even when no
         // emitted construct needs one; missing helpers are demanded only by
         // checking, never diagnosed just for this synthetic program edge.
-        if !declaration
-            && self.config.options.semantic.import_helpers
-            && (self.config.options.semantic.isolated_modules || !json && facts.module)
+        if self.config.options.semantic.import_helpers
+            && (javascript
+                || !declaration
+                    && (self.config.options.semantic.isolated_modules || !json && facts.module))
         {
             facts.requests.push(ModuleRequest {
                 specifier: "tslib".into(),
@@ -752,9 +1367,13 @@ impl Loader<'_> {
                 resolved_path: None,
             });
         }
-        // TypeScript imports an automatic JSX runtime into every TSX file and
-        // reports a missing one at the file's first JSX tag.
-        let runtime = self.jsx_runtime(jsx, declaration, source.as_str());
+        // `jsx_runtime` owns the implicit import rule; a missing runtime is
+        // reported at the file's first JSX tag.
+        let runtime = self.jsx_runtime(
+            matches!(script, ScriptKind::Tsx | ScriptKind::Jsx),
+            declaration,
+            source.as_str(),
+        );
         if let Some(specifier) = &runtime {
             let at = facts.jsx.unwrap_or(0);
             facts.requests.push(ModuleRequest {
@@ -785,10 +1404,71 @@ impl Loader<'_> {
             library,
             skip_default_lib_check: options.skip_default_lib_check,
             json,
-            nocheck: !json && crate::pragmas::checks(source.as_str()) == Some(false),
+            file: crate::checking::FileChecking::new(
+                javascript,
+                source.as_str(),
+                options.semantic.check_js,
+            ),
         };
         let checking = Checking::new(unchecked, &source, &facts);
-        let runtime_request = runtime.map(|_| facts.requests.len() - 1);
+        // The depth this file's subtasks start from, its lowest so far.
+        let depth = self.depths[id.index()];
+        let navigated = self.navigated[id.index()];
+        let Subtasks {
+            edges,
+            modules,
+            missing,
+            unsupported,
+            program_only,
+        } = self.subtasks(id, &path, format, &source, &mut facts, depth, navigated)?;
+        self.program_only.extend(program_only);
+        let display = self.display(&path);
+        self.sources.capture(
+            id,
+            SourceFile {
+                path: file_path,
+                display,
+                text: source,
+            },
+        );
+        self.loaded.push(Loaded {
+            depth,
+            format,
+            module_semantics,
+            facts,
+            modules,
+            checking,
+            missing,
+            unsupported,
+            navigation,
+            // What the file's lookups could not read is its failure, as a
+            // failure of its own text is (`failed`): the load's only if the
+            // file stays in the program.
+            failure: self.resolver.check_reads().err(),
+        });
+        self.edges.push(edges);
+        Ok(())
+    }
+
+    /// Follow the reference directives and module requests of `source`,
+    /// read as the file at `path` whose `facts` they are, `depth` package
+    /// lookups deep, as `importer`'s subtasks (`processReferencedFiles`,
+    /// `processTypeReferenceDirectives`, `processLibReferenceDirectives`,
+    /// `processImportedModules`). `navigated` guesses whether a reference
+    /// path's target is searched (`enqueue_as`).
+    #[allow(clippy::too_many_arguments)]
+    fn subtasks(
+        &mut self,
+        importer: FileId,
+        path: &str,
+        format: FileFormat,
+        source: &crate::source::SourceText,
+        facts: &mut FileFacts,
+        depth: usize,
+        navigated: bool,
+    ) -> Result<Subtasks, InputError> {
+        let file_path = PathBuf::from(path);
+        let declaration = paths::is_declaration(path);
         // TypeScript's subtask order: `/// <reference path>`s, then `types`
         // and `lib` references, then module names: helpers, JSX, then each
         // request by its `subtask_rank` and, within a rank, by its position,
@@ -798,6 +1478,7 @@ impl Loader<'_> {
         let mut unsupported: Option<(usize, InputError)> = None;
         let mut missing: Vec<(usize, InputError)> = Vec::new();
         let mut targets = Vec::new();
+        let mut program_only = Vec::new();
         let mut references = directives::scan(source.as_str());
         references.sort_by_key(|reference| match reference.directive {
             Directive::Path(_) => 0,
@@ -815,8 +1496,13 @@ impl Loader<'_> {
                 path: file_path.clone(),
                 position: Some(source.position(reference.offset)),
             };
-            match self.directive(id, &path, format, reference.directive, &origin)? {
-                Followed::Edge(target, external) => targets.push((target, external)),
+            match self.directive(depth, navigated, path, format, reference.directive, &origin)? {
+                Followed::Edge(target, external, route, package) => targets.push(Edge {
+                    target,
+                    external,
+                    route,
+                    package,
+                }),
                 Followed::Nothing => {}
                 // Settled with provenance (`Diagnostics::reports`).
                 Followed::Missing(error) => missing.push((reference.offset, error)),
@@ -840,13 +1526,13 @@ impl Loader<'_> {
             let request = &facts.requests[index];
             let mode = request.resolution_mode;
             // A request that reaches no program input: an ambient module may
-            // still satisfy it, and otherwise `not_admitted` says why
-            // resolution's file does not count.
-            let unresolved = |not_admitted: Option<String>| {
+            // still satisfy it, and otherwise `otherwise` says what
+            // resolution's file means.
+            let unresolved = |otherwise: ModuleResolution| {
                 if request.implicit == Some(binding::ImplicitImport::Helpers) {
                     return ModuleResolution::Unchecked;
                 }
-                if runtime_request == Some(index) {
+                if request.implicit == Some(binding::ImplicitImport::JsxRuntime) {
                     // TypeScript requires the runtime only where JSX is used.
                     if facts.jsx.is_none() {
                         return ModuleResolution::Unchecked;
@@ -856,17 +1542,16 @@ impl Loader<'_> {
                 {
                     return ModuleResolution::Unchecked;
                 }
-                not_admitted.map_or(ModuleResolution::Missing, ModuleResolution::NotAdmitted)
+                otherwise
             };
             // TypeScript's loader resolves no empty module name.
             let resolved = if request.specifier.is_empty() {
                 Resolved::Missing
             } else {
-                self.resolver.module(&request.specifier, &path, mode)
+                self.resolver.module(&request.specifier, path, mode)
             };
             let resolved_path = match &resolved {
                 Resolved::File { path, .. } => Some(path.clone()),
-                Resolved::JavaScript(resolved) => Some(resolved.path.clone()),
                 Resolved::Missing | Resolved::TooDeep => None,
             };
             modules[index] = match resolved {
@@ -875,36 +1560,94 @@ impl Loader<'_> {
                     original_path,
                     external,
                     extension,
-                } => match resolve::admission(&self.config.options, extension, declaration) {
-                    // TypeScript's loader adds no file for a module
-                    // augmentation's name (`shouldAddFile`): its target is
-                    // a program input only by another route.
-                    None if matches!(request.kind, RequestKind::Augmentation { .. }) => {
-                        self.program_only.push((id, index, target));
-                        ModuleResolution::Missing
-                    }
-                    None => {
-                        let target = self.enqueue(original_path.as_deref().unwrap_or(&target))?;
-                        targets.push((target, external));
-                        ModuleResolution::File(target)
-                    }
-                    Some(reason) => {
-                        let message = reason.message(&request.specifier, &self.display(&target));
-                        let resolution = unresolved(Some(message));
-                        if reason == NotAdmitted::Jsx
-                            && matches!(resolution, ModuleResolution::NotAdmitted(_))
+                    package,
+                } => {
+                    // What the module means where no route makes it an
+                    // input: JavaScript is an untyped module.
+                    let untyped = || ModuleResolution::Untyped(self.display(&target));
+                    let admission = resolve::admission(
+                        &self.config.options,
+                        (&target, extension, external),
+                        declaration,
+                    );
+                    match admission {
+                        // TypeScript's loader adds no file for a module
+                        // augmentation's name (`shouldAddFile`): its target
+                        // is a program input only by another route.
+                        Admission::Input { .. }
+                            if matches!(request.kind, RequestKind::Augmentation { .. }) =>
                         {
-                            self.program_only.push((id, index, target));
+                            let otherwise = if extension.is_javascript() {
+                                untyped()
+                            } else {
+                                ModuleResolution::Missing
+                            };
+                            program_only.push(ProgramOnly {
+                                importer,
+                                request: index,
+                                target,
+                                otherwise,
+                                subtask: None,
+                                package: None,
+                            });
+                            ModuleResolution::Missing
                         }
-                        resolution
+                        Admission::Input { elide_on_depth } => {
+                            let route = depth + usize::from(external);
+                            if elide_on_depth && self.beyond_js_depth(route) {
+                                // Settled with the program: a shallower
+                                // route may still load the file, or reach
+                                // this file lower (`revisit`).
+                                let otherwise = unresolved(untyped());
+                                program_only.push(ProgramOnly {
+                                    importer,
+                                    request: index,
+                                    target: original_path.unwrap_or(target),
+                                    otherwise,
+                                    subtask: Some(targets.len()),
+                                    package,
+                                });
+                                ModuleResolution::Missing
+                            } else {
+                                let target = self
+                                    .enqueue(original_path.as_deref().unwrap_or(&target), route)?;
+                                self.record_package(target, package.as_ref());
+                                targets.push(Edge {
+                                    target,
+                                    external,
+                                    route: libraries::Route::Other,
+                                    package,
+                                });
+                                ModuleResolution::File(target)
+                            }
+                        }
+                        // JavaScript without `allowJs`, which no route makes
+                        // an input.
+                        Admission::NotAdded(None | Some(NotAdmitted::AllowJs)) => {
+                            unresolved(untyped())
+                        }
+                        Admission::NotAdded(Some(reason)) => {
+                            let message =
+                                reason.message(&request.specifier, &self.display(&target));
+                            let resolution =
+                                unresolved(ModuleResolution::NotAdmitted(reason.code(), message));
+                            if reason == NotAdmitted::Jsx
+                                && matches!(resolution, ModuleResolution::NotAdmitted(..))
+                            {
+                                program_only.push(ProgramOnly {
+                                    importer,
+                                    request: index,
+                                    target,
+                                    otherwise: resolution.clone(),
+                                    subtask: None,
+                                    package: None,
+                                });
+                            }
+                            resolution
+                        }
                     }
-                },
-                Resolved::Missing => unresolved(None),
-                Resolved::JavaScript(target) => ModuleResolution::Unsupported(format!(
-                    "'{}' resolves to the JavaScript file '{}', which has no TypeScript declarations",
-                    request.specifier,
-                    self.display(&target.path)
-                )),
+                }
+                Resolved::Missing => unresolved(ModuleResolution::Missing),
                 // A limit of this tool, not an unsupported input: no file's
                 // diagnostic policy may tolerate it.
                 Resolved::TooDeep => {
@@ -922,42 +1665,140 @@ impl Loader<'_> {
             };
             facts.requests[index].resolved_path = resolved_path;
         }
+        Ok(Subtasks {
+            edges: targets,
+            modules,
+            missing,
+            unsupported,
+            program_only,
+        })
+    }
+
+    /// An input whose capture failed, kept without facts or edges: its
+    /// failure is the load's only if the input stays in the program, which
+    /// a package redirect can prevent, since TypeScript reports nothing of a
+    /// file `collectFiles` leaves out. Loading goes on, so that the program
+    /// is known; the failure of the first such input in load order that
+    /// stays in it is the load's (`load_program`).
+    fn failed(&mut self, id: FileId, path: String, error: InputError) {
+        debug_assert_eq!(
+            self.loaded.len(),
+            id.index(),
+            "a failed input loads nothing"
+        );
+        self.program_only.retain(|pending| pending.importer != id);
         let display = self.display(&path);
         self.sources.capture(
             id,
             SourceFile {
-                path: file_path,
+                path: PathBuf::from(path),
                 display,
-                text: source,
+                text: std::sync::Arc::new(crate::source::SourceText::new(String::new())),
             },
         );
+        let unchecked = Unchecked {
+            no_check: true,
+            declaration: false,
+            skip_lib_check: false,
+            library: false,
+            skip_default_lib_check: false,
+            json: false,
+            file: crate::checking::FileChecking::new(false, "", None),
+        };
+        let facts = FileFacts::default();
         self.loaded.push(Loaded {
-            module_semantics,
+            depth: self.depths[id.index()],
+            format: FileFormat::undeclared(),
+            module_semantics: self
+                .resolver
+                .module_semantics(FileFormat::undeclared(), false),
+            checking: Checking::new(unchecked, &self.sources.get(id).text, &facts),
             facts,
-            modules,
-            checking,
-            missing,
-            unsupported,
-            navigation,
+            modules: Vec::new(),
+            missing: Vec::new(),
+            unsupported: None,
+            navigation: None,
+            failure: Some(error),
         });
-        self.edges.push(targets);
-        Ok(())
+        self.edges.push(Vec::new());
     }
 
     /// TypeScript's checker resolves a request to a file the loader did not
     /// add for it when the program has that file by another route, such as a
-    /// root (`resolveExternalModule`): an import whose `.tsx` file lacks
-    /// `jsx` (TS6142), and a module augmentation's target. Otherwise the
-    /// request stays unresolved, which for an augmentation is TS2664 where
-    /// reported.
-    fn settle_program_only(&mut self) -> Result<(), InputError> {
-        for (file, index, target) in std::mem::take(&mut self.program_only) {
-            let key = self.case.key(&self.identity(&target)?);
-            if let Some(&id) = self.ids.get(&key) {
-                self.loaded[file.index()].modules[index] = ModuleResolution::File(id);
+    /// root (`resolveExternalModule`): an import whose `.tsx` or `.jsx` file
+    /// lacks `jsx` (TS6142), a module augmentation's target, and JavaScript
+    /// elided on the request's route. An elided subtask whose file a later
+    /// route loaded counts as one of its importer's edges again, where
+    /// TypeScript's `collectFiles` meets it. A request whose file no route
+    /// has loaded yet stays pending: collection can still add it, processing
+    /// a redirect again (`borrow`), until `finish_program_only`.
+    fn settle_program_only(&mut self) {
+        let mut pending_still = Vec::new();
+        // Latest first, so that each elided subtask's position counts only
+        // the edges its importer had when it was met.
+        for pending in std::mem::take(&mut self.program_only).into_iter().rev() {
+            let identity = match self.identity(&pending.target) {
+                Ok(identity) => identity,
+                // The importer's failure, the load's only if the importer
+                // stays in the program (`failed`).
+                Err(error) => {
+                    self.loaded[pending.importer.index()]
+                        .failure
+                        .get_or_insert(error);
+                    continue;
+                }
+            };
+            let Some(&id) = self.ids.get(&self.case.key(&identity)) else {
+                pending_still.push(pending);
+                continue;
+            };
+            self.loaded[pending.importer.index()].modules[pending.request] =
+                ModuleResolution::File(id);
+            self.program_only_fallbacks
+                .insert((pending.importer, pending.request), pending.otherwise);
+            if let Some(position) = pending.subtask {
+                self.record_package(id, pending.package.as_ref());
+                self.edges[pending.importer.index()].insert(
+                    position,
+                    Edge {
+                        target: id,
+                        external: true,
+                        route: libraries::Route::Other,
+                        package: pending.package,
+                    },
+                );
+                // The importer's elided subtasks met after this one, still
+                // pending, follow the new edge.
+                for later in &mut pending_still {
+                    if later.importer == pending.importer
+                        && let Some(position) = &mut later.subtask
+                    {
+                        *position += 1;
+                    }
+                }
             }
         }
-        Ok(())
+        pending_still.reverse();
+        self.program_only = pending_still;
+    }
+
+    /// Once collection adds no more files, a request still pending
+    /// (`settle_program_only`) keeps what it means without its file: an
+    /// unresolved name, which for an augmentation is TS2664 where reported,
+    /// or an untyped module.
+    fn finish_program_only(&mut self) {
+        for pending in std::mem::take(&mut self.program_only) {
+            self.loaded[pending.importer.index()].modules[pending.request] = pending.otherwise;
+        }
+    }
+
+    /// Whether a JavaScript file a package lookup found in `node_modules` is
+    /// no input on a route `depth` lookups deep: TypeScript's
+    /// `filesParser.start` elides it beyond `maxNodeModuleJsDepth`.
+    fn beyond_js_depth(&self, depth: usize) -> bool {
+        i64::try_from(depth).map_or(true, |depth| {
+            depth > self.config.options.max_node_module_js_depth
+        })
     }
 
     fn file_options(&self, path: &str, declaration: bool, format: FileFormat) -> FileOptions {
@@ -974,8 +1815,14 @@ impl Loader<'_> {
         }
     }
 
-    /// The automatic JSX runtime module a TSX file implicitly imports,
-    /// following `jsx`, `jsxImportSource`, and the file's JSX pragmas.
+    /// TypeScript 7.0.2's `resolveImportsAndModuleAugmentations` collects
+    /// automatic runtime imports only for JSX/TSX, using
+    /// `GetJSXImplicitImportBase` and `GetJSXRuntimeImport` for `jsx`,
+    /// `jsxImportSource`, and file pragmas. The 5.6 dialect deliberately
+    /// retains this narrower collection rule: 5.6.3's
+    /// `collectExternalModuleReferences` also considers JavaScript and
+    /// eligible ordinary non-declaration files. See docs/references.md's
+    /// compatibility limits for the resulting input-order difference.
     fn jsx_runtime(&self, jsx: bool, declaration: bool, text: &str) -> Option<String> {
         if declaration || !jsx {
             return None;
@@ -1004,11 +1851,14 @@ impl Loader<'_> {
         Some(format!("{source}/{module}"))
     }
 
-    /// Follows one reference directive. An error is fatal wherever the
-    /// directive appears; other failures are outcomes the caller settles.
+    /// Follows one reference directive of the file at `path`, whose
+    /// subtasks start `depth` package lookups deep. An error is fatal
+    /// wherever the directive appears; other failures are outcomes the
+    /// caller settles.
     fn directive(
         &mut self,
-        importer: FileId,
+        depth: usize,
+        navigated: bool,
         path: &str,
         format: FileFormat,
         directive: Directive,
@@ -1017,27 +1867,47 @@ impl Loader<'_> {
         let config = self.config;
         let options = &config.options;
         match directive {
-            Directive::Lib(name) => match libraries::reference(options, &name) {
+            Directive::Lib(name) => match options
+                .compiler
+                .dialect()
+                .libraries()
+                .reference(options, &name)
+            {
                 libraries::Reference::Ignored => Ok(Followed::Nothing),
-                libraries::Reference::File(file) => Ok(Followed::Edge(self.library(file)?, false)),
-                libraries::Reference::Unknown(lower) => Ok(Followed::Missing(origin.error(
-                    InputErrorKind::UnresolvedImport,
-                    format!("Cannot find lib definition for '{lower}'"),
-                ))),
+                libraries::Reference::File(request) => {
+                    let (id, library) = self.library(request)?;
+                    Ok(Followed::Edge(
+                        id,
+                        false,
+                        libraries::Route::Library(library),
+                        None,
+                    ))
+                }
+                libraries::Reference::Unknown(message) => Ok(Followed::Missing(
+                    origin.error(InputErrorKind::UnresolvedImport, message),
+                )),
             },
             Directive::Types(name, mode) => {
                 let mode = mode.or_else(|| self.resolver.type_directive_mode(format));
-                let Some(found) = self
-                    .resolver
-                    .type_reference(&name, paths::parent(path), mode)
-                else {
+                let Some(found) = self.resolver.type_reference(
+                    &name,
+                    paths::parent(path),
+                    mode,
+                    TypeReferenceOrigin::Source,
+                ) else {
                     return Ok(Followed::Missing(origin.error(
                         InputErrorKind::UnresolvedImport,
                         format!("Cannot find type definition file for '{name}'"),
                     )));
                 };
-                let id = self.enqueue(found.reached_path())?;
-                Ok(Followed::Edge(id, found.external))
+                let id = self.enqueue(found.reached_path(), depth + usize::from(found.external))?;
+                self.record_package(id, found.package.as_ref());
+                Ok(Followed::Edge(
+                    id,
+                    found.external,
+                    libraries::Route::Other,
+                    found.package,
+                ))
             }
             Directive::Path(reference) => {
                 let target = paths::resolve(paths::parent(path), &reference);
@@ -1047,22 +1917,27 @@ impl Loader<'_> {
                         format!("Referenced file '{reference}' {reason}"),
                     )))
                 };
-                match files::literal_input(
-                    &target,
-                    options.resolve_json_module,
-                    self.case,
-                    self.disk,
-                )? {
-                    files::Literal::Unsupported(kind) => unsupported(format!(
-                        "is a {} input, which is not supported",
-                        kind.label()
-                    )),
+                match files::literal_input(&target, options, self.case, self.disk)? {
+                    files::Literal::JavaScript => Ok(Followed::Unsupported(origin.error(
+                        InputErrorKind::Unsupported,
+                        files::needs_allow_js(&reference),
+                    ))),
                     files::Literal::Found(found) => {
-                        // A reference path is never an external edge.
-                        let navigated = self.navigated[importer.index()];
+                        // A reference path is never an external edge. It
+                        // keeps what it writes and the extension it was
+                        // found with, for its target's program name.
+                        let extension = found
+                            .strip_prefix(target.as_str())
+                            .expect("a literal input is found at its path or with an extension")
+                            .to_owned();
                         Ok(Followed::Edge(
-                            self.enqueue_as(&found, None, navigated)?,
+                            self.enqueue_as(&found, None, navigated, depth)?,
                             false,
+                            libraries::Route::ReferencePath {
+                                written: reference,
+                                extension,
+                            },
+                            None,
                         ))
                     }
                     files::Literal::Missing => Ok(Followed::Missing(origin.error(
@@ -1079,64 +1954,318 @@ impl Loader<'_> {
 
     /// `GetSourceFiles`: TypeScript's `collectFiles` walks the root tasks
     /// depth first and lists each file after the files its subtasks reach;
-    /// the libraries then come first, ordered by `getDefaultLibFilePriority`
-    /// (a stable sort, where TypeScript's is not; see docs/references.md).
-    fn program_order(&self) -> Vec<FileId> {
-        let mut walked = vec![false; self.loaded.len()];
-        let mut order = Vec::with_capacity(self.loaded.len());
-        let mut walk = |start: FileId, order: &mut Vec<FileId>| {
-            if std::mem::replace(&mut walked[start.index()], true) {
-                return;
+    /// the files ordered with the libraries then come first, ordered by
+    /// `getDefaultLibFilePriority` (a stable sort, as 5.6.3's is and 7.0.2's
+    /// is not; see docs/references.md). Which files those are the catalog
+    /// decides where the walk first meets each one
+    /// (`libraries::Catalog::ordering`), as 5.6.3 decides where
+    /// it first processes one.
+    ///
+    /// The walk deduplicates packages too, unless `deduplicatePackages` is
+    /// false (`packageIdToSourceFile`): a file it meets with the package id
+    /// of an input it met before is that input's redirect, whose subtasks it
+    /// does not follow, so that what only the redirect reaches leaves the
+    /// program. Which route's id a file has is the dialect's
+    /// (`resolve::Rules::first_route_package_id`); in both compilers the
+    /// first file met depth first is the program's, whichever file a
+    /// breadth-first load reserved first.
+    ///
+    /// Where the dialect's collection processes a file again
+    /// (`resolve::Rules::collected_provenance`), the walk does too: a route
+    /// at depth zero that meets a file first met through a package lookup
+    /// follows its subtasks again, and a redirect's are its target's,
+    /// followed from the redirect's location (`borrow`), which the walk
+    /// asks for before it can go on (`Collection::Borrows`).
+    fn program_order(&self) -> Collection {
+        let rules = self.config.options.compiler.dialect().resolution();
+        let mut walk = Walk {
+            catalog: self.config.options.compiler.dialect().libraries(),
+            first_route: rules.first_route_package_id(),
+            reprocesses: rules.collected_provenance(),
+            deduplicate: self.config.options.semantic.deduplicate_packages,
+            walked: vec![false; self.loaded.len()],
+            in_packages: vec![false; self.loaded.len()],
+            placements: vec![None; self.loaded.len()],
+            order: Vec::with_capacity(self.loaded.len()),
+            primaries: HashMap::new(),
+            redirects: Vec::new(),
+            redirected: HashMap::new(),
+            frames: Vec::new(),
+        };
+        for task in &self.root_tasks {
+            let met = self.meet(
+                &mut walk,
+                task.file,
+                &task.route,
+                task.package.as_ref(),
+                task.depth,
+                None,
+            );
+            if let Some(borrows) = met {
+                return borrows;
             }
-            let mut stack = vec![(start, 0)];
-            while let Some((id, next)) = stack.last_mut() {
-                let id = *id;
-                match self.edges[id.index()].get(*next) {
-                    Some(&(target, _)) => {
-                        *next += 1;
-                        if !std::mem::replace(&mut walked[target.index()], true) {
-                            stack.push((target, 0));
-                        }
+            while let Some(frame) = walk.frames.last_mut() {
+                let edges = if frame.borrowed {
+                    &self.borrowed[&frame.file]
+                } else {
+                    &self.edges[frame.file.index()]
+                };
+                let Some(edge) = edges.get(frame.next) else {
+                    let frame = walk.frames.pop().expect("a frame is on the walk");
+                    if frame.listed {
+                        walk.order.push(frame.file);
                     }
-                    None => {
-                        stack.pop();
-                        order.push(id);
-                    }
+                    continue;
+                };
+                frame.next += 1;
+                let (from, depth) = (frame.file, frame.depth + usize::from(edge.external));
+                let met = self.meet(
+                    &mut walk,
+                    edge.target,
+                    &edge.route,
+                    edge.package.as_ref(),
+                    depth,
+                    Some(from),
+                );
+                if let Some(borrows) = met {
+                    return borrows;
                 }
             }
-        };
-        for &root in &self.root_tasks {
-            walk(root, &mut order);
         }
-        debug_assert_eq!(order.len(), self.loaded.len(), "every input is walked");
+        debug_assert!(
+            !walk.redirects.is_empty()
+                || walk.order.len() == self.loaded.len()
+                || self.loaded.iter().any(|loaded| loaded.failure.is_some()),
+            "every input is walked unless a redirect hides it or an input failed"
+        );
+        let Walk {
+            catalog,
+            walked,
+            in_packages,
+            placements,
+            order,
+            redirects,
+            ..
+        } = walk;
         let (mut libraries, files): (Vec<FileId>, Vec<FileId>) = order
             .into_iter()
-            .partition(|id| self.libraries[id.index()].is_some());
-        libraries.sort_by_key(|id| {
-            self.libraries[id.index()]
-                .expect("partitioned as a library")
-                .priority()
+            .partition(|id| placements[id.index()].is_some());
+        libraries.sort_by_cached_key(|id| {
+            let placement = placements[id.index()].as_ref();
+            catalog.priority(
+                placement.expect("partitioned with the libraries"),
+                self.library_dir,
+            )
         });
         libraries.extend(files);
-        libraries
+        Collection::Collected(Collected {
+            order: libraries,
+            redirects,
+            at_depth_zero: walked
+                .into_iter()
+                .zip(in_packages)
+                .map(|(walked, in_packages)| walked && !in_packages)
+                .collect(),
+        })
     }
 
-    /// Inputs TypeScript finds at depth zero, which are reachable from the
-    /// roots, local type packages, and root libraries without crossing an
-    /// external-library edge, less the standard libraries themselves.
-    fn search(&self) -> Vec<bool> {
-        let mut reached = vec![false; self.loaded.len()];
-        let mut stack = self.search_roots.clone();
-        while let Some(id) = stack.pop() {
-            if std::mem::replace(&mut reached[id.index()], true) {
-                continue;
+    /// Collection meets `id` through `route`, `depth` package lookups deep,
+    /// which gives it `package`, from the file `from` (none for a root
+    /// task): 5.6.3's `findSourceFileWorker`, 7.0.2's `collectFiles`. A file
+    /// met before is processed again only where the dialect does so; the
+    /// walk then asks for a redirect's borrowed subtasks unless they are
+    /// loaded.
+    fn meet(
+        &self,
+        walk: &mut Walk,
+        id: FileId,
+        route: &libraries::Route,
+        package: Option<&PackageId>,
+        depth: usize,
+        from: Option<FileId>,
+    ) -> Option<Collection> {
+        if std::mem::replace(&mut walk.walked[id.index()], true) {
+            // `sourceFilesFoundSearchingNodeModules`: a route at depth zero
+            // processes again a file a package lookup met, once.
+            if !walk.reprocesses || depth > 0 || !walk.in_packages[id.index()] {
+                return None;
             }
-            for &(target, external) in &self.edges[id.index()] {
-                if !external && !reached[target.index()] {
-                    stack.push(target);
+            let borrowed = match walk.redirected.get(&id) {
+                None => false,
+                Some(_) if self.borrowed.contains_key(&id) => true,
+                Some(&target) => {
+                    return Some(Collection::Borrows {
+                        redirect: id,
+                        target,
+                    });
+                }
+            };
+            walk.in_packages[id.index()] = false;
+            walk.frames.push(Frame {
+                file: id,
+                borrowed,
+                next: 0,
+                depth,
+                listed: false,
+            });
+            return None;
+        }
+        walk.in_packages[id.index()] = depth > 0;
+        let package = if walk.first_route {
+            package
+        } else {
+            self.packages[id.index()].as_ref()
+        };
+        if let Some(package) = package.filter(|_| walk.deduplicate) {
+            match walk.primaries.get(package) {
+                Some(&primary) => {
+                    walk.redirects.push(Redirected {
+                        file: id,
+                        target: primary,
+                        package: package.clone(),
+                    });
+                    walk.redirected.insert(id, primary);
+                    return None;
+                }
+                None => {
+                    walk.primaries.insert(package.clone(), id);
                 }
             }
         }
+        let identity = |id: FileId| {
+            self.sources
+                .get(id)
+                .path
+                .to_str()
+                .expect("an input's identity is text")
+        };
+        let from = from.and_then(|from| {
+            walk.placements[from.index()].as_ref().map(|placement| {
+                placement
+                    .name(self.library_dir, identity(from))
+                    .into_owned()
+            })
+        });
+        walk.placements[id.index()] = walk.catalog.ordering(
+            self.libraries[id.index()],
+            identity(id),
+            route,
+            from.as_deref(),
+        );
+        walk.frames.push(Frame {
+            file: id,
+            borrowed: false,
+            next: 0,
+            depth,
+            listed: true,
+        });
+        None
+    }
+
+    /// 5.6.3's `findSourceFileWorker` processes `redirect`, which a package
+    /// lookup met first, again where a route at depth zero meets it. The
+    /// redirect's parsed file is its target's (`createRedirectedSourceFile`),
+    /// so it follows the target's reference directives and module requests,
+    /// in the target's module format, resolved from the redirect's own
+    /// location: a reference to `./note.d.ts` reaches the redirect's
+    /// sibling, which neither copy names from where it is. Follow them as
+    /// such a route does, at depth zero, and load what they reach; the walk
+    /// follows them where it met the redirect (`program_order`). What only
+    /// the request's own resolution decides, which no checker reads from a
+    /// redirect, is not kept, nor is JavaScript elided on these routes.
+    fn borrow(&mut self, redirect: FileId, target: FileId) -> Result<(), InputError> {
+        let path = self
+            .sources
+            .get(redirect)
+            .path
+            .to_str()
+            .expect("an input's identity is text")
+            .to_owned();
+        let source = std::sync::Arc::clone(&self.sources.get(target).text);
+        let format = self.loaded[target.index()].format;
+        let mut facts = self.loaded[target.index()].facts.clone();
+        let Subtasks {
+            edges,
+            missing,
+            unsupported,
+            ..
+        } = self.subtasks(redirect, &path, format, &source, &mut facts, 0, true)?;
+        // Its lookups are those of a file processed at depth zero, which
+        // stays in the program: a failure fails the load at once, ahead of
+        // the failures of the files in load order (`failed`).
+        self.resolver.check_reads()?;
+        self.borrowed.insert(redirect, edges);
+        if !missing.is_empty() || unsupported.is_some() {
+            self.borrowed_failures.push(BorrowedFailures {
+                target,
+                missing,
+                unsupported,
+            });
+        }
+        self.load_queued();
+        self.settle_program_only();
+        Ok(())
+    }
+
+    /// What a redirect processed again met (`borrow`), reported as for a
+    /// project file, which a file processed at depth zero is: 5.6.3 reports
+    /// a missing reference there at the redirect, whose text and so whose
+    /// `SkipTypeChecking` and comment directives are its target's.
+    fn borrowed_failure(&self) -> Result<(), InputError> {
+        for failures in &self.borrowed_failures {
+            let diagnostics = Diagnostics::new(
+                FileOrigin::Project,
+                self.loaded[failures.target.index()].checking.clone(),
+            );
+            if let Some(error) = &failures.unsupported
+                && !diagnostics.tolerates_unsupported_input()
+            {
+                return Err(error.clone());
+            }
+            let text = &self.sources.get(failures.target).text;
+            if let Some((_, error)) = failures
+                .missing
+                .iter()
+                .find(|&&(offset, _)| diagnostics.reports_inclusion(text, offset))
+            {
+                return Err(error.clone());
+            }
+        }
+        Ok(())
+    }
+
+    /// Inputs TypeScript finds at depth zero, less the standard libraries
+    /// themselves. Which routes count is the dialect's
+    /// (`resolve::Rules::collected_provenance`): under 5.6.3 those
+    /// collection processes (`program_order`), which never follows a
+    /// redirect's own subtasks; under TypeScript 7 every loaded file's
+    /// (`lowestDepth`), a redirect's and those of files only it reaches
+    /// included, so that an input is searched where the root tasks at depth
+    /// zero reach it without crossing an external-library edge.
+    fn search(&self, collected: &Collected) -> Vec<bool> {
+        let rules = self.config.options.compiler.dialect().resolution();
+        let reached = if rules.collected_provenance() {
+            collected.at_depth_zero.clone()
+        } else {
+            let mut reached = vec![false; self.loaded.len()];
+            let mut stack: Vec<FileId> = self
+                .root_tasks
+                .iter()
+                .filter(|task| task.depth == 0)
+                .map(|task| task.file)
+                .collect();
+            while let Some(id) = stack.pop() {
+                if std::mem::replace(&mut reached[id.index()], true) {
+                    continue;
+                }
+                for edge in &self.edges[id.index()] {
+                    if !edge.external && !reached[edge.target.index()] {
+                        stack.push(edge.target);
+                    }
+                }
+            }
+            reached
+        };
         reached
             .into_iter()
             .zip(&self.libraries)

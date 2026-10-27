@@ -835,7 +835,6 @@ fn input_failures_are_the_outline_s_with_their_exit_codes() {
     let fixture = Fixture::new(&[
         ("broken.ts", "const = 1;\n"),
         ("data.json", "{}\n"),
-        ("script.js", "it(\"x\");\n"),
         ("notes.txt", "it(\"x\");\n"),
     ]);
     std::fs::create_dir(fixture.path("directory.ts")).unwrap();
@@ -845,7 +844,6 @@ fn input_failures_are_the_outline_s_with_their_exit_codes() {
         ("directory.ts", 2, "Io"),
         ("broken.ts", 1, "Syntax"),
         ("data.json", 1, "Unsupported"),
-        ("script.js", 1, "Unsupported"),
         ("notes.txt", 1, "Unsupported"),
     ] {
         let output = tsparse(&fixture, &["--test-outline", file]);

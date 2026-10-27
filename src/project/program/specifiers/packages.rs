@@ -23,7 +23,9 @@ impl Generator<'_> {
     }
 
     /// `tryGetModuleNameAsNodeModule` for packageNameOnly=false. The admitted
-    /// program has no redirect or global typings-cache candidates.
+    /// program has no project-reference redirect (`ModulePath.IsRedirect`)
+    /// or global typings-cache candidates; a package-id redirect is one more
+    /// module path (`module_paths::ordered`).
     pub(super) fn node_module(&self, target: &str) -> Result<Option<String>, SpecifierInputError> {
         let Some(parts) = node_module_parts(target) else {
             return Ok(None);
@@ -114,14 +116,15 @@ impl Generator<'_> {
         }
         let mut file = target.to_owned();
         let mut blocked_by_versions = false;
-        let version_paths = package.version_paths();
+        let version_paths = package.version_paths(&self.env.options.typescript);
         if let Some(patterns) = &version_paths {
             // A package.json *under a single-file module* would cause the
             // native slice to panic. Such an entry cannot physically exist
             // beneath that file, so a captured file target makes it unreachable.
+            // An empty name is no name here (`len(fromPaths) == 0`).
             match self.reverse_paths(&target[root.len() + 1..], patterns, endings, root)? {
-                Some(name) => file = paths::combine(root, &name),
-                None => blocked_by_versions = true,
+                Some(name) if !name.is_empty() => file = paths::combine(root, &name),
+                _ => blocked_by_versions = true,
             }
         }
         let main = contents
@@ -295,7 +298,13 @@ impl Generator<'_> {
             }),
             Kind::Object(values) => values
                 .iter()
-                .filter(|(key, _)| resolve::package_condition_applies(key, conditions))
+                .filter(|(key, _)| {
+                    resolve::package_condition_applies(
+                        key,
+                        conditions,
+                        &self.env.options.typescript,
+                    )
+                })
                 .find_map(|(_, value)| {
                     self.export_or_import(
                         target, directory, name, value, conditions, mode, imports, prefer_ts,

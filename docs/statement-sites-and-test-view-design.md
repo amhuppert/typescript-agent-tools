@@ -1,9 +1,9 @@
 # Statement sites and the test view: technical design
 
-Status: proposed, 2026-10-25, from tsparse friction a Codex agent reported in
-remote-ai-manager ("Improve Docs Tab Features"). Reviewed the same day
-against commit `c4a9350`; every statement below about current behavior was
-checked against that code and its build. The user selected two
+Status: proposed, 2026-10-25, from tsparse friction reported while improving
+a documentation interface in the navigation example project. Reviewed the
+same day against commit `c4a9350`; every statement below about current
+behavior was checked against that code and its build. The user selected two
 capabilities: **statement sites** (an `--at` position on a statement's first
 token selects that statement for `--show` and statement insertion) and the
 **test view** (a test file's `describe`/`it` hierarchy with each test's name).
@@ -16,9 +16,9 @@ once implemented, lives in [navigation](navigation.md) and
 The same as navigation and editing: one local user, a one-process-per-request
 CLI with the optional per-user project service, TypeScript 7.0.2 syntax, and
 UTF-8 TypeScript and TSX files. The test view's callers are agents reading
-Vitest-style suites. In remote-ai-manager, the motivating repository, that
-means 1,677 test files, all importing from `vitest`. They use `it.each` 611
-times, `describe.each` 21 times, and hooks (`beforeAll(` and the others)
+Vitest-style suites. In the navigation example project, that means 1,677
+test files, all importing from `vitest`. They use `it.each` 611 times,
+`describe.each` 21 times, and hooks (`beforeAll(` and the others)
 1,534 times. They await no test call: each of their 229 `await test.`
 occurrences calls a fixture object named `test`. They use no Playwright, no
 `suite`, no tagged-template `.each`, and no `.shuffle`. (Counted in its main
@@ -31,7 +31,7 @@ are syntactic, so the test view needs no project and no service.
 
 ## Problem
 
-Two reported failures, reproduced on remote-ai-manager's files:
+Two reported failures, reproduced on the navigation example project's files:
 
 - **No way to insert after a test.** The outline lists a test only as its
   callback, `134:75 function it("keeps the selected file…") callback`.
@@ -146,7 +146,8 @@ A consequence for imports and exports: `--at` on `import` in
 (specifier entries are anchored at their names) and selects the declaration
 as a statement site, the excerpt `--at` on `a` already prints. This answers
 the reported `--show --at 1:1 MarkdownDocumentList.stories.tsx`, and the
-imports design (the session's item 2) takes it as given.
+[definitions and import hints design](definition-and-import-hints-design.md)
+takes it as given.
 
 #### The statement site
 
@@ -394,10 +395,11 @@ the `.each` tables the view includes are the called form. `it.each(table);`
 alone is therefore not a test call, nor are `test.extend(…)`,
 `test.runtimeHost.advance(…)`, `test.describe(…)`,
 `await test.step(…)`, `suite(…)`, and `expect(…)`. The fixed modifier list
-guards against fixture objects named `test`: remote-ai-manager writes
-`test.runtimeHost.advance(…)` and `test.requests…` statements, which a chain
-rule without the list would report as tests. `await` is not recognized,
-because no test call in the envelope is awaited, and Playwright's
+guards against fixture objects named `test`: the navigation example project
+writes `test.runtimeHost.advance(…)` and `test.requests…` statements, which
+a chain rule without the list would report as tests. `await` is not
+recognized, because no test call in the envelope is awaited, and
+Playwright's
 `await test.step(…)` is out of scope. Statements count wherever they are,
 inside helper functions, conditionals, loops, and unbraced bodies alike, with
 one exception. A test call inside a computed property name (the `[…]` that
@@ -509,7 +511,7 @@ cannot be read, or a result that cannot be written.
   modifiers above, and the four hooks. It also names the version the
   modifier list was taken from, so that a later Vitest modifier is a known
   gap rather than a silent omission. That version is Vitest 3.2.4, the one
-  remote-ai-manager installs. In its `@vitest/runner` types:
+  the navigation example project installs. In its `@vitest/runner` types:
   - `ChainableTestAPI` has the keys `concurrent`, `sequential`, `only`,
     `skip`, `todo`, and `fails`, plus `each` and `for`.
   - `ChainableSuiteAPI` has the same keys with `shuffle` in place of `fails`,

@@ -5,11 +5,12 @@ import {execFileSync,spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {compilerHookOracle} from './type-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 
 // A dependency's lib reference distinguishes source provenance even though
 // the same default-library source bytes and order are selected in both APIs.
 for(const singleThreaded of [true]) test('native baseline and demand capture use the same source provenance (singleThreaded='+singleThreaded+')',async t=>{
-  const root=fs.realpathSync(fs.mkdtempSync(path.resolve('.cc/temp/corpus-provenance-')));
+  const root=fs.realpathSync(fs.mkdtempSync(scratchPath('corpus-provenance-')));
   t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
   const sources={
     'src/lib/specs/execution-service.ts':'import "dep";\ninterface SpecWorkflowCleanupPort {\n  observe(): void;\n}\n',
@@ -55,7 +56,7 @@ for(const singleThreaded of [true]) test('native baseline and demand capture use
     answer=await compilerHookOracle(path.join(root,'tsconfig.json'),{operation:'type',at:selected.at,question:selected.question});
   } finally {
     fs.readFileSync=readFile;fs.writeFileSync=writeFile;
-    fs.writeFileSync('.cc/temp/stage66-native-program-provenance-transport-'+singleThreaded+'.json',
+    fs.writeFileSync(scratchPath('stage66-native-program-provenance-transport-'+singleThreaded+'.json'),
       JSON.stringify({api:capturedInput?.programFiles,native:capturedOutput?.programFiles},null,2)+'\n');
   }
   const files=new Map(manifest.files.map(row=>[row.file,row]));
@@ -63,7 +64,7 @@ for(const singleThreaded of [true]) test('native baseline and demand capture use
     const row=files.get(file);
     return {file:path.resolve(root,file),defaultLibrary:row.defaultLibrary,externalLibrary:row.externalLibrary};
   });
-  fs.writeFileSync('.cc/temp/stage66-corpus-provenance-small.json',JSON.stringify({expected,actual:answer.programFiles},null,2)+'\n');
+  fs.writeFileSync(scratchPath('stage66-corpus-provenance-small.json'),JSON.stringify({expected,actual:answer.programFiles},null,2)+'\n');
   assert.equal(answer.summary,'() => void');
   assert.equal(answer.errorType,false);
   assert.deepEqual(answer.programFiles,expected,

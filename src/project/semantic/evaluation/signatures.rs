@@ -10,8 +10,8 @@ use super::super::model::{
 };
 use super::super::model::{KeyBuilder, same_types};
 use super::super::source::{
-    SignatureParameterRecipe, SignatureQuestion, SignatureRecipe, SignatureReturnRecipe,
-    SignatureRoot,
+    ExpressionRoot, SignatureParameterRecipe, SignatureQuestion, SignatureRecipe,
+    SignatureReturnRecipe, SignatureRoot, UntypedJavaScript,
 };
 use super::{DemandRecipe, Evaluator, TypeDemandState, TypeState, resolution};
 use crate::analysis::SemanticFailureReason;
@@ -595,16 +595,21 @@ impl Evaluator<'_, '_> {
     /// operation on every invocation. Its acquired default evidence is not part
     /// of the cached fresh-factory result. Existing callers with no inferred
     /// type-parameter list use the empty-list entry to the same whole owner.
+    /// `javascript` is the caller's `isJavaScript`: the provenance of the
+    /// signature's declaration (`signature_in_javascript_file`), of a
+    /// contextual signature's, or of a class's base location.
     pub(super) fn get_signature_instantiation_completion(
         &mut self,
         signature: &Signature,
         arguments: Vec<TypeId>,
+        javascript: bool,
         consumer: &Location,
     ) -> NativeResult<Signature> {
         self.get_signature_instantiation_with_inferred_completion(
             signature,
             arguments,
             &[],
+            javascript,
             consumer,
         )
     }
@@ -614,11 +619,13 @@ impl Evaluator<'_, '_> {
         signature: &Signature,
         arguments: Vec<TypeId>,
         inferred_parameters: &[TypeId],
+        javascript: bool,
         consumer: &Location,
     ) -> NativeResult<Signature> {
         self.fill_missing_type_arguments_completion(
             arguments,
             signature.type_parameter_types(),
+            javascript,
             consumer,
         )?
         .and_then(|arguments| {
@@ -718,26 +725,29 @@ impl Evaluator<'_, '_> {
             return Ok(canonical.clone());
         }
         let mut sequence = NativeSequence::new();
-        let result = (|| {
-            let mut arguments = Vec::new();
-            for &parameter in signature.type_parameter_types().iter() {
-                let argument = if let Some(target) = self.model.parameter_target(parameter) {
-                    if sequence
-                        .read(self.parameter_constraint_completion(target, consumer))?
-                        .is_none()
-                    {
-                        target
+        let result =
+            (|| {
+                let mut arguments = Vec::new();
+                for &parameter in signature.type_parameter_types().iter() {
+                    let argument = if let Some(target) = self.model.parameter_target(parameter) {
+                        if sequence
+                            .read(self.parameter_constraint_completion(target, consumer))?
+                            .is_none()
+                        {
+                            target
+                        } else {
+                            parameter
+                        }
                     } else {
                         parameter
-                    }
-                } else {
-                    parameter
-                };
-                arguments.push(argument);
-            }
-            sequence
-                .read(self.get_signature_instantiation_completion(signature, arguments, consumer))
-        })();
+                    };
+                    arguments.push(argument);
+                }
+                let javascript = self.signature_in_javascript_file(signature)?;
+                sequence.read(self.get_signature_instantiation_completion(
+                    signature, arguments, javascript, consumer,
+                ))
+            })();
         let canonical = sequence.finish(result)?;
         self.signatures
             .canonical
@@ -756,9 +766,12 @@ impl Evaluator<'_, '_> {
         self.minimum_argument_count_ex_completion(signature, false, consumer)
     }
 
-    /// The syntactic-arity mode of `getMinArgumentCountEx` ignores both the
-    /// resolved minimum cache and Void optionality, and does not publish it.
-    /// StrongArityForUntypedJS has no additional branch in accepted TS input.
+    /// The syntactic-arity mode of `getMinArgumentCountEx`
+    /// (`StrongArityForUntypedJS` with `VoidIsNonOptional`) ignores both the
+    /// resolved minimum cache and Void optionality, and does not publish it;
+    /// otherwise an untyped JavaScript signature
+    /// (`IsUntypedSignatureInJSFile`) without a required tuple rest needs no
+    /// argument.
     pub(super) fn minimum_argument_count_ex_completion(
         &mut self,
         signature: &Signature,
@@ -772,7 +785,7 @@ impl Evaluator<'_, '_> {
         }
         let mut sequence = NativeSequence::new();
         let result = (|| {
-            let mut minimum = signature.minimum_arguments;
+            let mut minimum = None;
             if signature.flags.has_rest() {
                 let rest =
                     sequence.read(self.signature_rest_parameter_type_completion(signature))?;
@@ -783,10 +796,15 @@ impl Evaluator<'_, '_> {
                         .position(|element| !element.flags.intersects(TupleElementFlags::REQUIRED))
                         .unwrap_or(tuple.fixed_length);
                     if required > 0 {
-                        minimum = signature.parameters.len() - 1 + required;
+                        minimum = Some(signature.parameters.len() - 1 + required);
                     }
                 }
             }
+            if minimum.is_none() && !void_is_non_optional && signature.flags.is_untyped_javascript()
+            {
+                return Ok(0);
+            }
+            let mut minimum = minimum.unwrap_or(signature.minimum_arguments);
             if void_is_non_optional {
                 return Ok(minimum);
             }
@@ -1220,6 +1238,18 @@ impl Evaluator<'_, '_> {
         sequence.finish(result)
     }
 
+    /// `IsInJSFile(signature.declaration)`: whether the declaration a
+    /// signature, or the one it instantiates, was made of is in a JavaScript
+    /// file. A synthetic signature has none.
+    pub(super) fn signature_in_javascript_file(
+        &self,
+        signature: &Signature,
+    ) -> Result<bool, DemandError> {
+        Ok(self
+            .signature_declaration_root(signature.id)?
+            .is_some_and(|root| self.inputs.in_javascript_file(root.file)))
+    }
+
     pub(super) fn signature_declaration_root(
         &self,
         mut signature: SignatureId,
@@ -1360,6 +1390,12 @@ impl Evaluator<'_, '_> {
                     recipe: recipe.return_type.clone(),
                 },
             );
+            let untyped = sequence.read(self.untyped_javascript_signature_completion(recipe))?;
+            let flags = if untyped {
+                recipe.flags.with_untyped_javascript()
+            } else {
+                recipe.flags
+            };
             let signature = self.model.signature(SignatureData {
                 type_parameter_types: type_parameter_types.into(),
                 type_parameters,
@@ -1369,7 +1405,7 @@ impl Evaluator<'_, '_> {
                 predicate,
                 origins: vec![recipe.origin.clone()].into(),
                 minimum_arguments,
-                flags: recipe.flags,
+                flags,
             })?;
             self.attach_signature_declaration(signature.id, Some(recipe.root))?;
             let return_location = match &recipe.return_type {
@@ -1383,6 +1419,28 @@ impl Evaluator<'_, '_> {
             Ok(signature)
         })();
         sequence.finish(result)
+    }
+
+    /// `getSignatureFromDeclaration`'s `IsUntypedSignatureInJSFile`: the
+    /// recipe's syntax (`UntypedJavaScript`), and no contextual type for an
+    /// expression's function (`getContextualType` with `ContextFlagsSignature`).
+    fn untyped_javascript_signature_completion(
+        &mut self,
+        recipe: &SignatureRecipe,
+    ) -> NativeResult<bool> {
+        match recipe.untyped_javascript {
+            UntypedJavaScript::No => Ok(NativeCompletion::clean(false)),
+            UntypedJavaScript::Declaration => Ok(NativeCompletion::clean(true)),
+            UntypedJavaScript::Expression => {
+                let root = ExpressionRoot {
+                    file: recipe.root.file,
+                    site: recipe.root.site(),
+                };
+                Ok(self
+                    .contextual_type_completion(root, super::contextual::ContextFlags::SIGNATURE)?
+                    .map(|contextual| contextual.is_none()))
+            }
+        }
     }
 
     /// An actual SignatureId owns its native resolvedReturnType property.

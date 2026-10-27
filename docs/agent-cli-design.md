@@ -368,8 +368,11 @@ transport.directory: /tmp/tsparse-501 must be a private directory owned by this 
 ```
 
 When the directory is not owned by the user, `next` names
-`TSPARSE_SERVICE_DIR` instead. Every `transport.*` message ends with
-`run: tsparse --doctor --project CONFIG`.
+`TSPARSE_SERVICE_DIR` instead. When it cannot be created or inspected, the
+remedy names `TMPDIR` and `TSPARSE_SERVICE_DIR` by the rule that chose the
+directory (`service::runtime`: `TSPARSE_SERVICE_DIR`, `TMPDIR/tsparse-UID`, or
+`/tmp/tsparse-UID`, with why `TMPDIR` was not used). Every `transport.*`
+message ends with `run: tsparse --doctor --project CONFIG`.
 
 Verification: one test per failure stage (unknown option, scope error,
 malformed `--at`, batch with several issues, missing input, non-private
@@ -490,6 +493,7 @@ order:
 | Environment | each `TSPARSE_*` variable: value or default, and any parse failure, via the shared environment owner | the same |
 | Runtime directory | path, exists, mode 0700, owned by this user, and the socket-path budget: directory length plus 22 against the platform limit | the same |
 | Configuration | | the spelling as given, its absolute form, readable, and a note that another spelling of the same file would own a separate service |
+| Compatibility | | the TypeScript package installed nearest the configuration (manifest and version, or none), the dialect it selects, the semantic authority (TypeScript 7.0.2), and the standard library's source, from the selection loading makes; a manifest loading would refuse is a finding |
 | Service | | running or not; when running: pid, build (must equal the client's), generation, started time, idle timeout and remaining seconds, and the limits it inherited beside the client's current values, with a finding when they differ |
 
 The limits finding states the mechanism and the remedy:
@@ -599,6 +603,7 @@ Verdicts are one line, say what was checked, and never imply type checking.
 | Display caps and the `display` key | each renderer in `cli`, through one `Cap` helper in `cli::delivery` |
 | The text form of a reference answer | `cli::references` |
 | Service identity, status fields, startup error file, transport failures | `service::Endpoint` and `service::handle` |
+| Compiler selection and the dialect it chooses | `project::program::compatibility`, which the doctor reaches through `project::compatibility` |
 | The doctor report | `cli::doctor`, composed from the owners above; it decides nothing itself |
 | The generated CLI reference and its drift check | `tests/cli_registry.rs` |
 

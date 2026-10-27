@@ -1828,6 +1828,9 @@ impl Evaluator<'_, '_> {
                     let ty = sequence.read(self.check_type_completion(&object))?;
                     sequence.read(self.reference_property_symbol_completion(ty, &name, consumer))
                 }
+                ReferenceSymbolRecipe::ImportTypeQualifier { import, name } => {
+                    sequence.read(self.import_type_symbol_completion(&import, name))
+                }
                 ReferenceSymbolRecipe::Absent => Ok(None),
                 ReferenceSymbolRecipe::Pending(message) => {
                     Err(self.access_pending(consumer, message))

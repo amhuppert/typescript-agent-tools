@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {compilerHookOracle} from './type-oracle.mjs';
 import {lineStarts,position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 
 const root=fileURLToPath(new URL('../fixtures/types/member-search-core/',import.meta.url));
 const source=fs.readFileSync(path.join(root,'cases.ts'),'utf8');
@@ -22,7 +23,7 @@ test('native directed member search and decoded candidate normalization',async()
   const answer=await compilerHookOracle(path.join(root,config),{operation:'member',at:{file:'cases.ts',...position(lineStarts(source),source.indexOf(tag)+tag.length)}});
   rows.push({config,marker,answer});
  }
- fs.writeFileSync('.cc/temp/member-search-core-native.json',JSON.stringify(rows,null,2));
+ fs.writeFileSync(scratchPath('member-search-core-native.json'),JSON.stringify(rows,null,2));
  assert.equal(rows.length,51);
  const generic=[group([origin('declaration',5)],['declaration','first','second'].map(x=>at(x,5)))];
  const other=[group([origin('other',5)],['other','otherUse'].map(x=>at(x,5)))];

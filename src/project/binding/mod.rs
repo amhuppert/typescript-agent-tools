@@ -10,6 +10,7 @@ mod ids;
 mod index;
 pub(super) mod inputs;
 mod instances;
+pub(super) mod javascript;
 mod json;
 mod link;
 pub(super) use link::{LinkState, NativeLinkOutput, ProjectionObserver};
@@ -161,6 +162,21 @@ pub(super) struct FileFacts {
     /// Where `@ts-ignore` and `@ts-expect-error` comment directives begin
     /// (`crate::pragmas::comment_directives`).
     directives: Vec<u32>,
+    /// The diagnostics TypeScript's checker may report from the file's
+    /// syntax alone (`source_diagnostics::candidates`), whatever the dialect:
+    /// loading classifies them with the generation's dialect, and each error
+    /// fails the load where it is reported.
+    source_candidates: Vec<crate::source_diagnostics::SourceCandidate>,
+    /// The first error each dialect's rule gives a JavaScript file's
+    /// TypeScript-only syntax (`crate::javascript_syntax`), a syntactic
+    /// diagnostic that no checking policy removes.
+    javascript_syntax: crate::javascript_syntax::Candidates,
+    /// A JavaScript file's first parameter decorator
+    /// (`crate::javascript_syntax::parameter_decorators`).
+    parameter_decorators: Vec<crate::javascript_syntax::ParameterDecorator>,
+    /// A JavaScript file's constructs this tool refuses, in source order
+    /// (`javascript::refusals`).
+    javascript_refusals: Vec<javascript::JsUnsupported>,
     facts: Arc<collect::Facts>,
     /// A JSON source file's module, which declares no names.
     json: Option<Arc<JsonFacts>>,
@@ -194,8 +210,14 @@ pub(super) enum ModuleResolution {
     /// importer (`project::resolve::admission`), such as an arbitrary-extension
     /// declaration without `allowArbitraryExtensions`: as for `Missing`, an
     /// ambient module may still satisfy it, and otherwise the error is this
-    /// message.
-    NotAdmitted(String),
+    /// message, with its code.
+    NotAdmitted(crate::checking::Code, String),
+    /// Resolution found JavaScript, at this display path, that is no
+    /// program input: TypeScript's untyped module, whose imported names have
+    /// the error type. As for `Missing`, an ambient module may still satisfy
+    /// it; otherwise an import is TS7016 under `noImplicitAny`
+    /// (`errorOnImplicitAnyModule`) and an augmentation TS2665.
+    Untyped(String),
 }
 
 pub(super) use ids::SymbolId;
@@ -223,8 +245,8 @@ pub(super) mod meaning {
     pub(crate) const ALL: u8 = VALUE | TYPE | NAMESPACE;
 }
 
-/// Capture one file's semantic facts from `ast`, parsed from `source`.
-/// Errors carry a position but no path.
+/// Capture one file's semantic facts from `ast`, parsed from `source`, the
+/// text of `file_name`, with `parser`. Errors carry a position but no path.
 /// `indicators` are the file's own (`ModuleIndicators::of`); `module`, their
 /// effective module decision, is collection's only configuration input.
 pub(super) fn collect(
@@ -232,14 +254,52 @@ pub(super) fn collect(
     source: &SourceText,
     indicators: ModuleIndicators,
     module: bool,
+    parser: &crate::analysis::Parser,
+    file_name: &str,
 ) -> Result<FileFacts, InputError> {
-    let (facts, requests) = collect::Collector::new(ast, source, module).run()?;
+    let commonjs = javascript::commonjs::module_exports(ast, indicators);
+    let (facts, requests) = collect::Collector::new(ast, source, module, commonjs).run()?;
+    let javascript_refusals = if crate::javascript_syntax::is_javascript(ast) {
+        javascript::refusals(
+            ast,
+            &facts.shared.scopes,
+            &facts.shared.decls,
+            &facts.shared.aliases,
+            javascript::commonjs::Exports {
+                module_syntax: indicators.external,
+                admitted: commonjs,
+            },
+            |kind, attachment| {
+                // Comment grammar errors are discarded; an exhausted depth
+                // budget fails, as it does for the file's own syntax.
+                parser
+                    .jsdoc_tags(source.as_str(), file_name, kind, attachment, None)
+                    .map_err(|failure| match failure {
+                        crate::parser::Failure::Syntax(error) => {
+                            InputError::unparsable(error, source, std::path::Path::new(file_name))
+                        }
+                        crate::parser::Failure::Interrupted(_) => InputError {
+                            kind: crate::analysis::InputErrorKind::ResourceLimit,
+                            message: "parsing a JSDoc comment was interrupted".into(),
+                            path: None,
+                            position: None,
+                        },
+                    })
+            },
+        )?
+    } else {
+        Vec::new()
+    };
     Ok(FileFacts {
         module,
         declaration: syntax::flag(ast.root(), "isDeclarationFile"),
         jsx: indicators.first_jsx,
         requests,
         directives: comment_directives(ast.source(), ast.literal_token_spans()),
+        source_candidates: crate::source_diagnostics::candidates(ast),
+        javascript_syntax: crate::javascript_syntax::Candidates::of(ast),
+        parameter_decorators: crate::javascript_syntax::parameter_decorators(ast),
+        javascript_refusals,
         facts: Arc::new(facts),
         json: None,
     })
@@ -273,8 +333,11 @@ pub(super) fn bind(
 /// options thereby shows whether others would collect it differently.
 #[derive(Debug, Clone, Copy)]
 pub(super) struct ModuleIndicators {
-    external: bool,
-    first_jsx: Option<usize>,
+    pub(in crate::project::binding) external: bool,
+    pub(in crate::project::binding) first_jsx: Option<usize>,
+    /// A JavaScript file's CommonJS module indicator candidate
+    /// (`javascript::commonjs::has_indicator`).
+    pub(in crate::project::binding) commonjs: bool,
 }
 
 impl ModuleIndicators {
@@ -287,12 +350,18 @@ impl ModuleIndicators {
                 root.flags,
             ),
             first_jsx: first_jsx(ast),
+            commonjs: javascript::commonjs::has_indicator(ast),
         }
     }
 
-    /// Whether `collect` with `options` treats the file as a module.
+    /// Whether `collect` with `options` treats the file as a module: one
+    /// its options or syntax make one, or else its CommonJS indicator
+    /// (`setCommonJSModuleIndicator`).
     pub(super) fn module(self, options: FileOptions) -> bool {
-        options.force_module || self.external || options.jsx_module && self.first_jsx.is_some()
+        options.force_module
+            || self.external
+            || options.jsx_module && self.first_jsx.is_some()
+            || self.commonjs
     }
 }
 
@@ -322,6 +391,32 @@ impl FileFacts {
     /// Where the file's comment directives begin.
     pub(super) fn comment_directives(&self) -> &[u32] {
         &self.directives
+    }
+
+    /// The diagnostics TypeScript's checker may report from the file's
+    /// syntax alone, in source order, before a dialect classifies them.
+    pub(super) fn source_candidates(&self) -> &[crate::source_diagnostics::SourceCandidate] {
+        &self.source_candidates
+    }
+
+    /// The first error of a JavaScript file's TypeScript-only syntax.
+    pub(super) fn javascript_syntax(&self) -> &crate::javascript_syntax::Candidates {
+        &self.javascript_syntax
+    }
+
+    /// A JavaScript file's first parameter decorator.
+    pub(super) fn parameter_decorators(&self) -> &[crate::javascript_syntax::ParameterDecorator] {
+        &self.parameter_decorators
+    }
+
+    /// A JavaScript file's first construct the dialect's `rules` refuse.
+    pub(super) fn javascript_refusal(
+        &self,
+        rules: javascript::Rules,
+    ) -> Option<&javascript::JsUnsupported> {
+        self.javascript_refusals
+            .iter()
+            .find(|refusal| rules.refuses(refusal))
     }
 }
 

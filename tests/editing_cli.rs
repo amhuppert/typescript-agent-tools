@@ -1613,6 +1613,120 @@ fn a_reserved_name_that_cannot_be_looked_up_is_named() {
     assert!(!fixture.path("result.json").exists());
 }
 
+/// Editing is for TypeScript files: every entry point refuses a JavaScript
+/// target, which a project with `allowJs` loads and queries read, as
+/// unsupported input naming the file, whatever its extension, `--apply` of
+/// a plan altered to name one included.
+#[test]
+fn every_editing_entry_point_refuses_a_javascript_target() {
+    const POLICY: &str =
+        "JavaScript files cannot be edited; editing needs a .ts, .tsx, .mts, or .cts file";
+    for extension in ["js", "jsx", "mjs", "cjs"] {
+        let file = format!("src/lib.{extension}");
+        let config = r#"{ "compilerOptions": { "allowJs": true, "noEmit": true, "noLib": true, "types": [], "module": "esnext", "moduleResolution": "bundler", "jsx": "preserve" }, "include": ["src"] }"#;
+        let fixture = Fixture::new(&[
+            ("tsconfig.json", config),
+            (&file, "export function start() {\n  return 1;\n}\n"),
+            ("src/host.ts", "export function other() {\n  return 1;\n}\n"),
+            ("body.ts", "{\n  return 2;\n}\n"),
+            ("statement.ts", "export const added = 3;\n"),
+        ]);
+        let batch = format!(
+            r#"{{ "edits": [ {{ "operation": "replace_body", "name": "start", "file": "{file}", "from": "body.ts" }} ] }}"#
+        );
+        std::fs::write(fixture.path("edits.json"), batch).unwrap();
+        let at = format!("{file}:1:17");
+        let requests: [Vec<&str>; 4] = [
+            vec![
+                "--replace-body",
+                "--name",
+                "start",
+                &file,
+                "--from",
+                "body.ts",
+            ],
+            vec!["--insert-after", "--at", &at, "--from", "statement.ts"],
+            vec!["--edit-batch", "edits.json"],
+            vec![
+                "--replace-body",
+                "--project",
+                "tsconfig.json",
+                "--direct",
+                "--name",
+                "start",
+                "--from",
+                "body.ts",
+            ],
+        ];
+        for request in &requests {
+            let output = tsparse(&fixture, request);
+            assert_eq!(output.status.code(), Some(1), "{request:?}: {output:?}");
+            assert!(output.stdout.is_empty(), "{request:?}: {output:?}");
+            let stderr = text(&output.stderr);
+            assert!(
+                stderr.ends_with(&format!("lib.{extension}: {POLICY}\n")),
+                "{request:?}: {stderr}"
+            );
+            let mut with_json = request.clone();
+            with_json.push("--json");
+            let document = json(&tsparse(&fixture, &with_json), 1);
+            assert_eq!(document["error"]["kind"], "Unsupported", "{document}");
+            assert_eq!(document["error"]["message"], POLICY, "{document}");
+            assert_eq!(document["effect"], "none", "{document}");
+            assert!(
+                document["error"]["path"]
+                    .as_str()
+                    .is_some_and(|path| path.ends_with(&format!("lib.{extension}"))),
+                "{document}"
+            );
+        }
+        // A plan altered to name the JavaScript file.
+        let output = tsparse(
+            &fixture,
+            &[
+                "--replace-body",
+                "--name",
+                "other",
+                "src/host.ts",
+                "--from",
+                "body.ts",
+                "--plan",
+                "p.json",
+            ],
+        );
+        assert_eq!(output.status.code(), Some(0), "{output:?}");
+        let mut plan: Value =
+            serde_json::from_str(&std::fs::read_to_string(fixture.path("p.json")).unwrap())
+                .unwrap();
+        let javascript = std::fs::canonicalize(fixture.path(&file)).unwrap();
+        plan["files"][0]["path"] = javascript.to_str().unwrap().into();
+        plan["files"][0]["referent"] = javascript.to_str().unwrap().into();
+        std::fs::write(fixture.path("p.json"), plan.to_string()).unwrap();
+        let output = tsparse(&fixture, &["--apply", "p.json"]);
+        assert_eq!(output.status.code(), Some(1), "{output:?}");
+        assert!(output.stdout.is_empty(), "{output:?}");
+        let stderr = text(&output.stderr);
+        assert!(
+            stderr.ends_with(&format!("lib.{extension}: {POLICY}\n")),
+            "{stderr}"
+        );
+        let document = json(&tsparse(&fixture, &["--apply", "p.json", "--json"]), 1);
+        assert_eq!(document["effect"], "unchanged", "{document}");
+        assert_eq!(document["error"]["kind"], "Unsupported", "{document}");
+        assert_eq!(document["error"]["message"], POLICY, "{document}");
+        assert!(
+            document["error"]["path"]
+                .as_str()
+                .is_some_and(|path| path.ends_with(&format!("lib.{extension}"))),
+            "{document}"
+        );
+        assert_eq!(
+            std::fs::read_to_string(fixture.path(&file)).unwrap(),
+            "export function start() {\n  return 1;\n}\n"
+        );
+    }
+}
+
 /// The statement-site design's sample, with its two fragments.
 fn edge_cases() -> Fixture {
     Fixture::new(&[

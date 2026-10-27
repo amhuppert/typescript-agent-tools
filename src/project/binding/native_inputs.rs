@@ -1220,9 +1220,11 @@ impl NativeInputs<'_> {
                         members,
                     });
                 }
+                // getTypeFromImportTypeNode owns an import-type qualifier's
+                // chain; it never asks resolveEntityName for these names.
                 RefBase::Module(_) => {
                     return Err(TypeBindingFailure::Pending(
-                        "native module entity lookup requires its import-type operation",
+                        "an import-type qualifier resolves through getTypeFromImportTypeNode, not resolveEntityName",
                     ));
                 }
             }
@@ -1236,9 +1238,26 @@ impl NativeInputs<'_> {
         let name = reference.name;
         TypeBindingFailure::Unresolved(match reference.base {
             RefBase::Lexical(_) => format!("cannot find `{name}`"),
-            RefBase::Member(_) => format!("namespace has no exported member `{name}`"),
-            RefBase::Module(_) => format!("cannot find `{name}`"),
+            // getTypeFromImportTypeNode reports a missing first qualifier
+            // name as a member of its module namespace, as it does later ones.
+            RefBase::Member(_) | RefBase::Module(_) => {
+                format!("namespace has no exported member `{name}`")
+            }
         })
+    }
+    /// The located miss of the retained reference at this exact name token,
+    /// such as an import-type qualifier part the checker cannot find.
+    pub(in crate::project) fn missing_reference_at(
+        &self,
+        file: FileId,
+        anchor: Span,
+    ) -> Result<TypeBindingFailure, TypeBindingFailure> {
+        let index = self
+            .files
+            .references(file)
+            .position(|reference| reference.span == anchor)
+            .ok_or(TypeBindingFailure::NotRetained)?;
+        Ok(self.missing_reference(file, index))
     }
     /// The module request attached to the exact selected alias declaration.
     /// A cloned/combined header's declarations may differ from node.Symbol's
@@ -1463,11 +1482,13 @@ impl<'p> NativeInputs<'p> {
             super::raw::RawModuleRequest::Script => Ok(None),
             super::raw::RawModuleRequest::Ignored => {
                 match &self.files.file(site.file).modules()[site.request.index()] {
-                    super::ModuleResolution::Missing => Ok(None),
+                    super::ModuleResolution::Missing | super::ModuleResolution::Untyped(_) => {
+                        Ok(None)
+                    }
                     super::ModuleResolution::Unchecked => Err(TypeBindingFailure::Pending(
                         "native module resolution request has not been established",
                     )),
-                    super::ModuleResolution::NotAdmitted(_)
+                    super::ModuleResolution::NotAdmitted(..)
                     | super::ModuleResolution::Unsupported(_) => Err(TypeBindingFailure::Pending(
                         "module resolution is outside the admitted input profile",
                     )),
@@ -1602,7 +1623,8 @@ impl<'p> NativeInputs<'p> {
                 match &self.files.file(file).modules()[request] {
                     super::ModuleResolution::Missing
                     | super::ModuleResolution::Unchecked
-                    | super::ModuleResolution::NotAdmitted(_) => Ok(None),
+                    | super::ModuleResolution::NotAdmitted(..)
+                    | super::ModuleResolution::Untyped(_) => Ok(None),
                     super::ModuleResolution::Unsupported(_) => Err(TypeBindingFailure::Pending(
                         "helper module resolves outside the admitted input profile",
                     )),

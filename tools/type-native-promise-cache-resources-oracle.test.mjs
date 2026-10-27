@@ -4,6 +4,7 @@ import path from 'node:path';
 import {test} from 'node:test';
 import {compilerHookOracle} from './type-oracle.mjs';
 import {lineStarts, position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 
 const root = path.resolve('fixtures/types/native-promise-cache-resources');
 test('native promised and awaited caches retain distinct fixed type identities', async () => {
@@ -20,7 +21,7 @@ test('native promised and awaited caches retain distinct fixed type identities',
       rows.push({config, file, width, summary: answer.summary, slots,
         diagnosticCodes: answer.beforeSummary.diagnosticCodes, compiler: answer.compiler,
         sourceCommit: answer.sourceCommit, inputHashes: answer.inputHashes});
-      fs.writeFileSync('.cc/temp/native-promise-cache-resources.json', JSON.stringify(rows, null, 2)+'\n');
+      fs.writeFileSync(scratchPath('native-promise-cache-resources.json'), JSON.stringify(rows, null, 2)+'\n');
       assert.equal(answer.compiler, '7.0.2');
       assert.equal(answer.checkerCount, 1);
       assert.equal(answer.summary, 'number');

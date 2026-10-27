@@ -93,6 +93,10 @@ pub(crate) struct Parser<'src> {
     end: usize,
     nodes: Vec<Node<'src>>,
     options: ParseOptions,
+    /// A JavaScript file (`ParseOptions::javascript_file`), where TypeScript's
+    /// parser reads no type arguments in an expression
+    /// (`tryParseTypeArgumentsInExpression`) or on a JSX tag.
+    javascript: bool,
     depth: usize,
     context: GrammarContext,
     source_flags: u32,
@@ -160,12 +164,14 @@ impl<'src> Parser<'src> {
         } else {
             lexer.next_controlled(control.as_ref())?
         };
-        let context =
-            GrammarContext::new(options.declaration_file()).with(if jsdoc_start.is_some() {
+        let javascript = options.javascript_file();
+        let context = GrammarContext::new(options.declaration_file(), javascript).with(
+            if jsdoc_start.is_some() {
                 node_flags::JSDOC
             } else {
                 0
-            });
+            },
+        );
         let track_await =
             jsdoc_start.is_none() && !options.declaration_file() && source.contains("await");
         // Sources of Command Center's program have about one node per 9
@@ -185,6 +191,7 @@ impl<'src> Parser<'src> {
             end: 0,
             nodes,
             options,
+            javascript,
             depth: 0,
             context,
             source_flags: 0,
@@ -281,10 +288,11 @@ impl<'src> Parser<'src> {
                 ),
                 (
                     "scriptKind",
-                    Value::Number(if self.options.jsx {
-                        script::TSX
-                    } else {
-                        script::TS
+                    Value::Number(match crate::script_kind(&self.options.file_name) {
+                        crate::ScriptKind::Js => script::JS,
+                        crate::ScriptKind::Jsx => script::JSX,
+                        _ if self.options.jsx => script::TSX,
+                        _ => script::TS,
                     }),
                 ),
                 ("isDeclarationFile", self.options.declaration_file().into()),
@@ -647,6 +655,7 @@ impl<'src> Parser<'src> {
             kind: kind.name(),
             syntax_kind: kind,
             possible_top_level_await: summary,
+            reparsed: false,
             native_jsdoc: None,
             native_literal_text: None,
             span: Span { start, end },
@@ -869,7 +878,7 @@ impl<'src> Parser<'src> {
         }
     }
     fn identifier(&mut self) -> Result<NodeId> {
-        if !matches!(self.current.kind, Kind::Word | Kind::Private) {
+        if !self.at_identifier_or_keyword() {
             if self.context.contains(node_flags::JSDOC) {
                 self.check_budget()?;
                 self.type_recovery_diagnostic("Expected identifier");
@@ -882,6 +891,49 @@ impl<'src> Parser<'src> {
             }
             return Err(self.error("Expected identifier"));
         }
+        let kind = if self.current.kind == Kind::Private {
+            PrivateIdentifier
+        } else {
+            Identifier
+        };
+        self.identifier_node(kind)
+    }
+    /// TypeScript's `parseIdentifierName`: an identifier, a keyword, reserved
+    /// or escaped, or a private name, since `tokenIsIdentifierOrKeyword`
+    /// admits every token kind from `Identifier` on; whatever the token, the
+    /// node is an `Identifier`.
+    fn identifier_name(&mut self) -> Result<NodeId> {
+        if !self.at_identifier_or_keyword() {
+            return Err(self.error("Expected identifier"));
+        }
+        self.identifier_node(Identifier)
+    }
+    /// TypeScript's `tokenIsIdentifierOrKeyword` for the current token: every
+    /// kind from `Identifier` on, which here is a word or a private name.
+    fn at_identifier_or_keyword(&self) -> bool {
+        matches!(self.current.kind, Kind::Word | Kind::Private)
+    }
+    /// Native parser `isIdentifier`, distinct from IdentifierName, which
+    /// also admits reserved keywords: not a reserved word, nor `yield` or
+    /// `await` where the context makes it a keyword. Keyword escapes are
+    /// decoded first, as JSDoc's scanner does.
+    fn is_identifier(&self) -> Result<bool> {
+        if self.current.kind != Kind::Word {
+            return Ok(false);
+        }
+        let name = decode_identifier(
+            self.current.raw,
+            Span {
+                start: self.current.start,
+                end: self.current.end,
+            },
+        )?;
+        Ok(!(reserved_word(&name)
+            || name == "yield" && self.context.contains(YIELD)
+            || name == "await" && self.context.contains(AWAIT)))
+    }
+    /// The current word or private-name token as a node of `kind`.
+    fn identifier_node(&mut self, kind: SyntaxKind) -> Result<NodeId> {
         let token = self.bump()?;
         let text = decode_identifier(
             token.raw,
@@ -901,23 +953,23 @@ impl<'src> Parser<'src> {
             text
         };
         let id = self.make(
-            if token.kind == Kind::Private {
-                PrivateIdentifier
-            } else {
-                Identifier
-            },
+            kind,
             token.full_start,
             token.end,
             fields![("escapedText", Value::Text(escaped))],
         )?;
-        if token.kind == Kind::Word && token.raw.contains("\\u{") {
+        // The syntax API's flag, which TypeScript 7 has no node flag for: its
+        // parser's `createIdentifier` records an extended escape on every
+        // identifier, one made of a private-name token too, while the
+        // factory's `createPrivateIdentifier` never does.
+        if kind == Identifier && token.raw.contains("\\u{") {
             self.nodes[id.0].flags |= node_flags::IDENTIFIER_HAS_EXTENDED_UNICODE_ESCAPE;
         }
         Ok(id)
     }
     fn binding_identifier(&mut self) -> Result<NodeId> {
         if self.context.contains(node_flags::JSDOC) {
-            return if self.jsdoc_is_identifier()? || self.current.kind == Kind::Private {
+            return if self.is_identifier()? || self.current.kind == Kind::Private {
                 self.identifier()
             } else {
                 self.missing_jsdoc_identifier("Expected a binding identifier")

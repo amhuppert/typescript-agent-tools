@@ -11,6 +11,7 @@ use super::super::source::{
     AliasRecipe, DeferredReferenceRecipe, OuterParameterRecipe, ParameterConstraintRecipe,
     ThisTypeContext, TypeExpression, TypeParameterRecipe,
 };
+use super::relations::RelationKind;
 use super::structure::MembersState;
 use super::{DemandRecipe, Evaluator, TypeDemandState, TypeState, resolution};
 use crate::Span;
@@ -486,6 +487,12 @@ impl Evaluator<'_, '_> {
             let mut result = Vec::new();
             for signature in signatures {
                 let parameters = signature.type_parameter_types();
+                if !parameters.is_empty() {
+                    self.refuse_javascript_generic_base(
+                        base.expression.root,
+                        &base.reference.location,
+                    )?;
+                }
                 let minimum = self.minimum_type_argument_count(parameters)?;
                 if arguments.len() >= minimum && arguments.len() <= parameters.len() {
                     let arguments = if parameters.is_empty() {
@@ -494,6 +501,7 @@ impl Evaluator<'_, '_> {
                         Some(sequence.read(self.fill_missing_type_arguments_completion(
                             arguments.clone(),
                             parameters,
+                            false,
                             consumer,
                         ))?)
                     };
@@ -509,6 +517,28 @@ impl Evaluator<'_, '_> {
             Ok(result)
         })();
         sequence.finish(result)
+    }
+
+    /// A JavaScript class's `extends` of a generic class, whose missing type
+    /// arguments TypeScript fills with `any` there (`IsInJSFile` in
+    /// `getTypeFromClassOrInterfaceReference`,
+    /// `getInstantiatedConstructorsForTypeArguments`, and
+    /// `getDefaultConstructSignatures`): a located refusal, as this tool
+    /// does not infer JavaScript classes.
+    fn refuse_javascript_generic_base(
+        &mut self,
+        heritage: Option<super::super::source::ExpressionRoot>,
+        reference: &Location,
+    ) -> Result<(), DemandError> {
+        if !heritage.is_some_and(|root| self.inputs.in_javascript_file(root.file)) {
+            return Ok(());
+        }
+        Err(super::super::unsupported_demand_at_location(
+            self.inputs,
+            reference,
+            SemanticFailureReason::JavascriptSemanticsRequired,
+            "a JavaScript class extending a generic class fills its type arguments with any",
+        ))
     }
 
     /// `resolveBaseTypesOfClass` selects the direct class-reference path only
@@ -574,11 +604,39 @@ impl Evaluator<'_, '_> {
             } else {
                 false
             };
+            // Only a JavaScript class's base asks whether it is generic, so a
+            // TypeScript class does no work of this check.
+            let javascript = base
+                .expression
+                .root
+                .is_some_and(|root| self.inputs.in_javascript_file(root.file));
+            if javascript {
+                let generic = if direct {
+                    !self
+                        .model
+                        .declared_target(original.expect("direct class has its declared type"))?
+                        .local_parameters
+                        .is_empty()
+                } else {
+                    !self.model.has_type_flags(constructor, TypeFlags::ANY)
+                        && sequence
+                            .read(self.construct_signatures_completion(constructor, consumer))?
+                            .iter()
+                            .any(|signature| !signature.type_parameter_types().is_empty())
+                };
+                if generic {
+                    self.refuse_javascript_generic_base(
+                        base.expression.root,
+                        &base.reference.location,
+                    )?;
+                }
+            }
             let base_type = if direct {
                 sequence.read(self.class_reference_type_completion(
                     original.expect("direct class has its declared type"),
                     &base.type_arguments,
                     None,
+                    javascript,
                     &base.reference.location,
                 ))?
             } else if self.model.has_type_flags(constructor, TypeFlags::ANY) {
@@ -588,6 +646,7 @@ impl Evaluator<'_, '_> {
                     self.instantiated_constructors_for_type_arguments_completion(
                         constructor,
                         &base.type_arguments,
+                        self.inputs.in_javascript_file(base.reference.file),
                         &base.reference.location,
                     ),
                 )?;
@@ -667,10 +726,13 @@ impl Evaluator<'_, '_> {
     /// construct inventory, then acquire every written argument even if no
     /// constructor matched. Each surviving generic signature is instantiated
     /// through the shared cached signature factory.
+    /// `javascript` is whether the base location is in a JavaScript file
+    /// (`IsInJSFile(location)`).
     pub(super) fn instantiated_constructors_for_type_arguments_completion(
         &mut self,
         ty: TypeId,
         nodes: &[TypeExpression],
+        javascript: bool,
         consumer: &Location,
     ) -> NativeResult<Vec<Signature>> {
         let mut sequence = NativeSequence::new();
@@ -692,6 +754,7 @@ impl Evaluator<'_, '_> {
                     sequence.read(self.get_signature_instantiation_completion(
                         &signature,
                         arguments.clone(),
+                        javascript,
                         consumer,
                     ))?
                 });
@@ -1133,12 +1196,7 @@ impl Evaluator<'_, '_> {
                         if self.is_unknown_reference_symbol(symbol) {
                             return NativeCompletion::recovered(
                                 symbol,
-                                self.generic_binding_failure(
-                                    crate::project::binding::TypeBindingFailure::ErrorType(
-                                        "native type alias target is unknown",
-                                    ),
-                                    &expression.location,
-                                ),
+                                self.unknown_type_target_failure(&expression.location),
                             );
                         }
                         return Ok(NativeCompletion::clean(symbol));
@@ -1159,6 +1217,18 @@ impl Evaluator<'_, '_> {
             });
         self.generics.reference_symbols.insert(key, result.clone());
         result
+    }
+
+    /// A type-meaning name whose alias resolved to `unknownSymbol`:
+    /// `getTypeReferenceType` consumes it as errorType, while the checker
+    /// reports the alias where it fails to resolve.
+    pub(super) fn unknown_type_target_failure(&self, consumer: &Location) -> DemandError {
+        self.generic_binding_failure(
+            crate::project::binding::TypeBindingFailure::ErrorType(
+                "native type alias target is unknown",
+            ),
+            consumer,
+        )
     }
 
     /// `getResolvedSymbolOrNil` observes only the installed native slot. It
@@ -1186,59 +1256,77 @@ impl Evaluator<'_, '_> {
         let consumer = &expression.location;
         self.symbol_from_type_reference(expression, site, anchor)?
             .and_then(|symbol| {
-                if self.is_unknown_reference_symbol(symbol) {
-                    if anchor.is_none() {
-                        // getTypeReferenceType consumes unknownSymbol as errorType.
-                        // Keep this evidence in the type cache, not the independent
-                        // getSymbolFromTypeReference cache used by symbol probes.
-                        return NativeCompletion::recovered(
-                            self.model.native_error_type(),
-                            super::super::invalid_at_location(
-                                self.inputs,
-                                consumer,
-                                SemanticFailureReason::ErrorType,
-                                "nonentity type reference consumes native errorType recovery",
-                            )
-                            .into(),
-                        );
-                    }
-                    return Ok(NativeCompletion::clean(self.model.native_error_type()));
+                if anchor.is_none() && self.is_unknown_reference_symbol(symbol) {
+                    // getTypeReferenceType consumes unknownSymbol as errorType.
+                    // Keep this evidence in the type cache, not the independent
+                    // getSymbolFromTypeReference cache used by symbol probes.
+                    return NativeCompletion::recovered(
+                        self.model.native_error_type(),
+                        super::super::invalid_at_location(
+                            self.inputs,
+                            consumer,
+                            SemanticFailureReason::ErrorType,
+                            "nonentity type reference consumes native errorType recovery",
+                        )
+                        .into(),
+                    );
                 }
-                if let Some(property) = symbol.property()
-                    && self.unresolved_alias_declared_type(property).is_some()
-                {
-                    return self
-                        .type_arguments_from_nodes_completion(arguments)?
-                        .and_then_value(|arguments| {
-                            let alias =
-                                self.unresolved_type_alias(property, arguments, consumer)?;
-                            Ok(self.model.unresolved_alias_type(alias))
-                        });
+                self.type_reference_type_completion(
+                    expression,
+                    symbol,
+                    anchor.filter(|_| site.kind == SyntaxKind::TypeReference),
+                    arguments,
+                    alias,
+                    deferred,
+                )
+            })
+    }
+
+    /// `getTypeReferenceType` for an already resolved symbol, shared by type
+    /// references and `resolveImportSymbolType`. `imported_alias` is the
+    /// TypeReference name `getTypeFromTypeAliasReference` asks again for an
+    /// alias import (`IsTypeReferenceType`); other nodes have none.
+    pub(super) fn type_reference_type_completion(
+        &mut self,
+        expression: &TypeExpression,
+        symbol: super::ReferenceSymbol,
+        imported_alias: Option<Span>,
+        arguments: &[TypeExpression],
+        alias: Option<&AliasRecipe>,
+        deferred: Option<&DeferredReferenceRecipe>,
+    ) -> NativeResult<TypeId> {
+        let consumer = &expression.location;
+        if self.is_unknown_reference_symbol(symbol) {
+            return Ok(NativeCompletion::clean(self.model.native_error_type()));
+        }
+        if let Some(property) = symbol.property()
+            && self.unresolved_alias_declared_type(property).is_some()
+        {
+            return self
+                .type_arguments_from_nodes_completion(arguments)?
+                .and_then_value(|arguments| {
+                    let alias = self.unresolved_type_alias(property, arguments, consumer)?;
+                    Ok(self.model.unresolved_alias_type(alias))
+                });
+        }
+        let declaration = self.declared_reference_family(symbol, consumer)?;
+        self.declared_type_completion(symbol, declaration)?
+            .and_then(|ty| {
+                if matches!(declaration, BoundDeclaredType::Alias(_)) {
+                    return self.type_alias_reference_completion(
+                        symbol,
+                        ty,
+                        expression,
+                        imported_alias,
+                        arguments,
+                        alias,
+                    );
                 }
-                let declaration = self.declared_reference_family(symbol, consumer)?;
-                self.declared_type_completion(symbol, declaration)?
-                    .and_then(|ty| {
-                        if matches!(declaration, BoundDeclaredType::Alias(_)) {
-                            let anchor = anchor.ok_or_else(|| {
-                                super::super::internal(
-                                    "resolved type alias lacks native entity-name syntax",
-                                )
-                            })?;
-                            return self.type_alias_reference_completion(
-                                symbol,
-                                ty,
-                                expression,
-                                anchor,
-                                arguments,
-                                alias,
-                                site.kind == SyntaxKind::TypeReference,
-                            );
-                        }
-                        if !matches!(declaration, BoundDeclaredType::ClassOrInterface(_)) {
-                            return self.without_type_arguments_completion(ty, arguments, consumer);
-                        }
-                        self.class_reference_type_completion(ty, arguments, deferred, consumer)
-                    })
+                if !matches!(declaration, BoundDeclaredType::ClassOrInterface(_)) {
+                    return self.without_type_arguments_completion(ty, arguments, consumer);
+                }
+                let javascript = self.inputs.in_javascript_file(expression.file);
+                self.class_reference_type_completion(ty, arguments, deferred, javascript, consumer)
             })
     }
 
@@ -1262,11 +1350,17 @@ impl Evaluator<'_, '_> {
 
     /// `getTypeFromClassOrInterfaceReference` applies actual class/interface
     /// identity. An extends value alias need not have a source TYPE meaning.
+    /// A reference in a JavaScript file (`IsInJSFile`, `javascript`), which
+    /// only a JSDoc type writes, as a JavaScript class's generic base is
+    /// refused first (`refuse_javascript_generic_base`), is never the error
+    /// type for its argument count: TypeScript reports a list that does not
+    /// fit and fits it (`fillMissingTypeArguments`).
     fn class_reference_type_completion(
         &mut self,
         ty: TypeId,
         arguments: &[TypeExpression],
         deferred: Option<&DeferredReferenceRecipe>,
+        javascript: bool,
         consumer: &Location,
     ) -> NativeResult<TypeId> {
         let TypeView::Reference(reference) = self.model.get(ty)? else {
@@ -1277,7 +1371,9 @@ impl Evaluator<'_, '_> {
             return self.without_type_arguments_completion(ty, arguments, consumer);
         }
         let minimum = self.minimum_type_argument_count(&target.local_parameters)?;
-        if arguments.len() < minimum || arguments.len() > target.local_parameters.len() {
+        if !javascript
+            && (arguments.len() < minimum || arguments.len() > target.local_parameters.len())
+        {
             return NativeCompletion::recovered(
                 self.model.native_error_type(),
                 super::super::invalid_at_location(
@@ -1310,6 +1406,7 @@ impl Evaluator<'_, '_> {
                 self.fill_missing_type_arguments_completion(
                     actual,
                     &target.local_parameters,
+                    javascript,
                     consumer,
                 )?
                 .and_then_value(|actual| {
@@ -1326,20 +1423,29 @@ impl Evaluator<'_, '_> {
 
     /// `fillMissingTypeArguments`: initialize every missing slot to native
     /// errorType before resolving defaults in order. Fully supplied arguments
-    /// never consume defaults. TS-only input admission owns the absent JS
-    /// implicit-any branch; default absence is native unknownType.
+    /// never consume defaults; default absence is native unknownType. With
+    /// `javascript` (`isJavaScriptImplicitAny`), which a reference in a
+    /// JavaScript file passes (`getTypeFromClassOrInterfaceReference`,
+    /// `getEffectiveTypeArguments`), as does a signature declared in one
+    /// (`checkTypeArguments`, `getSignatureInstantiation`), any list is
+    /// fitted to the parameters: arguments past them are dropped, and a
+    /// missing one's default is `any` where it is identical to `unknown` or
+    /// `{}` or absent. TypeScript's other JavaScript callers read a JSDoc type
+    /// alias's arguments, which loading refuses, and pass false here.
     pub(super) fn fill_missing_type_arguments_completion(
         &mut self,
-        actual: Vec<TypeId>,
+        mut actual: Vec<TypeId>,
         parameters: &[TypeId],
+        javascript: bool,
         consumer: &Location,
     ) -> NativeResult<Vec<TypeId>> {
         if parameters.is_empty() {
             return Ok(NativeCompletion::clean(Vec::new()));
         }
-        if actual.len() >= parameters.len() {
+        if !javascript && actual.len() >= parameters.len() {
             return Ok(NativeCompletion::clean(actual));
         }
+        actual.truncate(parameters.len());
         let start = actual.len();
         let mut completed = NativeCompletion::clean(actual);
         for &parameter in &parameters[start..] {
@@ -1360,16 +1466,31 @@ impl Evaluator<'_, '_> {
                     };
                     let default = self.demand_completion(default)?;
                     default.and_then(|default| {
-                        let mut targets: Vec<_> =
-                            actual.iter().copied().map(MapperTarget::Known).collect();
-                        targets.resize(parameters.len(), MapperTarget::ErrorType);
-                        let mapper = self.model.mapper_targets(parameters.to_vec(), targets)?;
-                        self.instantiate_type_completion(default, mapper, &default_consumer)
+                        let implicit_any = if javascript {
+                            self.is_unknown_or_empty_object_completion(default, &default_consumer)?
+                        } else {
+                            NativeCompletion::clean(false)
+                        };
+                        implicit_any.and_then(|implicit_any| {
+                            if implicit_any {
+                                return Ok(NativeCompletion::clean(
+                                    self.model.special(SpecialName::Any),
+                                ));
+                            }
+                            let mut targets: Vec<_> =
+                                actual.iter().copied().map(MapperTarget::Known).collect();
+                            targets.resize(parameters.len(), MapperTarget::ErrorType);
+                            let mapper = self.model.mapper_targets(parameters.to_vec(), targets)?;
+                            self.instantiate_type_completion(default, mapper, &default_consumer)
+                        })
                     })?
                 } else {
-                    // TS-only Project inputs: the JS implicit-any branch is owned
-                    // by input admission and cannot silently change this fallback.
-                    NativeCompletion::clean(self.model.special(SpecialName::Unknown))
+                    // `getDefaultTypeArgumentType`.
+                    NativeCompletion::clean(self.model.special(if javascript {
+                        SpecialName::Any
+                    } else {
+                        SpecialName::Unknown
+                    }))
                 };
                 Ok(default.map(|default| {
                     actual.push(default);
@@ -1378,6 +1499,25 @@ impl Evaluator<'_, '_> {
             })?;
         }
         Ok(completed)
+    }
+
+    /// `isTypeIdenticalTo(defaultType, unknownType) ||
+    /// isTypeIdenticalTo(defaultType, emptyObjectType)`, the defaults a
+    /// JavaScript reference takes as `any`.
+    fn is_unknown_or_empty_object_completion(
+        &mut self,
+        ty: TypeId,
+        consumer: &Location,
+    ) -> NativeResult<bool> {
+        let unknown = self.model.special(SpecialName::Unknown);
+        self.type_related_completion(ty, unknown, RelationKind::Identity, consumer)?
+            .and_then(|identical| {
+                if identical {
+                    return Ok(NativeCompletion::clean(true));
+                }
+                let empty = self.model.empty_object_type();
+                self.type_related_completion(ty, empty, RelationKind::Identity, consumer)
+            })
     }
 
     /// `getDefaultFromTypeParameter` consumes the canonical resolved-default

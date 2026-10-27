@@ -14,6 +14,7 @@
 //! (`inspect_directory`), and the configuration's identity (`absolute`).
 
 mod lease;
+pub(crate) mod runtime;
 
 pub(crate) use lease::user_id;
 
@@ -23,6 +24,7 @@ use crate::cli::delivery;
 use crate::cli::failure::{Category, Code};
 use crate::cli::registry::FlagId;
 use crate::process_limits::{Context, Environment, Limits};
+use runtime::{Rule, RuntimeDirectory};
 use serde::{Deserialize, Serialize};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
@@ -283,6 +285,9 @@ struct Endpoint {
     /// by a writer that died, and is reclaimed.
     staged_start_error: PathBuf,
     identity: Identity,
+    /// The rule that chose `directory`, whose remedy directory and lock
+    /// failures name.
+    rule: Rule,
 }
 
 impl Identity {
@@ -304,39 +309,64 @@ impl Identity {
     }
 }
 
-/// The runtime directory `TSPARSE_SERVICE_DIR` names, made absolute.
-fn runtime_directory() -> Result<PathBuf, Failure> {
-    let directory = Environment::service_dir();
-    std::path::absolute(&directory).map_err(|error| {
-        Failure::new(
-            Code::Directory,
-            format!(
-                "Project service directory {} cannot be made absolute: {error}",
-                directory.display()
-            ),
-        )
-    })
-}
-
 /// The socket of the endpoint whose key is `key`, in `directory`.
 fn socket_path(directory: &Path, key: &str) -> PathBuf {
     directory.join(format!("{key}.sock"))
 }
 
+/// The socket paths in a directory: their length, which every endpoint's
+/// there shares, since every key has `KEY_DIGITS` digits, and the longest
+/// path a socket address holds on this platform (`socket_path_limit`).
+#[derive(Clone, Copy)]
+struct SocketBudget {
+    length: usize,
+    limit: usize,
+}
+
+impl SocketBudget {
+    fn of(directory: &Path) -> Self {
+        Self {
+            length: socket_path(directory, &"0".repeat(KEY_DIGITS))
+                .as_os_str()
+                .len(),
+            limit: socket_path_limit(),
+        }
+    }
+
+    /// Whether a socket address holds them. `socket_path_limit` is the
+    /// longest path `SocketAddr::from_pathname`, which binding and
+    /// connecting use, accepts; the only other path it refuses holds a NUL,
+    /// which no runtime directory does, as each is an environment
+    /// variable's value or a literal.
+    fn fits(&self) -> bool {
+        self.length <= self.limit
+    }
+}
+
 impl Endpoint {
     fn new(config: &Path) -> Result<Self, Failure> {
         let identity = Identity::of(config)?;
-        Ok(Self::named(identity, runtime_directory()?))
+        Ok(Self::named(identity, runtime::chosen()?))
     }
 
     #[cfg(test)]
     fn in_directory(config: &Path, directory: PathBuf) -> Result<Self, Failure> {
-        Ok(Self::named(Identity::of(config)?, directory))
+        Ok(Self::named(
+            Identity::of(config)?,
+            RuntimeDirectory {
+                path: directory,
+                rule: Rule::Variable,
+            },
+        ))
     }
 
     /// The endpoint of the service `identity` names, in `directory`: its
     /// files are named by a key hashed from the identity.
-    fn named(identity: Identity, directory: PathBuf) -> Self {
+    fn named(identity: Identity, directory: RuntimeDirectory) -> Self {
+        let RuntimeDirectory {
+            path: directory,
+            rule,
+        } = directory;
         let mut hash = DefaultHasher::new();
         identity.build.hash(&mut hash);
         identity.config.hash(&mut hash);
@@ -349,6 +379,7 @@ impl Endpoint {
             staged_start_error: directory.join(format!("{key}.start-error.staged")),
             directory,
             identity,
+            rule,
         }
     }
 
@@ -359,10 +390,10 @@ impl Endpoint {
         {
             Ok(()) => {}
             Err(error) if error.kind() == io::ErrorKind::AlreadyExists => {}
-            Err(error) => return Err(uncreatable(&self.directory, error)),
+            Err(error) => return Err(uncreatable(&self.directory, &self.rule, error)),
         }
         let metadata = std::fs::symlink_metadata(&self.directory)
-            .map_err(|error| uninspected(&self.directory, error))?;
+            .map_err(|error| uninspected(&self.directory, &self.rule, error))?;
         require_private(&self.directory, &metadata)
     }
 
@@ -372,7 +403,7 @@ impl Endpoint {
         let metadata = match std::fs::symlink_metadata(&self.directory) {
             Ok(metadata) => metadata,
             Err(error) if absent(&error) => return Ok(None),
-            Err(error) => return Err(uninspected(&self.directory, error)),
+            Err(error) => return Err(uninspected(&self.directory, &self.rule, error)),
         };
         require_private(&self.directory, &metadata)?;
         match UnixStream::connect(&self.socket) {
@@ -518,7 +549,7 @@ impl Endpoint {
                 return Ok(stream);
             }
             if let Some(starting) = lease::Lease::acquire(&self.start_lock)
-                .map_err(|error| lock_error(&self.start_lock, error))?
+                .map_err(|error| self.lock_error(&self.start_lock, error))?
             {
                 break starting;
             }
@@ -609,6 +640,7 @@ impl Endpoint {
             Err(error) => return self.unreadable_start_error(error),
         };
         let failure = match recorded_failure(&recorded) {
+            Ok(failure) if failure.code() == Code::Lock => failure.with_remedy(self.rule.remedy()),
             Ok(failure) => failure,
             Err(error) => self.unreadable_start_error(error),
         };
@@ -680,7 +712,8 @@ impl Endpoint {
     /// cannot be completed is removed; while another writer holds the staged
     /// copy, this one fails rather than wait. No failure before binding has a
     /// remedy the client could not give itself: the client finds a socket
-    /// path that is too long before it starts a service.
+    /// path that is too long before it starts a service, and restores a
+    /// lock failure's runtime remedy from its own selection rule.
     fn publish_start_error(&self, failure: &Failure) -> io::Result<()> {
         let mut copy = self.stage_start_error()?;
         let text = format!("{}\n{}", failure.code().entry().name, failure.message());
@@ -741,7 +774,7 @@ impl Endpoint {
         config: &Path,
     ) -> Result<Option<(lease::Lease, ProjectSession, UnixListener)>, Failure> {
         let Some(lease) =
-            lease::Lease::acquire(&self.lock).map_err(|e| lock_error(&self.lock, e))?
+            lease::Lease::acquire(&self.lock).map_err(|e| self.lock_error(&self.lock, e))?
         else {
             return Ok(None);
         };
@@ -799,7 +832,7 @@ impl Endpoint {
         let started = Instant::now();
         loop {
             if lease::Lease::acquire(&self.lock)
-                .map_err(|error| lock_error(&self.lock, error))?
+                .map_err(|error| self.lock_error(&self.lock, error))?
                 .is_some()
             {
                 return Ok(());
@@ -813,10 +846,22 @@ impl Endpoint {
             std::thread::sleep(POLL);
         }
     }
+
+    /// A lock failure keeps its path and I/O cause, with the selected
+    /// runtime directory's remedy. Directory metadata alone cannot prove
+    /// that sandbox policy permits creating or opening its locks.
+    fn lock_error(&self, path: &Path, error: io::Error) -> Failure {
+        Failure::new(
+            Code::Lock,
+            format!("Project service lock {}: {error}", path.display()),
+        )
+        .with_remedy(self.rule.remedy())
+    }
 }
 
-/// A runtime `directory` that cannot be created, with the cause.
-fn uncreatable(directory: &Path, error: io::Error) -> Failure {
+/// A runtime `directory` that cannot be created, with the cause, and
+/// another directory, by the variables that choose one, as the remedy.
+fn uncreatable(directory: &Path, rule: &Rule, error: io::Error) -> Failure {
     Failure::new(
         Code::Directory,
         format!(
@@ -824,6 +869,7 @@ fn uncreatable(directory: &Path, error: io::Error) -> Failure {
             directory.display()
         ),
     )
+    .with_remedy(rule.remedy())
 }
 
 /// Whether `Endpoint::prepare` could create `directory`, asked without
@@ -855,7 +901,9 @@ fn creatable(directory: &Path) -> io::Result<()> {
     }
 }
 
-fn uninspected(directory: &Path, error: io::Error) -> Failure {
+/// A runtime `directory` that cannot be inspected, with the cause, and
+/// the remedy of one that cannot be created.
+fn uninspected(directory: &Path, rule: &Rule, error: io::Error) -> Failure {
     Failure::new(
         Code::Directory,
         format!(
@@ -863,6 +911,7 @@ fn uninspected(directory: &Path, error: io::Error) -> Failure {
             directory.display()
         ),
     )
+    .with_remedy(rule.remedy())
 }
 
 /// The runtime `directory` must be a directory owned by this user that
@@ -973,14 +1022,6 @@ fn names(path: &Path, copy: &std::fs::File) -> io::Result<bool> {
     }
 }
 
-/// A failure to open the lock file `path`, naming it.
-fn lock_error(path: &Path, error: io::Error) -> Failure {
-    Failure::new(
-        Code::Lock,
-        format!("Project service lock {}: {error}", path.display()),
-    )
-}
-
 /// The failure an answer of another kind than the request expects
 /// reports: the service's refusal, or a protocol failure.
 fn unexpected(response: Response) -> Failure {
@@ -1072,58 +1113,72 @@ pub(crate) fn absolute(config: &str) -> Result<PathBuf, Failure> {
     Ok(Identity::of(Path::new(config))?.config)
 }
 
+/// The runtime directory a project query would use, for the doctor: the
+/// directory and the rule that chose it, and what observing it without
+/// creating it found.
+pub(crate) struct DirectoryInspection {
+    /// The directory and the rule that chose it (`runtime::choose`), as
+    /// `PATH (RULE)`.
+    pub(crate) chosen: String,
+    /// What `examine` found, or the failure a query would report there.
+    pub(crate) found: Result<String, Failure>,
+}
+
 /// The runtime directory a project query would use, observed without
-/// creating it, for the doctor: its path, whether it exists as a private
-/// directory of this user's (`require_private`) or could be created
-/// (`creatable`), and the length of its socket paths beside the longest a
-/// socket address holds. Every socket in it is as long as `config`'s, or,
-/// without one, any key's. A directory that does not exist passes when the
-/// first query could create it; one that it could not, one that fails the
-/// check, and socket paths that are too long are the failures a query
-/// would report, each with its remedy.
-pub(crate) fn inspect_directory(config: Option<&str>) -> Result<String, Failure> {
-    let (directory, socket) = match config {
+/// creating it, for the doctor (`DirectoryInspection`). A configuration
+/// whose service cannot be named, or a directory that cannot be made
+/// absolute, is the failure, as no directory is chosen.
+pub(crate) fn inspect_directory(config: Option<&str>) -> Result<DirectoryInspection, Failure> {
+    let (directory, rule) = match config {
         Some(config) => {
             let endpoint = Endpoint::new(Path::new(config))?;
-            (endpoint.directory, endpoint.socket)
+            (endpoint.directory, endpoint.rule)
         }
         None => {
-            let directory = runtime_directory()?;
-            let socket = socket_path(&directory, &"0".repeat(KEY_DIGITS));
-            (directory, socket)
+            let RuntimeDirectory { path, rule } = runtime::chosen()?;
+            (path, rule)
         }
     };
-    let state = match std::fs::symlink_metadata(&directory) {
+    Ok(DirectoryInspection {
+        chosen: format!("{} ({rule})", directory.display()),
+        found: examine(&directory, &rule),
+    })
+}
+
+/// Whether `directory`, which `rule` chose, exists as a private directory of
+/// this user's (`require_private`) or could be created (`creatable`), and the
+/// length of its socket paths beside the longest a socket address holds
+/// (`SocketBudget`). A directory that does not exist passes when the first
+/// query could create it; one that it could not, one that fails the check,
+/// and socket paths that are too long are the failures a query would
+/// report, each with its remedy.
+fn examine(directory: &Path, rule: &Rule) -> Result<String, Failure> {
+    let state = match std::fs::symlink_metadata(directory) {
         Ok(metadata) => {
-            require_private(&directory, &metadata)?;
+            require_private(directory, &metadata)?;
             "is a private directory owned by this user with mode 0700"
         }
         Err(error) if absent(&error) => {
-            creatable(&directory).map_err(|error| uncreatable(&directory, error))?;
+            creatable(directory).map_err(|error| uncreatable(directory, rule, error))?;
             "does not exist yet; a project query creates it with mode 0700"
         }
-        Err(error) => return Err(uninspected(&directory, error)),
+        Err(error) => return Err(uninspected(directory, rule, error)),
     };
-    let length = socket.as_os_str().len();
-    let limit = socket_path_limit();
-    match SocketAddr::from_pathname(&socket) {
-        Ok(_) => Ok(format!(
-            "{} {state}; its socket paths take {length} of at most {limit} bytes",
-            directory.display()
-        )),
-        Err(_) if length > limit => Err(Failure::new(
+    let budget = SocketBudget::of(directory);
+    let SocketBudget { length, limit } = budget;
+    if !budget.fits() {
+        return Err(Failure::new(
             Code::Socket,
             format!(
                 "socket paths in {} take {length} bytes, more than the {limit} a socket address holds",
                 directory.display()
             ),
         )
-        .with_remedy(SHORTER_DIRECTORY)),
-        Err(error) => Err(Failure::new(
-            Code::Socket,
-            format!("Project service socket {}: {error}", socket.display()),
-        )),
+        .with_remedy(SHORTER_DIRECTORY));
     }
+    Ok(format!(
+        "{state}; its socket paths take {length} of at most {limit} bytes"
+    ))
 }
 
 /// What an earlier start left in the runtime directory for `config`'s
@@ -1481,7 +1536,10 @@ mod tests {
                     config: PathBuf::from(config),
                     build: build.into(),
                 },
-                PathBuf::from("/runtime"),
+                RuntimeDirectory {
+                    path: PathBuf::from("/runtime"),
+                    rule: Rule::Variable,
+                },
             )
             .socket
         };

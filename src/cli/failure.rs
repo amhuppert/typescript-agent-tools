@@ -204,7 +204,7 @@ pub(crate) static CODES: [CodeEntry; Code::COUNT] = [
         Code::Lock,
         Category::Transport,
         "transport.lock",
-        "A lock file in the service's runtime directory cannot be opened or locked.",
+        "A lock file in the service's runtime directory cannot be opened or locked; next or remedy says how to select a writable directory.",
     ),
     code(
         Code::Startup,

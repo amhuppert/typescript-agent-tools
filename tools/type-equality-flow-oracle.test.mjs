@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {compilerHookOracle} from './type-oracle.mjs';
 import {lineStarts, position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 
 const root = fileURLToPath(new URL('../fixtures/types/native-equality-flow/', import.meta.url));
 const source = fs.readFileSync(path.join(root, 'cases.ts'), 'utf8');
@@ -29,7 +30,7 @@ test('native equality preserves exact unchanged flow identities and ordered acqu
       .filter(([key,value]) => key.startsWith('referenceFlow:') && value.referenceEnd === offset + 1)
       .map(([,value]) => value);
     observations.push({config,marker,answer,flow});
-    fs.writeFileSync('.cc/temp/native-equality-flow-observations.json', JSON.stringify(observations,null,2));
+    fs.writeFileSync(scratchPath('native-equality-flow-observations.json'), JSON.stringify(observations,null,2));
     const loose = config === 'loose.json';
     const summary = loose && marker === 'nullableLoose' ? 'number'
       : loose && marker === 'optionalSame' ? '{ value: number; }' : expected;

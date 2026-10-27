@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { compilerHookOracle } from './type-oracle.mjs';
 import { lineStarts, position } from './semantic-oracle.mjs';
+import { scratchPath } from './harness-scratch.mjs';
 
 const root = fileURLToPath(new URL('../fixtures/types/native-symbol-id-collision/', import.meta.url));
 const source = fs.readFileSync(path.join(root, 'cases.ts'), 'utf8');
@@ -36,7 +37,7 @@ test('native flow binary key collision changes the final type with prior symbol-
 });
 
 test('native symbol IDs use eight binary bytes rather than decimal property-name text', async () => {
-  const temporary = fs.mkdtempSync(path.resolve('.cc/temp/type-symbol-id-decimal-'));
+  const temporary = fs.mkdtempSync(scratchPath('type-symbol-id-decimal-'));
   try {
     const decimal = source.replaceAll('@\\u0002\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000\\u0000', '@2');
     assert.notEqual(decimal, source);
@@ -59,7 +60,7 @@ test('native symbol IDs use eight binary bytes rather than decimal property-name
 });
 
 test('native private-name allocation records concurrent binding and the serial LIFO baseline', async () => {
-  const temporary = fs.mkdtempSync(path.resolve('.cc/temp/type-symbol-id-binding-'));
+  const temporary = fs.mkdtempSync(scratchPath('type-symbol-id-binding-'));
   try {
     const count = 12;
     const files = Array.from({ length: count }, (_, i) => `class${i}.ts`);
@@ -97,7 +98,7 @@ test('native private-name allocation records concurrent binding and the serial L
     }
     // Parallel order is intentionally observed, never asserted: a particular
     // scheduling permutation is not a native guarantee.
-    fs.writeFileSync(path.resolve('.cc/temp/type-symbol-id-bind-observations.json'), JSON.stringify(observations, null, 2));
+    fs.writeFileSync(scratchPath('type-symbol-id-bind-observations.json'), JSON.stringify(observations, null, 2));
   } finally {
     fs.rmSync(temporary, { recursive: true, force: true });
   }

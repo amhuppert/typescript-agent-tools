@@ -153,6 +153,9 @@ pub(super) enum DeclKind {
     Member(MemberKind),
     /// An anonymous default or `export =` expression.
     Expression,
+    /// A CommonJS module's `module` or `exports`, which the file itself
+    /// declares (`declareCommonJSVariable`).
+    CommonJsVariable,
 }
 
 /// Where a `declare module "name"` or `declare global` block is declared,
@@ -189,6 +192,22 @@ pub(super) enum MisplacedModule {
     /// `export as namespace` in a module that is not a declaration file
     /// (TS1315).
     UmdImplementation,
+}
+
+impl MisplacedModule {
+    /// The diagnostic code TypeScript reports for it.
+    pub(super) fn code(self) -> crate::checking::Code {
+        use crate::checking::Code;
+        match self {
+            Self::Quoted => Code::QUOTED_MODULE_NAME,
+            Self::Global => Code::MISPLACED_GLOBAL,
+            Self::Nested => Code::NESTED_AMBIENT_MODULE,
+            Self::Relative => Code::RELATIVE_AMBIENT_MODULE,
+            Self::UmdNested => Code::NESTED_UMD_GLOBAL,
+            Self::UmdScript => Code::UMD_GLOBAL_IN_SCRIPT,
+            Self::UmdImplementation => Code::UMD_GLOBAL_IN_IMPLEMENTATION,
+        }
+    }
 }
 
 /// Where an exported declaration or alias becomes visible to importers.
@@ -610,6 +629,9 @@ pub(super) struct Collector<'a, 's> {
     /// The parsed text, for error positions.
     source: &'a SourceText,
     module: bool,
+    /// The `module.exports = name` assignment bound as the module's
+    /// `export=` alias (`super::javascript::commonjs::module_exports`).
+    commonjs: Option<NodeId>,
     facts: CollectedFacts,
     // Scope capture mixes overwrite and first-write-only rules. Keep that
     // builder behavior intact, then compact its final associations once.
@@ -652,11 +674,17 @@ struct Declared {
 type Result<T> = std::result::Result<T, InputError>;
 
 impl<'a, 's> Collector<'a, 's> {
-    pub(super) fn new(ast: &'a Ast<'s>, source: &'a SourceText, module: bool) -> Self {
+    pub(super) fn new(
+        ast: &'a Ast<'s>,
+        source: &'a SourceText,
+        module: bool,
+        commonjs: Option<NodeId>,
+    ) -> Self {
         Self {
             ast,
             source,
             module,
+            commonjs,
             facts: CollectedFacts::default(),
             scope_sites: ScopeSites::default(),
             requests: Vec::new(),
@@ -707,6 +735,9 @@ impl<'a, 's> Collector<'a, 's> {
                     .binding_order
                     .push(BindingEntry::CommonJsTypeExports(Some(module))),
             }
+        }
+        if self.commonjs.is_some() {
+            self.commonjs_variables(scope, root);
         }
         if self.module {
             self.facts
@@ -1586,6 +1617,9 @@ impl<'a, 's> Collector<'a, 's> {
                 self.push_field(node, "operand", cx)
             }
             SyntaxKind::BinaryExpression => {
+                if self.commonjs == Some(id) {
+                    self.module_exports(node, cx)?;
+                }
                 self.push_field(node, "left", cx);
                 self.push_field(node, "right", cx);
             }
@@ -2326,9 +2360,8 @@ impl<'a, 's> Collector<'a, 's> {
     }
 
     fn import_type(&mut self, node: &Node<'s>, cx: Cx) -> Result<()> {
-        let literal = child(self.ast, node, "argument")
-            .and_then(|argument| child(self.ast, argument, "literal"))
-            .filter(|literal| literal.syntax_kind == SyntaxKind::StringLiteral);
+        let literal = crate::syntax::literal_import_type_specifier(self.ast, node)
+            .map(|literal| self.ast.node(literal));
         let request = literal
             .map(|literal| self.request(literal, RequestKind::ImportType, node))
             .transpose()?;
@@ -2421,6 +2454,7 @@ impl<'a, 's> Collector<'a, 's> {
             native_span: declaration.span,
             target_name: match declaration.syntax_kind {
                 SyntaxKind::ExportAssignment => child(self.ast, declaration, "expression"),
+                SyntaxKind::BinaryExpression => child(self.ast, declaration, "right"),
                 SyntaxKind::ImportEqualsDeclaration => {
                     child(self.ast, declaration, "moduleReference")
                 }
@@ -2710,6 +2744,62 @@ impl<'a, 's> Collector<'a, 's> {
             }
         }
         Ok(())
+    }
+
+    /// `bindModuleExportsAssignment` of the admitted `module.exports = name`:
+    /// the file's `export=` alias of the name, whose declaration is the
+    /// assignment, in the file's exports wherever it stands. The name itself
+    /// stays an ordinary use, as it is to TypeScript's binder, which
+    /// declares no name there.
+    fn module_exports(&mut self, node: &Node<'s>, cx: Cx) -> Result<()> {
+        let (true, Some(left), Some(right)) =
+            (self.module, field(node, "left"), field(node, "right"))
+        else {
+            return Err(self.unsupported(node, "module.exports assignment"));
+        };
+        let host = Host::File;
+        let kind = AliasKind::Lexical {
+            scope: cx.scope,
+            name: self.decoded(right),
+        };
+        let bind = AliasBind::Export {
+            host,
+            name: "export=".into(),
+        };
+        self.export_alias(kind, bind, false, self.ast.token_span(left), node);
+        Ok(())
+    }
+
+    /// `declareCommonJSVariable`: a CommonJS module's `module` and `exports`,
+    /// declared by the file itself, where its top-level declarations name
+    /// neither, after every other declaration of the file.
+    fn commonjs_variables(&mut self, scope: ScopeId, root: &Node<'s>) {
+        for name in super::javascript::commonjs::VARIABLES {
+            let declared = self
+                .facts
+                .decls
+                .iter()
+                .any(|decl| decl.lexical == Some(scope) && &*decl.name == name)
+                || self.facts.aliases.iter().any(|alias| {
+                    matches!(
+                        &alias.bind,
+                        AliasBind::Lexical { scope: bound, name: local }
+                            | AliasBind::Both { scope: bound, name: local, .. }
+                            if *bound == scope && local == name
+                    )
+                });
+            if !declared {
+                self.declare(Decl {
+                    name: name.into(),
+                    anchor: Span { start: 0, end: 0 },
+                    kind: DeclKind::CommonJsVariable,
+                    native_kind: SyntaxKind::SourceFile,
+                    native_span: Some(root.span),
+                    lexical: Some(scope),
+                    ..Decl::default()
+                });
+            }
+        }
     }
 
     /// A UMD global, `export as namespace`, which TypeScript's binder
@@ -3125,7 +3215,7 @@ mod tests {
                       const shape = new Shape();\nshape.size;\nenum Color { Red }\n";
         let ast = crate::parse(source).unwrap();
         let text = SourceText::new(source.into());
-        let (facts, _) = Collector::new(&ast, &text, true).run().unwrap();
+        let (facts, _) = Collector::new(&ast, &text, true, None).run().unwrap();
         let stored = |name: &str| {
             facts
                 .texts
@@ -3168,7 +3258,7 @@ mod tests {
         let source = "let value = 1; value; value; value; let other = value;";
         let ast = crate::parse(source).unwrap();
         let text = SourceText::new(source.into());
-        let (facts, _) = Collector::new(&ast, &text, true).run().unwrap();
+        let (facts, _) = Collector::new(&ast, &text, true, None).run().unwrap();
         let spelled = |name: &str| {
             facts
                 .names

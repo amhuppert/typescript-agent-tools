@@ -504,6 +504,24 @@ fn import_from_module_specifier(
     }
 }
 
+/// The explicit module request binding collected for this actual specifier
+/// literal, if any. Its resolution, including a `resolution-mode` attribute,
+/// is the loader's; callers never resolve a second spelling of the module.
+pub(super) fn retained_module_site(
+    bindings: crate::project::binding::inputs::BindingFiles<'_>,
+    captured: &super::CapturedSyntax<'_>,
+    file: FileId,
+    literal: NodeId,
+) -> Result<Option<ReferenceModuleSite>, DemandError> {
+    for site in bindings.reference_module_sites(file) {
+        let facts = bindings.reference_module_site(site);
+        if !facts.implicit && captured_module_literal(captured, facts.span)? == literal {
+            return Ok(Some(site));
+        }
+    }
+    Ok(None)
+}
+
 /// One captured attachment question for a retained module request. The caller
 /// decides whether native asks for the literal, its direct parent or import.
 pub(super) fn captured_module_literal(

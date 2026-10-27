@@ -26,7 +26,7 @@
 | **Service & Health** | `--references-status` | Report the state of the project's background service without loading or refreshing. |
 | | `--references-stop` | Stop the project's background service and release its cached snapshot. |
 | | `--references-serve` | Run the project's service in the foreground until idle. |
-| | `--doctor` | Check build capabilities, environment variables, runtime directory, and service state. |
+| | `--doctor` | Check build capabilities, environment variables, runtime directory, and project compiler compatibility/service state. |
 | **Meta** | `-h, --help` | Print the operation index, or `tsparse --OP --help` for one operation (`--json` for JSON). |
 | | `-V, --version` | Print the version and build stamp (`tsparse 0.1.0 (build ...)`). |
 
@@ -35,14 +35,14 @@
 ## 1. Parse & Validate
 
 ### Parse (`tsparse [FILE|-]`)
-Parses one TypeScript file or stdin (`-` or omitted) into a TypeScript 7 compiler-style JSON AST. `.tsx` and `.jsx` filenames enable JSX automatically; pass `--tsx` to enable JSX for stdin or other filenames.
+Parses one TypeScript file or stdin (`-` or omitted) into a TypeScript 7 compiler-style JSON AST. `.tsx` filenames and JavaScript filenames (`.js`, `.jsx`, `.mjs`, `.cjs`) enable JSX automatically; pass `--tsx` to enable JSX for stdin or other filenames. A JavaScript file is parsed as TypeScript parses one, so TypeScript-only syntax in it, such as a type annotation, is a syntax error (exit `1`).
 
 ```sh
 tsparse [--tsx] [--check] [--pretty] [-o OUTPUT] [FILE|-]
 ```
 
-- **`--check`**: Validate syntax only; prints `ok: FILE parses as TypeScript 7 (jsx: off|on)` on stdout instead of the AST.
-- **`--tsx`**: Enable JSX parsing when the filename does not end in `.tsx` or `.jsx`.
+- **`--check`**: Validate syntax only; prints `ok: FILE parses as TypeScript 7 (jsx: off|on)` on stdout instead of the AST. Like TypeScript 7, it also fails on a namespace declared with `module` (`module X {}`, TS1540), whose AST is still written without `--check`, and on TypeScript-only syntax in a JavaScript file.
+- **`--tsx`**: Enable JSX parsing when the filename is neither `.tsx` nor a JavaScript filename.
 - **`--pretty`**: Pretty-print the JSON AST.
 - **`-o, --output OUTPUT`**: Write the AST to `OUTPUT` instead of stdout.
 
@@ -57,7 +57,7 @@ printf 'const x: number = 1;' | tsparse --check
 
 ## 2. Navigate Declarations
 
-`--outline` and `--show` work on a single file (no project loaded) or with `--project TSCONFIG` (queries the project's searched files via the background project service, or in-process with `--direct`). `--test-outline` reads a single file only.
+`--outline` and `--show` work on a single file (no project loaded) or with `--project TSCONFIG` (queries the project's searched files via the background project service, or in-process with `--direct`). `--test-outline` reads a single file only; JavaScript tests can be shown but never edited. A file is TypeScript (`.ts`, `.tsx`, `.mts`, `.cts`) or JavaScript (`.js`, `.jsx`, `.mjs`, `.cjs`).
 
 ### `--outline`
 Lists one file's declarations in source order (`LINE:COLUMN kind signature`), indented by containment. Imports are grouped one line per import declaration.
@@ -115,8 +115,24 @@ tsparse --show --at src/host.ts:42:10
 
 Project queries require an explicit `--project TSCONFIG` (no ancestor directory search). They automatically start and reuse a per-project background service that rebuilds when inputs change; pass `--direct` to run in the CLI process instead. Project loading reads only regular files: a source, `tsconfig.json`, or `package.json` that is a pipe, device, or socket is refused with `PATH: not a regular file` (exit `2`), never read.
 
+The nearest `node_modules/typescript/package.json` above the configuration's canonical directory selects the project dialect: any TypeScript 5.x version selects TypeScript 5.6 rules for configuration, resolution and the installed compiler's standard libraries; only 5.6.3 is validated. No installed compiler, or another major version, selects TypeScript 7. TypeScript 7.0.2 remains the semantic authority. `tsparse --doctor --project TSCONFIG` reports the installed manifest/version, selected dialect, validation caveat and standard-library source in its `compatibility` check.
+
+In the 5.6 dialect, `baseUrl` and `paths` participate in module resolution and import hints, ambient `@types` packages follow 5.6.3's selection rules, and standard libraries come from the installed compiler's `lib` directory. The TypeScript 7 dialect refuses `baseUrl` as `Unsupported` (exit `1`). Project namespace declarations written `module X {}` load under the 5.6 dialect; under TypeScript 7, TS1540 fails loading where the file's diagnostic policy requires checking it. File-local `--check` always applies TypeScript 7's rule. See [compiler selection](docs/references.md#compiler-selection) for option inheritance, diagnostics and the retained ordering differences.
+
+Under the **TypeScript 5.6 dialect**, configuration failures remain failures:
+
+- **`Config`, exit `1`:** Unknown options or enabled removed settings (such as `stableTypeOrdering`, `libReplacement`, `charset`, `out`, or `importsNotUsedAsValues`), a library name absent from 5.6.3 (such as `es2024`), or an `include` of `[""]` or `[null]` that finds no inputs. Remove or correct the named setting. Inactive removed settings such as `importsNotUsedAsValues: "remove"` remain allowed.
+- **`Unsupported`, exit `1`:** `target` ES5; `moduleResolution` `classic`/`node10`; `module` `none`/`amd`/`umd`/`system`; false `esModuleInterop`, `allowSyntheticDefaultImports`, or `alwaysStrict`; `outFile`; `noResolve`; `paths` written as a non-empty array instead of an object; a `paths` pattern `__proto__`; a root-level `__proto__` object; or a null `moduleSuffixes` entry. The message names the option and whether TypeScript 5's default selected it. Set the named option explicitly or remove the entry; for `alwaysStrict`, set `strict` or `alwaysStrict` to true.
+- An unreadable compiler manifest or required installed library is **`Io`, exit `2`**; a manifest with no version is **`Unsupported`, exit `1`**. Repair or reinstall the compiler package. See [compatibility limits](docs/references.md#compatibility-limits) for the bounded profile.
+
+**Duplicate package copies (`Unsupported`, exit `1`):** Copies with the same package name, version and installed peer versions share the first input encountered in depth-first program loading (TypeScript 5 always; TypeScript 7 unless `deduplicatePackages` is false). Types and references resolve through that primary file. A project query or edit naming another copy's file is refused and names the primary file to query instead; use that path, or inspect the duplicate with file-local `--outline`/`--show` without `--project`.
+
+With `allowJs`, JavaScript files are project inputs, and `node_modules` JavaScript is within `maxNodeModuleJsDepth` (default `0`): queries answer for plain ES module JavaScript, and for a CommonJS file whose one export is a top-level `module.exports = name;`, as TypeScript does, with a variable's JSDoc `@type` as its declared type. JavaScript-only meaning is refused where it is written: loading fails with `FILE:LINE:COLUMN: unsupported JavaScript: CONSTRUCT` (exit `1`) for other CommonJS exports, `require`, assignments that add members to a function, class, or object, class `this` members, and other JSDoc types or tags TypeScript turns into syntax, in any project file whatever checks it, and at a project import of a dependency file that has one. A TypeScript 5.x project also refuses what only TypeScript 5.6 gives meaning, such as `this.x =` in a function. See [docs/references.md](docs/references.md#javascript-inputs).
+
 ### `--type`
 Inspects the type of a selected declaration (`--name`) or token (`--at`) in a project.
+
+A one-name `import("pkg").T` type resolves through the same project rules and reports the whole type; an import type TypeScript rejects is a located failure, not `any`. Literal widening follows the declaration's mutability, including mutable versus readonly constructor parameter properties.
 
 ```sh
 tsparse --type --project TSCONFIG (--name NAME [FILE] | --at [FILE:]LINE:COLUMN [FILE]) [--direct] [--expand [--depth 0..32]] [--limit N|all] [--json [--pretty]] [-o OUTPUT]
@@ -197,6 +213,8 @@ tsparse --constructs --project tsconfig.json --name Options --all-literals --jso
 ## 4. Edit Declarations
 
 Editing is two-phase: preview commands (`--replace-body`, `--insert-after`, `--edit-batch`) validate syntax, comment directives (`@ts-ignore`/`@ts-expect-error`), and JSDoc attachment, print a unified diff, and never modify source files. Passing `--plan PLAN` saves the prepared edit batch to a new file, which `--apply PLAN` then writes atomically.
+
+Only TypeScript files (`.ts`, `.tsx`, `.mts`, `.cts`) are edited: every edit operation, `--apply` included, refuses a JavaScript file with `FILE: JavaScript files cannot be edited; editing needs a .ts, .tsx, .mts, or .cts file` (`Unsupported`, exit `1`).
 
 ### `--replace-body`
 Previews replacing the complete body (`{ ... }` block, or expression for an arrow function) of a selected function, method, constructor, accessor, or function-initialized variable/property.
@@ -287,7 +305,9 @@ tsparse --references-serve --project TSCONFIG
 ```
 
 ### `--doctor`
-Runs read-only health checks on what project queries depend on (loads nothing, starts nothing). Without `--project`, checks build capabilities, `TSPARSE_*` environment variables, and the runtime directory (`0700` permissions and socket path length). With `--project`, also checks `tsconfig.json` readability, service status, and whether a running service's inherited limits differ from the current environment.
+Runs read-only health checks on what project queries depend on (loads no project, starts no service). Without `--project`, checks build capabilities, `TSPARSE_*` environment variables, and the runtime directory (the rule that chose it, `0700` permissions, and socket path length). With `--project`, also checks `tsconfig.json` readability; compiler compatibility (the nearest installed TypeScript manifest/version, the selected dialect, the 5.6.3-only validation caveat and standard-library source); service status; and whether a running service's inherited limits differ from the current environment. An unreadable or versionless compiler manifest is a finding, as loading would fail.
+
+A passing runtime metadata check does not prove lock writability. Directory creation/inspection and lock failures retain exit `2` and name `TMPDIR`/`TSPARSE_SERVICE_DIR` remedies, including why `TMPDIR` was skipped. A directory privacy failure instead names the permission or ownership remedy, such as `chmod 700`.
 
 ```sh
 tsparse --doctor [--project TSCONFIG] [--json [--pretty]]
@@ -315,7 +335,7 @@ tsparse --doctor [--project TSCONFIG] [--json [--pretty]]
 | `TSPARSE_MAX_MEMORY_MB` | `6144` | Positive integer MiB memory ceiling for read-only queries. |
 | `TSPARSE_QUERY_TIMEOUT_MS` | `60000` | Positive integer millisecond deadline for read-only queries. |
 | `TSPARSE_SERVICE_IDLE_SECS` | `600` | Positive integer idle timeout in seconds before a background service exits. |
-| `TSPARSE_SERVICE_DIR` | `/tmp/tsparse-<UID>` | Private runtime directory (must be owned by current user with mode `0700`). |
+| `TSPARSE_SERVICE_DIR` | `$TMPDIR/tsparse-<UID>` when `TMPDIR` is a non-empty absolute path short enough for socket paths, else `/tmp/tsparse-<UID>` | Private runtime directory (must be owned by current user with mode `0700`). `--doctor` names the rule that chose it. |
 
 ### Exit Codes
 

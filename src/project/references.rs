@@ -341,11 +341,13 @@ fn is_test_path(path: &str) -> bool {
                 return true;
             }
         } else {
-            return [".ts", ".tsx", ".mts", ".cts"].iter().any(|extension| {
-                segment
-                    .strip_suffix(extension)
-                    .is_some_and(|base| base.ends_with(".test") || base.ends_with(".spec"))
-            });
+            return [".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs"]
+                .iter()
+                .any(|extension| {
+                    segment
+                        .strip_suffix(extension)
+                        .is_some_and(|base| base.ends_with(".test") || base.ends_with(".spec"))
+                });
         }
     }
     false

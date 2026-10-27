@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {compilerHookOracle,typeOracle} from './type-oracle.mjs';
 import {lineStarts,position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 const root=fileURLToPath(new URL('../fixtures/types/native-qualified-alias-boundaries/',import.meta.url));
 const source=fs.readFileSync(path.join(root,'cases.ts'),'utf8');
 const expected=[
@@ -24,7 +25,7 @@ test('native qualified alias defaults, value-target negatives and unsearched pro
   const answer=await typeOracle(path.join(root,config),{at,properties:true});
   const hook=await compilerHookOracle(path.join(root,config),{at});
   observations.push({config,marker,summary:answer.summary,errorType:answer.errorType,properties:answer.properties.map(p=>[p.name,p.summary,p.errorType]),hook});
-  fs.writeFileSync('.cc/temp/native-qualified-alias-boundaries-observations.json',JSON.stringify(observations,null,2));
+  fs.writeFileSync(scratchPath('native-qualified-alias-boundaries-observations.json'),JSON.stringify(observations,null,2));
  }
  for(const row of observations){
   const [,summary,properties]=expected.find(([marker])=>marker===row.marker);

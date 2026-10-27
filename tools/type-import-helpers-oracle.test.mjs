@@ -6,6 +6,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {loadSemanticApi} from './semantic-oracle.mjs';
 import {typeOracle} from './type-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 
 const fixtures=fileURLToPath(new URL('../fixtures/types/native-import-helpers/',import.meta.url));
 const cases=JSON.parse(fs.readFileSync(path.join(fixtures,'cases.json'),'utf8'));
@@ -56,5 +57,5 @@ test('native helper imports load only the effective eligible inputs and remain c
   assert.equal(healthy.summary,'number',row.name);
   assert.equal(healthy.errorType,false,row.name);
  }
- fs.writeFileSync('.cc/temp/types-import-helpers-native.json',JSON.stringify(rows,null,2));
+ fs.writeFileSync(scratchPath('types-import-helpers-native.json'),JSON.stringify(rows,null,2));
 });

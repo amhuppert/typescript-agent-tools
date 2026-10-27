@@ -19,6 +19,8 @@ passed all three profiles, with zero skips, in
 `vrun-5cdb4ddc-9680-469a-84a1-8f90848d16e5`. The receipt is
 `.cc/temp/stage26-diagnostic-acquisitions-receipt.json`; raw rows are
 `.cc/temp/native-diagnostic-acquisitions-{tsconfig,loose,untruncated}.json`.
+A rerun of the harness now writes the raw rows to
+`target/harness/native-diagnostic-acquisitions-{tsconfig,loose,untruncated}.json`.
 The hooked final summary/error-type result matches the ordinary native API.
 These are natural repeated calls in one checker, not repeated Project requests.
 

@@ -55,21 +55,29 @@ impl Sources {
         self.files.push(file);
     }
 
-    /// Renumber the captured inputs to follow `order`, a permutation of
-    /// their ids, so the program's file order is also its `FileId` order.
-    /// Returns each former id's new id, indexed by the former id.
-    pub(super) fn reorder(&mut self, order: &[FileId]) -> Vec<FileId> {
-        assert_eq!(order.len(), self.files.len(), "inputs are all captured");
+    /// Renumber the captured inputs to follow `order`, each of their ids at
+    /// most once, so the program's file order is also its `FileId` order;
+    /// an input `order` leaves out is no longer one. Returns each former
+    /// id's new id, if any, indexed by the former id.
+    pub(super) fn reorder(&mut self, order: &[FileId]) -> Vec<Option<FileId>> {
+        assert_eq!(
+            self.reserved as usize,
+            self.files.len(),
+            "inputs are all captured"
+        );
         let mut files: Vec<Option<SourceFile>> = std::mem::take(&mut self.files)
             .into_iter()
             .map(Some)
             .collect();
-        let mut renumbered = vec![FileId(0); files.len()];
+        let mut renumbered = vec![None; files.len()];
         for (index, old) in order.iter().enumerate() {
-            renumbered[old.index()] = FileId(index as u32);
-            let file = files[old.index()].take().expect("order is a permutation");
+            renumbered[old.index()] = Some(FileId(index as u32));
+            let file = files[old.index()]
+                .take()
+                .expect("order names an input once");
             self.files.push(file);
         }
+        self.reserved = order.len() as u32;
         renumbered
     }
 

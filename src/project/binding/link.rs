@@ -28,6 +28,7 @@ use super::targets::{Meanings, Slots, each};
 use super::{FileFacts, ModuleResolution, RequestKind, meaning};
 use crate::Span;
 use crate::analysis::{InputError, InputErrorKind};
+use crate::checking::Code;
 use crate::project;
 use crate::project::program::Program;
 use crate::project::sources::FileId;
@@ -136,6 +137,7 @@ pub(super) fn symbol_flags(kind: DeclKind) -> u32 {
             MemberKind::Constructor => CONSTRUCTOR,
         },
         DeclKind::Expression => EXPRESSION,
+        DeclKind::CommonJsVariable => FUNCTION_SCOPED | MODULE_EXPORTS,
     }
 }
 
@@ -201,7 +203,8 @@ impl DeclKind {
             | DeclKind::Parameter
             | DeclKind::Let
             | DeclKind::Function
-            | DeclKind::Expression => VALUE,
+            | DeclKind::Expression
+            | DeclKind::CommonJsVariable => VALUE,
             DeclKind::Class | DeclKind::Enum { .. } | DeclKind::EnumMember => VALUE | TYPE,
             DeclKind::Interface | DeclKind::TypeAlias | DeclKind::TypeParameter => TYPE,
             DeclKind::TypeLiteral | DeclKind::ObjectLiteral => 0,
@@ -211,6 +214,45 @@ impl DeclKind {
             DeclKind::Namespace { .. } => NAMESPACE | VALUE,
             DeclKind::Member(kind) => meanings(symbol_flags(DeclKind::Member(kind))),
         }
+    }
+}
+
+/// The binder's code for a declaration that conflicts with an existing
+/// symbol (`declareSymbol`): TS2528 for a second default export, by its
+/// name in an export table, TS2567 where either is an enum, TS2451 where
+/// the existing symbol is a block-scoped variable, and TS2300 otherwise.
+fn duplicate_code(existing: u32, declared: u32, name: &str) -> Code {
+    if name == "default" {
+        Code::MULTIPLE_DEFAULT_EXPORTS
+    } else if (existing | declared) & flags::ENUM != 0 {
+        Code::ENUM_MERGE
+    } else if existing & flags::BLOCK_SCOPED != 0 {
+        Code::REDECLARED_BLOCK_SCOPED
+    } else {
+        Code::DUPLICATE_IDENTIFIER
+    }
+}
+
+/// The checker's code for a merge of two symbols that exclude each other
+/// (`reportMergeSymbolError`): TS2567 where either is an enum, TS2451 where
+/// either is a block-scoped variable, and TS2300 otherwise.
+fn merge_code(target: u32, source: u32) -> Code {
+    let either = target | source;
+    if either & flags::ENUM != 0 {
+        Code::ENUM_MERGE
+    } else if either & flags::BLOCK_SCOPED != 0 {
+        Code::REDECLARED_BLOCK_SCOPED
+    } else {
+        Code::DUPLICATE_IDENTIFIER
+    }
+}
+
+/// The code of the error for a module request that names no module:
+/// TS2307, or the reason resolution's file is not admitted.
+fn missing_code(resolution: &ModuleResolution) -> Code {
+    match resolution {
+        ModuleResolution::NotAdmitted(code, _) => *code,
+        _ => Code::MODULE_NOT_FOUND,
     }
 }
 
@@ -823,13 +865,23 @@ impl<'p> Linker<'p, '_> {
     fn search(&self, file: FileId) -> bool {
         self.program.files[file.index()].search
     }
-    /// Whether a diagnostic at `offset` of `file` fails the load: the one
-    /// reporting decision (`Diagnostics::reports`), which every binding
-    /// error and missing input here goes through.
-    fn reports(&self, file: FileId, offset: usize) -> bool {
+    /// Whether a diagnostic with `code` at `offset` of `file` fails the
+    /// load: the one reporting decision (`Diagnostics::reports`), which every
+    /// binding error and missing module here goes through.
+    fn reports(&self, file: FileId, offset: usize, code: Code) -> bool {
+        self.program.files[file.index()].diagnostics.reports(
+            &self.program.sources.get(file).text,
+            offset,
+            code,
+        )
+    }
+
+    /// `reports` for one side of a checker merge conflict
+    /// (`Diagnostics::reports_merge_conflict`).
+    fn reports_merge_conflict(&self, file: FileId, offset: usize, code: Code) -> bool {
         self.program.files[file.index()]
             .diagnostics
-            .reports(&self.program.sources.get(file).text, offset)
+            .reports_merge_conflict(&self.program.sources.get(file).text, offset, code)
     }
     fn error(&self, kind: InputErrorKind, file: FileId, span: Span, message: String) -> InputError {
         let source = self.program.sources.get(file);
@@ -977,6 +1029,22 @@ impl<'p> Linker<'p, '_> {
                 let span = request.span;
                 let augmentation = matches!(request.kind, RequestKind::Augmentation { .. });
                 let target = match (ambient, resolution) {
+                    // A project file's request for an input outside the
+                    // supported profile fails before an ambient module of
+                    // its name may stand in for the input: the capability
+                    // limit is the input's, whatever TypeScript selects.
+                    (_, ModuleResolution::Unsupported(reason))
+                        if !program_file.diagnostics.tolerates_unsupported_input() =>
+                    {
+                        return Err(self
+                            .error(
+                                InputErrorKind::Unsupported,
+                                file,
+                                span,
+                                format!("module \"{}\": {reason}", request.specifier),
+                            )
+                            .into());
+                    }
                     (Some(module), _) => RequestTarget::Module(module),
                     (None, ModuleResolution::File(target)) => {
                         match self.state.file_modules[target.index()] {
@@ -987,8 +1055,9 @@ impl<'p> Linker<'p, '_> {
                     (
                         None,
                         ModuleResolution::Missing
-                        | ModuleResolution::NotAdmitted(_)
-                        | ModuleResolution::Unchecked,
+                        | ModuleResolution::NotAdmitted(..)
+                        | ModuleResolution::Unchecked
+                        | ModuleResolution::Untyped(_),
                     ) => {
                         // Pattern ambient modules also match relative names.
                         match self.pattern(&request.specifier) {
@@ -1001,15 +1070,20 @@ impl<'p> Linker<'p, '_> {
                             None if matches!(resolution, ModuleResolution::Unchecked) => {
                                 RequestTarget::Ignored
                             }
+                            None if matches!(resolution, ModuleResolution::Untyped(_)) => {
+                                self.untyped_module(file, index)?
+                            }
                             None if augmentation => {
                                 self.augmentation_target_failed(file, index, false)?
                             }
                             // Where the error is not reported, only names
                             // imported through the request stay unresolved.
-                            None if !self.reports(file, span.start) => RequestTarget::Ignored,
+                            None if !self.reports(file, span.start, missing_code(resolution)) => {
+                                RequestTarget::Ignored
+                            }
                             None => {
                                 let message = match resolution {
-                                    ModuleResolution::NotAdmitted(message) => message.clone(),
+                                    ModuleResolution::NotAdmitted(_, message) => message.clone(),
                                     _ => format!("cannot resolve module \"{}\"", request.specifier),
                                 };
                                 return Err(self
@@ -1018,21 +1092,8 @@ impl<'p> Linker<'p, '_> {
                             }
                         }
                     }
-                    (None, ModuleResolution::Unsupported(_))
-                        if program_file.diagnostics.tolerates_unsupported_input() =>
-                    {
-                        RequestTarget::Ignored
-                    }
-                    (None, ModuleResolution::Unsupported(reason)) => {
-                        return Err(self
-                            .error(
-                                InputErrorKind::Unsupported,
-                                file,
-                                span,
-                                format!("module \"{}\": {reason}", request.specifier),
-                            )
-                            .into());
-                    }
+                    // A dependency's request is tolerated (above).
+                    (None, ModuleResolution::Unsupported(_)) => RequestTarget::Ignored,
                 };
                 let raw_target = match target {
                     // Final binder associations are installed by declare_all.
@@ -1060,6 +1121,44 @@ impl<'p> Linker<'p, '_> {
         Ok(())
     }
 
+    /// What an untyped module means for the request that names it, as
+    /// TypeScript's `resolveExternalModule` decides once no ambient module
+    /// matches: nothing, so the names imported through it have the error
+    /// type, and a failure where it reports one. An augmentation of it is
+    /// TS2665, reported even in an ambient context; an import is TS7016
+    /// under `noImplicitAny` (`errorOnImplicitAnyModule`), except a
+    /// side-effect import, which it never reports.
+    fn untyped_module(&self, file: FileId, index: usize) -> Result<RequestTarget> {
+        let program_file = &self.program.files[file.index()];
+        let request = &program_file.facts.requests[index];
+        let ModuleResolution::Untyped(target) = &program_file.modules[index] else {
+            unreachable!("only an untyped module's request is settled as one")
+        };
+        let (code, message) = match request.kind {
+            RequestKind::Augmentation { .. } => (
+                Code::UNTYPED_AUGMENTATION,
+                project::untyped_augmentation_message(&request.specifier, target),
+            ),
+            RequestKind::Import { side_effect: true } => return Ok(RequestTarget::Ignored),
+            _ if !self.program.semantic.no_implicit_any => return Ok(RequestTarget::Ignored),
+            _ => (
+                Code::UNTYPED_MODULE,
+                project::untyped_message(&request.specifier, target),
+            ),
+        };
+        if !self.reports(file, request.span.start, code) {
+            return Ok(RequestTarget::Ignored);
+        }
+        Err(self
+            .error(
+                InputErrorKind::UnresolvedImport,
+                file,
+                request.span,
+                message,
+            )
+            .into())
+    }
+
     /// The one decision for an augmentation whose target is missing (TS2664)
     /// or a script (TS2306), as TypeScript's `mergeModuleAugmentation` makes
     /// it: neither is reported where the augmentation's parent is ambient (a
@@ -1075,8 +1174,13 @@ impl<'p> Linker<'p, '_> {
     ) -> Result<RequestTarget> {
         let program_file = &self.program.files[file.index()];
         let request = &program_file.facts.requests[request];
+        let code = if script {
+            Code::NOT_A_MODULE
+        } else {
+            Code::AUGMENTATION_NOT_FOUND
+        };
         let tolerated = request.kind == (RequestKind::Augmentation { ambient: true })
-            || !self.reports(file, request.span.start);
+            || !self.reports(file, request.span.start, code);
         if tolerated {
             return Ok(RequestTarget::Ignored);
         }
@@ -1648,8 +1752,10 @@ impl<'p> Linker<'p, '_> {
             entry.and_then(|entry| entry.member.or_else(|| entry.slots.symbols().next()));
         let symbol = if let Some(previous) = previous {
             let previous = self.find(previous);
-            if self.symbol(previous).flags & excluded(declaration_flags) != 0 {
-                if let Some((file, span)) = self.reported(previous, (site.file, site.span)) {
+            let existing = self.symbol(previous).flags;
+            if existing & excluded(declaration_flags) != 0 {
+                let code = duplicate_code(existing, declaration_flags, &name);
+                if let Some((file, span)) = self.reported(previous, (site.file, site.span), code) {
                     return Err(self
                         .error(
                             InputErrorKind::Binding,
@@ -1728,7 +1834,8 @@ impl<'p> Linker<'p, '_> {
         } else {
             held.alias.map(|alias| self.alias_site(alias))
         };
-        if let Some((file, span)) = previous.filter(|&(file, span)| self.reports(file, span.start))
+        if let Some((file, span)) = previous
+            .filter(|&(file, span)| self.reports(file, span.start, Code::DUPLICATE_IDENTIFIER))
         {
             return Err(self
                 .error(
@@ -1778,7 +1885,8 @@ impl<'p> Linker<'p, '_> {
             let data = self.symbol(symbol);
             let repeated = list.is_some_and(|list| data.lists.as_slice().contains(&list));
             if conflicts(data.flags, declared, repeated) {
-                if let Some((file, span)) = self.reported(symbol, (site.file, site.span)) {
+                let code = duplicate_code(data.flags, declared, &site.name);
+                if let Some((file, span)) = self.reported(symbol, (site.file, site.span), code) {
                     return Err(self
                         .error(
                             InputErrorKind::Binding,
@@ -1832,7 +1940,9 @@ impl<'p> Linker<'p, '_> {
                 .mixed_exports
                 .iter()
                 .map(|&name| &facts.names[name.index()]);
-            if let Some(name) = mixed.find(|name| self.reports(file, name.span.start)) {
+            if let Some(name) =
+                mixed.find(|name| self.reports(file, name.span.start, Code::MIXED_EXPORTS))
+            {
                 return Err(self
                     .error(
                         InputErrorKind::Binding,
@@ -1862,8 +1972,8 @@ impl<'p> Linker<'p, '_> {
     fn check_module_declarations(&self) -> Result<()> {
         for file in self.file_ids() {
             let mut misplaced = self.facts(file).misplaced_modules.iter();
-            if let Some(&(span, misplaced)) =
-                misplaced.find(|(span, _)| self.reports(file, span.start))
+            if let Some(&(span, misplaced)) = misplaced
+                .find(|&&(span, misplaced)| self.reports(file, span.start, misplaced.code()))
             {
                 let message = match misplaced {
                     MisplacedModule::Quoted => "only ambient modules can use quoted names",
@@ -2114,7 +2224,7 @@ impl<'p> Linker<'p, '_> {
                 _ => Slots::default(),
             };
             if self.union_flags(target) & (flags::NAMESPACE | flags::ENUM | flags::MODULE) == 0 {
-                if !self.reports(file, data.span.start) {
+                if !self.reports(file, data.span.start, Code::AUGMENTATION_NON_MODULE) {
                     return Ok(());
                 }
                 return Err(self
@@ -2138,7 +2248,8 @@ impl<'p> Linker<'p, '_> {
             let name = format!("\"{}\"", data.specifier);
             let values = self.union_flags(target) & flags::NAMESPACE_MODULE != 0;
             let sources = self.sites_of(Slots::only(meaning::NAMESPACE, augmentation));
-            return self.reject(&name, &sources, &self.sites_of(target), values);
+            let code = merge_code(self.union_flags(target), self.symbol(augmentation).flags);
+            return self.reject(&name, &sources, &self.sites_of(target), values, code);
         }
         self.mark_merged_into(target);
         // `export *` supplies names only to a module.
@@ -2399,7 +2510,14 @@ impl<'p> Linker<'p, '_> {
                     (sites, namespace && !alias_clash)
                 }
             };
-            self.reject(&format!("`{name}`"), &source_sites, &target_sites, values)?;
+            let code = merge_code(self.union_flags(source_slots), self.union_flags(targets));
+            self.reject(
+                &format!("`{name}`"),
+                &source_sites,
+                &target_sites,
+                values,
+                code,
+            )?;
             // TypeScript keeps a declared target; a resolved alias or star
             // export gives way to the source.
             if matches!(origin, Origin::Alias(_) | Origin::Star(_)) {
@@ -2594,14 +2712,16 @@ impl<'p> Linker<'p, '_> {
 
     /// Report a checker merge TypeScript rejects, where it reports one of
     /// the declarations it names (`reports`): TS2649 (`values`) at the
-    /// source's first declaration only, TS2300, TS2451, or TS2567 at the
-    /// declarations of both sides.
+    /// source's first declaration only, or `code` (TS2300, TS2451, or
+    /// TS2567, `merge_code`) at the declarations of both sides, except a
+    /// plain JavaScript file's (`reportMergeSymbolError`).
     fn reject(
         &self,
         name: &str,
         sources: &[(FileId, Span)],
         targets: &[(FileId, Span)],
         values: bool,
+        code: Code,
     ) -> Result<()> {
         let (reported, message) = if values {
             (
@@ -2614,11 +2734,13 @@ impl<'p> Linker<'p, '_> {
             (sources, format!("duplicate declaration of {name}"))
         };
         let others = if values { &[][..] } else { targets };
-        match reported
-            .iter()
-            .chain(others)
-            .find(|&&(file, span)| self.reports(file, span.start))
-        {
+        match reported.iter().chain(others).find(|&&(file, span)| {
+            if values {
+                self.reports(file, span.start, Code::AUGMENTATION_VALUES)
+            } else {
+                self.reports_merge_conflict(file, span.start, code)
+            }
+        }) {
             Some(&(file, span)) => Err(self
                 .error(InputErrorKind::Binding, file, span, message)
                 .into()),
@@ -2806,7 +2928,9 @@ impl<'p> Linker<'p, '_> {
                         .and_then(|table| self.state.store.table(table).get(&*decl.name))
                         .and_then(|entry| entry.slots.value())
                         .is_some_and(|symbol| self.symbol(symbol).flags & flags::BLOCK_SCOPED != 0);
-                    if blocked && self.reports(file, decl.anchor.start) {
+                    if blocked
+                        && self.reports(file, decl.anchor.start, Code::HOISTED_PAST_BLOCK_SCOPED)
+                    {
                         return Err(self.error(
                             InputErrorKind::Binding,
                             file,
@@ -2861,7 +2985,7 @@ impl<'p> Linker<'p, '_> {
             for (index, decl) in self.facts(file).decls.iter().enumerate() {
                 if merged(decl.kind)
                     && self.state.decl_symbols[file.index()][index].is_some()
-                    && self.reports(file, decl.anchor.start)
+                    && self.reports(file, decl.anchor.start, Code::NAMESPACE_BEFORE_MERGE)
                 {
                     let view = self.decl_symbol(file, DeclId::new(index));
                     if seen.insert(view) {
@@ -2887,8 +3011,11 @@ impl<'p> Linker<'p, '_> {
                 continue;
             }
             let selects = |&(file, index): &(FileId, DeclId)| {
-                self.reports(file, decl((file, index)).anchor.start)
-                    && self.decl_symbol(file, index) == view
+                self.reports(
+                    file,
+                    decl((file, index)).anchor.start,
+                    Code::NAMESPACE_BEFORE_MERGE,
+                ) && self.decl_symbol(file, index) == view
             };
             let anchor = list.iter().copied().find(|&(file, index)| {
                 let decl = decl((file, index));
@@ -3074,7 +3201,8 @@ impl<'p> Linker<'p, '_> {
                     .contains(&list)
             });
             if conflicts(flags, declared, repeated) {
-                if let Some((file, span)) = self.reported(symbol, (site.file, site.span)) {
+                let code = duplicate_code(flags, declared, name);
+                if let Some((file, span)) = self.reported(symbol, (site.file, site.span), code) {
                     return Err(self
                         .error(
                             InputErrorKind::Binding,
@@ -3132,7 +3260,12 @@ impl<'p> Linker<'p, '_> {
     /// both, so the new one if it is reported (`reports`), or else the first
     /// reported declaration of `symbol`. Where none is, the declarations
     /// merge, as this tool binds what TypeScript does not report.
-    fn reported(&self, symbol: SymbolId, new: (FileId, Span)) -> Option<(FileId, Span)> {
+    fn reported(
+        &self,
+        symbol: SymbolId,
+        new: (FileId, Span),
+        code: Code,
+    ) -> Option<(FileId, Span)> {
         std::iter::once(new)
             .chain(
                 self.symbol(symbol)
@@ -3140,7 +3273,7 @@ impl<'p> Linker<'p, '_> {
                     .iter()
                     .map(|site| (site.file, site.span)),
             )
-            .find(|&(file, span)| self.reports(file, span.start))
+            .find(|&(file, span)| self.reports(file, span.start, code))
     }
 
     /// The meanings of a symbol and every declaration merged into it.
@@ -3235,7 +3368,7 @@ impl<'p> Linker<'p, '_> {
             // where neither is reported.
             if let Some(checked) = [alias, kept].into_iter().find(|alias| {
                 let span = self.facts(alias.file).aliases[alias.id.index()].span;
-                self.reports(alias.file, span.start)
+                self.reports_merge_conflict(alias.file, span.start, Code::DUPLICATE_IDENTIFIER)
             }) {
                 let span = self.facts(checked.file).aliases[checked.id.index()].span;
                 return Err(self
@@ -3281,7 +3414,8 @@ impl<'p> Linker<'p, '_> {
                             .iter()
                             .map(|site| (site.file, site.span))
                             .collect();
-                        self.reject("member", &source_sites, &target_sites, false)?;
+                        let code = merge_code(self.symbol(target).flags, self.symbol(source).flags);
+                        self.reject("member", &source_sites, &target_sites, false, code)?;
                         continue;
                     }
                     self.merge_into(target, source, direction, None, work)?;
@@ -3325,7 +3459,8 @@ impl<'p> Linker<'p, '_> {
             if other == symbol {
                 continue;
             }
-            if let Some((file, span)) = self.reported(other, (file, span)) {
+            let code = duplicate_code(self.symbol(other).flags, self.symbol(symbol).flags, name);
+            if let Some((file, span)) = self.reported(other, (file, span), code) {
                 return Err(self
                     .error(
                         InputErrorKind::Binding,
@@ -3390,9 +3525,10 @@ impl<'p> Linker<'p, '_> {
             if let Some(kept) = held.alias {
                 let kept_span = linker.facts(kept.file).aliases[kept.id.index()].span;
                 // TypeScript's binder reports both declarations.
+                let code = duplicate_code(flags::ALIAS, flags::ALIAS, name);
                 if let Some((file, span)) = [(file, span), (kept.file, kept_span)]
                     .into_iter()
-                    .find(|&(file, span)| linker.reports(file, span.start))
+                    .find(|&(file, span)| linker.reports(file, span.start, code))
                 {
                     return Err(linker
                         .error(
@@ -3434,7 +3570,8 @@ impl<'p> Linker<'p, '_> {
                     exports.push((name.clone(), reference));
                     return Ok(());
                 }
-                if self.reports(file, span.start) {
+                let code = duplicate_code(flags::ALIAS, flags::ALIAS, name);
+                if self.reports(file, span.start, code) {
                     return Err(self
                         .error(
                             InputErrorKind::Binding,
@@ -3706,7 +3843,12 @@ impl<'p> Linker<'p, '_> {
                 Resolution::Value { .. } => slots.get(meaning::VALUE).is_some(),
                 _ => false,
             };
-            if overlap && self.reports(file, span.start) {
+            let code = if name == "default" {
+                Code::MULTIPLE_DEFAULT_EXPORTS
+            } else {
+                Code::IMPORT_CONFLICT
+            };
+            if overlap && self.reports(file, span.start, code) {
                 return Err(self
                     .error(
                         InputErrorKind::Binding,

@@ -21,10 +21,6 @@ use typescript_parser::references::ReferenceQuery;
 const DATA: &str =
     r#"{ "greeting": "hi", "value": 1, "a-b": 2, "1": 3, "default": 4, "nested": { "x": 1 } }"#;
 
-fn load(fixture: &Fixture) -> Result<Project, InputError> {
-    Project::load(&fixture.path("tsconfig.json")).map_err(support::input_error)
-}
-
 #[test]
 fn json_import_forms_resolve_like_the_compiler_beside_ordinary_groups() {
     check(&[
@@ -126,7 +122,7 @@ fn without_resolve_json_module_a_json_specifier_is_missing() {
             ("data.json", DATA),
             ("main.ts", text),
         ]);
-        let error = load(&fixture).unwrap_err();
+        let error = fixture.try_load().unwrap_err();
         assert_eq!(error.kind, InputErrorKind::UnresolvedImport, "{error}");
         assert_eq!(error.position, Some(position(text, 17)), "{error}");
     }
@@ -197,7 +193,7 @@ fn load_data(text: &str) -> Result<Project, InputError> {
         ("main.ts", "import data from \"./data.json\";\ndata;\n"),
         ("data.json", text),
     ]);
-    load(&fixture)
+    fixture.try_load()
 }
 
 /// Each case's verdict is TypeScript 7.0.2's syntactic diagnostics for the
@@ -280,7 +276,7 @@ fn json_modules_follow_the_compilers_grammar() {
 fn a_json_member_takes_one_postfix_marker() {
     let config = |text: &str| {
         let fixture = Fixture::new(&[("tsconfig.json", text), ("a.ts", "export {};\n")]);
-        load(&fixture).map(|_| ())
+        fixture.try_load().map(|_| ())
     };
     // Positions count from after a leading byte order mark, as TypeScript's
     // file reading drops it.
@@ -375,7 +371,7 @@ fn an_unreadable_json_module_is_an_io_failure() {
         eprintln!("SKIP an_unreadable_json_module_is_an_io_failure: permissions are not enforced");
         return;
     }
-    let error = load(&fixture).map(|_| ()).unwrap_err();
+    let error = fixture.try_load().map(|_| ()).unwrap_err();
     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o644)).unwrap();
     assert_eq!(error.kind, InputErrorKind::Io, "{error}");
     assert!(
@@ -417,7 +413,7 @@ fn queries_inside_a_json_file_find_no_occurrences() {
 fn configuration_text_follows_the_compilers_grammar() {
     let load_config = |config: &str| {
         let fixture = Fixture::new(&[("tsconfig.json", config), ("a.ts", "export const a = 1;\n")]);
-        load(&fixture).map(|_| ())
+        fixture.try_load().map(|_| ())
     };
     for config in [
         "#!x\n{\"compilerOptions\":{\"noLib\":true}}",

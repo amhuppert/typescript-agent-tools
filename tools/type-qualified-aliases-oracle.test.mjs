@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {compilerHookOracle} from './type-oracle.mjs';
 import {lineStarts, position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 const root = fileURLToPath(new URL('../fixtures/types/native-qualified-aliases/', import.meta.url));
 const source = fs.readFileSync(path.join(root,'cases.ts'),'utf8');
 const expected = [
@@ -26,7 +27,7 @@ test('native Alias-only entity lookup preserves selected raw export and lexical 
       const aliases=Object.entries(answer.beforeSummary.observations)
         .filter(([key])=>key.startsWith('typeReferenceAlias:')).map(([,value])=>value);
       records.push({config,marker,summary:answer.summary,errorType:answer.errorType,aliases,codes:answer.beforeSummary.diagnosticCodes});
-      fs.writeFileSync('.cc/temp/native-qualified-aliases-observations.json',JSON.stringify(records,null,2));
+      fs.writeFileSync(scratchPath('native-qualified-aliases-observations.json'),JSON.stringify(records,null,2));
     }
   }
   for (const record of records) {

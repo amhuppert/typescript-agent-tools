@@ -42,6 +42,7 @@ use std::path::{Path, PathBuf};
 
 /// Binding asks the loader's question of whether a module name is relative.
 use program::is_relative_name;
+use program::{untyped_augmentation_message, untyped_message};
 
 /// An immutable snapshot of one configured project: its captured sources,
 /// its completed lexical bindings, their reference index, and the declaration
@@ -318,6 +319,16 @@ impl Project {
             .into()
         })
     }
+}
+
+/// The doctor's account of the compiler `config`'s project is read for:
+/// the TypeScript package installed nearest the configuration, its version,
+/// the dialect it selects, the semantic authority, and the standard
+/// library's source, as one line. It makes the selection loading makes and
+/// reads only the configuration's directory and the compiler manifests on
+/// the way; a manifest that names no version is the error loading reports.
+pub fn compatibility(config: &Path) -> Result<String, InputError> {
+    program::compatibility(config, &program::disk::Disk::default())
 }
 
 /// One operation on a project, as `Project::execute` and

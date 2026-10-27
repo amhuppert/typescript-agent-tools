@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {compilerHookOracle} from './type-oracle.mjs';
 import {lineStarts,position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 
 const root=fileURLToPath(new URL('../fixtures/types/member-search-inventory/',import.meta.url));
 const markers={
@@ -66,10 +67,10 @@ test('native member inventory roles, exact literal keys and search scope',async(
    } catch(error) {
     rows.push({config,file,marker,error:String(error)});
    }
-   fs.writeFileSync('.cc/temp/member-inventory-native.json',JSON.stringify(rows,null,2));
+   fs.writeFileSync(scratchPath('member-inventory-native.json'),JSON.stringify(rows,null,2));
   }
  }
- fs.writeFileSync('.cc/temp/member-inventory-native.json',JSON.stringify(rows,null,2));
+ fs.writeFileSync(scratchPath('member-inventory-native.json'),JSON.stringify(rows,null,2));
  assert.equal(rows.length,60);
  for(const {file,marker,answer,error} of rows){
   assert.equal(error,undefined,`${file}/${marker}: ${error}`);

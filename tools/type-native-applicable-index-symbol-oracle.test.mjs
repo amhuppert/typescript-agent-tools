@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {compilerHookOracle} from './type-oracle.mjs';
 import {lineStarts, position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 const root = fileURLToPath(new URL('../fixtures/types/native-applicable-index-symbol/', import.meta.url));
 const source = fs.readFileSync(path.join(root, 'cases.ts'), 'utf8');
 test('native applicable index candidates remain unrelated to a healthy member seed', async () => {
@@ -12,7 +13,7 @@ test('native applicable index candidates remain unrelated to a healthy member se
     for (const marker of ['seed', 'healthy']) {
       const tag = `/*#${marker}*/`;
       const answer = await compilerHookOracle(path.join(root, config), {operation: 'member', at: {file:'cases.ts', ...position(lineStarts(source), source.indexOf(tag) + tag.length)}});
-      fs.writeFileSync(`.cc/temp/applicable-index-symbol-${config}-${marker}.json`, JSON.stringify(answer, null, 2));
+      fs.writeFileSync(scratchPath(`applicable-index-symbol-${config}-${marker}.json`), JSON.stringify(answer, null, 2));
       assert.equal(answer.compiler, '7.0.2');
       assert.equal(answer.checkerCount, 1);
       assert.equal(answer.history, 'baseline');

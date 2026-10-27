@@ -53,6 +53,14 @@ problem is reported at once (see [Output](#output)).
 Paths in arguments and batch files are relative to the working
 directory; plans record absolute paths, so a plan applies from anywhere.
 
+Editing targets TypeScript files: `.ts`, `.tsx`, `.mts`, and `.cts`. A
+JavaScript file (`.js`, `.jsx`, `.mjs`, or `.cjs`), which a project with
+`allowJs` loads and navigation and project queries read, is never edited, by
+product policy: every edit operation refuses one as unsupported input that
+names the file (exit 1), whether a file, a batch, or a project selection names
+it, and `--apply` refuses a plan altered to name one alike, as `Unsupported`
+naming the file (exit 1, effect `unchanged`).
+
 The request parser rejects, as usage errors (exit 2): two operations;
 `--from` or `--plan` without an edit operation; a missing `--from`; both or
 neither of `--at` and `--name`; `--name` without FILE or `--project`; FILE `-`;

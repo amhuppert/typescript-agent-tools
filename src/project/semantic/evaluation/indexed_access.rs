@@ -694,6 +694,11 @@ impl Evaluator<'_, '_> {
                         self.model.special(SpecialName::Never),
                     )));
                 }
+                if sequence.read(self.is_js_literal_type_completion(object, consumer))? {
+                    return Ok(Some(IndexedValue::plain(
+                        self.model.special(SpecialName::Any),
+                    )));
+                }
                 if matches!(node, AccessNode::Element(..))
                     && self
                         .model
@@ -742,6 +747,11 @@ impl Evaluator<'_, '_> {
             {
                 return Ok(Some(IndexedValue::plain(
                     self.model.special(SpecialName::Undefined),
+                )));
+            }
+            if sequence.read(self.is_js_literal_type_completion(object, consumer))? {
+                return Ok(Some(IndexedValue::plain(
+                    self.model.special(SpecialName::Any),
                 )));
             }
             if self.model.has_type_flags(index, TypeFlags::ANY) {

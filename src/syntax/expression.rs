@@ -19,14 +19,37 @@ pub(crate) fn is_late_bindable_ast(ast: &Ast<'_>, node: NodeId) -> bool {
 /// TypeScript `IsEntityNameExpressionEx` with the TypeScript-only allowJS
 /// profile. Every receiver is direct syntax; parenthesized receivers and
 /// private names do not form an entity name.
-pub(crate) fn is_entity_name_expression(ast: &Ast<'_>, mut node: NodeId) -> bool {
+pub(crate) fn is_entity_name_expression(ast: &Ast<'_>, node: NodeId) -> bool {
+    is_entity_name_expression_ex(ast, node, false)
+}
+
+/// TypeScript `IsEntityNameExpressionEx`: with `allow_js`, as in a
+/// JavaScript file, `this` and an element access with a string or numeric
+/// literal argument also form an entity name.
+pub(crate) fn is_entity_name_expression_ex(
+    ast: &Ast<'_>,
+    mut node: NodeId,
+    allow_js: bool,
+) -> bool {
     loop {
         let syntax = ast.node(node);
         match syntax.syntax_kind {
             SyntaxKind::Identifier => return true,
+            SyntaxKind::ThisKeyword => return allow_js,
             SyntaxKind::PropertyAccessExpression => {
                 if !id(syntax, "name")
                     .is_some_and(|name| ast.node(name).syntax_kind == SyntaxKind::Identifier)
+                {
+                    return false;
+                }
+                let Some(receiver) = id(syntax, "expression") else {
+                    return false;
+                };
+                node = receiver;
+            }
+            SyntaxKind::ElementAccessExpression if allow_js => {
+                if !id(syntax, "argumentExpression")
+                    .is_some_and(|argument| super::is_string_or_numeric_literal_like(ast, argument))
                 {
                     return false;
                 }

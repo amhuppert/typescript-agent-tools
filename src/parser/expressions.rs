@@ -373,8 +373,11 @@ impl<'src> Parser<'src> {
                     fields.push(("argumentExpression", self.expression_allow_in()?.into()));
                     self.expect("]")?;
                     ElementAccessExpression
-                } else if question.is_some() && !no_call && (self.at("(") || self.type_open()) {
-                    if self.type_open() {
+                } else if question.is_some()
+                    && !no_call
+                    && (self.at("(") || self.expression_type_open())
+                {
+                    if self.expression_type_open() {
                         fields.push(("typeArguments", self.type_arguments()?.into()));
                     }
                     if matches!(
@@ -444,7 +447,7 @@ impl<'src> Parser<'src> {
                 if chain {
                     self.nodes[expression.0].flags |= node_flags::OPTIONAL_CHAIN;
                 }
-            } else if self.type_open() {
+            } else if self.expression_type_open() {
                 let arguments = self.expression_type_arguments(no_call)?;
                 let Some(type_arguments) = arguments else {
                     break;
@@ -526,6 +529,13 @@ impl<'src> Parser<'src> {
                         Kind::Word | Kind::Private | Kind::Number | Kind::String
                     ) && !matches!(self.current.raw, "[" | "{" | "!" | "~" | "++" | "--"))
     }
+    /// Whether type arguments may start here in an expression: never in a
+    /// JavaScript file, where `<` is a comparison
+    /// (`tryParseTypeArgumentsInExpression`).
+    pub(super) fn expression_type_open(&self) -> bool {
+        !self.javascript && self.type_open()
+    }
+
     fn expression_type_arguments(&mut self, no_call: bool) -> Result<Option<Vec<NodeId>>> {
         // Attempts that `angles` rules out could only fail, so skipping them
         // changes no result.

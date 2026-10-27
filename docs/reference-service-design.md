@@ -63,6 +63,15 @@ the loader captures query aliases through that configuration directory, and a
 symlink can later be retargeted. Distinct spellings may own separate services;
 they must never accidentally reuse each other's captured lookup aliases.
 
+The runtime directory is not part of that identity, but it scopes it: a
+service's files are found only in the directory the client chose (see
+Lifecycle). Environments that choose different runtime directories, such as
+an unsandboxed shell and a sandboxed agent whose `TMPDIR` differs, therefore
+start separate services for one configuration spelling and build, each with
+its own memory and warm cache, and status and stop in one do not see the
+other's. The remedy is the same `TSPARSE_SERVICE_DIR` in both environments,
+naming a directory both can write.
+
 ## Owners
 
 * `project::program::disk`: filesystem operations and their observations:
@@ -82,7 +91,11 @@ they must never accidentally reuse each other's captured lookup aliases.
 * Binary-private `service`: rendezvous, exclusive process ownership, private
   socket protocol, startup, idle shutdown, and administrative operations. The
   wire carries `ProjectRequest` and `Result<ProjectResponse, AnalysisError>`
-  unchanged, so a new operation needs no protocol work.
+  unchanged, so a new operation needs no protocol work. `service::runtime`
+  chooses the runtime directory from the strings
+  `process_limits::Environment` reads, with the socket owner deciding whether
+  the socket paths fit; `Endpoint::prepare` and `require_private` check the
+  chosen directory.
 * `cli`: one parsed-request boundary (`cli::request`), execution in file,
   direct, or service entry (`cli::query`), and one delivery policy for every
   outcome's channels and exit code (`cli::delivery`).
@@ -140,8 +153,21 @@ watchdog that could not run keep their codes across the socket.
 
 ## Lifecycle
 
-Use a private runtime directory outside the project source tree, with an
-optional `TSPARSE_SERVICE_DIR` override for managed environments and tests.
+Use a private runtime directory outside the project source tree, chosen from
+the environment's strings alone: `TSPARSE_SERVICE_DIR` when it is set, as given
+(a relative value taken in the working directory), for managed environments
+and tests; otherwise `TMPDIR/tsparse-UID` when `TMPDIR` is a non-empty
+absolute path, taken by its components, whose socket paths fit a socket
+address; otherwise `/tmp/tsparse-UID`. Restricted environments such as agent
+sandboxes often deny writes to `/tmp` but name a writable `TMPDIR`, and macOS
+sets a per-user `TMPDIR` in every session. The choice never probes the file
+system and never retries another directory after a failure: every client in
+one environment chooses the same directory, a failure there is reported with
+the rule that chose it and a remedy naming `TMPDIR` and `TSPARSE_SERVICE_DIR`,
+and nothing falls back to direct loading. The doctor reports the rule, and for
+`/tmp/tsparse-UID` why `TMPDIR` was not used (not set, empty, relative, or socket
+paths over the limit). The client passes the absolute directory it chose to the
+service it starts as `TSPARSE_SERVICE_DIR`, so both use one directory.
 Hold an operating-system advisory lock for the lifetime of a server. Only the
 lock holder may remove a stale socket and bind its replacement. Lock files
 remain in place so concurrent processes always lock the same inode; a crash

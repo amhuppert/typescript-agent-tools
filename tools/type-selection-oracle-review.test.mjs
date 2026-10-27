@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { lineStarts, position } from './semantic-oracle.mjs';
 import { typeOracle, compilerHookOracle } from './type-oracle.mjs';
+import { scratchPath } from './harness-scratch.mjs';
 
 const fixture=fileURLToPath(new URL('../fixtures/types/selection-review/',import.meta.url));
 const config=path.join(fixture,'tsconfig.json');
@@ -161,7 +162,7 @@ test('Q4 nested enclosing calls run outermost first in fresh baseline checkers',
 });
 
 test('Q4 positions preserve UTF-16 and exact trivia boundaries for compiler line breaks',async t=>{
- const root=fs.mkdtempSync(path.resolve('.cc/temp/type-selection-positions-'));
+ const root=fs.mkdtempSync(scratchPath('type-selection-positions-'));
  t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
  const config=path.join(root,'tsconfig.json');
  fs.writeFileSync(config,JSON.stringify({compilerOptions:{strict:true,noEmit:true,noLib:true},files:['cases.ts']}));

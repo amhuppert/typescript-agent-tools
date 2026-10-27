@@ -1,0 +1,546 @@
+{
+  "compiler": "7.0.2",
+  "types": [
+    {
+      "name": "response",
+      "file": "src/fetch.ts",
+      "kind": "value",
+      "summary": "Response",
+      "errorType": false
+    },
+    {
+      "name": "status",
+      "file": "src/fetch.ts",
+      "kind": "value",
+      "summary": "number",
+      "errorType": false
+    },
+    {
+      "name": "call",
+      "file": "src/fetch.ts",
+      "kind": "value",
+      "summary": "Promise<Response>",
+      "errorType": false
+    },
+    {
+      "name": "moduleValue",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "typeof import(\"<root>/src/lib\")",
+      "errorType": false
+    },
+    {
+      "name": "qualified",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "Thing",
+      "errorType": false
+    },
+    {
+      "name": "generic",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "Box<string>",
+      "errorType": false
+    },
+    {
+      "name": "nested",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "Leaf",
+      "errorType": false
+    },
+    {
+      "name": "typeofValue",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "{ count: number; nested: { deep: string; }; }",
+      "errorType": false
+    },
+    {
+      "name": "typeofProperty",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "string",
+      "errorType": false
+    },
+    {
+      "name": "typeofClass",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "typeof Thing",
+      "errorType": false
+    },
+    {
+      "name": "typeofGeneric",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "(input: number) => Box<number>",
+      "errorType": false
+    },
+    {
+      "name": "typeofNested",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "1",
+      "errorType": false
+    },
+    {
+      "name": "alias",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "Box<number>",
+      "errorType": false
+    },
+    {
+      "name": "typeOnlyAlias",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "Thing",
+      "errorType": false
+    },
+    {
+      "name": "namespaceAlias",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "Planet",
+      "errorType": false
+    },
+    {
+      "name": "typeofNamespaceAlias",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "365",
+      "errorType": false
+    },
+    {
+      "name": "exportEquals",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "Member",
+      "errorType": false
+    },
+    {
+      "name": "typeofExportEquals",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "Member",
+      "errorType": false
+    },
+    {
+      "name": "ambient",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "Shape",
+      "errorType": false
+    },
+    {
+      "name": "package",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "RequestInfo",
+      "errorType": false
+    },
+    {
+      "name": "packageTypeof",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "typeof Request",
+      "errorType": false
+    },
+    {
+      "name": "packageModule",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "typeof import(\"<root>/node_modules/undici-types/fetch\")",
+      "errorType": false
+    },
+    {
+      "name": "modeDefault",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "\"esm\"",
+      "errorType": false
+    },
+    {
+      "name": "modeImport",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "\"esm\"",
+      "errorType": false
+    },
+    {
+      "name": "modeRequire",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "\"cjs\"",
+      "errorType": false
+    },
+    {
+      "name": "selectBox",
+      "file": "src/cases.ts",
+      "kind": "type",
+      "summary": "Box<boolean>",
+      "errorType": false
+    },
+    {
+      "name": "selectLeaf",
+      "file": "src/cases.ts",
+      "unsupported": true
+    },
+    {
+      "name": "typeEquals",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "Only",
+      "errorType": false
+    },
+    {
+      "name": "packageDefault",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "typeof Request",
+      "errorType": false
+    },
+    {
+      "name": "typeofTypeOnly",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "{ count: number; nested: { deep: string; }; }",
+      "errorType": false
+    },
+    {
+      "name": "typeofTypeOnlyChain",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "number",
+      "errorType": false
+    },
+    {
+      "name": "defaultType",
+      "file": "src/cases.ts",
+      "kind": "value",
+      "summary": "Def",
+      "errorType": false
+    },
+    {
+      "name": "typeArgument",
+      "file": "src/checks.ts",
+      "kind": "value",
+      "summary": "Name",
+      "errorType": false
+    },
+    {
+      "name": "genericTypeArgument",
+      "file": "src/checks.ts",
+      "kind": "value",
+      "summary": "Limited<\"a\">",
+      "errorType": false
+    },
+    {
+      "name": "violatedConstraint",
+      "file": "src/checks.ts",
+      "kind": "value",
+      "summary": "Limited<number>",
+      "errorType": false
+    },
+    {
+      "name": "genericAlias",
+      "file": "src/aliases.ts",
+      "kind": "value",
+      "summary": "Pair<number>",
+      "errorType": false
+    },
+    {
+      "name": "defaultedAlias",
+      "file": "src/aliases.ts",
+      "kind": "value",
+      "summary": "Wide<\"d\">",
+      "errorType": false
+    },
+    {
+      "name": "wrongArity",
+      "file": "src/aliases.ts",
+      "kind": "value",
+      "summary": "any",
+      "errorType": true
+    },
+    {
+      "name": "typeofTypeAlias",
+      "file": "src/aliases.ts",
+      "kind": "value",
+      "summary": "any",
+      "errorType": true
+    },
+    {
+      "name": "missingMember",
+      "file": "src/errors.ts",
+      "kind": "value",
+      "summary": "any",
+      "errorType": true
+    },
+    {
+      "name": "missingNested",
+      "file": "src/errors.ts",
+      "kind": "value",
+      "summary": "any",
+      "errorType": true
+    },
+    {
+      "name": "missingTypeofMember",
+      "file": "src/errors.ts",
+      "kind": "value",
+      "summary": "any",
+      "errorType": true
+    },
+    {
+      "name": "moduleAsType",
+      "file": "src/errors.ts",
+      "kind": "value",
+      "summary": "any",
+      "errorType": true
+    },
+    {
+      "name": "typeOnlyModuleValue",
+      "file": "src/errors.ts",
+      "kind": "value",
+      "summary": "any",
+      "errorType": true
+    },
+    {
+      "name": "missingModule",
+      "file": "src/errors.ts",
+      "kind": "value",
+      "summary": "any",
+      "errorType": true
+    },
+    {
+      "name": "missingTypeofModule",
+      "file": "src/errors.ts",
+      "kind": "value",
+      "summary": "any",
+      "errorType": true
+    },
+    {
+      "name": "aliasToNowhere",
+      "file": "src/errors.ts",
+      "kind": "value",
+      "summary": "any",
+      "errorType": true
+    },
+    {
+      "name": "circular",
+      "file": "src/errors.ts",
+      "kind": "value",
+      "summary": "any",
+      "errorType": true
+    },
+    {
+      "name": "nonLiteral",
+      "file": "src/errors.ts",
+      "kind": "value",
+      "summary": "any",
+      "errorType": true
+    }
+  ],
+  "diagnostics": [
+    {
+      "code": 2307,
+      "file": "node_modules/broken/index.d.ts",
+      "line": 1,
+      "column": 40
+    },
+    {
+      "code": 2307,
+      "file": "node_modules/broken/index.d.ts",
+      "line": 2,
+      "column": 53
+    },
+    {
+      "code": 2314,
+      "file": "src/aliases.ts",
+      "line": 3,
+      "column": 49
+    },
+    {
+      "code": 2694,
+      "file": "src/aliases.ts",
+      "line": 4,
+      "column": 81
+    },
+    {
+      "code": 2305,
+      "file": "src/broken.ts",
+      "line": 1,
+      "column": 10
+    },
+    {
+      "code": 2344,
+      "file": "src/checks.ts",
+      "line": 4,
+      "column": 80
+    },
+    {
+      "code": 2456,
+      "file": "src/circular.ts",
+      "line": 1,
+      "column": 13
+    },
+    {
+      "code": 2694,
+      "file": "src/errors.ts",
+      "line": 2,
+      "column": 68
+    },
+    {
+      "code": 2694,
+      "file": "src/errors.ts",
+      "line": 3,
+      "column": 80
+    },
+    {
+      "code": 2694,
+      "file": "src/errors.ts",
+      "line": 4,
+      "column": 92
+    },
+    {
+      "code": 1340,
+      "file": "src/errors.ts",
+      "line": 5,
+      "column": 53
+    },
+    {
+      "code": 1339,
+      "file": "src/errors.ts",
+      "line": 6,
+      "column": 60
+    },
+    {
+      "code": 1141,
+      "file": "src/errors.ts",
+      "line": 11,
+      "column": 56
+    }
+  ],
+  "references": [
+    {
+      "name": "boxValue",
+      "file": "src/lib.ts",
+      "groups": [
+        {
+          "origins": [
+            {
+              "file": "src/lib.ts",
+              "line": 1,
+              "column": 40
+            }
+          ],
+          "occurrences": [
+            {
+              "file": "src/lib.ts",
+              "line": 1,
+              "column": 40
+            },
+            {
+              "file": "src/lib.ts",
+              "line": 4,
+              "column": 54
+            },
+            {
+              "file": "src/uses.ts",
+              "line": 2,
+              "column": 28
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "count",
+      "file": "src/lib.ts",
+      "groups": [
+        {
+          "origins": [
+            {
+              "file": "src/lib.ts",
+              "line": 3,
+              "column": 34
+            }
+          ],
+          "occurrences": [
+            {
+              "file": "src/cases.ts",
+              "line": 28,
+              "column": 101
+            },
+            {
+              "file": "src/lib.ts",
+              "line": 3,
+              "column": 34
+            },
+            {
+              "file": "src/uses.ts",
+              "line": 3,
+              "column": 36
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "nested",
+      "file": "src/lib.ts",
+      "groups": [
+        {
+          "origins": [
+            {
+              "file": "src/lib.ts",
+              "line": 3,
+              "column": 55
+            }
+          ],
+          "occurrences": [
+            {
+              "file": "src/cases.ts",
+              "line": 6,
+              "column": 79
+            },
+            {
+              "file": "src/lib.ts",
+              "line": 3,
+              "column": 55
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "deep",
+      "file": "src/lib.ts",
+      "groups": [
+        {
+          "origins": [
+            {
+              "file": "src/lib.ts",
+              "line": 3,
+              "column": 74
+            }
+          ],
+          "occurrences": [
+            {
+              "file": "src/cases.ts",
+              "line": 6,
+              "column": 86
+            },
+            {
+              "file": "src/lib.ts",
+              "line": 3,
+              "column": 74
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

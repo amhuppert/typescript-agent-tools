@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {compilerHookOracle} from './type-oracle.mjs';
 import {lineStarts, position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 
 // JSX attribute uses of a props member are compiler reference candidates
 // related through the contextual props type. The product defers that JSX
@@ -23,7 +24,7 @@ function observation(answer, target) {
 
 test('JSX attribute candidates relate to the props member only through JSX typing', async () => {
   const answer = await compilerHookOracle(path.join(root, 'tsconfig.json'), {operation: 'member', at: at('comp.tsx', 'prop')});
-  fs.writeFileSync('.cc/temp/native-jsx-member-gaps.json', JSON.stringify(answer, null, 2) + '\n');
+  fs.writeFileSync(scratchPath('native-jsx-member-gaps.json'), JSON.stringify(answer, null, 2) + '\n');
   assert.equal(answer.compiler, '7.0.2');
   assert.deepEqual(answer.demandFailures, []);
   for (const marker of ['attrFirst', 'attrSecond']) {

@@ -21,12 +21,14 @@ operation; a text match cannot tell a symbol from its spelling.
 | Every use or call of a member | `--references` with a dotted `--name`, and `--calls` for calls | member identity follows resolved receiver types, not spelling |
 | A type | `--type` | it reports the type of the declaration or token, and a bounded graph with `--expand` |
 | To replace a body or insert statements | `--replace-body`, `--insert-after`, or `--edit-batch`, then `--apply` | the preview is the exact diff; the rest of each file stays byte for byte, the result must parse and keep comment directives and JSDoc governing what they did, and no project file is written until you apply (`--plan` and `-o` only create new files); it is not type-checked |
-| Whether a file parses | `--check` | it parses as TypeScript 7 does; it does not type-check |
+| Whether a file parses | `--check` | it parses as TypeScript 7 does; it does not type-check, but rejects a namespace declared with `module` (TS1540) as TypeScript 7 does |
 
 Keep text search for:
 
 - Comments, string contents, configuration, and documentation.
-- Files the project does not search, and JavaScript, which is not supported.
+- Files the project does not search, and JavaScript beyond plain ES modules
+  and one `module.exports = name`, which a project refuses where it is
+  written (other CommonJS, `require`, JSDoc beyond a variable's `@type`).
 - A name you know only in part: every name is exact.
 
 ## Start a task
@@ -45,6 +47,7 @@ Keep text search for:
 | Write a previewed edit | `tsparse --apply run.plan.json` |
 | Check syntax | `tsparse --check src/host.ts` |
 | A project query fails to start or answer | `tsparse --doctor --project tsconfig.json` |
+| Learn which compiler's rules read a project (TypeScript 5.x or 7) | `tsparse --doctor --project tsconfig.json` (its `compatibility` line) |
 
 Then:
 

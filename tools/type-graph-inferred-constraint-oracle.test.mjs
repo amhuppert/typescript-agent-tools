@@ -4,6 +4,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {loadSemanticApi} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 
 const root=fileURLToPath(new URL('../fixtures/types/graph-inferred-constraint/',import.meta.url));
 test('native inferred constraint consumes a getter after its parameter header',async()=>{
@@ -25,7 +26,7 @@ test('native inferred constraint consumes a getter after its parameter header',a
    rows.push({config,before,constraint:describe(constraint),after:describe(type)});
   } finally {try{snapshot?.dispose();}finally{api.close();}}
  }
- fs.writeFileSync('.cc/temp/graph-inferred-constraint-native.json',JSON.stringify(rows,null,2));
+ fs.writeFileSync(scratchPath('graph-inferred-constraint-native.json'),JSON.stringify(rows,null,2));
  for(const row of rows){
   assert.deepEqual(row.before,{summary:'U',errorType:false});
   assert.deepEqual(row.constraint,{summary:'string | 0',errorType:false});

@@ -1,5 +1,12 @@
 # TypeScript 7.0.2 option ownership
 
+This inventory is the TypeScript 7 dialect's, and everything below
+describes that dialect alone. A project whose installed compiler is
+TypeScript 5.x is read with the TypeScript 5.6 dialect, which reads many of
+these options as TypeScript 5.6.3 does, as
+[references](references.md#compiler-selection) describes; both dialects fill
+the same snapshot.
+
 Configuration owns exact keys, occurrence validation, conversion, inheritance,
 defaults, and effective overrides. Checker consumers receive typed snapshot
 inputs; they do not reopen config files or reinterpret raw `strict`. The
@@ -25,8 +32,9 @@ existing behavior.
 The private `SemanticOptions` snapshot retains eight effective strict flags,
 `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`,
 `noPropertyAccessFromIndexSignature`, and `stableTypeOrdering`. It also retains
-package-deduplication, raw checkJs and effective allowJs, decorator and metadata
-flags, both class-field operations, and exact configured JSX hook names.
+package-deduplication, checkJs as set (unset, false, or true) and effective
+allowJs, decorator and metadata flags, both class-field operations, and exact
+configured JSX hook names.
 Strict flags
 default true when `strict` is unset; an explicit flag overrides inherited or
 own strict. Exact optional properties and unchecked indexed access default
@@ -43,9 +51,9 @@ explicit true or false is Unsupported here, while the native public compiler
 reports an unknown option.
 
 `GetAllowJS` now uses checkJs:true when allowJs is unset; explicit allowJs:false
-wins. A selected JavaScript input yields the existing Unsupported failure
-instead of a successful graph that silently omits it. This does not implement
-JavaScript checking. Native `verifyCompilerOptions` separately reports TS5052
+wins. JavaScript inputs follow it, with `maxNodeModuleJsDepth`, and checkJs
+stays unset, false, or true, as JavaScript checking reads it
+([references.md](references.md#javascript-inputs)). Native `verifyCompilerOptions` separately reports TS5052
 for checkJs:true with allowJs:false; that diagnostic remains outside this
 loader's limited compiler-option combination checks and does not change the
 GetAllowJS input-selection operation.
@@ -63,11 +71,11 @@ also does not implement every unrelated combination diagnostic from
 | Semantic | Optional/indexed reads/writes | `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess` | `NewChecker`, `getWriteTypeOfSymbol`, property/index operations; independent false defaults. |
 | Semantic input, reserved | Ordering compatibility setting | `stableTypeOrdering` | Catalog default true; stored by core/parser. No pinned checker consumer found; invent no false-mode ordering algorithm. |
 | Input | Module format/resolution | `module`, `moduleResolution`, `moduleDetection`, `jsx`, `jsxImportSource`, `paths`, `rootDirs`, `typeRoots`, `types`, `moduleSuffixes`, `customConditions`, `preserveSymlinks`, `resolvePackageJsonExports`, `resolvePackageJsonImports`, `resolveJsonModule`, `allowArbitraryExtensions` | Existing program/resolver; `GetEmitModuleKind`, `GetModuleResolutionKind`, `GetEmitModuleDetectionKind`, `GetResolutionDiagnostic`. |
-| Input | Library/root selection | `target`, `lib`, `noLib`, `libReplacement`, `outDir`, `declarationDir`, `rootDir`, `composite` | Existing library/file-selection owners; `GetEmitScriptTarget`, `GetDefaultLibFileName`, `getFileNamesFromConfigSpecs`. |
+| Input | Library/root selection | `target`, `lib`, `noLib`, `libReplacement`, `outDir`, `declarationDir`, `rootDir`, `composite` | Existing library/file-selection owners; `GetEmitScriptTarget`, `GetDefaultLibFileName`, `getFileNamesFromConfigSpecs`. `libraries::Catalog` decides library names, defaults, order, and replacement. |
 | Input / diagnostic | Side-effect imports | `noUncheckedSideEffectImports` | Existing resolution/binding reporting; default true in 7.0.2. |
 | Input / diagnostic | Namespace instantiation | `preserveConstEnums`, `isolatedModules`, `verbatimModuleSyntax` | Existing `shouldPreserveConstEnums` combines these; isolated/import checks also consume the latter two. |
-| Deferred input | Duplicate package identity | `deduplicatePackages` | `compiler.filesparser` package-ID redirects unless false. Existing loader lacks package-ID deduplication; demanded duplicate-package identity needs implementation or located refusal. |
-| Deferred input | JavaScript files | `allowJs`, `checkJs`, `maxNodeModuleJsDepth` | `GetAllowJS` defaults allowJs from checkJs. Existing loader rejects JS inputs; checkJs:true alone must not silently omit demanded JS inputs. |
+| Input | Duplicate package identity | `deduplicatePackages` | `compiler.filesparser` package-ID redirects unless false: the loader keeps the first file `collectFiles` meets per package id ([references.md](references.md#package-identity)). |
+| Input / diagnostic | JavaScript files | `allowJs`, `checkJs`, `maxNodeModuleJsDepth` | `GetAllowJS` defaults allowJs from checkJs; the loader admits JavaScript inputs within `maxNodeModuleJsDepth`, and `checkJs` with the file's pragma decides which of its diagnostics are reported ([references.md](references.md#javascript-inputs)). |
 | Deferred semantic | Decorators/JSX hooks | `experimentalDecorators`, `emitDecoratorMetadata`, `jsxFactory`, `jsxFragmentFactory`, `reactNamespace` | `NewChecker` and decorator/JSX operations. Demanded excluded operations require located refusal; metadata is not solely emit-only. |
 | Diagnostic / emit | Class-field policy | `useDefineForClassFields` | `GetUseDefineForClassFields` defaults from target; checker conflicts/read-before-initialization and class-field emit setup consume it. Demanded recovery must be tracked. |
 | Diagnostic | Checker/binder reporting | `noPropertyAccessFromIndexSignature`, `skipLibCheck`, `skipDefaultLibCheck`, `noCheck`, `noUnusedLocals`, `noUnusedParameters`, `noImplicitReturns`, `noFallthroughCasesInSwitch`, `noImplicitOverride`, `allowUnusedLabels`, `allowUnreachableCode`, `allowUmdGlobalAccess`, `noErrorTruncation`, `erasableSyntaxOnly`, `isolatedDeclarations`, `forceConsistentCasingInFileNames` | Checker diagnostic branches, filesparser casing checks and existing diagnostic policy. TS4111 preserves property read type; suppression does not validate recovery. |
@@ -109,8 +117,8 @@ TS5023 for true/false keyofStringsOnly; null keyofStringsOnly was ignored.
 Other probes recorded TS6266 for watch:null, TS5025 for Strict:true, TS5024
 for wrong primitive/plugin entry types, TS6046 for invalid newLine, accepted
 checkers:1.5, and TS5052 for the two explicit null-sensitive options with
-strictNullChecks:false. Scripts and complete results are in
-`.cc/temp/type-config-probe/`.
+strictNullChecks:false. The probe scripts and complete results were kept
+outside the repository.
 
 `tests/type_configuration.rs` tests final `Project::load` outcomes: every
 strict flag's invalid overridden occurrence and inherited origin, removed

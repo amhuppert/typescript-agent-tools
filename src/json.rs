@@ -33,7 +33,10 @@ impl Ast<'_> {
                     }
                     work.push(Action::CloseObject(depth));
                     for (key, value) in node.fields.iter().rev() {
-                        work.push(Action::Field(key, value, depth + 1));
+                        // The public tree is the written syntax.
+                        if !matches!(value, Value::Node(id) if self.is_reparsed(*id)) {
+                            work.push(Action::Field(key, value, depth + 1));
+                        }
                     }
                 }
                 Action::Field(key, value, depth) => {

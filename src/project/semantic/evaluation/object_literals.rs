@@ -68,6 +68,19 @@ impl ObjectMembers {
     }
 }
 
+/// What `object_literal_members` collects: the members, the spread so far,
+/// the members' propagated flags, whether the literal is constant, whether
+/// it is a JavaScript literal (`createObjectLiteralType`'s `JSLiteral`,
+/// which is not propagated), and a failure later work appends to.
+type CollectedLiteral = (
+    ObjectMembers,
+    TypeId,
+    ObjectFlags,
+    bool,
+    bool,
+    Option<DemandError>,
+);
+
 impl Evaluator<'_, '_> {
     /// `checkObjectLiteral`: grammar's effective-name reads precede the
     /// cached contextual frame. All computed names are checked before the
@@ -94,11 +107,18 @@ impl Evaluator<'_, '_> {
                     ));
                 }
                 let symbol = self.type_symbol_of_reference(symbol, consumer)?;
+                // An expando object literal of a JavaScript file is a
+                // JavaScript literal.
+                let flags = if self.inputs.in_javascript_file(root.file) {
+                    ObjectFlags::JS_LITERAL
+                } else {
+                    ObjectFlags::NONE
+                };
                 return self.new_resolved_anonymous_type(
                     symbol,
                     Some(MemberTable::Symbols(members.into())),
                     empty_members(),
-                    ObjectFlags::NONE,
+                    flags,
                     consumer,
                 );
             }
@@ -108,7 +128,7 @@ impl Evaluator<'_, '_> {
             Some(symbol) => self.type_symbol_of_reference(symbol, consumer)?,
             None => TypeSymbol::Absent,
         };
-        let (mut members, spread, flags, constant, mut failure) = self
+        let (mut members, spread, flags, constant, js_literal, mut failure) = self
             .with_cached_contextual_type(root, consumer, |checker| {
                 checker.object_literal_members(root, &recipe, symbol.clone(), mode, consumer)
             })?;
@@ -124,6 +144,7 @@ impl Evaluator<'_, '_> {
                         &members,
                         symbol.clone(),
                         flags,
+                        js_literal,
                         consumer,
                     )?;
                     let spread = self.spread_type(
@@ -149,6 +170,7 @@ impl Evaluator<'_, '_> {
                             &members,
                             symbol.clone(),
                             flags,
+                            js_literal,
                             consumer,
                         )
                     } else {
@@ -156,7 +178,7 @@ impl Evaluator<'_, '_> {
                     }
                 });
             }
-            self.object_literal_type(root, &recipe, &members, symbol, flags, consumer)
+            self.object_literal_type(root, &recipe, &members, symbol, flags, js_literal, consumer)
         })();
         match (failure.take(), result) {
             (Some(primary), Err(later)) => Err(primary.append_failure(later)),
@@ -220,17 +242,11 @@ impl Evaluator<'_, '_> {
         symbol: TypeSymbol,
         mode: CheckMode,
         consumer: &Location,
-    ) -> Result<
-        (
-            ObjectMembers,
-            TypeId,
-            ObjectFlags,
-            bool,
-            Option<DemandError>,
-        ),
-        DemandError,
-    > {
+    ) -> Result<CollectedLiteral, DemandError> {
         let contextual = self.apparent_contextual_type(root, ContextFlags::NONE, consumer)?;
+        // `createObjectLiteralType`: an object literal of a JavaScript file
+        // without a contextual type is a JavaScript literal.
+        let js_literal = contextual.is_none() && self.inputs.in_javascript_file(root.file);
         let contextual_pattern = match contextual {
             Some(ty)
                 if self.object_context_has_pattern(ty)?
@@ -278,6 +294,7 @@ impl Evaluator<'_, '_> {
                             &members,
                             symbol.clone(),
                             flags,
+                            js_literal,
                             consumer,
                         )?;
                         spread = self.spread_type(
@@ -459,7 +476,7 @@ impl Evaluator<'_, '_> {
                 None => error,
             });
         }
-        Ok((members, spread, flags, constant, failure))
+        Ok((members, spread, flags, constant, js_literal, failure))
     }
 
     fn check_object_computed_name(&mut self, root: ExpressionRoot) -> Result<TypeId, DemandError> {
@@ -578,6 +595,10 @@ impl Evaluator<'_, '_> {
         sequence.finish(result)
     }
 
+    #[expect(
+        clippy::too_many_arguments,
+        reason = "ports createObjectLiteralType's closure state plus the request consumer"
+    )]
     fn object_literal_type(
         &mut self,
         root: ExpressionRoot,
@@ -585,6 +606,7 @@ impl Evaluator<'_, '_> {
         members: &ObjectMembers,
         symbol: TypeSymbol,
         flags: ObjectFlags,
+        js_literal: bool,
         consumer: &Location,
     ) -> Result<TypeId, DemandError> {
         let readonly = self.is_const_context(root, consumer)?;
@@ -610,7 +632,14 @@ impl Evaluator<'_, '_> {
             symbol,
             Some(MemberTable::Symbols(members.snapshot())),
             inventory,
-            flags | ObjectFlags::OBJECT_LITERAL | ObjectFlags::CONTAINS_OBJECT_OR_ARRAY_LITERAL,
+            flags
+                | ObjectFlags::OBJECT_LITERAL
+                | ObjectFlags::CONTAINS_OBJECT_OR_ARRAY_LITERAL
+                | if js_literal {
+                    ObjectFlags::JS_LITERAL
+                } else {
+                    ObjectFlags::NONE
+                },
             consumer,
         )?;
         if recipe.destructuring {

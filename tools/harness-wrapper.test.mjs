@@ -47,8 +47,8 @@ process.exit(result.status ?? 1);
   write('tools/pass.test.mjs', `import { test } from 'node:test';\ntest('passes', () => {});\n`);
   write('tools/compiler.test.mjs', `import fs from 'node:fs';
 import { test } from 'node:test';
-const { TYPE_SCRIPT_API: api, TYPE_SCRIPT_SEMANTIC_API: semantic, TYPE_SCRIPT_NATIVE: native } = process.env;
-fs.writeFileSync(${JSON.stringify(seen)}, JSON.stringify({ api, semantic, native }));
+const { TYPE_SCRIPT_API: api, TYPE_SCRIPT_SEMANTIC_API: semantic, TYPE_SCRIPT_NATIVE: native, TYPE_SCRIPT_56_API: ts56 } = process.env;
+fs.writeFileSync(${JSON.stringify(seen)}, JSON.stringify({ api, semantic, native, ts56 }));
 test('needs the syntax API', { skip: !api && 'TYPE_SCRIPT_API is not set' }, () => {});
 `);
   write('tools/helper.mjs', `throw new Error('a non-test module ran');\n`);
@@ -65,13 +65,14 @@ test('needs the syntax API', { skip: !api && 'TYPE_SCRIPT_API is not set' }, () 
     api: install('typescript-6.0.3/package/lib/typescript.js'),
     semantic: path.dirname(install('typescript-7.0.2/package/package.json')),
     native: install(`typescript-${platform}-7.0.2/package/lib/tsc`),
+    ts56: path.dirname(install('typescript-5.6.3/package/package.json')),
   });
 
   const run = (wrapper, args = [], environment = {}) => {
     fs.writeFileSync(calls, '');
     fs.rmSync(seen, { force: true });
     const env = { ...process.env, PATH: `${bin}${path.delimiter}${process.env.PATH}`, NODE_OPTIONS: '--max-old-space-size=9999' };
-    for (const name of ['TYPE_SCRIPT_API', 'TYPE_SCRIPT_SEMANTIC_API', 'TYPE_SCRIPT_NATIVE', 'HARNESS_REQUIRE_COMPILERS', 'NODE_TEST_CONTEXT'])
+    for (const name of ['TYPE_SCRIPT_API', 'TYPE_SCRIPT_SEMANTIC_API', 'TYPE_SCRIPT_NATIVE', 'TYPE_SCRIPT_56_API', 'HARNESS_REQUIRE_COMPILERS', 'NODE_TEST_CONTEXT'])
       delete env[name];
     Object.assign(env, environment);
     const result = spawnSync(wrappers[wrapper], args, { cwd: worktree, env, encoding: 'utf8', timeout: 60_000 });
@@ -162,6 +163,7 @@ test('strict mode needs every compiler and fails with exit 2 before running test
   assert.match(none.stderr, /requires every compiler; no tests ran/);
   assert.match(none.stderr, /no syntax API at .*typescript-6\.0\.3\/package\/lib\/typescript\.js/);
   assert.match(none.stderr, /no semantic API package at .*typescript-7\.0\.2\/package/);
+  assert.match(none.stderr, /no TypeScript 5\.6\.3 package at .*typescript-5\.6\.3\/package/);
   assert.deepEqual(none.testRuns, []);
   install('typescript-6.0.3/package/lib/typescript.js');
   install('typescript-7.0.2/package/package.json');
@@ -170,6 +172,12 @@ test('strict mode needs every compiler and fails with exit 2 before running test
   assert.doesNotMatch(partial.stderr, /syntax API/);
   assert.match(partial.stderr, /no native compiler at/);
   assert.deepEqual(partial.testRuns, []);
+  install(`typescript-${platform}-7.0.2/package/lib/tsc`);
+  const without56 = run('changed', ['tools/pass.test.mjs'], { HARNESS_REQUIRE_COMPILERS: '1' });
+  assert.equal(without56.status, 2);
+  assert.doesNotMatch(without56.stderr, /native compiler|semantic API|syntax API/);
+  assert.match(without56.stderr, /no TypeScript 5\.6\.3 package at .*typescript-5\.6\.3\/package/);
+  assert.deepEqual(without56.testRuns, []);
   const typo = run('full', [], { HARNESS_REQUIRE_COMPILERS: 'yes' });
   assert.equal(typo.status, 2);
   assert.match(typo.stderr, /HARNESS_REQUIRE_COMPILERS must be 1, 0, or unset/);
@@ -273,12 +281,16 @@ test('without paths a package or unknown change runs every harness test', t => {
 });
 
 test('without paths a change no harness test can observe runs nothing', t => {
-  const { write, changed, branch } = selection(t);
-  write('docs/notes.md', 'changed\n');
-  const result = changed();
-  assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual(result.testRuns, []);
-  assert.equal(result.stdout, `harness tests: no harness test inputs changed since ${branch}\n`);
+  // Documents no module imports: docs, the agent plugins and their generated
+  // packages, and top-level Markdown such as the shared agents block.
+  for (const file of ['docs/notes.md', 'plugins/tool/skills/tool/SKILL.md', 'SHARED_AGENTS_BLOCK.md']) {
+    const { write, changed, branch } = selection(t);
+    write(file, 'changed\n');
+    const result = changed();
+    assert.equal(result.status, 0, `${file}: ${result.stderr}`);
+    assert.deepEqual(result.testRuns, [], file);
+    assert.equal(result.stdout, `harness tests: no harness test inputs changed since ${branch}\n`, file);
+  }
 });
 
 test('a passing harness run is recorded, and the next one selects only what changed since it', t => {
@@ -336,6 +348,7 @@ function readers(t) {
     'fixtures/cases/two/b.ts': '', 'fixtures/cases/two/tsconfig.json': '{}',
     'fixtures/other/c.ts': '', 'fixtures/top.json': '{}',
     'src/lib.rs': '', 'src/other.rs': '', 'vendor/lib.d.ts': '',
+    'plugins/tool/skills/tool/SKILL.md': '', 'SHARED_AGENTS_BLOCK.md': '',
     'tools/one.test.mjs': `import { test } from 'node:test';\nconst root = new URL('../fixtures/cases/one/', import.meta.url);\ntest('one', () => root);\n`,
     'tools/each.test.mjs': `import { test } from 'node:test';\nconst each = name => new URL(\`../fixtures/cases/\${name}/\`, import.meta.url);\ntest('each', () => each);\n`,
     'tools/project.test.mjs': `import { test } from 'node:test';\nconst config = '../fixtures/cases/two/tsconfig.json';\ntest('project', () => config);\n`,
@@ -343,12 +356,28 @@ function readers(t) {
     'tools/top.test.mjs': `import { test } from 'node:test';\nconst top = '../fixtures/top.json';\ntest('top', () => top);\n`,
     'tools/source.test.mjs': `import { test } from 'node:test';\nconst source = '../src/lib.rs';\ntest('source', () => source);\n`,
     'tools/vendor.test.mjs': `import { test } from 'node:test';\nconst libraries = '../vendor/';\ntest('vendor', () => libraries);\n`,
+    'tools/skill.test.mjs': `import { test } from 'node:test';\nconst skill = '../plugins/tool/skills/tool/SKILL.md';\ntest('skill', () => skill);\n`,
+    'tools/block.test.mjs': `import { test } from 'node:test';\nconst block = '../SHARED_AGENTS_BLOCK.md';\ntest('block', () => block);\n`,
   };
   for (const [file, text] of Object.entries(files)) project.write(file, text);
   project.commit();
   const changed = () => project.run('changed', [], { TARGET_BRANCH: project.branch });
   return { ...project, changed };
 }
+
+test('without paths a plugin or top-level document change runs the harness tests that name it', t => {
+  for (const [file, selected] of [
+    ['plugins/tool/skills/tool/SKILL.md', ['tools/skill.test.mjs']],
+    ['SHARED_AGENTS_BLOCK.md', ['tools/block.test.mjs']],
+  ]) {
+    const { write, changed, files } = readers(t);
+    write(file, 'changed\n');
+    const result = changed();
+    assert.equal(result.status, 0, `${file}: ${result.stderr}`);
+    assert.equal(result.testRuns.length, 1, `${file}: ${result.stdout}${result.stderr}`);
+    assert.deepEqual(files(result.testRuns[0]), selected, file);
+  }
+});
 
 test('without paths a fixture change runs the harness tests that name a path reaching it', t => {
   for (const [file, selected] of [

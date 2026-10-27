@@ -51,7 +51,16 @@ each group with its declarations and its occurrences by file, and any coverage
 gaps; `--json` writes the result document instead. The
 [CLI reference](docs/cli-reference.md#references) lists its flags and filters.
 
-Project queries (references, definitions, types, and outline and show with
+A project whose nearest installed `typescript` package is a 5.x release has
+its configuration read and its modules resolved, `baseUrl` included, with
+TypeScript 5.6.3's rules, the TypeScript 5.6 dialect; every other project is
+read as TypeScript 7.0.2 reads it, which also decides every answer ([compiler selection](docs/references.md#compiler-selection)).
+`tsparse --doctor --project ./tsconfig.json` names the compiler and dialect.
+Definitions and construction queries use that same program. File-only test
+outlines and statement selection also accept JavaScript; edits remain
+TypeScript-only.
+
+Project queries (references, definitions, construction sites, types, and outline and show with
 `--project`) automatically start a local service and reuse its snapshot across
 CLI invocations. Every query checks the captured inputs; changed sources,
 configuration, or resolution inputs trigger a full rebuild. A failed refresh
@@ -74,7 +83,9 @@ cost on Command Center, from the latest measurements.
 `no service: CONFIG`), and `--references-serve` administer the project service,
 which answers every project query, not only references. Use
 `--references-serve --project CONFIG` for a foreground service managed by a
-supervisor. `TSPARSE_SERVICE_DIR` selects a private runtime directory, and
+supervisor. `TSPARSE_SERVICE_DIR` selects a private runtime directory (by
+default `$TMPDIR/tsparse-UID` when `TMPDIR` is absolute and short enough for
+socket paths, else `/tmp/tsparse-UID`), and
 `TSPARSE_SERVICE_IDLE_SECS` sets its positive idle timeout in seconds. The [service design](docs/reference-service-design.md)
 describes freshness, process ownership, and the current full-rebuild limitation.
 
@@ -84,7 +95,9 @@ and refreshable generations through `ProjectSession`; reference queries and resu
 TypeScript 7.0.2's program; on the unchanged Command Center configuration all 7,639 inputs agree
 with `tsc --listFilesOnly` ([validation](docs/validation.md#command-center-checkpoint)). Standard
 libraries follow `target`, `lib`, `noLib`, `libReplacement`, and `/// <reference lib>` from the
-TypeScript 7.0.2 declarations vendored in [`vendor/typescript-7.0.2-lib`](vendor/README.md): their
+TypeScript 7.0.2 declarations vendored in [`vendor/typescript-7.0.2-lib`](vendor/README.md), or,
+for a project whose installed compiler is TypeScript 5, from that compiler's own `lib` directory
+by TypeScript 5.6.3's rules ([compiler selection](docs/references.md#compiler-selection)): their
 declarations join groups, but library files are never searched. JSON modules are program inputs
 under `resolveJsonModule`, read with the grammar `tsconfig.json` shares. Member references
 use resolved semantic identities; positions inside JSON are not selectable. Module
@@ -213,7 +226,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 - Enums, namespaces, ambient modules and global augmentation, imports and exports, type-only and deferred imports, `with` attributes, import types, `using`, and `await using`.
 - JSX elements and fragments, generic tags, namespaced names, attributes, spread, embedded expressions, and text scanning.
 
-TypeScript 7 uses the TypeScript 6 syntax baseline, with changes such as `namespace` for unquoted namespaces and `with` for import attributes. The parser rejects the removed unquoted `module` declaration, `assert` import attributes, and legacy standalone `?` and `function(...)` JSDoc type spellings. Identifier classification is checked across every Unicode code point against the native compiler. See Microsoft's [TypeScript 7 announcement](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/) and [native compiler repository](https://github.com/microsoft/typescript-go).
+TypeScript 7 uses the TypeScript 6 syntax baseline, with changes such as `namespace` for unquoted namespaces and `with` for import attributes. It still parses an unquoted `module` declaration as a namespace, but its checker reports TS1540 there: `--check` rejects it, and project loading reports it where TypeScript checks the file. The parser rejects the removed `assert` import attributes and legacy standalone `?` and `function(...)` JSDoc type spellings. Identifier classification is checked across every Unicode code point against the native compiler. See Microsoft's [TypeScript 7 announcement](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/) and [native compiler repository](https://github.com/microsoft/typescript-go).
 
 ## Verification
 

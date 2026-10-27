@@ -996,3 +996,221 @@ fn reference_directives_follow_the_compilers_precedence() {
         assert_eq!(error.span.start, at, "{source}");
     }
 }
+
+/// TypeScript 7's `parseModuleDeclaration` parses `module X {}` as a
+/// namespace declaration and keeps its keyword; its checker, not its
+/// parser, reports TS1540 there (`tests/verdicts.rs`). The syntax API,
+/// whose tree this is, keeps the keyword as the `Namespace` flag (32) of
+/// every part of a dotted name, beside `NestedNamespace` (8) on the inner
+/// parts. Only `module` takes a string name, only an identifier name may be
+/// dotted, and an identifier-named declaration always has a block. Flags
+/// and statements observed with the TypeScript 6.0.3 syntax API; the
+/// rejections with it and the native 7.0.2 compiler.
+#[test]
+fn module_declarations_keep_their_keyword_as_the_syntax_api_does() {
+    fn parsed<'src>(source: &'src str, file: &str) -> typescript_parser::Ast<'src> {
+        parse_with_options(source, ParseOptions::for_file(file))
+            .unwrap_or_else(|error| panic!("{source:?} in {file}: {error}"))
+    }
+    let modules = |source: &str, file: &str| -> Vec<(String, u32)> {
+        let ast = parsed(source, file);
+        ast.walk()
+            .map(|id| ast.node(id))
+            .filter(|node| node.kind == "ModuleDeclaration")
+            .map(|node| {
+                let Some(Value::Node(name)) = node.field("name") else {
+                    panic!("{source:?}: a module declaration without a name");
+                };
+                let name = ast.node(*name);
+                let text = match name.field("escapedText").or(name.field("text")) {
+                    Some(Value::Text(text)) => text.to_string(),
+                    other => panic!("{source:?}: name {other:?}"),
+                };
+                (text, node.flags)
+            })
+            .collect()
+    };
+    for (source, file, expected) in [
+        ("module X {}", "a.ts", &[("X", 0)][..]),
+        ("namespace X {}", "a.ts", &[("X", 32)]),
+        ("declare module X {}", "a.ts", &[("X", 33554432)]),
+        ("export declare module X {}", "a.ts", &[("X", 33554432)]),
+        ("module X {}", "a.d.ts", &[("X", 33554432)]),
+        (
+            "declare module X { export const a: number; }",
+            "a.d.ts",
+            &[("X", 33554432)],
+        ),
+        ("module A.B.C {}", "a.ts", &[("A", 0), ("B", 8), ("C", 8)]),
+        ("namespace A.B {}", "a.ts", &[("A", 32), ("B", 40)]),
+        (
+            "declare module A.B { const a: number; }",
+            "a.d.ts",
+            &[("A", 33554432), ("B", 33554440)],
+        ),
+        (
+            "declare namespace A.B {}",
+            "a.d.ts",
+            &[("A", 33554464), ("B", 33554472)],
+        ),
+        ("export module X {}", "a.ts", &[("X", 0)]),
+        (
+            "namespace N { module X {} }",
+            "a.ts",
+            &[("N", 32), ("X", 0)],
+        ),
+        ("function f() { module X {} }", "a.ts", &[("X", 0)]),
+        ("module \"x\" {}", "a.ts", &[("x", 0)]),
+        ("module \"x\";", "a.ts", &[("x", 0)]),
+        ("declare module \"x\";", "a.d.ts", &[("x", 33554432)]),
+        (
+            "export {}; declare global {}",
+            "a.ts",
+            &[("global", 33556480)],
+        ),
+    ] {
+        let expected: Vec<(String, u32)> = expected
+            .iter()
+            .map(|&(name, flags)| (name.to_string(), flags))
+            .collect();
+        assert_eq!(modules(source, file), expected, "{source:?} in {file}");
+    }
+    // `module` or `namespace` begins a declaration only before an
+    // identifier or string on its line (`nextTokenIsIdentifierOrStringLiteralOnSameLine`),
+    // for each line break the scanner knows.
+    for separator in ["\r", "\n", "\r\n", "\u{2028}", "\u{2029}"] {
+        let source = format!("module{separator}X{separator}{{}}");
+        let ast = parsed(&source, "a.ts");
+        let statements: Vec<&str> = match ast.root().field("statements") {
+            Some(Value::Nodes(ids)) => ids.iter().map(|&id| ast.node(id).kind).collect(),
+            other => panic!("{source:?}: statements {other:?}"),
+        };
+        assert_eq!(
+            statements,
+            ["ExpressionStatement", "ExpressionStatement", "Block"],
+            "{source:?}"
+        );
+        for source in [
+            format!("module{separator}X {{}}"),
+            format!("declare module{separator}X {{}}"),
+            format!("export module{separator}X {{}}"),
+            format!("export declare module{separator}X {{}}"),
+            format!("export namespace{separator}X {{}}"),
+        ] {
+            assert!(parse(&source).is_err(), "{source:?}");
+        }
+    }
+    for (source, file) in [
+        ("module X;", "a.ts"),
+        ("namespace X;", "a.ts"),
+        ("declare namespace X;", "a.d.ts"),
+        ("module A.B;", "a.ts"),
+        ("declare namespace \"x\" {}", "a.ts"),
+        ("declare module \"x\".y {}", "a.ts"),
+    ] {
+        assert!(
+            parse_with_options(source, ParseOptions::for_file(file)).is_err(),
+            "{source:?} in {file}"
+        );
+    }
+}
+
+/// TypeScript parses each name after a dot in a namespace declaration with
+/// `parseIdentifierName` (`parseModuleOrNamespaceDeclaration`), whose
+/// `tokenIsIdentifierOrKeyword` admits every token kind from `Identifier`
+/// on: an identifier, any keyword, reserved or escaped, and even a private
+/// name, each made an `Identifier`. The first name remains a binding
+/// identifier. Kinds, names, and flags observed with the TypeScript 6.0.3
+/// syntax API; acceptance with the native 7.0.2 compiler.
+#[test]
+fn dotted_namespace_names_after_the_first_are_identifier_names() {
+    for (source, file, expected) in [
+        (
+            "export declare module A.default { const n: number; }",
+            "a.d.ts",
+            &[("A", 33554432, 33554432), ("default", 33554432, 33554440)][..],
+        ),
+        (
+            r"export declare module A.\u0064efault { const n: number; }",
+            "a.d.ts",
+            &[("A", 33554432, 33554432), ("default", 33554432, 33554440)],
+        ),
+        (
+            "namespace A.class {}",
+            "a.ts",
+            &[("A", 0, 32), ("class", 0, 40)],
+        ),
+        (
+            r"namespace A.cl\u0061ss.if {}",
+            "a.ts",
+            &[("A", 0, 32), ("class", 0, 40), ("if", 0, 40)],
+        ),
+        (
+            r"namespace A.\u{64}efault {}",
+            "a.ts",
+            &[("A", 0, 32), ("default", 256, 40)],
+        ),
+        (
+            "module A.await.yield {}",
+            "a.ts",
+            &[("A", 0, 0), ("await", 0, 8), ("yield", 0, 8)],
+        ),
+        // A private name, too, is an identifier name: an `Identifier` whose
+        // extended escape sets `IdentifierHasExtendedUnicodeEscape` (256), as
+        // `createIdentifier` sets it for any token.
+        ("namespace A.#x {}", "a.ts", &[("A", 0, 32), ("#x", 0, 40)]),
+        (
+            r"namespace A.#\u0078 {}",
+            "a.ts",
+            &[("A", 0, 32), ("#x", 0, 40)],
+        ),
+        (
+            r"namespace A.#\u{78} {}",
+            "a.ts",
+            &[("A", 0, 32), ("#x", 256, 40)],
+        ),
+        ("module A.#x {}", "a.ts", &[("A", 0, 0), ("#x", 0, 8)]),
+        (r"module A.#\u0078 {}", "a.ts", &[("A", 0, 0), ("#x", 0, 8)]),
+        (
+            r"module A.#\u{78} {}",
+            "a.ts",
+            &[("A", 0, 0), ("#x", 256, 8)],
+        ),
+        (
+            r"namespace A.#\u{78}.\u{79} {}",
+            "a.ts",
+            &[("A", 0, 32), ("#x", 256, 40), ("y", 256, 40)],
+        ),
+    ] {
+        let ast = parse_with_options(source, ParseOptions::for_file(file))
+            .unwrap_or_else(|error| panic!("{source:?} in {file}: {error}"));
+        let names: Vec<(&str, String, u32, u32)> = ast
+            .walk()
+            .map(|id| ast.node(id))
+            .filter(|node| node.kind == "ModuleDeclaration")
+            .map(|node| {
+                let Some(Value::Node(name)) = node.field("name") else {
+                    panic!("{source:?}: a module declaration without a name");
+                };
+                let name = ast.node(*name);
+                let Some(Value::Text(text)) = name.field("escapedText") else {
+                    panic!("{source:?}: a name without text");
+                };
+                (name.kind, text.to_string(), name.flags, node.flags)
+            })
+            .collect();
+        let expected: Vec<(&str, String, u32, u32)> = expected
+            .iter()
+            .map(|&(text, name_flags, flags)| ("Identifier", text.to_string(), name_flags, flags))
+            .collect();
+        assert_eq!(names, expected, "{source:?} in {file}");
+    }
+    // The first name is a binding identifier, as `parseIdentifier` requires.
+    for source in [
+        "namespace default {}",
+        "module class.A {}",
+        r"namespace \u0064efault {}",
+    ] {
+        assert!(parse(source).is_err(), "{source:?}");
+    }
+}

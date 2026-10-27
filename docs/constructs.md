@@ -16,6 +16,14 @@ one compiler error per construction, an optional one nowhere. The
 [technical design](constructs-design.md) records the rules and their
 TypeScript sources.
 
+Construction queries use the same compiler selection, resolver, libraries and
+package identities as type queries. Under `allowJs`, admitted JavaScript
+literals participate, including a variable context supplied by JSDoc `@type`.
+Loading refusals prevent the query; unsupported checker demands remain located
+gaps. A selection or file filter naming a duplicate package file is refused.
+Generated type spellings use the captured module-naming environment, including
+5.6 `baseUrl`/`paths` and redirect alternatives.
+
 ## Selection
 
 `--name` takes `--show`'s declaration selectors, with an optional FILE that

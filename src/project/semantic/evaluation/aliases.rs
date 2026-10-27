@@ -172,19 +172,14 @@ impl Evaluator<'_, '_> {
     /// getTypeFromTypeAliasReference acquires declaredType before arity and
     /// asks no child argument until that count is valid. Enclosing alias and
     /// imported alias contexts are separate native symbol questions.
-    #[expect(
-        clippy::too_many_arguments,
-        reason = "ports getTypeFromTypeAliasReference's inputs plus the request consumer"
-    )]
     pub(super) fn type_alias_reference_completion(
         &mut self,
         symbol: impl Into<ReferenceSymbol>,
         ty: TypeId,
         expression: &TypeExpression,
-        anchor: Span,
+        imported_alias: Option<Span>,
         arguments: &[TypeExpression],
         context: Option<&AliasRecipe>,
-        type_reference_node: bool,
     ) -> NativeResult<TypeId> {
         let mut sequence = NativeSequence::new();
         let result = (|| {
@@ -223,7 +218,9 @@ impl Evaluator<'_, '_> {
                     );
                 }
             }
-            let imported = if alias.is_none() && type_reference_node {
+            let imported = if alias.is_none()
+                && let Some(anchor) = imported_alias
+            {
                 sequence
                     .read(self.reference_entity_at_completion(
                         expression.file,
@@ -298,7 +295,7 @@ impl Evaluator<'_, '_> {
         let result = self
             .alias_parameters_completion(alias_symbol, consumer)?
             .and_then(|parameters| {
-                self.fill_missing_type_arguments_completion(actual, &parameters, consumer)?
+                self.fill_missing_type_arguments_completion(actual, &parameters, false, consumer)?
                     .and_then(|actual| {
                         let mapper = self.model.mapper(parameters, actual)?;
                         self.instantiate_type_with_alias_completion(ty, mapper, alias, consumer)

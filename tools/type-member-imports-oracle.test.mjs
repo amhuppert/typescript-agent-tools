@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {compilerHookOracle} from './type-oracle.mjs';
 import {lineStarts,position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 
 const root=fileURLToPath(new URL('../fixtures/types/member-imports/',import.meta.url));
 const queries=[['factory.ts','equalsMember'],['factory.ts','equalsExport'],
@@ -48,7 +49,7 @@ test('native member searches follow export assignments, aliases and reexports',a
    at:{file,...position(lineStarts(source),source.indexOf(tag)+tag.length)}});
   rows.push({config,file,marker,answer});
  }
- fs.writeFileSync('.cc/temp/member-imports-native.json',JSON.stringify(rows,null,2));
+ fs.writeFileSync(scratchPath('member-imports-native.json'),JSON.stringify(rows,null,2));
  assert.equal(rows.length,48);
  for(const row of rows) {
   assert.deepEqual(row.answer.demandFailures,[],row.marker);

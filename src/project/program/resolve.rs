@@ -1,17 +1,23 @@
 //! Module and type-reference resolution for TypeScript 7's `node16`,
 //! `nodenext`, and `bundler` modes, in the compiler's lookup order:
-//! `paths` or `rootDirs`, then package `imports`, a self-name reference,
-//! ancestor `node_modules` (TypeScript and declarations first, including
-//! `@types`, then JavaScript), and finally explicit `typeRoots`.
+//! `paths`, then `baseUrl` (TypeScript 5.6 only) or `rootDirs`, then
+//! package `imports`, a self-name reference, ancestor `node_modules`
+//! (TypeScript and declarations first, including `@types`, then
+//! JavaScript), and finally explicit `typeRoots`. Where the two dialects'
+//! compilers answer differently, `Rules` decides. TypeScript 5.6.3's
+//! standard library replacement lookup (`Resolver::library`) shares the
+//! `node_modules` part alone.
 //!
 //! Lookups retain native ResolvedFileName and OriginalPath separately from
 //! the loader's input identity. Results are cached per directory, specifier,
 //! and resolution mode for one load.
 
+use super::compatibility::CompilerSelection;
 use super::config::{Config, Options, Resolution};
 use super::manifest::{Kind, PackageInfo, Value};
 use super::paths;
-use super::{disk, io_error, version};
+use super::version::{self, Version};
+use super::{disk, io_error};
 use crate::analysis::InputError;
 use crate::input::{self, Case};
 use crate::project::binding::ResolutionMode;
@@ -20,7 +26,9 @@ use std::path::Path;
 use std::rc::Rc;
 use std::sync::Arc;
 
+mod package_id;
 mod reuse;
+pub(super) use package_id::PackageId;
 pub(super) use reuse::Reuse;
 use reuse::{Access, Memo};
 
@@ -53,13 +61,131 @@ pub(super) fn resolution_conditions(
     conditions
 }
 
+/// The resolution rules of one dialect (`compatibility::Dialect`), which
+/// only this module interprets.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) struct Rules(Profile);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Profile {
+    TypeScript7,
+    TypeScript56,
+}
+
+impl Rules {
+    pub(super) const TYPESCRIPT_7: Self = Self(Profile::TypeScript7);
+    pub(super) const TYPESCRIPT_5_6: Self = Self(Profile::TypeScript56);
+
+    /// Whether a matched `paths` or `typesVersions` pattern whose
+    /// substitutions are all missing answers its lookup
+    /// (`tryLoadModuleUsingPaths`). TypeScript 5.6.3 returns `{ value:
+    /// undefined }` for a matched pattern, which ends the optional settings,
+    /// a directory's manifest entry, or a package in one `node_modules`;
+    /// TypeScript 7.0.2 continues searching as if no pattern matched.
+    fn matched_pattern_answers(self) -> bool {
+        self.0 == Profile::TypeScript56
+    }
+
+    /// The path `tryLoadModuleUsingPaths` tries for one substitution of the
+    /// matched pattern, given the text its `*` matched (`None` for an exact
+    /// key). TypeScript 7.0.2 replaces the substitution's first `*` with
+    /// every capture; 5.6.3 only with a non-empty one (`matchedStar ?
+    /// replaceFirstStar(subst, matchedStar) : subst`), so an empty capture
+    /// leaves the substitution as written, `*` included. 5.6.3's
+    /// `replaceFirstStar` is JavaScript's `String.prototype.replace`, which
+    /// would also expand `$$`, `$&`, `` $` `` and `$'` in a capture; this
+    /// tool inserts a capture as written in both dialects.
+    fn substitution(self, substitution: &str, star: Option<&str>) -> String {
+        match (self.0, star) {
+            (_, None) | (Profile::TypeScript56, Some("")) => substitution.to_owned(),
+            (_, Some(star)) => substitution.replacen('*', star, 1),
+        }
+    }
+
+    /// Whether a loaded file that a route reaches at a lower depth than any
+    /// route before has its subtasks followed again from that depth, so that
+    /// JavaScript elided on a deeper route becomes an input within
+    /// `maxNodeModuleJsDepth`. TypeScript 7's `filesParser.start`
+    /// reprocesses the subtasks of every file seen at a lower depth (7.0.2's
+    /// native loader starts them only once, so its listing races where a
+    /// deeper route loads the file first). 5.6.3's `findSourceFile`
+    /// reprocesses only a file with elided imports (`modulesWithElidedImports`)
+    /// reached below the limit, and a file first found searching
+    /// `node_modules` once a route reaches it at depth 0
+    /// (`sourceFilesFoundSearchingNodeModules`).
+    pub(super) fn reprocesses(self, revisit: Revisit) -> bool {
+        match self.0 {
+            Profile::TypeScript7 => true,
+            Profile::TypeScript56 => {
+                revisit.elided
+                    && i64::try_from(revisit.depth).is_ok_and(|depth| depth < revisit.max_depth)
+                    || revisit.found_in_packages && revisit.depth == 0
+            }
+        }
+    }
+
+    /// Whether a file found through a directory's manifest entry or index
+    /// takes the directory's package id: 5.6.3's
+    /// `loadNodeModuleFromDirectory` gives it one (`withPackageId`), 7.0.2's
+    /// none, so a relative or mapped name, or a type root, that reaches a
+    /// package directory gives no id under TypeScript 7.
+    fn directory_package_id(self) -> bool {
+        self.0 == Profile::TypeScript56
+    }
+
+    /// Whether the package id that collection deduplicates a file by is the
+    /// one the route that first processes it gives: 5.6.3's
+    /// `findSourceFileWorker` decides with the package id of the route that
+    /// finds the file first, depth first, and with none for a route without
+    /// one; 7.0.2's `filesParser.start` keeps the first id any route brings
+    /// (`parseTaskData.packageId`).
+    pub(super) fn first_route_package_id(self) -> bool {
+        self.0 == Profile::TypeScript56
+    }
+
+    /// Whether only the routes collection processes decide that a file is
+    /// found at depth 0, and so is no external library's. 7.0.2's
+    /// `filesParser` gives every loaded task the lowest depth of any route
+    /// to it (`lowestDepth`) before `collectFiles` deduplicates, so a
+    /// redirect's own subtasks count. 5.6.3's `findSourceFileWorker` marks a
+    /// file where it first meets it and clears the mark where a route at
+    /// depth 0 meets it again (`sourceFilesFoundSearchingNodeModules`), and
+    /// never processes a redirect's own subtasks: one marked where it was met
+    /// (`createRedirectedSourceFile`) is processed again with its target's
+    /// subtasks, resolved from the redirect's location.
+    pub(super) fn collected_provenance(self) -> bool {
+        self.0 == Profile::TypeScript56
+    }
+}
+
+/// A loaded file that a route reaches at a lower depth than any route
+/// before (`Rules::reprocesses`).
+#[derive(Debug, Clone, Copy)]
+pub(super) struct Revisit {
+    /// The route's depth, in package lookups.
+    pub(super) depth: usize,
+    /// `maxNodeModuleJsDepth`.
+    pub(super) max_depth: i64,
+    /// Whether the file has JavaScript subtasks elided on deeper routes.
+    pub(super) elided: bool,
+    /// Whether the file was loaded from a route that had searched
+    /// `node_modules`.
+    pub(super) found_in_packages: bool,
+}
+
 /// Native condition selection and `IsApplicableVersionedTypesKey`, shared
-/// wherever resolution or reverse module naming asks the same question.
-pub(super) fn package_condition_applies(condition: &str, conditions: &[String]) -> bool {
+/// wherever resolution or reverse module naming asks the same question. A
+/// `types@` range is evaluated against the dialect's compiler version.
+pub(super) fn package_condition_applies(
+    condition: &str,
+    conditions: &[String],
+    typescript: &Version,
+) -> bool {
     condition == "default"
         || conditions.iter().any(|value| value == condition)
         || condition.strip_prefix("types@").is_some_and(|range| {
-            conditions.iter().any(|value| value == "types") && version::matches_typescript(range)
+            conditions.iter().any(|value| value == "types")
+                && version::matches_typescript(range, typescript)
         })
 }
 
@@ -73,19 +199,20 @@ pub(super) const MAX_IMPORTS_CHAIN: usize = 1_024;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) enum Resolved {
-    /// A TypeScript, declaration, or JSON file, which the loader parses by
-    /// its script kind (`crate::script_kind`). `external` marks the
-    /// compiler's external-library imports: package lookups and paths in
-    /// `node_modules`. Whether the program admits the file for the importer
-    /// is a separate question (`admission`).
+    /// A TypeScript, declaration, JSON, or JavaScript file, which the loader
+    /// parses by its script kind (`crate::script_kind`). `external` marks
+    /// the compiler's external-library imports: package lookups and paths
+    /// in `node_modules`. Whether the program admits the file for the
+    /// importer is a separate question (`admission`).
     File {
         path: String,
         original_path: Option<String>,
         external: bool,
         extension: Extension,
+        /// The file's package id where the lookup that found it gives one
+        /// (`ResolvedModule.PackageId`).
+        package: Option<PackageId>,
     },
-    /// JavaScript found without TypeScript declarations.
-    JavaScript(ResolvedPath),
     Missing,
     /// A package `imports` chain longer than `MAX_IMPORTS_CHAIN`.
     TooDeep,
@@ -96,6 +223,8 @@ pub(super) struct ResolvedPath {
     pub(super) path: String,
     pub(super) original_path: Option<String>,
     pub(super) external: bool,
+    /// `ResolvedTypeReferenceDirective.PackageId`.
+    pub(super) package: Option<PackageId>,
 }
 
 impl ResolvedPath {
@@ -121,6 +250,17 @@ pub(super) enum Extension {
     /// a specifier's own extension (`tryAddingExtensions`). The same file
     /// named another way, such as `./styles.d.css`, has the `.ts` extension.
     Arbitrary,
+    /// `.js`, `.mjs`, or `.cjs`.
+    JavaScript,
+    Jsx,
+}
+
+impl Extension {
+    /// Whether a module found with this extension is JavaScript, which
+    /// TypeScript tests as `!resolutionExtensionIsTSOrJson`.
+    pub(super) fn is_javascript(self) -> bool {
+        matches!(self, Self::JavaScript | Self::Jsx)
+    }
 }
 
 /// Why the program does not admit a resolved module for an importer.
@@ -134,39 +274,112 @@ pub(super) enum NotAdmitted {
     /// TS6263: an arbitrary-extension declaration file, imported by a file
     /// that is not a declaration file, without `allowArbitraryExtensions`.
     AllowArbitraryExtensions,
+    /// TS7016: JavaScript without `allowJs`, under `noImplicitAny`. The
+    /// import names an untyped module (`ModuleResolution::Untyped`).
+    AllowJs,
 }
 
 impl NotAdmitted {
+    /// The code of the compiler's diagnostic.
+    pub(super) fn code(self) -> crate::checking::Code {
+        use crate::checking::Code;
+        match self {
+            NotAdmitted::Jsx => Code::JSX_NOT_SET,
+            NotAdmitted::ResolveJsonModule => Code::RESOLVE_JSON_MODULE,
+            NotAdmitted::AllowArbitraryExtensions => Code::ARBITRARY_EXTENSIONS,
+            NotAdmitted::AllowJs => Code::UNTYPED_MODULE,
+        }
+    }
+
     /// The compiler's message for `specifier` resolved to `target`.
     pub(super) fn message(self, specifier: &str, target: &str) -> String {
         let option = match self {
             NotAdmitted::Jsx => "'--jsx' is not set",
             NotAdmitted::ResolveJsonModule => "'--resolveJsonModule' is not used",
             NotAdmitted::AllowArbitraryExtensions => "'--allowArbitraryExtensions' is not set",
+            NotAdmitted::AllowJs => return untyped_message(specifier, target),
         };
         format!("Module '{specifier}' was resolved to '{target}', but {option}")
     }
 }
 
-/// TypeScript's `GetResolutionDiagnostic`: whether the program admits a
-/// module that resolution found with `extension`, for an importer that is a
-/// declaration file or not. The loader adds the module only when this is
-/// `None` (`shouldAddFile`), and otherwise the request is unresolved, except
-/// for `Jsx` (see `NotAdmitted`). It depends on the importer, so it is
-/// decided where a resolution is used, never cached with it. JavaScript,
-/// which needs `allowJs`, is outside the supported inputs
-/// (`Resolved::JavaScript`).
-pub(super) fn admission(
+/// TS7016, which TypeScript's checker reports for an import of an untyped
+/// module, a JavaScript file that is no program input
+/// (`errorOnImplicitAnyModule`), where `noImplicitAny` makes it an error.
+pub(in crate::project) fn untyped_message(specifier: &str, target: &str) -> String {
+    format!(
+        "Could not find a declaration file for module '{specifier}'. '{target}' implicitly has an 'any' type."
+    )
+}
+
+/// TS2665, for a module augmentation whose name resolves to an untyped
+/// module (`resolveExternalModule` with `isForAugmentation`).
+pub(in crate::project) fn untyped_augmentation_message(specifier: &str, target: &str) -> String {
+    format!(
+        "Invalid module name in augmentation. Module '{specifier}' resolves to an untyped module at '{target}', which cannot be augmented."
+    )
+}
+
+/// TypeScript's `GetResolutionDiagnostic`: why the program does not admit a
+/// module that resolution found with `extension`, for an importer that is
+/// a declaration file or not, if it does not. JavaScript needs `allowJs`
+/// only under `noImplicitAny` (`needAllowJs`), and a `.jsx` file `jsx`
+/// first. It depends on the importer, so it is decided where a resolution
+/// is used, never cached with it.
+fn resolution_diagnostic(
     options: &Options,
     extension: Extension,
     importer_is_declaration: bool,
 ) -> Option<NotAdmitted> {
+    let need_allow_js =
+        || (!options.allow_js && options.semantic.no_implicit_any).then_some(NotAdmitted::AllowJs);
+    let need_jsx = || (!options.jsx).then_some(NotAdmitted::Jsx);
     match extension {
         Extension::TypeScript => None,
-        Extension::Tsx => (!options.jsx).then_some(NotAdmitted::Jsx),
+        Extension::Tsx => need_jsx(),
         Extension::Json => (!options.resolve_json_module).then_some(NotAdmitted::ResolveJsonModule),
         Extension::Arbitrary => (!importer_is_declaration && !options.allow_arbitrary_extensions)
             .then_some(NotAdmitted::AllowArbitraryExtensions),
+        Extension::JavaScript => need_allow_js(),
+        Extension::Jsx => need_jsx().or_else(need_allow_js),
+    }
+}
+
+/// What TypeScript's loader makes of a module that resolution found for one
+/// importer (`resolveImportsAndModuleAugmentations`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) enum Admission {
+    /// `shouldAddFile`: the file is a subtask of the importer, one package
+    /// lookup deeper when `external` (`increaseDepth`). `elide_on_depth`
+    /// marks JavaScript that a package lookup found in `node_modules`,
+    /// which is no input on this route when that depth exceeds
+    /// `maxNodeModuleJsDepth` (`elideOnDepth`, `filesParser.start`).
+    Input { elide_on_depth: bool },
+    /// Not added for this importer: for `GetResolutionDiagnostic`'s reason,
+    /// or with none for JavaScript without `allowJs`. TypeScript's checker
+    /// still names the file where another route makes it an input and the
+    /// reason, if any, is `Jsx` or `AllowJs` (`resolveExternalModule`).
+    NotAdded(Option<NotAdmitted>),
+}
+
+/// The one decision whether a resolved module is a program input for an
+/// importer, a declaration file or not: TypeScript's `shouldAddFile` with
+/// `GetResolutionDiagnostic`, less the depth the loader alone tracks. A
+/// JavaScript file is an input only under `allowJs`.
+pub(super) fn admission(
+    options: &Options,
+    resolved: (&str, Extension, bool),
+    importer_is_declaration: bool,
+) -> Admission {
+    let (path, extension, external) = resolved;
+    if let Some(reason) = resolution_diagnostic(options, extension, importer_is_declaration) {
+        return Admission::NotAdded(Some(reason));
+    }
+    if extension.is_javascript() && !options.allow_js {
+        return Admission::NotAdded(None);
+    }
+    Admission::Input {
+        elide_on_depth: external && extension.is_javascript() && path.contains("/node_modules/"),
     }
 }
 
@@ -312,8 +525,8 @@ impl PackageJson {
         }
     }
 
-    fn version_paths(&self) -> Option<Vec<(String, Vec<String>)>> {
-        self.info.version_paths()
+    fn version_paths(&self, typescript: &Version) -> Option<Vec<(String, Vec<String>)>> {
+        self.info.version_paths(typescript)
     }
 }
 
@@ -433,9 +646,10 @@ impl Host<'_> {
     }
 }
 
-/// Per-lookup settings: TypeScript's resolution features and conditions.
+/// Per-lookup settings: TypeScript's resolution features and conditions,
+/// and the compiler version package ranges are evaluated against.
 #[derive(Clone)]
-struct State {
+struct State<'v> {
     extensions: u8,
     /// ESM-mode Node.js resolution: no implicit extensions or directory
     /// indexes for relative paths.
@@ -447,9 +661,12 @@ struct State {
     conditions: Rc<[String]>,
     config_lookup: bool,
     package_directory_only: bool,
+    typescript: &'v Version,
+    /// Whether the configuration's `moduleSuffixes` apply.
+    module_suffixes: bool,
 }
 
-impl State {
+impl State<'_> {
     fn with_extensions(&self, extensions: u8) -> Self {
         Self {
             extensions,
@@ -458,7 +675,7 @@ impl State {
     }
 
     fn applies(&self, condition: &str) -> bool {
-        package_condition_applies(condition, &self.conditions)
+        package_condition_applies(condition, &self.conditions, self.typescript)
     }
 }
 
@@ -477,6 +694,55 @@ enum Continuation {
     },
 }
 
+/// Where a type reference's name comes from, which decides whether
+/// explicit `typeRoots` end its lookup (`fromInferredTypesContainingFile`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub(super) enum TypeReferenceOrigin {
+    /// A `types` entry or an automatic name, which TypeScript resolves from
+    /// the configuration's directory as if `__inferred type names__.ts`
+    /// there named it.
+    Inferred,
+    /// A `/// <reference types>` directive in a source file.
+    Source,
+}
+
+/// What `tryLoadModuleUsingPaths` answers: no pattern matched, so other
+/// lookups follow, or the matched pattern's file, or the matched pattern's
+/// definitive miss (`Rules::matched_pattern_answers`).
+enum Mapped {
+    Unmatched,
+    Found(Found),
+    Missing,
+}
+
+/// A file a lookup found, and the manifest of the package whose id the
+/// lookup gives it, where it gives one: each site of TypeScript's
+/// `withPackageId` / `getPackageId` names the manifest it reads, which
+/// `Resolver::package_id` makes the id of once the resolution ends.
+#[derive(Debug, Clone)]
+struct Found {
+    path: String,
+    package: Option<Arc<PackageJson>>,
+}
+
+impl Found {
+    /// A file without a package id (`noPackageId`).
+    fn file(path: String) -> Self {
+        Self {
+            path,
+            package: None,
+        }
+    }
+
+    fn in_package(path: String, package: Option<Arc<PackageJson>>) -> Self {
+        Self { path, package }
+    }
+}
+
+/// A module resolution's question: the importing directory, the specifier,
+/// and the resolution mode.
+type ModuleKey = (String, String, Option<ResolutionMode>);
+
 /// A lookup named by an `imports` target: the package directory, the name,
 /// and the extension families and configuration-lookup flag of its state.
 type Hop = (String, String, u8, bool);
@@ -488,10 +754,12 @@ pub(super) struct Resolver<'a> {
     config_file: &'a str,
     case: Case,
     host: Host<'a>,
-    modules: HashMap<(String, String, Option<ResolutionMode>), Resolved>,
+    /// Each module resolution of this load, with the failure it met, which
+    /// every later request for it meets again (`isolated`).
+    modules: HashMap<ModuleKey, (Resolved, Option<InputError>)>,
     /// Results of `imports` hops during one module resolution, so branches
     /// that share a lookup evaluate it once.
-    hops: HashMap<Hop, Option<String>>,
+    hops: HashMap<Hop, Option<Found>>,
     /// The hops in progress; repeating one ends that route as a cycle.
     active: HashSet<Hop>,
     /// Files one module resolution found by adding an arbitrary extension's
@@ -584,22 +852,22 @@ impl<'a> Resolver<'a> {
     /// `GetConditions` preserves native mode-less resolution: Bundler supplies
     /// import conditions, while Node modes supply require conditions. The
     /// separate ES-module feature gate still requires an explicit import mode.
-    fn state(&self, mode: Option<ResolutionMode>, extensions: u8) -> State {
-        let node = self.options.resolution != Resolution::Bundler;
-        let conditions = resolution_conditions(
-            self.options.resolution,
-            &self.options.custom_conditions,
-            mode,
-        );
+    fn state(&self, mode: Option<ResolutionMode>, extensions: u8) -> State<'a> {
+        let options: &'a Options = self.options;
+        let node = options.resolution != Resolution::Bundler;
+        let conditions =
+            resolution_conditions(options.resolution, &options.custom_conditions, mode);
         State {
             extensions,
             esm: node && mode == Some(ResolutionMode::Import),
-            exports: self.options.package_exports,
-            imports: self.options.package_imports,
-            imports_root: self.options.resolution != Resolution::Node16,
+            exports: options.package_exports,
+            imports: options.package_imports,
+            imports_root: options.resolution != Resolution::Node16,
             conditions: conditions.into(),
             config_lookup: false,
             package_directory_only: false,
+            typescript: options.compiler.dialect().typescript(),
+            module_suffixes: true,
         }
     }
 
@@ -612,15 +880,17 @@ impl<'a> Resolver<'a> {
     ) -> Resolved {
         let directory = paths::parent(file).to_owned();
         let key = (directory.clone(), specifier.to_owned(), mode);
-        if let Some(resolved) = self.modules.get(&key) {
-            return resolved.clone();
+        if let Some((resolved, failure)) = self.modules.get(&key) {
+            let (resolved, failure) = (resolved.clone(), failure.clone());
+            self.relatch(failure.as_ref());
+            return resolved;
         }
         if let Some(saved) = self.reuse.as_ref().and_then(|state| state.module(&key))
             && saved.adopt(&mut self.host)
         {
             self.symlink_resolutions.extend_from_slice(&saved.symlinks);
             let result = saved.value.clone();
-            self.modules.insert(key.clone(), result.clone());
+            self.modules.insert(key.clone(), (result.clone(), None));
             self.reuse
                 .as_mut()
                 .expect("reuse is enabled")
@@ -629,6 +899,23 @@ impl<'a> Resolver<'a> {
             reuse_tests::finished(self.config_file, specifier);
             return result;
         }
+        let (resolved, failure) =
+            self.isolated(|resolver| resolver.fresh_module(specifier, &directory, mode, &key));
+        self.modules.insert(key, (resolved.clone(), failure));
+        #[cfg(test)]
+        reuse_tests::finished(self.config_file, specifier);
+        resolved
+    }
+
+    /// `module` without a reusable answer: the lookup itself, saved for
+    /// reuse where it met no failure.
+    fn fresh_module(
+        &mut self,
+        specifier: &str,
+        directory: &str,
+        mode: Option<ResolutionMode>,
+        key: &ModuleKey,
+    ) -> Resolved {
         let symlinks = self.begin_trace();
         #[cfg(test)]
         reuse_tests::worked(self.config_file, false);
@@ -640,37 +927,17 @@ impl<'a> Resolver<'a> {
         self.hops.clear();
         self.arbitrary.clear();
         self.too_deep = false;
-        let found = self.node_like(&state, specifier, &directory);
+        let found = self.node_like(&state, specifier, directory);
         let resolved = match found {
             _ if self.too_deep => Resolved::TooDeep,
             None => Resolved::Missing,
-            Some((path, _)) => {
-                let javascript = input::is_javascript(&path);
-                let extension = if self.arbitrary.contains(&path) {
-                    Extension::Arbitrary
-                } else if path.ends_with(".tsx") {
-                    Extension::Tsx
-                } else if path.ends_with(".json") {
-                    Extension::Json
-                } else {
-                    Extension::TypeScript
-                };
-                let external = paths::has_node_modules(&path);
-                let resolved = self.original_and_resolved(
-                    path,
-                    external && !is_relative_name(specifier),
-                    external,
-                );
-                if javascript {
-                    Resolved::JavaScript(resolved)
-                } else {
-                    Resolved::File {
-                        path: resolved.path,
-                        original_path: resolved.original_path,
-                        external,
-                        extension,
-                    }
-                }
+            Some((found, _)) => {
+                let external = paths::has_node_modules(&found.path);
+                let resolve_symlink = external && !is_relative_name(specifier);
+                let package = self.package_id(&found);
+                self.classify(found.path, package, |resolver, path| {
+                    resolver.original_and_resolved(path, resolve_symlink, external)
+                })
             }
         };
         if self.reuse.is_some()
@@ -681,25 +948,132 @@ impl<'a> Resolver<'a> {
                 .expect("reuse is enabled")
                 .save_module(key.clone(), saved);
         }
-        self.modules.insert(key, resolved.clone());
-        #[cfg(test)]
-        reuse_tests::finished(self.config_file, specifier);
         resolved
     }
 
-    /// Resolves a type library named by `types` or `/// <reference types>`:
-    /// type roots first, then, unless `typeRoots` is explicit, `node_modules`
-    /// above `directory`.
+    /// Run `lookup` with a failure slot of its own and return what it found
+    /// with the failure it alone met, which also stays latched for the
+    /// caller (`check_reads`). A memo that answers later requests from one
+    /// lookup keeps that failure for them, so a failure belongs to every
+    /// request that depends on it, whichever asked first.
+    fn isolated<T>(&mut self, lookup: impl FnOnce(&mut Self) -> T) -> (T, Option<InputError>) {
+        let outer = self.begin_isolation();
+        let value = lookup(self);
+        (value, self.end_isolation(outer))
+    }
+
+    /// Set aside the failure latched so far, so that what one lookup meets
+    /// can be told apart (`isolated`, `end_isolation`).
+    pub(super) fn begin_isolation(&mut self) -> Option<InputError> {
+        self.host.failure.take()
+    }
+
+    /// The failure met since `begin_isolation`, which stays latched for the
+    /// caller behind any earlier one.
+    pub(super) fn end_isolation(&mut self, outer: Option<InputError>) -> Option<InputError> {
+        let failure = self.host.failure.clone();
+        if outer.is_some() {
+            self.host.failure = outer;
+        }
+        failure
+    }
+
+    /// Latch a failure a memoized lookup met (`isolated`) for the request
+    /// it now answers.
+    pub(super) fn relatch(&mut self, failure: Option<&InputError>) {
+        if let Some(failure) = failure {
+            self.host.fail(failure.clone());
+        }
+    }
+
+    /// TypeScript 5.6.3's `resolveLibrary`, which resolves a standard
+    /// library's replacement package, written in `from`, with the options of
+    /// `getOptionsForLibraryResolution` alone, `{ moduleResolution: Node10 }`:
+    /// ancestor `node_modules` and their `@types`, TypeScript and
+    /// declarations before JavaScript, without package `exports`, `imports`,
+    /// or self-names (Node10 resolves with no features), without JSON, and
+    /// without the configuration's `paths`, `baseUrl`, `rootDirs`,
+    /// `typeRoots`, `moduleSuffixes`, conditions, or `preserveSymlinks`, so
+    /// a symbolic link always resolves to its target.
+    pub(super) fn library(&mut self, package: &str, from: &str) -> Resolved {
+        let state = State {
+            extensions: TS | DTS | JS,
+            esm: false,
+            exports: false,
+            imports: false,
+            imports_root: false,
+            conditions: Vec::new().into(),
+            config_lookup: false,
+            package_directory_only: false,
+            module_suffixes: false,
+            typescript: self.options.compiler.dialect().typescript(),
+        };
+        self.hops.clear();
+        self.arbitrary.clear();
+        self.too_deep = false;
+        match self.node_modules(&state, package, paths::parent(from)) {
+            // Unreachable while `imports` is off, but a limit stays a failure.
+            _ if self.too_deep => Resolved::TooDeep,
+            None => Resolved::Missing,
+            // `pathForLibFile` keeps only the file: a standard library is
+            // never deduplicated as a package.
+            Some(found) => {
+                let external = paths::has_node_modules(&found.path);
+                self.classify(found.path, None, |resolver, found| {
+                    resolver.real_path(found, external)
+                })
+            }
+        }
+    }
+
+    /// A module lookup's result for the file it `found`, at the path `reach`
+    /// resolves it to, with the extension TypeScript records for it
+    /// (`Extension`), which the found spelling decides.
+    fn classify(
+        &mut self,
+        found: String,
+        package: Option<PackageId>,
+        reach: impl FnOnce(&mut Self, String) -> ResolvedPath,
+    ) -> Resolved {
+        let extension = if found.ends_with(".jsx") {
+            Extension::Jsx
+        } else if input::is_javascript(&found) {
+            Extension::JavaScript
+        } else if self.arbitrary.contains(&found) {
+            Extension::Arbitrary
+        } else if found.ends_with(".tsx") {
+            Extension::Tsx
+        } else if found.ends_with(".json") {
+            Extension::Json
+        } else {
+            Extension::TypeScript
+        };
+        let resolved = reach(self, found);
+        Resolved::File {
+            path: resolved.path,
+            original_path: resolved.original_path,
+            external: resolved.external,
+            extension,
+            package,
+        }
+    }
+
+    /// Resolves a type library named by `types` or `/// <reference types>`
+    /// (`resolveTypeReferenceDirective`): type roots first, then
+    /// `node_modules` above `directory`, unless `typeRoots` is explicit and
+    /// the configuration inferred the name. The origin is part of the
+    /// lookup's identity, as in TypeScript 7's cache.
     pub(super) fn type_reference(
         &mut self,
         name: &str,
         directory: &str,
         mode: Option<ResolutionMode>,
+        origin: TypeReferenceOrigin,
     ) -> Option<ResolvedPath> {
         if self.reuse.is_none() {
-            return self.type_reference_worker(name, directory, mode);
+            return self.type_reference_worker(name, directory, mode, origin);
         }
-        let key = (directory.to_owned(), name.to_owned(), mode);
+        let key = (directory.to_owned(), name.to_owned(), mode, origin);
         if let Some(saved) = self.reuse.as_ref().and_then(|state| state.types(&key))
             && saved.adopt(&mut self.host)
         {
@@ -714,7 +1088,7 @@ impl<'a> Resolver<'a> {
             return result;
         }
         let symlinks = self.begin_trace();
-        let resolved = self.type_reference_worker(name, directory, mode);
+        let resolved = self.type_reference_worker(name, directory, mode, origin);
         if let Some(saved) = self.finish_trace(resolved.clone(), symlinks) {
             self.reuse
                 .as_mut()
@@ -729,23 +1103,32 @@ impl<'a> Resolver<'a> {
         name: &str,
         directory: &str,
         mode: Option<ResolutionMode>,
+        origin: TypeReferenceOrigin,
     ) -> Option<ResolvedPath> {
         #[cfg(test)]
         reuse_tests::worked(self.config_file, true);
         let state = self.state(mode, DTS);
+        // Explicit roots resolve a name as a file or a directory, just as
+        // modules resolve; the default `node_modules/@types` roots hold
+        // packages only.
+        let explicit = self.options.type_roots.is_some();
         for root in self.type_roots() {
             if !self.host.directory_exists(&root) {
                 continue;
             }
             let candidate = type_root_candidate(&root, name);
-            if let Some(found) = self.load_from_directory(&state, &candidate, true) {
-                if input::is_typescript(&found) {
-                    let external = paths::has_node_modules(&found);
-                    return Some(self.original_and_resolved(found, true, external));
-                }
+            let found = if explicit {
+                self.load_from_file(&state, &candidate)
+                    .map(|path| self.in_containing_package(path))
+            } else {
+                None
+            };
+            let found = found.or_else(|| self.load_from_directory(&state, &candidate, true));
+            if let Some(found) = found.filter(|found| input::is_typescript(&found.path)) {
+                return Some(self.type_reference_file(found));
             }
         }
-        if self.options.type_roots.is_some() {
+        if explicit && origin == TypeReferenceOrigin::Inferred {
             return None;
         }
         let found = if is_relative_name(name) {
@@ -754,11 +1137,76 @@ impl<'a> Resolver<'a> {
             self.node_modules(&state, name, directory)
         };
         found
-            .filter(|found| input::is_typescript(found))
-            .map(|found| {
-                let external = paths::has_node_modules(&found);
-                self.original_and_resolved(found, true, external)
-            })
+            .filter(|found| input::is_typescript(&found.path))
+            .map(|found| self.type_reference_file(found))
+    }
+
+    /// `createResolvedTypeReferenceDirective`: the file with its package id
+    /// and, unless `preserveSymlinks` is set, through its symbolic links.
+    fn type_reference_file(&mut self, found: Found) -> ResolvedPath {
+        let package = self.package_id(&found);
+        let external = paths::has_node_modules(&found.path);
+        ResolvedPath {
+            package,
+            ..self.original_and_resolved(found.path, true, external)
+        }
+    }
+
+    /// A file a lookup found by name, which takes the id of the package
+    /// directory its path is in, if any: `withPackageId` of the manifest
+    /// `parseNodeModuleFromPath` names.
+    fn in_containing_package(&mut self, path: String) -> Found {
+        let package =
+            package_id::package_directory(&path).and_then(|directory| self.host.package(directory));
+        Found::in_package(path, package)
+    }
+
+    /// `withPackageId` / `getPackageId`: the id of a file a lookup found in
+    /// a package, from the manifest's `name` and `version` as the dialect
+    /// reads them (`package_id::header`), the file's path in the package
+    /// (`package_id::sub_module`), and the
+    /// package's installed peers (`peers`); none for a file found without a
+    /// package (`Found`).
+    fn package_id(&mut self, found: &Found) -> Option<PackageId> {
+        let package = found.package.as_ref()?;
+        let rules = self.rules();
+        let (name, version) = package_id::header(rules, &package.info)?;
+        let sub_module = package_id::sub_module(rules, &found.path, &package.dir);
+        let sub_module = self.host.admit(sub_module)?;
+        let peers = self.peers(package);
+        Some(PackageId::new(rules, name, sub_module, version, peers))
+    }
+
+    /// `readPackageJsonPeerDependencies`: `+name@version` for each of the
+    /// package's peers (`package_id::peer_names`) whose manifest is in the
+    /// `node_modules` beside the package's real directory
+    /// (`package_id::peer_directory`), whatever `preserveSymlinks` says. The
+    /// real path and each peer's manifest, present or absent, are inputs of
+    /// the resolution.
+    fn peers(&mut self, package: &PackageJson) -> String {
+        let rules = self.rules();
+        let Some(names) = package_id::peer_names(rules, &package.info) else {
+            return String::new();
+        };
+        let real = self.canonical(&package.dir);
+        let Some(real) = self.host.admit(real) else {
+            return String::new();
+        };
+        let directory = package_id::peer_directory(rules, &real);
+        let Some(Some(directory)) = self.host.admit(directory) else {
+            return String::new();
+        };
+        let mut suffix = String::new();
+        for name in names {
+            let Some(peer) = self.host.package(&format!("{directory}{name}")) else {
+                continue;
+            };
+            let version = package_id::peer_version(rules, &peer.info);
+            if let Some(version) = self.host.admit(version) {
+                suffix.push_str(&format!("+{name}@{version}"));
+            }
+        }
+        suffix
     }
 
     /// `getOriginalAndResolvedFileName`, called at the native module/type
@@ -775,22 +1223,17 @@ impl<'a> Resolver<'a> {
                 path,
                 original_path: None,
                 external,
+                package: None,
             };
         }
-        let real = if let Some(trace) = &mut self.host.trace {
-            let (result, receipt) = self
-                .host
-                .disk
-                .capture(|| self.host.disk.canonicalize(&path));
-            trace.canonical(receipt);
-            result
-        } else {
-            self.host.disk.canonicalize(&path)
-        };
-        let real = real
-            .map_err(|error| io_error(Path::new(&path), &error))
-            .and_then(|path| paths::from_path(&path));
-        let real = match real {
+        self.real_path(path, external)
+    }
+
+    /// `path` through its symbolic links, the original spelling kept beside
+    /// it when they lead elsewhere, as `getOriginalAndResolvedFileName`
+    /// resolves a file wherever a lookup resolves symbolic links.
+    fn real_path(&mut self, path: String, external: bool) -> ResolvedPath {
+        let real = match self.canonical(&path) {
             Ok(real) => real,
             Err(error) => {
                 self.host.fail(error);
@@ -798,6 +1241,7 @@ impl<'a> Resolver<'a> {
                     path,
                     original_path: None,
                     external,
+                    package: None,
                 };
             }
         };
@@ -806,6 +1250,7 @@ impl<'a> Resolver<'a> {
                 path,
                 original_path: None,
                 external,
+                package: None,
             }
         } else {
             self.symlink_resolutions.push((path.clone(), real.clone()));
@@ -813,8 +1258,23 @@ impl<'a> Resolver<'a> {
                 path: real,
                 original_path: Some(path),
                 external,
+                package: None,
             }
         }
+    }
+
+    /// `realpath` of `path` through `Disk`, an input of the resolution in
+    /// progress.
+    fn canonical(&mut self, path: &str) -> Result<String, InputError> {
+        let real = if let Some(trace) = &mut self.host.trace {
+            let (result, receipt) = self.host.disk.capture(|| self.host.disk.canonicalize(path));
+            trace.canonical(receipt);
+            result
+        } else {
+            self.host.disk.canonicalize(path)
+        };
+        real.map_err(|error| io_error(Path::new(path), &error))
+            .and_then(|path| paths::from_path(&path))
     }
 
     pub(super) fn symlink_resolutions(&self) -> &[(String, String)] {
@@ -854,9 +1314,13 @@ impl<'a> Resolver<'a> {
         state.package_directory_only = true;
         let result = self
             .node_modules(&state, name, paths::parent(from))
-            .map(|path| {
-                let external = paths::has_node_modules(&path);
-                self.original_and_resolved(path, external && !is_relative_name(name), external)
+            .map(|found| {
+                let external = paths::has_node_modules(&found.path);
+                self.original_and_resolved(
+                    found.path,
+                    external && !is_relative_name(name),
+                    external,
+                )
             });
         self.check_reads()?;
         Ok(result)
@@ -1006,7 +1470,7 @@ impl<'a> Resolver<'a> {
     }
 
     /// The located file and whether it came from a `node_modules` lookup.
-    fn node_like(&mut self, state: &State, name: &str, dir: &str) -> Option<(String, bool)> {
+    fn node_like(&mut self, state: &State, name: &str, dir: &str) -> Option<(Found, bool)> {
         if let Some(found) = self.optional_settings(state, name, dir) {
             return Some((found, false));
         }
@@ -1038,32 +1502,38 @@ impl<'a> Resolver<'a> {
         None
     }
 
-    /// `paths` for non-relative names, `rootDirs` for relative ones.
-    fn optional_settings(&mut self, state: &State, name: &str, dir: &str) -> Option<String> {
+    /// `tryLoadModuleUsingOptionalResolutionSettings`: `paths` for a name
+    /// that does not start with `./` or `../`; unless its matched pattern
+    /// answered, `baseUrl` for a non-relative name
+    /// (`tryLoadModuleUsingBaseUrl`) or `rootDirs` for a relative or rooted
+    /// one. The candidate under `baseUrl` loads as a relative name does, a
+    /// directory's manifest included.
+    fn optional_settings(&mut self, state: &State, name: &str, dir: &str) -> Option<Found> {
         let options = self.options;
-        if let Some(mapping) = &options.paths {
-            if !paths::is_relative(name) {
-                let found = self.paths_lookup(
-                    state,
-                    name,
-                    &mapping.base,
-                    &mapping.patterns,
-                    &Continuation::Relative,
-                );
-                if found.is_some() {
-                    return found;
-                }
+        if let Some(mapping) = &options.paths
+            && !paths::is_relative(name)
+        {
+            match self.paths_lookup(
+                state,
+                name,
+                &mapping.base,
+                &mapping.patterns,
+                &Continuation::Relative,
+            ) {
+                Mapped::Found(found) => return Some(found),
+                Mapped::Missing => return None,
+                Mapped::Unmatched => {}
             }
         }
         if is_relative_name(name) {
-            self.root_dirs(state, name, dir)
-        } else {
-            None
+            return self.root_dirs(state, name, dir);
         }
+        let base_url = options.base_url.as_deref()?;
+        self.load_relative(state, &paths::resolve(base_url, name), true)
     }
 
-    /// An exact pattern, else the matching `*` pattern with the longest
-    /// prefix; each substitution is tried in order.
+    /// `tryLoadModuleUsingPaths`: an exact pattern, else the matching `*`
+    /// pattern with the longest prefix; each substitution is tried in order.
     fn paths_lookup(
         &mut self,
         state: &State,
@@ -1071,29 +1541,38 @@ impl<'a> Resolver<'a> {
         base: &str,
         patterns: &[(String, Vec<String>)],
         then: &Continuation,
-    ) -> Option<String> {
-        let (index, star) = best_pattern(patterns, name)?;
+    ) -> Mapped {
+        let Some((index, star)) = best_pattern(patterns, name) else {
+            return Mapped::Unmatched;
+        };
         for substitution in &patterns[index].1 {
-            let path = match &star {
-                Some(text) => substitution.replacen('*', text, 1),
-                None => substitution.clone(),
-            };
+            let path = self.rules().substitution(substitution, star.as_deref());
             let candidate = paths::resolve(base, &path);
+            // A file a substitution names with its extension has no package
+            // id in either compiler.
             if paths::known_extension(substitution).is_some() {
-                if let Some(found) = self.try_file(&candidate) {
-                    return Some(found);
+                if let Some(found) = self.try_file(state, &candidate) {
+                    return Mapped::Found(Found::file(found));
                 }
             }
             if let Some(found) = self.load(then, state, &candidate) {
-                return Some(found);
+                return Mapped::Found(found);
             }
         }
-        None
+        if self.rules().matched_pattern_answers() {
+            Mapped::Missing
+        } else {
+            Mapped::Unmatched
+        }
+    }
+
+    fn rules(&self) -> Rules {
+        self.options.compiler.dialect().resolution()
     }
 
     /// A relative name under the longest matching root directory, tried in
     /// place and then under each other root directory.
-    fn root_dirs(&mut self, state: &State, name: &str, dir: &str) -> Option<String> {
+    fn root_dirs(&mut self, state: &State, name: &str, dir: &str) -> Option<Found> {
         let options = self.options;
         if options.root_dirs.is_empty() {
             return None;
@@ -1131,12 +1610,14 @@ impl<'a> Resolver<'a> {
         None
     }
 
-    fn load(&mut self, then: &Continuation, state: &State, candidate: &str) -> Option<String> {
+    fn load(&mut self, then: &Continuation, state: &State, candidate: &str) -> Option<Found> {
         match then {
             Continuation::Relative => self.load_relative(state, candidate, true),
+            // A manifest field's file has no package id of its own: the
+            // lookup that read the manifest decides.
             Continuation::PackageField(package) => {
                 if let Some(found) = self.package_field(state, candidate) {
-                    return Some(found);
+                    return Some(Found::file(found));
                 }
                 // A manifest field may also name an extensionless file or a
                 // directory, resolved as CommonJS unless the package is ESM.
@@ -1149,6 +1630,7 @@ impl<'a> Resolver<'a> {
                 }
                 self.load_relative(&inner, candidate, false)
             }
+            // The package's id, whichever way its file is found.
             Continuation::Package { package, subpath } => {
                 let file = if *subpath || !state.esm {
                     self.load_from_file(state, candidate)
@@ -1166,14 +1648,23 @@ impl<'a> Resolver<'a> {
                             None
                         }
                     })
+                    .map(|path| Found::in_package(path, package.clone()))
             }
         }
     }
 
-    fn load_relative(&mut self, state: &State, candidate: &str, manifest: bool) -> Option<String> {
+    /// `nodeLoadModuleByRelativeName`. Reading `manifest`s, a file found in
+    /// a package takes the package's id, and one found through a directory
+    /// the directory's where the dialect gives it one
+    /// (`load_from_directory`).
+    fn load_relative(&mut self, state: &State, candidate: &str, manifest: bool) -> Option<Found> {
         if !candidate.ends_with('/') {
             if let Some(found) = self.load_from_file(state, candidate) {
-                return Some(found);
+                return Some(if manifest {
+                    self.in_containing_package(found)
+                } else {
+                    Found::file(found)
+                });
             }
         }
         // ESM-mode relative imports never resolve directories.
@@ -1265,7 +1756,7 @@ impl<'a> Resolver<'a> {
             }
         }
         order.into_iter().find_map(|extension| {
-            let found = self.try_file(&format!("{stem}{extension}"))?;
+            let found = self.try_file(state, &format!("{stem}{extension}"))?;
             if arbitrary.as_ref() == Some(&extension) {
                 self.arbitrary.insert(found.clone());
             }
@@ -1273,10 +1764,11 @@ impl<'a> Resolver<'a> {
         })
     }
 
-    /// An existing file, honoring `moduleSuffixes` before the extension.
-    fn try_file(&mut self, path: &str) -> Option<String> {
+    /// An existing file, honoring `moduleSuffixes` before the extension
+    /// where they apply.
+    fn try_file(&mut self, state: &State, path: &str) -> Option<String> {
         let options = self.options;
-        if options.module_suffixes.is_empty() {
+        if !state.module_suffixes || options.module_suffixes.is_empty() {
             return self.host.file_exists(path).then(|| path.to_owned());
         }
         let extension = paths::known_extension(path).unwrap_or("");
@@ -1288,18 +1780,23 @@ impl<'a> Resolver<'a> {
             .find(|candidate| self.host.file_exists(candidate))
     }
 
+    /// `loadNodeModuleFromDirectory`: a directory's manifest entry or index,
+    /// with the directory's package id where `Rules::directory_package_id`
+    /// gives one.
     fn load_from_directory(
         &mut self,
         state: &State,
         candidate: &str,
         manifest: bool,
-    ) -> Option<String> {
+    ) -> Option<Found> {
         let package = if manifest {
             self.host.package(candidate)
         } else {
             None
         };
-        self.directory(state, candidate, package)
+        let found = self.directory(state, candidate, package.clone())?;
+        let package = package.filter(|_| self.rules().directory_package_id());
+        Some(Found::in_package(found, package))
     }
 
     /// A directory's manifest entry (`typesVersions`, `typings`/`types`,
@@ -1333,7 +1830,10 @@ impl<'a> Resolver<'a> {
             },
         );
         let then = Continuation::PackageField(package.clone());
-        if let Some(version_paths) = package.as_ref().and_then(|p| p.version_paths()) {
+        let version_paths = package
+            .as_ref()
+            .and_then(|p| p.version_paths(state.typescript));
+        if let Some(version_paths) = version_paths {
             // TypeScript's `containsPath` here compares case-sensitively.
             if package_file
                 .as_ref()
@@ -1341,16 +1841,16 @@ impl<'a> Resolver<'a> {
             {
                 let target = package_file.as_deref().unwrap_or(&index);
                 let name = paths::relative(candidate, target);
-                if let Some(found) =
-                    self.paths_lookup(state, &name, candidate, &version_paths, &then)
-                {
-                    return Some(found);
+                match self.paths_lookup(state, &name, candidate, &version_paths, &then) {
+                    Mapped::Found(found) => return Some(found.path),
+                    Mapped::Missing => return None,
+                    Mapped::Unmatched => {}
                 }
             }
         }
         if let Some(file) = &package_file {
             if let Some(found) = self.load(&then, state, file) {
-                return Some(found);
+                return Some(found.path);
             }
         }
         self.load_from_file(state, &index)
@@ -1364,14 +1864,14 @@ impl<'a> Resolver<'a> {
                 && paths::has_extension(candidate, &[".d.ts", ".d.mts", ".d.cts"])
             || state.config_lookup && state.extensions == JSON && candidate.ends_with(".json")
         {
-            return self.try_file(candidate);
+            return self.try_file(state, candidate);
         }
         self.no_implicit_extensions(state, candidate)
     }
 
     /// Searches each ancestor's `node_modules` (and `@types`) for TypeScript
     /// and declarations, then again for other extensions.
-    fn node_modules(&mut self, state: &State, name: &str, dir: &str) -> Option<String> {
+    fn node_modules(&mut self, state: &State, name: &str, dir: &str) -> Option<Found> {
         for extensions in [
             state.extensions & (TS | DTS),
             state.extensions & !(TS | DTS),
@@ -1411,7 +1911,7 @@ impl<'a> Resolver<'a> {
 
     /// A package name, possibly with a subpath, in one `node_modules`.
     /// `exports` takes precedence and blocks other lookups.
-    fn package_lookup(&mut self, state: &State, name: &str, modules: &str) -> Option<String> {
+    fn package_lookup(&mut self, state: &State, name: &str, modules: &str) -> Option<Found> {
         let candidate = paths::resolve(modules, name);
         let (package_name, rest) = split_package_name(name);
         let package_dir = paths::combine(modules, package_name);
@@ -1419,7 +1919,7 @@ impl<'a> Resolver<'a> {
             return self
                 .host
                 .directory_exists(&package_dir)
-                .then_some(package_dir);
+                .then(|| Found::file(package_dir));
         }
         let nested = self.host.package(&candidate);
         let mut root = None;
@@ -1430,10 +1930,15 @@ impl<'a> Resolver<'a> {
                 root = Some(package);
                 has
             };
+            // A nested manifest's file has no package id; its directory's
+            // entry has the nested manifest's.
             if !root_has_exports {
+                if let Some(found) = self.load_from_file(state, &candidate) {
+                    return Some(Found::file(found));
+                }
                 return self
-                    .load_from_file(state, &candidate)
-                    .or_else(|| self.directory(state, &candidate, nested));
+                    .directory(state, &candidate, nested.clone())
+                    .map(|found| Found::in_package(found, nested));
             }
         }
         let package = if rest.is_empty() {
@@ -1456,11 +1961,14 @@ impl<'a> Resolver<'a> {
             subpath: !rest.is_empty(),
         };
         if !rest.is_empty() {
-            if let Some(version_paths) = package.as_ref().and_then(|p| p.version_paths()) {
-                if let Some(found) =
-                    self.paths_lookup(state, rest, &package_dir, &version_paths, &then)
-                {
-                    return Some(found);
+            let version_paths = package
+                .as_ref()
+                .and_then(|p| p.version_paths(state.typescript));
+            if let Some(version_paths) = version_paths {
+                match self.paths_lookup(state, rest, &package_dir, &version_paths, &then) {
+                    Mapped::Found(found) => return Some(found),
+                    Mapped::Missing => return None,
+                    Mapped::Unmatched => {}
                 }
             }
         }
@@ -1474,7 +1982,7 @@ impl<'a> Resolver<'a> {
         state: &State,
         scope: &Arc<PackageJson>,
         subpath: &str,
-    ) -> Option<Option<String>> {
+    ) -> Option<Option<Found>> {
         let Some(exports) = scope.exports.as_ref() else {
             return Some(None);
         };
@@ -1508,7 +2016,7 @@ impl<'a> Resolver<'a> {
         name: &str,
         table: &Table,
         imports: bool,
-    ) -> Option<Option<String>> {
+    ) -> Option<Option<Found>> {
         if !name.ends_with('/') && !name.contains('*') {
             if let Some(&index) = table.exact.get(name) {
                 let target = &table.entries[index].1;
@@ -1543,7 +2051,7 @@ impl<'a> Resolver<'a> {
         subpath: &str,
         pattern: bool,
         imports: bool,
-    ) -> Option<Option<String>> {
+    ) -> Option<Option<Found>> {
         let mut stack: Vec<(&Value, usize)> = Vec::new();
         let mut current = Some(target);
         loop {
@@ -1593,6 +2101,9 @@ impl<'a> Resolver<'a> {
         }
     }
 
+    /// A string target's file, which takes the id of the package whose
+    /// `exports` or `imports` named it, or the id its own lookup gives a
+    /// file another package's `imports` target names.
     fn string_target(
         &mut self,
         state: &State,
@@ -1601,7 +2112,7 @@ impl<'a> Resolver<'a> {
         subpath: &str,
         pattern: bool,
         imports: bool,
-    ) -> Option<String> {
+    ) -> Option<Found> {
         if !pattern && !subpath.is_empty() && !target.ends_with('/') {
             return None;
         }
@@ -1632,15 +2143,16 @@ impl<'a> Resolver<'a> {
             format!("{resolved}{subpath}")
         });
         if let Some(found) = self.input_for_output(state, scope, &final_path) {
-            return found;
+            return found.map(|found| Found::in_package(found, Some(scope.clone())));
         }
         self.package_field(state, &final_path)
+            .map(|found| Found::in_package(found, Some(scope.clone())))
     }
 
     /// Looks up a name an `imports` target gives, at most once per module
     /// resolution. A lookup already in progress is a cycle and fails that
     /// route; the compiler itself overflows its stack on one.
-    fn hop(&mut self, state: &State, dir: &str, name: String) -> Option<String> {
+    fn hop(&mut self, state: &State, dir: &str, name: String) -> Option<Found> {
         let key = (dir.to_owned(), name, state.extensions, state.config_lookup);
         if let Some(found) = self.hops.get(&key) {
             return found.clone();
@@ -1727,7 +2239,7 @@ impl<'a> Resolver<'a> {
     }
 
     /// `#name` through the nearest manifest's `imports`; always definitive.
-    fn imports_lookup(&mut self, state: &State, name: &str, dir: &str) -> Option<String> {
+    fn imports_lookup(&mut self, state: &State, name: &str, dir: &str) -> Option<Found> {
         if name == "#" || name.starts_with("#/") && !state.imports_root {
             return None;
         }
@@ -1738,7 +2250,7 @@ impl<'a> Resolver<'a> {
     }
 
     /// A package importing itself by name through its own `exports`.
-    fn self_name_lookup(&mut self, state: &State, name: &str, dir: &str) -> Option<Option<String>> {
+    fn self_name_lookup(&mut self, state: &State, name: &str, dir: &str) -> Option<Option<Found>> {
         let scope = self.host.scope(dir)?;
         scope.exports.as_ref()?;
         let package_name = scope.name.as_deref()?;
@@ -1765,7 +2277,7 @@ impl<'a> Resolver<'a> {
 
     /// A non-relative name as a declaration package under explicit
     /// `typeRoots`, the last module lookup.
-    fn type_root_lookup(&mut self, state: &State, name: &str) -> Option<String> {
+    fn type_root_lookup(&mut self, state: &State, name: &str) -> Option<Found> {
         let options = self.options;
         let roots = options.type_roots.as_ref()?;
         let state = state.with_extensions(DTS);
@@ -1773,6 +2285,7 @@ impl<'a> Resolver<'a> {
             let candidate = type_root_candidate(root, name);
             let found = self
                 .load_from_file(&state, &candidate)
+                .map(|found| self.in_containing_package(found))
                 .or_else(|| self.load_from_directory(&state, &candidate, true));
             if found.is_some() {
                 return found;
@@ -1784,13 +2297,15 @@ impl<'a> Resolver<'a> {
 
 /// Resolves a package-name `extends` as TypeScript does: a NodeNext
 /// `require` of JSON that honors a manifest's `tsconfig` field and a
-/// package's `tsconfig.json`.
+/// package's `tsconfig.json`, by the selected compiler's resolution rules
+/// and version, which a package's `typesVersions` may consult.
 pub(super) fn config_package(
     name: &str,
     directory: &str,
     disk: &disk::Disk,
+    compiler: &CompilerSelection,
 ) -> Result<Option<String>, InputError> {
-    let options = Options::for_extends_lookup();
+    let options = Options::for_extends_lookup(compiler.clone());
     // A configuration lookup consults neither the configuration's location
     // nor output directories.
     let mut resolver = Resolver::with(&options, "", "", Case::Sensitive, disk);
@@ -1798,7 +2313,7 @@ pub(super) fn config_package(
     state.config_lookup = true;
     let found = resolver
         .node_like(&state, name, directory)
-        .map(|(found, _)| found);
+        .map(|(found, _)| found.path);
     resolver.check_reads()?;
     Ok(found)
 }

@@ -21,20 +21,31 @@ export function nativeCompilerVersion(binary) {
   return result.stdout.trim();
 }
 
+// TS1540's message, as TypeScript 7.0.2 words it.
+const MODULE_KEYWORD = "A 'namespace' declaration should not be declared using the 'module' keyword. Please use the 'namespace' keyword instead.";
+
 // Classify the TS6 tree for TS7 syntax validation. Runners decide whether an
 // ineligible fixture is an error or an exclusion; eligible invalid inputs must
-// be compared as syntax rejections. Native checks use only strictDiagnostics.
+// be compared as syntax rejections. Native checks use only strictDiagnostics:
+// the errors TypeScript 7 reports from syntax alone that the API and native
+// --noCheck leave to the checker. Of those, TS1540 leaves TypeScript 7's tree
+// whole, so the Rust CLI must still write the tree (`parsed`) while --check
+// rejects the source.
 export function classifyReference(ts, reference) {
   let removed;
-  const strictDiagnostics = [];
-  const pending = [reference];
+  const deferred = [], checker = [];
+  const containers = new Set([ts.SyntaxKind.SourceFile, ts.SyntaxKind.ModuleBlock, ts.SyntaxKind.ModuleDeclaration]);
+  const pending = [[reference, undefined]];
   while (pending.length) {
-    const node = pending.pop();
-    if (ts.isModuleDeclaration(node) && !ts.isStringLiteral(node.name)
-      && !(node.flags & (ts.NodeFlags.Namespace | ts.NodeFlags.GlobalAugmentation | ts.NodeFlags.NestedNamespace))) {
-      removed ??= 'unquoted module';
-      strictDiagnostics.push({ code: 1540, message: 'Unquoted module declarations were removed in TypeScript 7.' });
-    }
+    const [node, parent] = pending.pop();
+    // checkModuleDeclaration: an identifier-named declaration whose keyword is
+    // `module`, which the API keeps as the absence of the Namespace flag, at
+    // each part of a dotted name, unless checkGrammarModuleElementContext
+    // reports the declaration out of place (TS1235) first.
+    if (ts.isModuleDeclaration(node) && ts.isIdentifier(node.name)
+      && !(node.flags & (ts.NodeFlags.Namespace | ts.NodeFlags.GlobalAugmentation))
+      && containers.has(parent?.kind))
+      checker.push({ code: 1540, message: MODULE_KEYWORD });
     if ((ts.isImportDeclaration(node) || ts.isExportDeclaration(node) || ts.isImportTypeNode(node))
       && node.attributes?.token === ts.SyntaxKind.AssertKeyword) removed ??= 'assert attributes';
     if (node.kind === ts.SyntaxKind.JSDocUnknownType || node.kind === ts.SyntaxKind.JSDocFunctionType)
@@ -42,24 +53,28 @@ export function classifyReference(ts, reference) {
     // The API and native --noCheck leave this grammar error to the checker.
     if (ts.isThrowStatement(node) && ts.isIdentifier(node.expression)
       && !node.expression.escapedText && node.expression.pos === node.expression.end)
-      strictDiagnostics.push({ code: 1142, message: 'Line break not permitted after throw.' });
-    ts.forEachChild(node, child => { pending.push(child); });
+      deferred.push({ code: 1142, message: 'Line break not permitted after throw.' });
+    ts.forEachChild(node, child => { pending.push([child, node]); });
   }
+  const strictDiagnostics = [...deferred, ...checker];
   const diagnostics = reference.parseDiagnostics.filter(d => d.code !== 2458)
     .map(d => ({ code: d.code, message: ts.flattenDiagnosticMessageText(d.messageText, '\n') }));
+  const parsed = !diagnostics.length && !deferred.length;
   diagnostics.push(...strictDiagnostics);
-  return { eligible: !removed, removed, valid: !diagnostics.length, diagnostics, strictDiagnostics };
+  return { eligible: !removed, removed, valid: !diagnostics.length, parsed, diagnostics, strictDiagnostics };
 }
 
 // Compare one source text with the compiler API oracle. `name` is the oracle's
 // file name; its extension selects TSX and declaration context. When TypeScript
 // 7 still has the syntax (eligible), the Rust CLI parses `file`, which must
-// keep that extension, or else the source on stdin. Invalid inputs, and every
-// input under `checkOnly`, run with --check; otherwise `normalize` prepares both
-// trees for firstDifference.
+// keep that extension, or else the source on stdin. A source TypeScript 7
+// parses whole has its tree compared, after `normalize` prepares both trees
+// for firstDifference, unless under `checkOnly`. Invalid inputs, and every
+// input under `checkOnly`, also run with --check.
 //
 // Returns classifyReference's facts plus `outcome`, the CLI's accepted,
-// rejected, or failed (absent when ineligible), and `difference`, the first
+// rejected, or failed (absent when ineligible) for the tree, or else for
+// --check, `checkOutcome` when both ran, and `difference`, the first
 // disagreement with the oracle, if any: a process failure, acceptance of
 // invalid syntax, rejection of valid syntax, or the first differing tree path.
 // Differing trees are also returned as `actual` and `expected`. Runners own the
@@ -71,20 +86,26 @@ export function compareSource(ts, binary, { name, source, file, normalize, check
   const reference = ts.createSourceFile(name, source, ts.ScriptTarget.Latest, false, tsx ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
   const facts = classifyReference(ts, reference);
   if (!facts.eligible) return facts;
-  const check = checkOnly || !facts.valid;
-  const args = [...(check ? ['--check'] : []), ...(file ? [file] : tsx ? ['--tsx'] : [])];
-  const result = runParser(binary, args, file ? options : { ...options, input: source });
-  facts.outcome = result.outcome;
+  const run = args => runParser(binary, [...args, ...(file ? [file] : tsx ? ['--tsx'] : [])],
+    file ? options : { ...options, input: source });
+  if (facts.parsed && !checkOnly) {
+    const result = run([]);
+    facts.outcome = result.outcome;
+    if (result.outcome !== 'accepted') facts.difference = parserFailure(result);
+    else {
+      const actual = normalize(JSON.parse(result.stdout), true);
+      const expected = normalize(reference, true);
+      facts.difference = firstDifference(actual, expected);
+      if (facts.difference) Object.assign(facts, { actual, expected });
+    }
+    if (facts.difference || facts.valid) return facts;
+  }
+  const result = run(['--check']);
+  facts[facts.outcome ? 'checkOutcome' : 'outcome'] = result.outcome;
   if (result.outcome === 'failed') facts.difference = parserFailure(result);
   else if (!facts.valid) {
     if (result.outcome === 'accepted') facts.difference = { error: 'Accepted compiler-invalid syntax', diagnostics: facts.diagnostics };
   } else if (result.outcome === 'rejected') facts.difference = parserFailure(result);
-  else if (!check) {
-    const actual = normalize(JSON.parse(result.stdout), true);
-    const expected = normalize(reference, true);
-    facts.difference = firstDifference(actual, expected);
-    if (facts.difference) Object.assign(facts, { actual, expected });
-  }
   return facts;
 }
 

@@ -412,9 +412,22 @@ impl Evaluator<'_, '_> {
                     None
                 };
                 let Some(index) = index else {
-                    if let Some(type_symbol) =
-                        self.reference_symbol_of_type(left_type, name_location)?
+                    let type_symbol = self.reference_symbol_of_type(left_type, name_location)?;
+                    let is_unchecked_js = self.is_unchecked_js_suggestion(
+                        recipe.root,
+                        type_symbol,
+                        true,
+                        name_location,
+                    )?;
+                    if !is_unchecked_js
+                        && sequence
+                            .read(self.is_js_literal_type_completion(left_type, name_location))?
                     {
+                        return Ok(self
+                            .model
+                            .special(crate::project::semantic::model::SpecialName::Any));
+                    }
+                    if let Some(type_symbol) = type_symbol {
                         let global = self.global_this_reference_symbol();
                         if self.reference_symbol_identity(type_symbol, name_location)?
                             == self.reference_symbol_identity(global, name_location)?
@@ -462,7 +475,7 @@ impl Evaluator<'_, '_> {
                         sequence.read(self.report_nonexistent_property_completion(
                             *declaration,
                             if this_parameter { apparent } else { left_type },
-                            false,
+                            is_unchecked_js,
                             name_location,
                         ))?;
                     }

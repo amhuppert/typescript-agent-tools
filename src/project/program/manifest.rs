@@ -6,7 +6,8 @@
 //! Values keep the byte offset where they start so that diagnostics can
 //! point at them.
 
-use super::{disk, io_error, paths, version};
+use super::version::{self, Version};
+use super::{disk, io_error, paths};
 use crate::analysis::{InputError, InputErrorKind};
 use crate::source::SourceText;
 use std::borrow::Cow;
@@ -20,6 +21,13 @@ pub(super) struct PackageInfo {
     pub(super) directory: String,
     pub(super) contents: Option<Arc<Value>>,
     runtime_dependencies: Vec<String>,
+    /// `peerDependencies` as TypeScript 7 decodes it, when it decodes as a
+    /// valid string map (`peer_dependencies`).
+    peer_dependencies: Option<Vec<String>>,
+    /// `HeaderFields.Name` and `HeaderFields.Version` as TypeScript 7
+    /// decodes them (`ExpectedString`), which package ids read.
+    name: ExpectedString,
+    version: ExpectedString,
 }
 
 impl PackageInfo {
@@ -39,21 +47,25 @@ impl PackageInfo {
     /// `Parse` / `GetPackageJsonInfo` preserve ordered fields and retain one
     /// shared interpretation for resolution and module-specifier generation.
     fn parse(directory: &str, text: &str) -> Result<Self, SyntaxError> {
-        let (contents, runtime_dependencies) = match parse_preserving_duplicates(text) {
-            Ok(mut value) if value.entries().is_some() => {
-                let runtime_dependencies = runtime_dependency_names(&value);
-                value.normalize_objects();
-                (Some(Arc::new(value)), runtime_dependencies)
-            }
-            Ok(_) => (None, Vec::new()),
-            Err(error) if error.failure == Failure::Malformed => (None, Vec::new()),
-            Err(error) => return Err(error),
-        };
-        Ok(Self {
+        let mut package = Self {
             directory: directory.to_owned(),
-            contents,
-            runtime_dependencies,
-        })
+            ..Self::default()
+        };
+        match parse_preserving_duplicates(text) {
+            Ok(mut value) if value.entries().is_some() => {
+                package.runtime_dependencies = runtime_dependency_names(&value);
+                let peers = ExpectedMap::decode(&value, "peerDependencies");
+                package.peer_dependencies = peers.valid.then(|| peers.keys.into_iter().collect());
+                package.name = ExpectedString::decode(&value, "name");
+                package.version = ExpectedString::decode(&value, "version");
+                value.normalize_objects();
+                package.contents = Some(Arc::new(value));
+            }
+            Ok(_) => {}
+            Err(error) if error.failure == Failure::Malformed => {}
+            Err(error) => return Err(error),
+        }
+        Ok(package)
     }
 
     pub(super) fn read(
@@ -84,14 +96,15 @@ impl PackageInfo {
             })
     }
 
-    /// `PackageJson.GetVersionPaths` / `VersionPaths.GetPaths`: first matching
-    /// range wins even when its value is invalid. Non-array mappings disappear;
-    /// non-string array slots remain empty, as native's allocated string slice.
-    pub(super) fn version_paths(&self) -> Option<Vec<(String, Vec<String>)>> {
+    /// `PackageJson.GetVersionPaths` / `VersionPaths.GetPaths`: first range
+    /// that admits `typescript` wins even when its value is invalid.
+    /// Non-array mappings disappear; non-string array slots remain empty, as
+    /// native's allocated string slice.
+    pub(super) fn version_paths(&self, typescript: &Version) -> Option<Vec<(String, Vec<String>)>> {
         let ranges = self.contents.as_ref()?.field("typesVersions")?.entries()?;
         let (range, paths) = ranges
             .iter()
-            .find(|(range, _)| version::matches_typescript(range))?;
+            .find(|(range, _)| version::matches_typescript(range, typescript))?;
         if range.is_empty() {
             return None;
         }
@@ -118,44 +131,122 @@ impl PackageInfo {
     pub(super) fn runtime_dependency_names(&self) -> Vec<String> {
         self.runtime_dependencies.clone()
     }
+
+    /// The names TypeScript 7's `PeerDependencies.GetValue` gives, in sorted
+    /// order, or `None` where the field is absent or does not decode as a
+    /// string map (`validatePackageJSONField`), so that the package has no
+    /// peers to read (`readPackageJsonPeerDependencies`).
+    pub(super) fn peer_dependencies(&self) -> Option<&[String]> {
+        self.peer_dependencies.as_deref()
+    }
+
+    /// `Name` as TypeScript 7 decodes it (`ExpectedString`).
+    pub(super) fn name(&self) -> &ExpectedString {
+        &self.name
+    }
+
+    /// `Version` as TypeScript 7 decodes it (`ExpectedString`).
+    pub(super) fn version(&self) -> &ExpectedString {
+        &self.version
+    }
 }
 
-/// `Expected[map[string]string].UnmarshalJSON` followed by
-/// `GetRuntimeDependencyNames`. Each field decode reuses its map, except null
-/// resets it. Its fresh JSON decoder rejects duplicate keys, inserts a key
-/// before a value-type error, and leaves earlier entries available despite
-/// Valid=false. The enclosing PackageJson parser permits repeated fields.
-fn runtime_dependency_names(value: &Value) -> Vec<String> {
-    use std::collections::BTreeSet;
-    let mut maps: [BTreeSet<String>; 3] = Default::default();
-    for (field, value) in value.entries().expect("package object") {
-        let index = match field.as_str() {
-            "dependencies" => 0,
-            "peerDependencies" => 1,
-            "optionalDependencies" => 2,
-            _ => continue,
-        };
-        let map = &mut maps[index];
-        match &value.kind {
-            Kind::Null => map.clear(),
-            Kind::Object(entries) => {
-                let mut seen = BTreeSet::new();
-                for (name, value) in entries {
-                    if !seen.insert(name) {
-                        break;
-                    }
-                    map.insert(name.clone());
-                    if !matches!(value.kind, Kind::String(_) | Kind::Null) {
-                        break;
+/// `Expected[string].UnmarshalJSON` over every occurrence of one field: a
+/// string replaces the value and makes it valid; `null` resets both; any
+/// other value fails its decode and leaves both as they were. So
+/// `"version":"1.0.0","version":42` keeps `1.0.0` valid, where the
+/// normalized object (`Value`) keeps `42`. `GetValue` gives the value when
+/// valid, and `Value` reads it either way.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub(super) struct ExpectedString {
+    pub(super) value: String,
+    pub(super) valid: bool,
+}
+
+impl ExpectedString {
+    fn decode(value: &Value, field: &str) -> Self {
+        let mut decoded = Self::default();
+        for (name, value) in value.entries().expect("package object") {
+            if name != field {
+                continue;
+            }
+            match &value.kind {
+                Kind::Null => decoded = Self::default(),
+                Kind::String(text) => {
+                    decoded = Self {
+                        value: text.clone(),
+                        valid: true,
                     }
                 }
+                _ => {}
             }
-            _ => {}
         }
+        decoded
     }
-    maps.into_iter()
-        .flatten()
-        .collect::<BTreeSet<_>>()
+
+    /// `GetValue`: the value, if valid.
+    pub(super) fn get(&self) -> Option<&str> {
+        self.valid.then_some(self.value.as_str())
+    }
+}
+
+/// `Expected[map[string]string].UnmarshalJSON` over every occurrence of one
+/// field. Each field decode reuses its map, except null resets it. Its fresh
+/// JSON decoder rejects duplicate keys, inserts a key before a value-type
+/// error, and leaves earlier entries available despite Valid=false; a
+/// successful decode sets Valid, which only null clears. The enclosing
+/// PackageJson parser permits repeated fields.
+struct ExpectedMap {
+    keys: std::collections::BTreeSet<String>,
+    valid: bool,
+}
+
+impl ExpectedMap {
+    fn decode(value: &Value, field: &str) -> Self {
+        use std::collections::BTreeSet;
+        let mut map = Self {
+            keys: BTreeSet::new(),
+            valid: false,
+        };
+        for (name, value) in value.entries().expect("package object") {
+            if name != field {
+                continue;
+            }
+            match &value.kind {
+                Kind::Null => {
+                    map.keys.clear();
+                    map.valid = false;
+                }
+                Kind::Object(entries) => {
+                    let mut seen = BTreeSet::new();
+                    let mut decoded = true;
+                    for (name, value) in entries {
+                        if !seen.insert(name) {
+                            decoded = false;
+                            break;
+                        }
+                        map.keys.insert(name.clone());
+                        if !matches!(value.kind, Kind::String(_) | Kind::Null) {
+                            decoded = false;
+                            break;
+                        }
+                    }
+                    map.valid |= decoded;
+                }
+                _ => {}
+            }
+        }
+        map
+    }
+}
+
+/// `GetRuntimeDependencyNames` over the maps `ExpectedMap` decodes, valid
+/// or not.
+fn runtime_dependency_names(value: &Value) -> Vec<String> {
+    ["dependencies", "peerDependencies", "optionalDependencies"]
+        .into_iter()
+        .flat_map(|field| ExpectedMap::decode(value, field).keys)
+        .collect::<std::collections::BTreeSet<_>>()
         .into_iter()
         .collect()
 }
@@ -338,8 +429,10 @@ impl Frame {
 /// recurse, stay shallow. The same limit as `crate::parser::json`.
 const MAX_DEPTH: usize = crate::parser::json::MAX_JSON_DEPTH;
 
-#[cfg(test)]
-fn parse(text: &str) -> Result<Value, SyntaxError> {
+/// The value of a whole manifest, malformed text an error: where
+/// `PackageInfo::read` lets such a manifest establish a scope without
+/// contents, a caller that must know its contents decides here.
+pub(super) fn parse(text: &str) -> Result<Value, SyntaxError> {
     let mut value = parse_preserving_duplicates(text)?;
     value.normalize_objects();
     Ok(value)

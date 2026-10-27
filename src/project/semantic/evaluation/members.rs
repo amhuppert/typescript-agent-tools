@@ -391,6 +391,20 @@ impl Evaluator<'_, '_> {
             ),
             ValueSymbol::Created(created) => super::ReferenceSymbol::from_property(created),
         };
+        // `ModuleExports`: a CommonJS module's own `module` or `exports`
+        // (`declareCommonJSVariable`), whose type TypeScript makes of the
+        // module, is refused at the file that declares it.
+        if self
+            .reference_symbol_flags(reference, consumer)?
+            .module_exports
+        {
+            return Err(super::super::unsupported_demand_at_location(
+                self.inputs,
+                consumer,
+                SemanticFailureReason::JavascriptSemanticsRequired,
+                "a CommonJS module's `module` and `exports` have the module's JavaScript-only type",
+            ));
+        }
         if !self.push_value_resolution(symbol, resolution::Property::Type) {
             return self.report_symbol_circularity_completion(reference, consumer);
         }

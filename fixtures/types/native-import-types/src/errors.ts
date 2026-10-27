@@ -1,0 +1,11 @@
+import { viaModule, viaTypeofModule } from "broken";
+export declare const /*#missingMember*/missing: import("./lib.js").Missing;
+export declare const /*#missingNested*/missingNested: import("./lib.js").Outer.Missing.Leaf;
+export declare const /*#missingTypeofMember*/missingValue: typeof import("./lib.js").value.absent;
+export declare const /*#moduleAsType*/moduleAsType: import("./lib.js");
+export declare const /*#typeOnlyModuleValue*/ambientValue: typeof import("type-equals");
+export const /*#missingModule*/fromBroken = viaModule;
+export const /*#missingTypeofModule*/fromBrokenTypeof = viaTypeofModule;
+export declare const /*#aliasToNowhere*/nowhere: import("./broken.js").Missing;
+export declare const /*#circular*/loop: import("./circular.js").Loop;
+export declare const /*#nonLiteral*/nonLiteral: import(string).Thing;

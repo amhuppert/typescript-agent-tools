@@ -106,6 +106,114 @@ fn check_prints_one_verdict_line() {
     );
 }
 
+/// `--check` reports the error TypeScript 7's checker reports at the name of
+/// a namespace declared with the `module` keyword (TS1540), the first in
+/// source order, and fails as a syntax error does. Without `--check` the
+/// AST is still written: TypeScript 7 parses the declaration. Forms whose
+/// keyword is not `module`, whose name is a string, whose `module` is not a
+/// declaration, or that TypeScript's checker reports out of place instead
+/// (TS1235, which `--check` leaves to a checker as it does for `namespace`)
+/// pass. Positions are the native 7.0.2 compiler's.
+#[test]
+fn check_reports_namespaces_declared_with_module() {
+    const TS1540: &str = "A 'namespace' declaration should not be declared using the 'module' \
+                          keyword. Please use the 'namespace' keyword instead.";
+    let fixture = Fixture::new(&[
+        ("plain.ts", "module X {}"),
+        (
+            "declared.ts",
+            "declare module X { export const a: number; }",
+        ),
+        ("types.d.ts", "declare module X { export const a: number; }"),
+        (
+            "dotted.ts",
+            "namespace A.B {}\nmodule C.D { export const a = 1; }",
+        ),
+        ("exported.ts", "export module X { export const a = 1; }"),
+        (
+            "nested.ts",
+            "namespace N {\n  module X { export const a = 1; }\n}",
+        ),
+        ("crlf.ts", "namespace N {\r\n  module X {}\r\n}"),
+        ("wide.ts", "const s = \"\u{1F600}\"; module X {}"),
+        (
+            "quoted.d.ts",
+            "declare module \"x\" { export const a: number; }",
+        ),
+        ("global.ts", "export {};\ndeclare global { interface G {} }"),
+        ("namespace.ts", "namespace X { export const a = 1; }"),
+        ("lines.ts", "module\nX\n{}"),
+        ("function.ts", "function f() { module X {} }"),
+    ]);
+    let rejected = |file: &str, line: usize, column: usize| {
+        (
+            Some(1),
+            String::new(),
+            format!("{file}:{line}:{column}: {TS1540}\n"),
+        )
+    };
+    for (args, stdin, expected) in [
+        (vec!["--check", "plain.ts"], "", rejected("plain.ts", 1, 8)),
+        (vec!["--check"], "module X {}", rejected("-", 1, 8)),
+        (
+            vec!["--check", "declared.ts"],
+            "",
+            rejected("declared.ts", 1, 16),
+        ),
+        (
+            vec!["--check", "types.d.ts"],
+            "",
+            rejected("types.d.ts", 1, 16),
+        ),
+        (
+            vec!["--check", "dotted.ts"],
+            "",
+            rejected("dotted.ts", 2, 8),
+        ),
+        (
+            vec!["--check", "exported.ts"],
+            "",
+            rejected("exported.ts", 1, 15),
+        ),
+        (
+            vec!["--check", "nested.ts"],
+            "",
+            rejected("nested.ts", 2, 10),
+        ),
+        (vec!["--check", "crlf.ts"], "", rejected("crlf.ts", 2, 10)),
+        (vec!["--check", "wide.ts"], "", rejected("wide.ts", 1, 24)),
+    ] {
+        assert_eq!(
+            outcome(&tsparse(&fixture, &args, stdin)),
+            expected,
+            "{args:?}"
+        );
+    }
+    for file in [
+        "quoted.d.ts",
+        "global.ts",
+        "namespace.ts",
+        "lines.ts",
+        "function.ts",
+    ] {
+        assert_eq!(
+            outcome(&tsparse(&fixture, &["--check", file], "")),
+            (
+                Some(0),
+                format!("ok: {file} parses as TypeScript 7 (jsx: off)\n"),
+                String::new()
+            ),
+            "{file}"
+        );
+    }
+    let ast = tsparse(&fixture, &["plain.ts"], "");
+    assert_eq!(ast.status.code(), Some(0), "{ast:?}");
+    let ast: serde_json::Value = serde_json::from_slice(&ast.stdout).unwrap();
+    assert_eq!(ast["statements"][0]["kind"], 268);
+    assert_eq!(ast["statements"][0]["flags"], 0);
+    assert_eq!(ast["statements"][0]["name"]["escapedText"], "X");
+}
+
 /// `--references-stop` prints `stopped: pid N`, the pid status reported,
 /// when it stopped a service, and `no service: CONFIG`, naming the
 /// configuration as given, when none was running.

@@ -2,7 +2,7 @@
 //! handles; published graph nodes retain exact sites and file-local identities.
 
 mod switch_flow;
-mod syntax;
+pub(super) mod syntax;
 mod try_flow;
 
 use super::site_map::{PackedValue, SiteMap};

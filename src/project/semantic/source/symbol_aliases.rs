@@ -21,9 +21,10 @@ pub(in crate::project::semantic) enum SymbolAliasTarget {
 }
 
 impl Source<'_, '_> {
-    /// `ast.IsAliasSymbolDeclaration`, over the admitted TypeScript syntax.
-    /// Require-initialized variables and assignment aliases are JS-only
-    /// binder products and are excluded by program input admission.
+    /// `ast.IsAliasSymbolDeclaration`, over the admitted syntax: of the
+    /// JavaScript-only binder products, the one `module.exports = name`
+    /// binding admits; require-initialized variables and other assignment
+    /// aliases are refused at loading.
     pub(in crate::project::semantic) fn is_alias_symbol_declaration(
         &mut self,
         declaration: DeclarationIdentity,
@@ -43,6 +44,20 @@ impl Source<'_, '_> {
                 syntax::is_entity_name_expression(ast, expression)
                     || ast.node(expression).syntax_kind == K::ClassExpression
             }),
+            K::BinaryExpression => {
+                matches!(
+                    syntax::assignment_declaration_kind(
+                        ast,
+                        declaration.node,
+                        crate::javascript_syntax::is_javascript(ast)
+                    ),
+                    syntax::AssignmentDeclarationKind::ModuleExports
+                        | syntax::AssignmentDeclarationKind::ExportsProperty
+                ) && syntax::id(node, "right").is_some_and(|right| {
+                    syntax::is_entity_name_expression(ast, right)
+                        || ast.node(right).syntax_kind == K::ClassExpression
+                })
+            }
             _ => false,
         })
     }
@@ -107,16 +122,16 @@ impl Source<'_, '_> {
         let Some(literal) = syntax::id(node, "moduleSpecifier") else {
             return Ok(None);
         };
-        for site in bindings.reference_module_sites(declaration.file) {
-            let facts = bindings.reference_module_site(site);
-            if !facts.implicit
-                && super::reference_import_tracker::captured_module_literal(captured, facts.span)?
-                    == literal
-            {
-                return Ok(Some(site));
-            }
-        }
-        Err(super::super::internal("export declaration lacks its retained module request").into())
+        super::reference_import_tracker::retained_module_site(
+            bindings,
+            captured,
+            declaration.file,
+            literal,
+        )?
+        .map(Some)
+        .ok_or_else(|| {
+            super::super::internal("export declaration lacks its retained module request").into()
+        })
     }
 
     /// `resolveESModuleSymbol` retains the actual moduleSpecifier.Parent for

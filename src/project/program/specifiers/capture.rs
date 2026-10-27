@@ -54,13 +54,11 @@ pub(in crate::project::program) fn index_collision_paths(
                     }
                 }
             }
-            if let Some(paths) = &env.options.paths {
-                let base = if paths.patterns.is_empty() {
-                    &env.cwd
-                } else {
-                    &paths.base
-                };
-                spellings.insert(mappings::same_volume_relative(target, base, env.case));
+            // `paths` validation processes the path from the local base; the
+            // path from `baseUrl` alone asks no collision question.
+            if env.options.paths.is_some() {
+                let base = mappings::local_base(&env.options, &env.cwd);
+                spellings.insert(mappings::same_volume_relative(target, &base, env.case));
             }
             if !path.in_node_modules {
                 continue;
@@ -75,7 +73,7 @@ pub(in crate::project::program) fn index_collision_paths(
                 Ok(None) | Err(SpecifierInputError::Input(_)) => continue,
                 Err(error @ SpecifierInputError::NotCaptured { .. }) => return Err(error),
             };
-            let Some(patterns) = package.version_paths() else {
+            let Some(patterns) = package.version_paths(&env.options.typescript) else {
                 continue;
             };
             let subpath = &target[root.len() + 1..];
@@ -92,7 +90,9 @@ pub(in crate::project::program) fn index_collision_paths(
                             endings::process(file, endings, &env.options, |_| Ok(collision))
                         },
                     );
-                    if let Some(name) = result.expect("pure ending transform") {
+                    if let Some(name) = result.expect("pure ending transform")
+                        && !name.is_empty()
+                    {
                         spellings.insert(paths::combine(root, &name));
                     }
                 }

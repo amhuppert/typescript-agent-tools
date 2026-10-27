@@ -16,6 +16,7 @@ pub(crate) mod node {
     pub(crate) const DECORATOR_CONTEXT: u32 = 32768;
     pub(crate) const AWAIT_CONTEXT: u32 = 65536;
     pub(crate) const DISALLOW_CONDITIONAL_TYPES_CONTEXT: u32 = 131072;
+    pub(crate) const JAVA_SCRIPT_FILE: u32 = 524288;
     pub(crate) const POSSIBLY_CONTAINS_DYNAMIC_IMPORT: u32 = 4194304;
     pub(crate) const POSSIBLY_CONTAINS_IMPORT_META: u32 = 8388608;
     pub(crate) const JSDOC: u32 = 16777216;
@@ -47,6 +48,8 @@ pub(crate) mod variant {
 }
 
 pub(crate) mod script {
+    pub(crate) const JS: u32 = 1;
+    pub(crate) const JSX: u32 = 2;
     pub(crate) const TS: u32 = 3;
     pub(crate) const TSX: u32 = 4;
 }

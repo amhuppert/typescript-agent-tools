@@ -18,7 +18,8 @@ only move complexity away from its callers.
 
 Keep the native Rust implementation, TypeScript 7.0.2 baseline, unpublished
 checkout-built distribution, and local CLI/library callers. Inputs are existing
-UTF-8 TypeScript files, including TSX, under navigation's file-kind rules.
+UTF-8 TypeScript files, including TSX, under navigation's file-kind rules;
+JavaScript files, which navigation and project queries read, are never edited.
 Projects use one explicit configuration and its existing searched-file policy.
 Fragments and saved plans are local inputs from the same user; no application
 code, formatter, or shell command runs as part of editing.

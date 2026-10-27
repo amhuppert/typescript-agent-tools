@@ -17,9 +17,16 @@ pub(super) struct GrammarContext {
 }
 
 impl GrammarContext {
-    pub(super) fn new(declaration_file: bool) -> Self {
+    /// The context a file starts in: ambient in a declaration file, and
+    /// `JavaScriptFile` in a JavaScript one, which every node then carries.
+    pub(super) fn new(declaration_file: bool, javascript_file: bool) -> Self {
+        let javascript = if javascript_file {
+            crate::compiler::node::JAVA_SCRIPT_FILE
+        } else {
+            0
+        };
         Self {
-            flags: if declaration_file { AMBIENT } else { 0 },
+            flags: javascript | if declaration_file { AMBIENT } else { 0 },
             allow_in: true,
             allow_conditional: true,
         }

@@ -109,8 +109,13 @@
     "source": "const {default} = value;"
   },
   {
-    "name": "removed-module-namespace",
+    "name": "module-keyword-namespace",
     "source": "module Old {}",
+    "nativeDiagnostic": 1540
+  },
+  {
+    "name": "module-keyword-dotted-namespace",
+    "source": "declare module Old.Inner { const value: number; }",
     "nativeDiagnostic": 1540
   },
   {

@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {compilerHookOracle} from './type-oracle.mjs';
 import {lineStarts,position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 const root=fileURLToPath(new URL('../fixtures/types/native-module-wrappers/',import.meta.url));
 test('native module wrappers retain named, optional and default properties',async()=>{
  const rows=[];
@@ -23,6 +24,6 @@ test('native module wrappers retain named, optional and default properties',asyn
    assert.deepEqual(row.failures,[],`${config}/${row.name}/failures`);
   }
  }
- fs.writeFileSync('.cc/temp/types-module-wrappers-native.json',JSON.stringify(rows,null,2));
+ fs.writeFileSync(scratchPath('types-module-wrappers-native.json'),JSON.stringify(rows,null,2));
  assert.equal(rows.length,30);
 });

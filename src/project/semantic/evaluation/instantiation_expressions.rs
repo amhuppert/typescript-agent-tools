@@ -5,7 +5,7 @@ use super::super::model::{
     MembersView, Metadata, NativeCompletion, NativeResult, NativeSequence, ObjectFlags, Signature,
     TypeFlags, TypeId, TypeView,
 };
-use super::super::source::{CallTypeArgument, ExpressionRoot, InstantiationExpressionRecipe};
+use super::super::source::{CallTypeArgument, ExpressionRoot, InstantiationSite};
 use super::{Evaluator, relations::RelationReporting};
 use crate::references::Location;
 
@@ -30,7 +30,7 @@ impl Evaluator<'_, '_> {
         let mut sequence = NativeSequence::new();
         let result = (|| {
             let recipe = self.source.instantiation_expression_recipe(root)?;
-            if let Some(arguments) = &recipe.arguments {
+            if let Some(arguments) = &recipe.site.arguments {
                 for argument in arguments {
                     sequence.read(self.check_type_source_element_completion(argument.root))?;
                 }
@@ -39,7 +39,7 @@ impl Evaluator<'_, '_> {
                 &recipe.operand,
                 super::contextual::CheckMode::NORMAL,
             ))?;
-            sequence.read(self.instantiation_expression_type_completion(ty, &recipe))
+            sequence.read(self.instantiation_expression_type_completion(ty, &recipe.site))
         })();
         sequence.finish(result)
     }
@@ -65,10 +65,10 @@ impl Evaluator<'_, '_> {
     /// `getInstantiationExpressionType`: native identity is (actual node,
     /// operand type). Only the mapped factory completion is installed; the
     /// later diagnostic display belongs to this invocation's returned copy.
-    fn instantiation_expression_type_completion(
+    pub(super) fn instantiation_expression_type_completion(
         &mut self,
         ty: TypeId,
-        recipe: &InstantiationExpressionRecipe,
+        recipe: &InstantiationSite,
     ) -> NativeResult<TypeId> {
         if self.model.is_silent_never(ty)
             || self.model.is_error_type(ty)
@@ -109,7 +109,7 @@ impl Evaluator<'_, '_> {
     fn instantiate_expression_constituent_completion(
         &mut self,
         ty: TypeId,
-        recipe: &InstantiationExpressionRecipe,
+        recipe: &InstantiationSite,
         applicability: &mut Applicability,
     ) -> NativeResult<TypeId> {
         let mut signatures = ConstituentSignatures::default();
@@ -131,7 +131,7 @@ impl Evaluator<'_, '_> {
     fn instantiate_expression_type_part_completion(
         &mut self,
         ty: TypeId,
-        recipe: &InstantiationExpressionRecipe,
+        recipe: &InstantiationSite,
         signatures: &mut ConstituentSignatures,
         applicability: &mut Applicability,
     ) -> NativeResult<TypeId> {
@@ -275,9 +275,10 @@ impl Evaluator<'_, '_> {
                     RelationReporting::Report,
                     consumer,
                 ))? {
-                    *signature = sequence.read(
-                        self.get_signature_instantiation_completion(signature, arguments, consumer),
-                    )?;
+                    let javascript = self.signature_in_javascript_file(signature)?;
+                    *signature = sequence.read(self.get_signature_instantiation_completion(
+                        signature, arguments, javascript, consumer,
+                    ))?;
                 }
             }
             Ok(applicable)

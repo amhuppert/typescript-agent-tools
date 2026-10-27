@@ -33,13 +33,13 @@ ${entries.map(([, name]) => `            Self::${name} => "${name}",`).join('\n'
 const groups = {
   node: ['Let', 'Const', 'Using', 'AwaitUsing', 'NestedNamespace', 'Namespace', 'OptionalChain',
     'GlobalAugmentation', 'DisallowInContext', 'YieldContext', 'DecoratorContext', 'AwaitContext',
-    'DisallowConditionalTypesContext', 'PossiblyContainsDynamicImport', 'PossiblyContainsImportMeta',
-    'JSDoc', 'Ambient', 'InWithStatement', 'Deprecated', 'IdentifierHasExtendedUnicodeEscape'],
+    'DisallowConditionalTypesContext', 'JavaScriptFile', 'PossiblyContainsDynamicImport',
+    'PossiblyContainsImportMeta', 'JSDoc', 'Ambient', 'InWithStatement', 'Deprecated', 'IdentifierHasExtendedUnicodeEscape'],
   token: ['ExtendedUnicodeEscape', 'Scientific', 'HexSpecifier', 'BinarySpecifier', 'OctalSpecifier',
     'ContainsSeparator', 'UnicodeEscape', 'ContainsInvalidEscape', 'HexEscape'],
   target: ['Latest'],
   variant: ['Standard', 'JSX'],
-  script: ['TS', 'TSX'],
+  script: ['JS', 'JSX', 'TS', 'TSX'],
 };
 const enums = { node: ts.NodeFlags, token: ts.TokenFlags, target: ts.ScriptTarget,
   variant: ts.LanguageVariant, script: ts.ScriptKind };

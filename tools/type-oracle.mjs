@@ -12,6 +12,7 @@ import { VENDORED } from './vendor-typescript-libs.mjs';
 import { compilerText } from './navigation-oracle.mjs';
 import { captureFileSystem } from './type-oracle-filesystem.mjs';
 import { compiledOracle } from './type-oracle-compiler.mjs';
+import { scratchPath } from './harness-scratch.mjs';
 
 
 
@@ -495,7 +496,7 @@ export async function compilerHookOracle(config, request) {
         nodeEnd: byteOffset(sourceOf(candidate.node), candidate.node.end) })),
       compilerOptions: context.project.program.getCompilerOptions(), syntaxKind: context.semantic.SyntaxKind };
   }, true, request.currentDirectory);
-  const temporary = fs.mkdtempSync(path.resolve('.cc/temp/type-oracle-hook-'));
+  const temporary = fs.mkdtempSync(scratchPath('type-oracle-hook-'));
   try {
     const replace = {};
     const attach = (source, destination) => { replace[path.join(sourceDirectory, destination)] = source; };

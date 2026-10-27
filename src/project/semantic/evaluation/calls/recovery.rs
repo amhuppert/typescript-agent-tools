@@ -37,7 +37,8 @@ impl Evaluator<'_, '_> {
                 return Ok(candidate.clone());
             }
             let arguments = if input.recipe.type_arguments.is_empty() {
-                let context = self.new_call_inference_context(candidate);
+                let javascript = self.inputs.in_javascript_file(input.recipe.root.file);
+                let context = self.new_call_inference_context(candidate, javascript);
                 sequence.read(self.infer_call_type_arguments_completion(
                     input,
                     candidate,

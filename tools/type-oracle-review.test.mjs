@@ -6,9 +6,10 @@ import { spawnSync } from 'node:child_process';
 import { test } from 'node:test';
 import { typeOracle, compilerHookOracle } from './type-oracle.mjs';
 import { lineStarts, position } from './semantic-oracle.mjs';
+import { scratchPath } from './harness-scratch.mjs';
 
 function project(t, files, selectedFile = 'cases.ts', configFile = 'tsconfig.json') {
-  const root = fs.mkdtempSync(path.resolve('.cc/temp/type-oracle-review-'));
+  const root = fs.mkdtempSync(scratchPath('type-oracle-review-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   for (const [file, text] of Object.entries(files)) {
     fs.mkdirSync(path.dirname(path.join(root, file)), { recursive: true });
@@ -69,7 +70,7 @@ test('compiler source pin rejects untracked Go build inputs', async t => {
   const common = spawnSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], { encoding: 'utf8' });
   assert.equal(common.status, 0, common.stderr);
   const source = process.env.TYPE_SCRIPT_GO_SOURCE || path.join(path.dirname(common.stdout.trim()), '.cache/typescript-go-7.0.2');
-  const root = fs.mkdtempSync(path.resolve('.cc/temp/type-oracle-source-review-'));
+  const root = fs.mkdtempSync(scratchPath('type-oracle-source-review-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const clone = path.join(root, 'source');
   const copied = spawnSync('git', ['clone', '--quiet', '--shared', source, clone], { encoding: 'utf8' });
@@ -126,7 +127,7 @@ test('compiler hook checks candidates in normalized project-relative path order'
 });
 
 test('compiler hook fixture paths preserve spaces, percent signs and non-ASCII checkout names', async t => {
-  const root = fs.mkdtempSync(path.resolve('.cc/temp/type-oracle-path-review-'));
+  const root = fs.mkdtempSync(scratchPath('type-oracle-path-review-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const relocated = path.join(root, 'oracle fixtures é %');
   const toolsDirectory = path.join(relocated, 'tools');
@@ -134,7 +135,8 @@ test('compiler hook fixture paths preserve spaces, percent signs and non-ASCII c
   fs.mkdirSync(toolsDirectory, { recursive: true });
   fs.mkdirSync(hooksDirectory, { recursive: true });
   for (const file of ['type-oracle.mjs', 'type-oracle-filesystem.mjs', 'type-oracle-compiler.mjs',
-    'semantic-oracle.mjs', 'navigation-oracle.mjs', 'corpus-selection.mjs', 'vendor-typescript-libs.mjs'])
+    'semantic-oracle.mjs', 'navigation-oracle.mjs', 'corpus-selection.mjs', 'vendor-typescript-libs.mjs',
+    'harness-scratch.mjs'])
     fs.copyFileSync(fileURLToPath(new URL(file, import.meta.url)), path.join(toolsDirectory, file));
   for (const file of ['checker-hook.go', 'ls-hook.go', 'oracle-test.go'])
     fs.copyFileSync(fileURLToPath(new URL(`../fixtures/types/compiler-hook/${file}`, import.meta.url)), path.join(hooksDirectory, file));

@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { typeOracle, compilerHookOracle } from './type-oracle.mjs';
 import { lineStarts, position } from './semantic-oracle.mjs';
+import { scratchPath } from './harness-scratch.mjs';
 
 const directory = fileURLToPath(new URL('../fixtures/types/native-effects-review/', import.meta.url));
 const source = fs.readFileSync(path.join(directory, 'effects.ts'), 'utf8');
@@ -51,7 +52,7 @@ test('same-checker dotted effects retain consumed global dependencies', async ()
     assert(!Object.values(answer.beforeSummary.observations).some(value => value.emptyRecovery === true));
     observed.push({ marker, summary: answer.summary, beforeSummary: answer.beforeSummary });
   }
-  fs.writeFileSync('.cc/temp/types-effects-dotted-consumption.json', JSON.stringify(observed, null, 2));
+  fs.writeFileSync(scratchPath('types-effects-dotted-consumption.json'), JSON.stringify(observed, null, 2));
 });
 
 // Missing noLib globals have a healthy-looking flow summary but property

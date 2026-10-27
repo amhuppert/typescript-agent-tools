@@ -341,8 +341,13 @@ impl Evaluator<'_, '_> {
                             RelationKind::Assignable,
                             consumer,
                         ))? {
+                            // `widenTypeInferredFromInitializer`.
                             let initial = sequence
                                 .read(self.widened_literal_type_completion(initial, consumer))?;
+                            let initial = self.widen_javascript_initializer(
+                                self.inputs.in_javascript_file(declaration.file),
+                                initial,
+                            )?;
                             if sequence.read(self.type_related_completion(
                                 contextual,
                                 initial,
@@ -538,7 +543,8 @@ impl Evaluator<'_, '_> {
     }
 
     /// `getContextualThisParameterType`: arrows never acquire a contextual
-    /// this; explicit signature this precedes literal and assignment context.
+    /// this; explicit signature this precedes literal and assignment context,
+    /// which `noImplicitThis` or a JavaScript file (`IsInJSFile`) enables.
     pub(super) fn contextual_this_parameter_type_completion(
         &mut self,
         root: ExpressionRoot,
@@ -561,7 +567,11 @@ impl Evaluator<'_, '_> {
                     .read(self.demand_completion(parameter.value_type))
                     .map(Some);
             }
-            if self.inputs.semantic_options().no_implicit_this {
+            // A JavaScript file's function gets the literal or assignment
+            // context without `noImplicitThis` too.
+            if self.inputs.semantic_options().no_implicit_this
+                || self.inputs.in_javascript_file(root.file)
+            {
                 match self.source.contextual_this_source(root)? {
                     super::super::source::ContextualThisSource::None => {}
                     super::super::source::ContextualThisSource::Assignment(receiver) => {

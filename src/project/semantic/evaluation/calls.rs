@@ -633,6 +633,7 @@ impl Evaluator<'_, '_> {
                             self.instantiated_constructors_for_type_arguments_completion(
                                 super_type,
                                 &base.type_arguments,
+                                self.inputs.in_javascript_file(base.reference.file),
                                 &base.reference.location,
                             ),
                         )?;
@@ -1082,7 +1083,8 @@ impl Evaluator<'_, '_> {
                     candidate.clone()
                 } else {
                     let arguments = if recipe.type_arguments.is_empty() {
-                        let inference = self.new_call_inference_context(&candidate);
+                        let javascript = self.inputs.in_javascript_file(recipe.root.file);
+                        let inference = self.new_call_inference_context(&candidate, javascript);
                         context = Some(inference);
                         let arguments =
                             sequence.read(self.infer_call_type_arguments_completion(
@@ -1110,9 +1112,11 @@ impl Evaluator<'_, '_> {
                         };
                         arguments
                     };
+                    let javascript = self.signature_in_javascript_file(&candidate)?;
                     let checked = sequence.read(self.get_signature_instantiation_completion(
                         &candidate,
                         arguments,
+                        javascript,
                         &recipe.location,
                     ))?;
                     if sequence
@@ -1146,9 +1150,11 @@ impl Evaluator<'_, '_> {
                                 context,
                                 CheckMode::NORMAL,
                             ))?;
+                        let javascript = self.signature_in_javascript_file(&candidate)?;
                         checked = sequence.read(self.get_signature_instantiation_completion(
                             &candidate,
                             arguments,
+                            javascript,
                             &recipe.location,
                         ))?;
                         if sequence
@@ -1213,9 +1219,11 @@ impl Evaluator<'_, '_> {
             for argument in nodes {
                 supplied.push(sequence.read(self.check_type_completion(&argument.expression))?);
             }
+            let javascript = self.signature_in_javascript_file(signature)?;
             let arguments = sequence.read(self.fill_missing_type_arguments_completion(
                 supplied,
                 signature.type_parameter_types(),
+                javascript,
                 consumer,
             ))?;
             let mut mapper: Option<MapperId> = None;

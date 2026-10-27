@@ -81,6 +81,10 @@ pub enum LoadErrorKind {
     Incompatible,
     /// Preparing the recorded edits again does not give the recorded text.
     Replay,
+    /// A recorded file is one editing refuses for its kind, such as a
+    /// JavaScript file, which preparing it would refuse too; the error's
+    /// path names that file.
+    Unsupported,
 }
 
 impl std::fmt::Display for LoadError {
@@ -159,11 +163,22 @@ impl PreparedBatch {
                 record.identity,
                 crate::source::encode(record.byte_order_mark, &record.proposal.original),
             )
-            .map_err(|admission| {
-                error(
-                    LoadErrorKind::Malformed,
-                    format!("a recorded file cannot be edited: {admission}"),
-                )
+            .map_err(|refused| {
+                if refused.file_kind {
+                    // The product policy refuses the file as preparing it
+                    // would, naming it.
+                    LoadError {
+                        kind: LoadErrorKind::Unsupported,
+                        message: refused.error.message,
+                        path: refused.error.path.unwrap_or_else(|| path.to_path_buf()),
+                        names: Some(names.clone()),
+                    }
+                } else {
+                    error(
+                        LoadErrorKind::Malformed,
+                        format!("a recorded file cannot be edited: {}", refused.error),
+                    )
+                }
             })?;
             targets.push(Target::replay(captured, &record.proposal));
         }

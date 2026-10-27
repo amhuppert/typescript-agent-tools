@@ -6,6 +6,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {compilerHookOracle, typeOracle} from './type-oracle.mjs';
 import {lineStarts, position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 
 const root = fileURLToPath(new URL('../fixtures/types/native-jsx-partial/', import.meta.url));
 const names = ['globals.d.ts', 'model.tsx', 'consumer.ts', 'tsconfig.json'];
@@ -39,7 +40,7 @@ test('native healthy JSX model and deferred property for partial expansion', asy
       rows.push({name, at, summary: native.summary, errorType: native.errorType,
         codes: native.beforeSummary.diagnosticCodes,
         demandFailures: native.beforeSummary.demandFailures, inputHashes: native.inputHashes});
-      fs.writeFileSync('.cc/temp/native-jsx-partial.json', JSON.stringify(rows, null, 2) + '\n');
+      fs.writeFileSync(scratchPath('native-jsx-partial.json'), JSON.stringify(rows, null, 2) + '\n');
     }
   }
   assert.deepEqual(rows.map(row => row.name), Object.keys(expected));

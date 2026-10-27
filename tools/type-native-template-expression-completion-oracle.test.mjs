@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {compilerHookOracle, typeOracle} from './type-oracle.mjs';
 import {lineStarts, position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 
 const root = fileURLToPath(new URL('../fixtures/types/native-template-expression-completion/', import.meta.url));
 const source = fs.readFileSync(path.join(root, 'cases.ts'), 'utf8');
@@ -26,7 +27,7 @@ for (const profile of ['strict', 'loose', 'nocheck']) {
           ({operation, pos, end, declarationPos, declarationEnd, name}));
       queries.push({name: marker[1], summary: native.summary, errorType: native.errorType,
         codes: native.beforeSummary.diagnosticCodes, demandFailures: native.beforeSummary.demandFailures, errors});
-      fs.writeFileSync(`.cc/temp/native-template-expression-completion-${profile}.json`, JSON.stringify({queries}, null, 2) + '\n');
+      fs.writeFileSync(scratchPath(`native-template-expression-completion-${profile}.json`), JSON.stringify({queries}, null, 2) + '\n');
     }
     assert.equal(queries.length, 9);
     assert.deepEqual(JSON.parse(JSON.stringify({queries})), JSON.parse(fs.readFileSync(path.join(root, `expected-${profile}.json`), 'utf8')));

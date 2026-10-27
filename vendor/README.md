@@ -25,7 +25,7 @@ Production Rust source files are upstream files. Local Cargo manifests omit deve
 
 ## TypeScript standard library declarations
 
-[`typescript-7.0.2-lib`](typescript-7.0.2-lib) holds the 108 `lib*.d.ts` files of TypeScript 7.0.2, the declarations that `target`, `lib`, and `/// <reference lib>` select. They are data that find references reads at run time, not Rust sources: the built binary locates this directory through the checkout it was built from (`CARGO_MANIFEST_DIR`), so moving the checkout requires rebuilding, and a missing or unreadable file fails the load. `build.rs` watches `vendor`, so a change here gives the next build a new service identity.
+[`typescript-7.0.2-lib`](typescript-7.0.2-lib) holds the 108 `lib*.d.ts` files of TypeScript 7.0.2, the declarations that `target`, `lib`, and `/// <reference lib>` select under the TypeScript 7 dialect. The TypeScript 5.6 dialect never reads them: it reads the installed compiler's own `lib` directory, by a catalog extracted from TypeScript 5.6.3 ([validation](../docs/validation.md#typescript-563-oracle)). They are data that find references reads at run time, not Rust sources: the built binary locates this directory through the checkout it was built from (`CARGO_MANIFEST_DIR`), so moving the checkout requires rebuilding, and a missing or unreadable file fails the load. `build.rs` watches `vendor`, so a change here gives the next build a new service identity.
 
 | Data | Version | Origin |
 | --- | --- | --- |

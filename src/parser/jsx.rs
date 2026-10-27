@@ -13,7 +13,9 @@ impl<'src> Parser<'src> {
             } else {
                 let tag = p.jsx_name(true)?;
                 opening_fields.push(("tagName", tag.into()));
-                if p.at("<") {
+                // A JavaScript file's tag takes no type arguments
+                // (`parseJsxOpeningOrSelfClosingElementOrOpeningFragment`).
+                if p.at("<") && !p.javascript {
                     opening_fields.push(("typeArguments", p.type_arguments()?.into()));
                 }
                 Some(tag)

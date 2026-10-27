@@ -200,26 +200,28 @@ impl Evaluator<'_, '_> {
             if self.model.is_error_type(ty) {
                 return Ok(NativeCompletion::clean(()));
             }
-            let TypeExpressionForm::Reference {
-                arguments, site, ..
-            } = &node.form
-            else {
-                return Err(super::super::internal(
-                    "type-reference check lacks a reference recipe",
-                )
-                .into());
-            };
+            let arguments = self.reference_or_import_arguments(node)?;
             let checked = if arguments.is_empty() {
                 NativeCompletion::clean(())
             } else {
-                self.check_type_argument_constraints_completion(node, arguments)?
+                self.check_type_argument_constraints_completion(node, &arguments)?
             };
             checked.and_then_value(|()| {
-                let root = ExpressionRoot {
-                    file: node.file,
-                    site: *site,
+                let symbol = match &node.form {
+                    TypeExpressionForm::Reference { site, .. } => self
+                        .resolved_type_reference_symbol(ExpressionRoot {
+                            file: node.file,
+                            site: *site,
+                        }),
+                    TypeExpressionForm::Import(root) => self.resolved_import_type_symbol(*root),
+                    _ => {
+                        return Err(super::super::internal(
+                            "type-reference check lacks a reference or import recipe",
+                        )
+                        .into());
+                    }
                 };
-                let Some(symbol) = self.resolved_type_reference_symbol(root) else {
+                let Some(symbol) = symbol else {
                     return Ok(());
                 };
                 let declarations = self.reference_symbol_declarations(symbol, &node.location)?;
@@ -327,12 +329,21 @@ impl Evaluator<'_, '_> {
         let mut sequence = NativeSequence::new();
         let result = (|| {
             let ty = sequence.read(self.check_type_completion(node))?;
-            let TypeExpressionForm::Reference { site, anchor, .. } = &node.form else {
-                return Err(
-                    super::super::internal("reference parameters lack a reference recipe").into(),
-                );
+            let symbol = match &node.form {
+                TypeExpressionForm::Reference { site, anchor, .. } => {
+                    sequence.read(self.symbol_from_type_reference(node, *site, *anchor))?
+                }
+                TypeExpressionForm::Import(root) => match self.resolved_import_type_symbol(*root) {
+                    Some(symbol) => symbol,
+                    None => return Ok(Vec::new()),
+                },
+                _ => {
+                    return Err(super::super::internal(
+                        "reference parameters lack a reference or import recipe",
+                    )
+                    .into());
+                }
             };
-            let symbol = sequence.read(self.symbol_from_type_reference(node, *site, *anchor))?;
             if self
                 .reference_symbol_native_flags(symbol, &node.location)?
                 .type_flags()
@@ -366,15 +377,16 @@ impl Evaluator<'_, '_> {
         node: &TypeExpression,
         parameters: &[TypeId],
     ) -> NativeResult<Vec<TypeId>> {
-        let TypeExpressionForm::Reference { arguments, .. } = &node.form else {
-            return Err(
-                super::super::internal("effective arguments lack a reference recipe").into(),
-            );
-        };
-        self.type_arguments_from_nodes_completion(arguments)?
+        let arguments = self.reference_or_import_arguments(node)?;
+        self.type_arguments_from_nodes_completion(&arguments)?
             .and_then(|arguments| {
                 self.minimum_type_argument_count(parameters)?;
-                self.fill_missing_type_arguments_completion(arguments, parameters, &node.location)
+                self.fill_missing_type_arguments_completion(
+                    arguments,
+                    parameters,
+                    self.inputs.in_javascript_file(node.file),
+                    &node.location,
+                )
             })
     }
 
@@ -388,11 +400,7 @@ impl Evaluator<'_, '_> {
     ) -> NativeResult<TypeId> {
         let mut sequence = NativeSequence::new();
         let result = (|| {
-            let TypeExpressionForm::Reference { arguments, .. } = &node.form else {
-                return Err(
-                    super::super::internal("effective argument lacks reference recipe").into(),
-                );
-            };
+            let arguments = self.reference_or_import_arguments(node)?;
             if let Some(argument) = arguments.get(index) {
                 sequence.read(self.check_type_completion(argument))
             } else {
@@ -407,5 +415,23 @@ impl Evaluator<'_, '_> {
             }
         })();
         sequence.finish(result)
+    }
+
+    /// The written type arguments of a TypeReference or ImportType node,
+    /// which `checkTypeReferenceOrImport` and its constraint checks share.
+    fn reference_or_import_arguments(
+        &mut self,
+        node: &TypeExpression,
+    ) -> Result<Vec<TypeExpression>, DemandError> {
+        match &node.form {
+            TypeExpressionForm::Reference { arguments, .. } => Ok(arguments.clone()),
+            TypeExpressionForm::Import(root) => {
+                Ok(self.source.import_type_recipe(*root)?.type_arguments())
+            }
+            _ => Err(super::super::internal(
+                "type-reference check lacks a reference or import recipe",
+            )
+            .into()),
+        }
     }
 }

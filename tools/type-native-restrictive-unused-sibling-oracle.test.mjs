@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {compilerHookOracle, typeOracle} from './type-oracle.mjs';
 import {lineStarts, position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 
 const root = fileURLToPath(new URL('../fixtures/types/native-restrictive-unused-sibling/', import.meta.url));
 const source = fs.readFileSync(path.join(root, 'cases.ts'), 'utf8');
@@ -27,7 +28,7 @@ for (const profile of ['strict', 'nocheck']) {
         restrictive, acquisitions: native.beforeSummary.displayAcquisitions ?? [],
         inputHashes: native.inputHashes};
       rows.push(row);
-      fs.writeFileSync('.cc/temp/native-restrictive-unused-sibling.json', JSON.stringify(rows, null, 2) + '\n');
+      fs.writeFileSync(scratchPath('native-restrictive-unused-sibling.json'), JSON.stringify(rows, null, 2) + '\n');
       assert.equal(native.compiler, '7.0.2');
       assert.equal(native.checkerCount, 1);
       assert.deepEqual([native.summary, native.errorType], [api.summary, api.errorType]);

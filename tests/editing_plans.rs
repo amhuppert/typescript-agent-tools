@@ -192,8 +192,11 @@ fn a_plan_edits_only_files_preparation_would() {
         plan["files"][0]["path"] = js.to_str().unwrap().into();
         plan["files"][0]["referent"] = js.to_str().unwrap().into();
     });
+    // A file editing refuses for its kind is unsupported, as preparing it
+    // would be, and named.
     let error = PreparedBatch::load(&path).unwrap_err();
-    assert_eq!(error.kind, LoadErrorKind::Malformed, "{error:?}");
+    assert_eq!(error.kind, LoadErrorKind::Unsupported, "{error:?}");
+    assert_eq!(error.path, js);
     // Every recorded name is admitted, the other names too.
     let fixture = Fixture::new(&[("a.ts", SOURCE)]);
     let path = plan(&fixture);
@@ -201,10 +204,9 @@ fn a_plan_edits_only_files_preparation_would() {
     edit_plan(&path, |plan| {
         plan["files"][0]["aliases"] = serde_json::json!([js.to_str().unwrap()])
     });
-    assert_eq!(
-        PreparedBatch::load(&path).unwrap_err().kind,
-        LoadErrorKind::Malformed
-    );
+    let error = PreparedBatch::load(&path).unwrap_err();
+    assert_eq!(error.kind, LoadErrorKind::Unsupported, "{error:?}");
+    assert_eq!(error.path, js);
     // A relative path names nothing exactly, nor does a relative referent.
     for field in ["path", "referent"] {
         let fixture = Fixture::new(&[("a.ts", SOURCE)]);

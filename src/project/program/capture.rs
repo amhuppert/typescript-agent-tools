@@ -190,7 +190,7 @@ fn contents(parser: &Parser, job: &Job, source: &Arc<SourceText>) -> Result<Cont
         navigation: job.navigation.then(|| Captured::typescript(&ast, source)),
         indicators,
         module,
-        facts: collect(&ast, source, indicators, module, &file_path),
+        facts: collect(&ast, source, indicators, module, parser, &file_path),
     })
 }
 
@@ -200,9 +200,11 @@ pub(super) fn collect(
     source: &SourceText,
     indicators: ModuleIndicators,
     module: bool,
+    parser: &Parser,
     path: &std::path::Path,
 ) -> Result<FileFacts, InputError> {
-    binding::collect(ast, source, indicators, module).map_err(|mut error| {
+    let file_name = path.to_str().expect("loading names its inputs with text");
+    binding::collect(ast, source, indicators, module, parser, file_name).map_err(|mut error| {
         error.path.get_or_insert_with(|| path.to_path_buf());
         error
     })

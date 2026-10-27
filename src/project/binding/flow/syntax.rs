@@ -16,14 +16,14 @@ struct Fact {
     dotted: bool,
 }
 
-pub(super) struct Facts(Vec<Fact>);
+pub(in crate::project::binding) struct Facts(Vec<Fact>);
 
 impl Facts {
-    pub(super) fn parent(&self, id: NodeId) -> Option<NodeId> {
+    pub(in crate::project::binding) fn parent(&self, id: NodeId) -> Option<NodeId> {
         self.0[id.index()].parent
     }
 
-    pub(super) fn new(ast: &Ast<'_>) -> Self {
+    pub(in crate::project::binding) fn new(ast: &Ast<'_>) -> Self {
         let mut facts = Self(vec![Fact::default(); ast.nodes().len()]);
         let order: Vec<_> = ast.walk().collect();
         for &id in &order {
@@ -286,7 +286,11 @@ impl Facts {
     /// `GetContainerFlags`: the complete native container classification for
     /// this project's TS/TSX grammar. Native JSTypeAliasDeclaration is outside
     /// that accepted grammar and has no parser-schema node here.
-    pub(super) fn container_flags(&self, ast: &Ast<'_>, id: NodeId) -> ContainerFlags {
+    pub(in crate::project::binding) fn container_flags(
+        &self,
+        ast: &Ast<'_>,
+        id: NodeId,
+    ) -> ContainerFlags {
         use ContainerFlags as C;
         let node = ast.node(id);
         let flags = match node.syntax_kind {
@@ -408,7 +412,7 @@ impl Facts {
 
 /// Native ContainerFlags are distinct questions over one established result.
 #[derive(Clone, Copy)]
-pub(super) struct ContainerFlags(u16);
+pub(in crate::project::binding) struct ContainerFlags(u16);
 
 impl ContainerFlags {
     const CONTAINER: u16 = 1;
@@ -422,6 +426,18 @@ impl ContainerFlags {
     const THIS_CONTAINER: u16 = 1 << 8;
     const PROPAGATES_THIS: u16 = 1 << 9;
 
+    /// `IsContainer`: the binder's `container` and `blockScopeContainer`.
+    pub(in crate::project::binding) fn container(self) -> bool {
+        self.0 & Self::CONTAINER != 0
+    }
+    /// `IsBlockScopedContainer`: the binder's `blockScopeContainer` alone.
+    pub(in crate::project::binding) fn block_scoped(self) -> bool {
+        self.0 & Self::BLOCK_SCOPED != 0
+    }
+    /// `IsThisContainer`: the binder's `thisContainer`.
+    pub(in crate::project::binding) fn this_container(self) -> bool {
+        self.0 & Self::THIS_CONTAINER != 0
+    }
     pub(super) fn control_flow(self) -> bool {
         self.0 & Self::CONTROL_FLOW != 0
     }

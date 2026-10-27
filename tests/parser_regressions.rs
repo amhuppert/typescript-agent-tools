@@ -445,3 +445,36 @@ fn type_lookaheads_skip_every_modifier_typescript_skips() {
         );
     }
 }
+
+/// Native `nextIsStartOfMappedType` decides a braced type by its tokens:
+/// `{` then an optional `readonly`, `+readonly`, or `-readonly`, `[`, an
+/// identifier (not a reserved word, nor `yield` or `await` where they are
+/// keywords), and `in`. Anything else is a type literal, such as an index
+/// signature or a computed member.
+#[test]
+fn a_mapped_type_starts_with_its_key_and_in() {
+    for (written, kind) in [
+        ("{ [K in \"a\"]: number }", "MappedType"),
+        ("{ readonly [K in \"a\"]: number }", "MappedType"),
+        ("{ +readonly [K in \"a\"]: number }", "MappedType"),
+        ("{ -readonly [K in \"a\"]: number }", "MappedType"),
+        ("{ [K in \"a\" as `x${K}`]?: number }", "MappedType"),
+        ("{ [k: string]: number }", "TypeLiteral"),
+        ("{ readonly [k: string]: number }", "TypeLiteral"),
+        ("{ [k]: number }", "TypeLiteral"),
+        ("{ readonly x: number }", "TypeLiteral"),
+        ("{ k: number }", "TypeLiteral"),
+    ] {
+        let source = format!("declare const k: unique symbol;\ntype T = {written};\n");
+        let ast = parse(&source).unwrap_or_else(|error| panic!("{written}: {error}"));
+        let alias = ast
+            .walk()
+            .map(|id| ast.node(id))
+            .find(|node| node.kind == "TypeAliasDeclaration")
+            .unwrap();
+        let Some(Value::Node(ty)) = alias.field("type") else {
+            panic!("{written}: alias has no type");
+        };
+        assert_eq!(ast.node(*ty).kind, kind, "{written}");
+    }
+}

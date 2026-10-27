@@ -18,8 +18,10 @@ pub(super) mod enums;
 mod functions;
 mod generics;
 pub(super) mod identifiers;
+mod import_types;
 mod instantiation_expressions;
 mod iteration;
+mod javascript;
 pub(super) mod mapped;
 mod members;
 mod module_specifiers;
@@ -69,7 +71,8 @@ pub(super) use functions::{ContextualThisSource, FunctionExpressionFacts};
 pub(super) use generics::{
     ClassRecipe, ParameterConstraintRecipe, ThisTypeContext, TypeParameterRecipe,
 };
-pub(super) use instantiation_expressions::InstantiationExpressionRecipe;
+pub(super) use import_types::ImportTypeRecipe;
+pub(super) use instantiation_expressions::InstantiationSite;
 pub(super) use members::{
     AccessDeclarationContext, DeclarationIdentity, DeclarationReference, OuterParameterRecipe,
     ParameterReferenceSyntax,
@@ -207,6 +210,8 @@ pub(super) enum TypeExpressionForm {
     Literal(Expression),
     This(generics::ThisTypeContext),
     Query(ExpressionRoot),
+    /// `getTypeFromImportTypeNode`; its recipe is acquired when evaluated.
+    Import(ExpressionRoot),
     ArrayOrTuple(ArrayOrTupleRecipe),
     TupleElement(TupleElementRecipe),
     Readonly {
@@ -342,6 +347,22 @@ pub(super) struct SignatureRecipe {
     pub(super) predicate: Option<SignaturePredicateRecipe>,
     pub(super) origin: Location,
     pub(super) flags: SignatureFlags,
+    pub(super) untyped_javascript: UntypedJavaScript,
+}
+
+/// The syntax `getSignatureFromDeclaration` reads for
+/// `IsUntypedSignatureInJSFile`: a function, method, accessor, or
+/// constructor of a JavaScript file, not immediately invoked, with no
+/// parameter annotated. Its last term, that the declaration has no
+/// contextual type, is the evaluator's.
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(super) enum UntypedJavaScript {
+    No,
+    /// A declaration, which no expression gives a contextual type.
+    Declaration,
+    /// A function expression, arrow function, or object literal method or
+    /// accessor, untyped where it has no contextual type.
+    Expression,
 }
 
 #[derive(Clone)]
@@ -1114,6 +1135,17 @@ impl<'p, 'w> Source<'p, 'w> {
                     ))));
                 }
             }
+            // A one-name import-type qualifier is the node's final name and
+            // selects its type, as a type reference's name does. A name in a
+            // qualified chain is a namespace path segment, which no anchor
+            // types (the final name's parent is a QualifiedName, not a type).
+            if let Some(import) = syntax::import_type_of_qualifier_part(ast, parents, id) {
+                return Ok(Some(if parents[id.index()] == Some(import) {
+                    SelectedSyntax::Type(type_expression(inputs, file, captured, parents, import))
+                } else {
+                    SelectedSyntax::UnsupportedTarget { token }
+                }));
+            }
             if syntax::is_in_type_query(ast, |id| parents[id.index()], id) {
                 return Ok(Some(SelectedSyntax::ValueAt(type_query_operand(
                     inputs, file, captured, parents, id,
@@ -1299,6 +1331,11 @@ fn type_expression(
             file,
             site: super::super::binding::flow::Site::new(ast, id),
         })
+    } else if node.syntax_kind == SyntaxKind::ImportType {
+        TypeExpressionForm::Import(ExpressionRoot {
+            file,
+            site: super::super::binding::flow::Site::new(ast, id),
+        })
     } else if matches!(
         node.syntax_kind,
         SyntaxKind::TypeReference | SyntaxKind::ExpressionWithTypeArguments
@@ -1478,6 +1515,35 @@ fn signature_recipe(
                     syntax::has_modifier(ast, ast.node(parent), SyntaxKind::AbstractKeyword)
                 }),
     );
+    let untyped = inputs.in_javascript_file(file)
+        && matches!(
+            role,
+            SignatureRole::FunctionExpression
+                | SignatureRole::ArrowFunction
+                | SignatureRole::MethodDeclaration
+                | SignatureRole::Getter
+                | SignatureRole::Setter
+                | SignatureRole::FunctionDeclaration
+                | SignatureRole::Constructor
+        )
+        && syntax::immediately_invoked_function(ast, parents, id).is_none()
+        && syntax::ids(node, "parameters")
+            .iter()
+            .all(|&parameter| syntax::id(ast.node(parameter), "type").is_none());
+    let in_object_literal = parents[id.index()]
+        .is_some_and(|parent| ast.node(parent).syntax_kind == SyntaxKind::ObjectLiteralExpression);
+    let untyped_javascript = match role {
+        _ if !untyped => UntypedJavaScript::No,
+        SignatureRole::FunctionExpression | SignatureRole::ArrowFunction => {
+            UntypedJavaScript::Expression
+        }
+        SignatureRole::MethodDeclaration | SignatureRole::Getter | SignatureRole::Setter
+            if in_object_literal =>
+        {
+            UntypedJavaScript::Expression
+        }
+        _ => UntypedJavaScript::Declaration,
+    };
     Ok(SignatureRecipe {
         root,
         type_parameters,
@@ -1487,6 +1553,7 @@ fn signature_recipe(
         predicate,
         origin: super::location(inputs, file, origin),
         flags,
+        untyped_javascript,
     })
 }
 

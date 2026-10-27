@@ -854,6 +854,7 @@ impl Evaluator<'_, '_> {
                             .map(|args| args.to_vec())
                             .unwrap_or_default(),
                         &parameters,
+                        false,
                         consumer,
                     ),
                 )?;
@@ -865,6 +866,7 @@ impl Evaluator<'_, '_> {
                             .map(|args| args.to_vec())
                             .unwrap_or_default(),
                         &parameters,
+                        false,
                         consumer,
                     ),
                 )?;

@@ -442,15 +442,7 @@ pub(crate) fn fail(route: Route, failure: Failure) -> Delivered {
 /// does not cover.
 pub(crate) fn failure_code(error: &AnalysisError) -> u8 {
     match error {
-        AnalysisError::Input(error) => match error.kind {
-            InputErrorKind::Io => 2,
-            InputErrorKind::Syntax => SYNTAX_ERROR,
-            InputErrorKind::Config
-            | InputErrorKind::ResourceLimit
-            | InputErrorKind::Unsupported
-            | InputErrorKind::Binding
-            | InputErrorKind::UnresolvedImport => 1,
-        },
+        AnalysisError::Input(error) => input_failure_code(error.kind),
         AnalysisError::Query(error) => match error.kind {
             QueryErrorKind::OutsideProject
             | QueryErrorKind::InvalidPosition
@@ -495,11 +487,27 @@ pub(crate) const REJECTED: u8 = 1;
 /// The exit code of a plan that cannot be loaded: 2 when it could not be
 /// read or is not a plan, as for other unreadable input; 1 when another
 /// build wrote it or its edits no longer give its text, which preparing
-/// again resolves.
+/// again resolves, and, as for any unsupported input, when it records a
+/// file editing refuses.
 pub(crate) fn load_failure_code(kind: LoadErrorKind) -> u8 {
     match kind {
         LoadErrorKind::Io | LoadErrorKind::Malformed => 2,
         LoadErrorKind::Incompatible | LoadErrorKind::Replay => REJECTED,
+        LoadErrorKind::Unsupported => input_failure_code(InputErrorKind::Unsupported),
+    }
+}
+
+/// The exit code of an input failure, by its kind: 2 for one that could
+/// not be read, 1 otherwise.
+fn input_failure_code(kind: InputErrorKind) -> u8 {
+    match kind {
+        InputErrorKind::Io => 2,
+        InputErrorKind::Syntax => SYNTAX_ERROR,
+        InputErrorKind::Config
+        | InputErrorKind::ResourceLimit
+        | InputErrorKind::Unsupported
+        | InputErrorKind::Binding
+        | InputErrorKind::UnresolvedImport => 1,
     }
 }
 

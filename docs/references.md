@@ -9,6 +9,15 @@ the implemented behavior and where it deliberately differs from TypeScript.
 `tsparse --definition` prints the declarations the same selection denotes
 ([go to definition](#go-to-definition)).
 
+Unless a passage names the TypeScript 5.6 dialect, this document describes
+the TypeScript 7 dialect, which reads every project whose installed compiler
+is not TypeScript 5. A project whose installed compiler is TypeScript 5 is
+read with the TypeScript 5.6 dialect, which differs only where a passage
+names it: in [Compiler selection](#compiler-selection), which describes the
+whole dialect, and in [Package identity](#package-identity), [JavaScript
+inputs](#javascript-inputs), and the library and JSX-runtime entries in
+[Compatibility limits](#compatibility-limits).
+
 ## Command
 
 ```sh
@@ -58,7 +67,8 @@ that function. Implicit decorator calls and JSX tags are excluded; explicit
 
 `--no-tests` removes occurrences in exact case-sensitive directory segments
 `test`, `tests`, `__tests__`, or basenames ending `.test` or `.spec` followed by
-`.ts`, `.tsx`, `.mts` or `.cts`, on normalized project-relative `/` paths.
+`.ts`, `.tsx`, `.mts`, `.cts`, `.js`, `.jsx`, `.mjs` or `.cjs`, on normalized
+project-relative `/` paths.
 Selection, loading, dependencies and declaration metadata still include those
 files. `fixtures`, `spec`, `Tests`, and `.TEST.ts` are retained.
 
@@ -174,13 +184,50 @@ every check passes and 1 when any finding is present. `--json` prints one
 document with an entry per check: `name`, `status` (`pass` or `finding`),
 `detail`, and a finding's `why`, `next.argv`, or `remedy`.
 
-The private runtime directory defaults to `/tmp/tsparse-UID`. Override it with
-`TSPARSE_SERVICE_DIR`, naming a directory owned by the current user with mode 0700;
-its parent must exist. Keep paths short enough for Unix sockets: a socket
+The private runtime directory is chosen from the environment alone, without
+looking at the file system, by the first of these rules that applies:
+
+1. `TSPARSE_SERVICE_DIR`, when it is set: any path, a relative one taken in the
+   working directory. A directory it names that cannot be used fails; nothing
+   else is tried.
+2. `TMPDIR/tsparse-UID`, when `TMPDIR` is a non-empty absolute path and the
+   socket paths in that directory fit a socket address. `TMPDIR` is taken by
+   its components, so a trailing slash, as macOS writes it, names the same
+   directory as none.
+3. `/tmp/tsparse-UID` otherwise: `TMPDIR` is not set, empty, relative, or so
+   long that the socket paths would not fit.
+
+On macOS every login session sets `TMPDIR`, so the second rule is the usual
+one there. `--doctor` names the directory, the rule that chose it, and, for
+the third, why `TMPDIR` was not used:
+
+```text
+runtime directory: /var/folders/zz/zyxvpxvq6csfxvn_n0000000000000/T/tsparse-501 (TMPDIR/tsparse-UID, as TSPARSE_SERVICE_DIR is not set) is a private directory owned by this user with mode 0700; its socket paths take 82 of at most 103 bytes
+runtime directory: /tmp/tsparse-501 (/tmp/tsparse-UID, as TSPARSE_SERVICE_DIR is not set and TMPDIR is not an absolute path) does not exist yet; a project query creates it with mode 0700; its socket paths take 38 of at most 103 bytes
+```
+
+A finding names the directory and the rule the same way, then the failure a
+query there would report, with its remedy (`detail` and `remedy` in a
+document). A failure before any directory is chosen, for a configuration whose
+service cannot be named or a `TSPARSE_SERVICE_DIR` that cannot be made
+absolute, is reported alone:
+
+```text
+runtime directory: /tmp/tsparse-501 (/tmp/tsparse-UID, as TSPARSE_SERVICE_DIR is not set and TMPDIR is not set): Project service directory /tmp/tsparse-501 cannot be created: Operation not permitted (os error 1)
+  next: set TMPDIR to an absolute directory this user can write, or TSPARSE_SERVICE_DIR to a path in one; TMPDIR is not set
+```
+
+The directory must be owned by the current user with mode 0700, and a client
+creates it, but not its parent. A client passes the absolute directory it chose
+to the service it starts. Environments that choose different directories,
+such as an unsandboxed shell and a sandboxed agent with another `TMPDIR`, start
+separate services for one configuration and build, and status and stop in one
+do not see the other's; set the same `TSPARSE_SERVICE_DIR` in both to share
+one service. Keep paths short enough for Unix sockets: a socket
 address holds about 100 bytes (104 on macOS, 108 on Linux), and the socket's
-name adds 22 to the directory. A longer path fails every service request with
-`transport.socket`, exit 2, naming the socket, with the remedy
-`next: set a shorter TSPARSE_SERVICE_DIR` (`remedy` in a document). Set
+name adds 22 to the directory. A longer `TSPARSE_SERVICE_DIR` fails every
+service request with `transport.socket`, exit 2, naming the socket, with the
+remedy `next: set a shorter TSPARSE_SERVICE_DIR` (`remedy` in a document). Set
 `TSPARSE_SERVICE_IDLE_SECS` to a positive integer to change the idle timeout.
 Configuration spellings and compiled build identities have separate services.
 Old-build services expire normally. Lock files remain after shutdown so concurrent
@@ -193,10 +240,11 @@ document: an invalid `TSPARSE_SERVICE_IDLE_SECS`,
 form, default, and value (`usage.environment: TSPARSE_SERVICE_IDLE_SECS must be
 a positive integer number of seconds (default 600), got 0`), which direct
 queries, direct edits, and `--references-serve` report alike; as
-`transport.directory`, a runtime directory that cannot be created, named with
-the cause, and one that is not a directory owned by the current user with mode
-0700, since a service could not report why it failed in a directory it cannot
-write, which `--references-status` and `--references-stop` also report; and,
+`transport.directory`, a runtime directory that cannot be created or
+inspected, named with the cause, and one that is not a directory owned by the
+current user with mode 0700, since a service could not report why it failed in
+a directory it cannot write, which `--references-status` and
+`--references-stop` also report; and,
 as `transport.socket`, a socket path that is too long. A directory of this
 user's with any group or other permission prints
 `  why: any process that can open the socket can run queries as you` and
@@ -207,8 +255,15 @@ lacks read, write, or search says a service could not create its socket or
 record why it failed, with the same command; and a directory of another user,
 or a link or another kind of file at its path, prints
 `  next: set TSPARSE_SERVICE_DIR to a new path or to a private directory this user owns`
-(`remedy` in a document). Status and stop read only
-`TSPARSE_SERVICE_DIR`. Clients that find no service start one at a time, holding
+(`remedy` in a document). A directory that cannot be created or inspected
+names another directory by the rule that chose it, such as
+`  next: set TMPDIR to an absolute directory this user can write, or TSPARSE_SERVICE_DIR to a path in one; TMPDIR is not set`
+for a sandbox that denies writes to `/tmp`; for a directory `TMPDIR` chose,
+`  next: set TMPDIR to a directory this user can write, or TSPARSE_SERVICE_DIR to a path in one`;
+and for one `TSPARSE_SERVICE_DIR` names,
+`  next: set TSPARSE_SERVICE_DIR to a path in a directory this user can write, or unset it and set TMPDIR to such a directory`.
+Status and stop read only the runtime directory `TSPARSE_SERVICE_DIR` and
+`TMPDIR` choose. Clients that find no service start one at a time, holding
 `KEY.start.lock`, which, like the lock file, is never removed; a client that
 waits 10 seconds for another's start without a service answering says so, as
 `transport.timeout`. A
@@ -506,6 +561,15 @@ ambient module (`declare module "x"`) is named `x` at its string literal.
 
 ## Go to definition
 
+Definitions use the same configured program as references: compiler selection,
+`baseUrl` and `paths`, JavaScript admission, and package-id redirects all apply.
+An imported name in an admitted JavaScript file can lead to its original
+declaration; a request explicitly naming a duplicate package file is refused
+and names the primary. A project loading failure, including a JavaScript
+capability refusal or the selected dialect's TS1540 error, prevents an answer.
+The import hint on a missed `--show --name` prints a definition command at
+the existing specifier; it does not generate a new module name.
+
 `tsparse --definition` prints the declarations that the identifier at a
 position, or a name, denotes, following import and export aliases to the
 original declarations. It reads the declarations of the symbols the reference
@@ -759,7 +823,9 @@ as namespace` names, is a value and a namespace; an `import =` alias of an
 entity name takes every meaning its target has.
 Conflicting declarations, such as two `let x`, fail with a `Binding` error
 where the error is reported. One decision says whether a diagnostic at a
-place is reported, for every binding error and every missing input (an
+place is reported, for every binding error, every error TypeScript's checker
+reports from a file's syntax alone (a namespace declared with `module`,
+TS1540, a `Syntax` error at its name), and every missing input (an
 unresolved module, reference directive target, or augmented module): it is
 reported only in a project file, and only where TypeScript reports it there.
 TypeScript reports nothing in a file it skips (`SkipTypeChecking`): every
@@ -937,7 +1003,14 @@ which TypeScript reads in its place. A `?` after a key is an error in a
 configuration (TS8009), though not in a JSON module. A repeated key keeps its
 first position and its last value, and a property with an empty name is left
 out, so `"paths": { "": ... }` declares no pattern; a JSON module keeps such a
-key. Every occurrence of an option this tool reads is validated, as TypeScript
+key. A `null` entry of `files`, `include`, `exclude`, or an `extends` list is
+left out, and such a list of only `null`s is no list at all: `"files": [null]`
+or `"include": [null]` selects as if the list were absent, so the default
+`include` applies, a base's `[null]` is not inherited, and `"extends":
+[null]` names nothing. TypeScript 7.0.2 drops `null` entries from every
+array alike, which this tool does not yet do for compiler options: there,
+`"lib": [null]` selects no library, where 7.0.2 selects the default ones, and
+a `null` `paths` substitution is a `Config` error, where 7.0.2 ignores it. Every occurrence of an option this tool reads is validated, as TypeScript
 validates each one it converts: a repeated key, each `compilerOptions` object
 of a file, and each file of the `extends` chain, so an invalid value that a
 later one overrides is still a `Config` error. Within a file, an option takes
@@ -958,9 +1031,20 @@ than 128 arrays and objects deep is `Unsupported`: that is this tool's limit,
 not an unparsable file. `extends` accepts a
 string or an ordered array of relative, rooted, or package configurations
 (through `node_modules`, a manifest `tsconfig` field, `exports`, or a package's
-`tsconfig.json`), with `${configDir}` and inheritance cycles reported as
-configuration errors. Path settings stay relative to the configuration that
-declared them. `files`, `include`, and `exclude` replace inherited values: a
+`tsconfig.json`), with inheritance cycles reported as configuration errors.
+Path settings stay relative to the configuration that declared them, unless a
+path-valued option (`rootDir`, `outDir`, `declarationDir`, `rootDirs`,
+`typeRoots`, a `paths` substitution) or a `files`, `include`, or `exclude`
+entry starts with `${configDir}`, matched without case as Go's
+`strings.ToLower` lowers it: it then names a path under the selected
+configuration's directory once its first exact `${configDir}` becomes `./`, so
+`${configDir}src` is `src` there and `${CONFIGDIR}/src` is
+`${CONFIGDIR}/src` there. Other options, such as `jsxImportSource`, `types`,
+or a `paths` pattern, keep the text. A `paths` substitution is checked as
+substituted, as TypeScript 7.0.2 checks it after normalizing it: its `*`
+count (TS5062, which names the substituted path) and whether it is relative
+are the path's, so `${configDir}/x*/../src/*` has one `*`, and a `*` in the
+configuration's directory counts. `files`, `include`, and `exclude` replace inherited values: a
 configuration that has the key at all, even as `null`, inherits none, and a
 `null` then selects as if the key were absent; otherwise the last base whose
 own value, after its own inheritance, is a list supplies it.
@@ -970,14 +1054,14 @@ Roots follow TypeScript's selection: `files`, `include` and `exclude` globs,
 `declarationDir`. Program inputs add every resolved import, re-export,
 `import = require`, import type, dynamic `import("literal")`, module
 augmentation, `/// <reference path>`, `/// <reference types>`, and `types`
-entry, JSON files included, plus the automatic JSX runtime of each `.tsx` file under `jsx`
+entry, JSON files included, plus the automatic JSX runtime of each `.tsx` or `.jsx` file under `jsx`
 `react-jsx` or `react-jsxdev`, from `jsxImportSource` or a block-comment
 `@jsxImportSource` pragma (`@jsxRuntime classic` turns it off). Searched files are the roots and their local dependencies; files reached
 through packages or type packages are program inputs whose declarations
 resolve names but whose own occurrences are not reported.
 
 Program order, which orders the global table's merges, pattern ambient
-modules, and module augmentations, is TypeScript's (`collectFiles`, as
+modules, and module augmentations, follows TypeScript 7's (`collectFiles`, as
 `tsc --listFilesOnly` prints it): starting from the roots, the root
 libraries, and the `types` packages, each file follows the files its
 subtasks reach, depth first, and libraries come first. A file's subtasks are,
@@ -985,43 +1069,48 @@ in order, its `/// <reference path>`s, its `types` and `lib` references, the
 automatic JSX runtime, its imports and re-exports, then its dynamic imports
 and import types; within each group they follow source order, wherever they
 appear (an `else` branch, a call's arguments, a type annotation), as
-TypeScript finds them in the text. A module augmentation's name adds no file.
+TypeScript finds them in the text. The TypeScript 5.6 dialect retains the
+JSX-runtime admission difference described under
+[Standard libraries and program order](#standard-libraries-and-program-order).
+A module augmentation's name adds no file.
 On unchanged Command Center, the 7,639 inputs this selects, their order, and
 their provenance (library, dependency, or searched) are the pinned compiler's
 (`tools/program-inputs.mjs`, see [validation](validation.md#command-center-checkpoint)).
 
 Standard libraries follow TypeScript 7.0.2. A project with root files and
 without `noLib` loads the default library of its `target`, or else each `lib`
-entry: an unset, null, or empty `target` is ES2025 (`lib.es2025.full.d.ts`),
-`es6` and `es2015` select `lib.es6.d.ts`, and an empty `lib` list selects no
-library. `/// <reference lib>` directives in any file, libraries included, add
-the libraries they name, so selection is a transitive closure; `noLib` ignores
-every such reference. `lib` entries are library names in any case, not file
-names; a reference also accepts the file a name selects, such as
-`lib.es2015.promise.d.ts`. An unknown or empty library reference is an
-`UnresolvedImport` at its value, tolerated where other missing references
+entry; `es6` and `es2015` select `lib.es6.d.ts`, and an empty
+`lib` list selects no library. `/// <reference lib>` directives in any file,
+libraries included, add the libraries they name, so selection is a transitive
+closure; `noLib` ignores every such reference. `lib` entries are library
+names in any case, not file names. An unknown or empty library reference is
+an `UnresolvedImport` at its value, tolerated where other missing references
 are: where the reporting decision (Binding model) does not report it, as in a
 library or dependency, a declaration file under `skipLibCheck`, or after a
 `@ts-ignore` or `@ts-expect-error` line.
 `no-default-lib="true"` only makes TypeScript ignore its whole directive; it
-does not affect library selection. With `libReplacement`, each library file
-except `lib.d.ts` looks up its `@typescript/lib-*` package as a `require` from
-the configuration's directory (`lib.dom.iterable.d.ts` is
-`@typescript/lib-dom/iterable`), and an installed package replaces the file.
+does not affect library selection.
 
+An unset, null, or empty `target` is ES2025 (`lib.es2025.full.d.ts`), and a reference also accepts the file a name
+selects, such as `lib.es2015.promise.d.ts`. With `libReplacement`, each
+library file except `lib.d.ts` looks up its `@typescript/lib-*` package as a
+`require` from the configuration's directory (`lib.dom.iterable.d.ts` is
+`@typescript/lib-dom/iterable`), and an installed package replaces the file.
 The declarations are the pinned compiler's own, vendored in
 `vendor/typescript-7.0.2-lib` and located through the checkout the tool was
 built from: no compiler is searched for or run, nothing is downloaded, a
 missing or unreadable library file is an `Io` failure, and moving the checkout
-requires rebuilding. Library paths in results are real, readable files.
-Libraries come first in program order, ordered as TypeScript orders them, and
-are read as CommonJS scripts without a `package.json` lookup. They are never
-searched and never external, even when a replacement package supplies them:
-their declarations join groups, so `interface Array` merges with a project's
-`declare global { interface Array<T> { ... } }`, while their own occurrences
-are not reported and their bindings are checked leniently, like dependencies.
-Library reads and replacement lookups are captured inputs, so a session
-refreshes when an installed replacement changes.
+requires rebuilding.
+
+Library paths in results are real, readable files. Libraries come first in
+program order, ordered as the compiler orders them, and are read as CommonJS scripts without a `package.json`
+lookup. They are never searched and never external, even when a replacement
+package supplies them: their declarations join groups, so `interface Array`
+merges with a project's `declare global { interface Array<T> { ... } }`,
+while their own occurrences are not reported and their bindings are checked
+leniently, like dependencies. Library reads and replacement lookups are
+captured inputs, so a session refreshes when an installed replacement
+changes.
 
 Module resolution implements TypeScript 7's `bundler` (the default), `node16`,
 and `nodenext` modes: importer format, per-request resolution mode, extension
@@ -1060,9 +1149,18 @@ An enumeration option (`module`, `moduleResolution`, `moduleDetection`, `jsx`,
 `Config` error, as are `lib` with `noLib` (TS5053) and a `lib` file name in
 place of a library name.
 
-`types` defaults to `[]`; list packages, or use `"types": ["*"]` for every type
-root. An explicit `typeRoots` turns off the `node_modules` fallback for type
-references. `moduleDetection` defaults to `force` for Node.js `module` settings
+`types` defaults to `[]`, as in TypeScript 7.0.2, though this tool's design
+first assumed automatic discovery when `types` is absent: list packages, or
+use `"types": ["*"]` for every type root. A type name is looked up in each
+type root (`resolveTypeReferenceDirective`): under an explicit
+`typeRoots`, an empty list included, first as a declaration file
+(`types/name.d.ts`) and then as a package directory, and under the default
+`node_modules/@types` roots as a package only. A name the configuration
+infers, a `types` entry or an automatic name, is looked up nowhere else when
+`typeRoots` is explicit (TS2688), while a `/// <reference types>`
+directive's name, and any name under the default roots, then falls back to
+`node_modules` above the file that names it. The two origins are separate
+lookups, as in TypeScript 7.0.2's cache. `moduleDetection` defaults to `force` for Node.js `module` settings
 and `auto` otherwise. Options that do not affect the program graph or binding
 are ignored.
 
@@ -1117,26 +1215,864 @@ file that does not parse fails loading as a `Syntax` error at the first error
 this tool's parser meets, which is TypeScript's first diagnostic except where
 noted below.
 
-Rejected configurations: `baseUrl` (removed in TypeScript 7), `moduleResolution`
-`node`, `node10`, or `classic`, `module` `amd`, `umd`, or `system`, `target`
-`es5` (removed in TypeScript 7, TS5108), `noResolve`, `noDtsResolution`,
-a non-empty `references`, and JavaScript roots or reference targets,
-whether or not the file exists. As in TypeScript, whether an input has a
+Rejected configurations: `baseUrl` (removed in TypeScript 7), `moduleResolution` `node`, `node10`, or `classic`, `module` `amd`, `umd`, or
+`system`, `target` `es5` (removed in TypeScript 7, TS5108), `noResolve`,
+`noDtsResolution`, a non-empty `references`, and, without `allowJs`, JavaScript
+roots or reference targets, whether or not the file exists (TS6504). A message that reports a setting the
+TypeScript 7 profile removed also names an installed compiler of another major
+version, since the profile's rule is not that compiler's: `Option 'baseUrl' was
+removed in TypeScript 7, whose rules read this project (installed compiler:
+TypeScript 6.0.3); ...`. As in TypeScript, whether an input has a
 supported extension follows the file system's case policy, so `A.JS` is
 JavaScript on a case-insensitive file system; other name rules use the exact
 spelling, so `G.D.TS` is an ordinary module rather than a declaration file, and
-JSX follows a `.tsx` extension in any case.
+JSX parses in a `.tsx` or JavaScript file in any case (see
+[JavaScript inputs](#javascript-inputs)).
+
+### Package identity
+
+Both compilers give a file found in a package a package id: its manifest's
+`name` and `version`, the file's path in the package, and `+name@version` for
+each of the package's `peerDependencies` whose manifest is in the
+`node_modules` beside the package's real directory (`withPackageId`,
+`getPackageId`, `readPackageJsonPeerDependencies`). Files with one id are one
+program input. Collection walks the program depth first (`collectFiles`) and
+keeps the first file it meets with an id; a later file with the same id
+redirects to it. A request that resolves to the redirected file names the
+kept file, and what only the redirected file reaches leaves the program, with
+its failures: a syntax error, an unreadable file, a lookup that cannot read
+a `package.json`, or a missing reference there fails no load, as neither
+compiler reports anything of it. A failure is the failure of the file it
+belongs to, whether of the file's own text or of a lookup the file makes
+(another file making the same lookup meets it too), and loading reports the
+first such file in load order that stays in the program; a failure of the
+roots, the standard libraries, or the type packages themselves comes first.
+Both copies are still read and parsed. TypeScript 7.0.2 deduplicates unless
+`deduplicatePackages` is false; TypeScript 5.6.3 always does, and has no such
+option (TS5023). So a class with a protected member, or a unique symbol, that
+two installed copies of one package declare is one declaration, as both
+compilers check it, and references and types through either copy reach the
+kept file. Which copy is kept depends on the order imports are written, not
+on where the copy is installed: with `import "a"` before `import "dup"`, the
+copy of `dup` inside `a` is the one kept.
+
+Which routes give a file an id, and what the id holds, follow each dialect's
+compiler:
+
+- The `name` and `version` are TypeScript 7.0.2's `Expected[string]`
+  decodes: a repeated field keeps its last string through a later value of
+  another type (`"version": "1.0.0", "version": 42` is `1.0.0`) and loses it
+  to a later `null`, and an id with an empty `name` is no id. TypeScript 5.6
+  reads the last value of each, which must be a string, an empty `name`
+  included. Resolution itself reads a repeated field's last value in both
+  dialects.
+
+- In both, a package lookup's file (`node_modules`, `@types`, `exports`,
+  `imports`, a self-name, `typesVersions`, a nested `package.json`) has the
+  id of the manifest the lookup read. So does a file that a relative name, a
+  `paths` substitution, a `baseUrl` name, `rootDirs`, or a type root finds
+  inside `node_modules`: the manifest is that of the package directory its
+  path is in. A `paths` or `typesVersions` substitution written with its
+  extension gives no id (`tryLoadModuleUsingPaths` returns its file as
+  found).
+- Under TypeScript 5.6 only, a file found through a directory's manifest
+  entry or index also takes that directory's id (`loadNodeModuleFromDirectory`):
+  a relative or mapped name of a package directory, and a `/// <reference
+  types>` or `types` name resolved in `node_modules/@types`, give one.
+  TypeScript 7.0.2 gives none there, so such a copy is not deduplicated.
+- TypeScript 7.0.2 keeps the first id any route to the file gives;
+  TypeScript 5.6.3 decides when it first reaches the file, depth first, by
+  that route's id, so a file first reached by a `/// <reference path>` is
+  never deduplicated under TypeScript 5.6.
+- Peers: TypeScript 7.0.2 reads `peerDependencies` only as a map of strings,
+  in sorted order; TypeScript 5.6.3 reads any object in the order the
+  manifest lists it (array indices first, as JavaScript orders keys), so two
+  copies listing the same peers in different orders differ under
+  TypeScript 5.6 only. A peer's version is its last decoded string under
+  TypeScript 7 (`Version.Value`, so `"18.0.0"` followed by `true` stays
+  `18.0.0`, and none adds `name@`) and the last value's JavaScript text under
+  TypeScript 5.6 (`name@undefined` without one, `null` and booleans as their
+  text; another value is `Unsupported`, naming the manifest, since its
+  JavaScript text would merge distinct versions). The
+  `node_modules` is the last `/node_modules` of the package's real path
+  (TypeScript 7; none means no peers) or its last `node_modules` (TypeScript
+  5.6; none means the path's first eleven UTF-16 units, as 5.6.3's
+  `lastIndexOf` gives). The real path is taken under `preserveSymlinks` too.
+- Ids are equal when their parts are (TypeScript 7.0.2's `PackageId`) or
+  when their text is (TypeScript 5.6.3's `packageIdToString`).
+
+Whether a kept file is a project file, found without a package lookup, follows
+the routes each compiler counts. TypeScript 7.0.2 gives every file it loads
+the lowest depth of any route to it before collection deduplicates
+(`lowestDepth`), so a redirected file's own references count: where a root's
+`/// <reference path>` reaches a redirected copy that references
+`node_modules/shared/index.d.ts`, `shared` is a project file. TypeScript 5.6.3
+counts only the routes it processes (`sourceFilesFoundSearchingNodeModules`),
+and never processes a redirected file's own references and imports, so there
+`shared` stays a dependency, which project queries do not answer for. When
+such a route, or a root, reaches a redirected file that a package lookup met
+first, TypeScript 5.6.3 processes it again, with its target's references and
+imports, resolved from the redirected file's location and in the target's
+module format (the redirect shares its target's parsed file): a target's
+`/// <reference path="./note.d.ts" />` then adds the redirected copy's own
+`note.d.ts` as a project file, a type reference finds `@types` packages
+beside the redirected copy, and an import of `./note` makes that copy's
+`note.d.ts` another redirect, to the target's. This tool follows them where
+5.6.3's collection meets the redirected file, and reports a missing reference
+there at the redirected file, as 5.6.3 does unless `skipLibCheck` skips it; a
+`package.json` such a lookup cannot read fails the load at once, before the
+failures of other files in load order. What a module augmentation names, a
+file it never adds, is decided once collection adds no more files, so an
+augmentation of the redirected copy's `note.d.ts` augments it under 5.6.
+TypeScript 7.0.2 never processes a redirected file's subtasks. A request on
+such a route whose JavaScript is elided is not followed again later, as
+5.6.3 would within `maxNodeModuleJsDepth`.
+
+The program lists each input once, as TypeScript 7.0.2's `--listFiles` does;
+TypeScript 5.6.3 also lists each redirected file, which
+`tools/program-inputs.mjs --oracle=5.6` drops before comparing. A module
+named in generated text, such as `import("dup").Box`, is named through the
+redirected files too (`GetEachFileNameOfModule`), so a kept copy nested in
+another package can be named `dup` from the project.
+
+Every request that names a redirected file, by its path or a spelling it was
+reached by, is `Unsupported` (exit 1), whichever operation it is: its message
+names the package id and the file the program reads in its place. That file
+has the other copy's text, so answering for it, or editing it, would act on a
+file the request did not name.
+
+A session reloads when an id's inputs change: the package's manifest, each
+peer's manifest, present or absent, the package directory's real path,
+links included, and either copy's text.
+
+## Compiler selection
+
+The compiler installed for a configuration selects the rules that read its
+project. Selection is this tool's policy, not a TypeScript rule: from the
+configuration's canonical directory up to the root, the first
+`node_modules/typescript/package.json` that exists and is not a directory
+names the installed compiler, as Node's `require` would find the package,
+passing over a directory named `node_modules` itself, a candidate without a
+manifest, and a dangling link. Links on the way are followed. Any TypeScript 5 release selects the TypeScript 5.6 dialect, whose
+configuration rules and tables are 5.6.3's; no package, or any other major
+version (4, 6, 7, 8), selects TypeScript 7, whose rules the rest of this
+document describes. Only 5.6.3 is validated: another 5.x release is read with
+5.6.3's rules, and `--doctor` says `validated for 5.6.3 only`. TypeScript 7.0.2
+stays the semantic authority in both dialects: checking, types, and every
+query follow it. Selection reads metadata only and never runs a compiler.
+
+A manifest that cannot name a version fails loading, naming the manifest,
+and never selects another compiler: one that cannot be read, or is not valid
+UTF-8, is `Io`; one that is not JSON, not an object, has no `version`, or a
+`version` that is not a full SemVer version (`5.6`, `v5.6.3`, `latest`) is
+`Unsupported`. Each candidate on the way, the winner's real path, and its text
+are inputs a session observes, so editing the version, removing the package,
+installing a nearer one, or retargeting a link answers as a fresh load does.
+
+Selection follows each configuration, not a workspace: in a monorepo whose
+TypeScript is installed only at the root, every package's configuration is
+read with the root's compiler, and a package with its own
+`node_modules/typescript` is read with that one, whatever the root has. The
+compiler is selected from the selected configuration's directory before any
+`extends` is followed, so a package named in `extends` is resolved by the
+selected compiler's rules and version, which its `typesVersions` may consult.
+
+`--doctor --project` reports the selection on its `compatibility` line: the
+installed compiler's manifest and version, the dialect, the semantic
+authority, and the standard library's source.
+
+The subsections below describe where the TypeScript 5.6 dialect reads a
+project as TypeScript 5.6.3 does rather than as TypeScript 7 does, and the
+5.6.3 behaviors it does not reproduce. Its package ids are in [Package
+identity](#package-identity), and its JavaScript inputs, TypeScript-only
+syntax errors, and refusals in [JavaScript inputs](#javascript-inputs).
+
+### Configuration
+
+The TypeScript 5.6 dialect reads configuration as TypeScript 5.6.3 does. Its
+options are 5.6.3's `optionDeclarations`, pinned as data extracted from its
+`typescript.js` with that file's SHA-256 (`tools/ts56-option-catalog.mjs`;
+[validation](validation.md#typescript-563-oracle)). An option 5.6.3 does not
+declare, such as `stableTypeOrdering`, `deduplicatePackages`, or
+`libReplacement`, is a `Config` error even when `null`: TS5093 when its name
+lowers to a `--build` option's, such as `Verbose` or `Incremental`; otherwise
+`Unknown compiler option`, with the suggestion 5.6.3's `getSpellingSuggestion`
+makes, if any (TS5025), which measures names in UTF-16 code units and lowers
+them as JavaScript does, so `stric😀` and `lİb` get none. A value of the wrong
+type names a list as an `Array` and an entry by its element's name (`suffix`
+for `moduleSuffixes`, `condition`, `plugin`); an enumeration's TS6046 names
+the option as `--name` and lists 5.6.3's keys. Enumeration values are lowered
+with JavaScript's `toLowerCase`, so `react-natİve` (U+0130) is TS6046 where
+TypeScript 7 accepts it, and an empty string is TS6046 too. The declarations
+also decide how each value converts: a path (`isFilePath`, of the option or
+of its list's entries) is relative to the configuration that declares it,
+`${configDir}` applies to the options 5.6.3 substitutes it in
+(`configDirTemplateSubstitutionOptions`), and a list keeps its empty entries
+only where `listPreserveFalsyValues` says so (`moduleSuffixes`).
+
+Options TypeScript 5.5 removed (`charset`, `importsNotUsedAsValues`,
+`keyofStringsOnly`, `noImplicitUseStrict`, `noStrictGenericChecks`, `out`,
+`preserveValueImports`, `suppressExcessPropertyErrors`,
+`suppressImplicitAnyIndexErrors`, and `target: es3`) are `Config` errors,
+TS5102 or TS5108, even with `"ignoreDeprecations": "5.0"`; a setting
+JavaScript reads as false, such as `"importsNotUsedAsValues": "remove"`,
+passes. A non-empty `ignoreDeprecations` other than `5.0` is TS5103. The
+`verifyCompilerOptions` checks that the TypeScript 7 profile ports have
+5.6.3's conditions, words, and order (TS5052, the removed options, TS5061 to
+TS5066 and TS5090 naming `baseUrl`, TS5053, then TS5091 for
+`preserveConstEnums: false` beside `isolatedModules` or
+`verbatimModuleSyntax`, TS5095 for `bundler` without ES modules or
+`preserve`, TS5109, and TS5110); of several, the first is reported. Its other
+checks, such as `checkJs` without `allowJs`, are not ported in either
+dialect. Each error points at the value that applies, as under TypeScript 7,
+where 5.6.3 points TS5102, TS5052, and TS5091 at an option's name; the
+message is 5.6.3's, its "Use ... instead" detail on the same line.
+
+Defaults are 5.6.3's `computedOptions`: `strict` is false unless set, and
+each strict-family flag follows it; an unset `target` is ES5 unless `module`
+is `node16` (ES2022) or `nodenext` (ESNext); `module` follows `target`;
+`moduleResolution` follows `module`, `preserve` resolving as `bundler`;
+`esModuleInterop` is on for `node16`, `nodenext`, and `preserve`;
+`resolveJsonModule` is on for bundler resolution alone; and
+`noUncheckedSideEffectImports` is off. Refused as `Unsupported`, naming the
+option and whether TypeScript 5's default set it, are an effective `target`
+ES5, `module` `none`, `amd`, `umd`, or `system`, `moduleResolution` `classic`
+or `node10`, `esModuleInterop` or `allowSyntheticDefaultImports` false, and
+`alwaysStrict` false, which TypeScript 5's default makes it when `strict` is
+unset, so a project must set `strict` or `alwaysStrict`; also `outFile`,
+`noResolve`, and a non-empty `references`. `downlevelIteration` is accepted.
+A refused default is reported at the configuration, an explicit setting at
+its value.
+
+Each file's own options are 5.6.3's (`onPropertySet`): the last occurrence
+decides, so a `null` after a value, in the same object, a later
+`compilerOptions` object, or over an inherited value, unsets the option, and
+an empty string replaces an inherited one (an empty `jsxFactory`,
+`jsxFragmentFactory`, `reactNamespace`, or `jsxImportSource` then selects
+the default, as both compilers test them for truthiness). A list leaves out
+its `null` and empty entries, except that an empty path names the declaring
+configuration's directory; an own `paths: {}` replaces inherited patterns;
+and a `paths` pattern may be empty. Refused as `Unsupported` where they
+apply, as JavaScript artifacts that would change names, are a `paths` pattern
+`__proto__`, whose assignment sets the mapping's prototype in 5.6.3; a `null`
+`moduleSuffixes` entry, which 5.6.3 keeps and spells `undefined` in file
+names; and a root-level `__proto__` whose value is an object, in the
+configuration or any base, which sets the raw configuration's prototype,
+where 5.6.3's inheritance then sees its `files`, `include`, or `exclude` and
+its own lookups do not. Another `__proto__` value sets no such prototype and
+is read as an ordinary key. `compilerOptions` may be an array, as 5.6.3 reads
+any object: it sets no option and none of its entries is converted, so
+earlier and inherited options stand (TypeScript 7 reports it as TS5024).
+
+Inheritance and root lists are 5.6.3's (`applyExtendedConfig`,
+`getConfigFileSpecs`): an own `null` `files`, `include`, or `exclude`
+inherits the base's list; `[]` is an explicit empty list (`include: []` is
+TS18003); an own `[null]` lists nothing, so `include: [null]` is TS18003; an
+empty `include` or `exclude` spec matches nothing, so a leaf's
+`include: [""]` is TS18003, while an empty `files` entry names the
+configuration's directory; and an inherited `null` or empty entry is rebased
+first, so it names the base's directory when the base is in another one.
+TS18003 lists each entry as written in the configuration that declared it,
+`null` included, where 5.6.3 lists inherited entries rebased. An `extends`
+entry that is not a string, `null` included, is TS5024. `${configDir}` is
+matched as JavaScript's `toUpperCase` folds the value's first 12 UTF-16 code
+units, so `${confıgDir}` (U+0131) matches where TypeScript 7 does not, and
+`${confİgDir}` (U+0130) does not where it does.
+
+`baseUrl` is a path option, relative to the configuration that declares it,
+`${configDir}`-capable, and inherited; `paths` substitutions are relative to
+it when it is set (`getPathsBasePath`), including the leaf's own and a
+base's, and may then be non-relative, while without it a non-relative
+substitution is TS5090. An unset `types` includes every package in the type
+roots, the nearest root first, a name in two roots resolving to the nearer
+one; `[]` includes none; and `*` is a package's name, TS2688 when no
+`@types/*` exists.
+
+### Resolution and naming
+
+Module resolution follows 5.6.3's
+`tryLoadModuleUsingOptionalResolutionSettings`: a name that does not start
+with `./` or `../` is first matched against `paths`. A matched pattern
+decides the optional settings: its first existing substitution, or, when
+every substitution is missing, no file under `baseUrl` or `rootDirs`, after
+which package `imports`, a self name, and packages are still searched. A bare
+name no pattern matches is looked up as `baseUrl/name`, as a relative name
+is, a directory's `package.json` included, before package `imports` (so
+`baseUrl/#name.ts` wins), a self name, and packages; a backslash in the name
+is a separator there. A relative or rooted name never uses `baseUrl`, and
+goes to `rootDirs`. TypeScript 7.0.2 instead continues past a matched
+pattern whose substitutions are missing, so a rooted name it matches still
+tries `rootDirs` there. The same 5.6.3 rule holds for a package's
+`typesVersions`: a matched pattern whose substitutions are missing ends that
+directory's manifest entry or that package's lookup in one `node_modules`,
+where TypeScript 7.0.2 goes on to the subpath's own file or the `types`
+entry. In both places 5.6.3 replaces a substitution's `*` only with a
+non-empty capture: `ab` matched by `"ab*": ["./first/*"]` tries `first/*` as
+written, a file named `*`, where 7.0.2 tries the directory `first/`.
+
+`typesVersions` ranges and `types@` export conditions are evaluated against
+the installed compiler's version, as each compiler evaluates them against
+its own, and 7.0.2 under TypeScript 7: in module and type-reference
+resolution, in `extends` package lookups, in the standard library
+replacement lookup, and in module names the checker spells. A version change
+in the installed manifest selects again.
+
+Module names the checker spells (`getLocalModuleSpecifier`) take `baseUrl`
+as their base, else the `paths` base: with no package `imports` or `paths`
+name, the path from `baseUrl` is the non-relative candidate (an empty `paths`
+name, from an empty key or a `*` that matched nothing, still answers, and
+leaves the relative name), which the checker's project-relative preference
+takes for a target across the project's boundary or in another package
+scope; a path that climbs out of `baseUrl` stays relative. 5.6.3 processes
+that candidate's ending without asking whether an `index` file collides with
+a sibling. Type displays (`--type`) name a module by its file's absolute
+path, as both compilers' quick info does, so these names show in the
+checker's own diagnostics and choices rather than in output.
+
+5.6.3 differences in module naming, resolution, and manifests that the
+TypeScript 5.6 dialect does not reproduce, each outside what a supported
+project depends on: 5.6.3 asks `processEnding`'s index-collision question
+only when `paths` validates a minimal ending and for a package's file, where
+this tool, as 7.0.2, also asks it for relative, `rootDirs`, and `paths`
+candidate names (the question resolves the name against the working
+directory, so the two differ only when that directory is the name's base and
+an `index` file's directory has a same-named sibling); 5.6.3 enumerates
+integer-like `paths` and `typesVersions` keys first, as JavaScript orders
+object keys; 5.6.3 compares an absolute `paths` substitution, such as one
+from `${configDir}`, with a relative name and so never spells a module
+through it; 5.6.3 takes an empty `typesVersions` name, from a `*` key whose
+star matches nothing, as the package's root, where this tool, as 7.0.2,
+blocks the package name; 5.6.3 reads a `package.json` with its configuration
+JSON reader, which accepts comments and trailing commas, where this tool
+reads one as strict JSON in both dialects; and 5.6.3's per-directory
+type-reference cache can replay a directive's result for an inferred name,
+where this tool keeps the two origins separate lookups in both dialects, as
+7.0.2 does.
+
+One compatibility exception is scoped to the text a wildcard captures.
+5.6.3 inserts that text with JavaScript's `String.prototype.replace`, whose
+replacement string expands `$$` to `$`, `$&` to the `*` it replaces, and
+`` $` `` and `$'` to the text before and after that `*`: in the first `*` of a
+`paths` or `typesVersions` substitution and of a `paths` or `exports` key it
+spells a module name with (`replaceFirstStar`), and in every `*` of a package
+`exports` or `imports` target (`replace(/\*/g, ...)`). TypeScript 7.0.2 inserts
+the text as written (`strings.Replace`, `strings.ReplaceAll`), and so does
+this tool in both dialects: with `"ab*": ["./first/*"]`, `ab$$y` names
+`first/$$y` where 5.6.3 names `first/$y`. A capture without those four
+sequences is inserted alike by both compilers.
+
+### Standard libraries and program order
+
+Standard libraries are the installed compiler's own declarations, in the
+real path of its package directory's `lib`, where the compiler runs from
+(`getDefaultLibLocation`), through a linked package directory or a linked
+`lib` and whatever file a linked `package.json` names; a session notices any
+of them relinked. Answers follow those declarations: `new
+TextEncoder().encode("x")` is 5.6.3's non-generic `Uint8Array`, where 7.0.2's
+is `Uint8Array<ArrayBuffer>`. The libraries are selected by 5.6.3's catalog (`libs`, `libMap`,
+and `getDefaultLibFileName`, extracted from the pinned `typescript.js`):
+`lib` names are 5.6.3's (an unknown one, such as `es2024` or `esnext.date`,
+is TS6046), and without `lib` ES2015 selects `lib.es6.d.ts`, ES2016 to
+ES2023 their `.full` files, and ESNext `lib.esnext.full.d.ts`. Libraries
+come first in program order by the first position of their name in `libs`,
+where `esnext.array` and `esnext.string` appear twice, and a name declared
+twice selects its last file. A file the catalog names that the installed
+`lib` lacks or cannot read is an `Io` failure naming it; the vendored
+TypeScript 7.0.2 copy never stands in for it. A `/// <reference lib>` names
+a library only (`getLibFileNameFromLibReference`), lowered as 5.6.3's
+`toFileNameLowerCase` lowers it, so `lib.es2015.promise.d.ts` is TS2727 with
+5.6.3's suggestion (`Cannot find lib definition for
+'lib.es2015.promise.d.ts'. Did you mean 'es2018.promise'?`) and an unknown
+name without a suggestion TS2726.
+
+A `@typescript/lib-*` package replaces every library `pathForLibFile`
+locates, without `libReplacement`, which 5.6.3 does not know: each `lib`
+entry and each library a `/// <reference lib>` names, but not the target's
+default, which 5.6.3 reads from its directory directly, though the libraries
+the default references are replaced. The package is looked up from the
+configuration's directory with 5.6.3's own options (`resolveLibrary`,
+`getOptionsForLibraryResolution`): `moduleResolution: node10`,
+`node_modules` and `@types`, declarations before JavaScript, without package
+`exports` and without the project's `paths`, `baseUrl`, `rootDirs`,
+`typeRoots`, `moduleSuffixes`, or conditions; it ignores `preserveSymlinks`,
+so a symbolic link resolves to its target. Library selection ignores
+`/// <reference no-default-lib="true" />` as under TypeScript 7, where 5.6.3
+skips the default libraries when such a file is among the roots, the type
+packages, or the files they reach, and lets `skipDefaultLibCheck` cover any
+file that has one.
+
+Library ordering follows 5.6.3. `createProgram` processes the type packages
+before the libraries, depth first, and orders a file with the libraries by
+the route that first processes it: a `lib` entry, a `/// <reference lib>`,
+or a `/// <reference path>` from a file ordered with the libraries
+(`processReferencedFiles(file, isDefaultLib)`), never an import or a
+`/// <reference types>`. So a type package precedes the files a replacement
+imports; a replacement that a type package imports or references by path is
+processed there, before its `lib` entry, and is ordered as an ordinary file
+after the type package's earlier files; a file a library first references by
+path is ordered with the libraries though it is not itself one, even when
+another library imports it later; and a replacement a type package's
+`/// <reference lib>` names precedes, among libraries of equal priority, one
+a `lib` entry names. The libraries are then ordered by each file's own path
+(`getDefaultLibFilePriority`): a file anywhere beneath the compiler's `lib`
+directory, a replacement that resolves there included, by its file name, and
+any other file last, keeping discovery order among equals as 5.6.3's stable
+sort does. A file is placed by the
+name its first route gives it, as 5.6.3 names it (`SourceFile.fileName`): a
+located library in the real `lib` directory, a replacement at the real path
+it resolves to, and a file a reference path names at the path it writes from
+the referencing file's own name, through any link, normalized before the
+extension it was found with is added, so `lib/es5/child/..` and `lib/es5/.`
+name `lib/es5.d.ts` as `lib/es5` does. So a file a replacement references
+through a linked `node_modules/typescript` or a linked `lib` lies outside
+that directory and is last, while a replacement whose `types` names a file
+there lies inside it. The order decides answers: overload resolution tries a
+later file's declarations of a merged function first, so where a replacement
+imports `declare function pick(value: string): "lib"` and a type package
+declares the same signature returning `"types"`, `pick("x")` is `"lib"`
+here, as under 5.6.3, and `"types"` under TypeScript 7; and where a type
+package imports both a file declaring `"types"` and the replacement
+declaring `"lib"`, it is `"lib"` here and under 5.6.3, which order the
+replacement after that file.
+
+Synthetic JSX-runtime imports remain a compatibility limit. TypeScript
+5.6.3's `collectExternalModuleReferences` considers every JavaScript file,
+and every non-declaration file when effective `isolatedModules` is true or
+the file is an external module; `getJSXImplicitImportBase` and
+`getJSXRuntimeImport` then decide whether a runtime is selected. This tool
+retains 7.0.2's JSX/TSX-only predicate in both dialects. On the unchanged
+Artemis program, four moved files account for all 858 unequal order rows:
+React global declarations, csstype, React index and jsx-runtime. Input sets,
+provenance and all 18 redirects agree. An exhaustive comparison of the
+declarations whose relative order changes found no contributed member,
+base-type or overload sequence change; the four crossing React interfaces
+have neither members nor bases. This proves unchanged answers for that
+program only. Elsewhere the predicate can change which runtime inputs are
+loaded, and thus answers; a full port must cover input admission, module
+status, diagnostics and refresh under both dialects. See the
+[dated acceptance](validation.md#artemis-acceptance-2026-10-27).
+
+Replacements are libraries, never searched, and a package that imports
+`typescript` reaches `typescript/lib/typescript.d.ts` as a dependency like
+any other. A file reached both as a library and through another route takes
+its provenance from the same breadth-first route as under TypeScript 7
+([Loading and lexical differences](#standard-library-files)), while its
+program-order place follows the route that first processes it depth first,
+as 5.6.3 decides it (above). 5.6.3 decides provenance by content and name
+instead (`isSourceFileDefaultLibrary`): a file with `no-default-lib`, as
+every installed library has, is a library however it is reached, and any
+other file, a replacement without that directive included, only when it is
+the target's default or the file a `lib` entry resolves to. So a replacement
+without `no-default-lib` of a library that only a reference names, such as
+one the target's default references, is an ordinary input to 5.6.3, searched
+and reported, and an installed library a project file reaches first by
+reference path or import is still a library there. This tool gives both the
+first route's provenance: keeping every replacement a library, never
+searched, is its product policy in both dialects, not either compiler's
+rule.
+
+### Diagnostics
+
+A namespace declared with the `module` keyword is a suggestion, not TS1540,
+as TypeScript 5.6 reports it, so a project read with the TypeScript 5.6
+dialect loads it; file-local `--check`, which reads no configuration, still
+reports TypeScript 7's TS1540 ([Loading and lexical
+differences](#diagnostics-and-failures)). Unknown options and library
+references get 5.6.3's spelling suggestions ([Configuration](#configuration),
+[Standard libraries and program order](#standard-libraries-and-program-order)),
+and a JavaScript file's TypeScript-only syntax error and parameter
+decorators follow 5.6.3's rules ([JavaScript inputs](#javascript-inputs)).
+
+## JavaScript inputs
+
+With `allowJs` (or `checkJs: true` and `allowJs` unset), `.js`, `.jsx`, `.mjs`,
+and `.cjs` files are program inputs as TypeScript makes them: roots that
+`include` or `files` selects, files a project import or `/// <reference path>`
+reaches, and JavaScript a package lookup finds in `node_modules` within
+`maxNodeModuleJsDepth` (default 0) package lookups of a root. A file first
+reached beyond that depth and later by a shallower route is loaded, where the
+deeper route met it (`collectFiles`). A loaded file that a later route reaches
+at a lower depth follows its subtasks again from there, so JavaScript it elided
+before is an input once within the limit. Under TypeScript 7 every such file
+does, and the lower depth reaches its loaded subtasks in turn
+(`filesParser.start`). The native 7.0.2 loader starts a file's subtasks only
+once, so its listing varies from run to run where a deeper route loads the
+file first; this tool follows the rule. Under the TypeScript 5.6 dialect only
+a file with elided imports reached below the limit, or one first found in
+`node_modules` reached at depth 0, does, as 5.6.3's `findSourceFile` decides,
+so a package without elided imports of its own does not pass a lower depth on
+to its subtasks. 5.6.3 loads depth first and this tool breadth first, so their
+routes can reach a file in a different order: the listings agree where the
+deeper route loads the file first under both. Loading also lowers the depth
+of what a package-id duplicate's own subtasks reach (see [Package
+identity](#package-identity)) before collection knows the duplicate is
+redirected, which 5.6.3 never processes, so with `maxNodeModuleJsDepth` of 1
+or more a `node_modules` JavaScript file reached only through a duplicate
+reached at depth 0 may be an input here and not under 5.6.3; not yet
+followed up. Without `allowJs`, a JavaScript
+root or reference target is TS6504, and an import that finds only JavaScript
+is TypeScript's untyped module: TS7016 at the import under `noImplicitAny`,
+TS2665 for an augmentation, and otherwise names of the error type.
+`jsconfig.json`'s defaults (`allowJs`, `maxNodeModuleJsDepth: 2`) are not
+applied, and TS5055 (`allowJs` without `noEmit` overwriting an input) is not
+reported.
+
+A JavaScript file parses with the JSX language variant. TypeScript-only syntax
+in one (a type annotation, `interface`, `enum`, `import =`, an access modifier,
+a non-null assertion, a type assertion, and the rest of `checkJSSyntax`) fails
+loading at TypeScript's first error, whatever checks the file. A parameter
+decorator without `experimentalDecorators` is TS1206: under TypeScript 7, the
+checker's at the first decorator that no `@ts-ignore` covers in a file it
+checks, and otherwise syntactic, at the first decorator's full start, leading
+comments included (`getAdditionalJSSyntacticDiagnostics`); under the
+TypeScript 5.6 dialect always syntactic, at the first decorator, however the
+file is checked. The TypeScript-only syntax error is each dialect's own.
+Under TypeScript 7 it is the parser's first (`checkJSSyntax`), which does not
+check an ambient module (`declare global`, `declare module "x"`). Under the
+TypeScript 5.6 dialect it is the first of 5.6.3's walk of the whole tree
+(`getJSSyntacticDiagnosticsForFile`), which checks an ambient module too and
+locates each error as 5.6.3 does (`getErrorSpanForNode`): at a declaration's
+name, so a bodiless function's at its name; at a list's first element; and at
+an index signature's key type, whose annotation is the error (TS8010).
+File-local `--check`, `--outline`, and `--show` accept JavaScript files. They
+read no configuration and so have no dialect: `--check` reports TypeScript
+7's error (`checkJSSyntax`), while `--outline` and `--show` answer from the
+whole tree despite one.
+
+Binding diagnostics follow `checkJs` (unset, `false`, or `true`) and the file's
+last `// @ts-check` or `// @ts-nocheck` pragma (`IsCheckJSEnabledForFile`). A
+file `checkJs: false` or `// @ts-nocheck` leaves unchecked reports none. A
+plain JavaScript file, without a pragma while `checkJs` is unset, reports only
+the codes of `plainJSErrors` (TS2451 and TS2528, for example, but not TS2300
+or TS2307), ignores `@ts-ignore` and `@ts-expect-error`, and reports no merge
+conflict at its own declarations (`reportMergeSymbolError`). A checked file
+reports as a TypeScript file does.
+
+Answers for plain ES module JavaScript follow TypeScript's JavaScript rules:
+an object literal without a contextual type is a JavaScript literal, whose
+missing members are `any` unless `noImplicitAny`; a `null` or `undefined`
+initializer widens to `any` without `strictNullChecks`, and an empty array
+initializer to `any[]`; an untyped function needs no arguments; a call infers `any` for a type
+parameter nothing infers; and an object literal method's `this` is the literal.
+A default import of a JavaScript script without ES module syntax or
+`module.exports` (which has TypeScript's synthetic default), a JavaScript
+class that extends a generic class (whose type arguments TypeScript fills
+with `any`), and JSX element types are located query refusals
+(`javascript_semantics_required`, `jsx_typing_required`). JavaScript files
+are never edited ([editing.md](editing.md)).
+
+A JSDoc `@type` in the last comment of a variable statement or declaration
+is its declared type, as TypeScript 7's parser reparses it
+(`reparseTags`, `reparseHosted`; `src/parser/jsdoc.rs`): the statement's
+first declaration without a type takes the first such tag, its next one the
+next, and a declaration's own comment comes first. The type is TypeScript
+type syntax, whose names resolve where the declaration stands, and an
+`import("...")` type in it is a module request the loader follows, as from
+any type. References find the names the type spells, as 5.6.3's
+`findReferences` does. A reference in it to a generic class or interface
+is fitted to its type parameters as TypeScript fits one in JavaScript
+(`fillMissingTypeArguments`), never the error type: an omitted argument
+takes its default, but `any` where that default is identical to `unknown`
+or `{}` or absent, and arguments past the parameters are dropped, so
+`UBox` for `UBox<T = unknown>` is `UBox<any>` in JavaScript and
+`UBox<unknown>` in TypeScript. A JSDoc function type's type parameters are
+fitted the same way wherever TypeScript instantiates its signature with
+written type arguments, whatever file writes them, since TypeScript asks of
+the signature's declaration (`checkTypeArguments`,
+`getSignatureInstantiation`): `f<string>("x")` from TypeScript is `any` for
+`<A, B = unknown>(x: A) => B`, while a signature declared in TypeScript keeps
+TypeScript's defaults though a JavaScript `@type` names it. A short list for
+a parameter without a default, `p<string>("x")` for `<A, B>(x: A) => B`, is
+TS2558, from which TypeScript recovers with the call's own file
+(`pickLongestCandidateSignature`); this tool refuses that overload recovery
+at the call, as in every file kind. The public AST (`tsparse FILE`),
+`--check`, and `--outline` leave the reparsed type out, as TypeScript's
+checks of written syntax do.
+
+A JavaScript file without ES module syntax whose one `module.exports`
+assignment is a top-level `module.exports = name;` is a CommonJS module, as
+TypeScript 7's binder makes it (`setCommonJSModuleIndicator`,
+`bindModuleExportsAssignment`; `src/project/binding/javascript/commonjs.rs`):
+its `export=` is an alias of `name`, whose declaration is the assignment,
+and it declares its own `module` and `exports` (`declareCommonJSVariable`),
+which references find, declared at the file's start, in place of a global
+of that name. A TypeScript default import of it is its synthetic default,
+`name`, unless `name`'s type has an `__esModule` member
+(`canHaveSyntheticDefault`; see [Compatibility limits](#compatibility-limits)
+for one spelled as an identifier). References to `name` reach that import,
+its uses, and the assignment's operand, as a use. `import("...")` types follow
+the `export=`, and a type qualifier that `name` does not export is looked
+up among the module's own exports (`getTypeFromImportTypeNode`), which have
+no other. The types of `module` and `exports` themselves, which TypeScript
+makes of the module, are located query refusals.
+
+### Refused JavaScript
+
+A JavaScript construct to which TypeScript 7.0.2 gives JavaScript-only meaning
+this tool does not model is a capability limit, never a diagnostic. Binding
+records each where TypeScript decides it (`src/project/binding/javascript.rs`):
+
+- a CommonJS `module.exports =`, `exports.name =`, `module.exports.name =`,
+  or `Object.defineProperty(exports, ...)` in a file without ES module
+  syntax (`setCommonJSModuleIndicator`, `bindModuleExportsAssignment`,
+  `bindExportsOrObjectDefineProperty`), but the one top-level
+  `module.exports = name;` above: another operand (`module.exports = {}`,
+  `= o.a`, `= class {}`), a second assignment, or one in a function or
+  another expression is refused;
+- an assignment or `Object.defineProperty` call that declares a member of a
+  function, class, or object (`bindDeferredExpandoAssignment`, judged by the
+  binder's `lookupEntity`, `getInitializerSymbol`, and existing-member rules:
+  `f.x = 1` for a function `f` declared in the same container, a class, an
+  arrow, function, or class expression, or an empty object literal);
+- a `this.name =` in a class member, a property initializer, or an object
+  literal method (`bindThisPropertyAssignment`);
+- every `require` call, which makes a script a CommonJS module
+  (`bindCallExpression`), names a module TypeScript's loader follows, and
+  resolves to it in the checker;
+- a JSDoc tag the parser reparses into syntax: at its host, in the host's last
+  comment (`@type`, `@satisfies`, `@template`, `@param`, `@this`, `@returns`,
+  `@public`, `@private`, `@protected`, `@readonly`, `@override`, `@implements`,
+  and `@extends` where they change the host, `reparseHosted`), or as a
+  declaration of its own (a `@typedef` with a type, `@callback`, an `@import`
+  with a clause, and an `@overload` of a function, method, or constructor
+  outside an object literal, `reparseUnhosted`); a variable's `@type`, above,
+  is refused only for a `for`, `for...in`, `for...of`, or `catch` variable,
+  and, as a `JSDoc type with JavaScript-only meaning` at the type, where
+  the type is JSDoc type syntax (`*`, `?T`, `!T`, `T=`, `...T`), names
+  `String`, `Number`, `BigInt`, `Boolean`, `Void`, `Undefined`, `Null`,
+  `Function`, `function`, `array`, `promise`, or `Object`, which
+  `getIntendedTypeFromJSDocTypeReference` reads as other types, or needed
+  recovery from a syntax error, such as Closure's `function(number): string`;
+- a JSDoc import type with a literal argument, whose module TypeScript's
+  loader follows from a JavaScript file, but in a variable's reparsed
+  `@type`.
+
+Loading fails at the first one, as `Unsupported` with `unsupported JavaScript:
+CONSTRUCT (tsparse reads JavaScript as plain ES modules or one CommonJS
+module.exports, and JSDoc only as a variable's @type)`,
+for every project JavaScript file that has one, whether a root, an import, a
+re-export, or a reference directive reaches it, and whatever `checkJs`,
+`noCheck`, a pragma, a comment directive, or `skipLibCheck` says. A dependency's
+JavaScript that has one is no program input: a project file's import,
+re-export, dynamic import, or import type of it fails at the specifier
+(`module "NAME": FILE:LINE:COLUMN: unsupported JavaScript: ...`), even where an
+ambient module of its name would stand in for it, and a dependency's request
+for it names nothing, or that ambient module, so none of its declarations is
+bound; a CommonJS dependency script declares no globals, as in TypeScript. Such
+a file is missing from the program's inputs, which TypeScript lists.
+Constructs to which TypeScript 7 gives no such meaning load under its dialect
+and keep its answers: `config.resolve.alias = value` for a parameter `config`, an
+assignment to a member of an object literal with members, of an existing
+static member, or of a function declared in another container, `this.x =` in a
+function or at the top level, `exports` and `module.exports` in an ES module,
+and JSDoc without such a tag. In a CommonJS module, `config.resolve.alias =
+value` for a callback's parameter `config`, spreads, an empty array in a
+conditional, and reads such as `process.env.NAME` declare nothing either and
+keep TypeScript 7's answers.
+
+Deliberately broader than TypeScript's own decisions: every `require` call is
+refused, not only a `require` declaration; a JSDoc import type is refused where
+its tag has no meaning; a CommonJS form is refused in a file with a JSX
+element, which under `jsx: react-jsx` makes the file a module where
+TypeScript declares nothing; a `module.exports = name` inside a function or
+block is refused, though TypeScript binds it as the top-level one
+(`bindModuleExportsAssignment` reads no container); a variable's `@type`
+naming `array`, `promise`, or `Object` is refused whatever its type arguments
+and `noImplicitAny`, though `getIntendedTypeFromJSDocTypeReference` reads
+`array` and `promise` only without type arguments and without
+`noImplicitAny`, and `Object` only with two type arguments or without
+`noImplicitAny`; and a project file's import of a refused dependency fails
+even where TypeScript would select an ambient module of that name.
+
+The TypeScript 5.6 dialect refuses everything above too, since both dialects
+answer through one binder and checker, which port 7.0.2 for the supported slice
+alone and follow it beyond the slice only in part (a CommonJS export sets the
+module indicator by 7.0.2's classification, but binds nothing): a construct to
+which 5.6.3 gives no meaning is not therefore one this tool can answer as 5.6.3
+does. So it refuses, deliberately more than 5.6.3 gives meaning, whatever 7.0.2
+alone gives meaning, for example: an assignment whose rightmost value is
+`void 0`, which 5.6.3 declares nothing for (`getAssignmentDeclarationKind`),
+such as `module.exports = void 0` or `exports.a = exports.b = void 0`, after which
+5.6.3 imports a file with no other CommonJS export as a script (TS2306),
+`f.x = void 0`, or `this.x = void 0` in a class; an expando assignment ahead
+of its variable's declaration, which 5.6.3 binds as it walks; and
+`@satisfies` at an export assignment or a `return`, which 7.0.2's reparser
+reads. The dialect also refuses what 5.6.3 gives JavaScript-only meaning, each
+where it is written, by 5.6.3's own decisions. A `require` call and a JSDoc
+import type mean the same to both. 5.6.3's binder binds as it walks the file,
+a statement list's function declarations first and a `for` loop's body before
+its incrementor, so an assignment sees only the declarations bound before it
+(`bindWorker`, `bindChildren`). Apart from an assignment of `void 0`, it
+declares:
+
+- a CommonJS export, as 7.0.2 does, but no `export=` for `module.exports =
+  name` where `name` is `exports` or a variable initialized to it
+  (`isExportsOrModuleExportsOrAlias`), which the dialect therefore refuses;
+- for a `this.name =`, or one through a variable initialized to `this`
+  (`isThisInitializedDeclaration`), a member of the class or object literal,
+  or a member of the function that holds it, which becomes a constructor
+  function, or of `E` for a function assigned to `E.prototype.m`; at a file's
+  top level it declares a variable, unless the name is dynamic
+  (`bindThisPropertyAssignment`);
+- for an assignment to, or `Object.defineProperty` call on, `E.prototype.m`,
+  or an object literal assigned to `E.prototype`, a member of `E`, which
+  becomes a class (`bindPrototypePropertyAssignment`,
+  `bindObjectDefinePrototypeProperty`, `bindPrototypeAssignment`);
+- for a top-level assignment to, or `Object.defineProperty` call on, a member
+  of an entity whose leftmost name is not an import, a namespace for each name
+  of the entity, a global one where no declaration of the name is bound yet
+  (`bindPotentiallyMissingNamespaces`), and the member;
+- elsewhere, a member of a function, class, or namespace, or of a variable
+  whose initializer, after a `||` or `??` default, is a function, a class, an
+  immediately invoked function, or an empty object literal (`isExpandoSymbol`,
+  `getExpandoInitializer`);
+- for an access expression statement with a `@type` tag, such a member
+  (`bindSpecialPropertyDeclaration`).
+
+5.6.3 reads JSDoc by ownership rather than by position. A node owns the tags of
+the last comment of each node its comment chain reaches, but for a
+parenthesized expression's `@type` and `@satisfies`, which only it owns, and
+an earlier comment's `@overload` (`getJSDocCommentsAndTags`,
+`filterOwnedJSDocTags`). The
+chain runs up from a variable to its statement, and from an expression to the
+variable, property, assignment, `return`, or defaulted assignment that holds
+it (`getNextJSDocCommentLocation`), so a function in
+`ns.f = ns.f || function (a) {}` reads the statement's `@param`. A tag is refused
+where an owner reads it:
+
+- `@type` at a variable, parameter, property, binding element, accessor,
+  export assignment, function, or declared assignment, or at the
+  parenthesized expression it is attached to, but a variable's first owned
+  `@type`, its declared type (`getJSDocType`), where the parser reparsed it
+  onto that variable: the dialect refuses a statement's `@type` the reparse
+  gives a later declaration, which 5.6.3 leaves untyped, and one whose
+  statement initializes its first declaration with a function, which 5.6.3
+  also reads as that function's signature (`getSignatureOfTypeTag`);
+- `@satisfies` at the parenthesized expression it is attached to; at a
+  variable, parameter, class property, or binding element with an
+  initializer, whose initializer it types contextually and checks
+  (`getContextualTypeForVariableLikeDeclaration`, `checkDeclarationInitializer`);
+  and at an object literal property with an initializer, whose initializer it
+  only types contextually (`getContextualTypeForObjectLiteralElement`). 7.0.2
+  reads it at an export assignment and a `return` instead of a parameter;
+- `@param` with a type or brackets at the parameter it names, or at a binding
+  pattern's position;
+- `@returns` with a type, `@this`, and `@template` at a function, `@overload`
+  at one with comments of its own, and `@template` and `@implements` at a
+  class;
+- `@extends` or `@augments` at a class with an `extends` clause, whatever
+  class the tag names;
+- `@class` and `@constructor` at a function;
+- a modifier tag at a class member or a declared assignment, and `@readonly`
+  at an object literal member, whose accessibility 5.6.3 drops
+  (`getDeclarationModifierFlagsFromSymbol`);
+- `@typedef`, `@callback`, `@enum`, and `@import` with a clause, in any
+  comment, which its binder declares.
+
+5.6.3's broader synthetic JSX-runtime predicate is retained as a
+[compatibility limit](#standard-libraries-and-program-order), including for
+ordinary files under `isolatedModules`. It also lists a `node_modules` file
+first loaded by a shallower route in its processing order.
+
+### TypeScript's JavaScript-only branches
+
+The 58 static `IsInJSFile` sites of 7.0.2's checker and binder, and what this
+tool does at each. *Ported* sites behave as TypeScript's; *refused* sites are
+reached only by a construct refused at loading or at a query, in both
+dialects: the TypeScript 5.6 dialect refuses every construct 7.0.2 gives
+meaning at such a site, even where 5.6.3 gives it none, as for
+`module.exports = void 0`, which would otherwise reach `bindContainer`'s
+CommonJS variables with no export (R `REFUSED_7`); *not an
+operation* sites serve diagnostics, declaration emit, or hover, which this tool
+does not produce; *unreachable* sites need syntax TypeScript itself rejects in
+JavaScript (TS8010, TS8011). Tests are in `tests/javascript_refusals.rs` (R),
+`tests/javascript_semantics.rs` (S), `tests/javascript_hosted_types.rs` (H),
+`tests/javascript_commonjs.rs` (C), and the classifier's unit tests in
+`src/project/binding/javascript.rs` (U).
+
+| Site | Function | Disposition | Test |
+| --- | --- | --- | --- |
+| binder.go:694 | `bind` | refused at loading: `require` call | R `REFUSED` |
+| binder.go:1104 | `getInitializerSymbol` | refused at loading: expando member of a class | R `REFUSED` |
+| binder.go:1107 | `getInitializerSymbol` | refused at loading: expando member through a `let` or `var` | R `REFUSED`, `REFUSED_7` |
+| binder.go:1112 | `getInitializerSymbol` | refused at loading: expando member through an earlier expando, which is itself refused, so loading fails at that earlier expando | R `REFUSED` (`o.a = {}; o.a.b = 1`, which fails at `o.a`), U `expandos_follow_the_binders_lookup_and_initializer_rules` (the classifier also records the later member) |
+| binder.go:1122 | `bindThisPropertyAssignment` | refused at loading: `this` member | R `REFUSED`, `REFUSED_7`, U `this_assignments_follow_the_binders_this_container` |
+| binder.go:1606 | `bindContainer` | ported: a CommonJS module's `module` and `exports` (`declareCommonJSVariable`), reached in both dialects only by the one `module.exports = name` bound; refused at loading: every other CommonJS indicator, `@typedef`, `@callback` | C `the_commonjs_module_variable_is_the_files_own`, R `REFUSED`, `REFUSED_7` |
+| nameresolver.go:323 | `Resolve` | refused at loading: `require` call | R `REFUSED` |
+| checker.go:2573 | `checkJSDocTypeIsInJsFile` | not an operation: diagnostic | |
+| checker.go:2639 | `shouldCheckErasableSyntax` | not an operation: diagnostic | |
+| checker.go:4713 | `checkMemberForOverrideModifier` | not an operation: diagnostic | |
+| checker.go:5252 | `checkImportDeclaration` | not an operation: diagnostic | |
+| checker.go:5445 | `checkImportEqualsDeclaration` | not an operation: diagnostic | |
+| checker.go:5487 | `checkExportDeclaration` | not an operation: diagnostic | |
+| checker.go:6730 | `checkAliasSymbol` | not an operation: diagnostic | |
+| checker.go:6818 | `checkAliasSymbol` | not an operation: diagnostic | |
+| checker.go:8320 | `checkCallExpression` | refused at loading: `require` call | R `REFUSED` |
+| checker.go:9031 | `chooseOverload` | ported: `any` for an uninferred type parameter | S `plain_javascript_object_literals_initializers_and_calls_match_the_compilers` |
+| checker.go:9041 | `chooseOverload` | ported: a JSDoc signature's explicit type arguments are fitted as JavaScript's (`fillMissingTypeArguments`), and a complete inferred list is unchanged | S `plain_javascript_object_literals_initializers_and_calls_match_the_compilers`, H `a_javascript_signature_fills_type_arguments_as_typescript_does` |
+| checker.go:9063 | `chooseOverload` | ported: as 9041 | S `plain_javascript_object_literals_initializers_and_calls_match_the_compilers`, H `a_javascript_signature_fills_type_arguments_as_typescript_does` |
+| checker.go:9199 | `checkTypeArguments` | ported: a TypeScript call's explicit type arguments to a JSDoc signature, fitted as JavaScript's | H `a_javascript_signature_fills_type_arguments_as_typescript_does` |
+| checker.go:9359 | `getEffectiveCheckNode` | refused at loading: JSDoc type assertion | R `REFUSED` |
+| checker.go:9552 | `inferSignatureInstantiationForOverloadFailure` | ported; reached only by overload recovery, a query refusal in every file kind | S `a_javascript_call_needing_overload_recovery_is_refused_at_the_call` |
+| checker.go:9720 | `getArgumentArityError` | not an operation: diagnostic | |
+| checker.go:10652 | `getInstantiationExpressionType` | ported: a TypeScript instantiation expression of a JSDoc signature, fitted as JavaScript's | H `a_javascript_signature_fills_type_arguments_as_typescript_does` |
+| checker.go:11049 | `checkIdentifier` | not an operation: diagnostic | |
+| checker.go:12003 | `getContextualThisParameterType` | ported | S `plain_javascript_object_literals_initializers_and_calls_match_the_compilers` |
+| checker.go:12444 | `checkBinaryLikeExpression` | not an operation: diagnostic | |
+| checker.go:13098 | `checkObjectLiteral` | ported | S `plain_javascript_object_literals_initializers_and_calls_match_the_compilers` |
+| checker.go:13154 | `checkObjectLiteral` | ported | S `plain_javascript_object_literals_initializers_and_calls_match_the_compilers` |
+| checker.go:14795 | `canHaveSyntheticDefault` | ported for an ES module and a `module.exports` CommonJS module; refused at query otherwise | S `a_default_import_of_javascript_follows_can_have_synthetic_default`, C `a_default_import_of_module_exports_has_the_exported_constants_type` |
+| checker.go:14870 | `reportInvalidImportEqualsExportMember` | not an operation: diagnostic | |
+| checker.go:15750 | `resolveQualifiedName` | refused at loading: `require` declaration | R `REFUSED` |
+| checker.go:16797 | `widenTypeInferredFromInitializer` | ported | S `plain_javascript_object_literals_initializers_and_calls_match_the_compilers` |
+| checker.go:18021 | `getWidenedTypeForAssignmentDeclaration` | refused at loading: assignment declaration | R `REFUSED`, `REFUSED_7` |
+| checker.go:18189 | `reportImplicitAny` | not an operation: diagnostic | |
+| checker.go:19185 | `getInstantiatedConstructorsForTypeArguments` | refused at query: generic base class | S `a_javascript_class_extending_a_generic_class_is_refused_at_its_heritage` |
+| checker.go:19340 | `createCanonicalSignature` | ported: a JSDoc signature's type parameters, through the owner 9199 uses | H `a_javascript_signature_fills_type_arguments_as_typescript_does` |
+| checker.go:19400 | `instantiateSignatureInContextOf` | ported: by the contextual signature's file, with no effect on the complete list it infers | S `untyped_javascript_signatures_need_no_arguments` |
+| checker.go:19753 | `getSignatureFromDeclaration` | ported: untyped signature | S `untyped_javascript_signatures_need_no_arguments` |
+| checker.go:19978 | `getSignatureOfFullSignatureType` | refused at loading: `@type` on a function | R `REFUSED` |
+| checker.go:20772 | `getDefaultConstructSignatures` | refused at query: generic base class | S `a_javascript_class_extending_a_generic_class_is_refused_at_its_heritage` |
+| checker.go:21839 | `getEffectiveTypeArguments` | ported: a JSDoc reference's deferred type arguments, fitted as below | H `javascript_type_references_fill_type_arguments_as_typescript_does` |
+| checker.go:23084 | `getTypeFromClassOrInterfaceReference` | ported: a JSDoc reference's type arguments, fitted to the parameters with `any` for an omitted one whose default is `unknown`, `{}`, or none (`fillMissingTypeArguments`); refused at query: generic base class | H `javascript_type_references_fill_type_arguments_as_typescript_does`, S `a_javascript_class_extending_a_generic_class_is_refused_at_its_heritage` |
+| checker.go:23566 | `getTypeAliasInstantiation` | refused at loading: a JavaScript type alias comes only from JSDoc | R `REFUSED` |
+| emitresolver.go:427 | `hasVisibleDeclarations` | not an operation: declaration emit | |
+| flow.go:261 | `getTypeAtFlowAssignment` | refused at loading: matters only for an expando member | R `REFUSED`, `REFUSED_7` |
+| inference.go:86 | `inferFromTypes` | refused at loading: alias type arguments of a JSDoc type alias | R `REFUSED` |
+| jsdoc.go:25 | `checkUnmatchedJSDocParameters` | not an operation: diagnostic | |
+| jsx.go:979 | `getJsxPropsTypeFromClassType` | refused at query: JSX typing | S `javascript_jsx_element_types_are_refused_at_the_element` |
+| jsx.go:1026 | `getJsxManagedAttributesFromLocatedAttributes` | refused at query: JSX typing | S `javascript_jsx_element_types_are_refused_at_the_element` |
+| jsx.go:1290 | `getJsxElementTypeTypeAt` | refused at query: JSX typing | S `javascript_jsx_element_types_are_refused_at_the_element` |
+| nodebuilder_hover.go:319 | `serializeConstructors` | not an operation: hover | |
+| nodebuilderimpl.go:1998 | `tryGetThisParameterDeclaration` | refused at loading: `@this` | R `REFUSED` |
+| nodecopy.go:324 | `getExistingNodeTreeVisitor` | not an operation: declaration emit and hover reuse a JSDoc type's nodes, while type display reuses only an instantiation expression, which JavaScript cannot write | |
+| nodecopy.go:626 | `getExistingNodeTreeVisitor` | ported: an empty branch | H `a_hosted_type_is_its_variables_declared_type` |
+| relater.go:3400 | `structuredTypeRelatedToWorker` | refused at loading: alias variance of a JSDoc type alias | R `REFUSED` |
+| symbolaccessibility.go:861 | `isSymbolAccessibleWorker` | not an operation: declaration emit | |
+| utilities.go:995 | `isClassInstanceProperty` | refused at loading: expando member | R `REFUSED`, `REFUSED_7` |
 
 ## Compatibility limits
 
 - One configuration. Project references are not followed; a configuration with
   non-empty `references` is rejected.
-- Inputs are `.ts`, `.tsx`, `.mts`, `.cts`, their declaration files, and JSON
-  modules. JavaScript, JSDoc binding, and asset modules are unsupported
-  when resolution needs them. In a dependency file, an import or
-  `/// <reference path>` that reaches such an input is skipped instead.
-- Standard library declarations come from the checkout the tool was built
-  from; there is no installation override or relocation.
+- Inputs are `.ts`, `.tsx`, `.mts`, `.cts`, their declaration files, JSON
+  modules, and, under `allowJs`, JavaScript files as plain ES modules or as
+  a CommonJS module whose one export is a top-level `module.exports = name;`,
+  with a variable's JSDoc `@type` as its declared type (see [JavaScript
+  inputs](#javascript-inputs)). Asset modules are unsupported when
+  resolution needs them, and other JavaScript-only meaning, such as other
+  CommonJS, `require`, or other JSDoc TypeScript reparses, is refused where
+  it is written ([Refused JavaScript](#refused-javascript)). In a dependency
+  file, an import or `/// <reference path>` that reaches such an input is
+  skipped instead.
+- Under the TypeScript 7 dialect, standard library declarations come from
+  the checkout the tool was built from; there is no installation override or
+  relocation. Under the TypeScript 5.6 dialect they are the installed
+  compiler's own.
+- Synthetic JSX-runtime admission keeps TypeScript 7's JSX/TSX-only rule
+  in both dialects, while 5.6.3 considers more files. The verified Artemis
+  difference is ordering only; other projects can lose runtime inputs and
+  answers. See [the precise predicate and scope of proof](#standard-libraries-and-program-order).
 - `with` statements and other syntax without a binding rule are rejected with
   an `Unsupported` error naming the construct.
 - Modules and exports are keyed by their exact names, which must be valid
@@ -1148,6 +2084,12 @@ JSX follows a `.tsx` extension in any case.
 - File and directory names must be Unicode. On a file system that allows
   other names, such a name that file selection or `"types": ["*"]` would use
   is `Unsupported` rather than converted to a different name.
+- A member declared by an identifier that begins with `__`, such as `__x:`
+  or `__esModule:`, is keyed by TypeScript 6's escaped spelling (`___x`), in
+  every file kind, while a string-literal member or access uses the name
+  itself: such a type displays the escaped spelling, and `o["__x"]`, `o.__y`
+  for a member `"__y"`, and `canHaveSyntheticDefault`'s `__esModule` marker
+  written as an identifier are not found, where TypeScript 7 finds them.
 - Lexical searches do not infer receiver/member identity. Semantic member
   searches are a separate coverage baseline; their failures and deliberate
   differences are described below and in [types.md](types.md).
@@ -1158,7 +2100,9 @@ The semantic oracle is TypeScript 7.0.2's language service (see
 [validation](validation.md#reference-semantics)). Its results are normalized
 to this model before comparison. Normalization keeps every program file's
 locations, so it cannot hide a missing or extra occurrence; it names files by
-canonical path, as this tool does, unless `preserveSymlinks` is set:
+canonical path, as this tool does, unless `preserveSymlinks` is set.
+
+### Symbols and names
 
 - TypeScript gives every same-named declaration in one table a single symbol.
   This tool keeps separate symbols per meaning unless the declarations merge,
@@ -1205,66 +2149,6 @@ canonical path, as this tool does, unless `preserveSymlinks` is set:
   merged with a local namespace in spaces that do not conflict, such as an
   exported enum and a local namespace of types: TypeScript gives the export its
   own symbol, here they form one group.
-- A JSON module's value and properties are not reference targets here;
-  TypeScript gives an import of them a group of the import's own
-  occurrences, and a property access such as `data.a` a group that includes
-  the key in the JSON file. The oracle classifies both as members. An
-  interface that an augmentation merges beside such a value is a separate
-  symbol of the type meaning here, as for other declarations of several
-  meanings, so a type use of the name denotes the interface; TypeScript's one
-  symbol is a property, which the oracle classifies as a member
-  (`fixtures/json-probes/json-augmentations.json`).
-- The members a JSON string, number, boolean, or array has are those that the
-  declarations of its global library interface declare. Where one of those
-  declarations extends other types, a name none declares is unsupported here;
-  TypeScript also finds the inherited members and leaves other names
-  unresolved. A member is one target per interface and name, so two arrays'
-  `length` through two `export *` routes is one export here; TypeScript
-  instantiates an array's members per element type, so arrays of different
-  element types make the name ambiguous there (TS2308). A library member's
-  own type is not inferred, so a name selected from it, as through
-  `export = length`, is unsupported; TypeScript resolves it from the member's
-  type (`fixtures/json-probes/linking.json`).
-- Checker diagnostics that do not change what a name denotes are not reported,
-  as for other checker rules: the import attribute and named-import rules for
-  JSON under `node18` and later (TS1543, TS1544), `export *` from a JSON module
-  (TS2498), an `import =` under ECMAScript module output (TS1202), and TS6142
-  for an import of a `.tsx` file without `jsx` that another route makes a
-  program input, which the import still names.
-- A JSON file with a syntax error fails loading, as other inputs do;
-  TypeScript reports the diagnostic and still binds what it parsed.
-- A syntax error inside a token, such as an invalid escape, digit, or numeric
-  separator, or an unterminated string or comment, is reported at the
-  token's start; TypeScript reports it at the offending character, as
-  `"\00"` at its `\`. Where TypeScript's error recovery parses on and its
-  JSON validation then reports an earlier node, such as a JSON member that is
-  not a property assignment (`{get "a": 1}`, `{default "a": 1}`) or a value
-  that is not JSON (`{"a": 1 ? }`), this tool reports where its parser stops,
-  later in the file (`fixtures/json-probes/parsing.json`).
-- Standard library files are never searched. TypeScript's own
-  find-all-references also reports occurrences inside them; this tool, like the
-  semantic oracle's model, reports their declarations in groups but no
-  occurrences from them.
-- Libraries of equal program-order priority, which only replacement packages
-  and a `.full` default can be, keep TypeScript's depth-first discovery order
-  here; TypeScript sorts more than twelve libraries with Go's unstable sort,
-  which may reorder them. Only file order differs.
-- A file reached both as a library and through another route, such as a
-  project file naming a vendored or replacement library by
-  `/// <reference path>` or import, takes the provenance of the route that
-  reaches it first, as TypeScript's loader takes it from the task it starts
-  first: a root file, then a root library, then breadth first, each file's
-  routes in its subtask order. Where two routes are equally deep, TypeScript's
-  parallel loader starts either first, so its choice varies between runs; this
-  tool takes the earlier one in program order
-  (`tests/reference_libraries.rs`).
-- Replacement packages are resolved from the configuration's real directory;
-  TypeScript uses the directory as the configuration path spells it, so
-  through a symbolic link it can find a package beside the link that this
-  tool does not (`tests/reference_libraries.rs` and, for the compiler,
-  `tools/semantic-oracle.test.mjs`).
-- An unknown library reference is reported without TypeScript's spelling
-  suggestion (TS2727).
 - `undefined`, `arguments`, and `globalThis` are built-in non-reference
   targets. A missing export of a namespace, module, or `globalThis` qualifier is
   unresolved; any other unresolved `a.b` name is a property. Receiver types are
@@ -1287,6 +2171,80 @@ canonical path, as this tool does, unless `preserveSymlinks` is set:
   resolves it to the enclosing class), and a tuple member label.
 - A constructor parameter property's name belongs to the parameter's group;
   TypeScript resolves the name itself to the property.
+
+### JSON modules
+
+- A JSON module's value and properties are not reference targets here;
+  TypeScript gives an import of them a group of the import's own
+  occurrences, and a property access such as `data.a` a group that includes
+  the key in the JSON file. The oracle classifies both as members. An
+  interface that an augmentation merges beside such a value is a separate
+  symbol of the type meaning here, as for other declarations of several
+  meanings, so a type use of the name denotes the interface; TypeScript's one
+  symbol is a property, which the oracle classifies as a member
+  (`fixtures/json-probes/json-augmentations.json`).
+- The members a JSON string, number, boolean, or array has are those that the
+  declarations of its global library interface declare. Where one of those
+  declarations extends other types, a name none declares is unsupported here;
+  TypeScript also finds the inherited members and leaves other names
+  unresolved. A member is one target per interface and name, so two arrays'
+  `length` through two `export *` routes is one export here; TypeScript
+  instantiates an array's members per element type, so arrays of different
+  element types make the name ambiguous there (TS2308). A library member's
+  own type is not inferred, so a name selected from it, as through
+  `export = length`, is unsupported; TypeScript resolves it from the member's
+  type (`fixtures/json-probes/linking.json`).
+- A JSON file with a syntax error fails loading, as other inputs do;
+  TypeScript reports the diagnostic and still binds what it parsed.
+
+### Standard library files
+
+- Standard library files are never searched. TypeScript's own
+  find-all-references also reports occurrences inside them; this tool, like the
+  semantic oracle's model, reports their declarations in groups but no
+  occurrences from them.
+- Libraries of equal program-order priority, which only replacement
+  packages and a `.full` default can be, keep TypeScript's depth-first
+  discovery order here; TypeScript 7.0.2 sorts more than twelve libraries
+  with Go's unstable sort, which may reorder them. Only file order differs.
+- A file reached both as a library and through another route, such as a project file naming a vendored or
+  replacement library by `/// <reference path>` or import, takes the
+  provenance and the program-order place of the route that reaches it
+  first, as TypeScript's loader takes both from the task it starts first:
+  a root file, then a root library, then breadth first, each file's routes
+  in its subtask order. Where two routes are equally deep, TypeScript's
+  parallel loader starts either first, so its choice varies between runs;
+  this tool takes the earlier one in program order
+  (`tests/reference_libraries.rs`).
+- Replacement packages are resolved from the configuration's real directory;
+  TypeScript uses the directory as the configuration path spells it, so
+  through a symbolic link it can find a package beside the link that this
+  tool does not (`tests/reference_libraries.rs` and, for the compiler,
+  `tools/semantic-oracle.test.mjs`).
+- An unknown library reference is reported without TypeScript's spelling
+  suggestion (TS2727).
+
+### Diagnostics and failures
+
+- An unknown compiler option whose name differs from a known one only by
+  case, such as `Strict`, is TS5025 in TypeScript 7.0.2, which names the
+  option it found lowered (`CommandLineOptionNameMap.Get`); 7.0.2 makes no
+  other suggestion. This tool reports both as `Unknown compiler option`
+  without the suggestion; the error is the same `Config` failure.
+- Checker diagnostics that do not change what a name denotes are not reported,
+  as for other checker rules: the import attribute and named-import rules for
+  JSON under `node18` and later (TS1543, TS1544), `export *` from a JSON module
+  (TS2498), an `import =` under ECMAScript module output (TS1202), and TS6142
+  for an import of a `.tsx` file without `jsx` that another route makes a
+  program input, which the import still names.
+- A syntax error inside a token, such as an invalid escape, digit, or numeric
+  separator, or an unterminated string or comment, is reported at the
+  token's start; TypeScript reports it at the offending character, as
+  `"\00"` at its `\`. Where TypeScript's error recovery parses on and its
+  JSON validation then reports an earlier node, such as a JSON member that is
+  not a property assignment (`{get "a": 1}`, `{default "a": 1}`) or a value
+  that is not JSON (`{"a": 1 ? }`), this tool reports where its parser stops,
+  later in the file (`fixtures/json-probes/parsing.json`).
 - Invalid declaration arrangements that TypeScript binds but its checker
   rejects are `Binding` errors here where reported (Binding model): duplicate
   implementations (TS2393), a function merged with a non-ambient class
@@ -1311,6 +2269,16 @@ canonical path, as this tool does, unless `preserveSymlinks` is set:
   input is unresolved, and conflicting declarations there merge; TypeScript
   reports them unless `skipLibCheck` or `skipDefaultLibCheck` covers the
   file (`fixtures/json-probes/reporting.json`).
+- A namespace declared with the `module` keyword (`declare module X {}`)
+  binds as a namespace in a dependency declaration file whatever
+  `skipLibCheck` says, as other dependency diagnostics are not reported;
+  TypeScript 7 reports TS1540 there unless `skipLibCheck` covers the file
+  (`fixtures/references/module-keyword-namespaces`). In a project file, or a
+  project declaration file without `skipLibCheck`, it fails the load at its
+  name, as TypeScript reports it, unless `// @ts-nocheck` or a comment
+  directive covers it. File-local `--check` always reports it, applying
+  neither `skipLibCheck` nor directives: it reads no configuration, so it has
+  no dialect and reports TypeScript 7's errors.
 - An unresolved module or reference directive leaves the names that depend
   on it unresolved instead of failing the project where TypeScript reports no
   error: in a file it skips, such as a declaration file under `skipLibCheck`
@@ -1338,11 +2306,6 @@ canonical path, as this tool does, unless `preserveSymlinks` is set:
   checks, which can be later in source when a function expression's body is
   checked late.
 
-TypeScript 7.0.2 defaults `types` to `[]`: `@types` packages are included only
-when listed in `types`, or all of them with `"types": ["*"]`. The design assumed
-automatic discovery when `types` is absent; the implementation follows the
-compiler.
-
 ## Semantic type and member-query differences
 
 The semantic owners implement the contract in [types-design.md](types-design.md),
@@ -1367,8 +2330,9 @@ records the current validation status; this section is not a delivery-complete c
   anchor the actual selected segment. Ambiguity anchors must round-trip through
   that operation's selection owner.
 - Q4 normalizes declaration/alias meanings for useful inspection. Both type-only
-  import/export spellings follow one table; type-reference name tokens select
-  their type syntax. Explicit closing delimiters can select call/access/tagged
+  import/export spellings follow one table; type-reference name tokens and a
+  one-name `import("...")` qualifier select their type syntax, while the names
+  of a qualified import-type qualifier are unsupported targets. Explicit closing delimiters can select call/access/tagged
   results. These product anchors use node-level type operations rather than
   claiming equality to every raw compiler position query. Unsupported catalog
   forms and positions inside JSON remain explicit target failures.

@@ -610,10 +610,12 @@ impl Store {
         {
             return Ok(symbol);
         }
-        let excludes = if kind == SyntaxKind::ExportAssignment {
-            u32::MAX
-        } else {
-            super::link::flags::ALIAS
+        // `bindExportAssignment` excludes every flag, and
+        // `bindModuleExportsAssignment` none.
+        let excludes = match kind {
+            SyntaxKind::ExportAssignment => u32::MAX,
+            SyntaxKind::BinaryExpression => 0,
+            _ => super::link::flags::ALIAS,
         };
         let symbol = self
             .native
@@ -640,7 +642,11 @@ impl Store {
             .as_mut()
             .expect("binder arena before publication")
             .attach_alias(alias, symbol);
-        if kind == SyntaxKind::ExportAssignment && name == "export=" {
+        if matches!(
+            kind,
+            SyntaxKind::ExportAssignment | SyntaxKind::BinaryExpression
+        ) && name == "export="
+        {
             self.native
                 .as_mut()
                 .expect("binder arena before publication")

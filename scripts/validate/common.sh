@@ -29,10 +29,12 @@ run_quiet() {
 # Compiler oracles. TYPE_SCRIPT_API is the TypeScript 6.0.3 syntax API
 # (lib/typescript.js) behind the AST runners. TYPE_SCRIPT_SEMANTIC_API and
 # TYPE_SCRIPT_NATIVE are the TypeScript 7.0.2 semantic API package and native
-# compiler behind the reference oracle. A variable that is already set wins;
-# an unset one is looked up in the canonical checkout's .cache/compiler-oracles,
-# found from any linked worktree. Each find_* function exports what it finds
-# and returns 0, or returns 1 with the reason in compiler_missing.
+# compiler behind the reference oracle. TYPE_SCRIPT_56_API is the TypeScript
+# 5.6.3 package behind the TypeScript 5.6 dialect's tools (tools/ts56-*.mjs).
+# A variable that is already set wins; an unset one is looked up in the
+# canonical checkout's .cache/compiler-oracles, found from any linked
+# worktree. Each find_* function exports what it finds and returns 0, or
+# returns 1 with the reason in compiler_missing.
 compiler_missing=""
 
 compiler_cache() {
@@ -55,6 +57,22 @@ find_syntax_api() {
     return 1
   fi
   export TYPE_SCRIPT_API="$api"
+}
+
+find_typescript_56() {
+  local cache package="${TYPE_SCRIPT_56_API:-}"
+  if [[ -z "$package" ]]; then
+    if ! cache="$(compiler_cache)"; then
+      compiler_missing="TYPE_SCRIPT_56_API is unset and no Git checkout was found"
+      return 1
+    fi
+    package="$cache/typescript-5.6.3/package"
+  fi
+  if [[ ! -f "$package/package.json" ]]; then
+    compiler_missing="no TypeScript 5.6.3 package at $package"
+    return 1
+  fi
+  export TYPE_SCRIPT_56_API="$package"
 }
 
 find_semantic_compilers() {
@@ -461,9 +479,10 @@ harness_toolchain() {
   local name value
   find_syntax_api >/dev/null 2>&1 || true
   find_semantic_compilers >/dev/null 2>&1 || true
+  find_typescript_56 >/dev/null 2>&1 || true
   {
     node -v 2>/dev/null
-    for name in TYPE_SCRIPT_API TYPE_SCRIPT_SEMANTIC_API TYPE_SCRIPT_NATIVE; do
+    for name in TYPE_SCRIPT_API TYPE_SCRIPT_SEMANTIC_API TYPE_SCRIPT_NATIVE TYPE_SCRIPT_56_API; do
       value="${!name:-}"
       printf '%s=%s\n' "$name" "$value"
       if [[ -n "$value" ]]; then ls -ld "$value" "$value/package.json" 2>/dev/null || true; fi
@@ -547,6 +566,7 @@ run_harness_tests() {
   local missing=()
   find_syntax_api || missing+=("$compiler_missing")
   find_semantic_compilers || missing+=("$compiler_missing")
+  find_typescript_56 || missing+=("$compiler_missing")
   if (( strict && ${#missing[@]} > 0 )); then
     printf 'harness tests: strict mode (HARNESS_REQUIRE_COMPILERS=1) requires every compiler; no tests ran.\n' >&2
     printf 'harness tests: %s\n' "${missing[@]}" >&2

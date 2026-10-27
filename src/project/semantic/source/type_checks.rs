@@ -140,6 +140,14 @@ impl Source<'_, '_> {
                 children: sites(syntax::ids(node, "typeArguments")),
                 result: result(),
             },
+            // checkImportType visits only its argument, never the written
+            // type arguments, before checkTypeReferenceOrImport. Its
+            // getResolutionModeOverride reports grammar errors only.
+            K::ImportType => TypeSourceCheck::Reference {
+                children: sites(&[syntax::id(node, "argument")
+                    .ok_or_else(|| super::super::internal("import type check lacks argument"))?]),
+                result: result(),
+            },
             K::TypePredicate => {
                 // `getTypePredicateParent` admits only the actual return
                 // child of these seven signature declaration kinds.

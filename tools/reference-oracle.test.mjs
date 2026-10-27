@@ -23,11 +23,12 @@ function syntheticApi(directory, { version = '6.0.3', allInvalid = false } = {})
     version: ${JSON.stringify(version)},
     ScriptTarget: {Latest: 99}, ScriptKind: {TS: 3, TSX: 4},
     NodeFlags: {Namespace: 32, GlobalAugmentation: 2048, NestedNamespace: 8},
-    SyntaxKind: {AssertKeyword: 132, JSDocUnknownType: 312, JSDocFunctionType: 317},
+    SyntaxKind: {AssertKeyword: 132, JSDocUnknownType: 312, JSDocFunctionType: 317,
+      SourceFile: 308, ModuleBlock: 'module-block', ModuleDeclaration: 'module'},
     createSourceFile(name, source) {
       const children = [];
       if (source.includes('throw\\n')) children.push({kind: 'throw', expression: {kind: 'identifier', escapedText: '', pos: 5, end: 5}});
-      if (source.includes('/*unquoted-module*/')) children.push({kind: 'module', name: {kind: 'identifier'}, flags: 0});
+      if (source.includes('/*module-keyword*/')) children.push({kind: 'module', name: {kind: 'identifier'}, flags: 0});
       if (source.includes('/*assert-attributes*/')) children.push({kind: 'import', attributes: {token: 132}});
       if (source.includes('/*legacy-type*/')) children.push({kind: 312});
       const parseDiagnostics = ${allInvalid} || source.includes('/*invalid*/') ? [{code: 1000, messageText: 'Invalid syntax'}]
@@ -73,21 +74,38 @@ test('synthetic API: shared TS7 classification handles eligibility and deferred 
   assert.equal(classify('const x = 1;').valid, true);
   assert.equal(classify('/*amd-name*/').valid, true);
   assert.deepEqual(classify('throw\nnew Error();').diagnostics.map(d => d.code), [1142]);
+  assert.equal(classify('throw\nnew Error();').parsed, false);
   assert.equal(classify('/*invalid*/').valid, false);
   for (const [source, removed] of [
-    ['/*unquoted-module*/', 'unquoted module'],
     ['/*assert-attributes*/', 'assert attributes'],
     ['/*legacy-type*/', 'legacy JSDoc type syntax'],
   ]) {
     assert.equal(classify(source).eligible, false);
     assert.equal(classify(source).removed, removed);
   }
-  assert.deepEqual(classify('/*unquoted-module*/').strictDiagnostics.map(d => d.code), [1540]);
+  // TypeScript 7 parses a namespace declared with `module`; its checker
+  // reports TS1540, so --check must reject the source whose tree is compared.
+  const moduleKeyword = classify('/*module-keyword*/');
+  assert.deepEqual([moduleKeyword.eligible, moduleKeyword.valid, moduleKeyword.parsed], [true, false, true]);
+  assert.deepEqual(moduleKeyword.strictDiagnostics, [{ code: 1540, message:
+    "A 'namespace' declaration should not be declared using the 'module' keyword. Please use the 'namespace' keyword instead." }]);
+  assert.deepEqual(moduleKeyword.diagnostics, moduleKeyword.strictDiagnostics);
   for (const flags of Object.values(ts.NodeFlags)) {
-    const reference = ts.createSourceFile('source.ts', '/*unquoted-module*/');
+    const reference = ts.createSourceFile('source.ts', '/*module-keyword*/');
     reference.children[0].flags = flags;
-    assert.equal(classifyReference(ts, reference).eligible, true);
+    const facts = classifyReference(ts, reference);
+    assert.equal(facts.eligible, true);
+    assert.deepEqual(facts.strictDiagnostics.map(d => d.code), flags === ts.NodeFlags.NestedNamespace ? [1540] : [], flags);
   }
+  // Each part of a dotted name, and a declaration in a module block, has its
+  // own; a string name, or a parent that reports TS1235 instead, has none.
+  const module = (flags, children = []) => ({ kind: 'module', name: { kind: 'identifier' }, flags, children });
+  for (const [children, codes] of [
+    [[module(0, [module(ts.NodeFlags.NestedNamespace)])], [1540, 1540]],
+    [[module(ts.NodeFlags.Namespace, [{ kind: 'module-block', children: [module(0)] }])], [1540]],
+    [[{ kind: 'module', name: { kind: 'string' }, flags: 0 }], []],
+    [[{ kind: 'block', children: [module(0)] }], []],
+  ]) assert.deepEqual(classifyReference(ts, { kind: 308, children, parseDiagnostics: [] }).strictDiagnostics.map(d => d.code), codes);
 });
 
 // A stand-in Rust CLI that records its arguments and stdin, then prints the
@@ -97,14 +115,17 @@ function parserStandIn(directory) {
   const log = path.join(directory, 'parser-calls.jsonl');
   return {
     binary,
-    behave({ status = 0, stdout = '', stderr = '' } = {}) {
+    // `check`, when given, is the behavior under --check.
+    behave({ status = 0, stdout = '', stderr = '', check } = {}) {
       fs.writeFileSync(log, '');
+      const behaviors = { tree: { status, stdout, stderr }, check: check ?? { status, stdout, stderr } };
       fs.writeFileSync(binary, `#!${process.execPath}
 const fs = require('node:fs');
 fs.appendFileSync(${JSON.stringify(log)}, JSON.stringify({ args: process.argv.slice(2), stdin: fs.readFileSync(0, 'utf8') }) + '\\n');
-process.stdout.write(${JSON.stringify(stdout)});
-process.stderr.write(${JSON.stringify(stderr)});
-process.exitCode = ${status};
+const behavior = ${JSON.stringify(behaviors)}[process.argv.includes('--check') ? 'check' : 'tree'];
+process.stdout.write(behavior.stdout ?? '');
+process.stderr.write(behavior.stderr ?? '');
+process.exitCode = behavior.status ?? 0;
 `, { mode: 0o755 });
     },
     calls: () => fs.readFileSync(log, 'utf8').split('\n').filter(Boolean).map(line => JSON.parse(line)),
@@ -149,10 +170,26 @@ test('compareSource reports agreement and each way the parser can disagree with 
     assert.deepEqual(failed.difference, { error: 'cannot read input', status: 2, signal: null });
   }
 
-  const removed = compare('/*unquoted-module*/', { stdout: tree });
+  const removed = compare('/*assert-attributes*/', { stdout: tree });
   assert.deepEqual([removed.eligible, removed.removed, removed.outcome, removed.difference],
-    [false, 'unquoted module', undefined, undefined]);
+    [false, 'assert attributes', undefined, undefined]);
   assert.deepEqual(parser.calls(), []);
+
+  // A namespace declared with `module` has its tree compared, then --check
+  // must reject it.
+  const moduleKeyword = '/*module-keyword*/';
+  const moduleTree = JSON.stringify({ kind: 308, children: [{ kind: 'module', name: { kind: 'identifier' } }] });
+  const agreedModule = compare(moduleKeyword, { stdout: moduleTree, check: { status: 1, stderr: '-:1:8: TS1540' } });
+  assert.deepEqual([agreedModule.eligible, agreedModule.valid, agreedModule.outcome, agreedModule.checkOutcome, agreedModule.difference],
+    [true, false, 'accepted', 'rejected', undefined]);
+  assert.deepEqual(parser.calls(), [{ args: [], stdin: moduleKeyword }, { args: ['--check'], stdin: moduleKeyword }]);
+  const acceptedModule = compare(moduleKeyword, { stdout: moduleTree });
+  assert.deepEqual(acceptedModule.difference, { error: 'Accepted compiler-invalid syntax', diagnostics: acceptedModule.diagnostics });
+  const differsModule = compare(moduleKeyword, { stdout: tree, check: { status: 1 } });
+  assert.equal(differsModule.difference.path, '$.children.length');
+  assert.deepEqual(parser.calls().map(call => call.args), [[]]);
+  const rejectedModule = compare(moduleKeyword, { status: 1, stderr: 'syntax error' });
+  assert.deepEqual([rejectedModule.outcome, rejectedModule.difference], ['rejected', { error: 'syntax error', status: 1, signal: null }]);
 });
 
 test('compareSource parses a named file or stdin, and checks without a tree under checkOnly', t => {
@@ -265,7 +302,7 @@ test('synthetic source/upstream checks count eligible syntax rejections and skip
   const directory = temporary(t);
   const environment = { TYPE_SCRIPT_API: syntheticApi(directory), TSPARSE: executable(directory, 'parser', 'exit 1') };
   const sourceDirectory = path.join(directory, 'sources'); fs.mkdirSync(sourceDirectory);
-  for (const [name, source] of [['throw.ts', 'throw\nnew Error();'], ['removed.ts', '/*unquoted-module*/']]) {
+  for (const [name, source] of [['throw.ts', 'throw\nnew Error();'], ['removed.ts', '/*assert-attributes*/']]) {
     fs.writeFileSync(path.join(sourceDirectory, name), source);
     fixture(directory, name, source);
   }
@@ -293,21 +330,25 @@ test('synthetic source/upstream checks count eligible syntax rejections and skip
 test('synthetic runners apply their own policy to the same comparison facts', t => {
   const directory = temporary(t);
   const environment = { TYPE_SCRIPT_API: syntheticApi(directory), TSPARSE: path.join(directory, 'parser') };
-  // Rejects sources containing "invalid"; otherwise prints, as tsparse does,
-  // the verdict line with --check, or a tree with one extra child for
-  // sources containing "extra".
+  // Rejects sources containing "invalid", and with --check those containing
+  // "module-keyword"; otherwise prints, as tsparse does, the verdict line
+  // with --check, or a tree with one extra child for sources containing
+  // "extra".
   fs.writeFileSync(environment.TSPARSE, `#!${process.execPath}
 const fs = require('node:fs');
 const file = process.argv.slice(2).find(arg => !arg.startsWith('--'));
 const source = fs.readFileSync(file ?? 0, 'utf8');
-if (source.includes('invalid')) { process.stderr.write('syntax error'); process.exitCode = 1; }
+if (source.includes('invalid') || process.argv.includes('--check') && source.includes('module-keyword')) {
+  process.stderr.write('syntax error'); process.exitCode = 1;
+}
 else if (process.argv.includes('--check')) {
   const jsx = process.argv.includes('--tsx') || /\\.[jt]sx$/i.test(file ?? '');
   process.stdout.write('ok: ' + (file ?? '-') + ' parses as TypeScript 7 (jsx: ' + (jsx ? 'on' : 'off') + ')\\n');
 }
-else process.stdout.write(JSON.stringify({ kind: 308, children: source.includes('extra') ? [{ kind: 80 }] : [] }));
+else process.stdout.write(JSON.stringify({ kind: 308, children: source.includes('extra') ? [{ kind: 80 }]
+  : source.includes('module-keyword') ? [{ kind: 'module', name: { kind: 'identifier' } }] : [] }));
 `, { mode: 0o755 });
-  const cases = [['same', 'const x = 1;'], ['extra', 'const extra = 1;'], ['invalid', '/*invalid*/']];
+  const cases = [['same', 'const x = 1;'], ['extra', 'const extra = 1;'], ['invalid', '/*invalid*/'], ['module', '/*module-keyword*/']];
   fs.mkdirSync(path.join(directory, 'fixtures'));
   fs.writeFileSync(path.join(directory, 'fixtures/conformance.json'), JSON.stringify(cases.map(([name, source]) => ({ name, source }))));
   const authored = runner(directory, 'conformance', [], environment);
@@ -315,18 +356,20 @@ else process.stdout.write(JSON.stringify({ kind: 308, children: source.includes(
   assert.deepEqual(authored.stdout.trim().split('\n'), [
     'AST FAIL extra: {"path":"$.children.length","actual":1,"expected":0}; compare .cache/conformance/extra.{actual,expected}.json',
     'INVALID FIXTURE invalid: Invalid syntax',
-    '1/3 structural comparisons passed (TypeScript 6.0.3; compared: structure only)',
+    "INVALID FIXTURE module: A 'namespace' declaration should not be declared using the 'module' keyword. Please use the 'namespace' keyword instead.",
+    '1/4 structural comparisons passed (TypeScript 6.0.3; compared: structure only)',
   ]);
   const dump = JSON.parse(fs.readFileSync(path.join(directory, '.cache/conformance/extra.actual.json'), 'utf8'));
   assert.deepEqual(dump, { kind: 308, children: [{ kind: 80 }] });
 
-  // A corpus runner passes the same rejected invalid input.
+  // A corpus runner passes the same rejected invalid input, and the module
+  // declaration whose tree agrees and which --check rejects.
   const sources = path.join(directory, 'sources'); fs.mkdirSync(sources);
   for (const [name, source] of cases) fs.writeFileSync(path.join(sources, `${name}.ts`), source);
   const corpus = runner(directory, 'source-corpus', [sources], environment);
   assert.equal(corpus.status, 1, corpus.stderr);
   const report = JSON.parse(fs.readFileSync(path.join(directory, '.cache/source-corpus.json'), 'utf8'));
-  assert.deepEqual([report.total, report.invalid, report.passed], [3, 1, 2]);
+  assert.deepEqual([report.total, report.invalid, report.passed], [4, 2, 3]);
   assert.deepEqual(report.failures.map(failure => [path.basename(failure.file), failure.path]), [['extra.ts', '$.children.length']]);
 });
 
@@ -408,10 +451,10 @@ test('syntax runners apply each comparison option they accept and report the act
 test('synthetic authored fixtures fail rather than skip TS7-removed syntax', t => {
   const directory = temporary(t);
   fs.mkdirSync(path.join(directory, 'fixtures'));
-  fs.writeFileSync(path.join(directory, 'fixtures/conformance.json'), JSON.stringify([{ name: 'removed', source: '/*unquoted-module*/' }]));
+  fs.writeFileSync(path.join(directory, 'fixtures/conformance.json'), JSON.stringify([{ name: 'removed', source: '/*assert-attributes*/' }]));
   const result = runner(directory, 'conformance', [], { TYPE_SCRIPT_API: syntheticApi(directory) });
   assert.equal(result.status, 1, result.stderr);
-  assert.match(result.stdout, /INVALID FIXTURE removed: unquoted module/);
+  assert.match(result.stdout, /INVALID FIXTURE removed: assert attributes/);
 });
 
 test('synthetic upstream native setup failures cannot produce passing reports', t => {

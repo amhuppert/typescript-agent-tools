@@ -3,7 +3,7 @@ use std::{
     io::{self, Read},
     process::ExitCode,
 };
-use typescript_parser::{ParseOptions, parse_with_options};
+use typescript_parser::{Diagnostic, ParseOptions, parse_with_options, source_errors};
 
 mod cli;
 mod process_limits;
@@ -36,7 +36,8 @@ fn run() -> Result<(), Delivered> {
 /// its diagnostics do and whether JSX was parsed; it says what was checked,
 /// syntax, and never implies type checking (design, step 5, "Clean
 /// verdicts"). It writes no AST, so `--output` and `--pretty` change
-/// nothing then.
+/// nothing then. A check also fails on the errors TypeScript 7's checker
+/// reports from syntax alone (`source_errors`), which leave the AST whole.
 fn parse(request: request::Parse) -> Result<(), Delivered> {
     let name = request.file.as_deref().unwrap_or("-");
     let file = ParseOptions::for_file(if name == "-" { "source.ts" } else { name });
@@ -51,14 +52,19 @@ fn parse(request: request::Parse) -> Result<(), Delivered> {
         fs::read_to_string(name).map_err(|e| unread(format!("{name}: {e}")))?
     };
     let jsx = request.jsx || file.jsx;
-    let ast = parse_with_options(&source, ParseOptions { jsx, ..file }).map_err(|e| {
+    let syntax_error = |e: Diagnostic| {
         let (line, column) = e.line_column(&source);
         delivery::diagnostic(
             delivery::SYNTAX_ERROR,
             &format!("{name}:{line}:{column}: {}", e.message),
         )
-    })?;
+    };
+    let ast = parse_with_options(&source, ParseOptions { jsx, ..file }).map_err(syntax_error)?;
     if request.check {
+        // TypeScript 7 rejects what its checker reports from syntax alone.
+        if let Some(error) = source_errors(&ast).into_iter().next() {
+            return Err(syntax_error(error));
+        }
         let jsx = if jsx { "on" } else { "off" };
         return write_output(None, |writer| {
             write!(writer, "ok: {name} parses as TypeScript 7 (jsx: {jsx})")

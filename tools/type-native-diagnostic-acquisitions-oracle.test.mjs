@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {compilerHookOracle, typeOracle} from './type-oracle.mjs';
 import {lineStarts, position} from './semantic-oracle.mjs';
+import {scratchPath} from './harness-scratch.mjs';
 
 const root = fileURLToPath(new URL('../fixtures/types/native-diagnostic-cache/', import.meta.url));
 const source = fs.readFileSync(path.join(root, 'cases.ts'), 'utf8');
@@ -68,6 +69,6 @@ for (const profile of ['tsconfig', 'loose', 'untruncated']) {
       rows.push({name, summary:native.summary, codes:native.beforeSummary.diagnosticCodes,
         events, cacheEvents:native.beforeSummary.displayEvents});
     }
-    fs.writeFileSync(`.cc/temp/native-diagnostic-acquisitions-${profile}.json`, JSON.stringify(rows,null,2)+'\n');
+    fs.writeFileSync(scratchPath(`native-diagnostic-acquisitions-${profile}.json`), JSON.stringify(rows,null,2)+'\n');
   });
 }

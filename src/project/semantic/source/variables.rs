@@ -36,12 +36,15 @@ pub(in crate::project::semantic) struct VariableFacts {
     pub(in crate::project::semantic) property: bool,
     pub(in crate::project::semantic) optional: bool,
     pub(in crate::project::semantic) constant: bool,
+    /// `isDeclarationReadonly`, never true for a parameter property.
     pub(in crate::project::semantic) readonly: bool,
     pub(in crate::project::semantic) automatic_eligible: bool,
     pub(in crate::project::semantic) empty_array: bool,
     pub(in crate::project::semantic) rest: bool,
     pub(in crate::project::semantic) root_parameter: bool,
     pub(in crate::project::semantic) parent: Option<DeclarationIdentity>,
+    /// The declaration is in a JavaScript file (`IsInJSFile`).
+    pub(in crate::project::semantic) javascript: bool,
 }
 
 pub(in crate::project::semantic) enum AssignmentPatternRecipe {
@@ -530,7 +533,7 @@ impl Source<'_, '_> {
             property,
             optional: syntax::id(node, "questionToken").is_some(),
             constant: syntax::is_var_const_like_flags(flags),
-            readonly: modifiers & syntax::modifiers::READONLY != 0,
+            readonly: syntax::is_declaration_readonly(ast, parents, declaration.node),
             automatic_eligible: node.syntax_kind == K::VariableDeclaration
                 && pattern.is_none()
                 && modifiers & syntax::modifiers::EXPORT == 0
@@ -542,6 +545,7 @@ impl Source<'_, '_> {
             rest: syntax::id(node, "dotDotDotToken").is_some(),
             root_parameter: ast.node(outer).syntax_kind == K::Parameter,
             parent: parent.map(|parent| DeclarationIdentity::new(declaration.file, parent)),
+            javascript: inputs.in_javascript_file(declaration.file),
         })
     }
 

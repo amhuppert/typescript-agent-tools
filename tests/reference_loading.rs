@@ -1163,6 +1163,65 @@ fn the_first_failing_input_in_load_order_is_reported_among_many() {
     }
 }
 
+/// A lookup that cannot read a manifest (`Io`) fails the file that asked
+/// for it, ordered among the other inputs' failures by that file's place in
+/// load order: an earlier file's syntax error is reported before a later
+/// file's unreadable `package.json`, and a later syntax error after it.
+#[cfg(unix)]
+#[test]
+fn a_lookup_failure_is_ordered_by_the_file_that_met_it() {
+    use std::os::unix::fs::PermissionsExt;
+    for (syntax, lookup, expected) in [
+        ("m010.ts", "m290.ts", InputErrorKind::Syntax),
+        ("m290.ts", "m010.ts", InputErrorKind::Io),
+    ] {
+        let mut files = vec![("tsconfig.json".to_owned(), support::CONFIG.to_owned())];
+        for index in 0..300 {
+            files.push((
+                format!("m{index:03}.ts"),
+                format!("export const value{index} = {index};\n"),
+            ));
+        }
+        files.push((
+            "node_modules/pkg/package.json".to_owned(),
+            r#"{"name":"pkg","version":"1.0.0","types":"index.d.ts"}"#.to_owned(),
+        ));
+        files.push((
+            "node_modules/pkg/index.d.ts".to_owned(),
+            "export declare const pkg: number;\n".to_owned(),
+        ));
+        let borrowed: Vec<(&str, &str)> = files
+            .iter()
+            .map(|(path, text)| (path.as_str(), text.as_str()))
+            .collect();
+        let fixture = Fixture::new(&borrowed);
+        std::fs::write(fixture.path(syntax), "export const = ;\n").unwrap();
+        std::fs::write(
+            fixture.path(lookup),
+            "import { pkg } from \"pkg\";\nexport const viaPkg = pkg;\n",
+        )
+        .unwrap();
+        let manifest = fixture.path("node_modules/pkg/package.json");
+        std::fs::set_permissions(&manifest, std::fs::Permissions::from_mode(0o000)).unwrap();
+        if std::fs::read(&manifest).is_ok() {
+            eprintln!(
+                "SKIP a_lookup_failure_is_ordered_by_the_file_that_met_it: this user reads files without permission"
+            );
+            return;
+        }
+        let error =
+            support::input_error(Project::load(&fixture.path("tsconfig.json")).unwrap_err());
+        std::fs::set_permissions(&manifest, std::fs::Permissions::from_mode(0o644)).unwrap();
+        assert_eq!(error.kind, expected, "{syntax} and {lookup}: {error:?}");
+        let reported = error.path.clone().expect("the failure names its file");
+        let expected_path = match expected {
+            InputErrorKind::Io => manifest.clone(),
+            _ => fixture.path(syntax),
+        };
+        assert_eq!(reported, expected_path, "{error:?}");
+    }
+}
+
 /// What loading `config` gives, from another thread: nothing when it does
 /// not answer within ten seconds, as a read waiting on a pipe never would.
 fn load_promptly(
@@ -1389,4 +1448,136 @@ fn a_literal_name_that_is_not_a_regular_file_is_refused_not_passed_over() {
             path.display()
         );
     }
+}
+
+/// TS1540's message, as TypeScript 7.0.2 words it.
+const TS1540: &str = "A 'namespace' declaration should not be declared using the 'module' \
+                      keyword. Please use the 'namespace' keyword instead.";
+
+/// TypeScript 7 parses `module X {}` as a namespace declaration, and its
+/// checker reports TS1540 at the name of each such declaration in a file it
+/// checks. A project file therefore fails to load at the first reported
+/// one, as a syntax error, while a dependency declaration file under
+/// `skipLibCheck` loads and binds the namespace (positions and outcomes from
+/// the native 7.0.2 compiler). So does a dependency without `skipLibCheck`,
+/// where TypeScript reports TS1540: a dependency's diagnostics are never
+/// reported (docs/references.md, Binding model).
+#[test]
+fn namespaces_declared_with_module_fail_only_where_typescript_reports_them() {
+    let dependency = Fixture::checked_in("module-keyword-namespaces");
+    dependency.check_markers(&dependency.load());
+    let checked = Fixture::copy_of("module-keyword-namespaces");
+    std::fs::write(
+        checked.path("tsconfig.json"),
+        r#"{ "compilerOptions": { "noLib": true, "skipLibCheck": false } }"#,
+    )
+    .unwrap();
+    checked.check_markers(&checked.load());
+
+    let declaration = "declare module X { const a: number; }\n";
+    for (files, file, line, column) in [
+        (
+            &[("app.ts", "module X { export const a = 1; }\nX.a;\n")][..],
+            "app.ts",
+            1,
+            8,
+        ),
+        (&[("app.ts", declaration)], "app.ts", 1, 16),
+        (
+            &[("app.ts", "module A.B { export const a = 1; }\n")],
+            "app.ts",
+            1,
+            8,
+        ),
+        (
+            &[("app.ts", "export module X { export const a = 1; }\n")],
+            "app.ts",
+            1,
+            15,
+        ),
+        (
+            &[(
+                "app.ts",
+                "namespace N {\n  module X { export const a = 1; }\n}\n",
+            )],
+            "app.ts",
+            2,
+            10,
+        ),
+        (
+            &[("app.ts", "namespace N {\r\n  module X {}\r\n}\r\n")],
+            "app.ts",
+            2,
+            10,
+        ),
+        // The directive covers the line after it, where `B` is not.
+        (
+            &[("app.ts", "// @ts-ignore\nmodule A.\n  B {}\n")],
+            "app.ts",
+            3,
+            3,
+        ),
+        // A name after a dot may be a keyword, here escaped.
+        (
+            &[("app.ts", "// @ts-ignore\nmodule A.\n  \\u0064efault {}\n")],
+            "app.ts",
+            3,
+            3,
+        ),
+        // A project declaration file without `skipLibCheck`.
+        (
+            &[("types.d.ts", declaration), ("app.ts", "X.a;\n")],
+            "types.d.ts",
+            1,
+            16,
+        ),
+    ] {
+        let error = load_error(files);
+        assert_eq!(error.kind, InputErrorKind::Syntax, "{files:?}: {error}");
+        assert_eq!(error.message, TS1540, "{files:?}");
+        assert!(
+            error.path.as_ref().unwrap().ends_with(file),
+            "{files:?}: {error}"
+        );
+        assert_eq!(
+            error.position,
+            Some(SourcePosition { line, column }),
+            "{files:?}"
+        );
+    }
+
+    // Files TypeScript does not check bind the namespace.
+    let skipped = Fixture::new(&[
+        ("tsconfig.json", SKIP_LIB_CHECK),
+        (
+            "types.d.ts",
+            "declare module /*@X:d*/X { const /*@a:d*/a: number; }\n",
+        ),
+        ("app.ts", "/*@X:u*/X./*@a:u*/a;\n"),
+    ]);
+    skipped.check_markers(&skipped.load());
+    for directive in ["// @ts-nocheck", "// @ts-ignore", "// @ts-expect-error"] {
+        let source = format!(
+            "{directive}\nmodule /*@X:d*/X {{ export const /*@a:de*/a = 1; }}\n/*@X:u*/X./*@a:u*/a;\n"
+        );
+        let fixture = project(&[("app.ts", &source)]);
+        fixture.check_markers(&fixture.load());
+    }
+
+    // The other module declarations are unaffected.
+    let unaffected = project(&[
+        (
+            "types.d.ts",
+            "declare module \"virtual\" { export const /*@v:de*/v: number; }\n",
+        ),
+        (
+            "app.ts",
+            "import { /*@v:i*/v } from \"virtual\";\n\
+             declare global { interface /*@G:d*/G {} }\n\
+             namespace /*@N:d*/N { export const /*@n:de*/n = /*@v:u*/v; }\n\
+             let /*@g:d*/g: /*@G:u*/G;\n\
+             /*@N:u*/N./*@n:u*/n; /*@g:u*/g;\n",
+        ),
+    ]);
+    unaffected.check_markers(&unaffected.load());
 }

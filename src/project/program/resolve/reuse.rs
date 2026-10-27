@@ -2,7 +2,7 @@
 //! Disk owns physical evidence; Host owns first answers; this module owns
 //! which logical answers and side effects make a resolved path reusable.
 
-use super::{Host, PackageJson, Resolved, ResolvedPath};
+use super::{Host, PackageJson, Resolved, ResolvedPath, TypeReferenceOrigin};
 use crate::analysis::InputError;
 use crate::input::Case;
 use crate::project::binding::ResolutionMode;
@@ -12,6 +12,9 @@ use std::sync::Arc;
 
 pub(super) type Key = (String, String, Option<ResolutionMode>);
 
+/// A type reference's lookup also depends on where its name came from.
+pub(super) type TypesKey = (String, String, Option<ResolutionMode>, TypeReferenceOrigin);
+
 /// Only the last successful generation's reached lookups survive. Paths,
 /// rather than FileIds, let loading assign the current generation's identity
 /// and admission/provenance independently of a reused resolution.
@@ -19,7 +22,7 @@ pub(super) type Key = (String, String, Option<ResolutionMode>);
 pub(in crate::project::program) struct Reuse {
     context: Option<Arc<Context>>,
     modules: HashMap<Key, Arc<Saved<Resolved>>>,
-    types: HashMap<Key, Arc<Saved<Option<ResolvedPath>>>>,
+    types: HashMap<TypesKey, Arc<Saved<Option<ResolvedPath>>>>,
 }
 
 /// Compare the entire effective option set conservatively. This includes
@@ -73,7 +76,7 @@ impl<'a> State<'a> {
         self.previous?.modules.get(key).cloned()
     }
 
-    pub(super) fn types(&self, key: &Key) -> Option<Arc<Saved<Option<ResolvedPath>>>> {
+    pub(super) fn types(&self, key: &TypesKey) -> Option<Arc<Saved<Option<ResolvedPath>>>> {
         self.previous?.types.get(key).cloned()
     }
 
@@ -81,7 +84,7 @@ impl<'a> State<'a> {
         self.next.modules.insert(key, saved);
     }
 
-    pub(super) fn save_types(&mut self, key: Key, saved: Arc<Saved<Option<ResolvedPath>>>) {
+    pub(super) fn save_types(&mut self, key: TypesKey, saved: Arc<Saved<Option<ResolvedPath>>>) {
         self.next.types.insert(key, saved);
     }
 }

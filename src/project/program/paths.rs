@@ -17,6 +17,9 @@ pub(super) use relative::{RelativePaths, relative_with_case};
 pub(crate) struct FileLookup {
     case: Case,
     files: HashMap<String, (FileId, bool)>,
+    /// Spellings of the files that redirect to an input as duplicates of its
+    /// package (`super::Redirect`), each with why a request may not name it.
+    duplicates: HashMap<String, String>,
 }
 
 impl FileLookup {
@@ -24,6 +27,7 @@ impl FileLookup {
         Self {
             case,
             files: HashMap::new(),
+            duplicates: HashMap::new(),
         }
     }
 
@@ -32,24 +36,38 @@ impl FileLookup {
         self.files.insert(self.case.key(path), (file, searched));
     }
 
+    /// Record `path`, an absolute spelling of a file that redirects to an
+    /// input, with the reason a request naming it is refused.
+    pub(super) fn insert_duplicate(&mut self, path: &str, reason: String) {
+        self.duplicates.insert(self.case.key(path), reason);
+    }
+
     /// The searched file a query path names, matched lexically once made
     /// absolute (`absolute`), or `None` for none, including an empty path.
     /// A query path names a file only by its exact text: one that is not
     /// Unicode, which a lossy conversion could turn into another file's
-    /// name, is `Unsupported` (`input::exact_path`), not any file.
+    /// name, is `Unsupported` (`input::exact_path`), not any file. So is a
+    /// duplicate of a package another file is the program's input for: the
+    /// program's file has another file's text, so no operation answers for
+    /// the duplicate from it, or edits it in the duplicate's place.
     pub(crate) fn find(&self, path: &Path) -> Result<Option<FileId>, InputError> {
-        Ok(self
-            .entry(path)?
-            .and_then(|(file, searched)| searched.then_some(file)))
-    }
-
-    fn entry(&self, path: &Path) -> Result<Option<(FileId, bool)>, InputError> {
         if path.as_os_str().is_empty() {
             return Ok(None);
         }
         let absolute = Self::absolute(path)?;
-        let text = from_path(&absolute)?;
-        Ok(self.files.get(&self.case.key(&text)).copied())
+        let key = self.case.key(&from_path(&absolute)?);
+        if let Some(reason) = self.duplicates.get(&key) {
+            return Err(InputError {
+                kind: InputErrorKind::Unsupported,
+                message: reason.clone(),
+                path: Some(absolute),
+                position: None,
+            });
+        }
+        Ok(self
+            .files
+            .get(&key)
+            .and_then(|&(file, searched)| searched.then_some(file)))
     }
 
     /// A query path made absolute against the working directory, without

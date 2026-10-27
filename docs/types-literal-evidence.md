@@ -54,3 +54,47 @@ generic JSON escape policy. All four tests passed without skips in
 `vrun-4786237a-98d4-4590-a9de-457fd298d375` after the literal and shared printer
 changes. An intervening in-flight signature mismatch was only a compilation
 failure and is not native literal evidence.
+
+## Initializer widening
+
+`getWidenedLiteralTypeForInitializer` keeps an initializer's fresh literal type
+only for a constant declaration or one that `isDeclarationReadonly` accepts. That
+predicate is a combined `readonly` modifier on anything but a parameter
+property, so `constructor(private readonly key = KEY)` widens `KEY`'s `"value"` to
+`string` while a class's `readonly key = KEY;` keeps `"value"`. Before this fix the
+variable facts read the bare `readonly` modifier. A readonly parameter property
+whose default was a string, number, boolean, enum-member or template constant kept
+the literal type, so a call that passed another value consumed overload recovery,
+and member searches through that call reported an `overload_recovery` gap. The
+predicate now has one owner, `syntax::is_declaration_readonly`, which the
+variable facts use. Other readonly checks answer different questions
+(`isValidESSymbolDeclaration`, `isReadonlySymbol`, the pseudochecker's
+template rule) and are unchanged.
+
+`fixtures/types/native-initializer-literal-widening` pins 69 native 7.0.2 answers.
+The sources are a same-file constant and one reached through a named import, a
+renamed re-export, a star re-export and a namespace import. They also include
+`let` and `var` sources, number, boolean, enum-member, enum-access, plain and
+substituted template constants, `as const` values, and a fresh object's property
+beside a readonly object-type property. Each source is used as a `private readonly`
+parameter property's default and as a readonly class property's initializer. The
+declaration forms, each with an imported constant, are parameter properties with
+`private`, `protected` or `public` beside `readonly`, plain `readonly`, `override
+readonly`, `private` and `public` without `readonly`, a plain constructor parameter,
+function and arrow parameters, static readonly and mutable class properties, and
+`let` and `const` variables. Both sides of each parameter-property pair are
+asked: the parameter at its name, and the property through `this.name` inside a
+method and, for the public ones, from outside the class. The calls that pass
+other values must resolve.
+`fixtures/types/native-initializer-literal-widening-call` is the smallest shape:
+an imported constant as a readonly parameter property's default, and a call
+passing another string constant.
+
+`tools/type-initializer-literal-widening-oracle.test.mjs` takes every summary and
+member search from the compiler hook, which answers a parameter-property question
+the public API cannot. `tests/type_initializer_literal_widening.rs` asserts those
+summaries through `Project::type_of`. It also checks that `Forms.describe`'s
+member search is complete with the native occurrences, and that the CLI's
+`--type` and `--references` answer the small shape. All three tests failed before
+the fix: every readonly parameter property kept its literal, and the search
+reported the `overload_recovery` gap at the call.

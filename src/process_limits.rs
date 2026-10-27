@@ -8,7 +8,6 @@ use serde::{Deserialize, Serialize};
 use std::ffi::OsString;
 use std::fmt;
 use std::io;
-use std::path::PathBuf;
 use std::sync::{Condvar, Mutex};
 use std::time::{Duration, Instant};
 use typescript_parser::analysis::{
@@ -37,20 +36,13 @@ macro_rules! default_idle_secs {
         600
     };
 }
-/// The default runtime directory, before this user's id.
-macro_rules! default_service_dir_prefix {
-    () => {
-        "/tmp/tsparse-"
-    };
-}
-pub(crate) use {
-    default_idle_secs, default_memory_mb, default_service_dir_prefix, default_timeout_ms,
-};
+pub(crate) use {default_idle_secs, default_memory_mb, default_timeout_ms};
 
-/// The one reader of the `TSPARSE_*` variables that configure this program's
+/// The one reader of the variables that configure this program's
 /// processes: the query limits `TSPARSE_MAX_MEMORY_MB` and
-/// `TSPARSE_QUERY_TIMEOUT_MS`, and the service's `TSPARSE_SERVICE_IDLE_SECS`
-/// and `TSPARSE_SERVICE_DIR`. A client and the service it starts read the
+/// `TSPARSE_QUERY_TIMEOUT_MS`, the service's `TSPARSE_SERVICE_IDLE_SECS`, and
+/// `TSPARSE_SERVICE_DIR` and `TMPDIR`, which choose its runtime directory
+/// (`service::runtime`). A client and the service it starts read the
 /// same environment, so a client that reads it before starting a service
 /// reports an invalid value as the service would have, and starts nothing.
 pub(crate) struct Environment {
@@ -87,30 +79,20 @@ impl Environment {
         self.idle
     }
 
-    /// The service's runtime directory: `TSPARSE_SERVICE_DIR`, any path, or
-    /// `/tmp/tsparse-UID` when it is not set.
-    pub(crate) fn service_dir() -> PathBuf {
-        Self::directory().0
-    }
-
-    /// The runtime directory, and whether it is the default.
-    fn directory() -> (PathBuf, bool) {
-        match std::env::var_os(SERVICE_DIR) {
-            Some(directory) => (PathBuf::from(directory), false),
-            None => (
-                PathBuf::from(format!(
-                    concat!(default_service_dir_prefix!(), "{}"),
-                    crate::service::user_id()
-                )),
-                true,
-            ),
+    /// The variables that choose the service's runtime directory, each as
+    /// the environment sets it, for `service::runtime::choose`.
+    pub(crate) fn runtime_variables() -> RuntimeVariables {
+        RuntimeVariables {
+            service_dir: std::env::var_os(SERVICE_DIR),
+            tmpdir: std::env::var_os(TMPDIR),
         }
     }
 
     /// What the environment sets each variable to, in this order: the
     /// limits, the idle time, and the runtime directory, each as `read`
-    /// and `service_dir` take it, so the doctor reports every invalid
-    /// value, not only the first.
+    /// and `service::runtime::choose` take it, so the doctor reports every
+    /// invalid value, not only the first. The runtime directory is the
+    /// default when `TSPARSE_SERVICE_DIR` does not name it.
     pub(crate) fn settings() -> Vec<Setting> {
         let mut settings: Vec<Setting> = [&MEMORY_MB, &TIMEOUT_MS, &IDLE_SECS]
             .into_iter()
@@ -128,14 +110,22 @@ impl Environment {
                 Err(invalid) => Setting::Invalid(invalid.to_string()),
             })
             .collect();
-        let (directory, default) = Self::directory();
+        let chosen =
+            crate::service::runtime::choose(Self::runtime_variables(), crate::service::user_id());
         settings.push(Setting::Valid {
             name: SERVICE_DIR,
-            value: directory.display().to_string(),
-            default,
+            value: chosen.path.display().to_string(),
+            default: !matches!(chosen.rule, crate::service::runtime::Rule::Variable),
         });
         settings
     }
+}
+
+/// The variables that choose the service's runtime directory, each as the
+/// environment sets it, or `None` when it is not set.
+pub(crate) struct RuntimeVariables {
+    pub(crate) service_dir: Option<OsString>,
+    pub(crate) tmpdir: Option<OsString>,
 }
 
 /// What the environment sets one variable to.
@@ -153,6 +143,10 @@ pub(crate) enum Setting {
 /// The variable that names the service's runtime directory, which a client
 /// also sets for the service it starts, so that both use one directory.
 pub(crate) const SERVICE_DIR: &str = "TSPARSE_SERVICE_DIR";
+
+/// The variable that names the directory for temporary files, in which the
+/// runtime directory is chosen when `SERVICE_DIR` is not set.
+const TMPDIR: &str = "TMPDIR";
 
 /// A positive integer variable: a value that is not set takes `default`;
 /// any other must be an integer from 1 through `maximum`.

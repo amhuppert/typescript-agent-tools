@@ -141,6 +141,11 @@ impl File {
             jsx: _,
             // The Diagnostics product already owns directive coverage.
             directives: _,
+            // Loading already failed on the reported errors.
+            source_candidates: _,
+            javascript_syntax: _,
+            parameter_decorators: _,
+            javascript_refusals: _,
         } = facts;
         assert_eq!(facts.refs.len(), sources.len());
         let refs = facts

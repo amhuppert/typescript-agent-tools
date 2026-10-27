@@ -417,6 +417,8 @@ impl Evaluator<'_, '_> {
                         self.fill_missing_type_arguments_completion(
                             arguments,
                             &target.local_parameters,
+                            self.inputs
+                                .in_javascript_file(recipe.recipe.declaration.file),
                             &recipe.consumer,
                         )
                         .map(|value| {

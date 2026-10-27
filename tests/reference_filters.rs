@@ -125,6 +125,43 @@ fn no_tests_is_an_exact_path_filter_and_does_not_remove_declarations() {
     );
 }
 
+/// JavaScript inputs follow the same test-path policy, by their own
+/// extensions.
+#[test]
+fn no_tests_filters_javascript_test_paths_too() {
+    let fixture = support::Fixture::new(&[
+        (
+            "tsconfig.json",
+            r#"{ "compilerOptions": { "noLib": true, "allowJs": true, "noEmit": true } }"#,
+        ),
+        ("decl.ts", "export function run() {}"),
+        ("a.test.js", "import { run } from \"./decl\"; run();"),
+        ("a.spec.jsx", "import { run } from \"./decl\"; run();"),
+        ("b.test.mjs", "import { run } from \"./decl\"; run();"),
+        ("c.spec.cjs", "import { run } from \"./decl\"; run();"),
+        ("kept.js", "import { run } from \"./decl\"; run();"),
+    ]);
+    let output = Command::new(env!("CARGO_BIN_EXE_tsparse"))
+        .args(["--references", "--direct", "--project"])
+        .arg(fixture.path("tsconfig.json"))
+        .args(["--name", "run", "--calls", "--no-tests", "--json"])
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let document: Value = serde_json::from_slice(&output.stdout).unwrap();
+    let actual: Vec<_> = document["groups"][0]["occurrences"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|occurrence| occurrence["location"]["file"].as_str().unwrap())
+        .collect();
+    assert_eq!(actual, ["kept.js"]);
+}
+
 #[test]
 fn test_directory_matching_preserves_case_on_case_insensitive_filesystems_too() {
     let fixture = project(&[
